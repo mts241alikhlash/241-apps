@@ -61,7 +61,7 @@ const identityEnv = readEnv(envFile('identity'))
 
 function databaseUrl(service) {
   const url = new URL(identityEnv.DATABASE_URL)
-  url.pathname = `/${service}_service`
+  url.pathname = `/${service}`
   return url.toString()
 }
 
@@ -103,7 +103,7 @@ async function ensureDatabase(service) {
   const client = new Client({ connectionString: admin.toString() })
   await client.connect()
   try {
-    const name = `${service}_service`
+    const name = service
     const found = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [name])
     if (found.rowCount === 0) {
       await client.query(`CREATE DATABASE "${name}"`)
@@ -170,19 +170,46 @@ function run(label, command, args, cwd) {
   start()
 }
 
-const databasePort = Number(new URL(identityEnv.DATABASE_URL).port || 5432)
-if (!(await portBusy(databasePort))) {
-  console.log(`starting the dev Postgres on :${databasePort}`)
+const STORAGE = [
+  { port: Number(new URL(identityEnv.DATABASE_URL).port || 5432), container: /^241-apps[-_]postgres[-_]1$/, label: 'Postgres' },
+  { port: 9000, container: /^241-apps[-_]s3[-_]1$/, label: 'S3' },
+]
+
+function containerOnPort(port) {
+  return execFileSync('docker', ['ps', '--filter', `publish=${port}`, '--format', '{{.Names}}'], {
+    encoding: 'utf8',
+  }).trim()
+}
+
+let startStorage = false
+for (const { port, container, label } of STORAGE) {
+  if (!(await portBusy(port))) {
+    startStorage = true
+    continue
+  }
+  const owner = containerOnPort(port)
+  if (!container.test(owner)) {
+    console.error(
+      `:${port} is busy with ${owner ? `container ${owner}` : 'a process that is not a container'}, not the 241-apps ${label} container. Stop it first so ${label} can run from infra/compose/compose.yaml.`,
+    )
+    process.exit(1)
+  }
+}
+if (startStorage) {
+  console.log('starting the local Postgres and S3 (compose profile storage)')
   execFileSync(
     'docker',
     [
       'compose',
       '-f',
-      path.join(workspace, 'infra/compose/docker-compose.dev.yml'),
+      path.join(workspace, 'infra/compose/compose.yaml'),
+      '--profile',
+      'storage',
       'up',
       '-d',
       '--wait',
       'postgres',
+      's3',
     ],
     { stdio: 'inherit' },
   )
