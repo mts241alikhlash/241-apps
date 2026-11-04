@@ -20,7 +20,6 @@ overrides:
   '@vue/test-utils': '2.5.0'
   'vue-component-type-helpers': '3.3.11'
   '@nestjs/swagger': '12.0.1'
-  'eslint-plugin-vue': '10.10.0'
   'vue-tsc': '3.3.11'
   '@vue/language-core': '3.3.11'
 

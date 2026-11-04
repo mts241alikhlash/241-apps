@@ -35,7 +35,7 @@ function navigateToEdit(eventObj: CalendarEventData) {
 }
 
 onMounted(() => {
-  void tableViewRef
+  void tableViewRef.value
   void fetchTableEvents()
 })
 </script>

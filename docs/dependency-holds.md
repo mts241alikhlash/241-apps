@@ -21,7 +21,6 @@ Record of dependencies kept below their latest version. Phase 2e moves these int
 | `@vue/test-utils` | 2.5.0 pinned by patch 1b-3-pins | 2.5.1 with vue-component-type-helpers 3.3.14 leaves spec types unresolved in typed ESLint; release when that is fixed upstream |
 | `vue-component-type-helpers` | 3.3.11 pinned with @vue/test-utils | release together |
 | `@nestjs/swagger` | 12.0.1 pinned by patch 1b-3-pins | 12.1.0 emits OpenAPI that differs from tracked contracts; release when contracts are regenerated with 12.1.x |
-| `eslint-plugin-vue` | 10.10.0 pinned by patch 1b-3-pins | 10.12 vue/no-ref-as-operand flags void tableViewRef in academic-web; release when that code is fixed |
 | `vue-tsc` | 3.3.11 pinned with @vue/language-core by patch 1b-3-pins | 3.3.14 breaks pinia store .value typing in portal-web typecheck; release when portal-web store usage is fixed |
 | `@vue/language-core` | 3.3.11 pinned with vue-tsc | release together |
 | `@fullcalendar/core` | stay on 6.x | v7 removes core/daygrid/interaction (no v7 release of daygrid/interaction; plugins move to @fullcalendar/vue3/*), renames Arg types to Info, uses Temporal dates and needs theme plugin + CSS imports; release when AcademicCalendarGridView.vue is migrated as its own step with a visual check |
