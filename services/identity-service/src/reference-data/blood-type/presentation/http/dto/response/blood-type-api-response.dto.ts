@@ -1,5 +1,5 @@
 import type { GetBloodTypesUseCase } from '../../../../application/use-cases/get-blood-types/get-blood-types.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { BloodTypeEntity } from '../../../../domain/entities/blood-type.entity.js'
 
 export class BloodTypeItemResponseDto {

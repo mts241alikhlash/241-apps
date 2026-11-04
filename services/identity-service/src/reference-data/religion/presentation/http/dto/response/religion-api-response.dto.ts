@@ -1,5 +1,5 @@
 import type { GetReligionsUseCase } from '../../../../application/use-cases/get-religions/get-religions.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { ReligionEntity } from '../../../../domain/entities/religion.entity.js'
 
 export class ReligionItemResponseDto {

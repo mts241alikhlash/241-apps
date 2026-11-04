@@ -1,6 +1,6 @@
 import type { MarkNotificationReadUseCase } from '../../../../application/use-cases/mark-notification-read/mark-notification-read.use-case.js'
 import type { AdmissionNotificationList } from '../../../../domain/repositories/admission-notification-repository.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { AdmissionNotificationEntity } from '../../../../domain/entities/admission-notification.entity.js'
 
 export class AdmissionNotificationResponseDto {

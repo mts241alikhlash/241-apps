@@ -1,5 +1,5 @@
 import type { DeleteSchoolUnitTypeUseCase } from '../../../../application/use-cases/delete-school-unit-type/delete-school-unit-type.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { SchoolUnitTypeEntity } from '../../../../domain/entities/school-unit-type.entity.js'
 
 export class SchoolUnitTypeItemResponseDto {

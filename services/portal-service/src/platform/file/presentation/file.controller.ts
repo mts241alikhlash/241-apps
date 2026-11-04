@@ -32,7 +32,6 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
-import { FileResponseDto } from '../dto/response/file-response.dto.js'
 import { UploadFileUseCase } from '../use-cases/upload-file.use-case.js'
 import { GetFilesUseCase } from '../use-cases/get-files.use-case.js'
 import { DeleteFileUseCase } from '../use-cases/delete-file.use-case.js'

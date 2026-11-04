@@ -1,10 +1,7 @@
 import { NotFoundException } from '@nestjs/common'
 import { GetMyStudentUseCase } from './get-my-student.use-case.js'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
-import {
-  IProfileLookupPort,
-  ProfileSummary,
-} from '../../../../platform/profile-lookup/profile-lookup.port.js'
+import { ProfileSummary } from '../../../../platform/profile-lookup/profile-lookup.port.js'
 
 describe('GetMyStudentUseCase', () => {
   function makeUseCase(options: {

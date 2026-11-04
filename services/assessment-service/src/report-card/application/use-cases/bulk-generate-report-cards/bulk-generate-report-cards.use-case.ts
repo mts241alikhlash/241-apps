@@ -1,5 +1,4 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common'
-import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 import { BULK_GENERATE_ENROLLMENT_LIMIT } from '../../../constants/report-card.constants.js'
 import { GenerateReportCardUseCase } from '../generate-report-card/generate-report-card.use-case.js'

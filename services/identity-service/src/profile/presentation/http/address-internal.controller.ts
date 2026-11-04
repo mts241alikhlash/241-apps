@@ -15,10 +15,7 @@ import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.
 import { IProfileAddressRepository } from '../../domain/repositories/profile-address.repository.js'
 import { ProfileAddressService } from '../../application/services/profile-address.service.js'
 import { CreateAddressDto } from './dto/request/address.dto.js'
-import {
-  AddressBatchResponseDto,
-  AddressSingleResponseDto,
-} from './dto/response/address-response.dto.js'
+import { AddressBatchResponseDto } from './dto/response/address-response.dto.js'
 
 export class RecordAddressDto extends CreateAddressDto {
   @ApiProperty({ format: 'uuid' })

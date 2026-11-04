@@ -1,8 +1,5 @@
 import { PrismaAssetUnitRepository } from './prisma-asset-unit.repository.js'
 import type { IAssetRepository } from '../../../domain/repositories/asset.repository.js'
-import type { IAssetConditionLookupPort } from '../../../domain/repositories/condition-lookup.port.js'
-import type { IAssetLocationLookupPort } from '../../../domain/repositories/location-lookup.port.js'
-import type { IAssetStatusLookupPort } from '../../../domain/repositories/status-lookup.port.js'
 import type { PrismaService } from '../../../../../core/database/prisma.service.js'
 import type { AssetUnitQueryInput } from '../../../domain/repositories/asset-unit.repository.js'
 

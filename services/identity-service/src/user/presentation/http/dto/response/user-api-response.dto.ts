@@ -1,7 +1,7 @@
 import type { ProvisionAccountUseCase } from '../../../../application/use-cases/provision-account/provision-account.use-case.js'
 import type { UserSummary } from '../../../../domain/repositories/user.repository.js'
 import type { GetUsersUseCase } from '../../../../application/use-cases/get-users/get-users.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { UserPublic } from '../../../../domain/entities/user.entity.js'
 
 export class UserPublicResponseDto {

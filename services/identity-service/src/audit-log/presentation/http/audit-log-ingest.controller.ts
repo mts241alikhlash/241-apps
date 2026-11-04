@@ -5,7 +5,6 @@ import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { CreateAuditLogUseCase } from '../../application/use-cases/create-audit-log/create-audit-log.use-case.js'
 import { IngestAuditLogDto } from './dto/request/ingest-audit-log.dto.js'
-import { AuditLogResponseDto } from './dto/response/audit-log-response.dto.js'
 
 @ApiTags('Audit Logs')
 @Public()

@@ -5,13 +5,11 @@ import {
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
   Query,
   UseGuards,
@@ -21,10 +19,6 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import type {
-  LeaveBalanceRow,
-  LeaveRequestWithDetails,
-} from '../domain/entities/leave.entity.js'
 import { DecideLeaveRequestDto } from '../dto/request/decide-leave-request.dto.js'
 import { LeaveRequestQueryDto } from '../dto/request/leave-request-query.dto.js'
 import { SubmitLeaveRequestDto } from '../dto/request/submit-leave-request.dto.js'

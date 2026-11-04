@@ -841,18 +841,13 @@ describe('ProcessApprovalUseCase', () => {
   })
 
   it('returns a retryable failed result and stores a safe consequence error', async () => {
-    const {
-      useCase,
-      loanCapability,
-      transitionLogConsequence,
-      makeLog,
-      roleCodes,
-    } = makeRepository({
-      steps: [
-        { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
-      ],
-      roleCodes: ['ADMIN'],
-    })
+    const { useCase, loanCapability, transitionLogConsequence, roleCodes } =
+      makeRepository({
+        steps: [
+          { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
+        ],
+        roleCodes: ['ADMIN'],
+      })
     const downstreamError = new Error('database host and credentials leaked')
     loanCapability.updateStatus.mockRejectedValue(downstreamError)
 
@@ -1023,7 +1018,6 @@ describe('ProcessApprovalUseCase', () => {
       useCase,
       transitionLogConsequence,
       loanCapability,
-      makeLog,
       repository,
       roleCodes,
     } = makeRepository({
@@ -1548,20 +1542,15 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: 'Previous safe error',
       consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
     }
-    const {
-      useCase,
-      transitionLogConsequence,
-      loanCapability,
-      makeLog,
-      roleCodes,
-    } = makeRepository({
-      steps: [
-        { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
-      ],
-      statusId: 'st-approved',
-      existingLog: failedLog,
-      roleCodes: ['ADMIN'],
-    })
+    const { useCase, transitionLogConsequence, loanCapability, roleCodes } =
+      makeRepository({
+        steps: [
+          { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
+        ],
+        statusId: 'st-approved',
+        existingLog: failedLog,
+        roleCodes: ['ADMIN'],
+      })
     transitionLogConsequence.mockResolvedValueOnce({
       log: { ...failedLog, consequenceStatus: 'PENDING' as const },
       transitioned: true,
@@ -1697,18 +1686,13 @@ describe('ProcessApprovalUseCase', () => {
   })
 
   it('propagates the downstream error when failure state cannot be saved', async () => {
-    const {
-      useCase,
-      loanCapability,
-      transitionLogConsequence,
-      makeLog,
-      roleCodes,
-    } = makeRepository({
-      steps: [
-        { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
-      ],
-      roleCodes: ['ADMIN'],
-    })
+    const { useCase, loanCapability, transitionLogConsequence, roleCodes } =
+      makeRepository({
+        steps: [
+          { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
+        ],
+        roleCodes: ['ADMIN'],
+      })
     const downstreamError = new Error('loan service unavailable')
     loanCapability.updateStatus.mockRejectedValue(downstreamError)
     transitionLogConsequence.mockRejectedValueOnce(
@@ -1841,20 +1825,15 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: 'Previous safe error',
       consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
     }
-    const {
-      useCase,
-      transitionLogConsequence,
-      loanCapability,
-      makeLog,
-      roleCodes,
-    } = makeRepository({
-      steps: [
-        { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
-      ],
-      statusId: 'st-approved',
-      existingLog: failedLog,
-      roleCodes: ['ADMIN'],
-    })
+    const { useCase, transitionLogConsequence, loanCapability, roleCodes } =
+      makeRepository({
+        steps: [
+          { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
+        ],
+        statusId: 'st-approved',
+        existingLog: failedLog,
+        roleCodes: ['ADMIN'],
+      })
     transitionLogConsequence.mockResolvedValueOnce({
       log: failedLog,
       transitioned: false,
@@ -2027,18 +2006,13 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: 'Stored safe error',
       consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
     }
-    const {
-      useCase,
-      transitionLogConsequence,
-      loanCapability,
-      makeLog,
-      roleCodes,
-    } = makeRepository({
-      steps: [
-        { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
-      ],
-      roleCodes: ['ADMIN'],
-    })
+    const { useCase, transitionLogConsequence, loanCapability, roleCodes } =
+      makeRepository({
+        steps: [
+          { stepSequence: 1, approverRoleCode: 'ADMIN', isMandatory: true },
+        ],
+        roleCodes: ['ADMIN'],
+      })
     transitionLogConsequence.mockResolvedValueOnce({
       log: failedLog,
       transitioned: false,

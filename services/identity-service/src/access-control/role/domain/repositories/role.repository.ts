@@ -1,4 +1,3 @@
-import { PermissionEntity } from '../../../domain/entities/permission.entity.js'
 import {
   RoleEntity,
   RoleWithPermissionsEntity,

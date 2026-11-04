@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import type { IAdmissionDocumentRepository } from '../../../domain/repositories/admission-document-repository.js'
-import type { IAdmissionFileStorage } from '../../../domain/repositories/admission-file-storage.js'
 import { UploadAttachmentUseCase } from './upload-attachment.use-case.js'
 
 const file = (overrides: Record<string, unknown> = {}) => ({

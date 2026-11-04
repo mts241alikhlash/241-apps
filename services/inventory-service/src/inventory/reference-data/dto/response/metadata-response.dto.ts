@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { GetMetadataUseCase } from '../../use-cases/get-metadata.use-case.js'
 
 export class InventoryMetadataResponseCategoriesDto {

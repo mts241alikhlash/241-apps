@@ -24,7 +24,7 @@ export class PrismaTimeSlotRepository extends ITimeSlotRepository {
     return new Date(`1970-01-01T${timeStr}:00.000Z`)
   }
 
-  async findAll(query?: TimeSlotQueryInput) {
+  async findAll(_query?: TimeSlotQueryInput) {
     const data = await this.prisma.timeSlot.findMany({
       where: { deletedAt: null },
       include: TIME_SLOT_WITH_TYPE_INCLUDE,

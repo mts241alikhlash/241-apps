@@ -19,7 +19,6 @@ import {
   HISTORY_WITH_TRANSACTION_TYPE_INCLUDE,
   LOAN_DETAILS_INCLUDE,
   LOAN_WITH_DETAILS_INCLUDE,
-  type HistoryWithTransactionType,
   type LoanDetailsRecord,
 } from './prisma-circulation.includes.js'
 import {

@@ -2,13 +2,11 @@ import 'reflect-metadata'
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '../core/database/prisma.service.js'
 import { PrismaModule } from '../core/database/prisma.module.js'
-import { ApprovalModule } from './approval/approval.module.js'
 import { PrismaApprovalRepository } from './approval/infrastructure/persistence/prisma/prisma-approval.repository.js'
 import {
   IApprovalCapabilityPort,
   IApprovalRepository,
 } from './approval/index.js'
-import { AssetModule } from './asset/asset.module.js'
 import { PrismaAssetRepository } from './asset/infrastructure/persistence/prisma/prisma-asset.repository.js'
 import { PrismaAssetUnitRepository } from './asset/infrastructure/persistence/prisma/prisma-asset-unit.repository.js'
 import {
@@ -23,7 +21,6 @@ import {
   IAssetUnitMutationPort,
   IAssetUnitRepository,
 } from './asset/index.js'
-import { CirculationModule } from './circulation/circulation.module.js'
 import { PrismaCirculationRepository } from './circulation/infrastructure/persistence/prisma/prisma-circulation.repository.js'
 import {
   IHistoryCapabilityPort,

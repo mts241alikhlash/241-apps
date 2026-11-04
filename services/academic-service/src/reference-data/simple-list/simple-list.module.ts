@@ -6,7 +6,6 @@ import { SimpleListService } from './simple-list.service.js'
 import type {
   ISimpleListUsage,
   SimpleListDefinition,
-  SimpleListDelegate,
 } from './simple-list.types.js'
 
 export const simpleListRepositoryToken = (definition: SimpleListDefinition) =>

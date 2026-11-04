@@ -27,10 +27,6 @@ import {
   CreateAddressDto,
   UpdateAddressDto,
 } from './dto/request/address.dto.js'
-import {
-  AddressListResponseDto,
-  AddressSingleResponseDto,
-} from './dto/response/address-response.dto.js'
 
 @ApiTags('Profiles')
 @ApiBearerAuth()

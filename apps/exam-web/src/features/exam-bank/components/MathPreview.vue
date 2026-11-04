@@ -9,9 +9,11 @@ const html = computed(() => renderLatex(props.latex))
 </script>
 
 <template>
+  <!-- eslint-disable vue/no-v-html -- KaTeX output, rendered with trust off -->
   <div
     class="min-h-8 overflow-x-auto rounded-md border bg-muted/30 px-3 py-2"
     data-testid="math-preview"
     v-html="html"
   />
+  <!-- eslint-enable vue/no-v-html -->
 </template>

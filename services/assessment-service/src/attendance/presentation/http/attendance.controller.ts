@@ -42,10 +42,7 @@ import { DeleteAttendanceUseCase } from '../../application/use-cases/delete-atte
 import { BulkUpsertAttendanceUseCase } from '../../application/use-cases/bulk-upsert-attendance/bulk-upsert-attendance.use-case.js'
 import { GetAttendanceRecapUseCase } from '../../application/use-cases/get-attendance-recap/get-attendance-recap.use-case.js'
 import { GetAttendanceTrendUseCase } from '../../application/use-cases/get-attendance-trend/get-attendance-trend.use-case.js'
-import {
-  AttendanceSuggestionResult,
-  GetAttendanceSuggestionsUseCase,
-} from '../../application/use-cases/get-attendance-suggestions/get-attendance-suggestions.use-case.js'
+import { GetAttendanceSuggestionsUseCase } from '../../application/use-cases/get-attendance-suggestions/get-attendance-suggestions.use-case.js'
 import { AttendanceSuggestionQueryDto } from './dto/request/attendance-suggestion-query.dto.js'
 
 @ApiTags('Attendances')

@@ -21,7 +21,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../auth/index.js'
-import { SchoolUnitSocialMediaResponseDto } from './dto/response/school-unit-social-media-response.dto.js'
 import { CreateSchoolUnitSocialMediaDto } from './dto/request/create-school-unit-social-media.dto.js'
 import { UpdateSchoolUnitSocialMediaDto } from './dto/request/update-school-unit-social-media.dto.js'
 import { SchoolUnitSocialMediaUseCase } from '../../application/use-cases/school-unit-social-media/school-unit-social-media.use-case.js'

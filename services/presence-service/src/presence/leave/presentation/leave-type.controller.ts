@@ -13,7 +13,6 @@ import {
 import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import type { LeaveTypeEntity } from '../domain/entities/leave.entity.js'
 import { CreateLeaveTypeDto } from '../dto/request/create-leave-type.dto.js'
 import { UpdateLeaveTypeDto } from '../dto/request/update-leave-type.dto.js'
 import { LeaveTypeResponseDto } from '../dto/response/leave-type-response.dto.js'

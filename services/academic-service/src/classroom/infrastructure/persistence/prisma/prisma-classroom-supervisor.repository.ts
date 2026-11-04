@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import {
-  ClassroomSupervisor,
-  Prisma,
-} from '../../../../generated/prisma/client.js'
+import { Prisma } from '../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { resolveSemesterId } from '../../../../shared/utils/active-academic-year.helper.js'
 import { ClassroomSupervisorEntity } from '../../../domain/entities/classroom-supervisor.entity.js'

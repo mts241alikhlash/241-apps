@@ -15,7 +15,6 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import type { AttendancePeriodEntity } from '../domain/entities/attendance-period.entity.js'
 import { CloseAttendancePeriodUseCase } from '../use-cases/close-attendance-period.use-case.js'
 import { GetAttendancePeriodsUseCase } from '../use-cases/get-attendance-periods.use-case.js'
 

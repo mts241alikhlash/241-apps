@@ -39,12 +39,14 @@ function openEdit(item: T) {
 }
 
 async function handleAddSave(payload: Record<string, unknown>) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- vue-tsc needs the cast; typed lint sees the SFC generic as unconstrained
   const success = await create(payload as TCreate)
   if (success) isAddOpen.value = false
 }
 
 async function handleEditSave(payload: Record<string, unknown>) {
   if (!selectedItem.value) return
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- vue-tsc needs the cast; typed lint sees the SFC generic as unconstrained
   const success = await update(selectedItem.value.id, payload as TUpdate)
   if (success) isEditOpen.value = false
 }

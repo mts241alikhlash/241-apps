@@ -5,11 +5,7 @@ import {
   StudentResponseDto,
 } from './dto/response/student-response.dto.js'
 import { MyClassroomResponseDto } from './dto/response/my-classroom-response.dto.js'
-import {
-  GetMyClassroomUseCase,
-  type MyClassroom,
-} from '../../application/use-cases/get-my-classroom/get-my-classroom.use-case.js'
-import type { UserEntity } from '../../../shared/domain/entities/user.entity.js'
+import { GetMyClassroomUseCase } from '../../application/use-cases/get-my-classroom/get-my-classroom.use-case.js'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
@@ -48,12 +44,10 @@ import { GetMyStudentUseCase } from '../../application/use-cases/get-my-student/
 import { GetStudentsUseCase } from '../../application/use-cases/get-students/get-students.use-case.js'
 import { ToggleStudentActiveUseCase } from '../../application/use-cases/toggle-student-active/toggle-student-active.use-case.js'
 import { UpdateStudentUseCase } from '../../application/use-cases/update-student/update-student.use-case.js'
-import { StudentWithDetails } from '../../domain/repositories/student.repository.js'
 import { CreateStudentWithRelationsDto } from './dto/request/create-student-with-relations.dto.js'
 import { EnrollExistingAccountDto } from './dto/request/enroll-existing-account.dto.js'
 import { EnrollExistingAccountResponseDto } from './dto/response/enroll-existing-account-response.dto.js'
 import { EnrollExistingAccountUseCase } from '../../application/use-cases/enroll-existing-account/enroll-existing-account.use-case.js'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Students')
 @ApiBearerAuth()

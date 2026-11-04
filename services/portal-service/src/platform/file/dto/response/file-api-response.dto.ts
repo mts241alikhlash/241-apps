@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { UploadFileUseCase } from '../../use-cases/upload-file.use-case.js'
 
 export class PortalFileResponseDto {

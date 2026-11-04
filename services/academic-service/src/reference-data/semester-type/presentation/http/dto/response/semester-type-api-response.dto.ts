@@ -1,5 +1,5 @@
 import type { GetSemesterTypesUseCase } from '../../../../application/use-cases/get-semester-types/get-semester-types.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { SemesterTypeEntity } from '../../../../domain/entities/semester-type.entity.js'
 
 export class SemesterTypeItemResponseDto {

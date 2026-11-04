@@ -1,5 +1,5 @@
 import type { GetMediaUsageUseCase } from '../../use-cases/get-media-usage.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { GetMediaLibraryUseCase } from '../../use-cases/get-media-library.use-case.js'
 
 export class MediaLibraryItemResponseDto {

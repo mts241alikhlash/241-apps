@@ -7,10 +7,7 @@ import { StudentStatusEnum } from '@mts241alikhlash/nest-core/domain'
 import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 import { IncomeRange } from '@mts241alikhlash/nest-core/domain'
 import { UserEntity } from '../../../shared/domain/entities/user.entity.js'
-import {
-  ProfileEntity,
-  ProfileUpdateInput,
-} from '../../../platform/profile/domain/entities/profile.entity.js'
+import { ProfileUpdateInput } from '../../../platform/profile/domain/entities/profile.entity.js'
 import { StudentEntity } from '../entities/student.entity.js'
 import {
   StudentExportWithDetails,

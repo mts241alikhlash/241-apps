@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
-import { PostType } from '../domain/enums/post-type.enum.js'
 import { IPostRepository } from '../domain/interfaces/post-repository.interface.js'
 import { PublicPostQueryDto } from '../dto/request/public-post-query.dto.js'
 import { PostSummaryDto } from '../dto/response/post-detail.dto.js'

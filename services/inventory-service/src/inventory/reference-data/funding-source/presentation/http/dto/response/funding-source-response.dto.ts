@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { InventoryFundingSourceEntity } from '../../../../domain/entities/funding-source.entity.js'
 
 export class InventoryFundingSourceResponseDto {

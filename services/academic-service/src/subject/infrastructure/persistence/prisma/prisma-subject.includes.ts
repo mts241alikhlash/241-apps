@@ -6,13 +6,11 @@ const TEACHING_ASSIGNMENT_SELECT = {
   classroom: { select: { id: true, name: true } },
 } satisfies Prisma.TeachingAssignmentSelect
 
-const SUBJECT_INCLUDE_SHAPE = {
-  _count: { select: { teachingAssignments: true } },
-  teachingAssignments: { select: TEACHING_ASSIGNMENT_SELECT },
-} satisfies Prisma.SubjectInclude
-
 export type SubjectRow = Prisma.SubjectGetPayload<{
-  include: typeof SUBJECT_INCLUDE_SHAPE
+  include: {
+    _count: { select: { teachingAssignments: true } }
+    teachingAssignments: { select: typeof TEACHING_ASSIGNMENT_SELECT }
+  }
 }>
 
 export function buildSubjectInclude(activeSemesterId: string | null) {

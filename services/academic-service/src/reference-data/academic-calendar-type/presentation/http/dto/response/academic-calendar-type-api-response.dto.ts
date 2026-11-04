@@ -1,5 +1,5 @@
 import type { GetAcademicCalendarTypesUseCase } from '../../../../application/use-cases/get-academic-calendar-types/get-academic-calendar-types.use-case.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { AcademicCalendarTypeEntity } from '../../../../domain/entities/academic-calendar-type.entity.js'
 
 export class AcademicCalendarTypeItemResponseDto {

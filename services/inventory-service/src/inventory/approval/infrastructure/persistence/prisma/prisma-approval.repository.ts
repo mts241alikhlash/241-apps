@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import type { Prisma } from '../../../../../generated/prisma/client.js'
-import type { ApprovalLog } from '../../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../../core/database/prisma.service.js'
 import {
   IApprovalRepository,

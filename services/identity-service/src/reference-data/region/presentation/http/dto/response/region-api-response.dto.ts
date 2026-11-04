@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { RegionEntity } from '../../../../domain/repositories/region.repository.js'
 
 export class RegionNodeResponseDto {

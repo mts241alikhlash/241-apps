@@ -2,7 +2,6 @@ import {
   SemesterTypeItemResponseDto,
   SemesterTypePageResponseDto,
 } from './dto/response/semester-type-api-response.dto.js'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
@@ -25,7 +24,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { SemesterType } from '../../domain/repositories/semester-type.repository.js'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateSemesterTypeDto } from './dto/request/create-semester-type.dto.js'
 import { SemesterTypeQueryDto } from './dto/request/semester-type-query.dto.js'

@@ -13,10 +13,6 @@ import {
 
 import { JwtAuthGuard } from '../../../auth/index.js'
 import { AuditLogQueryDto } from './dto/request/audit-log-query.dto.js'
-import {
-  AuditLogResponseDto,
-  AuditLogSummaryResponseDto,
-} from './dto/response/audit-log-response.dto.js'
 import { GetAuditLogSummaryUseCase } from '../../application/use-cases/get-audit-log-summary/get-audit-log-summary.use-case.js'
 import { GetAuditLogsUseCase } from '../../application/use-cases/get-audit-logs/get-audit-logs.use-case.js'
 

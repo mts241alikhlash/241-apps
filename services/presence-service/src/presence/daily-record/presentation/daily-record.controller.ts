@@ -22,12 +22,6 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
-import { DailyPresenceEntity } from '../domain/entities/daily-presence.entity.js'
-import type {
-  DailyPresenceWithDetails,
-  PresenceRecap,
-} from '../domain/interfaces/daily-presence-recap.interface.js'
 import { CreateDailyPresenceDto } from '../dto/request/create-daily-presence.dto.js'
 import { DailyPresenceQueryDto } from '../dto/request/daily-presence-query.dto.js'
 import { MyPresenceQueryDto } from '../dto/request/my-presence-query.dto.js'
@@ -35,7 +29,6 @@ import { PresenceRecapQueryDto } from '../dto/request/presence-recap-query.dto.j
 import { UpdateDailyPresenceDto } from '../dto/request/update-daily-presence.dto.js'
 import { CreateDailyPresenceUseCase } from '../use-cases/create-daily-presence.use-case.js'
 import {
-  DailyPresenceDetail,
   GetDailyPresenceByIdUseCase,
   GetDailyPresencesUseCase,
   GetMyDailyPresencesUseCase,
@@ -43,7 +36,6 @@ import {
 import {
   ExportPresenceRecapUseCase,
   GetPresenceRecapUseCase,
-  RecapExportRow,
 } from '../use-cases/get-presence-recap.use-case.js'
 import { UpdateDailyPresenceUseCase } from '../use-cases/update-daily-presence.use-case.js'
 

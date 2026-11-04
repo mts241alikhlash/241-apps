@@ -24,8 +24,6 @@ import {
 } from '@nestjs/swagger'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
-import { DeviceEntity } from '../domain/entities/device.entity.js'
 import { DeviceQueryDto } from '../dto/request/device-query.dto.js'
 import { RegisterDeviceDto } from '../dto/request/register-device.dto.js'
 import { UpdateDeviceDto } from '../dto/request/update-device.dto.js'
@@ -35,7 +33,6 @@ import {
   UpdateDeviceUseCase,
 } from '../use-cases/get-devices.use-case.js'
 import {
-  DeviceWithToken,
   RegisterDeviceUseCase,
   RotateDeviceTokenUseCase,
 } from '../use-cases/register-device.use-case.js'

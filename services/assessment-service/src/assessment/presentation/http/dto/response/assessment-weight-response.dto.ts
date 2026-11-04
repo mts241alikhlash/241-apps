@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { AssessmentWeightEntity } from '../../../../domain/entities/assessment-weight.entity.js'
 
 export class AssessmentWeightResponseDto {

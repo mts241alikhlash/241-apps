@@ -25,11 +25,6 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
-import {
-  CredentialWithCode,
-  CredentialWithHolder,
-} from '../domain/entities/credential.entity.js'
 import { CredentialPrintQueryDto } from '../dto/request/credential-print-query.dto.js'
 import { CredentialQueryDto } from '../dto/request/credential-query.dto.js'
 import { IssueCredentialDto } from '../dto/request/issue-credential.dto.js'

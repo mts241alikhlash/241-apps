@@ -1,7 +1,7 @@
 import type { GetPublicAgendaUseCase } from '../../use-cases/get-public-agenda.use-case.js'
 import type { GetPublicAgendaBySlugUseCase } from '../../use-cases/get-public-agenda.use-case.js'
 import type { GetAgendaEntriesUseCase } from '../../use-cases/manage-agenda.use-cases.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { GetAgendaByIdUseCase } from '../../use-cases/manage-agenda.use-cases.js'
 
 export class AgendaAdminResponseDto {

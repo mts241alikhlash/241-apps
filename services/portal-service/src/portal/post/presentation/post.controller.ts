@@ -27,10 +27,7 @@ import { PostQueryDto } from '../dto/request/post-query.dto.js'
 import { PinPostDto, PostVersionDto } from '../dto/request/post-version.dto.js'
 import { PublishPostDto } from '../dto/request/publish-post.dto.js'
 import { UpdatePostDto } from '../dto/request/update-post.dto.js'
-import {
-  PostAdminDetailDto,
-  PostAdminSummaryDto,
-} from '../dto/response/post-admin.dto.js'
+import { PostAdminDetailDto } from '../dto/response/post-admin.dto.js'
 import { PostDetailDto } from '../dto/response/post-detail.dto.js'
 import { ArchivePostUseCase } from '../use-cases/archive-post.use-case.js'
 import { CreatePostUseCase } from '../use-cases/create-post.use-case.js'

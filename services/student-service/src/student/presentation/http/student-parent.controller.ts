@@ -33,8 +33,6 @@ import { DeleteStudentParentUseCase } from '../../application/use-cases/delete-s
 import { GetStudentParentByIdUseCase } from '../../application/use-cases/get-student-parent-by-id/get-student-parent-by-id.use-case.js'
 import { GetStudentParentsListUseCase } from '../../application/use-cases/get-student-parents-list/get-student-parents-list.use-case.js'
 import { UpdateStudentParentUseCase } from '../../application/use-cases/update-student-parent/update-student-parent.use-case.js'
-import { StudentParentWithDetails } from '../../domain/repositories/student-parent.repository.js'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Student Parents')
 @ApiBearerAuth()

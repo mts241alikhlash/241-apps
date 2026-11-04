@@ -1,5 +1,5 @@
 import type { ProfileAddressEntity } from '../../../../domain/repositories/profile-address.repository.js'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { ProfileWithAvatarUrl } from '../../../../application/services/profile-avatar-url.service.js'
 
 export class ProfileWithAvatarResponseReligionDto {

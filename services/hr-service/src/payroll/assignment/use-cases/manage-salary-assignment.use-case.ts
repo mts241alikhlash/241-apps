@@ -4,10 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common'
 import { ISalaryComponentRepository } from '../../component/domain/interfaces/salary-component-repository.interface.js'
-import {
-  SalaryAssignmentEntity,
-  SalaryAssignmentWithComponent,
-} from '../domain/entities/salary-assignment.entity.js'
+import { SalaryAssignmentWithComponent } from '../domain/entities/salary-assignment.entity.js'
 import { ISalaryAssignmentRepository } from '../domain/interfaces/salary-assignment-repository.interface.js'
 import { CreateSalaryAssignmentDto } from '../dto/request/create-salary-assignment.dto.js'
 

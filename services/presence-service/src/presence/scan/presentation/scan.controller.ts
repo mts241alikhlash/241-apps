@@ -21,16 +21,12 @@ import type { CookieOptions, Response } from 'express'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import {
   DEVICE_TOKEN_COOKIE,
   PRESENCE_DEVICE_REQUEST_KEY,
 } from '../../shared/constants/presence.constants.js'
 import { DeviceAuth } from '../../shared/decorators/device-auth.decorator.js'
 import { bearerToken, DeviceGuard } from '../../shared/guards/device.guard.js'
-import type { ClockAnchor } from '../../shared/services/server-clock.service.js'
-import { BatchScanResult, ScanResult } from '../domain/entities/scan.entity.js'
-import { ScanWithDevice } from '../domain/interfaces/scan-repository.interface.js'
 import { RecordScanBatchDto } from '../dto/request/record-scan-batch.dto.js'
 import { RecordScanDto } from '../dto/request/record-scan.dto.js'
 import { ScanQueryDto } from '../dto/request/scan-query.dto.js'

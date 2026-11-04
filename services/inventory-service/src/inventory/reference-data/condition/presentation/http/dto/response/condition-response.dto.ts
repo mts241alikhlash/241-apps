@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import type { InventoryConditionEntity } from '../../../../domain/entities/condition.entity.js'
 
 export class InventoryConditionResponseDto {

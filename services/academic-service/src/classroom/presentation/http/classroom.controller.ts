@@ -30,10 +30,6 @@ import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CopyClassroomsDto } from './dto/request/copy-classrooms.dto.js'
 import { CreateClassroomDto } from './dto/request/create-classroom.dto.js'
 import { ClassroomQueryDto } from './dto/request/classroom-query.dto.js'
-import {
-  ClassroomWithDetails,
-  CopyClassroomsResult,
-} from '../../domain/repositories/classroom.repository.js'
 import { UpdateClassroomDto } from './dto/request/update-classroom.dto.js'
 import { CopyClassroomsToAcademicYearUseCase } from '../../application/use-cases/copy-classrooms-to-academic-year/copy-classrooms-to-academic-year.use-case.js'
 import { CreateClassroomUseCase } from '../../application/use-cases/create-classroom/create-classroom.use-case.js'
@@ -41,7 +37,6 @@ import { DeleteClassroomUseCase } from '../../application/use-cases/delete-class
 import { GetClassroomByIdUseCase } from '../../application/use-cases/get-classroom-by-id/get-classroom-by-id.use-case.js'
 import { GetClassroomsUseCase } from '../../application/use-cases/get-classrooms/get-classrooms.use-case.js'
 import { UpdateClassroomUseCase } from '../../application/use-cases/update-classroom/update-classroom.use-case.js'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Classrooms')
 @ApiBearerAuth()

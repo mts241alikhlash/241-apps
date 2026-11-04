@@ -22,12 +22,6 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import type {
-  NonWorkingDayEntity,
-  WorkPatternAssignmentWithDetails,
-  WorkPatternEntity,
-  WorkPatternWithDays,
-} from '../domain/entities/work-pattern.entity.js'
 import { AssignWorkPatternDto } from '../dto/request/assign-work-pattern.dto.js'
 import { BulkNonWorkingDaysDto } from '../dto/request/bulk-non-working-days.dto.js'
 import { CreateWorkPatternDto } from '../dto/request/create-work-pattern.dto.js'

@@ -1,9 +1,4 @@
 import type { PrismaService } from '../../../../../core/database/prisma.service.js'
-import type { IAssetCategoryLookupPort } from '../../../domain/repositories/category-lookup.port.js'
-import type { IAssetFundingSourceLookupPort } from '../../../domain/repositories/funding-source-lookup.port.js'
-import type { IAssetConditionLookupPort } from '../../../domain/repositories/condition-lookup.port.js'
-import type { IAssetStatusLookupPort } from '../../../domain/repositories/status-lookup.port.js'
-import type { IAssetLocationLookupPort } from '../../../domain/repositories/location-lookup.port.js'
 import { PrismaAssetRepository } from './prisma-asset.repository.js'
 
 describe('PrismaAssetRepository', () => {

@@ -7,10 +7,6 @@ import {
 } from '../../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../../core/database/prisma.service.js'
 import { countFilledByWave, isWaveFull } from '../../../../wave/index.js'
-import {
-  isEligibleAdmissionParent,
-  hasCompleteAddress,
-} from '../../../domain/policies/enroll-as-student.rules.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IAccountProvisioningPort } from '../../../../../platform/user/index.js'
 import { IReferenceLookupPort } from '../../../../../platform/reference-lookup/reference-lookup.port.js'
@@ -35,8 +31,6 @@ import {
   ApplicationWithParentsAndUser,
   ApplicationWithWave,
   CreateAdmissionApplicationRepositoryInput,
-  EnrollApplicantRepositoryInput,
-  EnrollResult,
   IAdmissionApplicationRepository,
   RejectAdmissionApplicationInput,
   UpdateAdmissionApplicationRepositoryInput,

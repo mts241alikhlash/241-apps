@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Grade, Prisma } from '../../../../generated/prisma/client.js'
+import { Prisma } from '../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import type {
   GradeQueryInput,

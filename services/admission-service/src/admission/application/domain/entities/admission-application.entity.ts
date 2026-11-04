@@ -10,7 +10,7 @@ import type {
   AdmissionDocumentWithTypeAndFile,
 } from '../../../document/index.js'
 import type { AdmissionPaymentWithProof } from '../../../payment/index.js'
-import type { ActiveWaveRow, AdmissionWaveEntity } from '../../../wave/index.js'
+import type { AdmissionWaveEntity } from '../../../wave/index.js'
 
 export interface ReligionRef {
   id: string

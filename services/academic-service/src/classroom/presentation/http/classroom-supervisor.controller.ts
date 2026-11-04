@@ -35,8 +35,6 @@ import { DeleteClassroomSupervisorUseCase } from '../../application/use-cases/de
 import { GetClassroomSupervisorByIdUseCase } from '../../application/use-cases/get-classroom-supervisor-by-id/get-classroom-supervisor-by-id.use-case.js'
 import { GetClassroomSupervisorsUseCase } from '../../application/use-cases/get-classroom-supervisors/get-classroom-supervisors.use-case.js'
 import { UpdateClassroomSupervisorUseCase } from '../../application/use-cases/update-classroom-supervisor/update-classroom-supervisor.use-case.js'
-import { ClassroomSupervisorWithDetails } from '../../domain/repositories/classroom-supervisor.repository.js'
-import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Classroom Supervisors')
 @ApiBearerAuth()

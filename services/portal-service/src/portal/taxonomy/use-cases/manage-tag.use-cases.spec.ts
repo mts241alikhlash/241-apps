@@ -11,9 +11,6 @@ import {
   GetTagsUseCase,
   UpdateTagUseCase,
 } from './manage-tag.use-cases.js'
-import { PortalCacheService } from '../../shared/services/portal-cache.service.js'
-
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
 
 const tag = { id: 'tag-1', name: 'olimpiade', slug: 'olimpiade' }
 

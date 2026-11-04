@@ -1,5 +1,4 @@
 import { Prisma } from '../../../../../generated/prisma/client.js'
-import type { PrismaService } from '../../../../../core/database/prisma.service.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
   AssetUnitCapabilityOutput,

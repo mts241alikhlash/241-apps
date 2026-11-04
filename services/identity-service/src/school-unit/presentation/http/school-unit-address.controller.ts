@@ -19,7 +19,6 @@ import {
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../auth/index.js'
 import {
-  AddressResponseDto,
   CreateAddressDto,
   UpdateAddressDto,
 } from '@mts241alikhlash/nest-core/dto'

@@ -1,7 +1,4 @@
-import {
-  PaginatedResult,
-  PaginationQueryInput,
-} from '@mts241alikhlash/nest-core/domain'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   GradeAcademicYearEntity,
   GradeAcademicYearWithDetails,
