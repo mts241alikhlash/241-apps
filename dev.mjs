@@ -176,9 +176,13 @@ const STORAGE = [
 ]
 
 function containerOnPort(port) {
-  return execFileSync('docker', ['ps', '--filter', `publish=${port}`, '--format', '{{.Names}}'], {
+  const rows = execFileSync('docker', ['ps', '--format', '{{.Names}}\t{{.Ports}}'], {
     encoding: 'utf8',
-  }).trim()
+  })
+    .trim()
+    .split('\n')
+  const row = rows.find((r) => r.split('\t')[1]?.includes(`:${port}->`))
+  return row ? row.split('\t')[0] : ''
 }
 
 let startStorage = false
