@@ -1,7 +1,7 @@
 {
   "name": "inventory-service",
   "version": "0.1.0",
-  "description": "241 Inventory — assets, units, circulation, approvals",
+  "description": "241 Inventory \u2014 assets, units, circulation, approvals",
   "author": "mhrmnvl",
   "private": true,
   "license": "UNLICENSED",
@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",

@@ -1,7 +1,7 @@
 {
   "name": "admission-service",
   "version": "0.1.0",
-  "description": "241 Admission — admission waves, applications, documents, payments, enrollment",
+  "description": "241 Admission \u2014 admission waves, applications, documents, payments, enrollment",
   "author": "mhrmnvl",
   "private": true,
   "license": "UNLICENSED",
@@ -74,6 +74,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",

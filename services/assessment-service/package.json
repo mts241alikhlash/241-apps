@@ -1,7 +1,7 @@
 {
   "name": "assessment-service",
   "version": "0.1.0",
-  "description": "241 Academic — teaching evaluation: assessment, attendance, report cards, dashboard",
+  "description": "241 Academic \u2014 teaching evaluation: assessment, attendance, report cards, dashboard",
   "author": "mhrmnvl",
   "private": true,
   "license": "UNLICENSED",
@@ -79,6 +79,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",

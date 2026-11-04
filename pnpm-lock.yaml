@@ -324,6 +324,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -496,6 +499,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -671,6 +677,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -828,6 +837,9 @@ importers:
       '@mts241alikhlash/admission-api':
         specifier: workspace:*
         version: link:../../packages/admission-api
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -1018,6 +1030,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/katex':
         specifier: ^0.16.8
         version: 0.16.8
@@ -1187,6 +1202,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/katex':
         specifier: ^0.16.8
         version: 0.16.8
@@ -1350,6 +1368,9 @@ importers:
       '@mts241alikhlash/hr-api':
         specifier: workspace:*
         version: link:../../packages/hr-api
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -1522,6 +1543,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -1688,6 +1712,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -1754,48 +1781,79 @@ importers:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/admission-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/assessment-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/exam-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/hr-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/identity-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/inventory-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/nest-core:
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@nestjs/cache-manager':
         specifier: ^12.0.0
         version: 12.0.2(@nestjs/common@12.3.2(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@12.3.2)(cache-manager@7.2.9)(keyv@5.6.0)(rxjs@7.8.2)
@@ -1938,6 +1996,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@tanstack/vue-query':
         specifier: ^5.105.3
         version: 5.105.3(vue@3.5.44(typescript@5.9.3))
@@ -2025,12 +2086,20 @@ importers:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/presence-api:
     dependencies:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/reference-data:
     dependencies:
@@ -2047,6 +2116,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@tanstack/vue-table':
         specifier: ^8.21.3
         version: 8.21.3(vue@3.5.44(typescript@5.9.3))
@@ -2107,6 +2179,16 @@ importers:
       openapi-fetch:
         specifier: ^0.17.0
         version: 0.17.0
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+
+  packages/typescript-config:
+    dependencies:
+      '@vue/tsconfig':
+        specifier: ^0.9.1
+        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
 
   packages/ui:
     dependencies:
@@ -2162,6 +2244,9 @@ importers:
         specifier: ^2.0.9
         version: 2.0.9
     devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2
@@ -2189,6 +2274,10 @@ importers:
       vue-sonner:
         specifier: ^2.0.9
         version: 2.0.9
+    devDependencies:
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   services/academic-service:
     dependencies:
@@ -2304,6 +2393,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -2476,6 +2568,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -2660,6 +2755,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -2850,6 +2948,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3034,6 +3135,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3215,6 +3319,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3375,6 +3482,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3553,6 +3663,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3713,6 +3826,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
@@ -3891,6 +4007,9 @@ importers:
       '@mts241alikhlash/academic-api':
         specifier: workspace:*
         version: link:../../packages/academic-api
+      '@mts241alikhlash/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@nestjs/cli':
         specifier: ^12.0.0
         version: 12.0.11(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(prettier@3.9.10)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)))(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))

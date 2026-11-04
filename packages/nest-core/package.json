@@ -140,6 +140,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@nestjs/cache-manager": "^12.0.0",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/common": "^12.0.1",

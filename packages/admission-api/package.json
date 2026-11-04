@@ -26,5 +26,8 @@
   },
   "dependencies": {
     "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "@mts241alikhlash/typescript-config": "workspace:*"
   }
 }

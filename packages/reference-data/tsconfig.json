@@ -1,11 +1,12 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "extends": "@mts241alikhlash/typescript-config/vue.json",
   "compilerOptions": {
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "types": ["node"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ]
 }

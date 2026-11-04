@@ -1,15 +1,17 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "extends": "@mts241alikhlash/typescript-config/vue.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "paths": {
-      "@mts241alikhlash/web-shared": ["./src/index.ts"],
-      "@mts241alikhlash/web-shared/*": ["./src/*"]
+      "@mts241alikhlash/web-shared": [
+        "./src/index.ts"
+      ],
+      "@mts241alikhlash/web-shared/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ]
 }

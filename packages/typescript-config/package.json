@@ -1,0 +1,15 @@
+{
+  "name": "@mts241alikhlash/typescript-config",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "files": [
+    "*.json"
+  ],
+  "exports": {
+    "./*.json": "./*.json"
+  },
+  "dependencies": {
+    "@vue/tsconfig": "^0.9.1"
+  }
+}

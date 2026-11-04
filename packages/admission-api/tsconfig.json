@@ -1,12 +1,5 @@
 {
-  "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "ES2023",
-    "strict": true,
-    "skipLibCheck": true,
-    "noEmit": true
-  },
+  "extends": "@mts241alikhlash/typescript-config/library.json",
   "include": [
     "src/**/*.ts"
   ]

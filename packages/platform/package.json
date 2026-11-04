@@ -41,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@lucide/vue": "^1.52.0",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@tanstack/vue-query": "^5.105.3",
     "@tanstack/vue-table": "^8.21.3",
     "@types/node": "^24.10.0",

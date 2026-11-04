@@ -60,6 +60,7 @@
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@mts241alikhlash/hr-api": "workspace:*",
+    "@mts241alikhlash/typescript-config": "workspace:*",
     "@types/node": "^24.10.0",
     "@types/qrcode": "^1.5.5",
     "@typescript-eslint/eslint-plugin": "^8.67.0",

@@ -1,19 +1,29 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "extends": "@mts241alikhlash/typescript-config/vue.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "types": ["node"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@mts241alikhlash/ui": ["./src/index.ts"],
-      "@mts241alikhlash/ui/*": ["./src/components/ui/*/index.ts"],
-      "@mts241alikhlash/ui/utils": ["./src/utils/index.ts"],
-      "@mts241alikhlash/web-shared": ["../web-shared/src/index.ts"],
-      "@mts241alikhlash/web-shared/*": ["../web-shared/src/*"]
+      "@mts241alikhlash/ui": [
+        "./src/index.ts"
+      ],
+      "@mts241alikhlash/ui/*": [
+        "./src/components/ui/*/index.ts"
+      ],
+      "@mts241alikhlash/ui/utils": [
+        "./src/utils/index.ts"
+      ],
+      "@mts241alikhlash/web-shared": [
+        "../web-shared/src/index.ts"
+      ],
+      "@mts241alikhlash/web-shared/*": [
+        "../web-shared/src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue"
+  ]
 }
