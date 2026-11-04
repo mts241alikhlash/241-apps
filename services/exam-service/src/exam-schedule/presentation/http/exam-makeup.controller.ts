@@ -18,8 +18,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import type { GradingUser } from '../../../exam-grading/application/grading-scope.service.js'
 import { AddMakeupParticipantsUseCase } from '../../application/use-cases/makeup-participants/add-makeup-participants.use-case.js'
 import { GetMakeupParticipantsUseCase } from '../../application/use-cases/makeup-participants/get-makeup-participants.use-case.js'

@@ -22,8 +22,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { AssignCurriculumToGradeDto } from './dto/request/assign-curriculum-to-grade.dto.js'
 import { AssignCurriculumToGradeUseCase } from '../../application/use-cases/assign-curriculum-to-grade/assign-curriculum-to-grade.use-case.js'
 import { GetGradeAcademicYearsUseCase } from '../../application/use-cases/get-grade-academic-years/get-grade-academic-years.use-case.js'

@@ -16,8 +16,8 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { AssetUnitQueryDto } from './dto/request/asset-unit-query.dto.js'
 import { UpdateUnitDto } from './dto/request/update-unit.dto.js'
 import { GetAssetUnitsUseCase } from '../../application/use-cases/get-asset-units/get-asset-units.use-case.js'

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { ReferenceLookupModule } from '../../platform/reference-lookup/reference-lookup.module.js'
 import { ApplicationModule } from '../application/application.module.js'
 import { ComposeNisUseCase } from './application/use-cases/compose-nis/compose-nis.use-case.js'

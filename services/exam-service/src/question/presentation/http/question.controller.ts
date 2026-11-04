@@ -6,8 +6,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import type { ScopeUser } from '../../application/teacher-scope.service.js'
 import { GetQuestionScopeUseCase } from '../../application/use-cases/get-question-scope/get-question-scope.use-case.js'
 import { QuestionScopeDto } from './dto/response/question-response.dto.js'

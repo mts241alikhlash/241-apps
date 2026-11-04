@@ -1,4 +1,4 @@
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -20,7 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 
 import { CreateSemesterDto } from './dto/request/create-semester.dto.js'
 import { SemesterQueryDto } from './dto/request/semester-query.dto.js'

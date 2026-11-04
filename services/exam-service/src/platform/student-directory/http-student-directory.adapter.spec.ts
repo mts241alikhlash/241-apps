@@ -1,5 +1,5 @@
 import { ServiceUnavailableException } from '@nestjs/common'
-import type { ServiceClient } from '../service-client/service-client.js'
+import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { HttpStudentDirectoryAdapter } from './http-student-directory.adapter.js'
 
 function build(students: unknown, profiles: unknown) {

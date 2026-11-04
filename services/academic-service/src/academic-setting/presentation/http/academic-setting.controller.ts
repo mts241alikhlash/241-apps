@@ -6,8 +6,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 
 import { GetAcademicSettingUseCase } from '../../application/use-cases/get-academic-setting/get-academic-setting.use-case.js'
 import { UpdateAcademicSettingUseCase } from '../../application/use-cases/update-academic-setting/update-academic-setting.use-case.js'

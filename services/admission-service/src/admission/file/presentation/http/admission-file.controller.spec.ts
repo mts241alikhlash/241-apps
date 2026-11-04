@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { StreamableFile } from '@nestjs/common'
 import { Readable } from 'node:stream'
-import { PERMISSIONS_KEY } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { AdmissionFileController } from './admission-file.controller.js'
 
 const file = {

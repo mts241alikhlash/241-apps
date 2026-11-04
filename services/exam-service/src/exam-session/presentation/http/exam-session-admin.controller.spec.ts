@@ -1,6 +1,6 @@
 import 'reflect-metadata'
-import { PERMISSIONS_ANY_KEY } from '../../../platform/access-control/permission/decorators/require-any-permission.decorator.js'
-import { PERMISSIONS_KEY } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_ANY_KEY } from '@mts241alikhlash/nest-core/access-control'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { ExamSessionAdminController } from './exam-session-admin.controller.js'
 
 const expected: Record<string, string[]> = {

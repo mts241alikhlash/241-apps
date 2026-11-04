@@ -1,5 +1,5 @@
 import { ServiceUnavailableException } from '@nestjs/common'
-import type { ServiceClient } from '../service-client/service-client.js'
+import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { HttpStudentIdentityAdapter } from './http-student-identity.adapter.js'
 
 function build(answer: unknown) {

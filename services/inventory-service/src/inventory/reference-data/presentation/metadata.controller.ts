@@ -5,8 +5,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { InventoryMetadataResponseDto } from '../dto/response/metadata-response.dto.js'
 import { GetMetadataUseCase } from '../use-cases/get-metadata.use-case.js'
 

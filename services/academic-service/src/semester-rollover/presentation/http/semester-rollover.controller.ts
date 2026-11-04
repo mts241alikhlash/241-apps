@@ -5,8 +5,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { RolloverSemesterDto } from './dto/request/rollover-semester.dto.js'
 import { RolloverSummaryDto } from './dto/response/rollover-summary.dto.js'
 import { RolloverSemesterUseCase } from '../../application/use-cases/rollover-semester/rollover-semester.use-case.js'

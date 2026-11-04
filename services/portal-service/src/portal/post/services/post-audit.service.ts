@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { CreateAuditLogUseCase } from '../../../platform/audit-log/use-cases/create-audit-log.use-case.js'
+import { CreateAuditLogUseCase } from '@mts241alikhlash/nest-core/audit-log'
 import { PostWithDetails } from '../domain/interfaces/post-repository.interface.js'
 import { AUDIT_RESOURCE, PostAuditAction } from '../constants/post.constants.js'
 

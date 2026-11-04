@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { AdmissionBankAccountController } from './presentation/http/admission-bank-account.controller.js'
 import { PrismaAdmissionBankAccountRepository } from './infrastructure/persistence/prisma/prisma-admission-bank-account.repository.js'
 import { IAdmissionBankAccountRepository } from './domain/repositories/admission-bank-account-repository.js'

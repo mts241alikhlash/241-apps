@@ -18,9 +18,9 @@ import {
   ROUTE_ARGS_METADATA,
 } from '@nestjs/common/constants'
 import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum.js'
-import { JwtAuthGuard } from '../../../../../platform/auth/index.js'
-import { PERMISSIONS_KEY } from '../../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { PermissionGuard } from '../../../../../platform/access-control/permission/guards/permission.guard.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
 import { CreateConditionDto } from './dto/request/create-condition.dto.js'
 import { UpdateConditionDto } from './dto/request/update-condition.dto.js'
 import { InventoryConditionResponseDto } from './dto/response/condition-response.dto.js'

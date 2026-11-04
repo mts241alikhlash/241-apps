@@ -16,8 +16,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import type { GradingUser } from '../../application/grading-scope.service.js'
 import { GetGradingSessionUseCase } from '../../application/use-cases/get-grading-session/get-grading-session.use-case.js'
 import { GradeAnswerUseCase } from '../../application/use-cases/grade-answer/grade-answer.use-case.js'

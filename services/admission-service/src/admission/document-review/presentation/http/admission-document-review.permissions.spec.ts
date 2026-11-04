@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { PERMISSIONS_KEY } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { AdmissionDocumentReviewController } from './admission-document-review.controller.js'
 
 function required(method: string): unknown {

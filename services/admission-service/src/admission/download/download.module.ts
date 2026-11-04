@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { DeleteDownloadUseCase } from './application/use-cases/delete-download/delete-download.use-case.js'
 import { GetDownloadFileUseCase } from './application/use-cases/get-download-file/get-download-file.use-case.js'
 import { GetDownloadsUseCase } from './application/use-cases/get-downloads/get-downloads.use-case.js'

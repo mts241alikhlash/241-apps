@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuditLogModule } from '../../platform/audit-log/audit-log.module.js'
+import { AuditLogModule } from '@mts241alikhlash/nest-core/audit-log'
 import { AttendancePeriodModule } from '../attendance-period/attendance-period.module.js'
 import { CredentialModule } from '../credential/credential.module.js'
 import { WorkPatternModule } from '../work-pattern/work-pattern.module.js'

@@ -43,7 +43,7 @@ describe('no read takes every column of a User', () => {
   })
 
   it('finds the backend sources to check', () => {
-    expect(sources.length).toBeGreaterThan(200)
+    expect(sources.length).toBeGreaterThan(150)
   })
 
   it('never reaches a user relation with `include`', () => {

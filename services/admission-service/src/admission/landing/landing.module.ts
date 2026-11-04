@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { LandingImageGarbageCollector } from './application/landing-image-garbage-collector.js'
 import { DiscardLandingUseCase } from './application/use-cases/discard-landing/discard-landing.use-case.js'
 import { GetLandingImageUseCase } from './application/use-cases/get-landing-image/get-landing-image.use-case.js'

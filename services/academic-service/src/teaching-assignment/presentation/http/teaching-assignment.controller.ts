@@ -3,7 +3,7 @@ import {
   TeachingAssignmentItemResponseDto,
   TeachingAssignmentPageResponseDto,
 } from './dto/response/teaching-assignment-api-response.dto.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -22,7 +22,7 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateTeachingAssignmentDto } from './dto/request/create-teaching-assignment.dto.js'
 import { TeachingAssignmentQueryDto } from './dto/request/teaching-assignment-query.dto.js'
 import { UpdateTeachingAssignmentDto } from './dto/request/update-teaching-assignment.dto.js'

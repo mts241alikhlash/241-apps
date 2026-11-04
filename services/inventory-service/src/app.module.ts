@@ -12,11 +12,11 @@ import { HealthModule } from '@mts241alikhlash/nest-core/health'
 import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
 import { pinoLoggerConfig } from '@mts241alikhlash/nest-core/logger'
 import { InventoryModule } from './inventory/inventory.module.js'
-import { AuthModule } from './platform/auth/auth.module.js'
-import { IdentityModule } from './platform/identity/identity.module.js'
-import { PermissionModule } from './platform/access-control/permission/permission.module.js'
-import { JwtAuthGuard } from './platform/auth/index.js'
-import { PermissionGuard } from './platform/access-control/permission/guards/permission.guard.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
+import { IdentityModule } from '@mts241alikhlash/nest-core/identity'
+import { PermissionModule } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
 
 @Module({
   imports: [

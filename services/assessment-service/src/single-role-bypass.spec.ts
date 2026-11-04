@@ -4,12 +4,7 @@ import { glob } from 'node:fs/promises'
 
 const SRC = join(process.cwd(), 'src')
 
-const ALLOWED = new Map<string, string>([
-  [
-    'platform/access-control/permission/guards/permission.guard.ts',
-    'The bypass itself. The one sanctioned role-name check (ADR-0011).',
-  ],
-])
+const ALLOWED = new Map<string, string>()
 
 async function sourceFiles(): Promise<string[]> {
   const files: string[] = []
@@ -33,7 +28,7 @@ describe('the role-name bypass is not copied (ADR-0011)', () => {
   }, 60_000)
 
   it('finds source files to check', () => {
-    expect(sources.length).toBeGreaterThan(200)
+    expect(sources.length).toBeGreaterThan(150)
   })
 
   it('names SUPER_ADMIN only where the allowlist accounts for it', () => {
@@ -55,16 +50,5 @@ describe('the role-name bypass is not copied (ADR-0011)', () => {
     const stale = [...ALLOWED.keys()].filter((path) => !paths.has(path))
 
     expect(stale).toEqual([])
-  })
-
-  it('keeps the bypass in the guard', () => {
-    const guard = sources.find(
-      (source) =>
-        source.path ===
-        'platform/access-control/permission/guards/permission.guard.ts',
-    )
-
-    expect(guard?.text).toContain("const SUPER_ADMIN_ROLE = 'SUPER_ADMIN'")
-    expect(guard?.text).toContain('user.roles.includes(SUPER_ADMIN_ROLE)')
   })
 })

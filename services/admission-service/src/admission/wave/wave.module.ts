@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { AdmissionWaveController } from './presentation/http/admission-wave.controller.js'
 import { PrismaAdmissionWaveRepository } from './infrastructure/persistence/prisma/prisma-admission-wave.repository.js'
 import { CreateAdmissionWaveUseCase } from './application/use-cases/create-admission-wave/create-admission-wave.use-case.js'

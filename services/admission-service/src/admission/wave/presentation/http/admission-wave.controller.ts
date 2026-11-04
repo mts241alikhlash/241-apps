@@ -17,8 +17,8 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateAdmissionWaveDto } from './dto/request/create-admission-wave.dto.js'
 import { AdmissionWaveQueryDto } from './dto/request/admission-wave-query.dto.js'
 import { UpdateAdmissionWaveDto } from './dto/request/update-admission-wave.dto.js'

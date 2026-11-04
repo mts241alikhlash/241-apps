@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { CreateAuditLogUseCase } from '../../../platform/audit-log/use-cases/create-audit-log.use-case.js'
+import { CreateAuditLogUseCase } from '@mts241alikhlash/nest-core/audit-log'
 import { POST_AUDIT_ACTIONS } from '../constants/post.constants.js'
 import { PostType } from '../domain/enums/post-type.enum.js'
 import { PostAuditService } from './post-audit.service.js'

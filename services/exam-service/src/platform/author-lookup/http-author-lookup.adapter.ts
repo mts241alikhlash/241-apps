@@ -1,5 +1,5 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common'
-import { ServiceClient } from '../service-client/service-client.js'
+import { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { IAuthorLookupPort } from './author-lookup.port.js'
 
 const MAX_BATCH = 200

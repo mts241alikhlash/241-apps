@@ -19,8 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { GetDocumentTypesUseCase } from '../../application/use-cases/get-document-types/get-document-types.use-case.js'
 import { SaveDocumentTypeUseCase } from '../../application/use-cases/save-document-type/save-document-type.use-case.js'
 import { ReorderDocumentTypesUseCase } from '../../application/use-cases/reorder-document-types/reorder-document-types.use-case.js'

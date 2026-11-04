@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { IS_PUBLIC_KEY } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
-import { PERMISSIONS_KEY } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { ExamScoreController } from './exam-score.controller.js'
 import { ExamScoreInternalController } from './exam-score-internal.controller.js'
 

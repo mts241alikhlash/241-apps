@@ -19,8 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { GetLocationsUseCase } from '../../application/use-cases/get-locations/get-locations.use-case.js'
 import { CreateLocationUseCase } from '../../application/use-cases/create-location/create-location.use-case.js'
 import { UpdateLocationUseCase } from '../../application/use-cases/update-location/update-location.use-case.js'

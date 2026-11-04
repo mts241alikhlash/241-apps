@@ -22,8 +22,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { GradeQueryDto } from './dto/request/grade-query.dto.js'
 import { CreateGradeDto } from './dto/request/create-grade.dto.js'
 import { UpdateGradeDto } from './dto/request/update-grade.dto.js'

@@ -10,7 +10,7 @@ import {
   type MyClassroom,
 } from '../../application/use-cases/get-my-classroom/get-my-classroom.use-case.js'
 import type { UserEntity } from '../../../shared/domain/entities/user.entity.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -36,7 +36,7 @@ import {
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import type { RequestUser } from '@mts241alikhlash/nest-core/types'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateStudentDto } from './dto/request/create-student.dto.js'
 import { StudentQueryDto } from './dto/request/student-query.dto.js'
 import { UpdateStudentDto } from './dto/request/update-student.dto.js'

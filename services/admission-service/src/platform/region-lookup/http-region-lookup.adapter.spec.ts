@@ -1,4 +1,4 @@
-import type { ServiceClient } from '../service-client/service-client.js'
+import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { HttpRegionLookupAdapter } from './http-region-lookup.adapter.js'
 
 function build(data: unknown) {

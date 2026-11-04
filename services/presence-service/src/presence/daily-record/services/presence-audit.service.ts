@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { CreateAuditLogUseCase } from '../../../platform/audit-log/use-cases/create-audit-log.use-case.js'
+import { CreateAuditLogUseCase } from '@mts241alikhlash/nest-core/audit-log'
 
 export const PRESENCE_AUDIT_RESOURCE = 'presence-record'
 

@@ -1,4 +1,4 @@
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -22,7 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 
 import { UpdateProfileDto } from '../../../platform/profile/index.js'
 import { CreateEmployeeDto } from './dto/request/create-employee.dto.js'

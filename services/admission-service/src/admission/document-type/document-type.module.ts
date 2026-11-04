@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { VerificationModule } from '../verification/index.js'
 import { AdmissionDocumentTypeController } from './presentation/http/admission-document-type.controller.js'
 import { PrismaAdmissionDocumentTypeRepository } from './infrastructure/persistence/prisma/prisma-admission-document-type.repository.js'

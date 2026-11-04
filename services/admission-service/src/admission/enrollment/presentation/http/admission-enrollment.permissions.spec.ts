@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { PERMISSIONS_KEY } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { AdmissionAdminController } from '../../../application/presentation/http/admission-admin.controller.js'
 import { AdmissionEnrollmentController } from './admission-enrollment.controller.js'
 

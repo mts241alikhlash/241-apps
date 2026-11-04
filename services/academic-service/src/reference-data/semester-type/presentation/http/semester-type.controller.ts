@@ -3,7 +3,7 @@ import {
   SemesterTypePageResponseDto,
 } from './dto/response/semester-type-api-response.dto.js'
 import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
-import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -26,7 +26,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { SemesterType } from '../../domain/repositories/semester-type.repository.js'
-import { JwtAuthGuard } from '../../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateSemesterTypeDto } from './dto/request/create-semester-type.dto.js'
 import { SemesterTypeQueryDto } from './dto/request/semester-type-query.dto.js'
 import { UpdateSemesterTypeDto } from './dto/request/update-semester-type.dto.js'

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { UserModule } from '../platform/user/user.module.js'
 import { AdmissionApplicantController } from './applicant/presentation/http/admission-applicant.controller.js'
 import { AdmissionPublicController } from './applicant/presentation/http/admission-public.controller.js'

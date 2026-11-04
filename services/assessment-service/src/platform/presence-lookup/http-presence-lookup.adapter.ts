@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ServiceClient } from '../service-client/service-client.js'
+import { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import {
   GateSuggestion,
   IDailyPresenceReadPort,

@@ -27,9 +27,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { JwtAuthGuard } from '../../auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
 import { FileResponseDto } from '../dto/response/file-response.dto.js'

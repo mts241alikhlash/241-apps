@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { ServiceClient } from '../service-client/service-client.js'
+import { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { IAcademicLookupPort } from './academic-lookup.port.js'
 
 const URL_KEY = 'ACADEMIC_SERVICE_URL'

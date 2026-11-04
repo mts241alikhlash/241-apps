@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { NotificationModule } from '../notification/notification.module.js'
 import { AdmissionAnnouncementController } from './presentation/http/admission-announcement.controller.js'
 import { PrismaAdmissionAnnouncementRepository } from './infrastructure/persistence/prisma/prisma-admission-announcement.repository.js'

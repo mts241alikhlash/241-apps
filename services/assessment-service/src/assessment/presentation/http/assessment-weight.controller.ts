@@ -1,5 +1,5 @@
 import { AssessmentWeightResponseDto } from './dto/response/assessment-weight-response.dto.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { ReplaceAssessmentWeightsDto } from './dto/request/replace-assessment-weights.dto.js'
 import { GetAssessmentWeightsUseCase } from '../../application/use-cases/get-assessment-weights/get-assessment-weights.use-case.js'
 import { ReplaceAssessmentWeightsUseCase } from '../../application/use-cases/replace-assessment-weights/replace-assessment-weights.use-case.js'

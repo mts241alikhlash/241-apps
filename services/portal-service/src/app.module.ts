@@ -19,12 +19,12 @@ import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
 import { pinoLoggerConfig } from '@mts241alikhlash/nest-core/logger'
 import { PortalModule } from './portal/portal.module.js'
 import { FileModule } from './platform/file/file.module.js'
-import { AuthModule } from './platform/auth/auth.module.js'
-import { IdentityModule } from './platform/identity/identity.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
+import { IdentityModule } from '@mts241alikhlash/nest-core/identity'
 import { ProfileLookupModule } from './platform/profile-lookup/profile-lookup.module.js'
-import { PermissionModule } from './platform/access-control/permission/permission.module.js'
-import { JwtAuthGuard } from './platform/auth/index.js'
-import { PermissionGuard } from './platform/access-control/permission/guards/permission.guard.js'
+import { PermissionModule } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
 
 @Module({
   imports: [

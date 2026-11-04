@@ -19,8 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { GetFundingSourcesUseCase } from '../../application/use-cases/get-funding-sources/get-funding-sources.use-case.js'
 import { CreateFundingSourceUseCase } from '../../application/use-cases/create-funding-source/create-funding-source.use-case.js'
 import { UpdateFundingSourceUseCase } from '../../application/use-cases/update-funding-source/update-funding-source.use-case.js'

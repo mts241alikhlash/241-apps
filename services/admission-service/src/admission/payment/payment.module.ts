@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { ApplicantModule } from '../applicant/applicant.module.js'
 import { DocumentModule } from '../document/document.module.js'
 import { NotificationModule } from '../notification/notification.module.js'

@@ -15,8 +15,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { ListMyExamsUseCase } from '../../application/use-cases/list-my-exams/list-my-exams.use-case.js'
 import { StartExamSessionUseCase } from '../../application/use-cases/start-exam-session/start-exam-session.use-case.js'
 import { ClientPlatformHeader } from './client-platform.decorator.js'

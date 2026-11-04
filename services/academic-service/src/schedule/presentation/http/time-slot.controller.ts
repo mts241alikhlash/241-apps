@@ -3,7 +3,7 @@ import {
   TimeSlotPageResponseDto,
   TimeSlotTypeItemResponseDto,
 } from './dto/response/schedule-api-response.dto.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -24,7 +24,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CreateTimeSlotDto } from './dto/request/create-time-slot.dto.js'
 import { UpdateTimeSlotDto } from './dto/request/update-time-slot.dto.js'
 import { CreateTimeSlotTypeDto } from './dto/request/create-time-slot-type.dto.js'

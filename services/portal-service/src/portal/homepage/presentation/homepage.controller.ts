@@ -6,7 +6,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { IHomepageSectionRepository } from '../domain/interfaces/homepage-section-repository.interface.js'
 import { UpdateHomepageSectionDto } from '../dto/request/update-homepage-section.dto.js'
 import { HomepageSectionSettingDto } from '../dto/response/homepage-response.dto.js'

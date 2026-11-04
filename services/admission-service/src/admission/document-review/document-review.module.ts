@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { NotificationModule } from '../notification/notification.module.js'
 import { VerificationModule } from '../verification/verification.module.js'
 import { GetDocumentReviewQueueUseCase } from './application/use-cases/get-document-review-queue/get-document-review-queue.use-case.js'

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { JsonObject } from '@mts241alikhlash/nest-core/domain'
-import { CreateAuditLogUseCase } from '../../../platform/audit-log/use-cases/create-audit-log.use-case.js'
+import { CreateAuditLogUseCase } from '@mts241alikhlash/nest-core/audit-log'
 
 export const PAYROLL_AUDIT_RESOURCE = 'payroll'
 

@@ -4,7 +4,7 @@ import {
 } from '../dto/response/media-api-response.dto.js'
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { GetMediaLibraryUseCase } from '../use-cases/get-media-library.use-case.js'
 import { GetMediaUsageUseCase } from '../use-cases/get-media-usage.use-case.js'
 

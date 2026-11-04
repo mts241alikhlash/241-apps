@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { GetAdmissionFileUseCase } from './application/use-cases/get-admission-file/get-admission-file.use-case.js'
 import { IAdmissionFileContent } from './domain/repositories/admission-file-content.port.js'
 import { IAdmissionFileRepository } from './domain/repositories/admission-file.repository.js'

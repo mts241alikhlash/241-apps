@@ -18,8 +18,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { GetBankAccountsUseCase } from '../../application/use-cases/get-bank-accounts/get-bank-accounts.use-case.js'
 import { SaveBankAccountUseCase } from '../../application/use-cases/save-bank-account/save-bank-account.use-case.js'
 import { DeleteBankAccountUseCase } from '../../application/use-cases/delete-bank-account/delete-bank-account.use-case.js'

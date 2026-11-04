@@ -3,7 +3,7 @@ import {
   ReportCardListResponseDto,
   ReportCardResponseDto,
 } from './dto/response/report-card-response.dto.js'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import {
   Body,
   Controller,
@@ -28,7 +28,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 

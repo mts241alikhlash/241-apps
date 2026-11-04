@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthModule } from '../../platform/auth/auth.module.js'
+import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { ReferenceLookupModule } from '../../platform/reference-lookup/reference-lookup.module.js'
 import { DocumentModule } from '../document/document.module.js'
 import { DecideLateDocumentUseCase } from './application/use-cases/decide-late-document/decide-late-document.use-case.js'

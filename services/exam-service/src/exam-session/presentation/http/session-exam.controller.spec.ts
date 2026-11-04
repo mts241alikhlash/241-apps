@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { HTTP_CODE_METADATA } from '@nestjs/common/constants'
-import { PERMISSIONS_KEY } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { SessionExamController } from './session-exam.controller.js'
 
 const expected: Record<string, string[]> = {

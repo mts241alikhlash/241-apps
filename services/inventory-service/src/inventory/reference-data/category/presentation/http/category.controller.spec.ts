@@ -10,8 +10,8 @@ import {
   ROUTE_ARGS_METADATA,
 } from '@nestjs/common/constants'
 import { RouteParamtypes } from '@nestjs/common/enums/route-paramtypes.enum.js'
-import { JwtAuthGuard } from '../../../../../platform/auth/index.js'
-import { PERMISSIONS_KEY } from '../../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { CreateCategoryDto } from './dto/request/create-category.dto.js'
 import { UpdateCategoryDto } from './dto/request/update-category.dto.js'
 import { InventoryCategoryResponseDto } from './dto/response/category-response.dto.js'

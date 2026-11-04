@@ -18,8 +18,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../../../../../platform/auth/index.js'
-import { RequirePermissions } from '../../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { GetCategoriesUseCase } from '../../application/use-cases/get-categories/get-categories.use-case.js'
 import { CreateCategoryUseCase } from '../../application/use-cases/create-category/create-category.use-case.js'
 import { UpdateCategoryUseCase } from '../../application/use-cases/update-category/update-category.use-case.js'

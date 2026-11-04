@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { CreatePostDto } from '../dto/request/create-post.dto.js'
 import { PostQueryDto } from '../dto/request/post-query.dto.js'

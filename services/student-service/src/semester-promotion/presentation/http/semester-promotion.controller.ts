@@ -5,8 +5,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import { JwtAuthGuard } from '../../../platform/auth/index.js'
+import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { GenerateRecommendationDto } from './dto/request/generate-recommendation.dto.js'
 import { PromotionRecommendationDto } from './dto/response/promotion-recommendation.dto.js'
 import { PromotionDto } from './dto/request/promotion.dto.js'
