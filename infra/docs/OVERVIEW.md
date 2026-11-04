@@ -27,7 +27,7 @@ their paths through this table; the rules they state still hold.
 | --- | --- |
 | `infra/nginx/generate.mjs`, `infra/nginx/*.conf` | `platform-infra/gateway/generate.mjs` and `gateway/nginx*.conf` |
 | `infra/postgres/init-databases.sql` | `platform-infra/gateway-source/postgres/init-databases.sql` |
-| `docker-compose.prod.yml`, `docker-compose.dev.yml` | `platform-infra/compose/docker-compose.{production,staging,dev}.yml` |
+| `docker-compose.prod.yml`, `docker-compose.dev.yml` | `infra/compose/compose.yaml` (the local Postgres and S3 sit behind its `storage` profile) |
 | each app's or service's `CLAUDE.md` | its `docs/OVERVIEW.md`; no `CLAUDE.md` is checked in |
 | `.claude/skills/`, `skills-lock.json`, `.specify/` at the root | not checked in anywhere |
 | `scripts/release.mjs`, `VERSIONING.md` | Changesets, per repository — see "Versioning and releases" |
@@ -42,21 +42,21 @@ names it.
 
 | Service | Product | Owns | Port | Database |
 | --- | --- | --- | --- | --- |
-| `identity-service` | 241 Console | identity and access: users, roles, permissions, sessions, audit, school profile, **a person's address**, administrative areas | 3000 | `identity_service`, 20 models |
-| `academic-service` | 241 Academic | academic structure, curriculum, timetable, classrooms | 3200 | `academic_service`, 21 models |
-| `inventory-service` | 241 Inventory | assets, units, circulation, approvals | 3300 | `inventory_service`, 15 models |
-| `presence-service` | 241 Presence | gate credentials, devices, scans, daily attendance and leave, **for staff and students** | 3400 | `presence_service`, 14 models |
-| `portal-service` | 241 Portal | the public website and the area that manages its content | 3600 | `portal_service`, 15 models |
-| `admission-service` | 241 Admission | admission waves, applications, documents, payments, enrolment | 3700 | `admission_service`, 9 models |
-| `hr-service` | 241 HR | employee records, positions, employment types, **and payroll** | 3800 | `hr_service`, 10 models |
-| `student-service` | 241 Academic | student lifecycle: students, parents, enrolment, graduation, promotion | 3900 | `student_service`, 6 models |
-| `assessment-service` | 241 Academic | teaching evaluation: assessment, attendance, report cards, dashboard | 4000 | `assessment_service`, 6 models |
-| `exam-service` | 241 Academic | computer-based exams: question bank with versions, approval, import (phase 1) | 4100 | `exam_service`, 4 models |
+| `identity-service` | 241 Console | identity and access: users, roles, permissions, sessions, audit, school profile, **a person's address**, administrative areas | 3000 | `identity`, 20 models |
+| `academic-service` | 241 Academic | academic structure, curriculum, timetable, classrooms | 3200 | `academic`, 21 models |
+| `inventory-service` | 241 Inventory | assets, units, circulation, approvals | 3300 | `inventory`, 15 models |
+| `presence-service` | 241 Presence | gate credentials, devices, scans, daily attendance and leave, **for staff and students** | 3400 | `presence`, 14 models |
+| `portal-service` | 241 Portal | the public website and the area that manages its content | 3600 | `portal`, 15 models |
+| `admission-service` | 241 Admission | admission waves, applications, documents, payments, enrolment | 3700 | `admission`, 9 models |
+| `hr-service` | 241 HR | employee records, positions, employment types, **and payroll** | 3800 | `hr`, 10 models |
+| `student-service` | 241 Academic | student lifecycle: students, parents, enrolment, graduation, promotion | 3900 | `student`, 6 models |
+| `assessment-service` | 241 Academic | teaching evaluation: assessment, attendance, report cards, dashboard | 4000 | `assessment`, 6 models |
+| `exam-service` | 241 Academic | computer-based exams: question bank with versions, approval, import (phase 1) | 4100 | `exam`, 4 models |
 
 **Every service has its own database, its own `.env`, and its own
 `prisma:migrate` / `prisma:deploy`.** All ten point at the shared VPS Postgres
-on `postgres:5432`; `gateway-source/postgres/init-databases.sql` creates eight of them
-and `identity_service` is the server's `POSTGRES_DB`.
+on `postgres:5432`; `gateway-source/postgres/init-databases.sql` creates nine of them
+and `identity` is the server's `POSTGRES_DB`.
 
 **116 model declarations**, down from 164 on 2026-09-09. **No service declares
 a table another one owns.** student-service went from 26 to 7,
@@ -104,7 +104,7 @@ both red at `typecheck`; see the audit section's first finding.
 `employee-service` became `hr-service` and took `payroll/` with it from
 presence-service; `presence-service` kept gate presence alone and stayed
 person-agnostic. `presence-web` became `hr-web`, and the `employee_service`
-database became `hr_service`.
+database became `hr`.
 
 Payroll had been merged *into* presence on 2026-08-30, one day after being
 split out, and that merge was right at the time. The new fact is **students**:
@@ -305,7 +305,7 @@ Every payload was diffed by hand against student-service's DTOs first —
 `CreateStudentDto`, `CreateParentDto`, `CreateStudentWithRelationsDto`,
 `CreateStudentParentDto`, `CreateStudentGraduationDto`, `BulkGraduationDto` —
 because the 2026-09-11 rename had already shown that a drifted field name
-compiles fine and fails only in production. All matched.
+compiles fine and fails only at run time. All matched.
 
 `student-score` stayed behind (assessment-web owns marking) and `/achievement`
 was dropped: no service declares `AchievementType` any more.
@@ -478,7 +478,7 @@ everywhere. `inventory-service` was the last still running
 `prisma migrate deploy` on boot and stopped on 2026-09-10: migrating on boot
 races every extra replica and takes the timing of a schema change away from
 whoever is deploying. Migration is an explicit step — `--profile migrate` in
-`compose/docker-compose.production.yml`, per service.
+`compose/compose.yaml`, per service.
 
 **A change to a file that exists in more than one repository here must be made
 in all of them, in the same session.** There is no sync tooling and no CI
@@ -490,9 +490,9 @@ check. That covers `NESTJS-RULES.md`, `IAM.md`, the shared half of
 hand-edit them.** The routing table has one source per app — its own
 `api-routes.config.ts` — but the gateway never reads app source. Each app's
 release runs `pnpm run routes:emit` and publishes a JSON routing manifest with
-a SHA-256; that file lands in `gateway/manifests/<app>-<version>.json` (one per version a
-lock pins, so staging and production can run different app versions), and
-`deployment/<env>.lock.json` pins its version and checksum beside the app's
+a SHA-256; that file lands in `gateway/manifests/<app>-<version>.json` (one per version the
+lock pins), and
+`deployment/lock.json` pins its version and checksum beside the app's
 image digest. The generator renders both configs from the manifests,
 `upstreams/services.json`, and the lock:
 
@@ -505,21 +505,21 @@ node gateway/generate.self-check.mjs
 Add an endpoint prefix to an app's `api-routes.config.ts` and the Vite proxy
 learns it at once; the gateway learns it once that app releases and its new
 manifest is pinned here. A prefix a frontend calls but nothing routes is
-answered with `index.html` at HTTP 200 in dev and refused in production —
+answered with `index.html` at HTTP 200 by the Vite dev server and refused by the gateway —
 `UNROUTED_PREFIXES` exists to make both 404. Run `pnpm run routes:check` in the
 app and `--check` here before a deploy; run `pnpm run smoke:gateway` in
 `academic-web` against the deployed origin after one.
 
 Adding an app is: write its `api-routes.config.ts`, add it to `EXPECTED_APPS`
 in `gateway/generate.mjs`, add its manifest and lock entry, and add its image to
-`compose/docker-compose.{staging,production}.yml`. Adding a service an app calls
+`compose/compose.yaml`. Adding a service an app calls
 is one entry in `upstreams/services.json`. The generator exits 1 naming the app
 if a manifest routes a prefix to a service with no upstream declared.
 
 **All nine services are dockerized as of 2026-09-10**, each with a
 `Dockerfile` and a `.dockerignore` beside it. Until then only five had one —
 identity, academic, admission, hr and student — so the platform ran five
-services in Docker and four somewhere else, and `docker-compose.production.yml`
+services in Docker and four somewhere else, and `compose.yaml`
 listed only the five. inventory, presence, portal and assessment were added
 from the same template; portal's runner also copies `./public`, which
 `ServeStaticModule` resolves from the working directory.
@@ -531,8 +531,7 @@ already copies the service's full source — schema folder and
 no `package.json` `files` field narrows what `deploy` packs — so the
 `runner` image already holds everything `prisma migrate deploy` needs.
 Migration runs against that same image, via a `--profile migrate` sibling
-service per backend service in `compose/docker-compose.production.yml` /
-`.staging.yml`, overriding the entrypoint to call the `prisma` binary
+service per backend service in `compose/compose.yaml`, overriding the entrypoint to call the `prisma` binary
 directly instead of booting the app. `start:prod` migrates in none of the
 nine — `inventory-service` was the last one still doing it on boot, which
 races every extra replica and takes the timing of a schema change away from
@@ -612,29 +611,23 @@ identical in all nine), and `ThrottlerAsyncOptions` made `imports` required.
 
 ## Running the whole platform locally
 
-Needs Docker (for Postgres and MinIO) and pnpm. Nothing else — there is no
-Postgres or Docker installed on the machine this was set up on, so the first
-step is real.
+Needs Docker or Podman Compose (for Postgres and S3) and pnpm.
 
 ```bash
-docker compose -f compose/docker-compose.dev.yml up -d
-#   postgres  :5433 — 9 databases, created by gateway-source/postgres/init-databases.sql
+docker compose -f compose/compose.yaml --profile storage up -d postgres s3
+#   postgres  :5433 — 10 databases, created by gateway-source/postgres/init-databases.sql
+#   s3        :9000 — SeaweedFS, bucket 241-apps, any access keys
 ```
 
-That's Postgres only — MinIO and a compose file that also runs the nine
-services against shared infrastructure don't exist yet in this repo. Until
-either lands, MinIO (`S3_ENDPOINT`, `S3_BUCKET`) needs to be run and pointed
-at separately; see each service's own `.env.example`.
+The `storage` profile is for the laptop only; the VPS uses its native
+PostgreSQL and MinIO. The role is `mts241`, and the local password is a fixed
+development value that never leaves the laptop. `node dev.mjs <app>` starts the
+profile itself when the ports are free, and refuses to reuse `:5433` or `:9000`
+when another container owns them.
 
-Inside that network the database host is `postgres`, not `localhost`. The two
-files are alternatives, not layers: the shared one declares no Postgres and no
-MinIO, and joins `dev-network` as `external`, so a wrong name fails at `up`
-instead of quietly creating an empty network.
-
-MinIO was added on 2026-09-09. `portal-service` and `admission-service`
-**refuse to boot** without `S3_ENDPOINT`, `S3_BUCKET` and the two credentials
-— `StorageService` is written for MinIO already (`forcePathStyle: true`) and
-neither `.env` had the keys, so both had been unstartable since the split.
+`portal-service` and `admission-service` **refuse to boot** without
+`S3_ENDPOINT`, `S3_BUCKET` and the two credentials; `StorageService` is written
+for S3-compatible storage (`forcePathStyle: true`).
 
 Then, once per service (they are independent, order does not matter):
 
@@ -643,9 +636,7 @@ cd <service> && pnpm install && pnpm prisma:generate && pnpm prisma:deploy && pn
 ```
 
 **`.env` is set for the local stack.** All nine point at
-`localhost:5433`, and portal/admission at `localhost:9000`; the VPS
-`dev-network` pair (`postgres:5432`, `minio:9000`) sits commented beside each.
-Swap them to run inside that network.
+`localhost:5433`, and portal/admission at `localhost:9000`.
 
 Two traps the first live run found, both now closed in the files:
 
@@ -653,8 +644,8 @@ Two traps the first live run found, both now closed in the files:
   turns TLS on unless the string disables it, and the local container serves
   none — without the flag every service dies at boot with *"The server does not
   support SSL connections"*.
-- `S3_ENDPOINT=http://minio:9000` is the dev-network alias and does not resolve
-  from the host. `StorageService` builds its client lazily, so the service
+- An `S3_ENDPOINT` that names a container alias does not resolve from the
+  host. `StorageService` builds its client lazily, so the service
   **boots fine and only uploads fail** — a quiet one.
 
 `.env` is filled in for all nine and gitignored. `JWT_SECRET` and
@@ -664,15 +655,15 @@ an expiry if they drift.
 
 | Service | Port | Database |
 | --- | --- | --- |
-| identity | 3000 | `identity_service` |
-| academic | 3200 | `academic_service` |
-| inventory | 3300 | `inventory_service` |
-| presence | 3400 | `presence_service` |
-| portal | 3600 | `portal_service` |
-| admission | 3700 | `admission_service` |
-| hr | 3800 | `hr_service` |
-| student | 3900 | `student_service` |
-| assessment | 4000 | `assessment_service` |
+| identity | 3000 | `identity` |
+| academic | 3200 | `academic` |
+| inventory | 3300 | `inventory` |
+| presence | 3400 | `presence` |
+| portal | 3600 | `portal` |
+| admission | 3700 | `admission` |
+| hr | 3800 | `hr` |
+| student | 3900 | `student` |
+| assessment | 4000 | `assessment` |
 
 ### Which processes you actually need
 
@@ -681,7 +672,7 @@ services the app you are testing calls — each app's row in the frontend table
 lists them.
 
 ```bash
-docker compose -f compose/docker-compose.dev.yml up -d   # postgres :5433; MinIO runs separately
+docker compose -f compose/compose.yaml --profile storage up -d postgres s3   # postgres :5433, s3 :9000
 
 cd <service> && pnpm prisma:deploy && pnpm dev      # once per service you need
 cd <app> && pnpm dev                                # the app itself
@@ -724,7 +715,7 @@ On the VPS the seeds run from the service images, which ship `tsx` and the
 `prisma/` folder:
 
 ```bash
-docker compose -f compose/docker-compose.production.yml run --rm \
+docker compose -f compose/compose.yaml -f compose/compose.override.yaml run --rm \
   --entrypoint ./node_modules/.bin/tsx identity-service prisma/seed-permissions.ts
 ```
 
@@ -756,7 +747,7 @@ pnpm run smoke:gateway                          # proves the routing, once they 
 in `UNROUTED_PREFIXES` since the extraction, so every teacher picker in the app
 404'd — the roster had moved and nothing routed there. hr-service is in
 `SERVICE_PREFIXES`, in the Vite proxy, in the generated gateway config, in
-`compose/docker-compose.production.yml`, and has a `Dockerfile` (it had none).
+`compose/compose.yaml`, and has a `Dockerfile` (it had none).
 
 **`UNROUTED_PREFIXES` is now empty: every prefix academic-web calls is routed.**
 `/religions` and `/blood-types` were the last two, and neither had an owner —
@@ -1032,9 +1023,8 @@ without a changeset (`.github/scripts/require-changeset.mjs`). On `main`,
 version, writes `CHANGELOG.md`, and publishes — an app's image to GHCR and its
 routing manifest, a service's image, a package to GitHub Packages. Deploying is
 a separate step: the hourly Update lock workflow opens a pull request pinning
-the new digests into staging (run it by hand with `production` to promote what
-staging runs; see the README), and merging it deploys; `deploy.yml` deploys staging at once
-and production after approval (`docs/DEPLOY.md`, "Automatic deploys"). `main`
+the new digests into the lock, and merging it starts `deploy.yml`, which
+deploys after approval (`docs/DEPLOY.md`, "Automatic deploys"). `main`
 is the only long-lived branch.
 
 MAJOR here means the **HTTP contract** another service depends on changed — a
@@ -1067,7 +1057,7 @@ Beyond those:
   that is not versioned as one.
 - **This repository** runs `node gateway/generate.mjs --check`, the generator's
   self-check, `nginx -t` against both generated configs, and
-  `docker compose config` against the staging and production stacks.
+  `docker compose config` against the stack, with and without the `storage` profile.
 
 ## Pre-push audit, 2026-09-10, and the fixes on 2026-09-11
 
@@ -1294,9 +1284,9 @@ which is the right connection for a seed.
 - All nine migrations apply to an empty database, and the table count matches
   the documented model count exactly in every one: 20, 21, 15, 14, 15, 9, 10,
   6, 6.
-- `addresses` exists only in `identity_service`, carries `profile_id` and the
-  four Kemendagri code columns, and is absent from `hr_service` and
-  `student_service`.
+- `addresses` exists only in `identity`, carries `profile_id` and the
+  four Kemendagri code columns, and is absent from `hr` and
+  `student`.
 - `pnpm seed:iam` runs — it had been unrunnable since the `iam/` folder was
   flattened on 2026-09-03.
 - `GET /profiles/me`, `POST /profiles/me/addresses`, `GET /regions/provinces`
@@ -1315,13 +1305,13 @@ that catches these is running it.
 ## Redeploying one service
 
 Nine services, nine images, nine databases. Only the gateway declares
-`depends_on` in `compose/docker-compose.production.yml`, every service has its
+`depends_on` in `compose/compose.yaml`, every service has its
 own healthcheck, and every image is pinned by digest, so redeploying one is
 pinning its new digest and pulling it — the other eight keep running untouched:
 
 ```bash
-GITHUB_TOKEN=<...> node scripts/latest-digests.mjs --write production
-docker compose -f compose/docker-compose.production.yml up -d hr-service
+GITHUB_TOKEN=<...> node scripts/latest-digests.mjs --write
+docker compose -f compose/compose.yaml -f compose/compose.override.yaml up -d hr-service
 ```
 
 That is the whole command. It was not, until 2026-09-11.
@@ -1429,7 +1419,7 @@ first deployment").
 
 ## Migrations folded before the first deployment
 
-On 2026-10-04, before staging or production existed, every service's migration
+On 2026-10-04, before the first deployment, every service's migration
 history was folded into a single `prisma/migrations/20261004000000_init/`: the
 schema from `prisma migrate diff --from-empty --to-schema prisma --script`,
 followed by every default-data `INSERT` the old migrations carried. The data
@@ -1484,7 +1474,7 @@ is always safe.
 
 Collected on 2026-10-04 before the first deployment.
 
-### Production hardening
+### Hardening
 
 - **Multer** is held at 2.4.0 by a pnpm override in `services`; 2.2.0 had four
   advisories (GHSA-535w-7cp7-47q4, GHSA-wc9g-mqfw-jrwm, GHSA-qfvm-cv95-jqjf,
@@ -1492,7 +1482,7 @@ Collected on 2026-10-04 before the first deployment.
   `UPLOAD_LIMITS` passes the exact maximum; `upload-limits.spec.ts` pins the
   413 boundary.
 - **Container memory.** Each NestJS service runs with `mem_limit: 320m` and
-  `NODE_OPTIONS=--max-old-space-size=256` (staging and production compose).
+  `NODE_OPTIONS=--max-old-space-size=256` (`compose.yaml`).
   Add 2 GB of swap on the VPS, then check with `free -m` and
   `docker stats --no-stream` whether 320m is enough.
 - **Base images** are pinned to `node:24.22.1-alpine` and

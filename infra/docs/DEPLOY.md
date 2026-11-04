@@ -1,6 +1,6 @@
 # First deployment
 
-Staging and production have never run. This is the order for the first
+The stack has never run on the VPS. This is the order for the first
 install, which brings every service up together, so the "deploy X before Y"
 notes written for upgrades do not apply: what matters is publish, then
 migrate, then seed, then smoke-test. Every step that touches GitHub or the VPS
@@ -40,33 +40,31 @@ is done by a person. Once it is done, later deploys run on their own (section 6)
    `pnpm run validate`, commit, push. Each release publishes the image and its
    routing manifest.
 5. **platform-infra.** Copy each app's published routing manifest into
-   `gateway/manifests/<app>-<version>.json`; `GITHUB_TOKEN=<PAT> node scripts/latest-digests.mjs --write staging`
+   `gateway/manifests/<app>-<version>.json`; `GITHUB_TOKEN=<PAT> node scripts/latest-digests.mjs --write`
    (replaces every `REPLACE_BEFORE_DEPLOYMENT`); `node gateway/generate.mjs`;
    `node gateway/generate.self-check.mjs`; commit, push. The release publishes
    the gateway image.
-
-An app pinned with `REPLACE_BEFORE_DEPLOYMENT` in the staging lock is routed on
-staging only: leave it out of the production lock until its first release, then
-add its lock entry and compose service and regenerate.
 
 `exam-service` 3.1.0 removes the WHIP stream routes and their `GET
 /exam-schedules/:id/streams` endpoint; camera proctoring moved to
 `exam-sessions/:id/snapshots/*` and its UI lives in `exam-web`. Ship
 `exam-web` and `exam-service` 3.1.0 in the same window: while `exam-web` has no
-production pin, the only deployed exam UI is `assessment-web`, whose camera tab
+pin, the only deployed exam UI is `assessment-web`, whose camera tab
 calls the removed route and fails with a 404.
 
 ## 3. The VPS
 
 - [ ] PostgreSQL 13 or later (`gen_random_uuid()` in the migrations); one
-      database per service: `identity`, `academic`, `admission`, `hr`,
-      `inventory`, `presence`, `portal`, `student`, `assessment`, `exam`.
-- [ ] `docker network create mts241alikhlash-net`.
+      database per service, named after the domain: `identity`, `academic`,
+      `admission`, `hr`, `inventory`, `presence`, `portal`, `student`,
+      `assessment`, `exam`, all owned by the role `mts241`. The S3 bucket is
+      `241-apps`.
+- [ ] `docker network create 241-apps`.
 - [ ] 2 GB of swap (`free -m`); each NestJS service is capped at 320m.
 - [ ] Cloudflare, in the dashboard:
-  - proxied `A` records to the VPS for `dev-accounts`, `dev-academic`,
-    `dev-admission`, `dev-admin`, `dev-assessment`, `dev-exam`, `dev-hr`,
-    `dev-inventory` and `dev-portal` (`.mts241alikhlash.sch.id`);
+  - proxied `A` records to the VPS for `accounts`, `academic`,
+    `admission`, `admin`, `assessment`, `exam`, `hr`,
+    `inventory` and `portal` (`.mts241alikhlash.sch.id`);
   - SSL/TLS mode **Full (strict)** and **Always Use HTTPS**;
   - an Origin Certificate for `*.mts241alikhlash.sch.id` and
     `mts241alikhlash.sch.id`.
@@ -76,8 +74,8 @@ calls the removed route and fails with a 404.
     `proxy_pass http://127.0.0.1:8081`, `proxy_set_header Host $host`,
     `X-Forwarded-For $proxy_add_x_forwarded_for` and
     `X-Forwarded-Proto https`; port 80 redirects to https.
-- [ ] `compose/docker-compose.override.yml` copied from
-      `docker-compose.override.example.yml` (binds the gateway to
+- [ ] `compose/compose.override.yaml` copied from
+      `compose.override.example.yaml` (binds the gateway to
       `127.0.0.1:8081`), and `compose/.env` with `TRUST_PROXY=3`.
 - [ ] Firewall: ports 80 and 443 only from Cloudflare's ranges
       (`https://www.cloudflare.com/ips-v4`, `ips-v6`); keep SSH open.
@@ -89,23 +87,23 @@ calls the removed route and fails with a 404.
     the values of a local `.env`;
   - every `*_SERVICE_URL` is the container address (`http://identity-service:3000`
     and so on), never a public domain;
-  - identity: `SSO_ACCOUNTS_ORIGIN=https://dev-accounts.mts241alikhlash.sch.id`,
+  - identity: `SSO_ACCOUNTS_ORIGIN=https://accounts.mts241alikhlash.sch.id`,
     `SSO_APPS` with every app's `https://<host>/oauth/callback` (`account`
     required), `GOOGLE_CALLBACK_URL` the admission callback, the Google client
     id and secret;
   - S3 or MinIO credentials where the service stores files.
 - [ ] Google Cloud console: authorised redirect URIs
-      `https://dev-admission.mts241alikhlash.sch.id/auth/google/callback` and
-      `https://dev-accounts.mts241alikhlash.sch.id/auth/google/callback`.
+      `https://admission.mts241alikhlash.sch.id/auth/google/callback` and
+      `https://accounts.mts241alikhlash.sch.id/auth/google/callback`.
 
 ## 4. Migrate and seed
 
-Compose loads `docker-compose.override.yml` on its own only when no `-f` is
+Compose loads `compose.override.yaml` on its own only when no `-f` is
 given, so every command names it:
 
 ```bash
-cd platform-infra
-dc() { docker compose -f compose/docker-compose.staging.yml -f compose/docker-compose.override.yml "$@"; }
+cd 241-apps/infra
+dc() { docker compose -f compose/compose.yaml -f compose/compose.override.yaml "$@"; }
 dc --profile migrate pull
 for s in identity academic admission hr inventory presence portal student assessment exam; do
   dc --profile migrate run --rm "$s-service-migrate" || break
@@ -126,11 +124,11 @@ every later release's migrations.
 `seed:reference-data` in academic-service needs an active academic year:
 create the year in academic-web first, then
 `seed academic-service prisma/seed-reference-data.ts` for calendar types and a
-calendar. Never run `seed-timetable.ts` there (it refuses production).
+calendar. Never run `seed-timetable.ts` there (it refuses `NODE_ENV=production`).
 
 ## 5. Smoke test
 
-- [ ] `https://dev-<app>.mts241alikhlash.sch.id/health/<service>` answers for
+- [ ] `https://<app>.mts241alikhlash.sch.id/health/<service>` answers for
       every service.
 - [ ] `SELECT level, count(*) FROM regions GROUP BY level` in `identity` gives
       38 provinces, 514 regencies, 7,285 districts and 83,762 villages.
@@ -139,10 +137,10 @@ calendar. Never run `seed-timetable.ts` there (it refuses production).
       only.
 - [ ] A request through Cloudflare logs the client's real address in
       identity-service, not a Cloudflare one (`TRUST_PROXY` is right).
-- [ ] Sign in at `dev-accounts` as `admin`; the launcher lists every app.
+- [ ] Sign in at `accounts` as `admin`; the launcher lists every app.
 - [ ] Open three apps from the launcher without a password; sign out of one;
       the other two sign out within about 5 seconds.
-- [ ] An applicant account is refused at `dev-accounts`; a staff account is
+- [ ] An applicant account is refused at `accounts`; a staff account is
       refused on the admission sign-in form.
 - [ ] Add the school's payment account in admission-web (Admin PSB →
       Rekening Pembayaran); applicants cannot upload a payment proof until one
@@ -157,33 +155,22 @@ Keep the previous images on the VPS until the smoke test passes: do not
 ## 6. Automatic deploys
 
 `.github/workflows/deploy.yml` deploys over SSH. A push to `main` that
-changes `compose/docker-compose.staging.yml` or `deployment/staging.lock.json`
-deploys staging; the production pair deploys production after the owner
-approves the run in the `production` Environment. Both can be run by hand
-from the Actions tab (`Deploy` → `environment`, `ref`); a `ref` of an older
-`production-*` tag is the rollback. Digest commits no longer use `[skip ci]`:
-in every repository, Release skips publishing a version whose tag already
-exists (`<package>@<version>`; in `services`, per service image), so a commit
-without a version bump rebuilds nothing.
+changes `compose/compose.yaml` or `deployment/lock.json` deploys after the
+owner approves the run in the `vps` Environment. It can also be run by hand
+from the Actions tab (`Deploy` → `ref`); a `ref` of an older `deploy-*` tag is
+the rollback. Digest commits no longer use `[skip ci]`: in every repository,
+Release skips publishing a version whose tag already exists
+(`<package>@<version>`; per service image), so a commit without a version bump
+rebuilds nothing.
 
-Setting the repository variable `STAGING_PARKED` to `true` (Settings →
-Secrets and variables → Actions → Variables) parks staging: the plan drops
-staging from every push and dispatch, so a stopped staging stack is never
-started by a lock change, and production still deploys. Delete the variable to
-deploy staging again. The two environments deploy one after the other, and a
-failure in one does not cancel the other.
-
-New releases reach the locks through `.github/workflows/update-lock.yml`.
-Every hour it compares the staging lock with the newest released app, service
-and gateway versions (public git tags, GitHub Release manifests and GHCR, no
-token), and opens or updates the pull request `Update the staging lock`;
-merging it deploys staging. Running it by hand with `production` opens
-`Update the production lock`, which copies staging's app and service pins and
-pins the production gateway; merging it waits for approval as usual. When the
-change alters an environment's gateway routes, the pull request adds a
-changeset and says so: the gateway has to be released and pinned before that
-environment serves the new routes. Pull requests the workflow opens do not
-trigger Validate; the workflow runs the generator, its self-check and the lock
+New releases reach the lock through `.github/workflows/update-lock.yml`.
+Every hour it compares the lock with the newest released app, service and
+gateway versions (public git tags, GitHub Release manifests and GHCR, no
+token), and opens or updates the pull request `Update the lock`; merging it
+deploys. When the change alters the gateway routes, the pull request adds a
+changeset and says so: the gateway has to be released and pinned before the
+stack serves the new routes. Pull requests the workflow opens do not trigger
+Validate; the workflow runs the generator, its self-check and the lock
 validation itself.
 
 A rollback runs the older images against the current database. It is safe
@@ -192,86 +179,66 @@ since: after a release whose migrations drop or rename a column or table,
 roll forward with a fix instead.
 
 Every deploy first refuses to start with less than 5 GB free under Docker's
-root directory, then pulls, runs the nine migrations, runs `seed-permissions.ts`,
+root directory, then pulls, runs the ten migrations, runs `seed-permissions.ts`,
 brings the stack up with `--wait`, and asks the gateway for
-`/health/<service>` for all nine services, each through the host of an app
-that routes it. Only after every check passes does it run
-removes every `ghcr.io/mts241alikhlash/*` image no container uses. Images in
-use, by either environment, are refused by Docker and kept, and images of other
-projects on the VPS are never touched. A
-rollback pulls its pinned digests from GHCR again, so nothing it needs is
+`/health/<service>` for all ten services, each through the host of an app
+that routes it. Only after every check passes does it remove every
+`ghcr.io/mts241alikhlash/*` image no container uses. Images in use are refused
+by Docker and kept, and images of other projects on the VPS are never touched.
+A rollback pulls its pinned digests from GHCR again, so nothing it needs is
 lost; a failed deploy prunes nothing. Every container's log is capped at three
-10 MB files (`x-logging` in both compose files). The repository is public and so are its Actions logs:
-a failed deploy prints only container names and states there; read the
-container logs on the VPS. A failure before `up` leaves the old containers running.
-Old containers keep serving while migrations run, so a migration must work
-with the previous release's code: add first, remove in a later release. A
-failed Prisma migration stays in `_prisma_migrations`; fix it by hand with
-`prisma migrate resolve` before the next deploy.
+10 MB files (`x-logging` in `compose.yaml`). The repository is public and so
+are its Actions logs: a failed deploy prints only container names and states
+there; read the container logs on the VPS. A failure before `up` leaves the old
+containers running. Old containers keep serving while migrations run, so a
+migration must work with the previous release's code: add first, remove in a
+later release. A failed Prisma migration stays in `_prisma_migrations`; fix it
+by hand with `prisma migrate resolve` before the next deploy.
 
 One-time setup on the VPS:
 
 ```bash
 sudo useradd -m -s /bin/bash -G docker deploy
-sudo install -d -o deploy -g deploy /srv/mts241alikhlash /srv/mts241alikhlash/staging /srv/mts241alikhlash/production
-sudo -u deploy git clone https://github.com/mts241alikhlash/platform-infra.git /srv/mts241alikhlash/staging/platform-infra
-sudo -u deploy git clone https://github.com/mts241alikhlash/platform-infra.git /srv/mts241alikhlash/production/platform-infra
-sudo install -o root -g root -m 0755 /srv/mts241alikhlash/staging/platform-infra/scripts/deploy-entry.sh /srv/mts241alikhlash/deploy-entry
+sudo install -d -o deploy -g deploy /srv/241-apps
+sudo -u deploy git clone https://github.com/mts241alikhlash/241-apps.git /srv/241-apps
 sudo -u deploy install -d -m 700 /home/deploy/.ssh
-docker network create mts241alikhlash-production-net
+docker network create 241-apps
 ```
 
 - Membership of `docker` is root-equivalent; the `deploy` user is as
   powerful as root.
-- Each checkout gets its own `compose/env/<service>.env`, `compose/.env`
-  (`TRUST_PROXY=3`) and `compose/docker-compose.override.yml`. Staging's
-  override binds the gateway to `127.0.0.1:8081`, production's to
-  `127.0.0.1:8082`. Each points at its own databases (for example
-  `identity_staging` and `identity`), ideally with its own Postgres role.
-- Production's override also moves its stack onto its own network, or both
-  stacks share `mts241alikhlash-net` and Docker DNS answers
-  `identity-service` with either stack's container:
-
-  ```yaml
-  services:
-    gateway:
-      ports: !override
-        - "127.0.0.1:8082:80"
-  networks:
-    platform-net:
-      name: mts241alikhlash-production-net
-      external: true
-  ```
+- The checkout gets its own `infra/compose/env/<service>.env`,
+  `infra/compose/.env` (`TRUST_PROXY=3`) and
+  `infra/compose/compose.override.yaml` (the gateway on `127.0.0.1:8081`). It
+  points at the native PostgreSQL databases named after the domains, ideally
+  with the role `mts241` and nothing else.
 - Run `docker login ghcr.io` (section 1) as `deploy` when the images are
   private.
-- Host nginx sends the `dev-*` hosts to `127.0.0.1:8081` and the production
-  hosts to `127.0.0.1:8082`.
+- Host nginx sends every host to `127.0.0.1:8081`.
 - `python3` must be installed.
-- Re-copy `deploy-entry` by hand whenever `scripts/deploy-entry.sh` changes;
-  it is the one file a deploy does not update.
+- `deploy-entry.sh` runs from the checkout, so a deploy updates it; only a
+  commit on `main` can change what the forced command does.
 
-Keys, one per environment, generated on your own machine:
+The key is generated on your own machine:
 
 ```bash
-ssh-keygen -t ed25519 -N '' -C deploy-staging -f deploy-staging
-ssh-keygen -t ed25519 -N '' -C deploy-production -f deploy-production
+ssh-keygen -t ed25519 -N '' -C deploy -f deploy
 ssh-keyscan -t ed25519 <DEPLOY_HOST> > known_hosts
 ```
 
 `<DEPLOY_HOST>` is exactly the string stored in the `DEPLOY_HOST` secret (the
 same IP or the same hostname), or host-key checking refuses the connection.
 
-Append each public key to `/home/deploy/.ssh/authorized_keys` (mode 600,
-owned by `deploy`) as below. The argument binds a key to one environment:
-the staging key cannot deploy production.
+Append the public key to `/home/deploy/.ssh/authorized_keys` (mode 600, owned
+by `deploy`) as below. The forced command accepts one 40-character commit sha
+and nothing else.
 
 ```
-restrict,command="/srv/mts241alikhlash/deploy-entry staging" ssh-ed25519 AAAA... deploy-staging
-restrict,command="/srv/mts241alikhlash/deploy-entry production" ssh-ed25519 AAAA... deploy-production
+restrict,command="/srv/241-apps/infra/scripts/deploy-entry.sh" ssh-ed25519 AAAA... deploy
 ```
 
-In GitHub, Settings → Environments, create `staging` and `production`. Give
-each the secrets `DEPLOY_SSH_KEY` (its private key file), `DEPLOY_HOST` (the
-VPS address) and `DEPLOY_KNOWN_HOSTS` (the `known_hosts` file). On
-`production`, add the owner as a required reviewer. On both, restrict
-deployment branches to `main`. Delete the local private key files afterwards.
+In GitHub, Settings → Environments, create `vps`. Give it the secrets
+`DEPLOY_SSH_KEY` (the private key file), `DEPLOY_HOST` (the VPS address) and
+`DEPLOY_KNOWN_HOSTS` (the `known_hosts` file), add the owner as a required
+reviewer and restrict deployment branches to `main`. Delete the local private
+key file afterwards.

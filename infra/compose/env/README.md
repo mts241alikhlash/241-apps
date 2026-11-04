@@ -1,7 +1,6 @@
 # compose/env/
 
-Real per-service secrets for `docker-compose.production.yml` and
-`.staging.yml`. Everything in this directory except this file is gitignored
+Real per-service secrets for `compose.yaml`. Everything in this directory except this file is gitignored
 — never commit a real `.env` here.
 
 One file per backend service, named after the service:
@@ -22,10 +21,9 @@ compose/env/exam-service.env
 The 9 web apps don't get a file — they're static builds, nothing reads a
 runtime env var.
 
-Fill each one in from that service's own `.env.example` in the `services`
-repo (`services/services/<name>/.env.example`) with real values — same
-variables, same shape, just real credentials instead of the dev/example
-ones. `TRUST_PROXY` is set by the compose file itself, not here: it is the
+Fill each one in from that service's own `.env.example`
+(`services/<name>-service/.env.example`) with real values — same variables,
+same shape, just real credentials instead of the example ones. `TRUST_PROXY` is set by the compose file itself, not here: it is the
 number of proxies between the client and each service, and defaults to `1`,
 the gateway alone. Count every hop:
 
@@ -42,13 +40,12 @@ everyone. The count is only trustworthy when the VPS accepts ports 80 and 443
 from Cloudflare's address ranges alone: a client that reaches the origin
 directly can write its own `X-Forwarded-For` and step around those limits.
 
-**Default every one of these files to `NODE_ENV=production` — including the
-ones for `docker-compose.staging.yml`.** Don't leave the example's
+**Default every one of these files to `NODE_ENV=production`.** Don't leave the example's
 `NODE_ENV=development` as-is without knowing what it changes:
 
 - The session cookie only gets the `Secure` flag when
   `NODE_ENV === 'production'` exactly (`auth.controller.ts`). Setting
-  `development` anywhere deployed means that environment's cookies lose
+  `development` anywhere deployed means that deployment's cookies lose
   `Secure` — usually not what you want outside a throwaway debug box.
 - The logger only prints pretty/colorized console output — instead of
   structured JSON — when `NODE_ENV === 'development'` exactly. Every other
@@ -57,7 +54,7 @@ ones for `docker-compose.staging.yml`.** Don't leave the example's
 **`NODE_ENV=development` is safe to set on a deployed container** — all 9
 services ship `pino-pretty` as a real `dependency` now (fixed 2026-09-18), so
 it no longer crashes on boot the way it used to. It's a legitimate choice for
-verbose staging logs; just know it also drops the cookie `Secure` flag on
+verbose logs while debugging; just know it also drops the cookie `Secure` flag on
 whichever service you set it on.
 
 **`JWT_SECRET` and `PROVISIONING_SERVICE_TOKEN` must be byte-identical across
@@ -74,8 +71,11 @@ gateway adds `X-Forwarded-For`, and every route behind
 internal routes cannot be reached from the internet even with the token.
 
 `DATABASE_URL` (and `DIRECT_URL` where the service's `.env.example` has one)
-must point at that service's own database — each of the 9 is independent, no
-service shares a database with another.
+must point at that service's own database, named after the service domain
+(`identity`, `academic`, `inventory`, `presence`, `portal`, `admission`, `hr`,
+`student`, `assessment`, `exam`) and owned by the PostgreSQL role `mts241` —
+each of the 10 is independent, no service shares a database with another.
+The S3 bucket is `241-apps`.
 
 ## identity-service single sign-on variables
 
@@ -83,7 +83,7 @@ service shares a database with another.
 - `SSO_APPS`: comma-separated `app=https://<host>/oauth/callback` for every
   registered app (`account`, `academic`, `admin`, `admission`, `assessment`,
   `hr`, `inventory`, `portal`); `account` is required and every URL must be
-  `https` in production.
+  `https` when `NODE_ENV=production`.
 - `SSO_ABSOLUTE_SESSION_DAYS`: absolute session limit, default `30`.
 
 `GOOGLE_CALLBACK_URL` is the admission callback; staff Google sign-in returns to
