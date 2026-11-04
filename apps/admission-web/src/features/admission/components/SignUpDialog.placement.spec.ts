@@ -7,7 +7,7 @@ const service = vi.hoisted(() => ({ fetchGrades: vi.fn(), register: vi.fn() }))
 vi.mock('../services/publicAdmissionService', () => ({
   publicAdmissionService: service,
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   authApi: { googleStartUrl: vi.fn() },
   authService: { loginUser: vi.fn().mockResolvedValue(undefined) },
 }))

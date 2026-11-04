@@ -1,5 +1,5 @@
 import type { components } from '@mts241alikhlash/hr-api'
-import type { AddressSavePayload } from '@/features/platform/address'
+import type { AddressSavePayload } from '@mts241alikhlash/platform/address'
 
 type Schemas = components['schemas']
 

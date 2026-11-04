@@ -1,6 +1,6 @@
 import '@mts241alikhlash/web-shared/types/router'
-import { ssoAuthRoutes } from '@/features/platform/auth'
-import { dashboardRoutes } from '@/features/platform/dashboard'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
+import { dashboardRoutes } from '@mts241alikhlash/platform/dashboard'
 import { credentialRoutes } from '@/features/presence/credential'
 import { presenceDeviceRoutes } from '@/features/presence/device'
 import { employeeAttendanceRoutes } from '@/features/presence/employee-attendance'
@@ -17,8 +17,11 @@ import { positionRoutes } from '@/features/employee/position/routes'
 import { positionCategoryRoutes } from '@/features/employee/position-category/routes'
 import { employmentTypeRoutes } from '@/features/employee/employment-type/routes'
 import { createRouter, createWebHistory } from 'vue-router'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
-import { profileRoutes } from '@/features/platform/profile'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

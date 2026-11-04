@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({
   permissions: [] as string[],
   get: vi.fn(),
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthStore: () => ({ user: { permissions: state.permissions } }),
 }))
 vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({

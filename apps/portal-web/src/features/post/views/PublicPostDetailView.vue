@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { NotFoundView } from '@/features/platform/auth'
+import { NotFoundView } from '@mts241alikhlash/platform/auth'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import PostCard from '../components/PostCard.vue'
 import { postService } from '../services/postService'

@@ -30,7 +30,7 @@ import {
 } from '@mts241alikhlash/ui/table'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { Filter, Users } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import type { GraduationCandidate, GraduationStudentDecision } from '../types'
 
 const props = defineProps<{

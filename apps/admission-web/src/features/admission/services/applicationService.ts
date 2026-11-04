@@ -1,6 +1,6 @@
 import { admissionApi } from '../api/admissionApi'
 import { useApplicationStore } from '../stores/applicationStore'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import { notifyIfOutage } from '@mts241alikhlash/web-shared/utils/notify-outage'
 
 export const applicationService = {

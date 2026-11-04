@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@mts241alikhlash/ui/alert-dialog'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import LandingSectionForm from '../components/landing-admin/LandingSectionForm.vue'
 import { landingDefaults } from '../data/landingDefaults'
 import { LANDING_SECTIONS } from '../data/landingFormConfig'

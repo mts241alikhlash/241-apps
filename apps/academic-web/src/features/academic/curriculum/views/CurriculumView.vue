@@ -11,7 +11,7 @@ import {
   CardTitle,
   CardContent,
 } from '@mts241alikhlash/ui/card'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { Plus } from '@lucide/vue'
 import { useRouter } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'

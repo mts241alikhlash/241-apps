@@ -3,7 +3,7 @@ import { computed, onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { Button } from '@mts241alikhlash/ui/button'
 import { navigationService, usePageStore } from '@/features/page'
-import { ssoService } from '@/features/platform/auth'
+import { ssoService } from '@mts241alikhlash/platform/auth'
 
 const pageStore = usePageStore()
 

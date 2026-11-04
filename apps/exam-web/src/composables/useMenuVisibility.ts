@@ -1,4 +1,4 @@
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useMenuVisibility as useSharedMenuVisibility } from '@mts241alikhlash/web-shared/composables/useMenuVisibility'
 import { menuSections } from '@/config/menuConfig'
 

@@ -16,7 +16,7 @@ import {
 } from '@mts241alikhlash/ui/alert-dialog'
 import { Plus } from '@lucide/vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import DocumentTypeFormDialog from '../components/DocumentTypeFormDialog.vue'
 import { documentTypeService } from '../services/documentTypeService'
 import type {

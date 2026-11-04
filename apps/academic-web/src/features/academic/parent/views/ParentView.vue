@@ -14,7 +14,7 @@ import {
 import { Label } from '@mts241alikhlash/ui/label'
 import { Plus } from '@lucide/vue'
 import { useParent } from '../composables/useParent'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { createParentColumns } from '../components/columns'
 import ParentFormDialog from '../components/ParentFormDialog.vue'
 import type { Parent, ParentSavePayload } from '../types'

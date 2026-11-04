@@ -42,7 +42,7 @@ const { invalidate, userId } = vi.hoisted(() => ({
 vi.mock('@tanstack/vue-query', () => ({
   useQueryClient: () => ({ invalidateQueries: invalidate }),
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({ user: { value: { id: userId.value } } }),
 }))
 vi.mock('vue-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))

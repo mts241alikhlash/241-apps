@@ -1,5 +1,5 @@
 import { lookupApi } from '../api/lookupApi'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import type {
   AcademicYearOption,
   CalendarEntry,

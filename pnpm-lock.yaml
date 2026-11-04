@@ -233,6 +233,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/reference-data':
         specifier: workspace:*
         version: link:../../packages/reference-data
@@ -399,6 +402,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -568,6 +574,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/reference-data':
         specifier: workspace:*
         version: link:../../packages/reference-data
@@ -728,6 +737,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -891,6 +903,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1072,6 +1087,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1238,6 +1256,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/reference-data':
         specifier: workspace:*
         version: link:../../packages/reference-data
@@ -1407,6 +1428,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -1564,6 +1588,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.52.0
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
+      '@mts241alikhlash/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@mts241alikhlash/reference-data':
         specifier: workspace:*
         version: link:../../packages/reference-data

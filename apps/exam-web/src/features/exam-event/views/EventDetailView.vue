@@ -33,7 +33,7 @@ import {
 } from '@mts241alikhlash/ui/tabs'
 import { Plus } from '@lucide/vue'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { examTypeLabel } from '@/features/exam-schedule/types'
 import { formatWindow } from '@/features/exam-schedule/utils/formatWindow'
 import ExamCardPanel from '../components/ExamCardPanel.vue'

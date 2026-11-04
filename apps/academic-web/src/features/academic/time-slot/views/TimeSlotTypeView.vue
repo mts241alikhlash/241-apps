@@ -10,7 +10,7 @@ import {
   CardTitle,
   CardContent,
 } from '@mts241alikhlash/ui/card'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { timeSlotApi } from '../api/timeSlotApi'
 import { createTimeSlotTypeColumns } from '../components/timeSlotTypeColumns'

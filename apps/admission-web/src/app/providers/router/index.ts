@@ -1,9 +1,12 @@
 import '@mts241alikhlash/web-shared/types/router'
-import { authRoutes } from '@/features/platform/auth'
-import { profileRoutes } from '@/features/platform/profile'
+import { authRoutes } from '@mts241alikhlash/platform/auth'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 import { admissionPublicRoutes, admissionRoutes } from '@/features/admission'
 import { createRouter, createWebHistory } from 'vue-router'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
 import {
   deniedRedirect,
   effectivePermissions,

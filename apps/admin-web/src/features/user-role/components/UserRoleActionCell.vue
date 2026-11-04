@@ -25,8 +25,8 @@ import {
 } from '@mts241alikhlash/ui/tooltip'
 import { Pencil, ShieldCheck, Settings2 } from '@lucide/vue'
 import { useUserRole } from '../composables/useUserRole'
-import { useAuthSession } from '@/features/platform/auth'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import type { UserWithRoles } from '../types'
 
 const props = defineProps<{

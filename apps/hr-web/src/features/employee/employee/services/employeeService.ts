@@ -1,6 +1,6 @@
 import { employeeApi } from '../api/employeeApi'
 import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
-import { addressApi } from '@/features/platform/address'
+import { addressApi } from '@mts241alikhlash/platform/address'
 import { useEmployeeStore } from '../stores/employeeStore'
 import { positionCategoryApi } from '../../position-category/api/positionCategoryApi'
 import type {
@@ -16,7 +16,7 @@ import type {
 } from '../types'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { toast } from 'vue-sonner'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 
 export const employeeService = {
   fetchEmployees: async () => {
@@ -262,7 +262,7 @@ export const employeeService = {
   },
 
   changePassword: async (payload: { userId: string; password: string }) => {
-    const { accountService } = await import('@/features/platform/auth')
+    const { accountService } = await import('@mts241alikhlash/platform/auth')
     return accountService.changePassword(payload.userId, {
       password: payload.password,
     })

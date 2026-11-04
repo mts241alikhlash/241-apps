@@ -29,7 +29,7 @@ const listState = {
   filtersPending: ref(false),
 }
 
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     user: { value: { id: 'u1' } },
     hasPermission: (code: string) => permissions.has(code),

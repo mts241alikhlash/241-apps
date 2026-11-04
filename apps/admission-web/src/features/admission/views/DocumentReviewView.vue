@@ -34,7 +34,7 @@ import {
   TriangleAlert,
   X,
 } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import FilePreviewDialog from '../components/FilePreviewDialog.vue'
 import { useFilePreview } from '../composables/useFilePreview'
 import { admissionApi } from '../api/admissionApi'

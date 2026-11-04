@@ -12,7 +12,7 @@ const { loadParticipants, removeParticipant, permissions } = vi.hoisted(() => ({
 vi.mock('../services/examScheduleService', () => ({
   examScheduleService: { loadParticipants, removeParticipant },
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),
   }),

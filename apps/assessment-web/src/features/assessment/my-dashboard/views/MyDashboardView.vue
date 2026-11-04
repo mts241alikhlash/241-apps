@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useRoleGuard } from '@/features/platform/auth'
-import { DashboardView } from '@/features/platform/dashboard'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
+import { DashboardView } from '@mts241alikhlash/platform/dashboard'
 import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import {

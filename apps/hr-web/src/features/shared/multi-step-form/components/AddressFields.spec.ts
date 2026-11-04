@@ -5,7 +5,7 @@ import { reactive } from 'vue'
 import type { AddressFormState } from '../types'
 import AddressFields from './AddressFields.vue'
 
-vi.mock('@/features/platform/address', () => ({
+vi.mock('@mts241alikhlash/platform/address', () => ({
   RegionSelect: {
     props: ['modelValue'],
     emits: ['update:modelValue', 'update:names'],

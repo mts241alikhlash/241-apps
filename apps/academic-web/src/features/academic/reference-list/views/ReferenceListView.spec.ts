@@ -8,7 +8,7 @@ const route = reactive({ meta: { referenceList: 'transportations' } })
 const mounted: string[] = []
 
 vi.mock('vue-router', () => ({ useRoute: () => route }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useRoleGuard: () => ({ can: () => true }),
 }))
 vi.mock('@mts241alikhlash/reference-data', () => ({

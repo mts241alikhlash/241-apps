@@ -12,7 +12,7 @@ import {
   CardContent,
 } from '@mts241alikhlash/ui/card'
 import { Plus } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { onMounted, ref, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 

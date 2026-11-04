@@ -24,7 +24,7 @@ import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/err
 import type { ColumnDef } from '@tanstack/vue-table'
 import { h } from 'vue'
 import { Check, X } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { approvalService } from '../services/approvalService'
 import type {
   ApprovalInstance,

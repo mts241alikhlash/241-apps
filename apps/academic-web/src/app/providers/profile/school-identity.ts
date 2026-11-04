@@ -1,7 +1,7 @@
 import api from '@mts241alikhlash/web-shared/utils/api'
 import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
-import type { SchoolIdentity } from '@/features/platform/profile'
-import { useAuthStore } from '@/features/platform/auth'
+import type { SchoolIdentity } from '@mts241alikhlash/platform/profile'
+import { useAuthStore } from '@mts241alikhlash/platform/auth'
 
 interface EmployeeSlice {
   employmentType?: { name?: string } | null

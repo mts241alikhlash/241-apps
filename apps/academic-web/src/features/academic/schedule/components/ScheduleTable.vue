@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatEntityName } from '@mts241alikhlash/web-shared/utils/utils'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import type {
   ScheduleDay,
   ScheduleClassroom,

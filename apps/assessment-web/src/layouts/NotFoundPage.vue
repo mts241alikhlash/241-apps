@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppLayout from './AppLayout.vue'
-import { NotFoundView, useAuthStore } from '@/features/platform/auth'
+import { NotFoundView, useAuthStore } from '@mts241alikhlash/platform/auth'
 
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => Boolean(authStore.user))

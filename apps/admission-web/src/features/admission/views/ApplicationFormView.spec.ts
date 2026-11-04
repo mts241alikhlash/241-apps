@@ -129,7 +129,7 @@ vi.mock('../composables/useAdminRegistration', async () => {
   }
 })
 
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useRoleGuard: () => ({ can: () => false }),
 }))
 

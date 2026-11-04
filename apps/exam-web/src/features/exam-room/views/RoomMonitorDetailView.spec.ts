@@ -20,7 +20,7 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
 }))
 
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: () => true,
     user: ref({ id: 'u1' }),

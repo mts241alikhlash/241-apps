@@ -39,7 +39,7 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import { FileText, SquarePen, TriangleAlert } from '@lucide/vue'
 import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { useApplicationDetail } from '../composables/useApplicationDetail'
 import { useFilePreview } from '../composables/useFilePreview'
 import { useFormOptions } from '../composables/useFormOptions'

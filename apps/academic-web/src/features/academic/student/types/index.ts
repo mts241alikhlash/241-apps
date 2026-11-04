@@ -1,4 +1,4 @@
-import type { AddressSavePayload } from '@/features/platform/address'
+import type { AddressSavePayload } from '@mts241alikhlash/platform/address'
 import type { IncomeRange } from '@/features/academic/parent'
 
 export interface GradeOption {

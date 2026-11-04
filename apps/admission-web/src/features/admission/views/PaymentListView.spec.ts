@@ -37,7 +37,7 @@ vi.mock('../components/FilePreviewDialog.vue', () => ({
 }))
 
 const access = vi.hoisted(() => ({ granted: new Set<string>() }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useRoleGuard: () => ({
     can: (...permissions: string[]) =>
       permissions.some((p) => access.granted.has(p)),

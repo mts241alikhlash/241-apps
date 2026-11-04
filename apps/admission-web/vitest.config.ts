@@ -4,10 +4,6 @@ import vue from '@vitejs/plugin-vue'
 
 const uiRoot = path.resolve(import.meta.dirname, './packages/ui/src')
 const sharedRoot = path.resolve(import.meta.dirname, './packages/shared/src')
-const platformRoot = path.resolve(
-  import.meta.dirname,
-  './packages/platform/src/features',
-)
 
 export default defineConfig({
   plugins: [vue()],
@@ -24,10 +20,6 @@ export default defineConfig({
         replacement: path.resolve(sharedRoot, '$1'),
       },
       { find: /^@\/shared$/, replacement: sharedRoot },
-      {
-        find: /^@\/features\/platform\/(.+)$/,
-        replacement: path.resolve(platformRoot, '$1'),
-      },
       { find: '@', replacement: path.resolve(import.meta.dirname, './src') },
     ],
   },

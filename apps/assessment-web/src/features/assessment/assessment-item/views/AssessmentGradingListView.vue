@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 

@@ -25,7 +25,7 @@ import {
   TabsTrigger,
 } from '@mts241alikhlash/ui/tabs'
 import { onMounted, computed, watch } from 'vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const { can } = useRoleGuard()
 const canRecordAttendance = computed(() => can('attendances.manage'))

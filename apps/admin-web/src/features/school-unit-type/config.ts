@@ -1,11 +1,11 @@
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import type { ReferenceDataConfig } from '@mts241alikhlash/reference-data'
-import { schoolUnitTypeService } from '@/features/platform/school-unit-type'
+import { schoolUnitTypeService } from '@mts241alikhlash/platform/school-unit-type'
 import type {
   SchoolUnitType,
   SchoolUnitTypeCreatePayload,
   SchoolUnitTypeUpdatePayload,
-} from '@/features/platform/school-unit-type'
+} from '@mts241alikhlash/platform/school-unit-type'
 
 export function useSchoolUnitTypeConfig(): ReferenceDataConfig<
   SchoolUnitType,

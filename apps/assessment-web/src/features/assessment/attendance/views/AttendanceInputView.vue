@@ -31,7 +31,7 @@ import {
 } from '@mts241alikhlash/ui/select'
 import { Loader2, Save } from '@lucide/vue'
 import { onMounted, computed, ref, watch } from 'vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const { can } = useRoleGuard()
 const canRecordAttendance = computed(() => can('attendances.manage'))

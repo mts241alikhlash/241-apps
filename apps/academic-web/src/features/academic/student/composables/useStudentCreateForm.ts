@@ -21,7 +21,7 @@ import api from '@mts241alikhlash/web-shared/utils/api'
 import type { ApiPaginatedResponse } from '@mts241alikhlash/web-shared/types/api'
 import { studentService } from '../services/studentService'
 import type { GradeOption, StudentParentInput } from '../types'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 
 export function useStudentCreateForm() {
   const router = useRouter()

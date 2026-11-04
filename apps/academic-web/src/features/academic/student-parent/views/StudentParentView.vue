@@ -10,7 +10,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import { Plus } from '@lucide/vue'
 import { useStudentParent } from '../composables/useStudentParent'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { createStudentParentColumns } from '../components/columns'
 import StudentParentFormDialog from '../components/StudentParentFormDialog.vue'
 import type { StudentParent, StudentParentFormPayload } from '../types'

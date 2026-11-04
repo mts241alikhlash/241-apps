@@ -4,9 +4,9 @@ import App from '@/app/App.vue'
 import router from '@/app/providers/router'
 import store from '@/app/providers/store'
 import type { Component } from 'vue'
-import { authService, configureAuth } from '@/features/platform/auth'
+import { authService, configureAuth } from '@mts241alikhlash/platform/auth'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import { queryClient } from '@/features/platform/reference-data'
+import { queryClient } from '@mts241alikhlash/platform/reference-data'
 import { i18n, initialLocale, setLocale } from '@/i18n'
 
 configureAuth({

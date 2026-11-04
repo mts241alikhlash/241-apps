@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Loader2 } from '@lucide/vue'
-import { NotFoundView } from '@/features/platform/auth'
+import { NotFoundView } from '@mts241alikhlash/platform/auth'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { Separator } from '@mts241alikhlash/ui/separator'
 import { pageService } from '../services/pageService'

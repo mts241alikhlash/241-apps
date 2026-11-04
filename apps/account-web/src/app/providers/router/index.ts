@@ -5,8 +5,8 @@ import {
   authSessionService,
   ssoAuthRoutes,
   useAuthStore,
-} from '@/features/platform/auth'
-import { profileRoutes } from '@/features/platform/profile'
+} from '@mts241alikhlash/platform/auth'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

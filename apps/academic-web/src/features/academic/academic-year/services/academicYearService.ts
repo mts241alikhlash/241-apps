@@ -4,7 +4,7 @@ import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/err
 import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
 import { toast } from 'vue-sonner'
 import type { AcademicYearSavePayload } from '../types'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 
 export const academicYearService = {
   fetchAcademicYears: async () => {

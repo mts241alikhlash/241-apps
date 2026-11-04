@@ -2,7 +2,7 @@ import { studentScoreApi } from '../api/studentScoreApi'
 import { useStudentScoreStore } from '../stores/studentScoreStore'
 import type { StudentScoreRosterItem } from '../types'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { toast } from 'vue-sonner'
 
 export const studentScoreService = {

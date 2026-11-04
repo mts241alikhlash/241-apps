@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useAcademicCalendar } from './useAcademicCalendar'
 import { useCalendarEvents } from './useCalendarEvents'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 export function useAcademicCalendarView() {
   const {

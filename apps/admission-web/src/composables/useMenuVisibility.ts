@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { effectivePermissions } from '@/app/providers/router/home-route'
 import { useMenuVisibility as useSharedMenuVisibility } from '@mts241alikhlash/web-shared/composables/useMenuVisibility'
 import { menuSections } from '@/config/menuConfig'

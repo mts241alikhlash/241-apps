@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { watchDebounced } from '@vueuse/core'
 import { ArrowLeftRight, Plus, Filter } from '@lucide/vue'

@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { applicationService } from '../services/applicationService'
 import { decisionService } from '../services/decisionService'
 import { useApplicationStore } from '../stores/applicationStore'

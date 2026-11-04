@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@mts241alikhlash/ui/sidebar'
 
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useMenuVisibility } from '@/composables/useMenuVisibility'
 import NavMain from './NavMain.vue'
 import {

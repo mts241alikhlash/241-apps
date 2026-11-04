@@ -1,7 +1,7 @@
 import { toast } from 'vue-sonner'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { categoryApi, tagApi } from '../api/taxonomyApi'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import type {
   CategoryCreatePayload,
   CategoryUpdatePayload,

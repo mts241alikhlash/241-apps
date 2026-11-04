@@ -1,7 +1,7 @@
 import { toast } from 'vue-sonner'
 import { admissionApi } from '../api/admissionApi'
 import type { AdmissionBankAccount, BankAccountSavePayload } from '../types'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import { admissionErrorMessage } from '../utils'
 
 export const bankAccountService = {

@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { ssoAuthRoutes } from '@/features/platform/auth'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { examPackageRoutes } from '@/features/exam-package'
 import { examEventRoutes } from '@/features/exam-event'
 import { examGradingRoutes } from '@/features/exam-grading'
@@ -9,7 +9,7 @@ import {
   studentExamFocusRoutes,
   studentExamRoutes,
 } from '@/features/student-exam/routes'
-import { profileRoutes } from '@/features/platform/profile'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 export function landingPath(permissions: readonly string[]): string {
   if (permissions.includes('exam-rooms.supervise')) return '/exam/rooms'

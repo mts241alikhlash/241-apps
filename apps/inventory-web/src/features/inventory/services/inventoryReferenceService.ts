@@ -1,5 +1,5 @@
 import { inventoryApi } from '../api/inventoryApi'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import type { InventoryMetadata } from '../types'
 
 export const inventoryReferenceService = {

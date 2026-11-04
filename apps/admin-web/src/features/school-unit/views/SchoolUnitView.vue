@@ -6,7 +6,7 @@ import { useSchoolUnit } from '../composables/useSchoolUnit'
 import { Card, CardHeader, CardTitle } from '@mts241alikhlash/ui/card'
 import { Button } from '@mts241alikhlash/ui/button'
 import { PencilLine } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const router = useRouter()
 const { can } = useRoleGuard()

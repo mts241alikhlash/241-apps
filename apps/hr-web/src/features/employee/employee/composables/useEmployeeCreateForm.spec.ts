@@ -8,7 +8,7 @@ vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 vi.mock('../services/employeeService', () => ({
   employeeService: { createEmployeeWithRelations: vi.fn() },
 }))
-vi.mock('@/features/platform/reference-data', () => ({
+vi.mock('@mts241alikhlash/platform/reference-data', () => ({
   useReferenceList: () => ({ read: () => Promise.resolve([]) }),
 }))
 

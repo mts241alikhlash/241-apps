@@ -11,7 +11,7 @@ vi.mock('vue-router', () => ({
   RouterLink: defineComponent({ template: '<a><slot /></a>' }),
 }))
 
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   authService: { loginUser: vi.fn().mockResolvedValue({}) },
   authApi: { googleStartUrl: vi.fn() },
 }))
@@ -20,7 +20,7 @@ vi.mock('../services/publicAdmissionService', () => ({
   publicAdmissionService: { register: vi.fn(), fetchGrades: vi.fn() },
 }))
 
-import { authService, authApi } from '@/features/platform/auth'
+import { authService, authApi } from '@mts241alikhlash/platform/auth'
 import { publicAdmissionService } from '../services/publicAdmissionService'
 import SignUpDialog from './SignUpDialog.vue'
 

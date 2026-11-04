@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { Plus } from '@lucide/vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { semesterApi } from '@/features/lookup/semester'
 import { buildEventColumns } from '../components/eventColumns'
 import EventFormDialog from '../components/EventFormDialog.vue'

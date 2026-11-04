@@ -11,7 +11,7 @@ import {
   serviceUnavailableMessage,
 } from '@mts241alikhlash/web-shared/utils/service-error'
 import { toast } from 'vue-sonner'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 
 export const classroomService = {
   copyClassroomsToAcademicYear: async (

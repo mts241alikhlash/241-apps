@@ -30,7 +30,7 @@ import { watchDebounced } from '@vueuse/core'
 import { Filter } from '@lucide/vue'
 import { onMounted, ref, computed } from 'vue'
 import { toast } from 'vue-sonner'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const { can } = useRoleGuard()
 

@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { Filter, Plus } from '@lucide/vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { buildScheduleColumns } from '../components/scheduleColumns'
 import MakeupDialog from '../components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '../components/MakeupParticipantsDialog.vue'

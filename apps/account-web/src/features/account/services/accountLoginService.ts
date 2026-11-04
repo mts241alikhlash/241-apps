@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_BASE_URL } from '@mts241alikhlash/web-shared/utils/api'
-import { ssoService } from '@/features/platform/auth'
+import { ssoService } from '@mts241alikhlash/platform/auth'
 
 export function continueTarget(value: unknown): string | null {
   return typeof value === 'string' && value.startsWith('/sso/authorize?')

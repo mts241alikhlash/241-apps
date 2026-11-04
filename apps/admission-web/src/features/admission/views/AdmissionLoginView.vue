@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import LoginView from '@/features/platform/auth/views/LoginView.vue'
+import { LoginView } from '@mts241alikhlash/platform/auth'
 import SignUpDialog from '../components/SignUpDialog.vue'
 
 const route = useRoute()

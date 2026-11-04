@@ -27,7 +27,7 @@ import {
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
 import { Plus } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import FilePreviewDialog from '../components/FilePreviewDialog.vue'
 import { useFilePreview } from '../composables/useFilePreview'
 import { applicationService } from '../services/applicationService'

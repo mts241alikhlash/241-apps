@@ -3,7 +3,7 @@ import { onMounted } from 'vue'
 import { useAcademicSetting } from '../composables/useAcademicSetting'
 import AcademicSettingCard from '../components/AcademicSettingCard.vue'
 import WeeklyHolidaysSection from '../components/WeeklyHolidaysSection.vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const setting = useAcademicSetting()
 const { can } = useRoleGuard()

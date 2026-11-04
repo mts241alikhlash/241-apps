@@ -26,7 +26,7 @@ import {
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
-import { useAuthStore } from '@/features/platform/auth'
+import { useAuthStore } from '@mts241alikhlash/platform/auth'
 import { createLeaveApprovalColumns } from '../components/leaveApprovalColumns'
 import {
   isSaving,

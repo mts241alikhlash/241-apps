@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {

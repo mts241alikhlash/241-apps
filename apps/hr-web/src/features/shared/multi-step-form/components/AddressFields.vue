@@ -5,7 +5,7 @@ import {
   RegionSelect,
   type RegionCodes,
   type RegionNames,
-} from '@/features/platform/address'
+} from '@mts241alikhlash/platform/address'
 import type { AddressFormState } from '../types'
 
 const address = defineModel<AddressFormState>({ required: true })

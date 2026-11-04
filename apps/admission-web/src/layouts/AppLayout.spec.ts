@@ -9,7 +9,7 @@ const { changePassword, legacyChangePassword } = vi.hoisted(() => ({
   changePassword: vi.fn().mockResolvedValue({}),
   legacyChangePassword: vi.fn(),
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     user: ref({ id: 'user-1', name: 'Admin', roles: ['ADMIN'] }),
     logoutUser: vi.fn(),

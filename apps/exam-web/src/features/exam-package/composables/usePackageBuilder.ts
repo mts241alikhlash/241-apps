@@ -1,5 +1,5 @@
 import { computed, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   examPackageService,
   type ChangeResult,

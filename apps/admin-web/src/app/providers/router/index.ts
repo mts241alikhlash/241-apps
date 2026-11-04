@@ -1,8 +1,11 @@
 import '@mts241alikhlash/web-shared/types/router'
 import { createRouter, createWebHistory } from 'vue-router'
-import { ssoAuthRoutes } from '@/features/platform/auth'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { dashboardRoutes } from '@/features/dashboard'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
 import { auditLogsRoutes } from '@/features/audit-log'
 import { bloodTypeRoutes } from '@/features/blood-type/routes'
 import { fileRoutes } from '@/features/file'
@@ -12,7 +15,7 @@ import { rolesRoutes } from '@/features/role'
 import { schoolUnitRoutes } from '@/features/school-unit'
 import { schoolUnitTypeRoutes } from '@/features/school-unit-type/routes'
 import { userRoleRoutes } from '@/features/user-role'
-import { profileRoutes } from '@/features/platform/profile'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 const HOME = '/dashboard'
 

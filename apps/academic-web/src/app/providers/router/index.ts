@@ -2,7 +2,7 @@ import '@mts241alikhlash/web-shared/types/router'
 import { academicCalendarRoutes } from '@/features/academic/academic-calendar'
 import { academicSettingRoutes } from '@/features/academic/academic-setting'
 import { academicYearRoutes } from '@/features/academic/academic-year'
-import { ssoAuthRoutes } from '@/features/platform/auth'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { classroomRoutes } from '@/features/academic/classroom'
 import { gradeRoutes } from '@/features/academic/grade'
 import { curriculumRoutes } from '@/features/academic/curriculum'
@@ -22,8 +22,11 @@ import { academicInfoRoutes } from '@/features/academic/academic-info'
 import { academicCalendarTypeRoutes } from '@/features/academic/academic-calendar-type'
 import { semesterTypeRoutes } from '@/features/academic/semester-type'
 import { createRouter, createWebHistory } from 'vue-router'
-import { profileRoutes } from '@/features/platform/profile'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

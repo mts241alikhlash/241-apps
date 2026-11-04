@@ -1,4 +1,4 @@
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import type { ReferenceDataConfig } from '@mts241alikhlash/reference-data'
 import { academicCalendarTypeService } from './services/academicCalendarTypeService'
 import type {

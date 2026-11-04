@@ -1,6 +1,9 @@
 import '@mts241alikhlash/web-shared/types/router'
 import { createRouter, createWebHistory } from 'vue-router'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
 import { landingPath, routes } from './routes'
 
 const router = createRouter({

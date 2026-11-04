@@ -3,7 +3,7 @@ import type {
   TeachingAssignment,
   TeachingAssignmentQueryParams,
 } from '../types'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { notifyIfOutage } from '@mts241alikhlash/web-shared/utils/notify-outage'
 
 export interface LoadedAssignments {

@@ -11,8 +11,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/features/platform/*": ["./packages/platform/src/features/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

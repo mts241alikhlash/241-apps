@@ -19,7 +19,7 @@ const listState = {
 }
 
 vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),
   }),

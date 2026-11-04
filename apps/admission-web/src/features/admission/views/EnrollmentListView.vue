@@ -28,7 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import StatusBadge from '../components/StatusBadge.vue'
 import { applicationService } from '../services/applicationService'
 import { enrollmentService } from '../services/enrollmentService'

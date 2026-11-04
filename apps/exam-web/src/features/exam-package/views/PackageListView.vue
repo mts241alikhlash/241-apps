@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
 import { Filter, Plus } from '@lucide/vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { buildPackageColumns } from '../components/packageColumns'
 import PackageCreateDialog from '../components/PackageCreateDialog.vue'
 import PackageFilterFields from '../components/PackageFilterFields.vue'

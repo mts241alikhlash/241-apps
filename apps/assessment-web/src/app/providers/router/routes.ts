@@ -1,12 +1,12 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { ssoAuthRoutes } from '@/features/platform/auth/routes'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { assessmentItemRoutes } from '@/features/assessment/assessment-item'
 import { examScoreRoutes } from '@/features/exam-score'
 import { attendanceRoutes } from '@/features/assessment/attendance'
 import { myDashboardRoutes } from '@/features/assessment/my-dashboard'
 import { raporRoutes } from '@/features/assessment/rapor/routes'
 import { studentScoreRoutes } from '@/features/assessment/student-score'
-import { profileRoutes } from '@/features/platform/profile'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 export const routes: RouteRecordRaw[] = [
   {

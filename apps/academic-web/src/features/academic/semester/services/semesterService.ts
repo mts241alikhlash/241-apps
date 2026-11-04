@@ -5,7 +5,7 @@ import { useSemesterStore } from '../stores/semesterStore'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
 import { toast } from 'vue-sonner'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import type {
   GenerateRecommendationPayload,
   PromotionPayload,

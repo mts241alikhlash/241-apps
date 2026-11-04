@@ -1,6 +1,6 @@
 import { teachingAssignmentApi } from './api/teachingAssignmentApi'
 import type { TeachingAssignment, TeachingAssignmentQueryParams } from './types'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 export interface LoadedAssignments {
   rows: TeachingAssignment[]

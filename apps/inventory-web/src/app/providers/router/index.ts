@@ -1,9 +1,12 @@
 import '@mts241alikhlash/web-shared/types/router'
 import { createRouter, createWebHistory } from 'vue-router'
-import { ssoAuthRoutes } from '@/features/platform/auth'
-import { profileRoutes } from '@/features/platform/profile'
-import { authSessionService, useAuthStore } from '@/features/platform/auth'
-import { dashboardRoutes } from '@/features/platform/dashboard'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
+import {
+  authSessionService,
+  useAuthStore,
+} from '@mts241alikhlash/platform/auth'
+import { dashboardRoutes } from '@mts241alikhlash/platform/dashboard'
 import { inventoryRoutes } from '@/features/inventory/routes'
 
 const HOME = '/dashboard'

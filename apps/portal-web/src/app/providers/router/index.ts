@@ -1,8 +1,8 @@
 import '@mts241alikhlash/web-shared/types/router'
-import { ssoAuthRoutes } from '@/features/platform/auth'
+import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/features/platform/auth'
-import { authSessionService } from '@/features/platform/auth'
+import { useAuthStore } from '@mts241alikhlash/platform/auth'
+import { authSessionService } from '@mts241alikhlash/platform/auth'
 import { portalAgendaRoutes, portalPublicAgendaRoutes } from '@/features/agenda'
 import {
   portalGalleryRoutes,
@@ -12,7 +12,7 @@ import { portalHomeRoutes } from '@/features/homepage'
 import { portalPageRoutes, portalPublicPageRoutes } from '@/features/page'
 import { portalPostRoutes, portalPublicPostRoutes } from '@/features/post'
 import { portalTaxonomyRoutes } from '@/features/taxonomy'
-import { profileRoutes } from '@/features/platform/profile'
+import { profileRoutes } from '@mts241alikhlash/platform/profile'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

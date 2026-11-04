@@ -3,7 +3,7 @@ import { useGradeStore } from '../stores/gradeStore'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { toast } from 'vue-sonner'
 import type { GradeSavePayload, GradeQueryParams } from '../types'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 
 export const gradeService = {
   fetchGrades: async (params?: GradeQueryParams) => {

@@ -13,7 +13,7 @@ import { Plus } from '@lucide/vue'
 import { DataTable, ServiceUnavailable, SearchInput } from '@mts241alikhlash/ui'
 import { createClassroomColumns } from '../components/columns'
 import ClassroomFormDialog from '../components/ClassroomFormDialog.vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { useClassroomList } from '../composables/useClassroomList'
 import { watchDebounced } from '@vueuse/core'
 import {

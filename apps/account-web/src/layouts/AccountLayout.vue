@@ -12,8 +12,12 @@ import {
 import { NavUser } from '@mts241alikhlash/ui'
 import { SidebarProvider } from '@mts241alikhlash/ui/sidebar'
 import { TooltipProvider } from '@mts241alikhlash/ui/tooltip'
-import ChangePasswordSection from '@/features/platform/profile/components/ChangePasswordSection.vue'
-import { authService, useAuthStore, useSsoApps } from '@/features/platform/auth'
+import { ChangePasswordSection } from '@mts241alikhlash/platform/profile'
+import {
+  authService,
+  useAuthStore,
+  useSsoApps,
+} from '@mts241alikhlash/platform/auth'
 import { LayoutGrid, UserRound } from '@lucide/vue'
 
 const route = useRoute()

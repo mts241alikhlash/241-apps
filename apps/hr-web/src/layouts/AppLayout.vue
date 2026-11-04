@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import ChangePasswordSection from '@/features/platform/profile/components/ChangePasswordSection.vue'
+import { ChangePasswordSection } from '@mts241alikhlash/platform/profile'
 import { NavUser } from '@mts241alikhlash/ui'
 import {
   SidebarInset,
@@ -33,7 +33,7 @@ import {
 } from '@mts241alikhlash/ui/sidebar'
 import { TooltipProvider } from '@mts241alikhlash/ui/tooltip'
 import HeaderAppSwitcher from '@/components/layout/HeaderAppSwitcher.vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { menuSections } from '@/config/menuConfig'
 import { Menu, Search } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'

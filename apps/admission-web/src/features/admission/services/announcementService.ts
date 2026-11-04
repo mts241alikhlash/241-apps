@@ -3,7 +3,7 @@ import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/err
 import { admissionApi } from '../api/admissionApi'
 import { useAnnouncementStore } from '../stores/announcementStore'
 import type { AnnouncementSavePayload } from '../types'
-import { useReferenceList } from '@/features/platform/reference-data'
+import { useReferenceList } from '@mts241alikhlash/platform/reference-data'
 import { notifyIfOutage } from '@mts241alikhlash/web-shared/utils/notify-outage'
 
 export const announcementService = {

@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { examScheduleService } from '../services/examScheduleService'
 import type { MakeupParticipant } from '../types'
 import { buildParticipantColumns } from './participantColumns'

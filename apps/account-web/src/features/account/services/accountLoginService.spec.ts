@@ -11,7 +11,7 @@ vi.mock('axios', () => ({
   default: { post: mocks.post, isAxiosError: mocks.isAxiosError },
 }))
 vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({ API_BASE_URL: '' }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   ssoService: { startSignIn: mocks.startSignIn },
 }))
 

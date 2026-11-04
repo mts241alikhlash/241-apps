@@ -37,7 +37,7 @@ import {
   XCircle,
 } from '@lucide/vue'
 import { useMyApplication } from '../composables/useMyApplication'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import StatusBadge from '../components/StatusBadge.vue'
 import type { AdmissionStatus } from '../types'
 import { PAYMENT_STATUS_LABELS, STATUS_LABELS } from '../types'

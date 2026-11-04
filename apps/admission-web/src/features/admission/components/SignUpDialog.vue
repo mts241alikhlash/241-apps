@@ -15,7 +15,7 @@ import {
   DialogScrollContent,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { authApi, authService } from '@/features/platform/auth'
+import { authApi, authService } from '@mts241alikhlash/platform/auth'
 import { publicAdmissionService } from '../services/publicAdmissionService'
 import AdmissionPlacementFields from './AdmissionPlacementFields.vue'
 import type { AdmissionGrade } from '../types'

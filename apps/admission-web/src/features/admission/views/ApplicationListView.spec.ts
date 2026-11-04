@@ -33,7 +33,7 @@ const listState = {
   filtersPending: ref(false),
 }
 const sessionUser = ref({ id: 'admin-1' })
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({ user: sessionUser }),
 }))
 

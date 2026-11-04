@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   SessionRecoveryDialog,
   SessionTimelineDialog,

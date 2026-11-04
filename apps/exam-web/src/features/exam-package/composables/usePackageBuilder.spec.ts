@@ -15,7 +15,7 @@ const { loadPackage, reorder, removeQuestion, submit, permissions, user } =
 vi.mock('../services/examPackageService', () => ({
   examPackageService: { loadPackage, reorder, removeQuestion, submit },
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     user,
     hasPermission: (code: string) => permissions.has(code),

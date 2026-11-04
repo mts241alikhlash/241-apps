@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { NotFoundView } from '@/features/platform/auth'
+import { NotFoundView } from '@mts241alikhlash/platform/auth'
 import { CalendarDays, MapPin, Loader2 } from '@lucide/vue'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { Separator } from '@mts241alikhlash/ui/separator'

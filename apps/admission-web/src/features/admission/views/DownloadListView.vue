@@ -35,7 +35,7 @@ import {
 } from '@mts241alikhlash/ui/alert-dialog'
 import { ChevronDown, ChevronUp, Plus } from '@lucide/vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import FloatingField from '../components/AdmissionField.vue'
 import { downloadSchema } from '../schemas/applicationFormSchemas'
 import { downloadService } from '../services/downloadService'

@@ -43,7 +43,7 @@ vi.mock('vue-router', async () => {
 vi.mock('@mts241alikhlash/web-shared/composables/useBreadcrumbs', () => ({
   useBreadcrumbs: vi.fn(),
 }))
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     user,
     hasPermission: (code: string) => permissions.has(code),

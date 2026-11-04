@@ -29,7 +29,7 @@ import {
 import { ChevronDown, Plus } from '@lucide/vue'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import ScheduleFormDialog from '@/features/exam-schedule/components/ScheduleFormDialog.vue'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { buildBuilderColumns } from '../components/builderColumns'
 import AdjustKeyDialog from '../components/AdjustKeyDialog.vue'
 import RenamePackageDialog from '../components/RenamePackageDialog.vue'

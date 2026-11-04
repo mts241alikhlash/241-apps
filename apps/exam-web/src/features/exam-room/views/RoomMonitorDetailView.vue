@@ -26,7 +26,7 @@ import {
 } from '@mts241alikhlash/ui/tabs'
 import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
-import { useAuthSession } from '@/features/platform/auth'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import RoomCameraGrid from '../components/RoomCameraGrid.vue'
 import RoomMonitorSummaryCards from '../components/RoomMonitorSummaryCards.vue'
 import RoomReportTab from '../components/RoomReportTab.vue'

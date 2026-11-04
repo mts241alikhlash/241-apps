@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useSsoApps } from '@/features/platform/auth'
+import { useSsoApps } from '@mts241alikhlash/platform/auth'
 
 const LABELS: Record<string, string> = {
   academic: 'Akademik',

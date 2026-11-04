@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { AppSwitcher } from '@mts241alikhlash/ui'
-import { authConfig, useSsoApps } from '@/features/platform/auth'
+import { authConfig, useSsoApps } from '@mts241alikhlash/platform/auth'
 
 interface SwitcherApp {
   key: string

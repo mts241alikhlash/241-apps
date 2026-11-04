@@ -8,10 +8,6 @@ import {
   UNROUTED_PREFIXES,
 } from './api-routes.config.ts'
 
-const platformRoot = path.resolve(
-  import.meta.dirname,
-  './packages/platform/src/features',
-)
 
 const IDENTITY_URL = process.env.IDENTITY_SERVICE_URL ?? 'http://localhost:3000'
 const PRESENCE_URL = process.env.PRESENCE_SERVICE_URL ?? 'http://localhost:3400'
@@ -78,10 +74,6 @@ export default defineConfig(({ mode }) => ({
     tsconfigPaths: true,
     dedupe: ['vue', 'pinia', 'vue-router'],
     alias: [
-      {
-        find: /^@\/features\/platform\/(.+)$/,
-        replacement: path.resolve(platformRoot, '$1'),
-      },
       { find: '@', replacement: path.resolve(import.meta.dirname, './src') },
     ],
   },

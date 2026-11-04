@@ -9,7 +9,7 @@ import {
 import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Loader2 } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import type { useAcademicSetting } from '../composables/useAcademicSetting'
 
 withDefaults(

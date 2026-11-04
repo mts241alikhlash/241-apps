@@ -4,7 +4,7 @@ import TimeSlotManageTable from '../components/TimeSlotManageTable.vue'
 import { Card, CardHeader, CardTitle } from '@mts241alikhlash/ui/card'
 import { Button } from '@mts241alikhlash/ui/button'
 import { Loader2, Plus, Save } from '@lucide/vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const { can } = useRoleGuard()
 const tableRef = ref<InstanceType<typeof TimeSlotManageTable> | null>(null)

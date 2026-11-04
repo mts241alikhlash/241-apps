@@ -1,7 +1,7 @@
 import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
 import type { FileItem } from '../types/file.types'
 import api from '@mts241alikhlash/web-shared/utils/api'
-import { authConfig } from '@/features/platform/auth'
+import { authConfig } from '@mts241alikhlash/platform/auth'
 
 export const fileApi = {
   getFiles: (schoolUnitId?: string) => {

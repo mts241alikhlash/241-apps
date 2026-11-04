@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@mts241alikhlash/ui/alert-dialog'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { Copy, Plus } from '@lucide/vue'
 import { onMounted, ref, watch } from 'vue'
 import {

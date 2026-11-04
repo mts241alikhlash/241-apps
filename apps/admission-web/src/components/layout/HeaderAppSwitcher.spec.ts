@@ -9,7 +9,7 @@ const { apps, load } = vi.hoisted(() => ({
   load: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock('@/features/platform/auth', () => ({
+vi.mock('@mts241alikhlash/platform/auth', () => ({
   authConfig: ref({ ssoApp: 'admission' }),
   useSsoApps: () => ({ apps: ref(apps.value), load }),
 }))

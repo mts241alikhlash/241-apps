@@ -25,7 +25,7 @@ import AddStudentDialog from '../components/AddStudentDialog.vue'
 import TransferStudentDialog from '../components/TransferStudentDialog.vue'
 import ClassroomStructureDialog from '../components/ClassroomStructureDialog.vue'
 import ClassroomFormDialog from '../components/ClassroomFormDialog.vue'
-import { useRoleGuard } from '@/features/platform/auth'
+import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const route = useRoute()
 const router = useRouter()
