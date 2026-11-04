@@ -1,0 +1,51 @@
+import { Module } from '@nestjs/common'
+import { AuthModule } from '../platform/auth/auth.module.js'
+import { UserModule } from '../platform/user/user.module.js'
+import { AdmissionApplicantController } from './applicant/presentation/http/admission-applicant.controller.js'
+import { AdmissionPublicController } from './applicant/presentation/http/admission-public.controller.js'
+import { ApplicationModule } from './application/index.js'
+import { WaveModule } from './wave/index.js'
+import {
+  AnnouncementModule,
+  GetPublishedAnnouncementsUseCase,
+} from './announcement/index.js'
+import { GetActiveWavesUseCase } from './wave/index.js'
+import { ApplicantModule } from './applicant/index.js'
+import { DocumentModule } from './document/index.js'
+import { PaymentModule } from './payment/index.js'
+import { NotificationModule } from './notification/index.js'
+import { BankAccountModule } from './bank-account/index.js'
+import { DocumentTypeModule } from './document-type/index.js'
+import { DownloadModule } from './download/index.js'
+import { LandingModule } from './landing/index.js'
+import { DecisionModule } from './decision/index.js'
+import { EnrollmentModule } from './enrollment/index.js'
+import { DocumentReviewModule } from './document-review/index.js'
+import { FileModule } from './file/index.js'
+import { LateDocumentModule } from './late-document/index.js'
+
+@Module({
+  imports: [
+    AuthModule,
+    UserModule,
+    ApplicationModule,
+    WaveModule,
+    AnnouncementModule,
+    ApplicantModule,
+    DocumentModule,
+    PaymentModule,
+    NotificationModule,
+    BankAccountModule,
+    DocumentTypeModule,
+    DownloadModule,
+    LandingModule,
+    DocumentReviewModule,
+    DecisionModule,
+    EnrollmentModule,
+    FileModule,
+    LateDocumentModule,
+  ],
+  controllers: [AdmissionPublicController, AdmissionApplicantController],
+  providers: [GetActiveWavesUseCase, GetPublishedAnnouncementsUseCase],
+})
+export class AdmissionModule {}

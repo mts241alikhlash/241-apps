@@ -1,0 +1,490 @@
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common'
+import { Test, TestingModule } from '@nestjs/testing'
+import { IAdmissionApplicationRepository } from '../../domain/repositories/admission-application-repository.js'
+import { AdmissionNotificationService } from '../../../notification/index.js'
+import { AcceptApplicationUseCase } from './accept-application/accept-application.use-case.js'
+import { EnrollApplicantUseCase } from './enroll-applicant/enroll-applicant.use-case.js'
+import { IStudentEnrollmentPort } from '../../infrastructure/integration/student-enrollment.port.js'
+import { RejectApplicationUseCase } from './reject-application/reject-application.use-case.js'
+import { RequestRevisionUseCase } from './request-revision/request-revision.use-case.js'
+import { VerifyApplicationUseCase } from './verify-application/verify-application.use-case.js'
+
+describe('Admission workflow use-cases', () => {
+  const repo = {
+    findActiveById: jest.fn(),
+    findActiveWithWave: jest.fn(),
+    findActiveWithDocsAndPayment: jest.fn(),
+    findActiveWithParentsAndUser: jest.fn(),
+    countAcceptedInWave: jest.fn(),
+    findRequiredActiveDocumentTypes: jest.fn(),
+    setRevisionNeeded: jest.fn(),
+    setVerified: jest.fn(),
+    setAccepted: jest.fn(),
+    setRejected: jest.fn(),
+    setNis: jest.fn(),
+    setEnrolling: jest.fn(),
+    markEnrolled: jest.fn(),
+  }
+  const notifications = { notify: jest.fn() }
+  const enrollment = { enroll: jest.fn(), updateNis: jest.fn() }
+
+  let accept: AcceptApplicationUseCase
+  let reject: RejectApplicationUseCase
+  let verifyApp: VerifyApplicationUseCase
+  let enroll: EnrollApplicantUseCase
+  let requestRevision: RequestRevisionUseCase
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AcceptApplicationUseCase,
+        RejectApplicationUseCase,
+        VerifyApplicationUseCase,
+        EnrollApplicantUseCase,
+        RequestRevisionUseCase,
+        { provide: IAdmissionApplicationRepository, useValue: repo },
+        { provide: AdmissionNotificationService, useValue: notifications },
+        { provide: IStudentEnrollmentPort, useValue: enrollment },
+      ],
+    }).compile()
+
+    accept = module.get(AcceptApplicationUseCase)
+    reject = module.get(RejectApplicationUseCase)
+    verifyApp = module.get(VerifyApplicationUseCase)
+    enroll = module.get(EnrollApplicantUseCase)
+    requestRevision = module.get(RequestRevisionUseCase)
+    jest.clearAllMocks()
+  })
+
+  describe('AcceptApplicationUseCase', () => {
+    it('accepts without a quota check and notifies', async () => {
+      repo.findActiveWithWave.mockResolvedValue({
+        id: 'app1',
+        status: 'VERIFIED',
+        waveId: 'w1',
+        wave: { quota: 10 },
+      })
+      repo.setAccepted.mockResolvedValue({ id: 'app1', status: 'ACCEPTED' })
+
+      const result = await accept.execute('app1', {}, 'admin1')
+
+      expect(result).not.toHaveProperty('quotaWarning')
+      expect(repo.countAcceptedInWave).not.toHaveBeenCalled()
+      expect(notifications.notify).toHaveBeenCalled()
+    })
+  })
+
+  describe('RequestRevisionUseCase', () => {
+    it('returns a submitted application to the applicant with the note', async () => {
+      repo.findActiveById.mockResolvedValue({ id: 'app1', status: 'SUBMITTED' })
+      repo.setRevisionNeeded.mockResolvedValue({
+        id: 'app1',
+        status: 'REVISION_NEEDED',
+      })
+
+      await requestRevision.execute('app1', { note: 'Foto KK buram' })
+
+      expect(repo.setRevisionNeeded).toHaveBeenCalledWith(
+        'app1',
+        'Foto KK buram',
+      )
+      expect(notifications.notify).toHaveBeenCalledWith(
+        'app1',
+        'STATUS_CHANGE',
+        'Formulir perlu diperbaiki',
+        expect.stringContaining('Foto KK buram'),
+      )
+    })
+
+    it('refuses a draft the applicant has not submitted', async () => {
+      repo.findActiveById.mockResolvedValue({ id: 'app1', status: 'DRAFT' })
+
+      await expect(
+        requestRevision.execute('app1', { note: 'x' }),
+      ).rejects.toThrow(ConflictException)
+      expect(repo.setRevisionNeeded).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('VerifyApplicationUseCase', () => {
+    it('verifies once every required document is approved and the payment is verified', async () => {
+      repo.findActiveWithDocsAndPayment.mockResolvedValue({
+        id: 'app1',
+        status: 'SUBMITTED',
+        documents: [{ documentTypeId: 'dt1', status: 'APPROVED' }],
+        payment: { status: 'VERIFIED' },
+      })
+      repo.findRequiredActiveDocumentTypes.mockResolvedValue([
+        { id: 'dt1', name: 'KK' },
+      ])
+      repo.setVerified.mockResolvedValue({ id: 'app1', status: 'VERIFIED' })
+
+      await verifyApp.execute('app1', 'admin1')
+
+      expect(repo.setVerified).toHaveBeenCalled()
+      expect(notifications.notify).toHaveBeenCalled()
+    })
+
+    it('blocks verification when a required document is not approved', async () => {
+      repo.findActiveWithDocsAndPayment.mockResolvedValue({
+        id: 'app1',
+        status: 'SUBMITTED',
+        documents: [{ documentTypeId: 'dt1', status: 'PENDING' }],
+        payment: { status: 'VERIFIED' },
+      })
+      repo.findRequiredActiveDocumentTypes.mockResolvedValue([
+        { id: 'dt1', name: 'KK' },
+      ])
+
+      await expect(verifyApp.execute('app1', 'admin1')).rejects.toThrow(
+        ConflictException,
+      )
+    })
+
+    it('blocks verification when payment is not verified', async () => {
+      repo.findActiveWithDocsAndPayment.mockResolvedValue({
+        id: 'app1',
+        status: 'SUBMITTED',
+        documents: [{ documentTypeId: 'dt1', status: 'APPROVED' }],
+        payment: { status: 'PENDING' },
+      })
+      repo.findRequiredActiveDocumentTypes.mockResolvedValue([
+        { id: 'dt1', name: 'KK' },
+      ])
+
+      await expect(verifyApp.execute('app1', 'admin1')).rejects.toThrow(
+        ConflictException,
+      )
+    })
+  })
+
+  describe('status transitions an administrator cannot make', () => {
+    it('does not accept an application that is not verified', async () => {
+      repo.findActiveWithWave.mockResolvedValue({
+        id: 'app1',
+        status: 'SUBMITTED',
+        waveId: 'w1',
+        wave: { quota: 10 },
+      })
+
+      await expect(accept.execute('app1', {}, 'admin1')).rejects.toThrow(
+        ConflictException,
+      )
+      expect(repo.setAccepted).not.toHaveBeenCalled()
+    })
+
+    it('does not reject an application already accepted', async () => {
+      repo.findActiveById.mockResolvedValue({ id: 'app1', status: 'ACCEPTED' })
+
+      await expect(
+        reject.execute('app1', { reason: 'x' }, 'admin1'),
+      ).rejects.toThrow(ConflictException)
+      expect(repo.setRejected).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('minor decision hardening', () => {
+    const changed =
+      'Pendaftaran berubah saat Anda bekerja, muat ulang dan coba lagi'
+
+    it('tells a second leader accepting the same applicant in Indonesian', async () => {
+      repo.findActiveWithWave.mockResolvedValue({
+        id: 'app1',
+        status: 'ACCEPTED',
+        waveId: 'w1',
+        wave: { quota: 10 },
+      })
+
+      await expect(accept.execute('app1', {}, 'admin1')).rejects.toThrow(
+        new ConflictException(changed),
+      )
+    })
+
+    it('tells a leader rejecting an already decided applicant in Indonesian', async () => {
+      repo.findActiveById.mockResolvedValue({ id: 'app1', status: 'ACCEPTED' })
+
+      await expect(
+        reject.execute('app1', { reason: 'x' }, 'admin1'),
+      ).rejects.toThrow(new ConflictException(changed))
+    })
+
+    it('answers an unknown applicant in Indonesian', async () => {
+      repo.findActiveWithWave.mockResolvedValue(null)
+      repo.findActiveById.mockResolvedValue(null)
+
+      await expect(accept.execute('x', {}, 'admin1')).rejects.toThrow(
+        new NotFoundException('Pendaftar tidak ditemukan'),
+      )
+      await expect(
+        reject.execute('x', { reason: 'x' }, 'admin1'),
+      ).rejects.toThrow(new NotFoundException('Pendaftar tidak ditemukan'))
+    })
+
+    it('keeps an accepted applicant accepted when the notification fails', async () => {
+      repo.findActiveWithWave.mockResolvedValue({
+        id: 'app1',
+        status: 'VERIFIED',
+        waveId: 'w1',
+        wave: { quota: 10 },
+      })
+      repo.setAccepted.mockResolvedValue({ id: 'app1', status: 'ACCEPTED' })
+      notifications.notify.mockRejectedValueOnce(new Error('db down'))
+
+      await expect(accept.execute('app1', {}, 'admin1')).resolves.toMatchObject(
+        { status: 'ACCEPTED' },
+      )
+    })
+
+    it('passes the verified-only rule of the queue to the locked write', async () => {
+      repo.findActiveById.mockResolvedValue({ id: 'app1', status: 'VERIFIED' })
+      repo.setRejected.mockResolvedValue({ id: 'app1', status: 'REJECTED' })
+
+      await reject.execute(
+        'app1',
+        { reason: 'x', onlyVerified: true },
+        'admin1',
+      )
+
+      expect(repo.setRejected).toHaveBeenCalledWith({
+        id: 'app1',
+        adminId: 'admin1',
+        reason: 'x',
+        onlyVerified: true,
+      })
+    })
+  })
+
+  describe('RejectApplicationUseCase', () => {
+    it('rejects a submitted application and notifies', async () => {
+      repo.findActiveById.mockResolvedValue({
+        id: 'app1',
+        status: 'SUBMITTED',
+      })
+      repo.setRejected.mockResolvedValue({ id: 'app1', status: 'REJECTED' })
+
+      await reject.execute('app1', { reason: 'Berkas palsu' }, 'admin1')
+
+      expect(repo.setRejected).toHaveBeenCalledWith({
+        id: 'app1',
+        adminId: 'admin1',
+        reason: 'Berkas palsu',
+      })
+      expect(notifications.notify).toHaveBeenCalled()
+    })
+  })
+
+  describe('EnrollApplicantUseCase', () => {
+    const acceptedApplication = {
+      id: 'app1',
+      status: 'ACCEPTED',
+      registrationNumber: 'REG-1',
+      gender: 'MALE',
+      birthPlace: 'Bandung',
+      birthDate: new Date('2010-01-01'),
+      nik: '123',
+      parents: [],
+      userId: 'u1',
+      user: { id: 'u1' },
+    }
+
+    it('rejects enrollment when personal data is incomplete', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue({
+        ...acceptedApplication,
+        birthPlace: null,
+      })
+
+      await expect(
+        enroll.execute(
+          'app1',
+          { nis: '1', nisn: '2', gradeId: 'grade-1' },
+          'operator-token',
+        ),
+      ).rejects.toThrow(BadRequestException)
+    })
+
+    it('does not mark the application enrolled when academic refuses', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue(acceptedApplication)
+      enrollment.enroll.mockRejectedValue(
+        new ConflictException('NIS 1 is already in use'),
+      )
+
+      await expect(
+        enroll.execute(
+          'app1',
+          { nis: '1', nisn: '2', gradeId: 'grade-1' },
+          'operator-token',
+        ),
+      ).rejects.toThrow(ConflictException)
+      expect(repo.markEnrolled).not.toHaveBeenCalled()
+    })
+
+    it('enrolls through academic, then marks the application', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue(acceptedApplication)
+      enrollment.enroll.mockResolvedValue({
+        studentId: 's1',
+        parentsLinked: 0,
+        enrollmentCreated: false,
+        alreadyEnrolled: false,
+      })
+      repo.markEnrolled.mockResolvedValue({ id: 'app1', status: 'ENROLLED' })
+
+      const dto = { nis: '1', nisn: '2', gradeId: 'grade-1' }
+      const result = await enroll.execute('app1', dto, 'operator-token')
+
+      expect(enrollment.enroll).toHaveBeenCalledWith(
+        expect.objectContaining({
+          applicationId: 'app1',
+          userId: 'u1',
+          nis: '1',
+          nisn: '2',
+          profile: expect.objectContaining({ nik: '123' }),
+        }),
+        'operator-token',
+      )
+      expect(repo.markEnrolled).toHaveBeenCalledWith('app1', 's1')
+      expect(notifications.notify).toHaveBeenCalled()
+      expect(result.student.id).toBe('s1')
+    })
+
+    it('retries after remote success when local admission completion fails', async () => {
+      repo.findActiveWithParentsAndUser
+        .mockResolvedValueOnce(acceptedApplication)
+        .mockResolvedValueOnce({ ...acceptedApplication, status: 'ENROLLING' })
+      repo.setEnrolling.mockResolvedValue({
+        ...acceptedApplication,
+        status: 'ENROLLING',
+      })
+      enrollment.enroll
+        .mockResolvedValueOnce({
+          studentId: 's1',
+          parentsLinked: 0,
+          enrollmentCreated: true,
+          alreadyEnrolled: false,
+        })
+        .mockResolvedValueOnce({
+          studentId: 's1',
+          parentsLinked: 0,
+          enrollmentCreated: false,
+          alreadyEnrolled: true,
+        })
+      repo.markEnrolled
+        .mockRejectedValueOnce(new Error('admission database unavailable'))
+        .mockResolvedValueOnce({ id: 'app1', status: 'ENROLLED' })
+
+      await expect(
+        enroll.execute(
+          'app1',
+          { nis: '1', nisn: '2', gradeId: 'grade-1' },
+          'operator-token',
+        ),
+      ).rejects.toThrow('admission database unavailable')
+
+      const result = await enroll.execute(
+        'app1',
+        { nis: '1', nisn: '2', gradeId: 'grade-1' },
+        'operator-token',
+      )
+
+      expect(enrollment.enroll).toHaveBeenCalledTimes(2)
+      expect(enrollment.enroll).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ applicationId: 'app1', userId: 'u1' }),
+        'operator-token',
+      )
+      expect(repo.markEnrolled).toHaveBeenCalledTimes(2)
+      expect(notifications.notify).toHaveBeenCalledTimes(1)
+      expect(result.student.id).toBe('s1')
+    })
+
+    it('persists enrolling before calling student-service', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue(acceptedApplication)
+      repo.setEnrolling.mockResolvedValue({
+        ...acceptedApplication,
+        status: 'ENROLLING',
+      })
+      enrollment.enroll.mockResolvedValue({
+        studentId: 's1',
+        parentsLinked: 0,
+        enrollmentCreated: false,
+        alreadyEnrolled: false,
+      })
+      repo.markEnrolled.mockResolvedValue({ id: 'app1', status: 'ENROLLED' })
+
+      await enroll.execute(
+        'app1',
+        { nis: '1', nisn: '2', gradeId: 'grade-1' },
+        'operator-token',
+      )
+
+      expect(repo.setEnrolling).toHaveBeenCalledWith('app1')
+      expect(repo.setEnrolling.mock.invocationCallOrder[0]).toBeLessThan(
+        enrollment.enroll.mock.invocationCallOrder[0],
+      )
+    })
+
+    it('retries an application already in enrolling', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue({
+        ...acceptedApplication,
+        status: 'ENROLLING',
+      })
+      enrollment.enroll.mockResolvedValue({
+        studentId: 's1',
+        parentsLinked: 0,
+        enrollmentCreated: false,
+        alreadyEnrolled: true,
+      })
+      repo.markEnrolled.mockResolvedValue({ id: 'app1', status: 'ENROLLED' })
+
+      const result = await enroll.execute(
+        'app1',
+        { nis: '1', nisn: '2', gradeId: 'grade-1' },
+        'operator-token',
+      )
+
+      expect(enrollment.enroll).toHaveBeenCalled()
+      expect(repo.markEnrolled).toHaveBeenCalledWith('app1', 's1')
+      expect(result.student.id).toBe('s1')
+    })
+
+    it('does not complete or notify when a retryable remote call fails', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue({
+        ...acceptedApplication,
+        status: 'ENROLLING',
+      })
+      enrollment.enroll.mockRejectedValue(
+        new ConflictException('student unavailable'),
+      )
+
+      await expect(
+        enroll.execute(
+          'app1',
+          { nis: '1', nisn: '2', gradeId: 'grade-1' },
+          'operator-token',
+        ),
+      ).rejects.toThrow(ConflictException)
+      expect(repo.markEnrolled).not.toHaveBeenCalled()
+      expect(notifications.notify).not.toHaveBeenCalled()
+    })
+
+    it('keeps enrolled terminal and does not call student-service', async () => {
+      repo.findActiveWithParentsAndUser.mockResolvedValue({
+        ...acceptedApplication,
+        status: 'ENROLLED',
+      })
+
+      await expect(
+        enroll.execute(
+          'app1',
+          { nis: '1', nisn: '2', gradeId: 'grade-1' },
+          'operator-token',
+        ),
+      ).rejects.toThrow(ConflictException)
+      expect(enrollment.enroll).not.toHaveBeenCalled()
+      expect(repo.markEnrolled).not.toHaveBeenCalled()
+    })
+  })
+})

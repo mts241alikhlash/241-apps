@@ -1,0 +1,35 @@
+{
+  "name": "241-apps",
+  "private": true,
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24.22.1 <25",
+    "pnpm": ">=12.16.1 <13"
+  },
+  "scripts": {
+    "check": "pnpm -r --if-present run check",
+    "test": "pnpm -r --if-present run test",
+    "changeset": "changeset",
+    "runtime:check": "node --test scripts/runtime-config.spec.mjs",
+    "openapi:emit": "node scripts/emit-openapi.mjs",
+    "openapi:check": "node scripts/emit-openapi.mjs --check",
+    "db:smoke": "node scripts/db-smoke.mjs",
+    "version:check": "node scripts/check-contract-versions.mjs",
+    "api:generate": "node scripts/generate-api-clients.mjs",
+    "api:check": "node scripts/generate-api-clients.mjs --check",
+    "api:typecheck": "pnpm --filter '@mts241alikhlash/*-api' --if-present run typecheck"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "~5.9.3",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "@vue/test-utils": "^2.5.1",
+    "@vue/tsconfig": "^0.9.1",
+    "happy-dom": "^21.0.4",
+    "vitest": "^5.1.0",
+    "vue": "^3.5.43",
+    "vue-tsc": "^3.3.10"
+  },
+  "version": "0.1.0"
+}

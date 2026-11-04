@@ -1,0 +1,38 @@
+export default {
+  menu: {
+    section: {
+      overview: 'Overview',
+      access: 'Access & Users',
+      institution: 'Institution',
+      reference: 'Reference Data',
+      files: 'Files',
+      audit: 'Audit',
+    },
+    dashboard: 'Dashboard',
+    users: 'User Management',
+    roles: 'Roles',
+    permissions: 'Permissions',
+    files: 'Files',
+    auditLogs: 'Activity Log',
+    schoolUnit: 'School Profile',
+    schoolUnitTypes: 'School Unit Types',
+    religions: 'Religions',
+    bloodTypes: 'Blood Types',
+  },
+  dashboard: {
+    title: 'Dashboard',
+    subtitle: 'Platform at a glance',
+    dashboard: 'Dashboard',
+    users: 'Accounts',
+    roles: 'Roles',
+    permissions: 'Permissions',
+    auditLast24h: 'Audit entries (24h)',
+    unavailable: 'Unavailable',
+    refreshing: 'refreshing…',
+  },
+  common: {
+    language: 'Language',
+    indonesian: 'Indonesian',
+    english: 'English',
+  },
+}

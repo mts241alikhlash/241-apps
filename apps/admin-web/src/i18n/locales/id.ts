@@ -1,0 +1,38 @@
+export default {
+  menu: {
+    section: {
+      overview: 'Ringkasan',
+      access: 'Akses & Pengguna',
+      institution: 'Kelembagaan',
+      reference: 'Data Referensi',
+      files: 'Berkas',
+      audit: 'Audit',
+    },
+    dashboard: 'Dasbor',
+    users: 'Kelola Pengguna',
+    roles: 'Manajemen Role',
+    permissions: 'Manajemen Permission',
+    files: 'Berkas & Dokumen',
+    auditLogs: 'Log Aktivitas',
+    schoolUnit: 'Profil Sekolah',
+    schoolUnitTypes: 'Jenis Satuan Pendidikan',
+    religions: 'Agama',
+    bloodTypes: 'Golongan Darah',
+  },
+  dashboard: {
+    title: 'Dasbor',
+    subtitle: 'Ringkasan platform',
+    dashboard: 'Dasbor',
+    users: 'Akun',
+    roles: 'Role',
+    permissions: 'Permission',
+    auditLast24h: 'Entri audit (24 jam)',
+    unavailable: 'Tidak tersedia',
+    refreshing: 'memuat ulang…',
+  },
+  common: {
+    language: 'Bahasa',
+    indonesian: 'Indonesia',
+    english: 'Inggris',
+  },
+}

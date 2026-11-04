@@ -1,0 +1,151 @@
+enum ExamPackageStatus {
+  DRAFT
+  SUBMITTED
+  RETURNED
+  APPROVED
+  LOCKED
+}
+
+enum PackageReviewAction {
+  SUBMIT
+  APPROVE
+  RETURN
+}
+
+enum ExamType {
+  UH
+  QUIZ
+  ASSIGNMENT
+  UTS
+  UAS
+}
+
+enum ExamScheduleStatus {
+  SCHEDULED
+  CANCELLED
+}
+
+model ExamPackage {
+  id          String            @id @default(uuid()) @db.Uuid
+  title       String            @db.VarChar(200)
+  subjectId   String            @map("subject_id") @db.Uuid
+  gradeId     String            @map("grade_id") @db.Uuid
+  status      ExamPackageStatus @default(DRAFT)
+  lockedAt    DateTime?         @map("locked_at")
+  createdById String            @map("created_by_id") @db.Uuid
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at")
+
+  items     ExamPackageItem[]
+  schedules ExamSchedule[]
+  questions Question[]
+  reviews   ExamPackageReview[]
+
+  @@index([subjectId, gradeId, status])
+  @@index([status])
+  @@map("exam_packages")
+}
+
+model ExamPackageReview {
+  id            String              @id @default(uuid()) @db.Uuid
+  packageId     String              @map("package_id") @db.Uuid
+  action        PackageReviewAction
+  byUserId      String              @map("by_user_id") @db.Uuid
+  note          String?
+  questionNotes Json                @default("[]") @map("question_notes")
+  createdAt     DateTime            @default(now()) @map("created_at")
+
+  package ExamPackage @relation(fields: [packageId], references: [id])
+
+  @@index([packageId, createdAt])
+  @@map("exam_package_reviews")
+}
+
+enum ItemResolution {
+  NORMAL
+  BONUS_ALL
+  KEY_OVERRIDE
+}
+
+model ExamPackageItem {
+  id              String         @id @default(uuid()) @db.Uuid
+  packageId       String         @map("package_id") @db.Uuid
+  questionId      String         @map("question_id") @db.Uuid
+  questionVersion Int            @map("question_version")
+  position        Int
+  resolution      ItemResolution @default(NORMAL)
+  overrideContent Json?          @map("override_content")
+  adjustedById    String?        @map("adjusted_by_id") @db.Uuid
+  adjustedReason  String?        @map("adjusted_reason") @db.VarChar(300)
+  adjustedAt      DateTime?      @map("adjusted_at")
+
+  package  ExamPackage @relation(fields: [packageId], references: [id])
+  question Question    @relation(fields: [questionId], references: [id])
+
+  @@unique([packageId, questionId])
+  @@unique([packageId, position])
+  @@index([questionId])
+  @@map("exam_package_items")
+}
+
+enum ExamScheduleKind {
+  REGULAR
+  MAKEUP
+}
+
+enum MakeupReason {
+  SICK
+  PERMITTED
+  ABSENT
+  OTHER
+}
+
+model ExamSchedule {
+  id              String             @id @default(uuid()) @db.Uuid
+  packageId       String             @map("package_id") @db.Uuid
+  classroomId     String             @map("classroom_id") @db.Uuid
+  semesterId      String             @map("semester_id") @db.Uuid
+  eventId         String?            @map("event_id") @db.Uuid
+  startsAt        DateTime           @map("starts_at")
+  endsAt          DateTime           @map("ends_at")
+  durationMinutes Int                @map("duration_minutes")
+  type            ExamType           @default(UH)
+  kind            ExamScheduleKind   @default(REGULAR)
+  makeupOfId      String?            @map("makeup_of_id") @db.Uuid
+  tokenRotation   Int                @default(0) @map("token_rotation")
+  minSubmitMinutes Int               @default(0) @map("min_submit_minutes")
+  status          ExamScheduleStatus @default(SCHEDULED)
+  createdById     String             @map("created_by_id") @db.Uuid
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  package      ExamPackage               @relation(fields: [packageId], references: [id])
+  event        ExamEvent?                @relation(fields: [eventId], references: [id])
+  makeupOf     ExamSchedule?             @relation("Makeups", fields: [makeupOfId], references: [id], onDelete: Restrict)
+  makeups      ExamSchedule[]            @relation("Makeups")
+  sessions     ExamSession[]
+  participants ExamScheduleParticipant[]
+
+  @@index([classroomId, startsAt])
+  @@index([packageId])
+  @@index([makeupOfId])
+  @@index([eventId])
+  @@map("exam_schedules")
+}
+
+model ExamScheduleParticipant {
+  id         String       @id @default(uuid()) @db.Uuid
+  scheduleId String       @map("schedule_id") @db.Uuid
+  studentId  String       @map("student_id") @db.Uuid
+  reason     MakeupReason
+  note       String?      @db.VarChar(200)
+  addedById  String       @map("added_by_id") @db.Uuid
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  schedule ExamSchedule @relation(fields: [scheduleId], references: [id])
+
+  @@unique([scheduleId, studentId])
+  @@index([studentId])
+  @@map("exam_schedule_participants")
+}

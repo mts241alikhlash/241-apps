@@ -1,0 +1,35 @@
+.calendar-override .fc-day-holiday {
+  background-color: color-mix(in oklab, var(--destructive) 7%, transparent);
+}
+
+.calendar-override
+  .fc-col-header-cell.fc-day-holiday
+  .fc-col-header-cell-cushion {
+  color: var(--destructive);
+}
+
+.calendar-override .fc-day-holiday .fc-daygrid-day-number {
+  color: var(--destructive);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .calendar-override {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .calendar-override .fc-col-header-cell-cushion {
+    font-size: 0.75rem !important;
+    padding: 6px 0 !important;
+  }
+  .calendar-override .fc-daygrid-day-number {
+    font-size: 0.8125rem !important;
+    padding: 4px !important;
+  }
+  .calendar-override .fc-event-main {
+    padding: 1px 0 !important;
+  }
+  .calendar-override .fc-event {
+    font-size: 0.65rem !important;
+  }
+}

@@ -1,0 +1,26 @@
+export default {
+  menu: {
+    approval: 'Approvals',
+    approvalFlow: 'Approval Flow',
+    approvalList: 'Approval List',
+    assetCategory: 'Asset Categories',
+    assetCondition: 'Asset Conditions',
+    assetList: 'Assets',
+    assetStatus: 'Asset Statuses',
+    circulationHistory: 'Circulation History',
+    dashboard: 'Dashboard',
+    fundingSource: 'Funding Sources',
+    labelPrinting: 'Label Printing',
+    loan: 'Loans',
+    loanTransaction: 'Loan Transactions',
+    location: 'Locations',
+    reference: 'Reference',
+    section: {
+      approval: 'Approvals',
+      assets: 'Asset Management',
+      circulation: 'Asset Circulation',
+      main: 'Main',
+      settings: 'Settings',
+    },
+  },
+}

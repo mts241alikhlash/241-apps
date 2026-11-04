@@ -1,0 +1,159 @@
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common'
+import {
+  assertTransition,
+  AdmissionStatusTransitionError,
+} from '../../../domain/policies/admission-status.transitions.js'
+import {
+  hasCompleteAddress,
+  isEligibleAdmissionParent,
+  legacyIncomeFor,
+} from '../../../domain/policies/enroll-as-student.rules.js'
+import { IAdmissionApplicationRepository } from '../../../domain/repositories/admission-application-repository.js'
+import { AdmissionNotificationService } from '../../../../notification/index.js'
+import { IStudentEnrollmentPort } from '../../../infrastructure/integration/student-enrollment.port.js'
+import type { EnrollApplicantInput } from './enroll-applicant.input.js'
+
+@Injectable()
+export class EnrollApplicantUseCase {
+  private readonly logger = new Logger(EnrollApplicantUseCase.name)
+
+  constructor(
+    private readonly admissionApplicationRepository: IAdmissionApplicationRepository,
+    private readonly notifications: AdmissionNotificationService,
+    private readonly enrollment: IStudentEnrollmentPort,
+  ) {}
+
+  async execute(
+    applicationId: string,
+    dto: EnrollApplicantInput,
+    bearerToken: string,
+  ) {
+    const application =
+      await this.admissionApplicationRepository.findActiveWithParentsAndUser(
+        applicationId,
+      )
+    if (!application) {
+      throw new NotFoundException('Application not found')
+    }
+
+    try {
+      assertTransition(application.status, 'ENROLLING')
+    } catch (error) {
+      if (error instanceof AdmissionStatusTransitionError) {
+        throw new ConflictException(error.message)
+      }
+      throw error
+    }
+
+    if (
+      !application.gender ||
+      !application.birthPlace ||
+      !application.birthDate
+    ) {
+      throw new BadRequestException(
+        'Applicant profile is incomplete (gender, place and date of birth)',
+      )
+    }
+    if (!application.nik) {
+      throw new BadRequestException(
+        'A national ID is required before the applicant can be processed',
+      )
+    }
+
+    const nis = dto.nis ?? application.nis
+    const nisn = dto.nisn ?? application.nisn
+    const gradeId = dto.gradeId ?? application.targetGradeId
+    if (!nis) throw new BadRequestException('NIS belum disusun')
+    if (!nisn) throw new BadRequestException('NISN belum diisi')
+    if (!gradeId) {
+      throw new BadRequestException('Tingkat kelas tujuan belum diisi')
+    }
+
+    if (dto.nis && dto.nis !== application.nis) {
+      await this.admissionApplicationRepository.setNis(application.id, dto.nis)
+    }
+
+    if (application.status === 'ACCEPTED') {
+      await this.admissionApplicationRepository.setEnrolling(application.id)
+    }
+
+    const enrolled = await this.enrollment.enroll(
+      {
+        applicationId: application.id,
+        userId: application.userId,
+        nis,
+        nisn,
+        gradeId,
+        classroomId: dto.classroomId,
+        profile: {
+          name: application.fullName ?? '',
+          nik: application.nik,
+          gender: application.gender,
+          birthPlace: application.birthPlace,
+          birthDate: application.birthDate.toISOString(),
+          email: application.email,
+          phone: application.phone,
+          religionId: application.religionId,
+        },
+        parents: (application.parents ?? [])
+          .filter(isEligibleAdmissionParent)
+          .map((parent) => ({
+            name: parent.name,
+            nik: parent.nik,
+            birthPlace: parent.birthPlace,
+            birthDate: parent.birthDate.toISOString(),
+            phone: parent.phone,
+            occupationId: parent.occupationId,
+            income: legacyIncomeFor(parent.incomeRangeId),
+            relation: parent.relation,
+            isPrimary: parent.isPrimary ?? false,
+          })),
+        address: hasCompleteAddress(application)
+          ? {
+              street: application.street,
+              rt: application.rt,
+              rw: application.rw,
+              village: application.village,
+              district: application.district,
+              city: application.city,
+              province: application.province,
+              postalCode: application.postalCode!,
+            }
+          : undefined,
+      },
+      bearerToken,
+    )
+
+    const result = await this.admissionApplicationRepository.markEnrolled(
+      application.id,
+      enrolled.studentId,
+    )
+
+    await this.notifications.notify(
+      application.id,
+      'STATUS_CHANGE',
+      'Selamat bergabung sebagai santri',
+      `Anda telah resmi terdaftar sebagai santri dengan NIS ${nis}. Akun ini kini dapat digunakan untuk mengakses aplikasi akademik.`,
+    )
+
+    this.logger.log(
+      `Applicant ${application.registrationNumber} enrolled as student ${enrolled.studentId} (NIS ${nis})`,
+    )
+
+    return {
+      ...result,
+      student: {
+        id: enrolled.studentId,
+        parentsLinked: enrolled.parentsLinked,
+        enrollmentCreated: enrolled.enrollmentCreated,
+        alreadyEnrolled: enrolled.alreadyEnrolled,
+      },
+    }
+  }
+}

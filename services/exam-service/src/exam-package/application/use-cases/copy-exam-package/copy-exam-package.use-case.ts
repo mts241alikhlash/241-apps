@@ -1,0 +1,56 @@
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { IEmployeeIdentityReadPort } from '../../../../platform/employee-identity/employee-identity.port.js'
+import { resolveAuthor } from '../../../../question/application/resolve-author.js'
+import {
+  TeacherScope,
+  type ScopeUser,
+} from '../../../../question/application/teacher-scope.service.js'
+import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
+import type { ExamPackageDetail } from '../../../domain/entities/exam-package.entity.js'
+import { assertCanTakeFrom } from '../../../domain/policies/package-lifecycle.policy.js'
+import { IExamPackageRepository } from '../../../domain/repositories/exam-package.repository.js'
+import { MAX_TITLE_LENGTH } from '../../package-title.js'
+import { buildQuestionCopies } from '../../build-question-copies.js'
+
+@Injectable()
+export class CopyExamPackageUseCase {
+  constructor(
+    private readonly packages: IExamPackageRepository,
+    private readonly questions: IQuestionRepository,
+    private readonly scope: TeacherScope,
+    private readonly employees: IEmployeeIdentityReadPort,
+  ) {}
+
+  async execute(user: ScopeUser, id: string): Promise<ExamPackageDetail> {
+    const source = await this.packages.findById(id)
+    if (source === null) throw new NotFoundException('Paket tidak ditemukan')
+
+    const scope = await this.scope.forUser(user)
+    this.scope.assertCovers(scope, source.subjectId, source.gradeId)
+    assertCanTakeFrom(source.status)
+
+    const authorEmployeeId = await resolveAuthor(
+      this.employees,
+      user,
+      scope.all,
+      undefined,
+    )
+    const copies = await buildQuestionCopies(
+      this.questions,
+      source,
+      source.items.map((item) => item.questionId),
+      source,
+      authorEmployeeId,
+      user.id,
+    )
+    return this.packages.createWithQuestions(
+      {
+        title: `Salinan ${source.title}`.slice(0, MAX_TITLE_LENGTH),
+        subjectId: source.subjectId,
+        gradeId: source.gradeId,
+        createdById: user.id,
+      },
+      copies,
+    )
+  }
+}

@@ -1,0 +1,51 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
+
+export class PublicRegisterApplicantDto {
+  @ApiProperty({ example: 'Ahmad Fauzi' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  fullName: string
+
+  @ApiProperty({ example: 'ahmad@example.com' })
+  @IsEmail()
+  @MaxLength(255)
+  email: string
+
+  @ApiPropertyOptional({ example: '081234567890' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(15)
+  phone?: string
+
+  @ApiProperty({ minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(72)
+  password: string
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  passwordConfirm: string
+
+  @ApiPropertyOptional({ enum: ['NEW', 'TRANSFER'] })
+  @IsOptional()
+  @IsIn(['NEW', 'TRANSFER'])
+  admissionType?: 'NEW' | 'TRANSFER'
+
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  targetGradeId?: string
+}

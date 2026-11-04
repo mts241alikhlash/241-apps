@@ -1,0 +1,29 @@
+import type { RouteRecordRaw } from 'vue-router'
+
+export const raporRoutes: RouteRecordRaw[] = [
+  {
+    path: '/my/report-card',
+    name: 'my-rapor',
+    component: () => import('./views/MyRaporView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiredPermission: 'report-cards.read-own',
+      title: 'Rapor Saya',
+      breadcrumbs: [{ title: 'Akademik Saya', href: '#' }, { title: 'Rapor' }],
+    },
+  },
+  {
+    path: '/report-card',
+    name: 'rapor',
+    component: () => import('./views/RaporView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiredPermission: 'report-cards.read',
+      title: 'Rapor Siswa',
+      breadcrumbs: [
+        { title: 'Penilaian & Rapor', href: '#' },
+        { title: 'Rapor' },
+      ],
+    },
+  },
+]

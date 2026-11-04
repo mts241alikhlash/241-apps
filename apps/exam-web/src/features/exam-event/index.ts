@@ -1,0 +1,1 @@
+export { examEventRoutes } from './routes'

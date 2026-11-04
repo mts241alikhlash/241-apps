@@ -1,0 +1,65 @@
+import type { ClassroomSupervisorSavePayload } from '../types'
+import { classroomApi } from '../api/classroomApi'
+import { useClassroomStore } from '../stores/classroomStore'
+import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
+import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
+
+export const classroomSupervisorService = {
+  saveClassroomSupervisor: async (
+    id: string | null,
+    payload: ClassroomSupervisorSavePayload,
+  ) => {
+    const store = useClassroomStore()
+    store.isSupervisorSaving = true
+    store.supervisorFormError = null
+
+    try {
+      if (id) {
+        await classroomApi.updateClassroomSupervisor(id, payload)
+      } else {
+        await classroomApi.createClassroomSupervisor(payload)
+      }
+      return { success: true }
+    } catch (error: unknown) {
+      store.supervisorFormError = getIndonesianErrorMessage(
+        error,
+        'Gagal menyimpan wali kelas.',
+      )
+      return { success: false, error: store.supervisorFormError }
+    } finally {
+      store.isSupervisorSaving = false
+    }
+  },
+
+  deleteClassroomSupervisor: async (id: string) => {
+    const store = useClassroomStore()
+    store.isSupervisorSaving = true
+    store.supervisorFormError = null
+
+    try {
+      await classroomApi.deleteClassroomSupervisor(id)
+      return { success: true }
+    } catch (error: unknown) {
+      store.supervisorFormError = getIndonesianErrorMessage(
+        error,
+        'Gagal menghapus wali kelas.',
+      )
+      return { success: false, error: store.supervisorFormError }
+    } finally {
+      store.isSupervisorSaving = false
+    }
+  },
+
+  fetchClassroomSupervisors: async (classroomId: string) => {
+    const store = useClassroomStore()
+    try {
+      const res = await classroomApi.getClassroomSupervisors({
+        classroomId,
+        limit: PAGINATION.CHILD_ENTITY_LIMIT,
+      })
+      store.classroomSupervisorAssignments = res.data.data ?? []
+    } catch (error: unknown) {
+      void error
+    }
+  },
+}

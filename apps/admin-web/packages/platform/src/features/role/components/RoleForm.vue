@@ -1,0 +1,303 @@
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@mts241alikhlash/ui/alert-dialog'
+import { Button } from '@mts241alikhlash/ui/button'
+import { Input } from '@mts241alikhlash/ui/input'
+import { Textarea } from '@mts241alikhlash/ui/textarea'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@mts241alikhlash/ui/card'
+import { FormControl, FloatingField } from '@mts241alikhlash/ui/form'
+import { AlertCircle, Info } from '@lucide/vue'
+import PermissionMatrixPicker from './PermissionMatrixPicker.vue'
+import type {
+  Role,
+  Permission,
+  CreateRolePayload,
+  UpdateRolePayload,
+} from '../types'
+
+const props = defineProps<{
+  editData?: Role | null
+  isSaving: boolean
+  formError: string | null
+  permissions: Permission[]
+  isLoadingPermissions: boolean
+}>()
+
+const emit = defineEmits<{
+  cancel: []
+  save: [data: CreateRolePayload | UpdateRolePayload]
+}>()
+
+const isEditing = computed(() => !!props.editData)
+const isSystemRole = computed(() => props.editData?.isSystem ?? false)
+
+const permissionIds = ref<string[]>([])
+
+const formSchema = toTypedSchema(
+  z.object({
+    name: z.string().min(1, 'Nama Role wajib diisi.'),
+    code: z
+      .string()
+      .min(1, 'Kode Role wajib diisi.')
+      .regex(
+        /^[A-Z0-9_]+$/,
+        'Kode Role hanya boleh berisi huruf besar, angka, dan underscore.',
+      ),
+    description: z.string().optional().default(''),
+  }),
+)
+
+const { handleSubmit, resetForm, setValues, values } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    name: '',
+    code: '',
+    description: '',
+  },
+})
+
+watch(
+  () => props.editData,
+  (newData) => {
+    if (newData) {
+      setValues({
+        name: newData.name ?? '',
+        code: newData.code ?? '',
+        description: newData.description ?? '',
+      })
+      permissionIds.value = newData.permissions?.map((p) => p.id) ?? []
+    } else {
+      resetForm()
+      permissionIds.value = []
+    }
+  },
+  { immediate: true },
+)
+
+const showConfirmAlert = ref(false)
+
+function buildPayload() {
+  if (isEditing.value) {
+    const payload: UpdateRolePayload = {
+      name: values.name ?? '',
+      description: values.description ?? '',
+      permissionIds: permissionIds.value,
+    }
+    return payload
+  } else {
+    const payload: CreateRolePayload = {
+      name: values.name ?? '',
+      code: (values.code ?? '').toUpperCase(),
+      description: values.description ?? '',
+      permissionIds: permissionIds.value,
+    }
+    return payload
+  }
+}
+
+const onSubmit = handleSubmit(() => {
+  if (isEditing.value) {
+    showConfirmAlert.value = true
+  } else {
+    emit('save', buildPayload())
+  }
+})
+
+function confirmSave() {
+  showConfirmAlert.value = false
+  emit('save', buildPayload())
+}
+</script>
+
+<template>
+  <form
+    class="flex flex-col h-full gap-0"
+    @submit.prevent="onSubmit"
+  >
+    <div class="px-6 pb-6 pt-8 space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="lg:col-span-1">
+          <Card
+            gap="none"
+            class="overflow-hidden"
+          >
+            <CardHeader standard>
+              <CardTitle size="md">Detail Role</CardTitle>
+            </CardHeader>
+            <CardContent
+              variant="standard"
+              class="space-y-4"
+            >
+              <FloatingField
+                v-slot="{ componentField }"
+                name="name"
+                label="Nama Role"
+                required
+              >
+                <div class="content-start">
+                  <FormControl>
+                    <Input v-bind="componentField" />
+                  </FormControl>
+                </div>
+              </FloatingField>
+
+              <FloatingField
+                v-slot="{ componentField }"
+                name="code"
+                label="Kode Role"
+                required
+              >
+                <div class="content-start">
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="isEditing"
+                      @input="
+                        (e: Event) =>
+                          setValues({
+                            code: (
+                              e.target as HTMLInputElement
+                            ).value.toUpperCase(),
+                          })
+                      "
+                    />
+                  </FormControl>
+                  <p
+                    v-if="isEditing"
+                    class="text-xs text-muted-foreground mt-1"
+                  >
+                    <span class="text-amber-600 font-medium block mt-1">
+                      Kode role tidak dapat diubah setelah dibuat.
+                    </span>
+                  </p>
+                </div>
+              </FloatingField>
+
+              <FloatingField
+                v-slot="{ componentField }"
+                name="description"
+                label="Deskripsi"
+              >
+                <div class="content-start">
+                  <FormControl>
+                    <Textarea
+                      rows="3"
+                      v-bind="componentField"
+                    />
+                  </FormControl>
+                </div>
+              </FloatingField>
+
+              <div
+                v-if="isSystemRole"
+                class="flex gap-3 rounded-xl border border-amber-200 bg-amber-50/40 p-4 text-sm text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-300"
+              >
+                <Info class="size-5 shrink-0 text-amber-600" />
+                <div class="space-y-1">
+                  <p
+                    class="font-semibold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400"
+                  >
+                    Role Sistem
+                  </p>
+                  <p
+                    class="text-xs text-amber-800/80 dark:text-amber-300/80 leading-relaxed"
+                  >
+                    Ini adalah role bawaan sistem. Hak akses dapat
+                    dikonfigurasi, namun kode role dilindungi dan tidak dapat
+                    dihapus.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div class="lg:col-span-1">
+          <PermissionMatrixPicker
+            v-model="permissionIds"
+            :permissions="permissions"
+            :loading="isLoadingPermissions"
+          />
+        </div>
+      </div>
+
+      <div v-if="formError">
+        <Alert
+          variant="destructive"
+          class="rounded-xl"
+        >
+          <AlertCircle class="h-4 w-4" />
+          <AlertTitle>Kesalahan Sistem</AlertTitle>
+          <AlertDescription>{{ formError }}</AlertDescription>
+        </Alert>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center justify-between border-t px-6 py-4 bg-background shrink-0 mt-auto"
+    >
+      <Button
+        type="button"
+        variant="outline"
+        :disabled="isSaving"
+        @click="emit('cancel')"
+      >
+        Batal
+      </Button>
+      <Button
+        type="submit"
+        variant="default"
+        :disabled="isSaving || isLoadingPermissions"
+      >
+        <div
+          v-if="isSaving"
+          class="size-4 mr-2 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground animate-spin"
+        />
+        {{ isSaving ? 'Menyimpan...' : 'Simpan Role & Hak Akses' }}
+      </Button>
+    </div>
+  </form>
+
+  <AlertDialog v-model:open="showConfirmAlert">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Simpan Perubahan?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Apakah Anda yakin ingin menyimpan perubahan pada hak akses role ini?
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <Button
+          variant="outline"
+          :disabled="isSaving"
+          @click="showConfirmAlert = false"
+        >
+          Batal
+        </Button>
+        <Button
+          variant="default"
+          :disabled="isSaving"
+          @click="confirmSave"
+        >
+          {{ isSaving ? 'Menyimpan...' : 'Ya, Simpan' }}
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+</template>

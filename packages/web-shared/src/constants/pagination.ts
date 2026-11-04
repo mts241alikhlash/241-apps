@@ -1,0 +1,7 @@
+export const PAGINATION = {
+  DEFAULT_PAGE_SIZE: 10,
+
+  REFERENCE_LIMIT: 1000,
+
+  CHILD_ENTITY_LIMIT: 500,
+} as const

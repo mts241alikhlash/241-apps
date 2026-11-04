@@ -1,0 +1,26 @@
+export default {
+  menu: {
+    approval: 'Persetujuan',
+    approvalFlow: 'Alur Persetujuan',
+    approvalList: 'Daftar Persetujuan',
+    assetCategory: 'Kategori Aset',
+    assetCondition: 'Kondisi Aset',
+    assetList: 'Daftar Aset',
+    assetStatus: 'Status Aset',
+    circulationHistory: 'Riwayat Sirkulasi',
+    dashboard: 'Dashboard',
+    fundingSource: 'Sumber Dana',
+    labelPrinting: 'Cetak Label',
+    loan: 'Peminjaman',
+    loanTransaction: 'Transaksi Pinjam',
+    location: 'Daftar Lokasi',
+    reference: 'Referensi',
+    section: {
+      approval: 'Persetujuan',
+      assets: 'Manajemen Aset',
+      circulation: 'Sirkulasi Aset',
+      main: 'Utama',
+      settings: 'Pengaturan',
+    },
+  },
+}

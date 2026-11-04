@@ -1,0 +1,72 @@
+import type {
+  ChoiceKey,
+  QuestionContent,
+  QuestionType,
+} from '../../../question/domain/value-objects/question-content.js'
+import { seededShuffle } from './seeded-shuffle.policy.js'
+
+export type ItemResolution = 'NORMAL' | 'BONUS_ALL' | 'KEY_OVERRIDE'
+
+export interface PaperSource {
+  questionId: string
+  type: QuestionType
+  bodyHtml: string
+  content: QuestionContent
+  points: number
+  resolution?: ItemResolution
+  overrideContent?: QuestionContent | null
+}
+
+export interface PaperQuestion {
+  questionId: string
+  number: number
+  type: QuestionType
+  bodyHtml: string
+  points: number
+  choices: { key: ChoiceKey; html: string }[] | null
+}
+
+function choicesOf(
+  source: PaperSource,
+  seed: string,
+): { key: ChoiceKey; html: string }[] | null {
+  if (
+    source.type !== 'MULTIPLE_CHOICE' &&
+    source.type !== 'MULTIPLE_RESPONSE'
+  ) {
+    return null
+  }
+  const content = source.content as {
+    choices: { key: ChoiceKey; html: string }[]
+  }
+  return seededShuffle(content.choices, `${seed}:${source.questionId}`).map(
+    (choice) => ({ key: choice.key, html: choice.html }),
+  )
+}
+
+const TYPE_ORDER: readonly QuestionType[] = [
+  'MULTIPLE_CHOICE',
+  'MULTIPLE_RESPONSE',
+  'TRUE_FALSE',
+  'SHORT_ANSWER',
+  'ESSAY',
+]
+
+export function buildPaper(
+  sources: readonly PaperSource[],
+  seed: string,
+): PaperQuestion[] {
+  return TYPE_ORDER.flatMap((type) =>
+    seededShuffle(
+      sources.filter((source) => source.type === type),
+      `${seed}:${type}`,
+    ),
+  ).map((source, index) => ({
+    questionId: source.questionId,
+    number: index + 1,
+    type: source.type,
+    bodyHtml: source.bodyHtml,
+    points: source.points,
+    choices: choicesOf(source, seed),
+  }))
+}

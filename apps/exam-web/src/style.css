@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@mts241alikhlash/ui/theme.css';
+
+@source '../node_modules/@mts241alikhlash/ui/src';
+@source '../packages/platform/src';
+@source '../node_modules/@mts241alikhlash/web-shared/src';
+
+@layer base {
+  :root {
+    --sidebar: var(--background);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+[data-slot='card'] > div.p-6,
+[data-slot='card'] > div.p-6.pt-4,
+[data-slot='card'] > div.p-6.pt-2,
+[data-slot='card'] > div.p-6.pt-1 {
+  padding-top: 0.25rem !important;
+}
+
+@media print {
+  body.printing-cards * {
+    visibility: hidden;
+  }
+
+  body.printing-cards .exam-cards,
+  body.printing-cards .exam-cards * {
+    visibility: visible;
+  }
+
+  body.printing-cards .exam-cards {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  body.printing-report * {
+    visibility: hidden;
+  }
+
+  body.printing-report .exam-report,
+  body.printing-report .exam-report * {
+    visibility: visible;
+  }
+
+  body.printing-report .exam-report {
+    position: absolute;
+    inset: 0;
+    display: block;
+    max-width: none;
+    padding: 0;
+    color: #000;
+    background: #fff;
+  }
+
+  body.printing-sheet * {
+    visibility: hidden;
+  }
+
+  body.printing-sheet .print-sheet,
+  body.printing-sheet .print-sheet * {
+    visibility: visible;
+  }
+
+  body.printing-sheet .print-sheet {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}

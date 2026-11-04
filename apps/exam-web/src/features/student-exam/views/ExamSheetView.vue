@@ -1,0 +1,699 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { Skeleton } from '@mts241alikhlash/ui/skeleton'
+import { Textarea } from '@mts241alikhlash/ui/textarea'
+import QuestionListDialog from '../components/QuestionListDialog.vue'
+import SessionQuestionHtml from '../components/SessionQuestionHtml.vue'
+import { useExamSession } from '../composables/useExamSession'
+import { isAnswered } from '../logic/exam'
+import { API_ERROR_CODES, ExamApiError } from '../services/studentExamService'
+import { questionTypeLabel } from '../logic/questionType'
+import type { AnswerPayload, PaperQuestion } from '../types'
+
+interface StoredDeadline {
+  deadline: number
+  serverTime: number
+  examTitle?: string | null
+  durationMinutes?: number | null
+}
+
+const route = useRoute()
+const router = useRouter()
+const sessionId = String(route.params.sessionId ?? '')
+
+const index = ref(0)
+const showList = ref(false)
+const confirmSubmit = ref(false)
+const confirmLeave = ref(false)
+const submitting = ref(false)
+const submitError = ref<string | null>(null)
+const finished = ref(false)
+const notStored = ref(false)
+const gateNotice = ref<string | null>(null)
+const doubtful = ref(new Set<string>())
+const examTitle = ref<string | null>(null)
+const durationMinutes = ref<number | null>(null)
+
+const session = useExamSession({
+  onExpired: () => {
+    if (!finished.value) void submitNow()
+  },
+})
+
+const {
+  questions,
+  answers,
+  loading,
+  error,
+  remainingLabel,
+  answeredCount,
+  sync,
+  syncSummaryLabel,
+  submitGateMinutes,
+  submitGateSeconds,
+  canSubmit,
+  answersLocked,
+} = session
+
+const controlsLocked = computed(() => submitting.value || answersLocked.value)
+
+onMounted(async () => {
+  const raw = window.sessionStorage.getItem(`cbt:deadline:${sessionId}`)
+  let stored: StoredDeadline | null
+  try {
+    stored = raw ? (JSON.parse(raw) as StoredDeadline) : null
+  } catch {
+    stored = null
+  }
+  if (stored) {
+    session.startClock(stored.deadline, stored.serverTime)
+    examTitle.value = stored.examTitle ?? null
+    durationMinutes.value = stored.durationMinutes ?? null
+  }
+  await session.load(sessionId)
+})
+
+const current = computed<PaperQuestion | null>(
+  () => questions.value[index.value] ?? null,
+)
+const isLast = computed(() => index.value >= questions.value.length - 1)
+const unanswered = computed(() => questions.value.length - answeredCount.value)
+
+function answerOf(question: PaperQuestion): AnswerPayload | undefined {
+  return answers.value.get(question.id)
+}
+
+function keyOf(question: PaperQuestion): string | null {
+  const answer = answerOf(question)
+  return answer && 'key' in answer ? answer.key : null
+}
+
+function keysOf(question: PaperQuestion): string[] {
+  const answer = answerOf(question)
+  return answer && 'keys' in answer ? answer.keys : []
+}
+
+function boolOf(question: PaperQuestion): boolean | null {
+  const answer = answerOf(question)
+  return answer && 'value' in answer ? answer.value : null
+}
+
+function textOf(question: PaperQuestion): string {
+  const answer = answerOf(question)
+  return answer && 'text' in answer ? answer.text : ''
+}
+
+function letterOf(position: number): string {
+  return String.fromCharCode(65 + position)
+}
+
+function choose(question: PaperQuestion, payload: AnswerPayload) {
+  session.answer(question, payload)
+}
+
+function toggleMulti(question: PaperQuestion, key: string) {
+  const keys = [...keysOf(question)]
+  const position = keys.indexOf(key)
+  if (position >= 0) keys.splice(position, 1)
+  else keys.push(key)
+  keys.sort()
+  choose(question, { keys })
+}
+
+function toggleDoubtful(question: PaperQuestion) {
+  const next = new Set(doubtful.value)
+  if (next.has(question.id)) next.delete(question.id)
+  else next.add(question.id)
+  doubtful.value = next
+}
+
+function go(position: number) {
+  if (position < 0 || position >= questions.value.length) return
+  index.value = position
+  showList.value = false
+}
+
+function goNext() {
+  if (isLast.value) {
+    confirmSubmit.value = true
+    return
+  }
+  go(index.value + 1)
+}
+
+async function submitNow() {
+  if (submitting.value || answersLocked.value) return
+  submitting.value = true
+  submitError.value = null
+  gateNotice.value = null
+  try {
+    const result = await session.submit(sessionId)
+    notStored.value = !result.answersStored
+    finished.value = true
+    window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
+  } catch (cause) {
+    const code = cause instanceof ExamApiError ? cause.code : null
+    if (code === API_ERROR_CODES.MIN_SUBMIT) {
+      gateNotice.value =
+        cause instanceof Error ? cause.message : 'Belum waktunya mengumpulkan.'
+    } else if (code === API_ERROR_CODES.WINDOW_CLOSED) {
+      submitError.value =
+        cause instanceof Error
+          ? cause.message
+          : 'Waktu pengumpulan sudah habis.'
+    } else {
+      submitError.value =
+        cause instanceof Error ? cause.message : 'Ujian gagal dikumpulkan.'
+    }
+  } finally {
+    submitting.value = false
+    confirmSubmit.value = false
+  }
+}
+
+function leave() {
+  if (finished.value) {
+    void router.replace({ name: 'student-exam-list' })
+    return
+  }
+  confirmLeave.value = true
+}
+
+function leaveConfirmed() {
+  confirmLeave.value = false
+  void router.replace({ name: 'student-exam-list' })
+}
+
+function statusOf(question: PaperQuestion | null): string {
+  if (!question) return ''
+  if (doubtful.value.has(question.id)) return 'Ragu-ragu'
+  return isAnswered(question, answerOf(question))
+    ? 'Sudah dijawab'
+    : 'Belum dijawab'
+}
+</script>
+
+<template>
+  <div
+    class="relative flex h-svh flex-col overflow-hidden bg-background"
+    @online="session.onConnectivityChanged(true)"
+    @offline="session.onConnectivityChanged(false)"
+  >
+    <img
+      src="/logo.webp"
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none fixed -right-16 bottom-0 w-80 select-none opacity-[0.045]"
+    />
+    <header
+      class="z-20 flex h-[54px] shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4"
+    >
+      <img
+        src="/logo-name.webp"
+        alt="241 Exam"
+        class="h-7 w-auto"
+        decoding="async"
+      />
+      <span
+        v-if="!loading && !finished"
+        class="truncate rounded-md border px-2 py-1 text-[length:var(--text-control)] font-medium"
+        :class="
+          sync.pendingCount === 0
+            ? 'border-green-600 text-green-700'
+            : 'border-amber-500 text-amber-700'
+        "
+      >
+        {{ syncSummaryLabel }}
+      </span>
+    </header>
+
+    <main
+      class="relative flex min-h-0 w-full flex-1 flex-col gap-2 overflow-hidden p-2"
+    >
+      <div
+        v-if="loading"
+        class="space-y-2"
+      >
+        <Skeleton class="h-28 w-full" />
+        <Skeleton class="h-28 w-full" />
+      </div>
+
+      <Card
+        v-else-if="finished"
+        gap="none"
+        class="overflow-hidden"
+      >
+        <CardHeader standard>
+          <CardTitle size="lg">Ujian sudah dikumpulkan</CardTitle>
+        </CardHeader>
+        <CardContent
+          variant="standard"
+          class="space-y-3 text-center"
+        >
+          <p
+            v-if="notStored"
+            class="text-[length:var(--text-control)] text-amber-700"
+          >
+            Ujian sudah berakhir di server. Jawaban terakhir belum tersimpan dan
+            masih menunggu koneksi.
+          </p>
+          <p
+            v-else
+            class="text-[length:var(--text-control)] text-muted-foreground"
+          >
+            Jawaban Anda tersimpan. Menunggu penilaian guru bila ada soal
+            uraian.
+          </p>
+          <Button
+            size="sm"
+            @click="leave"
+            >Kembali ke daftar</Button
+          >
+        </CardContent>
+      </Card>
+
+      <template v-else>
+        <Card
+          v-if="error"
+          gap="none"
+          class="shrink-0 overflow-hidden"
+        >
+          <CardContent variant="standard">
+            <p class="text-[length:var(--text-control)] text-destructive">
+              {{ error }}
+            </p>
+          </CardContent>
+        </Card>
+
+        <div
+          class="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] gap-2 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-1"
+        >
+          <Card
+            v-if="current"
+            gap="none"
+            class="order-2 flex min-h-0 flex-col overflow-hidden lg:order-1"
+          >
+            <CardHeader standard>
+              <CardTitle>Detail Soal</CardTitle>
+            </CardHeader>
+            <CardContent
+              variant="standard"
+              class="space-y-3"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="rounded-md border border-border bg-muted px-2 py-0.5 text-[length:var(--text-control)] font-semibold tabular-nums"
+                  :class="
+                    remainingLabel <= '05:00'
+                      ? 'text-destructive'
+                      : 'text-foreground'
+                  "
+                >
+                  {{ remainingLabel }}
+                </span>
+                <span
+                  class="text-[length:var(--text-control)] text-muted-foreground tabular-nums"
+                >
+                  {{ index + 1 }}/{{ questions.length }}
+                </span>
+              </div>
+
+              <dl
+                class="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[length:var(--text-control,0.75rem)] [&>dd]:min-w-0 [&>dd]:break-words [&>dt]:flex [&>dt]:justify-between [&>dt]:gap-2 [&>dt]:text-muted-foreground"
+              >
+                <template v-if="examTitle">
+                  <dt><span>Ujian</span><span>:</span></dt>
+                  <dd class="font-medium">{{ examTitle }}</dd>
+                </template>
+                <dt><span>Jenis soal</span><span>:</span></dt>
+                <dd class="font-medium">
+                  {{ questionTypeLabel(current.type) }}
+                </dd>
+                <dt><span>Status</span><span>:</span></dt>
+                <dd
+                  class="font-medium"
+                  :class="
+                    doubtful.has(current.id)
+                      ? 'text-amber-600'
+                      : isAnswered(current, answerOf(current))
+                        ? 'text-green-600'
+                        : 'text-muted-foreground'
+                  "
+                >
+                  {{ statusOf(current) }}
+                </dd>
+                <dt><span>Terjawab</span><span>:</span></dt>
+                <dd>{{ answeredCount }} dari {{ questions.length }} soal</dd>
+                <template v-if="durationMinutes">
+                  <dt><span>Durasi</span><span>:</span></dt>
+                  <dd>{{ durationMinutes }} menit</dd>
+                </template>
+              </dl>
+
+              <div class="flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="w-full"
+                  @click="showList = true"
+                >
+                  Daftar Soal
+                </Button>
+                <p
+                  v-if="submitGateSeconds > 0"
+                  class="text-[length:var(--text-control)] text-muted-foreground"
+                >
+                  Dapat dikumpulkan dalam {{ submitGateMinutes }} menit
+                </p>
+                <Button
+                  size="sm"
+                  class="w-full bg-green-600 text-white hover:bg-green-700"
+                  :disabled="submitting || !canSubmit"
+                  @click="confirmSubmit = true"
+                >
+                  {{
+                    submitting
+                      ? 'Mengirim…'
+                      : submitGateSeconds > 0
+                        ? `Kumpulkan (${submitGateMinutes} mnt)`
+                        : 'Selesai & Kumpulkan'
+                  }}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card
+            v-if="current"
+            gap="none"
+            class="order-1 flex min-h-0 flex-col overflow-hidden lg:order-2"
+          >
+            <CardHeader standard>
+              <CardTitle>Soal {{ index + 1 }}</CardTitle>
+              <span
+                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              >
+                {{ statusOf(current) }}
+              </span>
+            </CardHeader>
+
+            <CardContent variant="standard">
+              <SessionQuestionHtml
+                :html="current.bodyHtml"
+                :session-id="sessionId"
+              />
+            </CardContent>
+
+            <CardContent
+              variant="standard"
+              class="space-y-2 border-t border-border"
+            >
+              <p
+                v-if="current.type === 'MULTIPLE_RESPONSE'"
+                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              >
+                Pilih semua jawaban yang benar
+              </p>
+
+              <template v-if="current.type === 'MULTIPLE_CHOICE'">
+                <button
+                  v-for="(choice, position) in current.choices ?? []"
+                  :key="choice.key"
+                  type="button"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left disabled:cursor-not-allowed disabled:opacity-60"
+                  :class="
+                    keyOf(current) === choice.key
+                      ? 'border-primary bg-primary/[0.06]'
+                      : 'border-input bg-card'
+                  "
+                  :disabled="controlsLocked"
+                  @click="choose(current, { key: choice.key })"
+                >
+                  <span
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    :class="
+                      keyOf(current) === choice.key
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-input bg-foreground/[0.04] text-muted-foreground'
+                    "
+                  >
+                    {{ letterOf(position) }}
+                  </span>
+                  <SessionQuestionHtml
+                    class="min-w-0 flex-1 px-2.5 py-1.5 [&_p]:!my-0"
+                    :html="choice.html"
+                    :session-id="sessionId"
+                  />
+                </button>
+              </template>
+
+              <template v-else-if="current.type === 'MULTIPLE_RESPONSE'">
+                <p
+                  class="text-[length:var(--text-control)] text-muted-foreground"
+                >
+                  Pilih semua jawaban yang benar
+                </p>
+                <button
+                  v-for="(choice, position) in current.choices ?? []"
+                  :key="choice.key"
+                  type="button"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left disabled:cursor-not-allowed disabled:opacity-60"
+                  :class="
+                    keysOf(current).includes(choice.key)
+                      ? 'border-primary bg-primary/[0.06]'
+                      : 'border-input bg-card'
+                  "
+                  :disabled="controlsLocked"
+                  @click="toggleMulti(current, choice.key)"
+                >
+                  <span
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    :class="
+                      keysOf(current).includes(choice.key)
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-input bg-foreground/[0.04] text-muted-foreground'
+                    "
+                  >
+                    {{ letterOf(position) }}
+                  </span>
+                  <SessionQuestionHtml
+                    class="min-w-0 flex-1 px-2.5 py-1.5 [&_p]:!my-0"
+                    :html="choice.html"
+                    :session-id="sessionId"
+                  />
+                </button>
+              </template>
+
+              <template v-else-if="current.type === 'TRUE_FALSE'">
+                <button
+                  v-for="option in [
+                    { key: 'B', label: 'Benar', value: true },
+                    { key: 'S', label: 'Salah', value: false },
+                  ]"
+                  :key="option.key"
+                  type="button"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left"
+                  :class="
+                    boolOf(current) === option.value
+                      ? 'border-primary bg-primary/[0.06]'
+                      : 'border-input bg-card'
+                  "
+                  :disabled="controlsLocked"
+                  @click="choose(current, { value: option.value })"
+                >
+                  <span
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    :class="
+                      boolOf(current) === option.value
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-input bg-foreground/[0.04] text-muted-foreground'
+                    "
+                  >
+                    {{ option.key }}
+                  </span>
+                  <span
+                    class="min-w-0 flex-1 px-2.5 py-1.5 text-[length:var(--text-control)]"
+                  >
+                    {{ option.label }}
+                  </span>
+                </button>
+              </template>
+
+              <Textarea
+                v-else
+                :model-value="textOf(current)"
+                :disabled="controlsLocked"
+                :rows="current.type === 'ESSAY' ? 7 : 2"
+                maxlength="20000"
+                :placeholder="
+                  current.type === 'ESSAY' ? 'Jawaban Anda' : 'Jawaban singkat'
+                "
+                @update:model-value="
+                  (value) => current && choose(current, { text: String(value) })
+                "
+              />
+            </CardContent>
+            <div
+              class="flex items-center gap-2 border-t border-border px-2 py-1.5"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                class="shrink-0"
+                :disabled="index === 0 || submitting"
+                @click="go(index - 1)"
+              >
+                Sebelumnya
+              </Button>
+
+              <button
+                type="button"
+                class="flex h-[var(--control-h-sm)] shrink-0 items-center gap-1.5 rounded-md border px-2 text-[length:var(--text-control)] font-medium transition-colors"
+                :class="
+                  doubtful.has(current.id)
+                    ? 'border-amber-500 bg-amber-50 text-amber-700'
+                    : 'border-input bg-card text-muted-foreground'
+                "
+                :disabled="controlsLocked"
+                @click="toggleDoubtful(current)"
+              >
+                <span
+                  class="size-2.5 rounded-sm"
+                  :class="
+                    doubtful.has(current.id) ? 'bg-amber-500' : 'bg-input'
+                  "
+                />
+                {{ doubtful.has(current.id) ? 'Ragu' : 'Ragu-ragu' }}
+              </button>
+
+              <Button
+                size="sm"
+                class="ml-auto shrink-0 font-semibold"
+                :class="
+                  isLast
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-primary text-primary-foreground'
+                "
+                :disabled="controlsLocked || (isLast && !canSubmit)"
+                @click="goNext"
+              >
+                {{
+                  isLast
+                    ? submitting
+                      ? 'Mengirim…'
+                      : submitGateSeconds > 0
+                        ? `Kumpulkan (${submitGateMinutes} mnt)`
+                        : 'Kumpulkan'
+                    : 'Selanjutnya'
+                }}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </template>
+    </main>
+
+    <QuestionListDialog
+      v-model:open="showList"
+      :questions="questions"
+      :answers="answers"
+      :doubtful="doubtful"
+      :current-index="index"
+      @go="go"
+    />
+
+    <Dialog v-model:open="confirmSubmit">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Kumpulkan ujian?</DialogTitle>
+        </DialogHeader>
+        <div class="space-y-2 px-4 py-3">
+          <DialogDescription>
+            Masih ada {{ unanswered }} soal belum dijawab. Jawaban tidak bisa
+            diubah setelah dikumpulkan.
+          </DialogDescription>
+          <p
+            v-if="gateNotice"
+            class="text-[length:var(--text-control)] text-amber-700"
+          >
+            {{ gateNotice }}
+          </p>
+          <p
+            v-if="submitError"
+            class="text-[length:var(--text-control)] text-destructive"
+          >
+            {{ submitError }}
+          </p>
+        </div>
+        <DialogFooter
+          standard
+          class="justify-end gap-2"
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            :disabled="submitting"
+            @click="confirmSubmit = false"
+          >
+            Batal
+          </Button>
+          <Button
+            size="sm"
+            :disabled="submitting"
+            @click="submitNow"
+          >
+            {{ submitting ? 'Mengirim…' : 'Kumpulkan' }}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="confirmLeave">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Keluar dari ujian?</DialogTitle>
+        </DialogHeader>
+        <div class="px-4 py-3">
+          <DialogDescription>
+            Ujian masih berjalan. Waktu tetap berjalan dan jawaban yang
+            tersimpan tidak hilang, tetapi Anda harus memasukkan token lagi
+            untuk kembali.
+          </DialogDescription>
+        </div>
+        <DialogFooter
+          standard
+          class="justify-end gap-2"
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            @click="confirmLeave = false"
+          >
+            Tetap di sini
+          </Button>
+          <Button
+            size="sm"
+            @click="leaveConfirmed"
+            >Keluar</Button
+          >
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+</template>

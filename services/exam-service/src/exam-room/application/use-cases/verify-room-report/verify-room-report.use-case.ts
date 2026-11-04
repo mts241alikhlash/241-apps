@@ -1,0 +1,19 @@
+import { Injectable } from '@nestjs/common'
+import type { ExamRoomReport } from '../../../domain/entities/exam-room-report.entity.js'
+import type { RoomStaffUser } from '../../room-access.service.js'
+import { RoomReportService } from '../../room-report.service.js'
+
+@Injectable()
+export class VerifyRoomReportUseCase {
+  constructor(private readonly reports: RoomReportService) {}
+
+  async execute(
+    user: RoomStaffUser,
+    roomId: string,
+    slotId: string,
+    now: Date = new Date(),
+  ): Promise<ExamRoomReport> {
+    const context = await this.reports.loadVerifiable(user, roomId, slotId)
+    return this.reports.verify(context, user.id, now)
+  }
+}

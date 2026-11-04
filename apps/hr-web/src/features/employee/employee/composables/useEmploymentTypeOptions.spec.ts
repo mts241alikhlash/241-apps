@@ -1,0 +1,47 @@
+import { describe, it, expect, vi } from 'vitest'
+import { useEmploymentTypeOptions } from './useEmploymentTypeOptions'
+import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
+
+const mockGet = vi.hoisted(() => vi.fn())
+
+vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
+  default: { get: mockGet },
+}))
+
+describe('useEmploymentTypeOptions', () => {
+  it('fetches employment types and stores them', async () => {
+    mockGet.mockResolvedValue({
+      data: {
+        data: [{ id: 'et-1', code: 'PNS', name: 'PNS' }],
+      },
+    })
+
+    const { employmentTypes, fetchEmploymentTypes } = useEmploymentTypeOptions()
+    await fetchEmploymentTypes()
+
+    expect(mockGet).toHaveBeenCalledWith('/employment-types', {
+      params: { limit: PAGINATION.REFERENCE_LIMIT },
+    })
+    expect(employmentTypes.value).toEqual([
+      { id: 'et-1', code: 'PNS', name: 'PNS' },
+    ])
+  })
+
+  it('falls back to an empty list when the response has no data', async () => {
+    mockGet.mockResolvedValue({ data: {} })
+
+    const { employmentTypes, fetchEmploymentTypes } = useEmploymentTypeOptions()
+    await fetchEmploymentTypes()
+
+    expect(employmentTypes.value).toEqual([])
+  })
+
+  it('silently keeps the list empty when the request fails', async () => {
+    mockGet.mockRejectedValue(new Error('network error'))
+
+    const { employmentTypes, fetchEmploymentTypes } = useEmploymentTypeOptions()
+    await fetchEmploymentTypes()
+
+    expect(employmentTypes.value).toEqual([])
+  })
+})

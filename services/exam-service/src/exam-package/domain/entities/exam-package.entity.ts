@@ -1,0 +1,73 @@
+import type { QuestionType } from '../../../question/domain/value-objects/question-content.js'
+import type { QuestionMarker } from '../policies/question-marker.policy.js'
+
+export const EXAM_PACKAGE_STATUSES = [
+  'DRAFT',
+  'SUBMITTED',
+  'RETURNED',
+  'APPROVED',
+  'LOCKED',
+] as const
+
+export type ExamPackageStatus = (typeof EXAM_PACKAGE_STATUSES)[number]
+
+export type ItemResolution = 'NORMAL' | 'BONUS_ALL' | 'KEY_OVERRIDE'
+
+export interface PackageItem {
+  id?: string
+  questionId: string
+  questionVersion: number
+  position: number
+  resolution?: ItemResolution
+  overrideContent?: unknown
+}
+
+export interface ExamPackage {
+  id: string
+  title: string
+  subjectId: string
+  gradeId: string
+  status: ExamPackageStatus
+  lockedAt: Date | null
+  createdById: string
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date | null
+}
+
+export interface ExamPackageDetail extends ExamPackage {
+  items: PackageItem[]
+}
+
+export interface ExamPackageSummary extends ExamPackage {
+  itemCount: number
+}
+
+export interface PackageItemView extends PackageItem {
+  type: QuestionType
+  marker: QuestionMarker
+  summary: string
+  points: number
+}
+
+export interface ExamPackageView extends ExamPackage {
+  items: PackageItemView[]
+  reviews: PackageReview[]
+}
+
+export type PackageReviewAction = 'SUBMIT' | 'APPROVE' | 'RETURN'
+
+export interface PackageQuestionNote {
+  questionId: string
+  note: string
+}
+
+export interface PackageReview {
+  id: string
+  packageId: string
+  action: PackageReviewAction
+  byUserId: string
+  note: string | null
+  questionNotes: PackageQuestionNote[]
+  createdAt: Date
+}

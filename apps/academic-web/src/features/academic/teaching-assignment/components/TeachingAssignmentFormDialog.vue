@@ -1,0 +1,459 @@
+<script setup lang="ts">
+import { computed, toRefs, ref, watch, onMounted } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { useTeachingAssignment } from '../composables/useTeachingAssignment'
+import { semesterApi } from '@/features/academic/semester'
+import type { Semester } from '@/features/academic/semester'
+import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
+import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@mts241alikhlash/ui/alert-dialog'
+import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { ScrollArea } from '@mts241alikhlash/ui/scroll-area'
+import { FormControl, FormField, FloatingField } from '@mts241alikhlash/ui/form'
+import { AppCombobox } from '@mts241alikhlash/ui'
+import type { ComboboxOption } from '@mts241alikhlash/ui'
+import { Checkbox } from '@mts241alikhlash/ui/checkbox'
+import { Input } from '@mts241alikhlash/ui/input'
+import { AlertCircle } from '@lucide/vue'
+import type {
+  TeachingAssignment,
+  TeachingAssignmentCreatePayload,
+  TeachingAssignmentUpdatePayload,
+} from '../types'
+
+const props = defineProps<{
+  open: boolean
+  formError: string | null
+  isSaving: boolean
+  editData?: TeachingAssignment | null
+}>()
+
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  save: [
+    data: TeachingAssignmentCreatePayload | TeachingAssignmentUpdatePayload,
+  ]
+}>()
+
+const open = computed({
+  get: () => props.open,
+  set: (value: boolean) => {
+    if (!value) resetForm()
+    emit('update:open', value)
+  },
+})
+
+const { editData } = toRefs(props)
+const isEditing = computed(() => !!editData?.value)
+
+const { employees, subjects, classrooms } = useTeachingAssignment()
+const semesters = ref<Semester[]>([])
+
+onMounted(async () => {
+  try {
+    const res = await semesterApi.getSemesters({
+      limit: PAGINATION.REFERENCE_LIMIT,
+    })
+    semesters.value = res.data?.data ?? []
+  } catch (err) {
+    console.error('Gagal memuat semester:', err)
+  }
+})
+
+const employeeOptions = computed<ComboboxOption[]>(() =>
+  employees.value.map((e) => ({
+    value: e.id,
+    label: e.user?.profile?.name ?? e.nip ?? '-',
+  })),
+)
+
+const subjectOptions = computed<ComboboxOption[]>(() =>
+  subjects.value.map((s) => ({
+    value: s.id,
+    label: s.code ? `${s.name} (${s.code})` : s.name,
+  })),
+)
+
+const subjectEmptyText = computed(() =>
+  subjects.value.length === 0
+    ? 'Belum ada mata pelajaran di kurikulum aktif. Tambahkan lewat Kurikulum › Mata Pelajaran.'
+    : 'Mata pelajaran tidak ditemukan.',
+)
+
+const classroomOptions = computed<ComboboxOption[]>(() =>
+  classrooms.value.map((c) => ({
+    value: c.id,
+    label: c.code ?? '-',
+  })),
+)
+
+const semesterOptions = computed<ComboboxOption[]>(() =>
+  semesters.value.map((s) => ({
+    value: s.id,
+    label:
+      `${s.type?.name === 'ODD' ? 'Ganjil' : 'Genap'} ${s.academicYear?.name ?? ''}`.trim(),
+  })),
+)
+
+const formSchema = toTypedSchema(
+  z.object({
+    employeeId: z.string().min(1, 'Guru wajib dipilih.'),
+    subjectId: z.string().min(1, 'Mata pelajaran wajib dipilih.'),
+    classroomIds: z.array(z.string()).min(1, 'Pilih minimal satu kelas.'),
+    semesterId: z.string().min(1, 'Semester wajib dipilih.'),
+    passingScore: z
+      .string()
+      .refine(
+        (value) =>
+          value === '' ||
+          (/^\d+$/.test(value) && Number(value) >= 0 && Number(value) <= 100),
+        'KKM harus bilangan bulat 0-100, atau kosongkan untuk mengikuti mata pelajaran.',
+      ),
+  }),
+)
+
+const { handleSubmit, resetForm, setValues } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    employeeId: '',
+    subjectId: '',
+    classroomIds: [] as string[],
+    semesterId: '',
+    passingScore: '',
+  },
+})
+
+function toggleClassroom(
+  current: string[],
+  classroomId: string,
+  checked: boolean,
+): string[] {
+  if (checked) {
+    return current.includes(classroomId) ? current : [...current, classroomId]
+  }
+  return current.filter((id) => id !== classroomId)
+}
+
+watch(
+  () => [props.open, editData?.value] as const,
+  ([isOpen]) => {
+    if (isOpen) {
+      const data = editData?.value
+      if (data) {
+        setValues({
+          employeeId: data.employeeId || '',
+          subjectId: data.subjectId || '',
+          classroomIds: data.classroomId ? [data.classroomId] : [],
+          semesterId: data.semesterId || '',
+          passingScore:
+            data.passingScore === null || data.passingScore === undefined
+              ? ''
+              : String(data.passingScore),
+        })
+      } else {
+        resetForm()
+      }
+    }
+  },
+  { immediate: true },
+)
+
+const showConfirmAlert = ref(false)
+
+function buildPayload(values: {
+  employeeId: string
+  subjectId: string
+  classroomIds: string[]
+  semesterId: string
+  passingScore: string
+}): TeachingAssignmentCreatePayload | TeachingAssignmentUpdatePayload {
+  const base = {
+    employeeId: values.employeeId,
+    subjectId: values.subjectId,
+    semesterId: values.semesterId,
+  }
+  return isEditing.value
+    ? {
+        ...base,
+        classroomId: values.classroomIds[0] ?? '',
+        passingScore:
+          values.passingScore === '' ? null : Number(values.passingScore),
+      }
+    : { ...base, classroomIds: values.classroomIds }
+}
+
+const onSubmit = handleSubmit((values) => {
+  if (isEditing.value) {
+    showConfirmAlert.value = true
+  } else {
+    emit('save', buildPayload(values))
+  }
+})
+
+function confirmSave() {
+  showConfirmAlert.value = false
+  void handleSubmit((values) => {
+    emit('save', buildPayload(values))
+  })()
+}
+</script>
+
+<template>
+  <Dialog v-model:open="open">
+    <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+        <DialogTitle>
+          {{
+            isEditing ? 'Edit Penugasan Mengajar' : 'Tambah Penugasan Mengajar'
+          }}
+        </DialogTitle>
+        <DialogDescription>
+          {{
+            isEditing
+              ? 'Perbarui informasi penugasan mengajar.'
+              : 'Masukkan informasi penugasan mengajar yang baru.'
+          }}
+        </DialogDescription>
+      </DialogHeader>
+
+      <ScrollArea class="flex-1 min-h-0">
+        <form
+          id="teaching-assignment-form"
+          class="space-y-4 px-6 py-4"
+          @submit.prevent="onSubmit"
+        >
+          <FormField
+            v-slot="{ value, handleChange }"
+            name="employeeId"
+          >
+            <FormItem>
+              <FormLabel>
+                Guru Pengampu
+                <span class="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <AppCombobox
+                  :model-value="value"
+                  :options="employeeOptions"
+                  placeholder="Pilih Guru Pengampu"
+                  search-placeholder="Cari guru..."
+                  empty-text="Guru tidak ditemukan."
+                  @update:model-value="(val) => handleChange(val)"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-slot="{ value, handleChange }"
+            name="subjectId"
+          >
+            <FormItem>
+              <FormLabel>
+                Mata Pelajaran
+                <span class="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <AppCombobox
+                  :model-value="value"
+                  :options="subjectOptions"
+                  placeholder="Pilih Mata Pelajaran"
+                  search-placeholder="Cari mata pelajaran..."
+                  :empty-text="subjectEmptyText"
+                  @update:model-value="(val) => handleChange(val)"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-slot="{ value, handleChange }"
+            name="classroomIds"
+          >
+            <FormItem>
+              <FormLabel>
+                Kelas
+                <span class="text-destructive">*</span>
+              </FormLabel>
+
+              <FormControl v-if="isEditing">
+                <AppCombobox
+                  :model-value="(value as string[])[0] ?? ''"
+                  :options="classroomOptions"
+                  placeholder="Pilih Kelas"
+                  search-placeholder="Cari kelas..."
+                  empty-text="Kelas tidak ditemukan."
+                  @update:model-value="(val) => handleChange(val ? [val] : [])"
+                />
+              </FormControl>
+
+              <template v-else>
+                <FormControl>
+                  <div
+                    class="grid grid-cols-2 gap-1.5 rounded-md border p-3 max-h-52 overflow-y-auto"
+                  >
+                    <label
+                      v-for="opt in classroomOptions"
+                      :key="opt.value"
+                      class="flex items-center gap-2 rounded-sm px-1.5 py-1 text-sm hover:bg-muted/60 cursor-pointer"
+                    >
+                      <Checkbox
+                        :model-value="(value as string[]).includes(opt.value)"
+                        @update:model-value="
+                          (checked) =>
+                            handleChange(
+                              toggleClassroom(
+                                value as string[],
+                                opt.value,
+                                checked === true,
+                              ),
+                            )
+                        "
+                      />
+                      <span>{{ opt.label }}</span>
+                    </label>
+                    <p
+                      v-if="classroomOptions.length === 0"
+                      class="col-span-2 text-xs text-muted-foreground"
+                    >
+                      Belum ada kelas pada tahun ajaran aktif.
+                    </p>
+                  </div>
+                </FormControl>
+                <p class="text-xs text-muted-foreground mt-1">
+                  Pilih beberapa kelas sekaligus: satu penugasan dibuat per
+                  kelas, dan kelas yang sudah ada akan dilewati.
+                </p>
+              </template>
+
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField
+            v-slot="{ value, handleChange }"
+            name="semesterId"
+          >
+            <FormItem>
+              <FormLabel>
+                Semester
+                <span class="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <AppCombobox
+                  :model-value="value"
+                  :options="semesterOptions"
+                  placeholder="Pilih Semester"
+                  search-placeholder="Cari semester..."
+                  empty-text="Semester tidak ditemukan."
+                  @update:model-value="(val) => handleChange(val)"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FloatingField
+            v-if="isEditing"
+            v-slot="{ componentField }"
+            name="passingScore"
+            label="KKM Kelas Ini"
+          >
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <p class="text-xs text-muted-foreground">
+                Kosongkan untuk mengikuti KKM yang ditetapkan kurikulum. Isi
+                hanya jika kelas ini memang dinilai dengan batas berbeda.
+              </p>
+            </div>
+          </FloatingField>
+
+          <Alert
+            v-if="formError"
+            variant="destructive"
+            class="mt-2"
+          >
+            <AlertCircle class="h-4 w-4" />
+            <AlertTitle>Kesalahan Sistem</AlertTitle>
+            <AlertDescription>{{ formError }}</AlertDescription>
+          </Alert>
+        </form>
+      </ScrollArea>
+
+      <DialogFooter
+        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
+      >
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="isSaving"
+          @click="open = false"
+        >
+          Batal
+        </Button>
+        <Button
+          type="submit"
+          form="teaching-assignment-form"
+          variant="default"
+          :disabled="isSaving"
+        >
+          {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <AlertDialog v-model:open="showConfirmAlert">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Simpan Perubahan?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Apakah Anda yakin ingin menyimpan perubahan pada penugasan mengajar
+          ini?
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <Button
+          variant="outline"
+          :disabled="isSaving"
+          @click="showConfirmAlert = false"
+        >
+          Batal
+        </Button>
+        <Button
+          variant="default"
+          :disabled="isSaving"
+          @click="confirmSave"
+        >
+          Simpan
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+</template>

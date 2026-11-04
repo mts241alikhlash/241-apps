@@ -1,0 +1,13 @@
+export const API_ERROR_CODES = [
+  'SHORTFALL',
+  'REBIND',
+  'MIN_SUBMIT',
+  'WINDOW_CLOSED',
+  'SESSION_LOST',
+  'SCHEDULE_GONE',
+  'TOKEN_REENTRY_REQUIRED',
+  'SESSION_LOCKED_BY_VIOLATION',
+  'ROOM_FORBIDDEN',
+] as const
+
+export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

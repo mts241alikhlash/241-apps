@@ -1,0 +1,26 @@
+export default {
+  menu: {
+    announcement: 'Pengumuman',
+    applicant: 'Pendaftar',
+    bankAccount: 'Rekening Pembayaran',
+    dashboard: 'Dashboard',
+    decision: 'Keputusan',
+    documentType: 'Jenis Berkas',
+    documentReview: 'Verifikasi Berkas',
+    lateDocuments: 'Berkas Susulan',
+    download: 'Unduhan',
+    enrollment: 'Daftar Ulang',
+    landing: 'Halaman Depan',
+    form: 'Formulir',
+    myProfile: 'Profil Saya',
+    payment: 'Pembayaran',
+    registrationStatus: 'Status Pendaftaran',
+    section: {
+      admission: 'Admin PSB',
+      registration: 'Pendaftaran',
+      settings: 'Pengaturan',
+    },
+    system: 'Sistem',
+    wave: 'Gelombang',
+  },
+}

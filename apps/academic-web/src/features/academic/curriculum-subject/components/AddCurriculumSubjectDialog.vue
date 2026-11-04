@@ -1,0 +1,241 @@
+<script setup lang="ts">
+import { Checkbox } from '@mts241alikhlash/ui/checkbox'
+import { ref, computed, watch } from 'vue'
+import { useCurriculumSubject } from '../composables/useCurriculumSubject'
+import { Button } from '@mts241alikhlash/ui/button'
+import { Input } from '@mts241alikhlash/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@mts241alikhlash/ui/table'
+import { Loader2 } from '@lucide/vue'
+
+const props = defineProps<{
+  open: boolean
+  existingSubjectIds: string[]
+  saving: boolean
+}>()
+
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  save: [subjectIds: string[]]
+}>()
+
+const dialogOpen = computed({
+  get: () => props.open,
+  set: (value: boolean) => emit('update:open', value),
+})
+
+const selectedIds = ref<Record<string, boolean>>({})
+const searchQuery = ref('')
+
+const { subjects, fetchReferenceData } = useCurriculumSubject()
+const loadingSubjects = ref(false)
+
+watch(
+  () => props.open,
+  (val) => {
+    if (!val) return
+
+    selectedIds.value = {}
+    searchQuery.value = ''
+
+    if (subjects.value.length > 0) return
+    loadingSubjects.value = true
+    void fetchReferenceData().finally(() => {
+      loadingSubjects.value = false
+    })
+  },
+)
+
+const availableSubjects = computed(() => {
+  return subjects.value.filter((s) => !props.existingSubjectIds.includes(s.id))
+})
+
+const filteredSubjects = computed(() => {
+  if (!searchQuery.value) return availableSubjects.value
+  const q = searchQuery.value.toLowerCase()
+  return availableSubjects.value.filter(
+    (s) =>
+      s.name.toLowerCase().includes(q) || s.code?.toLowerCase().includes(q),
+  )
+})
+
+const selectedCount = computed(
+  () => Object.values(selectedIds.value).filter(Boolean).length,
+)
+
+const allChecked = computed(
+  () =>
+    filteredSubjects.value.length > 0 &&
+    filteredSubjects.value.every((s) => selectedIds.value[s.id]),
+)
+
+const someChecked = computed(
+  () =>
+    filteredSubjects.value.some((s) => selectedIds.value[s.id]) &&
+    !allChecked.value,
+)
+
+function toggleSubject(id: string, checked: boolean) {
+  selectedIds.value = { ...selectedIds.value, [id]: checked }
+}
+
+function toggleAll(checked: boolean) {
+  const next = { ...selectedIds.value }
+  for (const s of filteredSubjects.value) {
+    next[s.id] = checked
+  }
+  selectedIds.value = next
+}
+
+function handleSave() {
+  const ids = Object.entries(selectedIds.value)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+  if (ids.length === 0) return
+  emit('save', ids)
+}
+</script>
+
+<template>
+  <Dialog v-model:open="dialogOpen">
+    <DialogContent class="sm:max-w-3xl max-h-[85vh] flex flex-col">
+      <DialogHeader>
+        <DialogTitle>Tambah Mata Pelajaran ke Kurikulum</DialogTitle>
+        <DialogDescription>
+          Pilih mata pelajaran yang akan didaftarkan ke kurikulum ini.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-2"
+      >
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p class="text-sm text-muted-foreground shrink-0">
+            {{
+              loadingSubjects
+                ? 'Memuat mata pelajaran...'
+                : `${filteredSubjects.length} mata pelajaran tersedia`
+            }}
+          </p>
+        </div>
+        <Input
+          v-model="searchQuery"
+          placeholder="Cari nama / kode mata pelajaran..."
+          class="h-8 w-full sm:max-w-xs text-sm"
+        />
+      </div>
+
+      <div class="flex-1 overflow-y-auto border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow class="bg-muted/50 hover:bg-muted/50">
+              <TableHead class="w-[50px] text-center px-4">
+                <Checkbox
+                  :model-value="allChecked || (someChecked && 'indeterminate')"
+                  aria-label="Pilih semua"
+                  @update:model-value="(value) => toggleAll(value === true)"
+                />
+              </TableHead>
+              <TableHead class="w-[50px] text-center px-4"> No </TableHead>
+              <TableHead class="px-4">Kode</TableHead>
+              <TableHead class="px-4">Nama Mata Pelajaran</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template v-if="loadingSubjects">
+              <TableRow>
+                <TableCell
+                  :colspan="4"
+                  class="h-24 text-center text-muted-foreground"
+                >
+                  <Loader2 class="mx-auto size-5 animate-spin" />
+                </TableCell>
+              </TableRow>
+            </template>
+            <template v-else-if="filteredSubjects.length > 0">
+              <TableRow
+                v-for="(subject, idx) in filteredSubjects"
+                :key="subject.id"
+                class="cursor-pointer"
+                :class="{ 'bg-primary/5': selectedIds[subject.id] }"
+                @click="toggleSubject(subject.id, !selectedIds[subject.id])"
+              >
+                <TableCell
+                  class="w-[50px] text-center px-4"
+                  @click.stop
+                >
+                  <Checkbox
+                    :model-value="!!selectedIds[subject.id]"
+                    aria-label="Pilih baris"
+                    @update:model-value="
+                      (value) => toggleSubject(subject.id, value === true)
+                    "
+                  />
+                </TableCell>
+                <TableCell class="w-[50px] text-center px-4">
+                  {{ idx + 1 }}
+                </TableCell>
+                <TableCell class="px-4">{{ subject.code || '-' }}</TableCell>
+                <TableCell class="px-4 font-medium">{{
+                  subject.name
+                }}</TableCell>
+              </TableRow>
+            </template>
+            <template v-else>
+              <TableRow>
+                <TableCell
+                  :colspan="4"
+                  class="h-24 text-center text-muted-foreground"
+                >
+                  Tidak ada mata pelajaran tersedia untuk ditambahkan.
+                </TableCell>
+              </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
+
+      <DialogFooter class="pt-4 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="saving"
+          @click="dialogOpen = false"
+        >
+          Batal
+        </Button>
+        <Button
+          type="button"
+          :disabled="selectedCount === 0 || saving"
+          @click="handleSave"
+        >
+          <Loader2
+            v-if="saving"
+            class="mr-2 h-4 w-4 animate-spin"
+          />
+          {{
+            saving
+              ? 'Menyimpan...'
+              : selectedCount > 0
+                ? `Tambahkan ${selectedCount} Mata Pelajaran`
+                : 'Pilih mata pelajaran dulu'
+          }}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</template>

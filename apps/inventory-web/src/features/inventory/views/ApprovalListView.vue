@@ -1,0 +1,336 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { DataTable } from '@mts241alikhlash/ui'
+import { Button } from '@mts241alikhlash/ui/button'
+import { Checkbox } from '@mts241alikhlash/ui/checkbox'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@mts241alikhlash/ui/card'
+import { Input } from '@mts241alikhlash/ui/input'
+import { Label } from '@mts241alikhlash/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { toast } from 'vue-sonner'
+import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
+import type { ColumnDef } from '@tanstack/vue-table'
+import { h } from 'vue'
+import { Check, X } from '@lucide/vue'
+import { useRoleGuard } from '@/features/platform/auth'
+import { approvalService } from '../services/approvalService'
+import type {
+  ApprovalInstance,
+  ApprovalStep,
+  InventoryLoanItem,
+} from '../types'
+
+const { can } = useRoleGuard()
+
+const canProcess = can('inventory-approvals.update')
+
+const pendingApprovals = ref<ApprovalInstance[]>([])
+const loading = ref(false)
+const isSubmitting = ref(false)
+
+const isActionOpen = ref(false)
+const selectedApproval = ref<ApprovalInstance | null>(null)
+const actionForm = ref({
+  note: '',
+  forwardToNextApprover: false,
+})
+
+const nextStep = computed<ApprovalStep | undefined>(() => {
+  const approval = selectedApproval.value
+  if (!approval) return undefined
+  return approval.workflow?.steps.find(
+    (s) => s.stepSequence === approval.currentStepSequence + 1,
+  )
+})
+
+const canChooseToForward = computed(
+  () => nextStep.value !== undefined && !nextStep.value.isMandatory,
+)
+
+async function loadApprovals() {
+  loading.value = true
+  try {
+    pendingApprovals.value = await approvalService.listPending()
+  } catch (e) {
+    toast.error(
+      getIndonesianErrorMessage(
+        e,
+        'Gagal memuat daftar persetujuan peminjaman.',
+      ),
+    )
+  } finally {
+    loading.value = false
+  }
+}
+
+function openActionDialog(approval: ApprovalInstance) {
+  selectedApproval.value = approval
+  actionForm.value.note = ''
+  actionForm.value.forwardToNextApprover = false
+  isActionOpen.value = true
+}
+
+async function processApproval(action: 'APPROVE' | 'REJECT') {
+  if (!selectedApproval.value) return
+  isSubmitting.value = true
+  try {
+    const ok = await approvalService.process(
+      selectedApproval.value.id,
+      action,
+      actionForm.value.note,
+      action === 'APPROVE' && canChooseToForward.value
+        ? actionForm.value.forwardToNextApprover
+        : undefined,
+    )
+    if (ok) {
+      isActionOpen.value = false
+      await loadApprovals()
+    }
+  } catch (e) {
+    toast.error(getIndonesianErrorMessage(e, 'Gagal memproses persetujuan.'))
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const columns: ColumnDef<ApprovalInstance>[] = [
+  {
+    id: 'no',
+    header: 'No',
+    cell: ({ row }) => row.index + 1,
+  },
+  {
+    id: 'loanNumber',
+    header: 'No. Pinjam',
+    cell: ({ row }) => row.original.details?.loanNumber ?? '-',
+  },
+  {
+    id: 'purpose',
+    header: 'Tujuan',
+    cell: ({ row }) => row.original.details?.purpose ?? '-',
+  },
+  {
+    id: 'assets',
+    header: 'Aset',
+    cell: ({ row }) => {
+      const items = row.original.details?.items ?? []
+      return items
+        .map(
+          (i: InventoryLoanItem) => i.unit?.asset?.name ?? i.unit?.unitNumber,
+        )
+        .join(', ')
+    },
+  },
+  {
+    id: 'expectedReturnDate',
+    header: 'Batas Kembali',
+    cell: ({ row }) => {
+      const d = row.original.details?.expectedReturnDate
+      return d ? new Date(d).toLocaleDateString('id-ID') : '-'
+    },
+  },
+  {
+    id: 'step',
+    header: 'Tahapan Saat Ini',
+    cell: ({ row }) => {
+      const seq = row.original.currentStepSequence
+      const step = row.original.workflow?.steps.find(
+        (s: ApprovalStep) => s.stepSequence === seq,
+      )
+      return step ? `Step ${seq}: ${step.approverRoleCode}` : `Step ${seq}`
+    },
+  },
+  {
+    id: 'actions',
+    header: 'Tindakan',
+    cell: ({ row }) => {
+      const approval = row.original
+      return h(
+        Button,
+        {
+          size: 'sm',
+          onClick: () => openActionDialog(approval),
+        },
+        () => 'Periksa',
+      )
+    },
+  },
+]
+
+onMounted(() => {
+  void loadApprovals()
+})
+</script>
+
+<template>
+  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+    <Card
+      gap="none"
+      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+    >
+      <CardHeader
+        standard
+        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
+      >
+        <div class="flex items-center gap-3">
+          <CardTitle size="lg">Daftar Persetujuan</CardTitle>
+          <p class="text-sm text-muted-foreground mt-1">
+            Periksa dan proses pengajuan peminjaman aset logistik sekolah sesuai
+            otorisasi Anda.
+          </p>
+        </div>
+      </CardHeader>
+      <CardContent class="p-0 sm:px-0">
+        <DataTable
+          :columns="columns"
+          :data="pendingApprovals"
+          :loading="loading"
+        />
+      </CardContent>
+    </Card>
+  </div>
+
+  <Dialog
+    :open="isActionOpen"
+    @update:open="isActionOpen = $event"
+  >
+    <DialogContent class="sm:max-w-[500px]">
+      <DialogHeader>
+        <DialogTitle>Detail Pengajuan Peminjaman</DialogTitle>
+        <DialogDescription>
+          Tinjau pengajuan pinjam sebelum menyetujui atau menolak.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div
+        v-if="selectedApproval"
+        class="space-y-4 py-2 text-sm"
+      >
+        <div class="grid grid-cols-3 gap-y-2 border p-3 rounded-lg bg-muted/40">
+          <span class="text-muted-foreground font-medium">No. Peminjaman</span>
+          <span class="col-span-2 text-foreground font-semibold">{{
+            selectedApproval.details?.loanNumber
+          }}</span>
+
+          <span class="text-muted-foreground font-medium">Tujuan</span>
+          <span class="col-span-2 text-foreground">{{
+            selectedApproval.details?.purpose
+          }}</span>
+
+          <span class="text-muted-foreground font-medium">Batas Kembali</span>
+          <span class="col-span-2 text-foreground">
+            {{
+              selectedApproval.details?.expectedReturnDate
+                ? new Date(
+                    selectedApproval.details.expectedReturnDate,
+                  ).toLocaleDateString('id-ID')
+                : '-'
+            }}
+          </span>
+
+          <span class="text-muted-foreground font-medium">Aset Diajukan</span>
+          <span class="col-span-2 text-foreground">
+            <ul class="list-disc pl-4 space-y-1">
+              <li
+                v-for="item in selectedApproval.details?.items"
+                :key="item.id"
+              >
+                {{ item.unit?.asset?.name }} ({{ item.unit?.unitNumber }})
+              </li>
+            </ul>
+          </span>
+        </div>
+
+        <div class="space-y-1">
+          <Label for="note">Catatan Keputusan</Label>
+          <Input
+            id="note"
+            v-model="actionForm.note"
+            placeholder="Tulis catatan persetujuan atau alasan penolakan..."
+          />
+        </div>
+
+        <div
+          v-if="canChooseToForward"
+          class="flex items-start gap-3 rounded-lg border border-dashed p-3"
+        >
+          <Checkbox
+            id="forward"
+            class="mt-0.5"
+            :model-value="actionForm.forwardToNextApprover"
+            @update:model-value="
+              actionForm.forwardToNextApprover = $event === true
+            "
+          />
+          <div class="space-y-1">
+            <Label
+              for="forward"
+              class="cursor-pointer"
+            >
+              Teruskan ke penyetuju berikutnya
+            </Label>
+            <p class="text-xs text-muted-foreground">
+              Persetujuan Anda diteruskan ke
+              {{ nextStep?.approverRoleCode }} untuk diperiksa lagi. Biarkan
+              kosong bila peminjaman ini cukup disetujui oleh Anda.
+            </p>
+          </div>
+        </div>
+
+        <p
+          v-else-if="nextStep"
+          class="text-xs text-muted-foreground"
+        >
+          Peminjaman ini wajib diteruskan ke
+          {{ nextStep.approverRoleCode }} setelah Anda setujui.
+        </p>
+
+        <DialogFooter class="pt-4 flex sm:justify-between">
+          <Button
+            class="mr-auto sm:mr-0"
+            type="button"
+            variant="outline"
+            @click="isActionOpen = false"
+            >Batal</Button
+          >
+
+          <div
+            v-if="canProcess"
+            class="flex space-x-2"
+          >
+            <Button
+              type="button"
+              variant="destructive"
+              :disabled="isSubmitting"
+              @click="processApproval('REJECT')"
+            >
+              <X class="size-4 mr-1.5" />
+              Tolak
+            </Button>
+            <Button
+              class="bg-emerald-600 hover:bg-emerald-700 text-white"
+              type="button"
+              :disabled="isSubmitting"
+              @click="processApproval('APPROVE')"
+            >
+              <Check class="size-4 mr-1.5" />
+              Setujui
+            </Button>
+          </div>
+        </DialogFooter>
+      </div>
+    </DialogContent>
+  </Dialog>
+</template>

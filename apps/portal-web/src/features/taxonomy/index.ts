@@ -1,0 +1,5 @@
+export { portalTaxonomyRoutes } from './routes'
+export { categoryService, tagService } from './services/taxonomyService'
+export { useCategoryConfig } from './config/categoryConfig'
+export { useTagConfig } from './config/tagConfig'
+export * from './types'

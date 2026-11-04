@@ -1,0 +1,69 @@
+enum QuestionType {
+  MULTIPLE_CHOICE
+  MULTIPLE_RESPONSE
+  TRUE_FALSE
+  SHORT_ANSWER
+  ESSAY
+}
+
+/// One question of a package. The subject and grade are ids owned by
+/// academic-service and equal those of the package. `currentVersion` is the
+/// version being edited; `revision` counts every edit.
+model Question {
+  id               String         @id @default(uuid()) @db.Uuid
+  packageId        String         @map("package_id") @db.Uuid
+  subjectId        String         @map("subject_id") @db.Uuid
+  gradeId          String         @map("grade_id") @db.Uuid
+  authorEmployeeId String         @map("author_employee_id") @db.Uuid
+  type             QuestionType
+  currentVersion   Int            @default(1) @map("current_version")
+  revision         Int            @default(1)
+  /// Plain lineage of a copy, not a foreign key: deleting the source never blocks a copy.
+  copiedFromQuestionId String?    @map("copied_from_question_id") @db.Uuid
+  copiedFromVersion    Int?       @map("copied_from_version")
+  createdById      String         @map("created_by_id") @db.Uuid
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  deletedAt        DateTime?      @map("deleted_at")
+
+  package      ExamPackage       @relation(fields: [packageId], references: [id])
+  versions     QuestionVersion[]
+  packageItems ExamPackageItem[]
+  answers      ExamAnswer[]
+
+  @@index([subjectId, gradeId])
+  @@index([authorEmployeeId])
+  @@index([packageId])
+  @@map("questions")
+}
+
+/// An immutable snapshot of what a question says. `content` holds the choices
+/// and the answer, shaped by the question type.
+model QuestionVersion {
+  id          String   @id @default(uuid()) @db.Uuid
+  questionId  String   @map("question_id") @db.Uuid
+  number      Int
+  bodyHtml    String   @map("body_html")
+  content     Json
+  points      Float    @default(1)
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([questionId, number])
+  @@map("question_versions")
+}
+
+/// An image used by a question, stored in object storage under `storageKey`.
+model ExamFile {
+  id           String   @id @default(uuid()) @db.Uuid
+  storageKey   String   @unique @map("storage_key")
+  mimeType     String   @map("mime_type") @db.VarChar(100)
+  sizeBytes    Int      @map("size_bytes")
+  originalName String   @map("original_name") @db.VarChar(255)
+  uploadedById String   @map("uploaded_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("exam_files")
+}

@@ -1,0 +1,163 @@
+import { studentApi } from '../api/studentApi'
+import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
+import { classroomApi } from '@/features/academic/classroom'
+import { useStudentStore } from '../stores/studentStore'
+import type {
+  StudentQueryParams,
+  StudentExportParams,
+  StudentSavePayload,
+  StudentUpdatePayload,
+  StudentAccountUpdatePayload,
+  CreateStudentWithRelationsInput,
+  ResolveBulkImportConflict,
+} from '../types'
+import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
+import { toast } from 'vue-sonner'
+import api from '@mts241alikhlash/web-shared/utils/api'
+import type { ApiPaginatedResponse } from '@mts241alikhlash/web-shared/types/api'
+import type { GradeOption } from '../types'
+
+export const studentService = {
+  fetchStudents: async () => {
+    const store = useStudentStore()
+    store.loading = true
+    try {
+      const params: StudentQueryParams = {
+        page: store.currentPage,
+        limit: store.pageSize,
+      }
+      if (store.filters.keyword.trim())
+        params.search = store.filters.keyword.trim()
+      if (store.filters.classroomId !== 'all')
+        params.classroomId = store.filters.classroomId
+
+      const res = await studentApi.getStudents(params)
+      store.students = res.data.data
+      store.totalStudents = res.data.meta?.total ?? res.data.data.length
+    } catch (error: unknown) {
+      toast.error(getIndonesianErrorMessage(error, 'Gagal memuat data siswa.'))
+    } finally {
+      store.loading = false
+    }
+  },
+
+  fetchClassrooms: async (gradeId?: string) => {
+    const store = useStudentStore()
+    try {
+      const res = await classroomApi.getClassrooms({
+        limit: PAGINATION.REFERENCE_LIMIT,
+        isActive: true,
+        ...(gradeId && gradeId !== 'all' ? { gradeId } : {}),
+      })
+      store.classrooms = res.data.data
+    } catch (error: unknown) {
+      toast.error(getIndonesianErrorMessage(error, 'Gagal memuat data kelas.'))
+    }
+  },
+
+  fetchGrades: async () => {
+    const store = useStudentStore()
+    try {
+      const res = await api.get<ApiPaginatedResponse<GradeOption>>('/grades', {
+        params: { limit: PAGINATION.REFERENCE_LIMIT, isActive: true },
+      })
+      store.grades = res.data.data
+    } catch (error: unknown) {
+      toast.error(
+        getIndonesianErrorMessage(error, 'Gagal memuat tingkat kelas.'),
+      )
+    }
+  },
+
+  saveStudent: async (
+    id: string | null,
+    payload: StudentSavePayload | StudentUpdatePayload,
+  ) => {
+    const store = useStudentStore()
+    store.isSaving = true
+    store.formError = null
+    try {
+      if (id) {
+        await studentApi.updateStudentAccount(id, payload)
+      } else {
+        await studentApi.createStudent(payload as StudentSavePayload)
+      }
+      return { success: true }
+    } catch (error: unknown) {
+      store.formError = getIndonesianErrorMessage(
+        error,
+        'Gagal menyimpan data siswa.',
+      )
+      return { success: false, error: store.formError }
+    } finally {
+      store.isSaving = false
+    }
+  },
+
+  createStudentWithRelations: async (
+    input: CreateStudentWithRelationsInput,
+  ) => {
+    const store = useStudentStore()
+    store.isSaving = true
+    store.formError = null
+    try {
+      const res = await studentApi.createStudentWithRelations(input)
+      const created = res.data.data
+      return { success: true, studentId: created.id, userId: created.user?.id }
+    } catch (error: unknown) {
+      store.formError = getIndonesianErrorMessage(
+        error,
+        'Gagal menyimpan data siswa.',
+      )
+      return { success: false }
+    } finally {
+      store.isSaving = false
+    }
+  },
+
+  exportStudents: async () => {
+    const store = useStudentStore()
+    const params: StudentExportParams = {}
+    if (store.filters.keyword.trim())
+      params.search = store.filters.keyword.trim()
+    if (store.filters.classroomId !== 'all')
+      params.classroomId = store.filters.classroomId
+    return studentApi.exportStudents(params)
+  },
+
+  getImportTemplate: async () => {
+    return studentApi.getImportTemplate()
+  },
+
+  bulkImport: async (file: File) => {
+    return studentApi.bulkImport(file)
+  },
+
+  resolveBulkImportConflicts: async (
+    conflicts: ResolveBulkImportConflict[],
+  ) => {
+    return studentApi.resolveBulkImportConflicts(conflicts)
+  },
+
+  updateStudentAccount: async (id: string, payload: StudentUpdatePayload) => {
+    return studentApi.updateStudentAccount(id, payload)
+  },
+
+  deleteStudent: async (id: string) => {
+    return studentApi.deleteStudent(id)
+  },
+
+  toggleActive: async (id: string, isActive: boolean) => {
+    return studentApi.toggleActive(id, isActive)
+  },
+
+  updateStudentCredentials: async (
+    studentId: string,
+    payload: StudentAccountUpdatePayload,
+    currentIsActive?: boolean,
+  ) => {
+    if (payload.isActive !== currentIsActive) {
+      await studentApi.toggleActive(studentId, payload.isActive)
+    }
+  },
+}

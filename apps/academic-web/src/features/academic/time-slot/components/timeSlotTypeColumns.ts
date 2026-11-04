@@ -1,0 +1,93 @@
+import type { ColumnDef } from '@tanstack/vue-table'
+import { h } from 'vue'
+import { ActionCell } from '@mts241alikhlash/ui'
+import { Badge } from '@mts241alikhlash/ui/badge'
+import { dayShortLabel } from '../constants'
+import type { TimeSlotType } from '../types'
+
+export const createTimeSlotTypeColumns = (
+  onEdit: (item: TimeSlotType) => void,
+  onDelete: (
+    item: TimeSlotType,
+    callbacks: { closeAlert: () => void; setLoading: (state: boolean) => void },
+  ) => void,
+  showActions = true,
+): ColumnDef<TimeSlotType>[] => [
+  {
+    accessorKey: 'code',
+    header: 'Kode',
+    meta: { align: 'center' },
+  },
+  {
+    accessorKey: 'name',
+    header: 'Nama',
+    meta: { align: 'left' },
+  },
+  {
+    id: 'isLesson',
+    header: 'Jenis',
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(
+        Badge,
+        { variant: row.original.isLesson ? 'secondary' : 'outline' },
+        () => (row.original.isLesson ? 'Pelajaran' : 'Khusus'),
+      ),
+  },
+  {
+    id: 'defaultDurationMinutes',
+    header: 'Durasi',
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(
+        'span',
+        { class: 'tabular-nums' },
+        `${row.original.defaultDurationMinutes} menit`,
+      ),
+  },
+  {
+    id: 'days',
+    header: 'Hari Berlaku',
+    meta: { align: 'center' },
+    cell: ({ row }) => {
+      const days = row.original.days ?? []
+      if (days.length === 0) {
+        return h(
+          'span',
+          { class: 'text-muted-foreground text-xs' },
+          'Semua hari',
+        )
+      }
+      return h(
+        'div',
+        { class: 'flex flex-wrap justify-center gap-1' },
+        days.map((d) =>
+          h(Badge, { variant: 'outline', class: 'text-[11px]' }, () =>
+            dayShortLabel(d),
+          ),
+        ),
+      )
+    },
+  },
+  ...(showActions
+    ? [
+        {
+          id: 'actions',
+          header: 'Opsi',
+          enableHiding: false,
+          cell: ({ row }: { row: { original: TimeSlotType } }) => {
+            const item = row.original
+            return h(ActionCell, {
+              deleteTitle: 'Hapus Tipe Jam?',
+              deleteDescription: `Yakin ingin menghapus tipe "${item.name}"? Tipe yang masih dipakai jam pelajaran tidak dapat dihapus.`,
+              onEdit: () => onEdit(item),
+              onDelete: (callbacks: {
+                closeAlert: () => void
+                setLoading: (v: boolean) => void
+              }) => onDelete(item, callbacks),
+            })
+          },
+        },
+      ]
+    : []),
+]

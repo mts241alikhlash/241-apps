@@ -1,0 +1,4 @@
+ALTER TABLE "exam_room_seats" ADD COLUMN "allow_web_client" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "allow_late_entry" BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TYPE "SessionAuditAction" ADD VALUE IF NOT EXISTS 'ASSIGN_SUPERVISOR';

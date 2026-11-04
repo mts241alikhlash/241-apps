@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@mts241alikhlash/ui/theme.css';
+
+@source '../node_modules/@mts241alikhlash/ui/src';
+@source '../packages/platform/src';
+@source '../node_modules/@mts241alikhlash/web-shared/src';
+
+@layer base {
+  :root {
+    --sidebar: var(--background);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+[data-slot='card'] > div.p-6,
+[data-slot='card'] > div.p-6.pt-4,
+[data-slot='card'] > div.p-6.pt-2,
+[data-slot='card'] > div.p-6.pt-1 {
+  padding-top: 0.25rem !important;
+}
