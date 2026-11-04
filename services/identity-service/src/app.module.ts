@@ -5,13 +5,15 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { onlyWhereDeclared } from '@mts241alikhlash/nest-core/throttle'
 import { LoggerModule } from 'nestjs-pino'
-import { AppConfigModule } from './core/config/config.module.js'
+import { AppConfigModule } from '@mts241alikhlash/nest-core/config'
+import { envSchema } from './core/config/env.validation.js'
+import { PrismaService } from './core/database/prisma.service.js'
 import { StorageModule } from './core/storage/storage.module.js'
 import { PrismaModule } from './core/database/prisma.module.js'
-import { HttpExceptionFilter } from './core/filters/http-exception.filter.js'
-import { HealthModule } from './core/health/health.module.js'
+import { HttpExceptionFilter } from '@mts241alikhlash/nest-core/filters'
+import { HealthModule } from '@mts241alikhlash/nest-core/health'
 import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
-import { pinoLoggerConfig } from './core/logger/logger.config.js'
+import { pinoLoggerConfig } from '@mts241alikhlash/nest-core/logger'
 import { AuthModule } from './auth/auth.module.js'
 import { JwtAuthGuard } from './auth/index.js'
 import { UserModule } from './user/user.module.js'
@@ -29,13 +31,12 @@ import { BloodTypeModule } from './reference-data/blood-type/blood-type.module.j
 
 @Module({
   imports: [
-    AppConfigModule,
+    AppConfigModule.forRoot(envSchema),
     StorageModule,
     PrismaModule,
     LoggerModule.forRoot(pinoLoggerConfig),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({
-      imports: [AppConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => [
         {
@@ -51,7 +52,7 @@ import { BloodTypeModule } from './reference-data/blood-type/blood-type.module.j
         },
       ],
     }),
-    HealthModule,
+    HealthModule.forRoot(PrismaService),
     AuthModule,
     UserModule,
     ProfileModule,

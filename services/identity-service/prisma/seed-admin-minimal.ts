@@ -2,7 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient, UserGender } from '../src/generated/prisma/client.js'
 import * as bcrypt from 'bcrypt'
 import 'dotenv/config'
-import { pgSslOptions } from '../src/core/database/pg-ssl.js'
+import { pgSslOptions } from '@mts241alikhlash/nest-core/database'
 import { syncPermissions } from './seeds/modules/permission-sync.seed.js'
 
 const adminPassword = process.env.SEED_ADMIN_PASSWORD

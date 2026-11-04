@@ -19,7 +19,7 @@ import { EnrollExistingAccountUseCase } from '../../application/use-cases/enroll
 import { UpdateStudentUseCase } from '../../application/use-cases/update-student/update-student.use-case.js'
 import { StudentController } from './student.controller.js'
 import { StudentImportExportController } from './student-import-export.controller.js'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
 const student = {
   id: 'stu-1',
@@ -51,6 +51,7 @@ describe('StudentController & StudentImportExportController', () => {
     sub: 'usr-1',
     identifier: 'admin',
     sessionId: 'sess-1',
+    roles: [],
   }
 
   beforeEach(async () => {

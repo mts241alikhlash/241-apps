@@ -6843,7 +6843,11 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The Health Check is successful */
+            /**
+             * @description Liveness and readiness check passed
+             *
+             *     The Health Check is successful
+             */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6911,7 +6915,11 @@ export interface operations {
                     };
                 };
             };
-            /** @description The Health Check is not successful */
+            /**
+             * @description Health check failed
+             *
+             *     The Health Check is not successful
+             */
             503: {
                 headers: {
                     [name: string]: unknown;

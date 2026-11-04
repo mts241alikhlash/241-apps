@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
-import type { RequestUser } from '../../../../core/types/request-user.type.js'
+import type { RequestUser } from '@mts241alikhlash/nest-core/types'
 import { StudentWithDetails } from '../../../domain/repositories/student.repository.js'
 import { StudentNotFoundException } from '../../../domain/exceptions/index.js'
 

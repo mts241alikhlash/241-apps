@@ -23,7 +23,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { BatchUpsertScheduleDto } from './dto/request/batch-upsert-schedule.dto.js'
 import { CreateScheduleDto } from './dto/request/create-schedule.dto.js'
 import { UpdateScheduleDto } from './dto/request/update-schedule.dto.js'

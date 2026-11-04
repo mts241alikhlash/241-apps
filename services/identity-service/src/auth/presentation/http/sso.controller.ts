@@ -35,7 +35,7 @@ import {
   SsoExchangeResponseDto,
 } from './dto/response/auth-api-response.dto.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { JwtAuthGuard } from '../../index.js'
 import {
   appCookieName,

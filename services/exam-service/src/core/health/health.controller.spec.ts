@@ -1,7 +1,7 @@
 import { HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus'
 import { Test } from '@nestjs/testing'
-import { HealthController } from './health.controller.js'
-import { PrismaHealthIndicator } from './prisma.health.js'
+import { HealthController } from '@mts241alikhlash/nest-core/health'
+import { PrismaHealthIndicator } from '@mts241alikhlash/nest-core/health'
 
 describe('HealthController', () => {
   it('runs the database and memory checks', async () => {

@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../src/generated/prisma/client.js'
 import 'dotenv/config'
-import { pgSslOptions } from './pg-ssl.js'
+import { pgSslOptions } from '@mts241alikhlash/nest-core/database'
 import { Day } from '../src/generated/prisma/client.js'
 import { seedTeachingPlan } from './seeds/modules/teaching-plan.seed.js'
 import {

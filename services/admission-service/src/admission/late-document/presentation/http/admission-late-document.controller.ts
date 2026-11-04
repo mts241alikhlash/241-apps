@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
-import type { AuthenticatedUser } from '../../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../../platform/auth/index.js'
 import { DecideLateDocumentUseCase } from '../../application/use-cases/decide-late-document/decide-late-document.use-case.js'

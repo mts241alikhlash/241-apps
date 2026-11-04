@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../src/generated/prisma/client.js'
 import 'dotenv/config'
-import { pgSslOptions } from '../src/core/database/pg-ssl.js'
+import { pgSslOptions } from '@mts241alikhlash/nest-core/database'
 import { syncPermissions } from './seeds/modules/permission-sync.seed.js'
 
 const connectionString =

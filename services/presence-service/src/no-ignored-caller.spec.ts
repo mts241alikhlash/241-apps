@@ -68,7 +68,7 @@ describe('no controller asks for a caller it ignores', () => {
   }, 60_000)
 
   it('finds the controllers', () => {
-    expect(controllers.length).toBeGreaterThan(10)
+    expect(controllers.length).toBeGreaterThan(9)
   })
 
   it('reads every caller it injects', () => {

@@ -4,13 +4,15 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { LoggerModule } from 'nestjs-pino'
-import { AppConfigModule } from './core/config/config.module.js'
+import { AppConfigModule } from '@mts241alikhlash/nest-core/config'
+import { envSchema } from './core/config/env.validation.js'
+import { PrismaService } from './core/database/prisma.service.js'
 import { PrismaModule } from './core/database/prisma.module.js'
 import { AppCacheModule } from '@mts241alikhlash/nest-core/cache'
-import { HttpExceptionFilter } from './core/filters/http-exception.filter.js'
-import { HealthModule } from './core/health/health.module.js'
+import { HttpExceptionFilter } from '@mts241alikhlash/nest-core/filters'
+import { HealthModule } from '@mts241alikhlash/nest-core/health'
 import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
-import { pinoLoggerConfig } from './core/logger/logger.config.js'
+import { pinoLoggerConfig } from '@mts241alikhlash/nest-core/logger'
 import { IdentityModule } from './platform/identity/identity.module.js'
 import { ServiceClientModule } from './platform/service-client/service-client.module.js'
 import { AuthModule } from './platform/auth/auth.module.js'
@@ -37,7 +39,7 @@ import { PermissionGuard } from './platform/access-control/permission/guards/per
 
 @Module({
   imports: [
-    AppConfigModule,
+    AppConfigModule.forRoot(envSchema),
     ServiceClientModule,
     PrismaModule,
     StorageModule,
@@ -58,7 +60,6 @@ import { PermissionGuard } from './platform/access-control/permission/guards/per
     ScheduleModule.forRoot(),
     AppCacheModule,
     ThrottlerModule.forRootAsync({
-      imports: [AppConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => [
         {
@@ -68,7 +69,7 @@ import { PermissionGuard } from './platform/access-control/permission/guards/per
         },
       ],
     }),
-    HealthModule,
+    HealthModule.forRoot(PrismaService),
     IdentityModule,
     AuthModule,
     PermissionModule,

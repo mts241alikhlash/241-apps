@@ -8,7 +8,7 @@ import {
 import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { MyDashboardResponseDto } from './dto/response/my-dashboard-response.dto.js'
 import { GetMyDashboardUseCase } from '../../application/use-cases/get-my-dashboard/get-my-dashboard.use-case.js'
 

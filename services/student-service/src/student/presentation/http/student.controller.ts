@@ -34,8 +34,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
-import type { RequestUser } from '../../../core/types/request-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
+import type { RequestUser } from '@mts241alikhlash/nest-core/types'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
 import { CreateStudentDto } from './dto/request/create-student.dto.js'
 import { StudentQueryDto } from './dto/request/student-query.dto.js'

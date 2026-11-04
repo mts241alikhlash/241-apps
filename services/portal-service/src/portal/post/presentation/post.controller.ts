@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { CreatePostDto } from '../dto/request/create-post.dto.js'
 import { PostQueryDto } from '../dto/request/post-query.dto.js'
 import { PinPostDto, PostVersionDto } from '../dto/request/post-version.dto.js'

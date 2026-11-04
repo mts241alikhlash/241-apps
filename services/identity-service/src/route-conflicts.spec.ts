@@ -14,7 +14,7 @@ process.env.S3_SECRET_ACCESS_KEY ??= 'routes'
 import { Test } from '@nestjs/testing'
 import type { NestExpressApplication } from '@nestjs/platform-express'
 import { AppModule } from './app.module.js'
-import { ROUTE_OPTIONS } from './core/config/route-options.js'
+import { ROUTE_OPTIONS } from '@mts241alikhlash/nest-core/config'
 import { EnsureStructuralRolesUseCase } from './access-control/role/application/use-cases/ensure-structural-roles/ensure-structural-roles.use-case.js'
 import { SyncPermissionsUseCase } from './access-control/permission/application/use-cases/sync-permissions/sync-permissions.use-case.js'
 

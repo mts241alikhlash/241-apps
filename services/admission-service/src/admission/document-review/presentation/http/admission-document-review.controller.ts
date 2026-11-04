@@ -17,7 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../../platform/auth/index.js'
 import { GetDocumentReviewQueueUseCase } from '../../application/use-cases/get-document-review-queue/get-document-review-queue.use-case.js'

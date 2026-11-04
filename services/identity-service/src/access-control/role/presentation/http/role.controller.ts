@@ -23,7 +23,7 @@ import {
 
 import { JwtAuthGuard } from '../../../../auth/index.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { CreateRoleDto } from './dto/request/create-role.dto.js'
 import { UpdateRoleDto } from './dto/request/update-role.dto.js'
 import { AssignRoleDto } from './dto/request/assign-role.dto.js'

@@ -8,7 +8,7 @@ process.env.ASSESSMENT_SERVICE_URL ??= 'http://localhost:4000'
 import { Test } from '@nestjs/testing'
 import type { NestExpressApplication } from '@nestjs/platform-express'
 import { AppModule } from './app.module.js'
-import { ROUTE_OPTIONS } from './core/config/route-options.js'
+import { ROUTE_OPTIONS } from '@mts241alikhlash/nest-core/config'
 
 interface ExpressLayer {
   route?: { path: string; methods?: Record<string, boolean> }

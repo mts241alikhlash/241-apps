@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../../generated/prisma/client.js'
-import { pgSslOptions } from './pg-ssl.js'
+import { pgSslOptions } from '@mts241alikhlash/nest-core/database'
 
 @Injectable()
 export class PrismaService

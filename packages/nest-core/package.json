@@ -13,6 +13,14 @@
       "types": "./dist/cache/index.d.ts",
       "default": "./dist/cache/index.js"
     },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "default": "./dist/config/index.js"
+    },
+    "./database": {
+      "types": "./dist/database/index.d.ts",
+      "default": "./dist/database/index.js"
+    },
     "./decorators": {
       "types": "./dist/decorators/index.d.ts",
       "default": "./dist/decorators/index.js"
@@ -25,9 +33,17 @@
       "types": "./dist/dto/index.d.ts",
       "default": "./dist/dto/index.js"
     },
+    "./filters": {
+      "types": "./dist/filters/index.d.ts",
+      "default": "./dist/filters/index.js"
+    },
     "./guards": {
       "types": "./dist/guards/index.d.ts",
       "default": "./dist/guards/index.js"
+    },
+    "./health": {
+      "types": "./dist/health/index.d.ts",
+      "default": "./dist/health/index.js"
     },
     "./helpers": {
       "types": "./dist/helpers/index.d.ts",
@@ -37,6 +53,10 @@
       "types": "./dist/interceptors/index.d.ts",
       "default": "./dist/interceptors/index.js"
     },
+    "./logger": {
+      "types": "./dist/logger/index.d.ts",
+      "default": "./dist/logger/index.js"
+    },
     "./openapi": {
       "types": "./dist/openapi/index.d.ts",
       "default": "./dist/openapi/index.js"
@@ -44,6 +64,10 @@
     "./throttle": {
       "types": "./dist/throttle/index.d.ts",
       "default": "./dist/throttle/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.js"
     },
     "./upload": {
       "types": "./dist/upload/index.d.ts",
@@ -70,13 +94,17 @@
     "@nestjs/common": "^12.0.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/swagger": "^12.1.0",
+    "@nestjs/terminus": "^12.0.0",
     "@nestjs/throttler": "^6.5.0",
+    "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "exceljs": "^4.4.0",
+    "nestjs-pino": "^5.3.1",
     "rxjs": "^7.8.2",
-    "sanitize-html": "^2.17.7"
+    "sanitize-html": "^2.17.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -88,8 +116,10 @@
     "@nestjs/platform-express": "^12.0.1",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/swagger": "^12.1.0",
+    "@nestjs/terminus": "^12.0.0",
     "@nestjs/testing": "^12.0.1",
     "@nestjs/throttler": "^6.5.0",
+    "@prisma/client": "7.10.0",
     "@swc/core": "^1.16.21",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
@@ -103,6 +133,8 @@
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "exceljs": "^4.4.0",
+    "nestjs-pino": "^5.3.1",
+    "pino-http": "^11.0.0",
     "prettier": "^3.9.10",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
@@ -111,6 +143,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.72.1",
     "unplugin-swc": "^2.0.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "zod": "^4.4.3"
   }
 }

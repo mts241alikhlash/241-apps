@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import type { Request } from 'express'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
-import { HttpExceptionFilter } from '../../../core/filters/http-exception.filter.js'
+import { HttpExceptionFilter } from '@mts241alikhlash/nest-core/filters'
 import { PayrollAuditService } from '../services/payroll-audit.service.js'
 
 @Catch(ForbiddenException)

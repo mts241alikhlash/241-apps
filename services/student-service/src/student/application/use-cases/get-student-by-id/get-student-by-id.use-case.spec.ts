@@ -1,7 +1,7 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
-import type { RequestUser } from '../../../../core/types/request-user.type.js'
+import type { RequestUser } from '@mts241alikhlash/nest-core/types'
 import { GetStudentByIdUseCase } from './get-student-by-id.use-case.js'
 
 describe('GetStudentByIdUseCase', () => {

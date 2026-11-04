@@ -1,4 +1,4 @@
-﻿import type { TransformFnParams } from 'class-transformer'
+import type { TransformFnParams } from 'class-transformer'
 
 export function toBoolean(value: unknown): unknown {
   if (value === undefined || value === null || value === '') {

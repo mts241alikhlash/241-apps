@@ -11,7 +11,7 @@ import { CreateTimeSlotTypeUseCase } from '../../application/use-cases/create-ti
 import { UpdateTimeSlotTypeUseCase } from '../../application/use-cases/update-time-slot-type/update-time-slot-type.use-case.js'
 import { DeleteTimeSlotTypeUseCase } from '../../application/use-cases/delete-time-slot-type/delete-time-slot-type.use-case.js'
 import { TimeSlotController } from './time-slot.controller.js'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
 const slotType = {
   id: 'type-1',
@@ -40,6 +40,7 @@ describe('TimeSlotController', () => {
     sub: 'user-uuid',
     identifier: 'admin',
     sessionId: 'session-uuid',
+    roles: [],
   }
 
   beforeEach(async () => {

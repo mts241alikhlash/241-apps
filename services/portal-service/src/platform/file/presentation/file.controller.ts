@@ -30,7 +30,7 @@ import {
 import { JwtAuthGuard } from '../../auth/index.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '../../access-control/permission/decorators/require-permissions.decorator.js'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
 import { FileResponseDto } from '../dto/response/file-response.dto.js'
 import { UploadFileUseCase } from '../use-cases/upload-file.use-case.js'

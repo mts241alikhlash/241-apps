@@ -30,7 +30,7 @@ import {
 
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 
 import { BulkGenerateReportCardDto } from './dto/request/bulk-generate-report-card.dto.js'
 import { BulkGenerateReportCardResponseDto } from './dto/response/bulk-generate-report-card-response.dto.js'

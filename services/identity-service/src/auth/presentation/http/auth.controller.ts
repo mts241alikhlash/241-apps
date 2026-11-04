@@ -34,7 +34,7 @@ import { SsoGoogleLoginUseCase } from '../../application/use-cases/sso-login/sso
 import { IntrospectTokenUseCase } from '../../application/use-cases/introspect-token/introspect-token.use-case.js'
 import type { Request, Response } from 'express'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
+import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { JwtAuthGuard } from '../../index.js'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { GoogleAuthGuard } from '../../guards/google-auth.guard.js'

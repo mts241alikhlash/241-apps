@@ -1,4 +1,4 @@
-﻿import type { TransformFnParams } from 'class-transformer'
+import type { TransformFnParams } from 'class-transformer'
 import { toBoolean, toBooleanFromTransform } from './boolean.transformer.js'
 
 describe('toBoolean', () => {
