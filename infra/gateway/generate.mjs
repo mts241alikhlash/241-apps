@@ -90,10 +90,8 @@ function assertMatching(actual, expected, label) {
   }
 }
 
-export function requiredApps(lock, staging = null) {
-  return EXPECTED_APPS.filter(
-    (app) => app in (lock.apps ?? {}) || !isRecord(staging?.apps?.[app]),
-  )
+export function requiredApps() {
+  return [...EXPECTED_APPS]
 }
 
 export function validateManifest(manifest, schema = null) {
@@ -197,9 +195,7 @@ export function validateUpstreams(upstreams) {
 export function validateDeploymentLock(
   lock,
   {
-    environment = null,
     expectedApps = null,
-    staging = null,
     upstreams = null,
     requirePinnedImages = false,
   } = {},
@@ -207,16 +203,10 @@ export function validateDeploymentLock(
   if (!isRecord(lock)) throw new Error('deployment lock must be a JSON object')
   assertOnlyKeys(
     lock,
-    new Set(['schemaVersion', 'environment', 'gatewayImage', 'apps', 'services']),
+    new Set(['schemaVersion', 'gatewayImage', 'apps', 'services']),
     'deployment lock',
   )
   if (lock.schemaVersion !== 1) throw new Error('unsupported deployment lock schema')
-  if (!['staging', 'production'].includes(lock.environment)) {
-    throw new Error('invalid deployment environment')
-  }
-  if (environment !== null && lock.environment !== environment) {
-    throw new Error(`deployment lock environment must be ${environment}`)
-  }
   assertImage(lock.gatewayImage, 'gateway image', requirePinnedImages)
 
   if (!isRecord(lock.apps)) throw new Error('deployment lock apps must be an object')
@@ -228,7 +218,7 @@ export function validateDeploymentLock(
         throw new Error(`deployment lock has unknown application "${app}"`)
       }
     }
-    for (const app of requiredApps(lock, staging)) {
+    for (const app of requiredApps()) {
       if (!present.has(app)) {
         throw new Error(`deployment lock is missing application "${app}"`)
       }
@@ -435,27 +425,20 @@ function sha256(raw) {
 
 export async function loadInputs({
   rootDir = path.resolve(here, '..'),
-  environment = 'staging',
-  requirePinnedImages = environment === 'production',
+  requirePinnedImages = true,
 } = {}) {
   const root = path.resolve(rootDir)
   const schemaFile = path.join(root, 'gateway', 'schema', 'routing-manifest.schema.json')
   const upstreamFile = path.join(root, 'upstreams', 'services.json')
-  const lockFile = path.join(root, 'deployment', `${environment}.lock.json`)
+  const lockFile = path.join(root, 'deployment', 'lock.json')
   const manifestDir = path.join(root, 'gateway', 'manifests')
 
   const { value: schema } = await readJson(schemaFile, 'routing manifest schema')
   const { value: upstreams } = await readJson(upstreamFile, 'upstream registry')
   validateUpstreams(upstreams)
-  const { value: lock } = await readJson(lockFile, `${environment} deployment lock`)
-  const staging =
-    environment === 'staging'
-      ? lock
-      : (await readJson(path.join(root, 'deployment', 'staging.lock.json'), 'staging deployment lock')).value
+  const { value: lock } = await readJson(lockFile, 'deployment lock')
   validateDeploymentLock(lock, {
-    environment,
     expectedApps: EXPECTED_APPS,
-    staging,
     upstreams,
     requirePinnedImages,
   })
@@ -485,7 +468,7 @@ export async function loadInputs({
     artifacts.push({ manifest, fileName, checksum: sha256(raw) })
   }
 
-  const apps = requiredApps(lock, staging)
+  const apps = requiredApps()
   const selected = apps.map((app) => {
     const pin = lock.apps[app]
     const artifact = artifacts.find(
@@ -511,7 +494,6 @@ export async function loadInputs({
   )
   validateModel({ manifests, upstreams, lock, artifacts: selected, deployments })
   return {
-    environment,
     schema,
     upstreams,
     lock,
@@ -717,41 +699,27 @@ ${model.manifests.map((app) => serverBlock(app, model.deployments[app.app], mode
 
 function parseArgs(argv) {
   let check = false
-  let environment = 'staging'
-  for (let index = 0; index < argv.length; index += 1) {
-    const argument = argv[index]
+  for (const argument of argv) {
     if (argument === '--check') {
       check = true
       continue
     }
-    if (argument === '--environment') {
-      environment = argv[++index]
-      continue
-    }
-    if (argument.startsWith('--environment=')) {
-      environment = argument.slice('--environment='.length)
-      continue
-    }
     throw new Error(`unknown argument ${argument}`)
   }
-  if (!['staging', 'production'].includes(environment)) {
-    throw new Error(`invalid environment ${environment}`)
-  }
-  return { check, environment }
+  return { check }
 }
 
-export async function run({ check = false, environment = 'staging' } = {}) {
+export async function run({ check = false } = {}) {
   const rootDir = path.resolve(here, '..')
-  const model = await loadInputs({ rootDir, environment })
-  const committed = environment === 'staging' ? model : await loadInputs({ rootDir, environment: 'staging' })
+  const model = await loadInputs({ rootDir })
   let stale = 0
 
   if (check) {
-    console.log(`check   ${environment} inputs; comparing the checked-in staging render`)
+    console.log('check   inputs; comparing the checked-in render')
   }
 
   for (const target of TARGETS) {
-    const expected = renderConfig(check ? committed : model, { ssl: target.ssl })
+    const expected = renderConfig(model, { ssl: target.ssl })
     const name = path.basename(target.file)
     if (!check) {
       await writeFile(target.file, expected, 'utf8')

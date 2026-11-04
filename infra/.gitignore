@@ -11,7 +11,7 @@ node_modules/
 secrets/
 compose/env/*
 !compose/env/README.md
-compose/docker-compose.override.yml
+compose/compose.override.yaml
 .claude/
 .agents/
 .specify/

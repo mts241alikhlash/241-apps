@@ -25,8 +25,6 @@ const SERVICES = [
 ]
 const COMPONENTS = [...APPS, ...SERVICES]
 
-const GATEWAY_TAG_SUFFIX = { staging: '-staging', production: '' }
-
 async function gh(apiPath) {
   const res = await fetch(`https://api.github.com${apiPath}`, {
     headers: {
@@ -80,14 +78,11 @@ for (const name of COMPONENTS) {
     console.error(`  ! ${name}: ${err.message}`)
   }
 }
-const gatewayResults = {}
-for (const [env, suffix] of Object.entries(GATEWAY_TAG_SUFFIX)) {
-  try {
-    gatewayResults[env] = await latestFor('platform-gateway', suffix)
-  } catch (err) {
-    gatewayResults[env] = null
-    console.error(`  ! platform-gateway (${env}): ${err.message}`)
-  }
+let gatewayResult = null
+try {
+  gatewayResult = await latestFor('gateway')
+} catch (err) {
+  console.error(`  ! gateway: ${err.message}`)
 }
 
 const rows = [
@@ -95,11 +90,11 @@ const rows = [
     const r = results[name]
     return { name, version: r?.version ?? '(none published)', digest: r?.digest ?? '' }
   }),
-  ...Object.entries(gatewayResults).map(([env, r]) => ({
-    name: `platform-gateway (${env})`,
-    version: r?.version ?? '(none published)',
-    digest: r?.digest ?? '',
-  })),
+  {
+    name: 'gateway',
+    version: gatewayResult?.version ?? '(none published)',
+    digest: gatewayResult?.digest ?? '',
+  },
 ]
 const nameWidth = Math.max(...rows.map((r) => r.name.length))
 console.log()
@@ -110,32 +105,24 @@ console.log()
 
 const missing = [
   ...COMPONENTS.filter((name) => !results[name]),
-  ...Object.entries(gatewayResults)
-    .filter(([, r]) => !r)
-    .map(([env]) => `platform-gateway (${env})`),
+  ...(gatewayResult ? [] : ['gateway']),
 ]
 if (missing.length) {
   console.error(`Missing a published image for: ${missing.join(', ')}`)
 }
 
-const envArgIndex = process.argv.indexOf('--write')
-if (envArgIndex === -1) {
+if (!process.argv.includes('--write')) {
   if (missing.length) process.exit(1)
   process.exit(0)
-}
-const env = process.argv[envArgIndex + 1]
-if (env !== 'production' && env !== 'staging') {
-  console.error('Usage: --write production|staging')
-  process.exit(1)
 }
 if (missing.length) {
   console.error('Refusing to write a lock file with missing images above.')
   process.exit(1)
 }
 
-const lockPath = path.join(root, 'deployment', `${env}.lock.json`)
+const lockPath = path.join(root, 'deployment', 'lock.json')
 const lock = JSON.parse(readFileSync(lockPath, 'utf8'))
-lock.gatewayImage = `ghcr.io/${org}/platform-gateway@sha256:${gatewayResults[env].digest.replace('sha256:', '')}`
+lock.gatewayImage = `ghcr.io/${org}/gateway@sha256:${gatewayResult.digest.replace('sha256:', '')}`
 for (const key of Object.keys(lock.apps)) {
   const r = results[`${key}-web`]
   lock.apps[key].webVersion = r.version
@@ -149,9 +136,9 @@ for (const key of Object.keys(lock.services)) {
 writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n')
 console.log(`wrote ${path.relative(root, lockPath)}`)
 
-const composePath = path.join(root, 'compose', `docker-compose.${env}.yml`)
+const composePath = path.join(root, 'compose', 'compose.yaml')
 let compose = readFileSync(composePath, 'utf8')
-for (const [name, r] of [...COMPONENTS.map((n) => [n, results[n]]), ['platform-gateway', gatewayResults[env]]]) {
+for (const [name, r] of [...COMPONENTS.map((n) => [n, results[n]]), ['gateway', gatewayResult]]) {
   const digest = r.digest.replace('sha256:', '')
   compose = compose.replaceAll(
     new RegExp(`ghcr\\.io/${org}/${name}@sha256:\\S+`, 'g'),

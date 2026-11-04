@@ -1,23 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-env="${1:?usage: scripts/deploy.sh <staging|production>}"
 services=(identity academic admission hr inventory presence portal student assessment exam)
 
 dc() {
-  docker compose -f "compose/docker-compose.$env.yml" -f compose/docker-compose.override.yml "$@"
+  docker compose -f compose/compose.yaml -f compose/compose.override.yaml "$@"
 }
 
 report() {
   dc ps -a --format '{{.Name}} {{.State}} {{.Health}}'
   echo "==> read logs on the VPS: docker logs --tail 100 <name>"
 }
-
-network="$(dc config --format json | python3 -c 'import json, sys; print(json.load(sys.stdin)["networks"]["platform-net"]["name"])')"
-if [[ "$env" == production && "$network" == mts241alikhlash-net ]]; then
-  echo "production is on the staging network; set its own network in compose/docker-compose.override.yml" >&2
-  exit 1
-fi
 
 docker_root="$(docker info --format '{{.DockerRootDir}}')"
 free_kb="$(df --output=avail -k "$docker_root" | tail -1)"
@@ -44,12 +37,12 @@ trap report ERR
 echo "==> up"
 dc up -d --wait --wait-timeout 300
 
-checks="$(python3 - "$env" "${services[@]}" <<'PY'
+checks="$(python3 - "${services[@]}" <<'PY'
 import json
 import sys
 
-env, *services = sys.argv[1:]
-lock = json.load(open(f"deployment/{env}.lock.json"))
+services = sys.argv[1:]
+lock = json.load(open("deployment/lock.json"))
 routes = {}
 for app, pin in sorted(lock["apps"].items()):
     manifest = json.load(open(f"gateway/manifests/{app}-{pin['routesVersion']}.json"))
@@ -87,4 +80,4 @@ docker image ls --no-trunc --format '{{.ID}} {{.Repository}}' |
       docker image rm "$id" > /dev/null 2>&1 || true
   done
 
-echo "==> deployed $(git rev-parse --short HEAD) to $env"
+echo "==> deployed $(git rev-parse --short HEAD)"

@@ -92,22 +92,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - run: node gateway/generate.mjs --environment staging
+      - run: node gateway/generate.mjs
       - uses: docker/build-push-action@v7
         id: image
         with:
           context: .
           file: gateway/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/platform-gateway:${{ steps.package.outputs.version }}-staging
-      - run: node gateway/generate.mjs --environment production
-      - uses: docker/build-push-action@v7
-        id: image-production
-        with:
-          context: .
-          file: gateway/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/platform-gateway:${{ steps.package.outputs.version }}
+          tags: ghcr.io/${{ github.repository_owner }}/gateway:${{ steps.package.outputs.version }}
       - uses: changesets/action/publish@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -126,5 +118,4 @@ jobs:
             --generate-notes
       - run: |
           echo "Gateway release: ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Gateway image (staging):    ghcr.io/${{ github.repository_owner }}/platform-gateway@${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Gateway image (production): ghcr.io/${{ github.repository_owner }}/platform-gateway@${{ steps.image-production.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Gateway image: ghcr.io/${{ github.repository_owner }}/gateway@${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"

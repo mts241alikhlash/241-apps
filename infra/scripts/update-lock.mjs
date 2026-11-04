@@ -10,7 +10,6 @@ const org = 'mts241alikhlash'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.dirname(here)
 const manifestDir = path.join(root, 'gateway', 'manifests')
-const GATEWAY_TAG_SUFFIX = { staging: '-staging', production: '' }
 const MISSING_REPOSITORY_RE = /not found|does not appear to be a git repository/i
 const MANIFEST_ACCEPT = [
   'application/vnd.oci.image.index.v1+json',
@@ -105,15 +104,15 @@ async function fetchManifest(app, version) {
   return { raw, sha256: actual }
 }
 
-function readLock(env) {
-  return JSON.parse(readFileSync(path.join(root, 'deployment', `${env}.lock.json`), 'utf8'))
+function readLock() {
+  return JSON.parse(readFileSync(path.join(root, 'deployment', 'lock.json'), 'utf8'))
 }
 
 function image(name, digest) {
   return `ghcr.io/${org}/${name}@${digest}`
 }
 
-async function updateStaging(lock, changes) {
+async function updateApps(lock, changes) {
   const webTags = {}
   for (const app of Object.keys(lock.apps)) webTags[app] = remoteTags(`${app}-web`)
   const serviceTags = remoteTags('services')
@@ -144,39 +143,14 @@ async function updateStaging(lock, changes) {
   }
 }
 
-export function productionPin(pin) {
-  return { ...pin, sslHost: pin.sslHost.replace(/^dev-/, '') }
-}
-
-export function promote(lock, staging, changes) {
-  for (const [app, from] of Object.entries(staging.apps)) {
-    const pin = lock.apps[app]
-    if (!pin) {
-      lock.apps[app] = productionPin(from)
-      changes.push(`${app}-web ${from.webVersion}`)
-      continue
-    }
-    if (pin.webImage === from.webImage && pin.routesSha256 === from.routesSha256) continue
-    for (const key of ['webVersion', 'webImage', 'routesVersion', 'routesSha256']) pin[key] = from[key]
-    changes.push(`${app}-web ${from.webVersion}`)
-  }
-  for (const [service, pin] of Object.entries(lock.services)) {
-    const from = staging.services[service]
-    if (pin.image === from.image) continue
-    Object.assign(pin, { version: from.version, image: from.image })
-    changes.push(`${service}-service ${from.version}`)
-  }
-}
-
-async function updateGateway(lock, env, changes) {
+async function updateGateway(lock, changes) {
   const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'))
-  const tag = `${version}${GATEWAY_TAG_SUFFIX[env]}`
-  const digest = await imageDigest('platform-gateway', tag)
+  const digest = await imageDigest('gateway', version)
   if (!digest) return
-  const pinned = image('platform-gateway', digest)
+  const pinned = image('gateway', digest)
   if (lock.gatewayImage === pinned) return
   lock.gatewayImage = pinned
-  changes.push(`platform-gateway ${tag}`)
+  changes.push(`gateway ${version}`)
 }
 
 export function pinImages(compose, images) {
@@ -218,8 +192,8 @@ export function addAppServices(compose, apps) {
   return `${withServices.slice(0, end)}${depends}${withServices.slice(end)}`
 }
 
-function writeCompose(env, lock) {
-  const file = path.join(root, 'compose', `docker-compose.${env}.yml`)
+function writeCompose(lock) {
+  const file = path.join(root, 'compose', 'compose.yaml')
   const images = [
     lock.gatewayImage,
     ...Object.values(lock.apps).map((pin) => pin.webImage),
@@ -230,29 +204,23 @@ function writeCompose(env, lock) {
 }
 
 function pruneManifests() {
-  const keep = referencedManifests([readLock('staging'), readLock('production')])
+  const keep = referencedManifests([readLock()])
   for (const name of readdirSync(manifestDir)) {
     if (name.endsWith('.json') && !keep.has(name)) unlinkSync(path.join(manifestDir, name))
   }
 }
 
 async function main() {
-  const env = process.argv[2]
-  if (env !== 'staging' && env !== 'production') {
-    console.error('usage: node scripts/update-lock.mjs staging|production')
-    process.exit(2)
-  }
-  const lock = readLock(env)
+  const lock = readLock()
   const changes = []
-  if (env === 'staging') await updateStaging(lock, changes)
-  else promote(lock, readLock('staging'), changes)
-  await updateGateway(lock, env, changes)
+  await updateApps(lock, changes)
+  await updateGateway(lock, changes)
   if (changes.length === 0) {
     console.log('no changes')
     return
   }
-  writeFileSync(path.join(root, 'deployment', `${env}.lock.json`), `${JSON.stringify(lock, null, 2)}\n`)
-  writeCompose(env, lock)
+  writeFileSync(path.join(root, 'deployment', 'lock.json'), `${JSON.stringify(lock, null, 2)}\n`)
+  writeCompose(lock)
   pruneManifests()
   for (const change of changes) console.log(change)
 }

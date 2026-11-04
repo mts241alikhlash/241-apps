@@ -4,8 +4,6 @@ import {
   manifestFileName,
   needsPin,
   pinImages,
-  productionPin,
-  promote,
   referencedManifests,
   remoteTags,
 } from './update-lock.mjs'
@@ -60,37 +58,6 @@ assert.equal(
   ),
   `  hr-web:\n    image: ghcr.io/mts241alikhlash/hr-web@sha256:${'d'.repeat(64)}\n`,
 )
-
-const stagingLock = {
-  apps: {
-    exam: {
-      host: 'exam.localhost',
-      sslHost: 'dev-exam.mts241alikhlash.sch.id',
-      root: '/usr/share/nginx/html/exam',
-      webVersion: '1.0.0',
-      webImage: `ghcr.io/mts241alikhlash/exam-web@sha256:${'e'.repeat(64)}`,
-      routesVersion: '1.0.0',
-      routesSha256: 'f'.repeat(64),
-    },
-  },
-  services: {},
-}
-const productionLock = { apps: {}, services: {} }
-const promoteChanges = []
-promote(productionLock, stagingLock, promoteChanges)
-assert.deepEqual(productionLock.apps.exam, {
-  host: 'exam.localhost',
-  sslHost: 'exam.mts241alikhlash.sch.id',
-  root: '/usr/share/nginx/html/exam',
-  webVersion: '1.0.0',
-  webImage: `ghcr.io/mts241alikhlash/exam-web@sha256:${'e'.repeat(64)}`,
-  routesVersion: '1.0.0',
-  routesSha256: 'f'.repeat(64),
-})
-assert.deepEqual(promoteChanges, ['exam-web 1.0.0'])
-assert.deepEqual(productionPin({ sslHost: 'accounts.mts241alikhlash.sch.id' }), {
-  sslHost: 'accounts.mts241alikhlash.sch.id',
-})
 
 assert.deepEqual(
   remoteTags('exam-web', () => `${'1'.repeat(40)}\trefs/tags/exam-web@1.0.0\n`),
