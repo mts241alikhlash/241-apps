@@ -6,7 +6,7 @@ describe('PrismaAdmissionFileRepository.findServable', () => {
       id: 'f1',
       originalName: 'kk.pdf',
       mimeType: 'application/pdf',
-      storageKey: 'production/admission/documents/kk.pdf',
+      storageKey: 'admission/documents/kk.pdf',
     }
     const findFirst = jest.fn().mockResolvedValue(found)
     const repository = new PrismaAdmissionFileRepository({

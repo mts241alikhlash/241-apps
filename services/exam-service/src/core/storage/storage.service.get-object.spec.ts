@@ -27,9 +27,7 @@ describe('StorageService.getObject', () => {
       ContentLength: 3,
     })
 
-    const result = await storageWith(send).getObject(
-      'production/admission/a.pdf',
-    )
+    const result = await storageWith(send).getObject('admission/a.pdf')
 
     expect(result).toEqual({
       stream: body,
@@ -39,7 +37,7 @@ describe('StorageService.getObject', () => {
     expect(send).toHaveBeenCalledTimes(1)
     expect(
       (send.mock.calls[0][0] as { input: Record<string, string> }).input,
-    ).toEqual({ Bucket: 'bucket', Key: 'production/admission/a.pdf' })
+    ).toEqual({ Bucket: 'bucket', Key: 'admission/a.pdf' })
   })
 
   it.each(['NoSuchKey', 'NotFound'])('answers 404 for %s', async (name) => {

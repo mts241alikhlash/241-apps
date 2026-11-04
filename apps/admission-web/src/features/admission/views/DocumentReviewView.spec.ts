@@ -61,7 +61,7 @@ const file = (id: string, name: string) => ({
   id,
   originalName: name,
   mimeType: 'application/pdf',
-  storageKey: `production/admission/documents/${name}`,
+  storageKey: `admission/documents/${name}`,
 })
 const doc = (
   id: string,

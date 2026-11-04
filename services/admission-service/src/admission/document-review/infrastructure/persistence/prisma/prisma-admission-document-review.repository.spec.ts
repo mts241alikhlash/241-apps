@@ -200,7 +200,7 @@ describe('PrismaAdmissionDocumentReviewRepository.findContext', () => {
             id: 'f1',
             originalName: 'kk.pdf',
             mimeType: 'application/pdf',
-            storageKey: 'production/admission/documents/kk.pdf',
+            storageKey: 'admission/documents/kk.pdf',
           },
         },
       ],
