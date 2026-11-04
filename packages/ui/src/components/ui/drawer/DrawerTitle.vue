@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { DrawerTitle } from 'reka-ui'
 
-const props = defineProps<DrawerTitleProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  DrawerTitleProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -14,7 +16,9 @@ const delegatedProps = reactiveOmit(props, 'class')
   <DrawerTitle
     data-slot="drawer-title"
     v-bind="delegatedProps"
-    :class="cn('text-foreground text-sm font-medium cn-font-heading', props.class)"
+    :class="
+      cn('text-foreground text-sm font-medium cn-font-heading', props.class)
+    "
   >
     <slot />
   </DrawerTitle>

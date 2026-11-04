@@ -106,16 +106,16 @@ As a maintainer, I need each migration slice to have characterization tests, foc
 
 ## Key Entities and Ownership
 
-| Module | Owned models |
-|---|---|
-| `reference-data/category` | `InventoryCategory` |
-| `reference-data/condition` | `InventoryCondition` |
-| `reference-data/location` | `InventoryLocation` |
-| `reference-data/funding-source` | `InventoryFundingSource` |
-| `reference-data/status` | `InventoryStatus` |
-| `asset` | `InventoryAsset`, `InventoryAssetUnit` |
-| `circulation` | `InventoryLoan`, `InventoryLoanItem`, `InventoryHistory`, `InventoryTransactionType` |
-| `approval` | `ApprovalWorkflow`, `ApprovalStep`, `ApprovalInstance`, `ApprovalLog` |
+| Module                          | Owned models                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| `reference-data/category`       | `InventoryCategory`                                                                  |
+| `reference-data/condition`      | `InventoryCondition`                                                                 |
+| `reference-data/location`       | `InventoryLocation`                                                                  |
+| `reference-data/funding-source` | `InventoryFundingSource`                                                             |
+| `reference-data/status`         | `InventoryStatus`                                                                    |
+| `asset`                         | `InventoryAsset`, `InventoryAssetUnit`                                               |
+| `circulation`                   | `InventoryLoan`, `InventoryLoanItem`, `InventoryHistory`, `InventoryTransactionType` |
+| `approval`                      | `ApprovalWorkflow`, `ApprovalStep`, `ApprovalInstance`, `ApprovalLog`                |
 
 ## Assumptions
 

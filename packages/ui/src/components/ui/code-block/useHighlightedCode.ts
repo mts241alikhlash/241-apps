@@ -10,21 +10,23 @@ export function useHighlightedCode(
 ) {
   const highlighter = shallowRef<Highlighter | null>(null)
 
-  watch(() => toValue(language), (lang, _, onCleanup) => {
-    if (typeof window === 'undefined')
-      return
+  watch(
+    () => toValue(language),
+    (lang, _, onCleanup) => {
+      if (typeof window === 'undefined') return
 
-    let cancelled = false
-    onCleanup(() => (cancelled = true))
-    highlighter.value = null
+      let cancelled = false
+      onCleanup(() => (cancelled = true))
+      highlighter.value = null
 
-    loadHighlighter(lang)
-      .then((next) => {
-        if (!cancelled)
-          highlighter.value = next
-      })
-      .catch(() => {})
-  }, { immediate: true })
+      loadHighlighter(lang)
+        .then((next) => {
+          if (!cancelled) highlighter.value = next
+        })
+        .catch(() => {})
+    },
+    { immediate: true },
+  )
 
   let done: {
     highlighter: Highlighter | null
@@ -39,7 +41,7 @@ export function useHighlightedCode(
     const current = highlighter.value
 
     if (!current)
-      return code.split('\n').map(line => (line ? [{ content: line }] : []))
+      return code.split('\n').map((line) => (line ? [{ content: line }] : []))
 
     if (done.highlighter !== current || !code.startsWith(done.text))
       done = { highlighter: current, text: '', lines: [] }

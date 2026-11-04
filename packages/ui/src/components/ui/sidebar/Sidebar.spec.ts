@@ -37,7 +37,9 @@ describe('sidebar items', () => {
     const c = sidebarMenuButtonVariants({ size: 'lg' })
     expect(c).not.toContain('text-muted-foreground')
     expect(c).toContain('text-sidebar-foreground')
-    expect(sidebarMenuButtonVariants({ size: 'sm' })).toContain('text-muted-foreground')
+    expect(sidebarMenuButtonVariants({ size: 'sm' })).toContain(
+      'text-muted-foreground',
+    )
   })
 
   it('sub button is muted until active', () => {
@@ -69,7 +71,12 @@ describe('sidebar inset', () => {
 
   it('sub menu keeps the 4px gap and left rule', () => {
     expect(mount(SidebarMenuSub).classes()).toEqual(
-      expect.arrayContaining(['gap-1', 'border-l', 'border-sidebar-border', 'py-0.5']),
+      expect.arrayContaining([
+        'gap-1',
+        'border-l',
+        'border-sidebar-border',
+        'py-0.5',
+      ]),
     )
   })
 })

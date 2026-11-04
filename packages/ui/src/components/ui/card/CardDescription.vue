@@ -10,7 +10,12 @@ const props = defineProps<{
 <template>
   <p
     data-slot="card-description"
-    :class="cn('text-muted-foreground text-[length:var(--text-control,0.75rem)]', props.class)"
+    :class="
+      cn(
+        'text-muted-foreground text-[length:var(--text-control,0.75rem)]',
+        props.class,
+      )
+    "
   >
     <slot />
   </p>

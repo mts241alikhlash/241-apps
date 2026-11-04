@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { SelectGroup } from 'reka-ui'
 
-const props = defineProps<SelectGroupProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SelectGroupProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>

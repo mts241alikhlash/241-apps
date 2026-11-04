@@ -7,7 +7,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { SelectScrollDownButton, useForwardProps } from 'reka-ui'
 
-const props = defineProps<SelectScrollDownButtonProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SelectScrollDownButtonProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
@@ -18,7 +20,12 @@ const forwardedProps = useForwardProps(delegatedProps)
   <SelectScrollDownButton
     data-slot="select-scroll-down-button"
     v-bind="forwardedProps"
-    :class="cn('bg-popover z-10 flex cursor-default items-center justify-center py-1 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]', props.class)"
+    :class="
+      cn(
+        'bg-popover z-10 flex cursor-default items-center justify-center py-1 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+        props.class,
+      )
+    "
   >
     <slot>
       <ChevronDownIcon />

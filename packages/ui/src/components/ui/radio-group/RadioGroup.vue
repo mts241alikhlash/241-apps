@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { RadioGroupRoot, useForwardPropsEmits } from 'reka-ui'
 
-const props = defineProps<RadioGroupRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  RadioGroupRootProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<RadioGroupRootEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')

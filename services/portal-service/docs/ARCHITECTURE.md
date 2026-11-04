@@ -11,7 +11,7 @@ They are independent: a module can be perfectly layered and still wrongly
 coupled, and the reverse.
 
 `NESTJS-RULES.md` holds the coding rules (controllers, DTOs, validation,
-naming). Its two *structure* sections — `DOMAIN STRUCTURE` and
+naming). Its two _structure_ sections — `DOMAIN STRUCTURE` and
 `MODULE STRUCTURE` — are superseded by Part 1 here. `IAM.md` holds how
 authorization works and which service owns it. `CLEAN-CODE.md` covers what a
 file looks like once it is in the right place.
@@ -24,16 +24,16 @@ file looks like once it is in the right place.
 
 Measured 2026-09-02 against `src/portal/`:
 
-| Signal | Count |
-| --- | --- |
-| Modules using the target `application/` layer | **0 of 8** |
-| Use case **classes** | **69** |
-| Files holding them | **32** — nine files hold between 2 and 9 each |
-| Use case files importing a `*.dto.js` (application → presentation) | **19 of 30** |
-| Files touching Prisma outside `infrastructure/` or `core/` | 1 |
-| Controllers touching Prisma | 0 |
-| Files over 300 lines | **0** |
-| `.spec.ts` files | **36** — the best coverage of the nine services |
+| Signal                                                             | Count                                           |
+| ------------------------------------------------------------------ | ----------------------------------------------- |
+| Modules using the target `application/` layer                      | **0 of 8**                                      |
+| Use case **classes**                                               | **69**                                          |
+| Files holding them                                                 | **32** — nine files hold between 2 and 9 each   |
+| Use case files importing a `*.dto.js` (application → presentation) | **19 of 30**                                    |
+| Files touching Prisma outside `infrastructure/` or `core/`         | 1                                               |
+| Controllers touching Prisma                                        | 0                                               |
+| Files over 300 lines                                               | **0**                                           |
+| `.spec.ts` files                                                   | **36** — the best coverage of the nine services |
 
 This service is the best-engineered of the five unmigrated ones. `post` already
 does what the other services will have to learn: its repository is split into
@@ -163,19 +163,19 @@ Self-contained checks go in `domain/policies/`, never in the entity file — an
 entity file describes shape, a policy file states a rule.
 
 **Default to interface.** Reach for a class only when you can name the
-self-contained rule *and* it covers the aggregate's real invariant.
+self-contained rule _and_ it covers the aggregate's real invariant.
 
 ## Three type boundaries
 
-| Type | Lives in | Carries |
-| --- | --- | --- |
-| `XxxDto` | `presentation/http/dto/` | `class-validator` + `@ApiProperty` |
-| `XxxInput` | `application/use-cases/<name>/` | nothing — a plain interface |
-| `XxxRepositoryInput` | `domain/repositories/` | nothing — a plain interface |
+| Type                 | Lives in                        | Carries                            |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| `XxxDto`             | `presentation/http/dto/`        | `class-validator` + `@ApiProperty` |
+| `XxxInput`           | `application/use-cases/<name>/` | nothing — a plain interface        |
+| `XxxRepositoryInput` | `domain/repositories/`          | nothing — a plain interface        |
 
 They may be structurally identical. TypeScript is structural, so a controller
 passes a Dto straight into a use case expecting an Input. **Do not write a
-mapper for it.** What you must not do is let the use case *name* the Dto.
+mapper for it.** What you must not do is let the use case _name_ the Dto.
 
 This service already gets the third boundary right. `post-repository.interface.ts`
 declares `CreatePostInput`, `UpdatePostInput`, `PublishPostInput`,
@@ -192,16 +192,16 @@ NodeNext ESM: **every relative import ends in `.js`** though the source is
 `.ts`. A wrong `../` count is the most common conversion error, and
 `pnpm run typecheck` catches every one.
 
-| File location | → `src/` | → module root |
-| --- | --- | --- |
-| `<module>.module.ts`, `index.ts` | `../../` | `./` |
-| `domain/{entities,repositories,policies}/x.ts` | `../../../../` | `../../` |
-| `application/use-cases/<name>/x.ts` | `../../../../../` | `../../../` |
-| `application/services/x.ts` | `../../../../` | `../../` |
-| `infrastructure/persistence/prisma/x.ts` | `../../../../../` | `../../../` |
-| `infrastructure/mappers/x.ts` | `../../../../` | `../../` |
-| `presentation/http/x.controller.ts` | `../../../../` | `../../` |
-| `presentation/http/dto/request/x.dto.ts` | `../../../../../../` | `../../../../` |
+| File location                                  | → `src/`             | → module root  |
+| ---------------------------------------------- | -------------------- | -------------- |
+| `<module>.module.ts`, `index.ts`               | `../../`             | `./`           |
+| `domain/{entities,repositories,policies}/x.ts` | `../../../../`       | `../../`       |
+| `application/use-cases/<name>/x.ts`            | `../../../../../`    | `../../../`    |
+| `application/services/x.ts`                    | `../../../../`       | `../../`       |
+| `infrastructure/persistence/prisma/x.ts`       | `../../../../../`    | `../../../`    |
+| `infrastructure/mappers/x.ts`                  | `../../../../`       | `../../`       |
+| `presentation/http/x.controller.ts`            | `../../../../`       | `../../`       |
+| `presentation/http/dto/request/x.dto.ts`       | `../../../../../../` | `../../../../` |
 
 ## Converting a module — the procedure
 
@@ -214,15 +214,15 @@ unreviewable.
 
 Then, old layout → new:
 
-| Old | New |
-| --- | --- |
-| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts` |
-| `use-cases/<name>.use-case.ts` | `application/use-cases/<name>/<name>.use-case.ts` |
-| `services/<name>.service.ts` | `application/services/<name>.service.ts` |
-| `infrastructure/persistence/*.ts` | `infrastructure/persistence/prisma/*.ts` |
-| `infrastructure/mappers/*.ts` | unchanged |
-| `presentation/<name>.controller.ts` | `presentation/http/<name>.controller.ts` |
-| `dto/request/*.ts`, `dto/response/*.ts` | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
+| Old                                                | New                                                       |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts`                |
+| `use-cases/<name>.use-case.ts`                     | `application/use-cases/<name>/<name>.use-case.ts`         |
+| `services/<name>.service.ts`                       | `application/services/<name>.service.ts`                  |
+| `infrastructure/persistence/*.ts`                  | `infrastructure/persistence/prisma/*.ts`                  |
+| `infrastructure/mappers/*.ts`                      | unchanged                                                 |
+| `presentation/<name>.controller.ts`                | `presentation/http/<name>.controller.ts`                  |
+| `dto/request/*.ts`, `dto/response/*.ts`            | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
 
 `constants/` stays at the module root. `domain/entities/` and `domain/enums/` do
 not move.
@@ -316,12 +316,12 @@ it at conversion time, not later.
 each narrowed to a read or a single write. **None is a second copy of
 identity-service.**
 
-| Here | May do | Left behind |
-| --- | --- | --- |
-| `platform/auth` | Verify a token, check the session is live | Login, refresh, logout, password reset, session cleanup |
-| `platform/access-control` | `PermissionGuard` asking if the caller holds a permission | The use cases, the controller, the catalog-sync hook |
-| `platform/audit-log` | Write an audit entry for a content change | Reading and searching the audit log |
-| `platform/file` | Resolve and serve an uploaded file | File administration |
+| Here                      | May do                                                    | Left behind                                             |
+| ------------------------- | --------------------------------------------------------- | ------------------------------------------------------- |
+| `platform/auth`           | Verify a token, check the session is live                 | Login, refresh, logout, password reset, session cleanup |
+| `platform/access-control` | `PermissionGuard` asking if the caller holds a permission | The use cases, the controller, the catalog-sync hook    |
+| `platform/audit-log`      | Write an audit entry for a content change                 | Reading and searching the audit log                     |
+| `platform/file`           | Resolve and serve an uploaded file                        | File administration                                     |
 
 > **The narrowing rule:** if a controller here would answer the same URL as one
 > in `identity-service`, it does not belong here.
@@ -368,7 +368,7 @@ reads or writes them, so migrating is simply how this service deploys.
 > nothing else. Do not "fix" this.
 
 That is no longer about racing another service for a shared schema — it is
-about who decides *when* the schema changes. Migrating on boot hands that
+about who decides _when_ the schema changes. Migrating on boot hands that
 decision to whichever replica starts first, and races every extra replica.
 Migration is an explicit deploy step: `--profile migrate` in
 `docker-compose.prod.yml`, per service.
@@ -383,13 +383,14 @@ it.
 - `pnpm prisma:generate` is required before anything else, and is always safe.
 - A schema change is made here and nowhere else. This service's schema is the
   only description of its database.
+
 ## Couplings, and what closing them means
 
-| # | Coupling | Status |
-| --- | --- | --- |
-| 1 | Authorization reads iam's tables | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma |
-| 2 | Author bylines join to `profiles` | **Open, deliberately.** While both tables sit in one database the join is the faster read |
-| 3 | Audit entries write iam's table | **Open.** `platform/audit-log` writes locally rather than calling `identity-service` |
+| #   | Coupling                          | Status                                                                                    |
+| --- | --------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1   | Authorization reads iam's tables  | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma    |
+| 2   | Author bylines join to `profiles` | **Open, deliberately.** While both tables sit in one database the join is the faster read |
+| 3   | Audit entries write iam's table   | **Open.** `platform/audit-log` writes locally rather than calling `identity-service`      |
 
 Coupling 1 is the next to close, and the shape is already proven:
 `inventory-service` replaced exactly this with `IIdentityPort` +
@@ -409,7 +410,7 @@ Only after all three can this service's database separate — and only then does
 ## Naming the boundary correctly
 
 Do not call `platform/` an **Anti-Corruption Layer**. An ACL translates between
-two *different* domain models at a boundary, and nothing there does that —
+two _different_ domain models at a boundary, and nothing there does that —
 `platform/auth` reads `auth_sessions` and `users` through the identical Prisma
 models `identity-service` itself uses. It becomes an accurate name only once a
 coupling closes into a real HTTP call and something here has to translate

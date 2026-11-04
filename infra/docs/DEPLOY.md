@@ -36,7 +36,7 @@ is done by a person. Once it is done, later deploys run on their own (section 6)
    settings and make it public there when it is not (GitHub has no API for
    it). The web apps' CI and Docker builds install the packages anonymously.
 4. **Web apps** (all nine, `account-web` included): `pnpm up
-   "@mts241alikhlash/*"` so the lockfile names the published 0.1.0 packages,
+"@mts241alikhlash/*"` so the lockfile names the published 0.1.0 packages,
    `pnpm run validate`, commit, push. Each release publishes the image and its
    routing manifest.
 5. **platform-infra.** Copy each app's published routing manifest into

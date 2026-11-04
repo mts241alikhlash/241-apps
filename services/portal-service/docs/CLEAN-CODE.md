@@ -174,8 +174,7 @@ belong, and both already exist. Use them.
 
 ```ts
 // fine as-is — the meaning is the literal
-if (data.length === 0)
-Math.ceil(total / limit)
+if (data.length === 0) Math.ceil(total / limit)
 ```
 
 ---
@@ -244,8 +243,8 @@ delegate (the delegates are distinct generated types), and **what `null` means**
 to a caller. The `update()` vs `updateMany()` distinction is a correctness trap
 where the wrong choice fails silently — the worst kind.
 
-That is the test for the exception: *a decision a reader cannot recover from the
-code, where getting it wrong fails quietly.* It applies to `shared/persistence`,
+That is the test for the exception: _a decision a reader cannot recover from the
+code, where getting it wrong fails quietly._ It applies to `shared/persistence`,
 `platform/` adapters, and published contract types. It does not license a
 comment on a use case.
 

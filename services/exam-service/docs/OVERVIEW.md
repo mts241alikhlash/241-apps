@@ -90,15 +90,15 @@ import and analysis.
 
 ## What it borrows
 
-| Borrowed | Why |
-|---|---|
-| `platform/auth` | Session liveness, `JwtAuthGuard` |
-| `platform/access-control/permission` | `PermissionGuard`, `exam-questions.*` codes |
-| `platform/identity` | Token introspection against identity-service |
-| `platform/employee-identity` | Which employee record a signed-in user owns |
-| `platform/academic-lookup` | The subject and grade pairs a teacher teaches, classrooms, grades and subjects by id, the active semester |
-| `platform/student-identity` | The student record of a signed-in account (student-service) |
-| `platform/enrollment-lookup` | The active classroom of a student (student-service) |
+| Borrowed                             | Why                                                                                                       |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `platform/auth`                      | Session liveness, `JwtAuthGuard`                                                                          |
+| `platform/access-control/permission` | `PermissionGuard`, `exam-questions.*` codes                                                               |
+| `platform/identity`                  | Token introspection against identity-service                                                              |
+| `platform/employee-identity`         | Which employee record a signed-in user owns                                                               |
+| `platform/academic-lookup`           | The subject and grade pairs a teacher teaches, classrooms, grades and subjects by id, the active semester |
+| `platform/student-identity`          | The student record of a signed-in account (student-service)                                               |
+| `platform/enrollment-lookup`         | The active classroom of a student (student-service)                                                       |
 
 ## Permissions
 

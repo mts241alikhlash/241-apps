@@ -8,7 +8,7 @@ the `.js` extension even though the source is `.ts`.
 
 `docs/NESTJS-RULES.md` (coding rules) and `docs/IAM.md` (how authorization
 works, and which service owns it). Both still
-binding, except that NESTJS-RULES.md's two *structure* sections are superseded
+binding, except that NESTJS-RULES.md's two _structure_ sections are superseded
 across this service's modules — see below.
 
 Above both sits `docs/CONSTITUTION.md` — the platform's binding principles.
@@ -84,14 +84,14 @@ Each borrowed piece is narrowed to a read or a single write. **None of them is
 a second copy of the service that owns the real thing**, and keeping it that
 way is the point:
 
-| Here | What it may do | What was left behind |
-|---|---|---|
-| `platform/auth` | Verify a token, check the session is live | Login, refresh, logout, password reset, session cleanup — the whole controller, left in identity-service |
-| `platform/access-control/permission` | `PermissionGuard` asking whether the caller holds a permission | Eight use cases, the controller, and the bootstrap hook that syncs the catalog, left in identity-service |
-| `platform/teacher-identity` | One method: which teacher record a signed-in user owns | Everything else about `Employee` — CRUD, bulk import, positions — left in `hr-service` since 2026-09-03 |
-| `platform/student-identity` | One method: which student record a signed-in user owns | Everything else about `Student` — CRUD, bulk import, parents — left in `student-service` since 2026-09-03 |
-| `platform/teacher-lookup` | `POST /employees/by-ids` — id, `userId`, NIP for a batch | The employee record itself |
-| `platform/student-lookup` | `POST /students/by-ids` — id, `userId`, NIS for a batch | The student record itself |
+| Here                                 | What it may do                                                 | What was left behind                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `platform/auth`                      | Verify a token, check the session is live                      | Login, refresh, logout, password reset, session cleanup — the whole controller, left in identity-service  |
+| `platform/access-control/permission` | `PermissionGuard` asking whether the caller holds a permission | Eight use cases, the controller, and the bootstrap hook that syncs the catalog, left in identity-service  |
+| `platform/teacher-identity`          | One method: which teacher record a signed-in user owns         | Everything else about `Employee` — CRUD, bulk import, positions — left in `hr-service` since 2026-09-03   |
+| `platform/student-identity`          | One method: which student record a signed-in user owns         | Everything else about `Student` — CRUD, bulk import, parents — left in `student-service` since 2026-09-03 |
+| `platform/teacher-lookup`            | `POST /employees/by-ids` — id, `userId`, NIP for a batch       | The employee record itself                                                                                |
+| `platform/student-lookup`            | `POST /students/by-ids` — id, `userId`, NIS for a batch        | The student record itself                                                                                 |
 
 The `*-identity` and `*-lookup` pairs answer opposite questions and are kept
 apart on purpose: identity maps a signed-in account **to** a record for the
@@ -236,7 +236,7 @@ segment plural. Exactly one role bypasses, `SUPER_ADMIN`, inside
 `PermissionGuard` itself, and that check must not be copied anywhere else
 (ADR-0011). `src/single-role-bypass.spec.ts` is the sweep that enforces it; its
 allowlist is six entries shorter than it once was because the files
-that named `SUPER_ADMIN` in order to *withhold* something are identity-service's.
+that named `SUPER_ADMIN` in order to _withhold_ something are identity-service's.
 
 ## Authorization no longer reads identity-service's tables
 
@@ -250,8 +250,8 @@ does not own.
 Two things did **not** change, and both are deliberate:
 
 - **Session validation still reads `auth_sessions` and `users`** on every
-  request. That is a different question — *is this session still live and this
-  account still active* — and answering it from a token would mean a revoked
+  request. That is a different question — _is this session still live and this
+  account still active_ — and answering it from a token would mean a revoked
   session kept working until expiry. Revocation should be immediate.
 - **The fallback is still here.** `IPermissionRepository` remains wired, because
   a token can arrive without permissions: one minted before this change, or a

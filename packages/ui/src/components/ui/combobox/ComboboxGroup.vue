@@ -5,10 +5,12 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { ComboboxGroup, ComboboxLabel } from 'reka-ui'
 
-const props = defineProps<ComboboxGroupProps & {
-  class?: HTMLAttributes['class']
-  heading?: string
-}>()
+const props = defineProps<
+  ComboboxGroupProps & {
+    class?: HTMLAttributes['class']
+    heading?: string
+  }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -19,7 +21,10 @@ const delegatedProps = reactiveOmit(props, 'class')
     v-bind="delegatedProps"
     :class="cn('overflow-hidden text-foreground', props.class)"
   >
-    <ComboboxLabel v-if="heading" class="text-muted-foreground px-2 py-1.5 text-xs">
+    <ComboboxLabel
+      v-if="heading"
+      class="text-muted-foreground px-2 py-1.5 text-xs"
+    >
       {{ heading }}
     </ComboboxLabel>
     <slot />

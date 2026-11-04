@@ -39,13 +39,13 @@ that already held the employment record, and presence stayed person-agnostic.
 
 **The 2026-08-30 arithmetic no longer applies:**
 
-| | payroll split off presence (2026-08-29) | payroll joined to HR (2026-09-10) |
-|---|---|---|
-| Cross-service edges | 3, two of them to presence | 2, both to presence |
-| The roster | an HTTP call to employee-service | in process — the staff record is here |
-| `summarizeMonth` | a **verbatim copy** of presence's arithmetic | `POST /daily-presences/monthly-summary`, served |
-| Guards cut in half | 2 | **0** — both now live in this repo |
-| Frontend of its own | none | 241 HR (`hr-web`) is exactly this service's frontend |
+|                     | payroll split off presence (2026-08-29)      | payroll joined to HR (2026-09-10)                    |
+| ------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Cross-service edges | 3, two of them to presence                   | 2, both to presence                                  |
+| The roster          | an HTTP call to employee-service             | in process — the staff record is here                |
+| `summarizeMonth`    | a **verbatim copy** of presence's arithmetic | `POST /daily-presences/monthly-summary`, served      |
+| Guards cut in half  | 2                                            | **0** — both now live in this repo                   |
+| Frontend of its own | none                                         | 241 HR (`hr-web`) is exactly this service's frontend |
 
 The copy is the one that mattered. The 2026-08-29 split shipped a duplicate of
 presence's monthly arithmetic because an earlier rewrite had got four things
@@ -59,11 +59,11 @@ assessment-service became its first consumer.
 
 ## What this service owns
 
-| Folder | What |
-|---|---|
-| `src/employee/` | the employee record — NIP, NUPTK, hire date, addresses, the account behind the person |
-| `src/reference-data/{employment-type,position,position-category}/` | the code tables a staff record points at |
-| `src/payroll/{component,assignment,run,payslip}/` | salary components, per-person assignments, monthly runs, payslips |
+| Folder                                                             | What                                                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `src/employee/`                                                    | the employee record — NIP, NUPTK, hire date, addresses, the account behind the person |
+| `src/reference-data/{employment-type,position,position-category}/` | the code tables a staff record points at                                              |
+| `src/payroll/{component,assignment,run,payslip}/`                  | salary components, per-person assignments, monthly runs, payslips                     |
 
 `Employee` is an **employment** record, not a teaching one. Who teaches which
 subject to which class in which semester is `TeachingAssignment` and
@@ -123,11 +123,11 @@ they would never have turned a build red.
 All go through `platform/service-client`, carry `x-provisioning-token`, and
 fail closed with a 503.
 
-| Wanted | Asked of | Route |
-|---|---|---|
+| Wanted                                                 | Asked of         | Route                                                    |
+| ------------------------------------------------------ | ---------------- | -------------------------------------------------------- |
 | Which teachers taught or supervised in academic year X | academic-service | `GET /teaching-assignments/employee-ids?academicYearId=` |
-| A person's attendance for a payroll month | presence-service | `POST /daily-presences/monthly-summary` |
-| Whether the attendance month is closed | presence-service | `GET /presence/periods/:year/:month/closed` |
+| A person's attendance for a payroll month              | presence-service | `POST /daily-presences/monthly-summary`                  |
+| Whether the attendance month is closed                 | presence-service | `GET /presence/periods/:year/:month/closed`              |
 
 Plus the calls every service makes: `POST /auth/introspect` and
 `POST /profiles/batch` to identity-service, `POST /accounts` for the account
@@ -148,12 +148,12 @@ already issued.
 All four go through `EmployeeInternalController`, `@Public()` +
 `ProvisioningTokenGuard` — the caller is a backend, not a signed-in person:
 
-| Route | Asked by | For |
-|---|---|---|
-| `GET /employees/roster` | nothing, today | see below |
-| `GET /employees/by-user/:userId` | academic, assessment | `/me` routes |
-| `GET /employees/:id/exists` | academic, student | before naming a homeroom teacher |
-| `POST /employees/by-ids` | academic-service | a name and NIP beside a timetable, a subject, a class |
+| Route                            | Asked by             | For                                                   |
+| -------------------------------- | -------------------- | ----------------------------------------------------- |
+| `GET /employees/roster`          | nothing, today       | see below                                             |
+| `GET /employees/by-user/:userId` | academic, assessment | `/me` routes                                          |
+| `GET /employees/:id/exists`      | academic, student    | before naming a homeroom teacher                      |
+| `POST /employees/by-ids`         | academic-service     | a name and NIP beside a timetable, a subject, a class |
 
 `POST /employees/by-ids` returns three fields — `id`, `userId`, `nip` — and no
 more. `userId` is how the caller resolves the name against identity-service, so

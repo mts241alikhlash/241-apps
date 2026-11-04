@@ -3,11 +3,11 @@ import type { ContextMenuSeparatorProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  ContextMenuSeparator,
-} from 'reka-ui'
+import { ContextMenuSeparator } from 'reka-ui'
 
-const props = defineProps<ContextMenuSeparatorProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  ContextMenuSeparatorProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>

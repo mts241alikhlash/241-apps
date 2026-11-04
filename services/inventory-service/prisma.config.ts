@@ -1,9 +1,9 @@
-import 'dotenv/config';
-import { defineConfig } from 'prisma/config';
+import 'dotenv/config'
+import { defineConfig } from 'prisma/config'
 
-const databaseUrl = process.env['DIRECT_URL'] || process.env['DATABASE_URL'];
+const databaseUrl = process.env['DIRECT_URL'] || process.env['DATABASE_URL']
 if (!databaseUrl) {
-  throw new Error('DIRECT_URL or DATABASE_URL is required');
+  throw new Error('DIRECT_URL or DATABASE_URL is required')
 }
 
 export default defineConfig({
@@ -14,4 +14,4 @@ export default defineConfig({
   datasource: {
     url: databaseUrl,
   },
-});
+})

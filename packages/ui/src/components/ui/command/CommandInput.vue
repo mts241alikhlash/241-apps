@@ -29,7 +29,9 @@ const { filterState } = useCommand()
     data-slot="command-input-wrapper"
     class="p-1 pb-0"
   >
-    <div class="border-input bg-input/20 dark:bg-input/30 flex h-[var(--control-h-lg,2rem)] items-center gap-2 rounded-md border px-2">
+    <div
+      class="border-input bg-input/20 dark:bg-input/30 flex h-[var(--control-h-lg,2rem)] items-center gap-2 rounded-md border px-2"
+    >
       <Search class="size-[var(--icon-control,0.875rem)] shrink-0 opacity-50" />
       <ListboxFilter
         v-bind="{ ...forwardedProps, ...$attrs }"

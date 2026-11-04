@@ -7,7 +7,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { TagsInputItemDelete, useForwardProps } from 'reka-ui'
 
-const props = defineProps<TagsInputItemDeleteProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  TagsInputItemDeleteProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
@@ -15,7 +17,10 @@ const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
-  <TagsInputItemDelete v-bind="forwardedProps" :class="cn('flex rounded bg-transparent mr-1', props.class)">
+  <TagsInputItemDelete
+    v-bind="forwardedProps"
+    :class="cn('flex rounded bg-transparent mr-1', props.class)"
+  >
     <slot>
       <XIcon class="w-4 h-4" />
     </slot>

@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { ComboboxEmpty } from 'reka-ui'
 
-const props = defineProps<ComboboxEmptyProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  ComboboxEmptyProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -14,7 +16,12 @@ const delegatedProps = reactiveOmit(props, 'class')
   <ComboboxEmpty
     data-slot="combobox-empty"
     v-bind="delegatedProps"
-    :class="cn('text-muted-foreground hidden w-full justify-center py-2 text-center text-[length:var(--text-control,0.75rem)] leading-relaxed group-data-empty/combobox-content:flex', props.class)"
+    :class="
+      cn(
+        'text-muted-foreground hidden w-full justify-center py-2 text-center text-[length:var(--text-control,0.75rem)] leading-relaxed group-data-empty/combobox-content:flex',
+        props.class,
+      )
+    "
   >
     <slot />
   </ComboboxEmpty>

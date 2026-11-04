@@ -61,7 +61,8 @@ describe('installed shadcn-vue components', () => {
   })
 
   it('carousel content receives the embla viewport ref', async () => {
-    const { Carousel, CarouselContent, CarouselItem } = await import('./carousel')
+    const { Carousel, CarouselContent, CarouselItem } =
+      await import('./carousel')
     const w = mount(Carousel, {
       slots: {
         default: () =>

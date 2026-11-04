@@ -25,7 +25,9 @@ describe('navigation and data components', () => {
   })
 
   it('field helper text uses the control text token', () => {
-    expect(mount(FieldError, { slots: { default: 'x' } }).classes()).toContain(text)
+    expect(mount(FieldError, { slots: { default: 'x' } }).classes()).toContain(
+      text,
+    )
     expect(mount(FieldDescription).classes()).toContain(text)
   })
 })

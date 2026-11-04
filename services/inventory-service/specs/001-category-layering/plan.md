@@ -19,14 +19,14 @@
 
 ## File Map
 
-| File group | Responsibility |
-|---|---|
-| `src/inventory/reference-data/category/domain/` | Entity shape and repository port. |
-| `src/inventory/reference-data/category/application/` | Four category operations and plain inputs. |
-| `src/inventory/reference-data/category/infrastructure/persistence/prisma/` | Prisma repository adapter. |
-| `src/inventory/reference-data/category/presentation/http/` | HTTP controller and DTOs. |
-| `src/inventory/reference-data/category/category.module.ts` | Nest provider wiring. |
-| `src/inventory/reference-data/category/*.spec.ts` | Focused behavior and dependency tests. |
+| File group                                                                 | Responsibility                             |
+| -------------------------------------------------------------------------- | ------------------------------------------ |
+| `src/inventory/reference-data/category/domain/`                            | Entity shape and repository port.          |
+| `src/inventory/reference-data/category/application/`                       | Four category operations and plain inputs. |
+| `src/inventory/reference-data/category/infrastructure/persistence/prisma/` | Prisma repository adapter.                 |
+| `src/inventory/reference-data/category/presentation/http/`                 | HTTP controller and DTOs.                  |
+| `src/inventory/reference-data/category/category.module.ts`                 | Nest provider wiring.                      |
+| `src/inventory/reference-data/category/*.spec.ts`                          | Focused behavior and dependency tests.     |
 
 ## Task 1: Capture Current Behavior
 

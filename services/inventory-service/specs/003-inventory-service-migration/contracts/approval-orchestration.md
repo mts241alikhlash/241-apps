@@ -14,12 +14,12 @@ capability calls. No shared Prisma transaction crosses these module boundaries.
 The existing `ApprovalLog` record is the action record and consequence state
 record. It needs these approval-owned fields:
 
-| Field | Values | Meaning |
-|---|---|---|
-| `consequenceType` | `NONE`, `FINAL_APPROVAL`, `REJECTION` | Whether the action has a downstream consequence and which one. |
-| `consequenceStatus` | `NOT_REQUIRED`, `PENDING`, `COMPLETED`, `FAILED` | Current consequence state. |
-| `consequenceError` | nullable text | Safe operator-facing failure text; never raw infrastructure details. |
-| `consequenceUpdatedAt` | timestamp | Last consequence-state transition. |
+| Field                  | Values                                           | Meaning                                                              |
+| ---------------------- | ------------------------------------------------ | -------------------------------------------------------------------- |
+| `consequenceType`      | `NONE`, `FINAL_APPROVAL`, `REJECTION`            | Whether the action has a downstream consequence and which one.       |
+| `consequenceStatus`    | `NOT_REQUIRED`, `PENDING`, `COMPLETED`, `FAILED` | Current consequence state.                                           |
+| `consequenceError`     | nullable text                                    | Safe operator-facing failure text; never raw infrastructure details. |
+| `consequenceUpdatedAt` | timestamp                                        | Last consequence-state transition.                                   |
 
 Add a unique constraint on `ApprovalLog(instanceId, stepSequence)`. One
 workflow step accepts one action. The application checks an existing action

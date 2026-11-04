@@ -18,21 +18,47 @@ describe('button', () => {
     const c = buttonVariants()
     expect(c).toContain(md)
     expect(c).toContain('text-[length:var(--text-control,0.75rem)]')
-    expect(c).toContain('[&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]')
+    expect(c).toContain(
+      '[&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+    )
   })
 
   it('sizes map to the control tokens', () => {
-    expect(buttonVariants({ size: 'sm' })).toContain('h-[var(--control-h-sm,1.5rem)]')
-    expect(buttonVariants({ size: 'lg' })).toContain('h-[var(--control-h-lg,2rem)]')
-    expect(buttonVariants({ size: 'xs' })).toContain('h-[var(--control-h-xs,1.25rem)]')
-    expect(buttonVariants({ size: 'icon' })).toContain('size-[var(--control-h-md,1.75rem)]')
+    expect(buttonVariants({ size: 'sm' })).toContain(
+      'h-[var(--control-h-sm,1.5rem)]',
+    )
+    expect(buttonVariants({ size: 'lg' })).toContain(
+      'h-[var(--control-h-lg,2rem)]',
+    )
+    expect(buttonVariants({ size: 'xs' })).toContain(
+      'h-[var(--control-h-xs,1.25rem)]',
+    )
+    expect(buttonVariants({ size: 'icon' })).toContain(
+      'size-[var(--control-h-md,1.75rem)]',
+    )
   })
 
   it('keeps the variant and size names', () => {
-    for (const variant of ['default', 'outline', 'secondary', 'ghost', 'destructive', 'link'] as const) {
+    for (const variant of [
+      'default',
+      'outline',
+      'secondary',
+      'ghost',
+      'destructive',
+      'link',
+    ] as const) {
       expect(buttonVariants({ variant })).toBeTruthy()
     }
-    for (const size of ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-sm', 'icon-lg'] as const) {
+    for (const size of [
+      'default',
+      'xs',
+      'sm',
+      'lg',
+      'icon',
+      'icon-xs',
+      'icon-sm',
+      'icon-lg',
+    ] as const) {
       expect(buttonVariants({ size })).toBeTruthy()
     }
   })
@@ -112,6 +138,8 @@ describe('form controls', () => {
     )
     const sw = mount(Switch)
     const toggle = sw.get('[data-slot=switch]')
-    expect(toggle.classes().join(' ')).toContain('data-[state=checked]:bg-primary')
+    expect(toggle.classes().join(' ')).toContain(
+      'data-[state=checked]:bg-primary',
+    )
   })
 })

@@ -15,7 +15,7 @@ Four documents govern this repo, in this order of precedence:
 - `docs/ARCHITECTURE.md` — **start here for where code goes.** Part 1 is the
   Clean Architecture layering `src/inventory/` is migrating to, with the measured
   current state and the conversion procedure. Part 2 is the service boundary.
-  Its two *structure* sections supersede `NESTJS-RULES.md`'s.
+  Its two _structure_ sections supersede `NESTJS-RULES.md`'s.
 - `docs/CLEAN-CODE.md` — **start here for what code looks like** once it is in
   the right place, worked through this service's real files rather than generic
   placeholders.
@@ -95,7 +95,7 @@ grants.
 ## The guard that matters most here
 
 `src/single-role-bypass.spec.ts`. The constitution allows exactly one check on a
-role *name* in the whole backend — `PermissionGuard` letting `SUPER_ADMIN`
+role _name_ in the whole backend — `PermissionGuard` letting `SUPER_ADMIN`
 through, as break-glass (ADR-0011). `ProcessApprovalUseCase`, in this service's
 `approval/`, is where the second copy lived:
 
@@ -106,7 +106,7 @@ roleCodes.includes(approverRoleCode) || roleCodes.includes('SUPER_ADMIN')
 It kept working after the bypass was removed from the guard, granting an approval
 signature the workflow never gave it. The file is here; so is the sweep. Its
 allowlist is two entries rather than the eight it started with, because the six that
-named `SUPER_ADMIN` in order to *withhold* something live in
+named `SUPER_ADMIN` in order to _withhold_ something live in
 `access-control/role/`, which is identity-service's.
 
 ## The other guard worth knowing about
@@ -132,8 +132,8 @@ does not own.
 Two things did **not** change, and both are deliberate:
 
 - **Session validation still reads `auth_sessions` and `users`** on every
-  request. That is a different question — *is this session still live and this
-  account still active* — and answering it from a token would mean a revoked
+  request. That is a different question — _is this session still live and this
+  account still active_ — and answering it from a token would mean a revoked
   session kept working until expiry. Revocation should be immediate.
 - **The fallback is still here.** `IPermissionRepository` remains wired, because
   a token can arrive without permissions: one minted before this change, or a

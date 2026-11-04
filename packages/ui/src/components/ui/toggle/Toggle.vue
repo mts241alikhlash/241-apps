@@ -7,15 +7,20 @@ import { cn } from '@mts241alikhlash/ui/utils'
 import { Toggle, useForwardPropsEmits } from 'reka-ui'
 import { toggleVariants } from '.'
 
-const props = withDefaults(defineProps<ToggleProps & {
-  class?: HTMLAttributes['class']
-  variant?: ToggleVariants['variant']
-  size?: ToggleVariants['size']
-}>(), {
-  variant: 'default',
-  size: 'default',
-  disabled: false,
-})
+const props = withDefaults(
+  defineProps<
+    ToggleProps & {
+      class?: HTMLAttributes['class']
+      variant?: ToggleVariants['variant']
+      size?: ToggleVariants['size']
+    }
+  >(),
+  {
+    variant: 'default',
+    size: 'default',
+    disabled: false,
+  },
+)
 
 const emits = defineEmits<ToggleEmits>()
 

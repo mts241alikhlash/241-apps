@@ -16,7 +16,7 @@ though the source is `.ts`.
   to (2026-09-03) — read it for the target shape and the conversion procedure
   a future module split would reuse. Part 2 is the service boundary: what
   this service publishes to others, and the partial-schema hazard. Its two
-  *structure* sections supersede `NESTJS-RULES.md`'s.
+  _structure_ sections supersede `NESTJS-RULES.md`'s.
 - `docs/CLEAN-CODE.md` — **start here for what code looks like** once it is in
   the right place, worked through `user`, `auth` and `access-control` as real
   files rather than generic placeholders.
@@ -24,7 +24,7 @@ though the source is `.ts`.
   modules below. It has never been rewritten — its module tree does not list
   `notification`, and it does not know about `school-unit` at all. `CLAUDE.md` and `ARCHITECTURE.md` are the current
   source of truth for what this repo actually has; treat `IAM.md` as
-  authoritative for authorization *behaviour* only, per its own doc order in
+  authoritative for authorization _behaviour_ only, per its own doc order in
   `ARCHITECTURE.md`.
 - `docs/NESTJS-RULES.md` — coding rules. Still binding.
 
@@ -48,17 +48,17 @@ an `iam/` folder, which was an artifact of the old layout removed on
 2026-09-03 once this became its own bounded context — plus one that is not
 identity at all:
 
-| Module | What |
-|---|---|
-| `auth/` | Sign-in, refresh, `GET /auth/me`, password reset, `JwtAuthGuard`, nightly session cleanup |
-| `access-control/` | `role/` and `permission/`, the permission catalog, `PermissionGuard` |
-| `user/` | Accounts, and provisioning an account together with its profile |
-| `session/` | Active sessions, revocation |
-| `audit-log/` | Who did what |
-| `notification/` | Password-reset email only — it is here because `auth` requires it |
+| Module                                             | What                                                                                                                                                              |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth/`                                            | Sign-in, refresh, `GET /auth/me`, password reset, `JwtAuthGuard`, nightly session cleanup                                                                         |
+| `access-control/`                                  | `role/` and `permission/`, the permission catalog, `PermissionGuard`                                                                                              |
+| `user/`                                            | Accounts, and provisioning an account together with its profile                                                                                                   |
+| `session/`                                         | Active sessions, revocation                                                                                                                                       |
+| `audit-log/`                                       | Who did what                                                                                                                                                      |
+| `notification/`                                    | Password-reset email only — it is here because `auth` requires it                                                                                                 |
 | `school-unit/`, `reference-data/school-unit-type/` | The institution's own record — name, address, contact, social media, type. Moved here from academic-service on 2026-09-03; see "The school-unit exception" below. |
-| `profile/` | The person behind the account — name, NIK, gender, birth, contact, religion, blood type, **and their address**. Added 2026-09-11. |
-| `reference-data/region/` | The Kemendagri administrative area tree, for the address form. Added 2026-09-11. |
+| `profile/`                                         | The person behind the account — name, NIK, gender, birth, contact, religion, blood type, **and their address**. Added 2026-09-11.                                 |
+| `reference-data/region/`                           | The Kemendagri administrative area tree, for the address form. Added 2026-09-11.                                                                                  |
 
 `src/core/` is infrastructure (config, database, decorators, filters,
 interceptors, logger, health). `src/shared/` is a kernel — helpers, types, DTOs,
@@ -157,8 +157,8 @@ does not own.
 Two things did **not** change, and both are deliberate:
 
 - **Session validation still reads `auth_sessions` and `users`** on every
-  request. That is a different question — *is this session still live and this
-  account still active* — and answering it from a token would mean a revoked
+  request. That is a different question — _is this session still live and this
+  account still active_ — and answering it from a token would mean a revoked
   session kept working until expiry. Revocation should be immediate.
 - **The fallback is still here.** `IPermissionRepository` remains wired, because
   a token can arrive without permissions: one minted before this change, or a
@@ -181,7 +181,7 @@ a second client for presigning when `S3_PUBLIC_ENDPOINT` differs from
 
 **One thing is deliberately different here: the `S3_*` variables are
 optional.** In portal-service and admission-service they are required, and the
-service refuses to boot without them — storage *is* what those services do. In
+service refuses to boot without them — storage _is_ what those services do. In
 this one, storage is a profile photo. **Signing in must never depend on MinIO
 being up**, so `StorageService` starts unconfigured, logs a warning, and the
 two photo endpoints answer **503** while everything else works normally.
@@ -213,11 +213,11 @@ creation. It is parsed as `z.enum(['true','false'])`, **not** `z.coerce.boolean(
 because the latter reads the string `"false"` as truthy, which would enable
 sign-up on a deployment that explicitly turned it off.
 
-| Account | Flag | Result |
-|---|---|---|
-| unknown email, `signup` | `false` | nothing created, no session, `oauthOutcome=signup-disabled` |
-| unknown email, `signup` | `true` | user + `UserRole(APPLICANT)` in one `prisma.user.create`, `oauthOutcome=signup-created` |
-| known email, either intent | n/a | signs in, `oauthOutcome=signup-existing` |
+| Account                    | Flag    | Result                                                                                  |
+| -------------------------- | ------- | --------------------------------------------------------------------------------------- |
+| unknown email, `signup`    | `false` | nothing created, no session, `oauthOutcome=signup-disabled`                             |
+| unknown email, `signup`    | `true`  | user + `UserRole(APPLICANT)` in one `prisma.user.create`, `oauthOutcome=signup-created` |
+| known email, either intent | n/a     | signs in, `oauthOutcome=signup-existing`                                                |
 
 `oauthOutcome` rides back to the SPA as a query parameter on the callback
 redirect. `signup-disabled` is the one case that also changes the target: it

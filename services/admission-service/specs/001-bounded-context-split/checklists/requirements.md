@@ -5,17 +5,17 @@
 
 ## Content Quality
 
-- [X] No implementation details beyond required path/slice constraints
-- [X] Focused on navigation and bounded-context business structure
-- [X] Requirements are testable
-- [X] Scope is bounded to Stage 1
+- [x] No implementation details beyond required path/slice constraints
+- [x] Focused on navigation and bounded-context business structure
+- [x] Requirements are testable
+- [x] Scope is bounded to Stage 1
 
 ## Completeness
 
-- [X] No clarification markers remain
-- [X] Acceptance scenarios cover navigation, HTTP, cross-context behavior, and slices
-- [X] Risks and assumptions are recorded
-- [X] External contracts are recorded
+- [x] No clarification markers remain
+- [x] Acceptance scenarios cover navigation, HTTP, cross-context behavior, and slices
+- [x] Risks and assumptions are recorded
+- [x] External contracts are recorded
 
 ## Notes
 

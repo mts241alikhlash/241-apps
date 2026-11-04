@@ -11,7 +11,12 @@ const props = defineProps<{
   <div
     data-slot="sidebar-group"
     data-sidebar="group"
-    :class="cn('relative flex w-full min-w-0 flex-col p-2 group-data-[collapsible=icon]:py-0 group-data-[variant=inset]:px-0', props.class)"
+    :class="
+      cn(
+        'relative flex w-full min-w-0 flex-col p-2 group-data-[collapsible=icon]:py-0 group-data-[variant=inset]:px-0',
+        props.class,
+      )
+    "
   >
     <slot />
   </div>

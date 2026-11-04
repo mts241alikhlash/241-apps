@@ -131,11 +131,11 @@ must be structural, not remembered per query.
 
 Each boundary has its own shape, and crossing one means mapping, not forwarding.
 
-| Type | Lives in | Carries |
-| --- | --- | --- |
-| `XxxDto` | `presentation/http/dto/` | `class-validator` + `@ApiProperty` |
-| `XxxInput` | `application/use-cases/<name>/` | nothing — a plain interface |
-| `XxxRepositoryInput` | `domain/repositories/` | nothing — a plain interface |
+| Type                 | Lives in                        | Carries                            |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| `XxxDto`             | `presentation/http/dto/`        | `class-validator` + `@ApiProperty` |
+| `XxxInput`           | `application/use-cases/<name>/` | nothing — a plain interface        |
+| `XxxRepositoryInput` | `domain/repositories/`          | nothing — a plain interface        |
 
 - **A use case MUST NOT import a `*Dto`.** A controller MAY pass its Dto object
   into a use case declaring an `Input` — TypeScript is structural and the use
@@ -148,7 +148,7 @@ Each boundary has its own shape, and crossing one means mapping, not forwarding.
   parameter is forbidden — it couples the write surface to the entity's field
   list, so adding a field silently widens what every caller may write.
 - API responses MUST use the global envelope `{ statusCode, message, data,
-  meta? }`. There is no `success` field.
+meta? }`. There is no `success` field.
 - **No `any`. No `unknown` in a declared return type.** No magic strings or
   numbers, no inline types inside use cases — types go next to their port or in
   `types/`, constants in `constants/`. Narrow projections in a signature
@@ -257,8 +257,8 @@ Exactly one process may migrate any given database.
 
 > "Services can safely share the same physical database **server**, but problems
 > arise when services share the same **schema or the same set of database
-> tables**." — Azure Architecture Center, *Data considerations for
-> microservices*
+> tables**." — Azure Architecture Center, _Data considerations for
+> microservices_
 
 That quote names the state most of this platform is in today — the same schema
 and the same tables, not merely the same server. It is the state the couplings
@@ -318,7 +318,7 @@ quiet failure into a loud one.
 - **Validation:** `class-validator` + `class-transformer` in DTOs. `zod` is used
   for environment configuration, not for request bodies.
 - **Auth transport:** JWT via `passport-jwt`, verified locally in every service.
-  Who the caller *is* comes either from `identity-service` over HTTP or, in services
+  Who the caller _is_ comes either from `identity-service` over HTTP or, in services
   that have not yet migrated, from a direct read of the shared database.
 - **HTTP hardening:** `helmet` and `@nestjs/throttler` in every service. A
   public surface gets its own throttle configuration, separate from the
@@ -379,14 +379,14 @@ written, and `.claude/skills/` is copied from a sibling.
 Measured across the six services included in the initial survey on 2026-09-02. It
 records the distance to be closed, not a set of new violations.
 
-| Service | `application/` layer | Use cases naming a Dto | Prisma outside `infrastructure/` | Specs |
-| --- | --- | --- | --- | --- |
-| `academic-service` | 13 modules migrated | 9 / 219 | 10 | — |
-| `identity-service` | 0 of 6 | 11 / 35 | 1 | 31 |
-| `inventory-service` | 0 of 8 | 22 / 40 | 1 | 12 |
-| `admission-service` | 0 of 1 (flat) | 19 / 36 | 1 | 20 |
-| `portal-service` | 0 of 8 | 19 / 30 | 1 | 36 |
-| `presence-service` | 0 of 14 | 18 / 33 | 14 | 44 |
+| Service             | `application/` layer | Use cases naming a Dto | Prisma outside `infrastructure/` | Specs |
+| ------------------- | -------------------- | ---------------------- | -------------------------------- | ----- |
+| `academic-service`  | 13 modules migrated  | 9 / 219                | 10                               | —     |
+| `identity-service`  | 0 of 6               | 11 / 35                | 1                                | 31    |
+| `inventory-service` | 0 of 8               | 22 / 40                | 1                                | 12    |
+| `admission-service` | 0 of 1 (flat)        | 19 / 36                | 1                                | 20    |
+| `portal-service`    | 0 of 8               | 19 / 30                | 1                                | 36    |
+| `presence-service`  | 0 of 14              | 18 / 33                | 14                               | 44    |
 
 Known outstanding items, each named in the owning service's `ARCHITECTURE.md`:
 
@@ -430,10 +430,11 @@ Known outstanding items, each named in the owning service's `ARCHITECTURE.md`:
   `CLEAN-CODE.md`, which are this document's concrete expression.
 
 ---
+
 # SERVICE PROFILE — student-service
 
-*This section is specific to this repository. Do not copy it into another
-service.*
+_This section is specific to this repository. Do not copy it into another
+service._
 
 **What it owns:** the student lifecycle. `src/student/` is the student record
 and the student-parent link, `src/parent/` the parent record, `src/enrollment/`
@@ -471,6 +472,7 @@ explicit deploy step.
 **Layering status:** 5 of 5. Every domain module is converted.
 
 **Known deviations:**
+
 - `enrollment-internal.controller.ts` is 440 lines and
   `prisma-graduation.repository.ts` 388, both over the Principle V budget.
 - `http-academic-lookup.adapter.ts` is 332 lines — it is the single adapter for

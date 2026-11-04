@@ -3,16 +3,15 @@ import type { MenubarItemEmits, MenubarItemProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  MenubarItem,
-  useForwardPropsEmits,
-} from 'reka-ui'
+import { MenubarItem, useForwardPropsEmits } from 'reka-ui'
 
-const props = defineProps<MenubarItemProps & {
-  class?: HTMLAttributes['class']
-  inset?: boolean
-  variant?: 'default' | 'destructive'
-}>()
+const props = defineProps<
+  MenubarItemProps & {
+    class?: HTMLAttributes['class']
+    inset?: boolean
+    variant?: 'default' | 'destructive'
+  }
+>()
 
 const emits = defineEmits<MenubarItemEmits>()
 
@@ -26,10 +25,12 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     :data-inset="inset ? '' : undefined"
     :data-variant="variant"
     v-bind="forwarded"
-    :class="cn(
-      'focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! not-data-[variant=destructive]:focus:**:text-accent-foreground min-h-[var(--control-h-md,1.75rem)] gap-2 rounded-md px-2 py-1 text-xs/relaxed data-disabled:opacity-50 data-inset:pl-7.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)] group/menubar-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0',
-      props.class,
-    )"
+    :class="
+      cn(
+        'focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:text-destructive! not-data-[variant=destructive]:focus:**:text-accent-foreground min-h-[var(--control-h-md,1.75rem)] gap-2 rounded-md px-2 py-1 text-xs/relaxed data-disabled:opacity-50 data-inset:pl-7.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)] group/menubar-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0',
+        props.class,
+      )
+    "
   >
     <slot />
   </MenubarItem>

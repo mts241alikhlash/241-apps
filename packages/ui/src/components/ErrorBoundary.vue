@@ -25,8 +25,8 @@ function reload() {
     <div>
       <p class="text-lg font-medium">Terjadi kesalahan tak terduga</p>
       <p class="text-muted-foreground mt-1 text-sm">
-        Halaman ini mengalami error dan tidak bisa ditampilkan. Muat ulang
-        untuk mencoba lagi.
+        Halaman ini mengalami error dan tidak bisa ditampilkan. Muat ulang untuk
+        mencoba lagi.
       </p>
     </div>
     <Button @click="reload">

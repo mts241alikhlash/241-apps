@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { MenubarCheckboxItemEmits, MenubarCheckboxItemProps } from 'reka-ui'
+import type {
+  MenubarCheckboxItemEmits,
+  MenubarCheckboxItemProps,
+} from 'reka-ui'
 
 import type { HTMLAttributes } from 'vue'
 import { CheckIcon } from '@lucide/vue'
@@ -11,7 +14,9 @@ import {
   useForwardPropsEmits,
 } from 'reka-ui'
 
-const props = defineProps<MenubarCheckboxItemProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  MenubarCheckboxItemProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<MenubarCheckboxItemEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')
@@ -23,12 +28,16 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
   <MenubarCheckboxItem
     data-slot="menubar-checkbox-item"
     v-bind="forwarded"
-    :class="cn(
-      'focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground min-h-[var(--control-h-md,1.75rem)] gap-2 rounded-md py-1.5 pr-2 pl-7.5 text-[length:var(--text-control,0.75rem)] data-inset:pl-7.5 relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0',
-      props.class,
-    )"
+    :class="
+      cn(
+        'focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground min-h-[var(--control-h-md,1.75rem)] gap-2 rounded-md py-1.5 pr-2 pl-7.5 text-[length:var(--text-control,0.75rem)] data-inset:pl-7.5 relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0',
+        props.class,
+      )
+    "
   >
-    <span class="left-2 size-4 [&_svg:not([class*=size-])]:size-4 pointer-events-none absolute flex items-center justify-center">
+    <span
+      class="left-2 size-4 [&_svg:not([class*=size-])]:size-4 pointer-events-none absolute flex items-center justify-center"
+    >
       <MenubarItemIndicator>
         <slot name="indicator-icon">
           <CheckIcon />

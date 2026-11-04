@@ -12,10 +12,12 @@ const props = defineProps<{
   <span
     data-slot="trace-line"
     :data-status="status"
-    :class="cn(
-      'gap-2 text-xs/relaxed flex w-fit max-w-full min-w-0 items-center text-muted-foreground transition-colors in-[a,button]:cursor-pointer in-[a:hover,button:hover]:text-foreground data-[status=error]:text-destructive data-[status=error]:in-[a:hover,button:hover]:text-destructive data-[status=pending]:opacity-60 data-[status=running]:*:data-[slot=trace-title]:shimmer',
-      props.class,
-    )"
+    :class="
+      cn(
+        'gap-2 text-xs/relaxed flex w-fit max-w-full min-w-0 items-center text-muted-foreground transition-colors in-[a,button]:cursor-pointer in-[a:hover,button:hover]:text-foreground data-[status=error]:text-destructive data-[status=error]:in-[a:hover,button:hover]:text-destructive data-[status=pending]:opacity-60 data-[status=running]:*:data-[slot=trace-title]:shimmer',
+        props.class,
+      )
+    "
   >
     <slot />
   </span>

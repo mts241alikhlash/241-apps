@@ -2,12 +2,12 @@
 
 The migration preserves this existing contract. No endpoint, method, permission, DTO validation, response type, or status code changes are allowed.
 
-| Method | Route | Permission | Success |
-|---|---|---|---|
-| GET | `/inventory/conditions` | `inventory-reference-data.read` | `200`, condition array |
-| POST | `/inventory/conditions` | `inventory-reference-data.create` | `201`, condition response |
-| PATCH | `/inventory/conditions/:id` | `inventory-reference-data.update` | `200`, condition response |
-| DELETE | `/inventory/conditions/:id` | `inventory-reference-data.delete` | `204`, empty body |
+| Method | Route                       | Permission                        | Success                   |
+| ------ | --------------------------- | --------------------------------- | ------------------------- |
+| GET    | `/inventory/conditions`     | `inventory-reference-data.read`   | `200`, condition array    |
+| POST   | `/inventory/conditions`     | `inventory-reference-data.create` | `201`, condition response |
+| PATCH  | `/inventory/conditions/:id` | `inventory-reference-data.update` | `200`, condition response |
+| DELETE | `/inventory/conditions/:id` | `inventory-reference-data.delete` | `204`, empty body         |
 
 ## Request fields
 

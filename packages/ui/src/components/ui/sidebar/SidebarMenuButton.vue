@@ -2,7 +2,11 @@
 import type { Component } from 'vue'
 import type { SidebarMenuButtonProps } from '.'
 import { reactiveOmit } from '@vueuse/core'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@mts241alikhlash/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@mts241alikhlash/ui/tooltip'
 import SidebarMenuButtonChild from './SidebarMenuButtonChild.vue'
 import { useSidebar } from './utils'
 

@@ -312,11 +312,11 @@ second copy of identity-service** — see CLAUDE.md's borrowed-pieces table for 
 current, authoritative list; this section is not kept byte-for-byte in sync
 with it.
 
-| Here                                 | May do                                                                 | Left behind                                               |
-| ------------------------------------ | ---------------------------------------------------------------------- | --------------------------------------------------------- |
-| `platform/auth`                      | Verify a token, check the session is live                              | Login, refresh, logout, password reset, session cleanup   |
-| `platform/access-control/permission` | `PermissionGuard` asking if the caller holds a permission              | Eight use cases, the controller, the catalog-sync hook  |
-| `platform/user`                      | `AccountProvisioningService` — the account behind a teacher or student | `GET/POST/PATCH/DELETE /users` and their five use cases   |
+| Here                                 | May do                                                                 | Left behind                                                                                                    |
+| ------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `platform/auth`                      | Verify a token, check the session is live                              | Login, refresh, logout, password reset, session cleanup                                                        |
+| `platform/access-control/permission` | `PermissionGuard` asking if the caller holds a permission              | Eight use cases, the controller, the catalog-sync hook                                                         |
+| `platform/user`                      | `AccountProvisioningService` — the account behind a teacher or student | `GET/POST/PATCH/DELETE /users` and their five use cases                                                        |
 | `platform/profile-lookup`            | `POST /profiles/batch` — a roster's teacher/student names, cached      | Everything else about `Profile` — it is not identity-service's `user` module, just the one read a roster needs |
 
 `platform/school-unit-identity` and `presence/daily-record` were here too,
@@ -336,10 +336,10 @@ is the coupling table below updated?
 
 Status as of 2026-09-03. **Update this table when one moves.**
 
-| #   | Coupling                         | Status                                                                                                                                             |
-| --- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Authorization reads iam's tables | **Reduced.** Permissions come from the token; session validation still reads `auth_sessions` + `users` per request                                 |
-| 2   | Provisioning writes iam's tables | **Closed, end to end.** `hr-service` and `student-service` — this repo owns neither caller any more — call identity-service's `POST /accounts` / `DELETE /accounts/:userId` over HTTP; academic-service no longer writes `users`/`user_roles` locally — see below |
+| #   | Coupling                         | Status                                                                                                                                                                                                                                                                                                 |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Authorization reads iam's tables | **Reduced.** Permissions come from the token; session validation still reads `auth_sessions` + `users` per request                                                                                                                                                                                     |
+| 2   | Provisioning writes iam's tables | **Closed, end to end.** `hr-service` and `student-service` — this repo owns neither caller any more — call identity-service's `POST /accounts` / `DELETE /accounts/:userId` over HTTP; academic-service no longer writes `users`/`user_roles` locally — see below                                      |
 | 3   | Rosters join to `profiles`       | **In progress, unmeasured.** `teaching-assignment` converted to a cached batch HTTP lookup; `classroom`, `schedule`, `enrollment` still join directly. No real identity-service or database was reachable in the dev session that built this, so the before/after this doc calls for has not been done |
 
 **1 — Authorization.** `PermissionGuard` reads `roles` and `permissions` from
@@ -379,10 +379,10 @@ again to undo the account.
 
 The contract, now implemented on both ends:
 
-|                                             | Request                                                                                                                                                               | Success                             | Failure                                                                                                                                                       |
-| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|                                                  | Request                                                                                                                                                               | Success                             | Failure                                                                                                                                                      |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `POST {IDENTITY_SERVICE_URL}/accounts`           | `ProvisionAccountInput` as JSON body — `identifier`, `passwordHash`, `roleCode?`, `profile?` (`name`, `nik`, `gender`, `birthPlace`, `birthDate`, `email?`, `phone?`) | 2xx with `{ data: { id: string } }` | 409 on a duplicate identifier — the caller maps it to `ConflictException`. Anything else non-2xx, unreachable, or slower than 10s: the caller maps it to 503 |
-| `DELETE {IDENTITY_SERVICE_URL}/accounts/:userId` | —                                                                                                                                                                     | Any 2xx                             | Same 503 mapping; no special case for "already gone" yet                                                                                                      |
+| `DELETE {IDENTITY_SERVICE_URL}/accounts/:userId` | —                                                                                                                                                                     | Any 2xx                             | Same 503 mapping; no special case for "already gone" yet                                                                                                     |
 
 Both requests carry an `x-provisioning-token` header — the same value in
 `PROVISIONING_SERVICE_TOKEN` on every caller and on identity-service, checked with
@@ -457,7 +457,7 @@ reads or writes them, so migrating is simply how this service deploys.
 > nothing else. Do not "fix" this.
 
 That is no longer about racing another service for a shared schema — it is
-about who decides *when* the schema changes. Migrating on boot hands that
+about who decides _when_ the schema changes. Migrating on boot hands that
 decision to whichever replica starts first, and races every extra replica.
 Migration is an explicit deploy step: `--profile migrate` in
 `docker-compose.prod.yml`, per service.
@@ -472,6 +472,7 @@ it.
 - `pnpm prisma:generate` is required before anything else, and is always safe.
 - A schema change is made here and nowhere else. This service's schema is the
   only description of its database.
+
 ## Closing order, and what done means
 
 1. **Roles and permissions in the token** — _done 2026-08-30._ Accepted cost: a
@@ -495,10 +496,10 @@ it.
 
 ## What enforces the boundary
 
-| File                                      | Enforces                                                                    |
-| ----------------------------------------- | --------------------------------------------------------------------------- |
-| `src/single-role-bypass.spec.ts`          | `SUPER_ADMIN` is checked in exactly one place, `PermissionGuard` (ADR-0011) |
-| `src/app.module.boots.spec.ts`            | The app boots — catches a provider injected without its module imported     |
+| File                                       | Enforces                                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| `src/single-role-bypass.spec.ts`           | `SUPER_ADMIN` is checked in exactly one place, `PermissionGuard` (ADR-0011) |
+| `src/app.module.boots.spec.ts`             | The app boots — catches a provider injected without its module imported     |
 | `enroll-existing-account.use-case.spec.ts` | Idempotency is checked before uniqueness                                    |
 
 Authorization rule, binding: **permissions, never role names** —

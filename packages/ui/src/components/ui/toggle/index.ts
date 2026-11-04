@@ -12,7 +12,8 @@ export const toggleVariants = cva(
         outline: 'border-input hover:bg-muted border bg-transparent',
       },
       size: {
-        default: 'h-[var(--control-h-md,1.75rem)] min-w-7 px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5',
+        default:
+          'h-[var(--control-h-md,1.75rem)] min-w-7 px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5',
         sm: 'h-[var(--control-h-sm,1.5rem)] min-w-6 rounded-[min(var(--radius-md),8px)] px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
         lg: 'h-[var(--control-h-lg,2rem)] min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
       },

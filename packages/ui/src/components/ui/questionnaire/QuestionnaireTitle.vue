@@ -6,12 +6,17 @@ import { Primitive } from 'reka-ui'
 import { onBeforeUnmount, onMounted, ref, useId } from 'vue'
 import { injectQuestionnaireItemContext } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-  id?: string
-}>(), {
-  as: 'legend',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+      id?: string
+    }
+  >(),
+  {
+    as: 'legend',
+  },
+)
 
 const item = injectQuestionnaireItemContext()
 
@@ -44,7 +49,12 @@ onBeforeUnmount(() => unregisterTitle?.())
     data-slot="questionnaire-title"
     :as="props.as"
     :as-child="props.asChild"
-    :class="cn('text-sm font-medium [&:not(:has(~[data-slot=questionnaire-description]))]:mb-3 cn-font-heading text-pretty', props.class)"
+    :class="
+      cn(
+        'text-sm font-medium [&:not(:has(~[data-slot=questionnaire-description]))]:mb-3 cn-font-heading text-pretty',
+        props.class,
+      )
+    "
   >
     <slot />
   </Primitive>

@@ -54,11 +54,9 @@ function getHighlighter() {
 function getLanguage(language: string) {
   const name = language.toLowerCase()
 
-  if (name === 'ansi')
-    return name
+  if (name === 'ansi') return name
 
-  if (name in languages)
-    return name as keyof typeof languages
+  if (name in languages) return name as keyof typeof languages
 
   return aliases[name] ?? null
 }
@@ -66,8 +64,7 @@ function getLanguage(language: string) {
 export async function loadHighlighter(language: string) {
   const lang = getLanguage(language)
 
-  if (!lang)
-    return null
+  if (!lang) return null
 
   const shiki = await getHighlighter()
 
@@ -84,12 +81,13 @@ export async function loadHighlighter(language: string) {
           grammarState: state,
         }).tokens
 
-      const tokens = lang === 'ansi'
-        ? code.split('\n').flatMap(line => tokenize(line))
-        : tokenize(code)
+      const tokens =
+        lang === 'ansi'
+          ? code.split('\n').flatMap((line) => tokenize(line))
+          : tokenize(code)
 
       return {
-        lines: tokens.map(line =>
+        lines: tokens.map((line) =>
           line.map((token): HighlightedToken => ({
             content: token.content,
             htmlStyle: token.htmlStyle as Record<string, string> | undefined,
@@ -101,7 +99,9 @@ export async function loadHighlighter(language: string) {
   }
 }
 
-export type Highlighter = NonNullable<Awaited<ReturnType<typeof loadHighlighter>>>
+export type Highlighter = NonNullable<
+  Awaited<ReturnType<typeof loadHighlighter>>
+>
 
 export async function highlightCode(code: string, language: string) {
   const highlighter = await loadHighlighter(language)

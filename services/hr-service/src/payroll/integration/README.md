@@ -5,11 +5,11 @@ kept separate because **students** need gate attendance too and student
 scans must not share a database with staff salaries. The seams inverted in
 the move: the roster became local, and the two presence reads became HTTP.
 
-| Port | One method | Answered by |
-|---|---|---|
-| `IPayrollRosterPort` | `listActiveEmployees()` | this service, in process |
-| `IDailyPresenceReadPort` | `summarizeMonth()` | presence-service |
-| `IAttendancePeriodReadPort` | `isClosed()` | presence-service |
+| Port                        | One method              | Answered by              |
+| --------------------------- | ----------------------- | ------------------------ |
+| `IPayrollRosterPort`        | `listActiveEmployees()` | this service, in process |
+| `IDailyPresenceReadPort`    | `summarizeMonth()`      | presence-service         |
+| `IAttendancePeriodReadPort` | `isClosed()`            | presence-service         |
 
 ## The roster stopped being a call
 
@@ -28,10 +28,10 @@ It is still a port, and the provider is still swapped in
 Both are HTTP now, and both ask for an answer presence-service already
 computes:
 
-| Port | Endpoint |
-|---|---|
-| `summarizeMonth()` | `POST /daily-presences/monthly-summary` |
-| `isClosed()` | `GET /presence/periods/:year/:month/closed` |
+| Port               | Endpoint                                    |
+| ------------------ | ------------------------------------------- |
+| `summarizeMonth()` | `POST /daily-presences/monthly-summary`     |
+| `isClosed()`       | `GET /presence/periods/:year/:month/closed` |
 
 **Neither adapter carries a copy of presence's arithmetic**, and that is the
 one thing to hold onto here. The 2026-08-29 payroll split shipped a verbatim

@@ -22,7 +22,6 @@ function tabs(variant?: 'line') {
   })
 }
 
-
 describe('tabs', () => {
   it('default is the Mira pill list and line is the underline strip', () => {
     const pill = tabs().get('[data-slot=tabs-list]').classes()

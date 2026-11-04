@@ -21,15 +21,15 @@
 
 ## File Map
 
-| Context | Primary files to move |
-|---|---|
-| `wave` | wave entity, wave port, Prisma wave adapter, six wave use cases including `GetActiveWavesUseCase`, `admission-wave-ids.dto.ts` and other wave DTOs/specs, wave controller references |
-| `announcement` | announcement entity, port, Prisma adapter, six announcement use cases, announcement DTOs/specs, announcement controller references |
-| `applicant` | applicant entity/port/adapter, registration and applicant use cases, applicant DTOs/specs/controller references |
-| `document` | document/file entities, upload/verify use cases and DTOs/spec coverage; preserve broad repository calls |
-| `payment` | payment/file entities, upload/verify use cases and DTOs/spec coverage |
-| `notification` | notification service/use cases and DTO-free notification routes/specs |
-| `application` | application entities, status policy/rules, application port/adapter, workflow use cases/specs, application DTOs/controller references |
+| Context        | Primary files to move                                                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `wave`         | wave entity, wave port, Prisma wave adapter, six wave use cases including `GetActiveWavesUseCase`, `admission-wave-ids.dto.ts` and other wave DTOs/specs, wave controller references |
+| `announcement` | announcement entity, port, Prisma adapter, six announcement use cases, announcement DTOs/specs, announcement controller references                                                   |
+| `applicant`    | applicant entity/port/adapter, registration and applicant use cases, applicant DTOs/specs/controller references                                                                      |
+| `document`     | document/file entities, upload/verify use cases and DTOs/spec coverage; preserve broad repository calls                                                                              |
+| `payment`      | payment/file entities, upload/verify use cases and DTOs/spec coverage                                                                                                                |
+| `notification` | notification service/use cases and DTO-free notification routes/specs                                                                                                                |
+| `application`  | application entities, status policy/rules, application port/adapter, workflow use cases/specs, application DTOs/controller references                                                |
 
 ## Task Sequence
 

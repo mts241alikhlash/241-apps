@@ -1,4 +1,3 @@
-
 export const SERVICE_PREFIXES = {
   identity: [
     '/auth',

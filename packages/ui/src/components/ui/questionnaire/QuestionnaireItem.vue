@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
-import type { AnswerControlRegistration, QuestionnaireItemStatus } from './useQuestionnaire'
+import type {
+  AnswerControlRegistration,
+  QuestionnaireItemStatus,
+} from './useQuestionnaire'
 import { cn } from '@mts241alikhlash/ui/utils'
-import { computed, onBeforeUnmount, ref, shallowRef, useAttrs, watch } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  ref,
+  shallowRef,
+  useAttrs,
+  watch,
+} from 'vue'
 import {
   compareDocumentOrder,
   getShortcutByChoiceValue,
@@ -19,19 +29,22 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const props = withDefaults(defineProps<{
-  class?: HTMLAttributes['class']
-  disabled?: boolean
-  invalid?: boolean
-  multiple?: boolean
-  name: string
-  required?: boolean
-}>(), {
-  disabled: false,
-  invalid: false,
-  multiple: false,
-  required: false,
-})
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes['class']
+    disabled?: boolean
+    invalid?: boolean
+    multiple?: boolean
+    name: string
+    required?: boolean
+  }>(),
+  {
+    disabled: false,
+    invalid: false,
+    multiple: false,
+    required: false,
+  },
+)
 
 const emits = defineEmits<{
   'update:status': [status: QuestionnaireItemStatus]
@@ -53,16 +66,22 @@ const titleIds = ref<string[]>([])
 
 let defaultSelectedAnswerIds: string[] = []
 
-const active = computed(() => !props.disabled && root.activeItemName.value === props.name)
+const active = computed(
+  () => !props.disabled && root.activeItemName.value === props.name,
+)
 const orderedAnswerControls = computed(() => {
   void root.domVersion.value
 
   return [...answerControls.value].sort((first, second) =>
-    compareDocumentOrder(first.element, second.element))
+    compareDocumentOrder(first.element, second.element),
+  )
 })
-const answers = computed(() => orderedAnswerControls.value.filter(answer => !answer.disabled))
+const answers = computed(() =>
+  orderedAnswerControls.value.filter((answer) => !answer.disabled),
+)
 const answered = computed(() =>
-  answers.value.some(answer => selectedAnswerIds.value.includes(answer.id)))
+  answers.value.some((answer) => selectedAnswerIds.value.includes(answer.id)),
+)
 const status = computed<QuestionnaireItemStatus>(() => {
   if (skipped.value) {
     return 'skipped'
@@ -70,55 +89,85 @@ const status = computed<QuestionnaireItemStatus>(() => {
 
   return answered.value ? 'answered' : 'unanswered'
 })
-const intentionallySkipped = computed(() => status.value === 'skipped' && !props.required)
-const valid = computed(() =>
-  props.disabled
-  || intentionallySkipped.value
-  || (!props.invalid && status.value === 'answered'))
-const invalid = computed(() =>
-  !props.disabled
-  && !intentionallySkipped.value
-  && (props.invalid || (validationAttempted.value && !valid.value)))
-const hasInputAnswer = computed(() => answers.value.some(answer => answer.type === 'input'))
-const itemDefinition = computed(() => root.itemDefinitionByName.value?.get(props.name))
+const intentionallySkipped = computed(
+  () => status.value === 'skipped' && !props.required,
+)
+const valid = computed(
+  () =>
+    props.disabled ||
+    intentionallySkipped.value ||
+    (!props.invalid && status.value === 'answered'),
+)
+const invalid = computed(
+  () =>
+    !props.disabled &&
+    !intentionallySkipped.value &&
+    (props.invalid || (validationAttempted.value && !valid.value)),
+)
+const hasInputAnswer = computed(() =>
+  answers.value.some((answer) => answer.type === 'input'),
+)
+const itemDefinition = computed(() =>
+  root.itemDefinitionByName.value?.get(props.name),
+)
 const shortcutByChoiceValue = computed(() =>
   root.itemDefinitionByName.value
     ? getShortcutByChoiceValue(itemDefinition.value, root.shortcuts.value)
-    : null)
+    : null,
+)
 const shortcutByAnswerId = computed(() => {
   if (shortcutByChoiceValue.value) {
     return new Map<string, string>()
   }
 
   const keys = getShortcutKeys(root.shortcuts.value)
-  const shortcutAnswers = answers.value.filter(answer => answer.type === 'choice')
+  const shortcutAnswers = answers.value.filter(
+    (answer) => answer.type === 'choice',
+  )
 
   return new Map(
     shortcutAnswers
       .slice(0, keys.length)
-      .flatMap((answer, index) => (keys[index] ? [[answer.id, keys[index]!] as const] : [])),
+      .flatMap((answer, index) =>
+        keys[index] ? [[answer.id, keys[index]!] as const] : [],
+      ),
   )
 })
-const labelledBy = computed(() =>
-  [...titleIds.value, attrs['aria-labelledby']].filter(Boolean).join(' ') || undefined)
-const describedBy = computed(() =>
-  [...descriptionIds.value, ...(invalid.value ? errorIds.value : []), attrs['aria-describedby']]
-    .filter(Boolean)
-    .join(' ') || undefined)
-const keyShortcuts = computed(() =>
-  [
-    attrs['aria-keyshortcuts'],
-    active.value ? 'Meta+Enter Control+Enter' : undefined,
-    active.value && answers.value.length ? 'ArrowUp ArrowDown' : undefined,
-    active.value && !root.first.value ? 'ArrowLeft' : undefined,
-    active.value && !root.last.value && status.value !== 'unanswered' ? 'ArrowRight' : undefined,
-  ]
-    .filter(Boolean)
-    .join(' ') || undefined)
+const labelledBy = computed(
+  () =>
+    [...titleIds.value, attrs['aria-labelledby']].filter(Boolean).join(' ') ||
+    undefined,
+)
+const describedBy = computed(
+  () =>
+    [
+      ...descriptionIds.value,
+      ...(invalid.value ? errorIds.value : []),
+      attrs['aria-describedby'],
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined,
+)
+const keyShortcuts = computed(
+  () =>
+    [
+      attrs['aria-keyshortcuts'],
+      active.value ? 'Meta+Enter Control+Enter' : undefined,
+      active.value && answers.value.length ? 'ArrowUp ArrowDown' : undefined,
+      active.value && !root.first.value ? 'ArrowLeft' : undefined,
+      active.value && !root.last.value && status.value !== 'unanswered'
+        ? 'ArrowRight'
+        : undefined,
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined,
+)
 
 function updateAnswerSelected(answerId: string, selected: boolean) {
   if (!selected) {
-    selectedAnswerIds.value = selectedAnswerIds.value.filter(current => current !== answerId)
+    selectedAnswerIds.value = selectedAnswerIds.value.filter(
+      (current) => current !== answerId,
+    )
     return
   }
 
@@ -132,7 +181,10 @@ function updateAnswerSelected(answerId: string, selected: boolean) {
   }
 }
 
-function setAnswerSelectionFromInteraction(answerId: string, selected: boolean) {
+function setAnswerSelectionFromInteraction(
+  answerId: string,
+  selected: boolean,
+) {
   skipped.value = false
   updateAnswerSelected(answerId, selected)
 }
@@ -148,7 +200,7 @@ function syncControlledAnswerSelection(answerId: string, selected: boolean) {
 function registerAnswerSelection(answerId: string, defaultSelected: boolean) {
   if (defaultSelected) {
     defaultSelectedAnswerIds = [
-      ...defaultSelectedAnswerIds.filter(current => current !== answerId),
+      ...defaultSelectedAnswerIds.filter((current) => current !== answerId),
       answerId,
     ]
 
@@ -156,15 +208,18 @@ function registerAnswerSelection(answerId: string, defaultSelected: boolean) {
       if (!selectedAnswerIds.value.length) {
         selectedAnswerIds.value = [answerId]
       }
-    }
-    else if (!selectedAnswerIds.value.includes(answerId)) {
+    } else if (!selectedAnswerIds.value.includes(answerId)) {
       selectedAnswerIds.value = [...selectedAnswerIds.value, answerId]
     }
   }
 
   return () => {
-    defaultSelectedAnswerIds = defaultSelectedAnswerIds.filter(current => current !== answerId)
-    selectedAnswerIds.value = selectedAnswerIds.value.filter(current => current !== answerId)
+    defaultSelectedAnswerIds = defaultSelectedAnswerIds.filter(
+      (current) => current !== answerId,
+    )
+    selectedAnswerIds.value = selectedAnswerIds.value.filter(
+      (current) => current !== answerId,
+    )
   }
 }
 
@@ -177,7 +232,9 @@ function setAnswerDefault(answerId: string, defaultSelected: boolean) {
     return
   }
 
-  defaultSelectedAnswerIds = defaultSelectedAnswerIds.filter(current => current !== answerId)
+  defaultSelectedAnswerIds = defaultSelectedAnswerIds.filter(
+    (current) => current !== answerId,
+  )
 }
 
 function requestControlSync() {
@@ -187,13 +244,17 @@ function requestControlSync() {
 function registerAnswerControl(registration: AnswerControlRegistration) {
   answerControls.value = [
     ...answerControls.value.filter(
-      current => current.element !== registration.element && current.id !== registration.id,
+      (current) =>
+        current.element !== registration.element &&
+        current.id !== registration.id,
     ),
     registration,
   ]
 
   return () => {
-    answerControls.value = answerControls.value.filter(current => current !== registration)
+    answerControls.value = answerControls.value.filter(
+      (current) => current !== registration,
+    )
   }
 }
 
@@ -203,7 +264,9 @@ function registerDescription(descriptionId: string) {
   }
 
   return () => {
-    descriptionIds.value = descriptionIds.value.filter(current => current !== descriptionId)
+    descriptionIds.value = descriptionIds.value.filter(
+      (current) => current !== descriptionId,
+    )
   }
 }
 
@@ -213,7 +276,7 @@ function registerTitle(titleId: string) {
   }
 
   return () => {
-    titleIds.value = titleIds.value.filter(current => current !== titleId)
+    titleIds.value = titleIds.value.filter((current) => current !== titleId)
   }
 }
 
@@ -223,7 +286,7 @@ function registerError(errorId: string) {
   }
 
   return () => {
-    errorIds.value = errorIds.value.filter(current => current !== errorId)
+    errorIds.value = errorIds.value.filter((current) => current !== errorId)
   }
 }
 
@@ -239,8 +302,10 @@ function validate() {
   }
 
   const invalidAnswer = answers.value.find(
-    answer =>
-      isAnswerFilled(answer) && answer.element.willValidate && !answer.element.validity.valid,
+    (answer) =>
+      isAnswerFilled(answer) &&
+      answer.element.willValidate &&
+      !answer.element.validity.valid,
   )
 
   if (!invalidAnswer) {
@@ -287,7 +352,7 @@ function skip() {
 }
 
 function getAnswerByElement(element: Element) {
-  return answers.value.find(answer => answer.element === element) ?? null
+  return answers.value.find((answer) => answer.element === element) ?? null
 }
 
 function getAnswerByShortcut(shortcut: string) {
@@ -297,7 +362,9 @@ function getAnswerByShortcut(shortcut: string) {
     )?.[0]
 
     return (
-      answers.value.find(answer => answer.type === 'choice' && answer.value === choiceValue) ?? null
+      answers.value.find(
+        (answer) => answer.type === 'choice' && answer.value === choiceValue,
+      ) ?? null
     )
   }
 
@@ -305,38 +372,49 @@ function getAnswerByShortcut(shortcut: string) {
     ([, answerShortcut]) => answerShortcut === shortcut,
   )?.[0]
 
-  return answers.value.find(answer => answer.id === answerId) ?? null
+  return answers.value.find((answer) => answer.id === answerId) ?? null
 }
 
-function moveAnswerFocus(currentElement: Element, direction: 'next' | 'previous') {
-  const currentIndex = answers.value.findIndex(answer => answer.element === currentElement)
-  const currentAnswer = currentIndex < 0 ? null : (answers.value[currentIndex] ?? null)
+function moveAnswerFocus(
+  currentElement: Element,
+  direction: 'next' | 'previous',
+) {
+  const currentIndex = answers.value.findIndex(
+    (answer) => answer.element === currentElement,
+  )
+  const currentAnswer =
+    currentIndex < 0 ? null : (answers.value[currentIndex] ?? null)
 
   if (
-    !answers.value.length
-    || (isTextEntryTarget(currentElement) && !isEmptyNavigableInput(currentAnswer))
-    || (currentIndex < 0 && currentElement !== itemElement.value)
+    !answers.value.length ||
+    (isTextEntryTarget(currentElement) &&
+      !isEmptyNavigableInput(currentAnswer)) ||
+    (currentIndex < 0 && currentElement !== itemElement.value)
   ) {
     return false
   }
 
-  const nextAnswer
-    = currentIndex < 0
-      ? (answers.value.find(isAnswerFilled)
-        ?? (direction === 'next' ? answers.value[0] : answers.value[answers.value.length - 1]))
+  const nextAnswer =
+    currentIndex < 0
+      ? (answers.value.find(isAnswerFilled) ??
+        (direction === 'next'
+          ? answers.value[0]
+          : answers.value[answers.value.length - 1]))
       : answers.value[
-        (currentIndex + (direction === 'next' ? 1 : -1) + answers.value.length)
-        % answers.value.length
-      ]
+          (currentIndex +
+            (direction === 'next' ? 1 : -1) +
+            answers.value.length) %
+            answers.value.length
+        ]
 
   if (!nextAnswer || nextAnswer.element === currentElement) {
     return false
   }
 
   if (
-    currentIndex >= 0
-    && isRadioTarget(currentElement)
-    && isRadioTarget(nextAnswer.element)
+    currentIndex >= 0 &&
+    isRadioTarget(currentElement) &&
+    isRadioTarget(nextAnswer.element)
   ) {
     return false
   }
@@ -354,45 +432,57 @@ watch(status, (nextStatus) => {
   emits('update:status', nextStatus)
 })
 
-watch(() => props.multiple, (multiple, wasMultiple) => {
-  if (!wasMultiple || multiple) {
-    return
-  }
+watch(
+  () => props.multiple,
+  (multiple, wasMultiple) => {
+    if (!wasMultiple || multiple) {
+      return
+    }
 
-  const selectedAnswer = answers.value.find(answer => selectedAnswerIds.value.includes(answer.id))
+    const selectedAnswer = answers.value.find((answer) =>
+      selectedAnswerIds.value.includes(answer.id),
+    )
 
-  selectedAnswerIds.value = selectedAnswer ? [selectedAnswer.id] : []
-})
+    selectedAnswerIds.value = selectedAnswer ? [selectedAnswer.id] : []
+  },
+)
 
 let unregisterItem: (() => void) | null = null
 
-watch([itemElement, () => props.name], ([element, name]) => {
-  unregisterItem?.()
-  unregisterItem = null
+watch(
+  [itemElement, () => props.name],
+  ([element, name]) => {
+    unregisterItem?.()
+    unregisterItem = null
 
-  if (!element) {
-    return
-  }
+    if (!element) {
+      return
+    }
 
-  unregisterItem = root.registerItem({
-    element,
-    focus,
-    focusInvalid,
-    getAnswerByElement,
-    getAnswerByShortcut,
-    getChoices: () =>
-      orderedAnswerControls.value.flatMap(answer =>
-        answer.type === 'choice' ? [{ disabled: answer.ownDisabled, value: answer.value }] : []),
-    isDisabled: () => props.disabled,
-    isRequired: () => props.required,
-    moveAnswerFocus,
-    name,
-    reset,
-    skip,
-    status: () => status.value,
-    validate,
-  })
-}, { flush: 'post' })
+    unregisterItem = root.registerItem({
+      element,
+      focus,
+      focusInvalid,
+      getAnswerByElement,
+      getAnswerByShortcut,
+      getChoices: () =>
+        orderedAnswerControls.value.flatMap((answer) =>
+          answer.type === 'choice'
+            ? [{ disabled: answer.ownDisabled, value: answer.value }]
+            : [],
+        ),
+      isDisabled: () => props.disabled,
+      isRequired: () => props.required,
+      moveAnswerFocus,
+      name,
+      reset,
+      skip,
+      status: () => status.value,
+      validate,
+    })
+  },
+  { flush: 'post' },
+)
 
 onBeforeUnmount(() => {
   unregisterItem?.()
@@ -445,8 +535,14 @@ provideQuestionnaireItemContext({
     :hidden="!active"
     :inert="!active"
     tabindex="-1"
-    :class="cn('flex flex-col gap-3 min-w-0 border-0 p-0 outline-none', props.class)"
+    :class="
+      cn('flex flex-col gap-3 min-w-0 border-0 p-0 outline-none', props.class)
+    "
   >
-    <slot :active="active" :invalid="invalid" :status="status" />
+    <slot
+      :active="active"
+      :invalid="invalid"
+      :status="status"
+    />
   </fieldset>
 </template>

@@ -5,13 +5,17 @@ const scopes = {
   services(file) {
     return (
       /^(services|packages|contracts)\//.test(file) ||
-      /^(package.json|pnpm-lock.yaml|pnpm-workspace.yaml|\.node-version)$/.test(file)
+      /^(package.json|pnpm-lock.yaml|pnpm-workspace.yaml|\.node-version)$/.test(
+        file,
+      )
     )
   },
   packages(file) {
     return (
       /^packages\//.test(file) ||
-      /^(package.json|pnpm-lock.yaml|pnpm-workspace.yaml|\.node-version)$/.test(file)
+      /^(package.json|pnpm-lock.yaml|pnpm-workspace.yaml|\.node-version)$/.test(
+        file,
+      )
     )
   },
   app(file) {
@@ -48,12 +52,17 @@ function validate(files, scope) {
 function selfCheck() {
   assert.equal(releaseFiles(['src/main.ts'], 'app').length, 1)
   assert.equal(releaseFiles(['README.md', 'docs/notes.md'], 'app').length, 0)
-  assert.equal(releaseFiles(['services/academic-service/src/main.ts'], 'services').length, 1)
+  assert.equal(
+    releaseFiles(['services/academic-service/src/main.ts'], 'services').length,
+    1,
+  )
   assert.equal(releaseFiles(['packages/ui/src/index.ts'], 'packages').length, 1)
   assert.equal(isChangeset(['.changeset/release.md'][0]), true)
   assert.equal(isChangeset(['.changeset/README.md'][0]), false)
   assert.throws(() => validate(['src/main.ts'], 'app'), /require a Changeset/)
-  assert.doesNotThrow(() => validate(['src/main.ts', '.changeset/fix.md'], 'app'))
+  assert.doesNotThrow(() =>
+    validate(['src/main.ts', '.changeset/fix.md'], 'app'),
+  )
   assert.doesNotThrow(() => validate(['README.md'], 'app'))
   console.log('changeset guard self-check passed')
 }
@@ -65,7 +74,9 @@ if (process.argv.includes('--self-check')) {
 
 const [base, scope] = process.argv.slice(2)
 if (!base || !scope) {
-  console.error('usage: node require-changeset.mjs <base-sha> <services|packages|app>')
+  console.error(
+    'usage: node require-changeset.mjs <base-sha> <services|packages|app>',
+  )
   process.exit(2)
 }
 

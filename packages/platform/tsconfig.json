@@ -1,12 +1,7 @@
 {
   "extends": "@mts241alikhlash/typescript-config/vue.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }

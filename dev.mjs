@@ -49,7 +49,10 @@ function readEnv(file) {
       .filter((line) => /^[A-Z_][A-Z0-9_]*=/.test(line))
       .map((line) => {
         const at = line.indexOf('=')
-        return [line.slice(0, at), line.slice(at + 1).replace(/^["']|["']$/g, '')]
+        return [
+          line.slice(0, at),
+          line.slice(at + 1).replace(/^["']|["']$/g, ''),
+        ]
       }),
   )
 }
@@ -96,7 +99,9 @@ async function ensureDatabase(service) {
   const fromIdentity = createRequire(
     path.join(servicesRoot, 'services/identity-service/package.json'),
   )
-  const { Client } = createRequire(fromIdentity.resolve('@prisma/adapter-pg'))('pg')
+  const { Client } = createRequire(fromIdentity.resolve('@prisma/adapter-pg'))(
+    'pg',
+  )
   const admin = new URL(identityEnv.DATABASE_URL)
   admin.pathname = '/postgres'
   admin.searchParams.delete('sslmode')
@@ -104,7 +109,10 @@ async function ensureDatabase(service) {
   await client.connect()
   try {
     const name = service
-    const found = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [name])
+    const found = await client.query(
+      'SELECT 1 FROM pg_database WHERE datname = $1',
+      [name],
+    )
     if (found.rowCount === 0) {
       await client.query(`CREATE DATABASE "${name}"`)
       console.log(`created database ${name}`)
@@ -130,13 +138,19 @@ async function portBusy(port) {
 }
 
 async function servicesOf(app) {
-  const config = path.join(workspace, 'apps', `${app}-web`, 'api-routes.config.ts')
+  const config = path.join(
+    workspace,
+    'apps',
+    `${app}-web`,
+    'api-routes.config.ts',
+  )
   const { SERVICE_PREFIXES } = await import(pathToFileURL(config).href)
   return Object.keys(SERVICE_PREFIXES)
 }
 
 const services = new Set(['identity'])
-for (const app of apps) for (const service of await servicesOf(app)) services.add(service)
+for (const app of apps)
+  for (const service of await servicesOf(app)) services.add(service)
 const webs = new Set(['account', ...apps])
 
 const children = new Set()
@@ -148,7 +162,11 @@ function run(label, command, args, cwd) {
   const color = COLORS[colorIndex++ % COLORS.length]
   const prefix = `\x1b[${color}m[${label}]\x1b[0m `
   const start = () => {
-    const child = spawn(command, args, { cwd, detached: true, env: process.env })
+    const child = spawn(command, args, {
+      cwd,
+      detached: true,
+      env: process.env,
+    })
     for (const stream of [child.stdout, child.stderr]) {
       let pending = ''
       stream.on('data', (chunk) => {
@@ -171,14 +189,22 @@ function run(label, command, args, cwd) {
 }
 
 const STORAGE = [
-  { port: Number(new URL(identityEnv.DATABASE_URL).port || 5432), container: /^241-apps[-_]postgres[-_]1$/, label: 'Postgres' },
+  {
+    port: Number(new URL(identityEnv.DATABASE_URL).port || 5432),
+    container: /^241-apps[-_]postgres[-_]1$/,
+    label: 'Postgres',
+  },
   { port: 9000, container: /^241-apps[-_]s3[-_]1$/, label: 'S3' },
 ]
 
 function containerOnPort(port) {
-  const rows = execFileSync('docker', ['ps', '--format', '{{.Names}}\t{{.Ports}}'], {
-    encoding: 'utf8',
-  })
+  const rows = execFileSync(
+    'docker',
+    ['ps', '--format', '{{.Names}}\t{{.Ports}}'],
+    {
+      encoding: 'utf8',
+    },
+  )
     .trim()
     .split('\n')
   const row = rows.find((r) => r.split('\t')[1]?.includes(`:${port}->`))
@@ -219,24 +245,44 @@ if (startStorage) {
   )
 }
 
-execFileSync('pnpm', ['--filter', '@mts241alikhlash/nest-core', 'run', 'build'], {
-  cwd: workspace,
-  stdio: ['ignore', 'ignore', 'inherit'],
-})
-run('nest-core', 'pnpm', ['--filter', '@mts241alikhlash/nest-core', 'run', 'dev'], workspace)
+execFileSync(
+  'pnpm',
+  ['--filter', '@mts241alikhlash/nest-core', 'run', 'build'],
+  {
+    cwd: workspace,
+    stdio: ['ignore', 'ignore', 'inherit'],
+  },
+)
+run(
+  'nest-core',
+  'pnpm',
+  ['--filter', '@mts241alikhlash/nest-core', 'run', 'dev'],
+  workspace,
+)
 
 for (const service of services) {
   if (await portBusy(SERVICE_PORTS[service])) {
-    console.log(`${service}-service already on :${SERVICE_PORTS[service]}, skipping`)
+    console.log(
+      `${service}-service already on :${SERVICE_PORTS[service]}, skipping`,
+    )
     continue
   }
   ensureEnv(service)
   await ensureDatabase(service)
-  execFileSync('pnpm', ['--filter', `${service}-service`, 'exec', 'prisma', 'migrate', 'deploy'], {
-    cwd: servicesRoot,
-    stdio: ['ignore', 'ignore', 'inherit'],
-  })
-  run(`${service}-service`, 'pnpm', ['--filter', `${service}-service`, 'run', 'start:dev'], servicesRoot)
+  execFileSync(
+    'pnpm',
+    ['--filter', `${service}-service`, 'exec', 'prisma', 'migrate', 'deploy'],
+    {
+      cwd: servicesRoot,
+      stdio: ['ignore', 'ignore', 'inherit'],
+    },
+  )
+  run(
+    `${service}-service`,
+    'pnpm',
+    ['--filter', `${service}-service`, 'run', 'start:dev'],
+    servicesRoot,
+  )
 }
 
 for (const web of webs) {

@@ -6,12 +6,12 @@ The ten services and nine apps that make up 241. This file lives in
 **The workspace folder is not a git repository.** Since 2026-09-15 it holds
 separate repositories, each with its own remote:
 
-| Repository | Holds |
-| --- | --- |
-| `services` | all ten NestJS services, one pnpm workspace, plus the generated `packages/*-api` clients and `contracts/` |
-| `academic-web`, `account-web`, `admin-web`, `admission-web`, `assessment-web`, `exam-web`, `hr-web`, `inventory-web`, `portal-web` | one Vue app each |
-| `web-packages` | `@mts241alikhlash/ui` and `@mts241alikhlash/web-shared`, published to GitHub Packages |
-| `platform-infra` | the gateway, the Compose stacks, the deployment locks, and this file |
+| Repository                                                                                                                         | Holds                                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `services`                                                                                                                         | all ten NestJS services, one pnpm workspace, plus the generated `packages/*-api` clients and `contracts/` |
+| `academic-web`, `account-web`, `admin-web`, `admission-web`, `assessment-web`, `exam-web`, `hr-web`, `inventory-web`, `portal-web` | one Vue app each                                                                                          |
+| `web-packages`                                                                                                                     | `@mts241alikhlash/ui` and `@mts241alikhlash/web-shared`, published to GitHub Packages                     |
+| `platform-infra`                                                                                                                   | the gateway, the Compose stacks, the deployment locks, and this file                                      |
 
 That has one consequence worth internalising before doing anything here:
 **anything a repository needs must live inside that repository.** Docs and the
@@ -23,15 +23,15 @@ parent to inherit from.
 Sections written before 2026-09-15 describe the old single-folder layout. Read
 their paths through this table; the rules they state still hold.
 
-| Before 2026-09-15 | Now |
-| --- | --- |
-| `infra/nginx/generate.mjs`, `infra/nginx/*.conf` | `platform-infra/gateway/generate.mjs` and `gateway/nginx*.conf` |
-| `infra/postgres/init-databases.sql` | `platform-infra/gateway-source/postgres/init-databases.sql` |
-| `docker-compose.prod.yml`, `docker-compose.dev.yml` | `infra/compose/compose.yaml` (the local Postgres and S3 sit behind its `storage` profile) |
-| each app's or service's `CLAUDE.md` | its `docs/OVERVIEW.md`; no `CLAUDE.md` is checked in |
-| `.claude/skills/`, `skills-lock.json`, `.specify/` at the root | not checked in anywhere |
-| `scripts/release.mjs`, `VERSIONING.md` | Changesets, per repository — see "Versioning and releases" |
-| `.github/scripts/changed-folders.mjs` | one `validate.yml` per repository — see "CI" |
+| Before 2026-09-15                                              | Now                                                                                       |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `infra/nginx/generate.mjs`, `infra/nginx/*.conf`               | `platform-infra/gateway/generate.mjs` and `gateway/nginx*.conf`                           |
+| `infra/postgres/init-databases.sql`                            | `platform-infra/gateway-source/postgres/init-databases.sql`                               |
+| `docker-compose.prod.yml`, `docker-compose.dev.yml`            | `infra/compose/compose.yaml` (the local Postgres and S3 sit behind its `storage` profile) |
+| each app's or service's `CLAUDE.md`                            | its `docs/OVERVIEW.md`; no `CLAUDE.md` is checked in                                      |
+| `.claude/skills/`, `skills-lock.json`, `.specify/` at the root | not checked in anywhere                                                                   |
+| `scripts/release.mjs`, `VERSIONING.md`                         | Changesets, per repository — see "Versioning and releases"                                |
+| `.github/scripts/changed-folders.mjs`                          | one `validate.yml` per repository — see "CI"                                              |
 
 ## The ten services
 
@@ -40,18 +40,18 @@ SIMAS, SIPRES, PSB — are gone from every `appTitle`, page title and sidebar
 fallback; a service's `package.json` description is the single sentence that
 names it.
 
-| Service | Product | Owns | Port | Database |
-| --- | --- | --- | --- | --- |
-| `identity-service` | 241 Console | identity and access: users, roles, permissions, sessions, audit, school profile, **a person's address**, administrative areas | 3000 | `identity`, 20 models |
-| `academic-service` | 241 Academic | academic structure, curriculum, timetable, classrooms | 3200 | `academic`, 21 models |
-| `inventory-service` | 241 Inventory | assets, units, circulation, approvals | 3300 | `inventory`, 15 models |
-| `presence-service` | 241 Presence | gate credentials, devices, scans, daily attendance and leave, **for staff and students** | 3400 | `presence`, 14 models |
-| `portal-service` | 241 Portal | the public website and the area that manages its content | 3600 | `portal`, 15 models |
-| `admission-service` | 241 Admission | admission waves, applications, documents, payments, enrolment | 3700 | `admission`, 9 models |
-| `hr-service` | 241 HR | employee records, positions, employment types, **and payroll** | 3800 | `hr`, 10 models |
-| `student-service` | 241 Academic | student lifecycle: students, parents, enrolment, graduation, promotion | 3900 | `student`, 6 models |
-| `assessment-service` | 241 Academic | teaching evaluation: assessment, attendance, report cards, dashboard | 4000 | `assessment`, 6 models |
-| `exam-service` | 241 Academic | computer-based exams: question bank with versions, approval, import (phase 1) | 4100 | `exam`, 4 models |
+| Service              | Product       | Owns                                                                                                                          | Port | Database               |
+| -------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| `identity-service`   | 241 Console   | identity and access: users, roles, permissions, sessions, audit, school profile, **a person's address**, administrative areas | 3000 | `identity`, 20 models  |
+| `academic-service`   | 241 Academic  | academic structure, curriculum, timetable, classrooms                                                                         | 3200 | `academic`, 21 models  |
+| `inventory-service`  | 241 Inventory | assets, units, circulation, approvals                                                                                         | 3300 | `inventory`, 15 models |
+| `presence-service`   | 241 Presence  | gate credentials, devices, scans, daily attendance and leave, **for staff and students**                                      | 3400 | `presence`, 14 models  |
+| `portal-service`     | 241 Portal    | the public website and the area that manages its content                                                                      | 3600 | `portal`, 15 models    |
+| `admission-service`  | 241 Admission | admission waves, applications, documents, payments, enrolment                                                                 | 3700 | `admission`, 9 models  |
+| `hr-service`         | 241 HR        | employee records, positions, employment types, **and payroll**                                                                | 3800 | `hr`, 10 models        |
+| `student-service`    | 241 Academic  | student lifecycle: students, parents, enrolment, graduation, promotion                                                        | 3900 | `student`, 6 models    |
+| `assessment-service` | 241 Academic  | teaching evaluation: assessment, attendance, report cards, dashboard                                                          | 4000 | `assessment`, 6 models |
+| `exam-service`       | 241 Academic  | computer-based exams: question bank with versions, approval, import (phase 1)                                                 | 4100 | `exam`, 4 models       |
 
 **Every service has its own database, its own `.env`, and its own
 `prisma:migrate` / `prisma:deploy`.** All ten point at the shared VPS Postgres
@@ -106,7 +106,7 @@ presence-service; `presence-service` kept gate presence alone and stayed
 person-agnostic. `presence-web` became `hr-web`, and the `employee_service`
 database became `hr`.
 
-Payroll had been merged *into* presence on 2026-08-30, one day after being
+Payroll had been merged _into_ presence on 2026-08-30, one day after being
 split out, and that merge was right at the time. The new fact is **students**:
 gate attendance is going to cover students as well as staff — every presence
 model already keys on `userId` and its only distinction is a `subjectType` of
@@ -154,8 +154,8 @@ blood type. The address was the one personal field left behind on a role table.
   for the day hr-web or academic-web wants to show an address beside a person.
 
 The .NET Architecture guidance this follows is precise about the distinction:
-duplicating data across bounded contexts is *"a valid design practice"* when a
-service stores *"only the specific attributes required for its own domain"* —
+duplicating data across bounded contexts is _"a valid design practice"_ when a
+service stores _"only the specific attributes required for its own domain"_ —
 what is not valid is a second **writable** copy with no propagation, which is
 three writers and no owner.
 
@@ -201,7 +201,7 @@ one — is XML-first and rate-limited on its free tier. `country` stays a
 defaulted field.
 
 **The init migrations were regenerated on 2026-09-10.** Seven of the nine
-still created the tables their schema declared *before* the split — student
+still created the tables their schema declared _before_ the split — student
 26 vs 7, assessment 25 vs 6, admission 13 vs 9, hr 9 vs 6, academic 24 vs
 21, presence 20 vs 19, identity 17 vs 19 (that one was short, not long: it
 gained `Religion` and `BloodType`). Only inventory and portal were current.
@@ -252,21 +252,21 @@ than left for a following step.
 **Every route in every app is English as of 2026-09-10.** `academic-web` and
 `inventory-web` already were; `hr-web` (`/presensi/*` → `/attendance/*`,
 `/penggajian/*` → `/payroll/*`), `admission-web` and `portal-web` were
-translated, route *names* included, since those are code. portal-web's public
+translated, route _names_ included, since those are code. portal-web's public
 URLs (`/berita`, `/artikel`, `/galeri`, `/pengumuman`) keep **redirects** to
 their English replacements: those are bookmarked and indexed, and renaming them
 silently breaks both. Each app is its own Vue 3 + Vite app with its own
 `packages/{platform,shared,ui}`, narrowed to what it reaches.
 
-| App | Product | Dev port | Gateway `server_name` | Services it needs |
-|---|---|---|---|---|
-| `academic-web` | 241 Academic | 5173 | `_` (default) | identity, academic, student, hr |
-| `inventory-web` | 241 Inventory | 5174 | `simas.localhost` | identity, inventory |
-| `admission-web` | 241 Admission | 5175 | `ppdb.localhost` | identity, academic, admission |
-| `portal-web` | 241 Portal | 5176 | `portal.localhost` | identity, portal |
-| `hr-web` | 241 HR | 5177 | `hr.localhost` | identity, hr, presence, academic, student |
-| `admin-web` | 241 Console | 5178 | `admin.localhost` | identity, portal |
-| `assessment-web` | 241 Assessment | 5179 | `assessment.localhost` | identity, assessment, academic, student |
+| App              | Product        | Dev port | Gateway `server_name`  | Services it needs                         |
+| ---------------- | -------------- | -------- | ---------------------- | ----------------------------------------- |
+| `academic-web`   | 241 Academic   | 5173     | `_` (default)          | identity, academic, student, hr           |
+| `inventory-web`  | 241 Inventory  | 5174     | `simas.localhost`      | identity, inventory                       |
+| `admission-web`  | 241 Admission  | 5175     | `ppdb.localhost`       | identity, academic, admission             |
+| `portal-web`     | 241 Portal     | 5176     | `portal.localhost`     | identity, portal                          |
+| `hr-web`         | 241 HR         | 5177     | `hr.localhost`         | identity, hr, presence, academic, student |
+| `admin-web`      | 241 Console    | 5178     | `admin.localhost`      | identity, portal                          |
+| `assessment-web` | 241 Assessment | 5179     | `assessment.localhost` | identity, assessment, academic, student   |
 
 **`assessment-web` arrived on 2026-09-11**, and it closes the last hole in the
 platform: `assessment-service` had run since 2026-09-03
@@ -350,7 +350,7 @@ the one thing an outage must not do. The screen stays, the click works, and
 the failure is stated where it happened.
 
 What the failure says was sharpened on 2026-09-11. `serviceUnavailableMessage`
-could only name the service when a *running* service reported that one of
+could only name the service when a _running_ service reported that one of
 **its** dependencies was unreachable, by parsing `The hr service could not be
 reached` out of the 503 body. When the service the browser called was itself
 the one down, the gateway answered 502 with no such body and the operator got
@@ -591,7 +591,7 @@ red with the exact sentence `DELETE /academic-calendars/:id is registered
 before /academic-calendars/bulk and swallows it`.
 
 The repo's own `src/route-collisions.spec.ts` stays. It reads source rather than
-booting, and it only ever detected *duplicates*: `if (a.file === b.file) continue`
+booting, and it only ever detected _duplicates_: `if (a.file === b.file) continue`
 skips same-controller shadowing, and it requires the match to hold in both
 directions, which one-way shadowing never does. It implemented half of what
 NestJS now names as two separate policies.
@@ -600,10 +600,10 @@ NestJS now names as two separate policies.
 them. Tests run through `cross-env NODE_OPTIONS=--experimental-vm-modules jest`
 — that flag is what exposes `vm.SourceTextModule`, which is how Jest 30 detects
 that Node 24.9+ can require ESM natively. Without it every suite fails with
-*Must use import to load ES Module*. The `transformIgnorePatterns` allowlist for
+_Must use import to load ES Module_. The `transformIgnorePatterns` allowlist for
 `htmlparser2` and friends was deleted in the same move: transpiling a dual
 package to CJS and then evaluating it as ESM is what produced
-*exports is not defined*.
+_exports is not defined_.
 
 **Two API breaks had to be fixed by hand.** `@nestjs/terminus` dropped the
 `HealthIndicator` base class for `HealthIndicatorService` (`prisma.health.ts`,
@@ -642,8 +642,8 @@ Two traps the first live run found, both now closed in the files:
 
 - The local `DATABASE_URL` must carry **`&sslmode=disable`**. `pgSslOptions()`
   turns TLS on unless the string disables it, and the local container serves
-  none — without the flag every service dies at boot with *"The server does not
-  support SSL connections"*.
+  none — without the flag every service dies at boot with _"The server does not
+  support SSL connections"_.
 - An `S3_ENDPOINT` that names a container alias does not resolve from the
   host. `StorageService` builds its client lazily, so the service
   **boots fine and only uploads fail** — a quiet one.
@@ -653,16 +653,16 @@ Two traps the first live run found, both now closed in the files:
 verification and every service-to-service call fail with a 401 that reads like
 an expiry if they drift.
 
-| Service | Port | Database |
-| --- | --- | --- |
-| identity | 3000 | `identity` |
-| academic | 3200 | `academic` |
-| inventory | 3300 | `inventory` |
-| presence | 3400 | `presence` |
-| portal | 3600 | `portal` |
-| admission | 3700 | `admission` |
-| hr | 3800 | `hr` |
-| student | 3900 | `student` |
+| Service    | Port | Database     |
+| ---------- | ---- | ------------ |
+| identity   | 3000 | `identity`   |
+| academic   | 3200 | `academic`   |
+| inventory  | 3300 | `inventory`  |
+| presence   | 3400 | `presence`   |
+| portal     | 3600 | `portal`     |
+| admission  | 3700 | `admission`  |
+| hr         | 3800 | `hr`         |
+| student    | 3900 | `student`    |
 | assessment | 4000 | `assessment` |
 
 ### Which processes you actually need
@@ -681,15 +681,15 @@ cd <app> && pnpm dev                                # the app itself
 `prisma:deploy` is only needed the first time against an empty database, or
 after a migration changes.
 
-| Testing | Services to start |
-|---|---|
-| `academic-web` :5173 | identity, academic, student, hr |
-| `inventory-web` :5174 | identity, inventory |
-| `admission-web` :5175 | identity, academic, admission |
-| `portal-web` :5176 | identity, portal |
-| `hr-web` :5177 | identity, hr, presence, academic, student |
-| `admin-web` :5178 | identity, portal |
-| `assessment-web` :5179 | identity, assessment, academic, student |
+| Testing                | Services to start                         |
+| ---------------------- | ----------------------------------------- |
+| `academic-web` :5173   | identity, academic, student, hr           |
+| `inventory-web` :5174  | identity, inventory                       |
+| `admission-web` :5175  | identity, academic, admission             |
+| `portal-web` :5176     | identity, portal                          |
+| `hr-web` :5177         | identity, hr, presence, academic, student |
+| `admin-web` :5178      | identity, portal                          |
+| `assessment-web` :5179 | identity, assessment, academic, student   |
 
 identity-service is in every row — start it first, and seed it once:
 
@@ -838,7 +838,7 @@ admission-service──POST /{academic-years,occupations,──> academic-servic
 ```
 
 **`POST /students/enrol` is the one that is not a provisioning call.**
-admission-service forwards the *operator's own* bearer token, so accepting an
+admission-service forwards the _operator's own_ bearer token, so accepting an
 applicant requires that person to hold `students.create` in student-service.
 Deliberate — the enrolment is an act by a named human, and the audit row should
 name them — but it means an admission operator with no student permission gets
@@ -862,7 +862,7 @@ The same shape as `admission-service → POST /students/enrol`.
 
 `/semester-rollovers` moved with it in `academic-web`'s routing manifest.
 
-academic-service became a *provider* on 2026-09-09 as well, for the
+academic-service became a _provider_ on 2026-09-09 as well, for the
 assessment-service conversion that is still open:
 
 ```
@@ -885,8 +885,7 @@ student-service still need".
 
 `/auth/introspect` runs through a byte-identical `src/platform/identity/` slice
 in all eight — cached for `IDENTITY_CACHE_TTL_MS`, coalesced per token,
-timed out at `IDENTITY_TIMEOUT_MS`, and failing closed with 503 rather than
-401. It sends `x-provisioning-token`: identity answers introspection only to
+timed out at `IDENTITY_TIMEOUT_MS`, and failing closed with 503 rather than 401. It sends `x-provisioning-token`: identity answers introspection only to
 services, and skips rate limiting for it. Change it in one service and it must
 be changed in all eight.
 
@@ -1204,7 +1203,6 @@ built, and `/educations` (academic) is served for a form that reads it through
 `/educations/by-ids` instead. `/parents`, `/student-parents` and
 `/student-graduations` now have screens.
 
-
 ## The first live run, 2026-09-11
 
 Docker arrived on the machine that day, and the platform was started against a
@@ -1234,8 +1232,8 @@ field(data, 'employeeId')                ->  undefined  ->  503
 most of the service-to-service surface: `POST /profiles/batch` (six callers),
 every `/employees/*` lookup, `/presence/periods/:y/:m/closed`,
 `/daily-presences/*`, the academic and student batch reads. A live
-`GET /teaching-assignments/me` returned *"The hr service returned an invalid
-response"*.
+`GET /teaching-assignments/me` returned _"The hr service returned an invalid
+response"_.
 
 Nothing caught it. Unit tests mock `ServiceClient`; no test crosses real HTTP;
 and until Docker existed nothing had run two services at once.
@@ -1267,7 +1265,7 @@ the rest had been generated before the banner appeared.
 `sslmode=disable`. The commented-out local pair in seven `.env` files read
 `postgresql://siakad:siakad@localhost:5433/<db>?schema=public` — no
 `sslmode` — so following the local runbook gave
-*"The server does not support SSL connections"*. All seven now carry
+_"The server does not support SSL connections"_. All seven now carry
 `&sslmode=disable`.
 
 ### Two seeds read a different variable than the other two
@@ -1325,14 +1323,14 @@ recreated on a new IP was never followed.
 
 Measured with a throwaway network, an `http-echo` backend and a one-line conf:
 
-| Step | Static upstream | `zone` + `resolve` |
-|---|---|---|
-| backend at `172.19.0.3` | `v1` | `v1` |
-| recreated at a new IP, another container now holding `.3` | **`filler`** | 502 |
-| ~15s later (one `valid=` window) | **`filler`** | `v2` |
+| Step                                                      | Static upstream | `zone` + `resolve` |
+| --------------------------------------------------------- | --------------- | ------------------ |
+| backend at `172.19.0.3`                                   | `v1`            | `v1`               |
+| recreated at a new IP, another container now holding `.3` | **`filler`**    | 502                |
+| ~15s later (one `valid=` window)                          | **`filler`**    | `v2`               |
 
 The old middle row is the reason this mattered. A stale IP pointing at
-*nothing* is a 502 — loud, and somebody fixes it. A stale IP that Docker has
+_nothing_ is a 502 — loud, and somebody fixes it. A stale IP that Docker has
 since handed to **a different container** is a gateway quietly proxying to the
 wrong service, and nothing in any log says so.
 
@@ -1383,11 +1381,11 @@ type from the types map either way.
 2026-09-11. Three defaults each decided something on the operator's behalf and
 left no trace that they had:
 
-| Was | Now |
-|---|---|
-| type dropdown preselected whichever type was created first | empty, with a `Pilih tipe...` placeholder |
-| every new row started 07:00–07:30 | starts where the previous row ended |
-| end time typed by hand | derived from the type's `defaultDurationMinutes` |
+| Was                                                        | Now                                              |
+| ---------------------------------------------------------- | ------------------------------------------------ |
+| type dropdown preselected whichever type was created first | empty, with a `Pilih tipe...` placeholder        |
+| every new row started 07:00–07:30                          | starts where the previous row ended              |
+| end time typed by hand                                     | derived from the type's `defaultDurationMinutes` |
 
 The rule the first row breaks is the general one: **a form may not answer a
 question the operator has not been asked.** A preselected dropdown produces a
@@ -1444,7 +1442,7 @@ What was wrong until 2026-09-11 was everything around it:
   breadcrumb, and the Kelola Kelas title. It now reads `VII-A`, or
   `VII-A (Awesome)` when an alias exists.
 - **The form called `code` "Kode Kelas"** and the alias "Nama Kelas", which is
-  backwards from how a school talks: the class *is* called VII A. The labels
+  backwards from how a school talks: the class _is_ called VII A. The labels
   are now **Nama Kelas** (the code) and **Alias**.
 - **The DTO example was `VIII-A`**, implying a separator convention nobody
   asked for. It is `VII A` now — the field holds whatever the school writes on

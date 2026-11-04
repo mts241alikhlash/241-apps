@@ -67,7 +67,6 @@ function inService(service, args, env = {}) {
   })
 }
 
-
 const postgresDatabase = new URL(serverUrl).pathname.slice(1) || 'postgres'
 
 for (const service of services) {
@@ -98,7 +97,11 @@ const expected = [
   ['portal-service', 'portal_nav_items', 5],
 ]
 for (const [service, table, rows] of expected) {
-  assert.equal(await count(databaseOf(service), table), rows, `${service} ${table}`)
+  assert.equal(
+    await count(databaseOf(service), table),
+    rows,
+    `${service} ${table}`,
+  )
 }
 const requirementMismatch = await sql(
   databaseOf('admission-service'),
@@ -106,7 +109,11 @@ const requirementMismatch = await sql(
    WHERE (requirement = 'REQUIRED') <> is_required
       OR requirement = 'LATER'`,
 )
-assert.equal(requirementMismatch[0].n, 0, 'requirement backfilled from is_required')
+assert.equal(
+  requirementMismatch[0].n,
+  0,
+  'requirement backfilled from is_required',
+)
 const regions = await sql(
   databaseOf('identity-service'),
   'SELECT level::text AS name, count(*)::int AS n FROM regions GROUP BY level ORDER BY level',
@@ -124,7 +131,6 @@ assert.deepEqual(
 console.log('default reference data: counts match')
 
 const identity = databaseOf('identity-service')
-
 
 const seedEnv = { SEED_ADMIN_PASSWORD: 'smoke-admin-password' }
 inService('identity-service', ['tsx', 'prisma/seed-admin-minimal.ts'], seedEnv)
@@ -154,7 +160,10 @@ const applicantGrants = await sql(
    JOIN roles r ON r.id = rp.role_id JOIN permissions p ON p.id = rp.permission_id
    WHERE r.code = 'APPLICANT'`,
 )
-assert.deepEqual(applicantGrants.map((row) => row.code), ['admissions.apply'])
+assert.deepEqual(
+  applicantGrants.map((row) => row.code),
+  ['admissions.apply'],
+)
 const staffApplying = await sql(
   identity,
   `SELECT r.code FROM role_permissions rp
@@ -162,7 +171,9 @@ const staffApplying = await sql(
    WHERE p.code = 'admissions.apply' AND r.code NOT IN ('APPLICANT', 'SUPER_ADMIN')`,
 )
 assert.deepEqual(staffApplying, [], 'no staff role can apply for admission')
-console.log('identity: default roles match the seed, applying kept to applicants')
+console.log(
+  'identity: default roles match the seed, applying kept to applicants',
+)
 
 await sql(
   identity,
@@ -203,6 +214,9 @@ assert.deepEqual(
 console.log('identity: edits and role assignments survive reseeding')
 
 for (const service of services) {
-  await sql(postgresDatabase, `DROP DATABASE IF EXISTS "${databaseOf(service)}"`)
+  await sql(
+    postgresDatabase,
+    `DROP DATABASE IF EXISTS "${databaseOf(service)}"`,
+  )
 }
 console.log('db smoke passed')

@@ -212,7 +212,7 @@ format is how a label printer and a database drift apart.
 ```ts
 // fine as-is — the meaning is the literal
 if (units.length === 0)
-const quantity = dto.quantity && dto.quantity > 0 ? dto.quantity : 1
+  const quantity = dto.quantity && dto.quantity > 0 ? dto.quantity : 1
 ```
 
 ---

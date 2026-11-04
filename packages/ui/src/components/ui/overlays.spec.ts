@@ -2,12 +2,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import { h } from 'vue'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from './dialog'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from './dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +10,12 @@ import {
   DropdownMenuLabel,
 } from './dropdown-menu'
 import { Popover, PopoverContent } from './popover'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './tooltip'
 
 const text = 'text-[length:var(--text-control,0.75rem)]'
 const md = 'min-h-[var(--control-h-md,1.75rem)]'
@@ -68,7 +68,9 @@ describe('overlays', () => {
     expect(content).toContain('sm:max-w-sm')
     expect(content).toContain('rounded-md')
     expect(content).toContain('p-4')
-    expect(document.body.querySelector('[data-slot=dialog-close]')).not.toBeNull()
+    expect(
+      document.body.querySelector('[data-slot=dialog-close]'),
+    ).not.toBeNull()
     const title = classOf('[data-slot=dialog-title]')
     expect(title).toContain('text-sm')
     expect(title).toContain('font-medium')

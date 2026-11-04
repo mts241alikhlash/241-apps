@@ -58,8 +58,7 @@ const env = {
     process.env.SSO_APPS ??
     'account=http://localhost:5180/oauth/callback,academic=http://localhost:5173/oauth/callback,inventory=http://localhost:5174/oauth/callback,admission=http://localhost:5175/oauth/callback,portal=http://localhost:5176/oauth/callback,hr=http://localhost:5177/oauth/callback,admin=http://localhost:5178/oauth/callback,assessment=http://localhost:5179/oauth/callback',
   S3_ENDPOINT: process.env.S3_ENDPOINT ?? 'http://localhost:9000',
-  S3_PUBLIC_ENDPOINT:
-    process.env.S3_PUBLIC_ENDPOINT ?? 'http://localhost:9000',
+  S3_PUBLIC_ENDPOINT: process.env.S3_PUBLIC_ENDPOINT ?? 'http://localhost:9000',
   S3_BUCKET: process.env.S3_BUCKET ?? 'build',
   S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID ?? 'build',
   S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY ?? 'build',

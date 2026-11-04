@@ -4,7 +4,9 @@ import type { HTMLAttributes } from 'vue'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { SelectLabel } from 'reka-ui'
 
-const props = defineProps<SelectLabelProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SelectLabelProps & { class?: HTMLAttributes['class'] }
+>()
 </script>
 
 <template>

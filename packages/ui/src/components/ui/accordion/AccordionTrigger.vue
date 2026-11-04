@@ -5,12 +5,11 @@ import type { HTMLAttributes } from 'vue'
 import { ChevronDownIcon, ChevronUpIcon } from '@lucide/vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  AccordionHeader,
-  AccordionTrigger,
-} from 'reka-ui'
+import { AccordionHeader, AccordionTrigger } from 'reka-ui'
 
-const props = defineProps<AccordionTriggerProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  AccordionTriggerProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -29,8 +28,14 @@ const delegatedProps = reactiveOmit(props, 'class')
     >
       <slot />
       <slot name="icon">
-        <ChevronDownIcon data-slot="accordion-trigger-icon" class="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden" />
-        <ChevronUpIcon data-slot="accordion-trigger-icon" class="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline" />
+        <ChevronDownIcon
+          data-slot="accordion-trigger-icon"
+          class="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
+        />
+        <ChevronUpIcon
+          data-slot="accordion-trigger-icon"
+          class="pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
+        />
       </slot>
     </AccordionTrigger>
   </AccordionHeader>

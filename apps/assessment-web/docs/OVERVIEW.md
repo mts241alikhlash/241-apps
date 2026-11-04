@@ -18,15 +18,15 @@ pairing `hr-web` has with `hr-service`.
 
 ## What it owns
 
-| Prefix | Feature |
-|---|---|
-| `/dashboard` | the teacher's or student's own slice: `GET /dashboards`, plural |
-| `/assessment/items` | assessment items and their weights |
-| `/student-scores`, `/student-scores/:assessmentItemId/grade` | entering marks |
-| `/report-card`, `/my/report-card` | report cards, generated and read |
-| `/attendance/input`, `/attendance/recap`, `/my/attendance` | the class register |
-| `/my/scores` | a student's own marks |
-| `/nilai-ujian` | exam scores sent to the assessment for the classes the teacher teaches |
+| Prefix                                                       | Feature                                                                |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `/dashboard`                                                 | the teacher's or student's own slice: `GET /dashboards`, plural        |
+| `/assessment/items`                                          | assessment items and their weights                                     |
+| `/student-scores`, `/student-scores/:assessmentItemId/grade` | entering marks                                                         |
+| `/report-card`, `/my/report-card`                            | report cards, generated and read                                       |
+| `/attendance/input`, `/attendance/recap`, `/my/attendance`   | the class register                                                     |
+| `/my/scores`                                                 | a student's own marks                                                  |
+| `/nilai-ujian`                                               | exam scores sent to the assessment for the classes the teacher teaches |
 
 **Every route is English and none keeps the old `/academic/` prefix.**
 `src/app/providers/router/router.spec.ts` fails the build if one comes back,
@@ -39,12 +39,12 @@ which it did once during the split, catching
 
 ## Four services answer it
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/users`, `/profiles`, `/roles`, `/permissions`, `/school-units`, `/religions`, `/blood-types` |
+| Service    | Port | Answers                                                                                                 |
+| ---------- | ---- | ------------------------------------------------------------------------------------------------------- |
+| identity   | 3000 | `/auth`, `/users`, `/profiles`, `/roles`, `/permissions`, `/school-units`, `/religions`, `/blood-types` |
 | assessment | 4000 | `/assessment-items`, `/assessment-weights`, `/attendances`, `/dashboards`, `/rapors`, `/student-scores` |
-| academic | 3200 | `/academic-years`, `/classrooms`, `/semesters`, `/subjects`, `/teaching-assignments` |
-| student | 3900 | `/students`, `/student-enrollments` |
+| academic   | 3200 | `/academic-years`, `/classrooms`, `/semesters`, `/subjects`, `/teaching-assignments`                    |
+| student    | 3900 | `/students`, `/student-enrollments`                                                                     |
 
 The last two are reached only through `src/features/lookup/`. A marking
 screen names a class, a term, a subject and a teaching assignment, and after

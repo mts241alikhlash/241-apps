@@ -6,7 +6,8 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const servicesRoot = path.join(root, 'services')
 const contractsRoot = path.join(root, 'contracts')
 const packagesRoot = path.join(root, 'packages')
-const semver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/
+const semver =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/
 const errors = []
 
 async function readJson(file) {
@@ -44,9 +45,13 @@ const packages = (await readdir(packagesRoot, { withFileTypes: true }))
   .sort()
 
 for (const packageDir of packages) {
-  const manifest = await readJson(path.join(packagesRoot, packageDir, 'package.json'))
+  const manifest = await readJson(
+    path.join(packagesRoot, packageDir, 'package.json'),
+  )
   if (!semver.test(manifest.version)) {
-    errors.push(`${manifest.name}: package version is not SemVer: ${manifest.version}`)
+    errors.push(
+      `${manifest.name}: package version is not SemVer: ${manifest.version}`,
+    )
   }
 }
 
@@ -54,5 +59,7 @@ if (errors.length > 0) {
   for (const error of errors) console.error(error)
   process.exitCode = 1
 } else {
-  console.log(`contract versions valid: ${services.length} services, ${packages.length} API clients`)
+  console.log(
+    `contract versions valid: ${services.length} services, ${packages.length} API clients`,
+  )
 }

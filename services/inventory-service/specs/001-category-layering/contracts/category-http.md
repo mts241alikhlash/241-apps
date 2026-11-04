@@ -4,12 +4,12 @@ This contract is preserved, not redesigned.
 
 ## Routes
 
-| Method | Path | Permission | Expected status |
-|---|---|---|---:|
-| `GET` | `/inventory/categories` | `inventory-reference-data.read` | `200` |
-| `POST` | `/inventory/categories` | `inventory-reference-data.create` | `201` |
-| `PATCH` | `/inventory/categories/:id` | `inventory-reference-data.update` | `200` |
-| `DELETE` | `/inventory/categories/:id` | `inventory-reference-data.delete` | `204` |
+| Method   | Path                        | Permission                        | Expected status |
+| -------- | --------------------------- | --------------------------------- | --------------: |
+| `GET`    | `/inventory/categories`     | `inventory-reference-data.read`   |           `200` |
+| `POST`   | `/inventory/categories`     | `inventory-reference-data.create` |           `201` |
+| `PATCH`  | `/inventory/categories/:id` | `inventory-reference-data.update` |           `200` |
+| `DELETE` | `/inventory/categories/:id` | `inventory-reference-data.delete` |           `204` |
 
 ## Query and body behavior
 

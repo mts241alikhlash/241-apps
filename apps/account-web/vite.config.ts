@@ -8,7 +8,6 @@ import {
   UNROUTED_PREFIXES,
 } from './api-routes.config.ts'
 
-
 const IDENTITY_URL = process.env.IDENTITY_SERVICE_URL ?? 'http://localhost:3000'
 
 const SERVICE_URL = {

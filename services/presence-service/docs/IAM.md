@@ -19,13 +19,13 @@ against the earlier design.
 
 # Who owns what
 
-| Piece | Owner | What every other service has |
-|---|---|---|
-| `POST /auth/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password` | identity-service | Nothing — no controller |
-| Token verification (`GET` on every authenticated route) | Both | `JwtStrategy` + `ValidateTokenUseCase` here verify the signature and check the session is live |
-| `GET/POST/PATCH/DELETE /users` | identity-service | Nothing — this repo has neither `teacher` nor `student` since the 2026-09-03 extraction; `hr-service`/`student-service` provision the account by calling identity-service's `POST /accounts` over HTTP, not by writing the table |
-| Role & permission CRUD, the permission-catalog sync | identity-service | `PermissionGuard` only — reads, never writes |
-| `auth_sessions`, `users`, `user_roles`, `roles`, `role_permissions`, `permissions` tables | identity-service's database | Nothing. Every service has its own database as of 2026-09-09, and no service reads identity's tables through Prisma any more — every answer arrives over HTTP through `src/platform/identity/` |
+| Piece                                                                                     | Owner                       | What every other service has                                                                                                                                                                                                     |
+| ----------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /auth/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password`          | identity-service            | Nothing — no controller                                                                                                                                                                                                          |
+| Token verification (`GET` on every authenticated route)                                   | Both                        | `JwtStrategy` + `ValidateTokenUseCase` here verify the signature and check the session is live                                                                                                                                   |
+| `GET/POST/PATCH/DELETE /users`                                                            | identity-service            | Nothing — this repo has neither `teacher` nor `student` since the 2026-09-03 extraction; `hr-service`/`student-service` provision the account by calling identity-service's `POST /accounts` over HTTP, not by writing the table |
+| Role & permission CRUD, the permission-catalog sync                                       | identity-service            | `PermissionGuard` only — reads, never writes                                                                                                                                                                                     |
+| `auth_sessions`, `users`, `user_roles`, `roles`, `role_permissions`, `permissions` tables | identity-service's database | Nothing. Every service has its own database as of 2026-09-09, and no service reads identity's tables through Prisma any more — every answer arrives over HTTP through `src/platform/identity/`                                   |
 
 If you are in identity-service reading this, the left column is yours in full.
 If you are anywhere else, the right column is all you get, and you get it over
@@ -127,7 +127,7 @@ Profile {
 A profile is read narrowly: `PROFILE_NAME_SELECT`, `PROFILE_DISPLAY_SELECT`
 or `PROFILE_ROSTER_SELECT` from `shared/infrastructure/prisma-selects.ts`, per the
 "Read only the fields the caller shows" rule in `NESTJS-RULES.md`. Reaching
-it *through* `User` needs the matching `USER_*_SELECT` — `User` owns
+it _through_ `User` needs the matching `USER_*_SELECT` — `User` owns
 `passwordHash`, and a bare `include` pulls every scalar column on the way to
 the relation.
 
@@ -205,7 +205,7 @@ else — `single-role-bypass.spec.ts` sweeps the codebase for a second one.
 
 `ADMIN` used to bypass too, with a growing exemption list carved out
 per-area (ADR-0006, ADR-0008: `portal-`, `payroll-` prefixes). That shape
-failed silently — a new area needing separation had to be *remembered* into
+failed silently — a new area needing separation had to be _remembered_ into
 the list, and forgetting it meant ADMIN passed anyway, before any grant was
 even read. `ADMIN` is now an ordinary role: whatever its grants say, and
 nothing more. If you are about to add a role-name check outside

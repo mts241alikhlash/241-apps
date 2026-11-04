@@ -3,9 +3,17 @@ import type { SliderRootEmits, SliderRootProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useForwardPropsEmits } from 'reka-ui'
+import {
+  SliderRange,
+  SliderRoot,
+  SliderThumb,
+  SliderTrack,
+  useForwardPropsEmits,
+} from 'reka-ui'
 
-const props = defineProps<SliderRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SliderRootProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<SliderRootEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')
@@ -18,10 +26,12 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     v-slot="{ modelValue }"
     data-slot="slider"
     :data-vertical="props.orientation === 'vertical' ? '' : undefined"
-    :class="cn(
-      'data-[orientation=vertical]:min-h-40 relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col',
-      props.class,
-    )"
+    :class="
+      cn(
+        'data-[orientation=vertical]:min-h-40 relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col',
+        props.class,
+      )
+    "
     v-bind="forwarded"
   >
     <SliderTrack

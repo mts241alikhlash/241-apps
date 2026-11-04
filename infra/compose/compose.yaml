@@ -4,15 +4,15 @@ x-logging: &logging
   driver: json-file
   options:
     max-size: 10m
-    max-file: "3"
+    max-file: '3'
 
 x-web-defaults: &web-defaults
   restart: unless-stopped
   logging: *logging
   expose:
-    - "8080"
+    - '8080'
   healthcheck:
-    test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
+    test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8080/']
     interval: 15s
     timeout: 5s
     retries: 5
@@ -25,16 +25,16 @@ x-service-defaults: &service-defaults
   logging: *logging
   mem_limit: 320m
   environment:
-    TRUST_PROXY: "${TRUST_PROXY:-1}"
-    NODE_OPTIONS: "--max-old-space-size=256"
+    TRUST_PROXY: '${TRUST_PROXY:-1}'
+    NODE_OPTIONS: '--max-old-space-size=256'
   networks:
     - platform-net
 
 x-migrate-defaults: &migrate-defaults
-  restart: "no"
+  restart: 'no'
   logging: *logging
-  entrypoint: ["./node_modules/.bin/prisma"]
-  command: ["migrate", "deploy"]
+  entrypoint: ['./node_modules/.bin/prisma']
+  command: ['migrate', 'deploy']
   networks:
     - platform-net
 
@@ -44,8 +44,8 @@ services:
     image: ghcr.io/mts241alikhlash/gateway@sha256:c0dfed9bed08b5b6d47da8618c07eca321e54845a6e795f18a4477f35eaefe7c
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     depends_on:
       academic-web:
         condition: service_healthy
@@ -120,7 +120,6 @@ services:
     <<: *web-defaults
     image: ghcr.io/mts241alikhlash/portal-web@sha256:a3944514b1ea25fd5cdd758092dc125d28c0449946e1c91ff1861e7ceb326215
 
-
   exam-web:
     <<: *web-defaults
     image: ghcr.io/mts241alikhlash/exam-web@sha256:d0801989562d6c65a8b4a721a53de6dd65ec738e5539e8b0a22aa6b3b8b51178
@@ -131,9 +130,9 @@ services:
       - path: env/identity-service.env
         required: false
     expose:
-      - "3000"
+      - '3000'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -146,9 +145,9 @@ services:
       - path: env/academic-service.env
         required: false
     expose:
-      - "3200"
+      - '3200'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3200/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3200/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -161,9 +160,9 @@ services:
       - path: env/inventory-service.env
         required: false
     expose:
-      - "3300"
+      - '3300'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3300/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3300/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -176,9 +175,9 @@ services:
       - path: env/presence-service.env
         required: false
     expose:
-      - "3400"
+      - '3400'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3400/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3400/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -191,9 +190,9 @@ services:
       - path: env/portal-service.env
         required: false
     expose:
-      - "3600"
+      - '3600'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3600/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3600/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -206,9 +205,9 @@ services:
       - path: env/admission-service.env
         required: false
     expose:
-      - "3700"
+      - '3700'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3700/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3700/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -221,9 +220,9 @@ services:
       - path: env/hr-service.env
         required: false
     expose:
-      - "3800"
+      - '3800'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3800/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3800/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -236,9 +235,9 @@ services:
       - path: env/student-service.env
         required: false
     expose:
-      - "3900"
+      - '3900'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3900/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3900/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -251,9 +250,9 @@ services:
       - path: env/assessment-service.env
         required: false
     expose:
-      - "4000"
+      - '4000'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4000/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4000/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -266,9 +265,9 @@ services:
       - path: env/exam-service.env
         required: false
     expose:
-      - "4100"
+      - '4100'
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4100/health"]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4100/health']
       interval: 15s
       timeout: 5s
       retries: 5
@@ -277,7 +276,7 @@ services:
   identity-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/identity-service@sha256:d2256d7b1142b19bf2088afc75acccbc9740acd223934cd3131289c357774e2a
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/identity-service.env
         required: false
@@ -285,7 +284,7 @@ services:
   academic-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/academic-service@sha256:90640fa607abbd90108d448a2419f8d13e18310198721d3581d708fdbd7bd433
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/academic-service.env
         required: false
@@ -293,7 +292,7 @@ services:
   inventory-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/inventory-service@sha256:f166960ffd64e377ee87f759600d681e8dfe7c6f6d5940f61ad83e6718237560
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/inventory-service.env
         required: false
@@ -301,7 +300,7 @@ services:
   presence-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/presence-service@sha256:e1ddfa564d87d1a42d48a382aad67277214ef61687d76eb714952410da925456
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/presence-service.env
         required: false
@@ -309,7 +308,7 @@ services:
   portal-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/portal-service@sha256:5a4845a446cc59c76c9e8d5f032b99dd2df29872c23b1c880bc8fc2b30b8ca1e
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/portal-service.env
         required: false
@@ -317,7 +316,7 @@ services:
   admission-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/admission-service@sha256:c63ac220ca1bddc36015d9a5d7884a0a38f9457e4604da484eb29ea829eb1176
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/admission-service.env
         required: false
@@ -325,7 +324,7 @@ services:
   hr-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/hr-service@sha256:9d7769e290635c61f206cfee2fd7e2614d7e1646ad8a9e031361ec391fa5b032
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/hr-service.env
         required: false
@@ -333,7 +332,7 @@ services:
   student-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/student-service@sha256:62947f497c8f4852e6a549126ec803353c4cba7c14b1f28d7987cad13381da1b
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/student-service.env
         required: false
@@ -341,7 +340,7 @@ services:
   assessment-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/assessment-service@sha256:a736a7ed7b3a86d0f80acd86edbaba9aa139f29c763ab0662fb5baf2de6a195f
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/assessment-service.env
         required: false
@@ -349,13 +348,13 @@ services:
   exam-service-migrate:
     <<: *migrate-defaults
     image: ghcr.io/mts241alikhlash/exam-service@sha256:bfd9c939e8c118549bad643d06265d626f47e1ca4e862a91526ea981237c74b5
-    profiles: ["migrate"]
+    profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
         required: false
 
   postgres:
-    profiles: ["storage"]
+    profiles: ['storage']
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -363,27 +362,27 @@ services:
       POSTGRES_USER: mts241
       POSTGRES_PASSWORD: mts241
     ports:
-      - "5433:5432"
+      - '5433:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ../gateway-source/postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro,z
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mts241 -d identity"]
+      test: ['CMD-SHELL', 'pg_isready -U mts241 -d identity']
       interval: 5s
       timeout: 5s
       retries: 10
 
   s3:
-    profiles: ["storage"]
+    profiles: ['storage']
     image: chrislusf/seaweedfs
     restart: unless-stopped
     command: server -s3 -dir=/data
     ports:
-      - "9000:8333"
+      - '9000:8333'
     volumes:
       - s3-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "nc -z 127.0.0.1 8333"]
+      test: ['CMD-SHELL', 'nc -z 127.0.0.1 8333']
       interval: 5s
       timeout: 5s
       retries: 10

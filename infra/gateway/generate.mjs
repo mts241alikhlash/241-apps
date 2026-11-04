@@ -11,7 +11,8 @@ const HOST_RE = /^(?:_|[A-Za-z0-9](?:[A-Za-z0-9_.-]*[A-Za-z0-9])?)$/
 const ROOT_RE = /^\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+$/
 const VERSION_RE = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/
 const CHECKSUM_RE = /^[a-f0-9]{64}$/
-const PINNED_IMAGE_RE = /^ghcr\.io\/[^/]+\/[A-Za-z0-9._/-]+@sha256:[a-f0-9]{64}$/
+const PINNED_IMAGE_RE =
+  /^ghcr\.io\/[^/]+\/[A-Za-z0-9._/-]+@sha256:[a-f0-9]{64}$/
 const PLACEHOLDER_IMAGE_RE =
   /^ghcr\.io\/[^/]+\/[A-Za-z0-9._/-]+@sha256:REPLACE_BEFORE_DEPLOYMENT$/
 const compare = (left, right) => (left < right ? -1 : left > right ? 1 : 0)
@@ -39,14 +40,16 @@ function isRecord(value) {
 
 function assertOnlyKeys(value, allowed, label) {
   for (const key of Object.keys(value)) {
-    if (!allowed.has(key)) throw new Error(`${label} has unknown property "${key}"`)
+    if (!allowed.has(key))
+      throw new Error(`${label} has unknown property "${key}"`)
   }
 }
 
 function assertUnique(values, label) {
   const seen = new Set()
   for (const value of values) {
-    if (seen.has(value)) throw new Error(`${label} contains duplicate item "${value}"`)
+    if (seen.has(value))
+      throw new Error(`${label} contains duplicate item "${value}"`)
     seen.add(value)
   }
 }
@@ -76,12 +79,11 @@ function assertChecksum(value, label) {
 }
 
 function assertImage(value, label, requirePinned) {
-  if (typeof value !== 'string') throw new Error(`${label} must be an image reference`)
+  if (typeof value !== 'string')
+    throw new Error(`${label} must be an image reference`)
   if (PINNED_IMAGE_RE.test(value)) return
   if (!requirePinned && PLACEHOLDER_IMAGE_RE.test(value)) return
-  throw new Error(
-    `${label} must be pinned by sha256 digest before deployment`,
-  )
+  throw new Error(`${label} must be pinned by sha256 digest before deployment`)
 }
 
 function assertMatching(actual, expected, label) {
@@ -146,17 +148,26 @@ export function validateManifest(manifest, schema = null) {
     throw new Error('healthRoutes must be an array')
   }
   for (const [index, route] of manifest.healthRoutes.entries()) {
-    if (!isRecord(route)) throw new Error(`healthRoutes[${index}] must be an object`)
+    if (!isRecord(route))
+      throw new Error(`healthRoutes[${index}] must be an object`)
   }
   assertUnique(
     manifest.healthRoutes.map((route) => route.path),
     'healthRoutes paths',
   )
   for (const [index, route] of manifest.healthRoutes.entries()) {
-    if (!isRecord(route)) throw new Error(`healthRoutes[${index}] must be an object`)
-    assertOnlyKeys(route, new Set(['path', 'service']), `healthRoutes[${index}]`)
+    if (!isRecord(route))
+      throw new Error(`healthRoutes[${index}] must be an object`)
+    assertOnlyKeys(
+      route,
+      new Set(['path', 'service']),
+      `healthRoutes[${index}]`,
+    )
     assertPrefix(route.path, `healthRoutes[${index}].path`)
-    if (typeof route.service !== 'string' || !/^[a-z][a-z0-9-]*$/.test(route.service)) {
+    if (
+      typeof route.service !== 'string' ||
+      !/^[a-z][a-z0-9-]*$/.test(route.service)
+    ) {
       throw new Error(`healthRoutes[${index}].service must be a service name`)
     }
   }
@@ -171,7 +182,8 @@ export function validateUpstreams(upstreams) {
     if (!/^[a-z][a-z0-9-]*$/.test(service)) {
       throw new Error(`invalid upstream service name "${service}"`)
     }
-    if (!isRecord(upstream)) throw new Error(`upstreams.${service} must be an object`)
+    if (!isRecord(upstream))
+      throw new Error(`upstreams.${service} must be an object`)
     assertOnlyKeys(
       upstream,
       new Set(['host', 'port', 'healthPath']),
@@ -183,7 +195,11 @@ export function validateUpstreams(upstreams) {
     ) {
       throw new Error(`upstreams.${service}.host must be a DNS service name`)
     }
-    if (!Number.isInteger(upstream.port) || upstream.port < 1 || upstream.port > 65535) {
+    if (
+      !Number.isInteger(upstream.port) ||
+      upstream.port < 1 ||
+      upstream.port > 65535
+    ) {
       throw new Error(`upstreams.${service}.port must be a valid TCP port`)
     }
     assertPrefix(upstream.healthPath, `upstreams.${service}.healthPath`)
@@ -194,11 +210,7 @@ export function validateUpstreams(upstreams) {
 
 export function validateDeploymentLock(
   lock,
-  {
-    expectedApps = null,
-    upstreams = null,
-    requirePinnedImages = false,
-  } = {},
+  { expectedApps = null, upstreams = null, requirePinnedImages = false } = {},
 ) {
   if (!isRecord(lock)) throw new Error('deployment lock must be a JSON object')
   assertOnlyKeys(
@@ -206,10 +218,12 @@ export function validateDeploymentLock(
     new Set(['schemaVersion', 'gatewayImage', 'apps', 'services']),
     'deployment lock',
   )
-  if (lock.schemaVersion !== 1) throw new Error('unsupported deployment lock schema')
+  if (lock.schemaVersion !== 1)
+    throw new Error('unsupported deployment lock schema')
   assertImage(lock.gatewayImage, 'gateway image', requirePinnedImages)
 
-  if (!isRecord(lock.apps)) throw new Error('deployment lock apps must be an object')
+  if (!isRecord(lock.apps))
+    throw new Error('deployment lock apps must be an object')
   const appNames = Object.keys(lock.apps).sort()
   if (expectedApps) {
     const present = new Set(appNames)
@@ -226,7 +240,8 @@ export function validateDeploymentLock(
   }
   for (const app of appNames) {
     const entry = lock.apps[app]
-    if (!isRecord(entry)) throw new Error(`deployment apps.${app} must be an object`)
+    if (!isRecord(entry))
+      throw new Error(`deployment apps.${app} must be an object`)
     assertOnlyKeys(
       entry,
       new Set([
@@ -246,15 +261,22 @@ export function validateDeploymentLock(
       throw new Error(`deployment apps.${app}.root must be an absolute path`)
     }
     assertVersion(entry.webVersion, `deployment apps.${app}.webVersion`)
-    assertImage(entry.webImage, `deployment apps.${app}.webImage`, requirePinnedImages)
+    assertImage(
+      entry.webImage,
+      `deployment apps.${app}.webImage`,
+      requirePinnedImages,
+    )
     assertVersion(entry.routesVersion, `deployment apps.${app}.routesVersion`)
     assertChecksum(entry.routesSha256, `deployment apps.${app}.routesSha256`)
     if (entry.webVersion !== entry.routesVersion) {
-      throw new Error(`deployment apps.${app} web and route versions must match`)
+      throw new Error(
+        `deployment apps.${app} web and route versions must match`,
+      )
     }
   }
 
-  if (!isRecord(lock.services)) throw new Error('deployment lock services must be an object')
+  if (!isRecord(lock.services))
+    throw new Error('deployment lock services must be an object')
   const serviceNames = Object.keys(lock.services).sort()
   if (upstreams) {
     const expected = Object.keys(upstreams).sort()
@@ -267,14 +289,19 @@ export function validateDeploymentLock(
       throw new Error(`invalid deployment service name "${service}"`)
     }
     const entry = lock.services[service]
-    if (!isRecord(entry)) throw new Error(`deployment services.${service} must be an object`)
+    if (!isRecord(entry))
+      throw new Error(`deployment services.${service} must be an object`)
     assertOnlyKeys(
       entry,
       new Set(['version', 'image', 'upstream', 'healthPath']),
       `deployment services.${service}`,
     )
     assertVersion(entry.version, `deployment services.${service}.version`)
-    assertImage(entry.image, `deployment services.${service}.image`, requirePinnedImages)
+    assertImage(
+      entry.image,
+      `deployment services.${service}.image`,
+      requirePinnedImages,
+    )
     const upstreamParts =
       typeof entry.upstream === 'string' ? entry.upstream.split(':') : []
     if (
@@ -284,7 +311,9 @@ export function validateDeploymentLock(
       Number(upstreamParts[1]) < 1 ||
       Number(upstreamParts[1]) > 65535
     ) {
-      throw new Error(`deployment services.${service}.upstream must be host:port`)
+      throw new Error(
+        `deployment services.${service}.upstream must be host:port`,
+      )
     }
     assertPrefix(entry.healthPath, `deployment services.${service}.healthPath`)
     if (upstreams?.[service]) {
@@ -308,14 +337,15 @@ export function validateDeploymentLock(
 function prefixesOverlap(left, right) {
   return (
     left === right ||
-    (left.startsWith(`${right}/`)) ||
-    (right.startsWith(`${left}/`))
+    left.startsWith(`${right}/`) ||
+    right.startsWith(`${left}/`)
   )
 }
 
 function assertNoOverlaps(app, routes) {
   const ordered = [...routes].sort(
-    (left, right) => compare(left.path, right.path) || compare(left.kind, right.kind),
+    (left, right) =>
+      compare(left.path, right.path) || compare(left.kind, right.kind),
   )
   for (let index = 0; index < ordered.length; index += 1) {
     for (let next = index + 1; next < ordered.length; next += 1) {
@@ -347,18 +377,22 @@ export function validateModel({
 
   for (const manifest of manifests) {
     validateManifest(manifest)
-    if (appNames.has(manifest.app)) throw new Error(`duplicate manifest for "${manifest.app}"`)
+    if (appNames.has(manifest.app))
+      throw new Error(`duplicate manifest for "${manifest.app}"`)
     appNames.add(manifest.app)
 
     const lockedDeployment = lock?.apps?.[manifest.app]
-    const deployment = deployments?.[manifest.app] ??
+    const deployment =
+      deployments?.[manifest.app] ??
       (lockedDeployment && {
         serverName: lockedDeployment.host,
         sslServerName: lockedDeployment.sslHost,
         root: lockedDeployment.root,
       })
     if (deployment && serverNames.has(deployment.serverName)) {
-      throw new Error(`duplicate gateway server name "${deployment.serverName}"`)
+      throw new Error(
+        `duplicate gateway server name "${deployment.serverName}"`,
+      )
     }
     if (deployment) serverNames.add(deployment.serverName)
     if (deployment && sslServerNames.has(deployment.sslServerName)) {
@@ -366,24 +400,40 @@ export function validateModel({
     }
     if (deployment) {
       assertHost(deployment.serverName, `${manifest.app}.deployment.serverName`)
-      assertHost(deployment.sslServerName, `${manifest.app}.deployment.sslServerName`)
-      if (typeof deployment.root !== 'string' || !ROOT_RE.test(deployment.root)) {
-        throw new Error(`${manifest.app}.deployment.root must be an absolute path`)
+      assertHost(
+        deployment.sslServerName,
+        `${manifest.app}.deployment.sslServerName`,
+      )
+      if (
+        typeof deployment.root !== 'string' ||
+        !ROOT_RE.test(deployment.root)
+      ) {
+        throw new Error(
+          `${manifest.app}.deployment.root must be an absolute path`,
+        )
       }
       sslServerNames.add(deployment.sslServerName)
     }
 
     const routes = []
-    for (const [service, prefixes] of Object.entries(manifest.servicePrefixes)) {
+    for (const [service, prefixes] of Object.entries(
+      manifest.servicePrefixes,
+    )) {
       if (!upstreams[service]) {
-        throw new Error(`${manifest.app}: no upstream declared for "${service}"`)
+        throw new Error(
+          `${manifest.app}: no upstream declared for "${service}"`,
+        )
       }
       routes.push(...prefixes.map((path) => ({ path, kind: 'routed' })))
     }
-    routes.push(...manifest.unroutedPrefixes.map((path) => ({ path, kind: 'unrouted' })))
+    routes.push(
+      ...manifest.unroutedPrefixes.map((path) => ({ path, kind: 'unrouted' })),
+    )
     for (const route of manifest.healthRoutes) {
       if (!upstreams[route.service]) {
-        throw new Error(`${manifest.app}: no upstream declared for "${route.service}"`)
+        throw new Error(
+          `${manifest.app}: no upstream declared for "${route.service}"`,
+        )
       }
       routes.push({ path: route.path, kind: 'health' })
     }
@@ -394,7 +444,9 @@ export function validateModel({
     for (const artifact of artifacts) {
       const pin = lock.apps?.[artifact.manifest.app]
       if (!pin || pin.routesVersion !== artifact.manifest.webVersion) {
-        throw new Error(`${artifact.manifest.app}: deployment lock manifest version mismatch`)
+        throw new Error(
+          `${artifact.manifest.app}: deployment lock manifest version mismatch`,
+        )
       }
       if (pin.routesSha256 !== artifact.checksum) {
         throw new Error(`${artifact.manifest.app}: manifest checksum mismatch`)
@@ -428,12 +480,20 @@ export async function loadInputs({
   requirePinnedImages = true,
 } = {}) {
   const root = path.resolve(rootDir)
-  const schemaFile = path.join(root, 'gateway', 'schema', 'routing-manifest.schema.json')
+  const schemaFile = path.join(
+    root,
+    'gateway',
+    'schema',
+    'routing-manifest.schema.json',
+  )
   const upstreamFile = path.join(root, 'upstreams', 'services.json')
   const lockFile = path.join(root, 'deployment', 'lock.json')
   const manifestDir = path.join(root, 'gateway', 'manifests')
 
-  const { value: schema } = await readJson(schemaFile, 'routing manifest schema')
+  const { value: schema } = await readJson(
+    schemaFile,
+    'routing manifest schema',
+  )
   const { value: upstreams } = await readJson(upstreamFile, 'upstream registry')
   validateUpstreams(upstreams)
   const { value: lock } = await readJson(lockFile, 'deployment lock')
@@ -447,7 +507,9 @@ export async function loadInputs({
   try {
     files = await readdir(manifestDir, { withFileTypes: true })
   } catch (error) {
-    throw new Error(`routing manifest directory cannot be read: ${error.message}`)
+    throw new Error(
+      `routing manifest directory cannot be read: ${error.message}`,
+    )
   }
   const manifestFiles = files
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
@@ -459,7 +521,10 @@ export async function loadInputs({
   const versions = new Set()
   for (const fileName of manifestFiles) {
     const file = path.join(manifestDir, fileName)
-    const { value: manifest, raw } = await readJson(file, `routing manifest ${fileName}`)
+    const { value: manifest, raw } = await readJson(
+      file,
+      `routing manifest ${fileName}`,
+    )
     validateManifest(manifest, schema)
     validateModel({ manifests: [manifest], upstreams, lock })
     const key = `${manifest.app}@${manifest.webVersion}`
@@ -472,7 +537,8 @@ export async function loadInputs({
   const selected = apps.map((app) => {
     const pin = lock.apps[app]
     const artifact = artifacts.find(
-      ({ manifest }) => manifest.app === app && manifest.webVersion === pin.routesVersion,
+      ({ manifest }) =>
+        manifest.app === app && manifest.webVersion === pin.routesVersion,
     )
     if (!artifact) throw new Error(`${app}: locked routing manifest is missing`)
     if (artifact.checksum !== pin.routesSha256) {
@@ -492,7 +558,13 @@ export async function loadInputs({
       },
     ]),
   )
-  validateModel({ manifests, upstreams, lock, artifacts: selected, deployments })
+  validateModel({
+    manifests,
+    upstreams,
+    lock,
+    artifacts: selected,
+    deployments,
+  })
   return {
     schema,
     upstreams,
@@ -560,7 +632,9 @@ function securityHeaders(ssl, pad) {
     `add_header X-Content-Type-Options "nosniff" always;`,
     `add_header Content-Security-Policy "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" always;`,
     ...(ssl
-      ? [`add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;`]
+      ? [
+          `add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;`,
+        ]
       : []),
   ]
     .map((line) => `${pad}${line}`)
@@ -635,7 +709,9 @@ ${securityHeaders(false, '    ')}`
   const routed = Object.entries(app.servicePrefixes)
     .sort(([left], [right]) => compare(left, right))
     .filter(([, prefixes]) => prefixes.length > 0)
-    .map(([service, prefixes]) => proxyBlock({ service, prefixes }, upstreams, ssl))
+    .map(([service, prefixes]) =>
+      proxyBlock({ service, prefixes }, upstreams, ssl),
+    )
     .join('\n\n')
 
   const health = [...app.healthRoutes]
@@ -674,7 +750,9 @@ export function renderConfig(model, { ssl }) {
 }`,
     )
     .join('\n\n')
-  const upstreams = [serviceUpstreams, webUpstreams].filter(Boolean).join('\n\n')
+  const upstreams = [serviceUpstreams, webUpstreams]
+    .filter(Boolean)
+    .join('\n\n')
 
   return `resolver 127.0.0.11 valid=10s ipv6=off;
 server_tokens off;
@@ -730,8 +808,7 @@ export async function run({ check = false } = {}) {
     let actual = null
     try {
       actual = await readFile(target.file, 'utf8')
-    } catch {
-    }
+    } catch {}
     if (actual === expected) {
       console.log(`ok      ${name}`)
     } else {
@@ -745,7 +822,10 @@ export async function run({ check = false } = {}) {
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
   try {
     await run(parseArgs(process.argv.slice(2)))
   } catch (error) {

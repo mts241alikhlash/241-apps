@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { MenubarSeparator, useForwardProps } from 'reka-ui'
 
-const props = defineProps<MenubarSeparatorProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  MenubarSeparatorProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 

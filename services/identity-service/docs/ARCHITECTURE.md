@@ -12,7 +12,7 @@ They are independent: a module can be perfectly layered and still wrongly
 coupled, and the reverse.
 
 `NESTJS-RULES.md` holds the coding rules (controllers, DTOs, validation,
-naming). Its two *structure* sections — `DOMAIN STRUCTURE` and
+naming). Its two _structure_ sections — `DOMAIN STRUCTURE` and
 `MODULE STRUCTURE` — are superseded by Part 1 here. `IAM.md` describes the
 authorization model this service implements; where it and this document
 disagree about **behaviour**, `IAM.md` wins and this file is wrong.
@@ -31,13 +31,13 @@ a folder move — `school-unit`/`reference-data/school-unit-type`, which
 arrived pre-shaped from academic-service (see CLAUDE.md's "The school-unit
 exception") but still owed their five use cases taking a DTO directly:
 
-| Signal | Count |
-| --- | --- |
-| Modules using the target `application/` layer | **7 of 7** |
+| Signal                                                        | Count       |
+| ------------------------------------------------------------- | ----------- |
+| Modules using the target `application/` layer                 | **7 of 7**  |
 | Use cases importing a `*.dto.js` (application → presentation) | **0 of 46** |
-| Files touching Prisma outside `infrastructure/` or `core/` | 1 |
-| Controllers touching Prisma | 0 |
-| `.spec.ts` files | 35 |
+| Files touching Prisma outside `infrastructure/` or `core/`    | 1           |
+| Controllers touching Prisma                                   | 0           |
+| `.spec.ts` files                                              | 35          |
 
 Part 1 is done. `session` is the one exception to owning a `domain/`
 folder, and deliberately: it owns no table of its own, and every use case it
@@ -53,7 +53,7 @@ migrated — sits at 9 of 219.
 
 Every module converges on this shape. `user` converted first, and is real —
 copy from it, not from this tree. `constants/` and `application/services/`
-are shown because a module *may* have them (see `<module>.module.ts` /
+are shown because a module _may_ have them (see `<module>.module.ts` /
 `domain/policies/` elsewhere in this doc for where a self-contained rule
 goes); `user` itself needed neither.
 
@@ -147,7 +147,7 @@ self-contained rule.
 ### One name, two entities — resolved on conversion
 
 `user/domain/entities/user.entity.ts` declared `class UserEntity`, and
-`user/domain/interfaces/user-repository.interface.ts` imported a *different*
+`user/domain/interfaces/user-repository.interface.ts` imported a _different_
 `UserEntity` from `shared/domain/entities/user.entity.js`, then re-exported
 `UserPublic` from the first. Two types, one name, in adjacent files.
 
@@ -163,7 +163,7 @@ coming from `shared/`, unchanged, because `auth` still depends on it and
 module's conversion — a decision to make when `auth` converts, not before.
 
 `UserPublic` had the same shape of bug one level down: `prisma-user.includes
-.ts` declared its *own* `UserPublic`, derived from `Prisma.UserGetPayload`,
+.ts` declared its _own_ `UserPublic`, derived from `Prisma.UserGetPayload`,
 that included `userRoles`/`profile` and omitted `lastLoginAt` — a shape that
 never matched the domain-declared one and was never checked against it,
 because nothing imported it. `PUBLIC_USER_SELECT` selected `userRoles` and
@@ -174,15 +174,15 @@ that were pure over-fetch), and the derived type is deleted along with it.
 
 ## Three type boundaries
 
-| Type | Lives in | Carries |
-| --- | --- | --- |
-| `XxxDto` | `presentation/http/dto/` | `class-validator` + `@ApiProperty` |
-| `XxxInput` | `application/use-cases/<name>/` | nothing — a plain interface |
-| `XxxRepositoryInput` | `domain/repositories/` | nothing — a plain interface |
+| Type                 | Lives in                        | Carries                            |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| `XxxDto`             | `presentation/http/dto/`        | `class-validator` + `@ApiProperty` |
+| `XxxInput`           | `application/use-cases/<name>/` | nothing — a plain interface        |
+| `XxxRepositoryInput` | `domain/repositories/`          | nothing — a plain interface        |
 
 They may be structurally identical. TypeScript is structural, so a controller
 passes a Dto straight into a use case expecting an Input. **Do not write a
-mapper for it.** What you must not do is let the use case *name* the Dto.
+mapper for it.** What you must not do is let the use case _name_ the Dto.
 
 Create `.input.ts` only when the use case takes structured input. One taking
 `(id: string)` or nothing needs no Input file.
@@ -211,15 +211,15 @@ NodeNext ESM: **every relative import ends in `.js`** though the source is
 `.ts`. A wrong `../` count is the most common conversion error, and
 `pnpm run typecheck` catches every one.
 
-| File location | → `src/` | → module root |
-| --- | --- | --- |
-| `<module>.module.ts`, `index.ts` | `../` | `./` |
-| `domain/{entities,repositories,policies}/x.ts` | `../../../` | `../../` |
-| `application/use-cases/<name>/x.ts` | `../../../../` | `../../../` |
-| `application/services/x.ts` | `../../../` | `../../` |
-| `infrastructure/persistence/prisma/x.ts` | `../../../../` | `../../../` |
-| `presentation/http/x.controller.ts` | `../../../` | `../../` |
-| `presentation/http/dto/request/x.dto.ts` | `../../../../../` | `../../../../` |
+| File location                                  | → `src/`          | → module root  |
+| ---------------------------------------------- | ----------------- | -------------- |
+| `<module>.module.ts`, `index.ts`               | `../`             | `./`           |
+| `domain/{entities,repositories,policies}/x.ts` | `../../../`       | `../../`       |
+| `application/use-cases/<name>/x.ts`            | `../../../../`    | `../../../`    |
+| `application/services/x.ts`                    | `../../../`       | `../../`       |
+| `infrastructure/persistence/prisma/x.ts`       | `../../../../`    | `../../../`    |
+| `presentation/http/x.controller.ts`            | `../../../`       | `../../`       |
+| `presentation/http/dto/request/x.dto.ts`       | `../../../../../` | `../../../../` |
 
 Depths assume a module directly under `src/`. `access-control/permission`
 and `access-control/role` sit one level deeper — add one `../` to every entry.
@@ -237,14 +237,14 @@ is exactly the kind of thing that looks authoritative and is wrong.
 
 One module per commit. Old layout → new:
 
-| Old | New |
-| --- | --- |
-| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts` |
-| `use-cases/<name>.use-case.ts` | `application/use-cases/<name>/<name>.use-case.ts` |
-| `services/<name>.service.ts` | `application/services/<name>.service.ts` |
-| `infrastructure/persistence/*.ts` | `infrastructure/persistence/prisma/*.ts` |
-| `presentation/<name>.controller.ts` | `presentation/http/<name>.controller.ts` |
-| `dto/request/*.ts`, `dto/response/*.ts` | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
+| Old                                                | New                                                       |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts`                |
+| `use-cases/<name>.use-case.ts`                     | `application/use-cases/<name>/<name>.use-case.ts`         |
+| `services/<name>.service.ts`                       | `application/services/<name>.service.ts`                  |
+| `infrastructure/persistence/*.ts`                  | `infrastructure/persistence/prisma/*.ts`                  |
+| `presentation/<name>.controller.ts`                | `presentation/http/<name>.controller.ts`                  |
+| `dto/request/*.ts`, `dto/response/*.ts`            | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
 
 `constants/` stays at the module root. `domain/entities/` does not move.
 `auth/guards/`, `auth/strategies/`, `auth/types/` do not move.
@@ -498,12 +498,12 @@ token this one issued, and `inventory-service` asks it, over HTTP, who a
 caller is.
 
 Every module under `src/` is owned outright. There is no `platform/` directory
-here, and there should never be one: this *is* the platform.
+here, and there should never be one: this _is_ the platform.
 
 ## What it answers for others
 
-| Endpoint | Caller | Contract |
-| --- | --- | --- |
+| Endpoint                | Caller                                      | Contract                                                                                                                             |
+| ----------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `POST /auth/introspect` | `inventory-service` (`HttpIdentityAdapter`) | token → `{ userId, identifier, sessionId, roles, permissions }`, or `null` for a token that is bad, expired, revoked, or deactivated |
 
 That response shape is a **published contract**, not an internal type. Changing

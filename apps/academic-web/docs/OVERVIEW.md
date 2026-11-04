@@ -26,12 +26,12 @@ shaped the way they are.
 
 Four modules were added:
 
-| Folder | Screens | Served by |
-|---|---|---|
-| `features/academic/student/` | `/student`, `/student/create`, `/student/account` | student-service |
-| `features/academic/parent/` | `/data/parent` | student-service |
-| `features/academic/student-parent/` | `/data/parent-relation` | student-service |
-| `features/academic/student-graduation/` | `/academic/graduation`, `/student/alumni` | student-service |
+| Folder                                  | Screens                                           | Served by       |
+| --------------------------------------- | ------------------------------------------------- | --------------- |
+| `features/academic/student/`            | `/student`, `/student/create`, `/student/account` | student-service |
+| `features/academic/parent/`             | `/data/parent`                                    | student-service |
+| `features/academic/student-parent/`     | `/data/parent-relation`                           | student-service |
+| `features/academic/student-graduation/` | `/academic/graduation`, `/student/alumni`         | student-service |
 
 They came with `shared/import-export`, `shared/import-preview` and
 `shared/multi-step-form`, which the student create wizard and the bulk import

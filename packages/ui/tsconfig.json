@@ -1,29 +1,14 @@
 {
   "extends": "@mts241alikhlash/typescript-config/vue.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
-      "@mts241alikhlash/ui": [
-        "./src/index.ts"
-      ],
-      "@mts241alikhlash/ui/*": [
-        "./src/components/ui/*/index.ts"
-      ],
-      "@mts241alikhlash/ui/utils": [
-        "./src/utils/index.ts"
-      ],
-      "@mts241alikhlash/web-shared": [
-        "../web-shared/src/index.ts"
-      ],
-      "@mts241alikhlash/web-shared/*": [
-        "../web-shared/src/*"
-      ]
+      "@mts241alikhlash/ui": ["./src/index.ts"],
+      "@mts241alikhlash/ui/*": ["./src/components/ui/*/index.ts"],
+      "@mts241alikhlash/ui/utils": ["./src/utils/index.ts"],
+      "@mts241alikhlash/web-shared": ["../web-shared/src/index.ts"],
+      "@mts241alikhlash/web-shared/*": ["../web-shared/src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }

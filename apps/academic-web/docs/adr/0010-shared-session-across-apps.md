@@ -9,13 +9,17 @@ The refresh cookie is set by the **backend**, on the API host:
 ```ts
 // backend/src/platform/auth/presentation/auth.controller.ts
 res.cookie(REFRESH_TOKEN_COOKIE, token, {
-  httpOnly: true, secure: isProduction, sameSite: 'strict', path: '/auth', maxAge,
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: 'strict',
+  path: '/auth',
+  maxAge,
 })
 ```
 
 With no `domain` attribute it is a host-only cookie for the API, and every frontend calls that API with `withCredentials: true`. The session was therefore already shared before this ADR; nothing about the split changed it.
 
-What is per-origin is `localStorage`, which holds a *cache* of the signed-in user. The route guard read that cache (not the token) to decide whether anyone was signed in, so a person with a live session opening a second app was shown a login form while holding a perfectly valid cookie. The bug was in what the guard trusted, not in the session.
+What is per-origin is `localStorage`, which holds a _cache_ of the signed-in user. The route guard read that cache (not the token) to decide whether anyone was signed in, so a person with a live session opening a second app was shown a login form while holding a perfectly valid cookie. The bug was in what the guard trusted, not in the session.
 
 **Decision**: one session for all apps, with two rules that keep it honest.
 
@@ -23,7 +27,7 @@ What is per-origin is `localStorage`, which holds a *cache* of the signed-in use
 
 2. **`GET /auth/me` is the only answer to "who is signed in".** It returns identity, roles, and permissions and nothing else. Both entry points, signing in and restoring a session another app opened, go through `authIdentityService.fetchIdentity()`, so the two cannot disagree about what a user may do.
 
-**Login pages stay per app.** With a shared cookie, per-app login pages *are* single sign-on: whichever app a person authenticates through sets the cookie for all of them, and the others never render their login page. A central login host would add a redirect round-trip, an open-redirect parameter to validate, and a deploy target, to replace something that already works.
+**Login pages stay per app.** With a shared cookie, per-app login pages _are_ single sign-on: whichever app a person authenticates through sets the cookie for all of them, and the others never render their login page. A central login host would add a redirect round-trip, an open-redirect parameter to validate, and a deploy target, to replace something that already works.
 
 ## Why `/auth/me` and not `/profiles/me`
 

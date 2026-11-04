@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { Primitive, useForwardProps } from 'reka-ui'
 
-const props = defineProps<PrimitiveProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  PrimitiveProps & { class?: HTMLAttributes['class'] }
+>()
 const delegatedProps = reactiveOmit(props, 'class')
 const forwardedProps = useForwardProps(delegatedProps)
 </script>

@@ -6,7 +6,9 @@ import { cn } from '@mts241alikhlash/ui/utils'
 import { useForwardPropsEmits } from 'reka-ui'
 import { Collapsible } from '@mts241alikhlash/ui/collapsible'
 
-const props = defineProps<CollapsibleRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  CollapsibleRootProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<CollapsibleRootEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')

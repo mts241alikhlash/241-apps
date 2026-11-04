@@ -5,13 +5,12 @@ import type { HTMLAttributes } from 'vue'
 import { ChevronDownIcon } from '@lucide/vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  NavigationMenuTrigger,
-  useForwardProps,
-} from 'reka-ui'
+import { NavigationMenuTrigger, useForwardProps } from 'reka-ui'
 import { navigationMenuTriggerStyle } from '.'
 
-const props = defineProps<NavigationMenuTriggerProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  NavigationMenuTriggerProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
@@ -25,6 +24,9 @@ const forwardedProps = useForwardProps(delegatedProps)
     :class="cn(navigationMenuTriggerStyle(), 'group', props.class)"
   >
     <slot />
-    <ChevronDownIcon class="relative top-px ml-1 size-3 transition duration-300 group-data-[state=open]/navigation-menu-trigger:rotate-180 group-data-popup-open/navigation-menu-trigger:rotate-180" aria-hidden="true" />
+    <ChevronDownIcon
+      class="relative top-px ml-1 size-3 transition duration-300 group-data-[state=open]/navigation-menu-trigger:rotate-180 group-data-popup-open/navigation-menu-trigger:rotate-180"
+      aria-hidden="true"
+    />
   </NavigationMenuTrigger>
 </template>

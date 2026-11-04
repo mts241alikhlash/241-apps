@@ -8,7 +8,11 @@ import {
   CommandItem,
   CommandList,
 } from '@mts241alikhlash/ui/command'
-import { Popover, PopoverContent, PopoverTrigger } from '@mts241alikhlash/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mts241alikhlash/ui/popover'
 import { cn } from '@mts241alikhlash/web-shared/utils/utils'
 import { Check, ChevronsUpDown } from '@lucide/vue'
 import { computed, ref } from 'vue'
@@ -69,7 +73,9 @@ function onSelect(val: string) {
         "
       >
         <span class="truncate">{{ selectedLabel || placeholder }}</span>
-        <ChevronsUpDown class="ml-2 size-[var(--icon-control,0.875rem)] shrink-0 opacity-50" />
+        <ChevronsUpDown
+          class="ml-2 size-[var(--icon-control,0.875rem)] shrink-0 opacity-50"
+        />
       </Button>
     </PopoverTrigger>
     <PopoverContent

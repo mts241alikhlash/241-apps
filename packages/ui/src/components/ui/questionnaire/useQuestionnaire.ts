@@ -4,19 +4,19 @@ import { createContext } from 'reka-ui'
 export type QuestionnaireItemStatus = 'unanswered' | 'answered' | 'skipped'
 export type QuestionnaireShortcutMode = 'letters' | 'numbers'
 
-export type QuestionnaireInputType
-  = | 'date'
-    | 'datetime-local'
-    | 'email'
-    | 'month'
-    | 'number'
-    | 'password'
-    | 'search'
-    | 'tel'
-    | 'text'
-    | 'time'
-    | 'url'
-    | 'week'
+export type QuestionnaireInputType =
+  | 'date'
+  | 'datetime-local'
+  | 'email'
+  | 'month'
+  | 'number'
+  | 'password'
+  | 'search'
+  | 'tel'
+  | 'text'
+  | 'time'
+  | 'url'
+  | 'week'
 
 export interface QuestionnaireChoiceDefinition {
   disabled?: boolean
@@ -71,7 +71,10 @@ export interface QuestionnaireRootContext {
   first: ComputedRef<boolean>
   goNext: () => void
   goPrevious: () => void
-  itemDefinitionByName: ComputedRef<Map<string, QuestionnaireItemDefinition> | null>
+  itemDefinitionByName: ComputedRef<Map<
+    string,
+    QuestionnaireItemDefinition
+  > | null>
   last: ComputedRef<boolean>
   nativeValidation: ComputedRef<boolean>
   registerItem: (registration: ItemRegistration) => () => void
@@ -89,7 +92,10 @@ export interface QuestionnaireItemContext {
   multiple: ComputedRef<boolean>
   name: ComputedRef<string>
   registerAnswerControl: (registration: AnswerControlRegistration) => () => void
-  registerAnswerSelection: (answerId: string, defaultSelected: boolean) => () => void
+  registerAnswerSelection: (
+    answerId: string,
+    defaultSelected: boolean,
+  ) => () => void
   registerDescription: (descriptionId: string) => () => void
   registerError: (errorId: string) => () => void
   registerTitle: (titleId: string) => () => void
@@ -98,7 +104,10 @@ export interface QuestionnaireItemContext {
   resetVersion: Ref<number>
   selectedAnswerIds: Ref<string[]>
   setAnswerDefault: (answerId: string, defaultSelected: boolean) => void
-  setAnswerSelectionFromInteraction: (answerId: string, selected: boolean) => void
+  setAnswerSelectionFromInteraction: (
+    answerId: string,
+    selected: boolean,
+  ) => void
   shortcutByAnswerId: ComputedRef<Map<string, string>>
   shortcutByChoiceValue: ComputedRef<Map<string, string> | null>
   shortcuts: ComputedRef<QuestionnaireShortcutMode | null>
@@ -106,23 +115,27 @@ export interface QuestionnaireItemContext {
   syncControlledAnswerSelection: (answerId: string, selected: boolean) => void
 }
 
-export const [injectQuestionnaireRootContext, provideQuestionnaireRootContext]
-  = createContext<QuestionnaireRootContext>('Questionnaire')
+export const [injectQuestionnaireRootContext, provideQuestionnaireRootContext] =
+  createContext<QuestionnaireRootContext>('Questionnaire')
 
-export const [injectQuestionnaireItemContext, provideQuestionnaireItemContext]
-  = createContext<QuestionnaireItemContext>('QuestionnaireItem')
+export const [injectQuestionnaireItemContext, provideQuestionnaireItemContext] =
+  createContext<QuestionnaireItemContext>('QuestionnaireItem')
 
 export function hasInputValue(value: unknown) {
   if (Array.isArray(value)) {
-    return value.some(item => String(item).trim().length > 0)
+    return value.some((item) => String(item).trim().length > 0)
   }
 
-  return value !== undefined && value !== null && String(value).trim().length > 0
+  return (
+    value !== undefined && value !== null && String(value).trim().length > 0
+  )
 }
 
 export function getShortcutKeys(shortcuts: QuestionnaireShortcutMode | null) {
   if (shortcuts === 'letters') {
-    return Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index))
+    return Array.from({ length: 26 }, (_, index) =>
+      String.fromCharCode(65 + index),
+    )
   }
 
   if (shortcuts === 'numbers') {
@@ -132,14 +145,24 @@ export function getShortcutKeys(shortcuts: QuestionnaireShortcutMode | null) {
   return []
 }
 
-export function getShortcutFromKey(key: string, shortcuts: QuestionnaireShortcutMode) {
+export function getShortcutFromKey(
+  key: string,
+  shortcuts: QuestionnaireShortcutMode,
+) {
   const normalizedKey = shortcuts === 'letters' ? key.toUpperCase() : key
 
-  return getShortcutKeys(shortcuts).includes(normalizedKey) ? normalizedKey : null
+  return getShortcutKeys(shortcuts).includes(normalizedKey)
+    ? normalizedKey
+    : null
 }
 
-export function getAnswerKeyShortcuts(shortcut: string | null, filled: boolean) {
-  return [shortcut, filled ? 'Enter' : null].filter(Boolean).join(' ') || undefined
+export function getAnswerKeyShortcuts(
+  shortcut: string | null,
+  filled: boolean,
+) {
+  return (
+    [shortcut, filled ? 'Enter' : null].filter(Boolean).join(' ') || undefined
+  )
 }
 
 export function isAnswerFilled(answer: AnswerControlRegistration) {
@@ -147,24 +170,35 @@ export function isAnswerFilled(answer: AnswerControlRegistration) {
     return answer.element.checked
   }
 
-  return answer.element.hasAttribute('name') && hasInputValue(answer.element.value)
+  return (
+    answer.element.hasAttribute('name') && hasInputValue(answer.element.value)
+  )
 }
 
-export function isEmptyNavigableInput(answer: AnswerControlRegistration | null) {
+export function isEmptyNavigableInput(
+  answer: AnswerControlRegistration | null,
+) {
   return (
-    answer?.type === 'input'
-    && ['email', 'password', 'search', 'tel', 'text', 'url'].includes(answer.element.type)
-    && !hasInputValue(answer.element.value)
+    answer?.type === 'input' &&
+    ['email', 'password', 'search', 'tel', 'text', 'url'].includes(
+      answer.element.type,
+    ) &&
+    !hasInputValue(answer.element.value)
   )
 }
 
 export function isTextEntryTarget(element: Element) {
-  if (element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement) {
+  if (
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement
+  ) {
     return true
   }
 
   if (element instanceof HTMLInputElement) {
-    return !['button', 'checkbox', 'radio', 'reset', 'submit'].includes(element.type)
+    return !['button', 'checkbox', 'radio', 'reset', 'submit'].includes(
+      element.type,
+    )
   }
 
   return element instanceof HTMLElement && element.isContentEditable
@@ -206,8 +240,8 @@ export function createQuestionnaireCollection(
   }
 
   return {
-    enabledItems: items.filter(item => !item.disabled),
-    itemByName: new Map(items.map(item => [item.name, item])),
+    enabledItems: items.filter((item) => !item.disabled),
+    itemByName: new Map(items.map((item) => [item.name, item])),
     items,
   }
 }
@@ -220,7 +254,9 @@ export function getInitialItemName(
     return defaultItem ?? null
   }
 
-  const defaultDefinition = defaultItem ? collection.itemByName.get(defaultItem) : undefined
+  const defaultDefinition = defaultItem
+    ? collection.itemByName.get(defaultItem)
+    : undefined
 
   if (defaultDefinition && !defaultDefinition.disabled) {
     return defaultDefinition.name

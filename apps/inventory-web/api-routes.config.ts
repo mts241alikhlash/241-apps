@@ -9,9 +9,7 @@ export const SERVICE_PREFIXES = {
     '/regions',
   ],
 
-  inventory: [
-    '/inventory',
-  ],
+  inventory: ['/inventory'],
 } as const
 
 export const UNROUTED_PREFIXES: readonly string[] = ['/settings']

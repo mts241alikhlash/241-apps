@@ -4,14 +4,17 @@ import type { CodeBlockVariants } from '.'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { codeBlockVariants } from '.'
 
-const props = withDefaults(defineProps<{
-  variant?: CodeBlockVariants['variant']
-  size?: 'default' | 'sm'
-  class?: HTMLAttributes['class']
-}>(), {
-  variant: 'default',
-  size: 'default',
-})
+const props = withDefaults(
+  defineProps<{
+    variant?: CodeBlockVariants['variant']
+    size?: 'default' | 'sm'
+    class?: HTMLAttributes['class']
+  }>(),
+  {
+    variant: 'default',
+    size: 'default',
+  },
+)
 </script>
 
 <template>

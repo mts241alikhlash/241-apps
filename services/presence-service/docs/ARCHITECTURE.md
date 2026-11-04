@@ -12,7 +12,7 @@ They are independent: a module can be perfectly layered and still wrongly
 coupled, and the reverse.
 
 `NESTJS-RULES.md` holds the coding rules (controllers, DTOs, validation,
-naming). Its two *structure* sections — `DOMAIN STRUCTURE` and
+naming). Its two _structure_ sections — `DOMAIN STRUCTURE` and
 `MODULE STRUCTURE` — are superseded by Part 1 here. `IAM.md` holds how
 authorization works and which service owns it. `CLEAN-CODE.md` covers what a
 file looks like once it is in the right place.
@@ -25,14 +25,14 @@ file looks like once it is in the right place.
 
 Measured 2026-09-02 against `src/presence/` and `src/payroll/`:
 
-| Signal | Count |
-| --- | --- |
-| Modules using the target `application/` layer | **0 of 14** |
-| Use cases importing a `*.dto.js` (application → presentation) | **18 of 33** |
-| Files touching Prisma outside `infrastructure/` or `core/` | **14** — the highest of the nine services |
-| Controllers touching Prisma | 0 |
-| Files over 300 lines | 0 |
-| `.spec.ts` files | **44** — the most of the nine services |
+| Signal                                                        | Count                                     |
+| ------------------------------------------------------------- | ----------------------------------------- |
+| Modules using the target `application/` layer                 | **0 of 14**                               |
+| Use cases importing a `*.dto.js` (application → presentation) | **18 of 33**                              |
+| Files touching Prisma outside `infrastructure/` or `core/`    | **14** — the highest of the nine services |
+| Controllers touching Prisma                                   | 0                                         |
+| Files over 300 lines                                          | 0                                         |
+| `.spec.ts` files                                              | **44** — the most of the nine services    |
 
 Two numbers pull in opposite directions, and both are real. This service has the
 most tests on the platform, and they are good ones — `payroll/integration`'s
@@ -52,7 +52,7 @@ constructor(
 ) {}
 ```
 
-This is the hard violation. The use case holds a port *and* a database handle,
+This is the hard violation. The use case holds a port _and_ a database handle,
 and its private `findIncomplete()` runs a query the port does not declare. The
 arrow points from the inner layer to the outer one, and the use case can no
 longer be tested without a database.
@@ -96,7 +96,7 @@ worth. They share a process, not a model.
 **They were split into two services on 2026-08-29 and merged back the next day.**
 That history is the most useful architectural fact in this repo, and
 `payroll/integration/README.md` records why: the split created an
-`IDailyPresenceReadPort` adapter carrying a *copy* of presence's
+`IDailyPresenceReadPort` adapter carrying a _copy_ of presence's
 `summarizeMonth` arithmetic, and the copy got four things wrong — `LATE`
 counting as a present day, `lateCount` keying on status rather than minutes,
 `lateMinutes` accumulating unconditionally, and the month bounded `lte` rather
@@ -183,7 +183,7 @@ use case.
 
 **`DailyPresence` says yes for its arithmetic and no for its completeness.**
 Whether a day is late, and by how many minutes, is decided from the record's own
-timestamps and the work pattern handed to it. Whether the *month* is complete
+timestamps and the work pattern handed to it. Whether the _month_ is complete
 needs a query. Put the arithmetic on the entity or in
 `domain/policies/presence-arithmetic.policy.ts` — it is the code the failed
 split proved must have exactly one home — and leave completeness in the use
@@ -199,15 +199,15 @@ self-contained rule.
 
 ## Three type boundaries
 
-| Type | Lives in | Carries |
-| --- | --- | --- |
-| `XxxDto` | `presentation/http/dto/` | `class-validator` + `@ApiProperty` |
-| `XxxInput` | `application/use-cases/<name>/` | nothing — a plain interface |
-| `XxxRepositoryInput` | `domain/repositories/` | nothing — a plain interface |
+| Type                 | Lives in                        | Carries                            |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| `XxxDto`             | `presentation/http/dto/`        | `class-validator` + `@ApiProperty` |
+| `XxxInput`           | `application/use-cases/<name>/` | nothing — a plain interface        |
+| `XxxRepositoryInput` | `domain/repositories/`          | nothing — a plain interface        |
 
 They may be structurally identical. TypeScript is structural, so a controller
 passes a Dto straight into a use case expecting an Input. **Do not write a
-mapper for it.** What you must not do is let the use case *name* the Dto.
+mapper for it.** What you must not do is let the use case _name_ the Dto.
 
 Create `.input.ts` only when the use case takes structured input. One taking
 `(id: string)` or nothing needs no Input file.
@@ -222,15 +222,15 @@ NodeNext ESM: **every relative import ends in `.js`** though the source is
 `.ts`. A wrong `../` count is the most common conversion error, and
 `pnpm run typecheck` catches every one.
 
-| File location | → `src/` | → module root |
-| --- | --- | --- |
-| `<module>.module.ts`, `index.ts` | `../../` | `./` |
-| `domain/{entities,repositories,policies,enums}/x.ts` | `../../../../` | `../../` |
-| `application/use-cases/<name>/x.ts` | `../../../../../` | `../../../` |
-| `application/services/x.ts` | `../../../../` | `../../` |
-| `infrastructure/persistence/prisma/x.ts` | `../../../../../` | `../../../` |
-| `presentation/http/x.controller.ts` | `../../../../` | `../../` |
-| `presentation/http/dto/request/x.dto.ts` | `../../../../../../` | `../../../../` |
+| File location                                        | → `src/`             | → module root  |
+| ---------------------------------------------------- | -------------------- | -------------- |
+| `<module>.module.ts`, `index.ts`                     | `../../`             | `./`           |
+| `domain/{entities,repositories,policies,enums}/x.ts` | `../../../../`       | `../../`       |
+| `application/use-cases/<name>/x.ts`                  | `../../../../../`    | `../../../`    |
+| `application/services/x.ts`                          | `../../../../`       | `../../`       |
+| `infrastructure/persistence/prisma/x.ts`             | `../../../../../`    | `../../../`    |
+| `presentation/http/x.controller.ts`                  | `../../../../`       | `../../`       |
+| `presentation/http/dto/request/x.dto.ts`             | `../../../../../../` | `../../../../` |
 
 Depths assume a module directly under `src/presence/` or `src/payroll/`.
 
@@ -238,19 +238,19 @@ Depths assume a module directly under `src/presence/` or `src/payroll/`.
 
 One module per commit. Old layout → new:
 
-| Old | New |
-| --- | --- |
-| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts` |
-| `use-cases/<name>.use-case.ts` | `application/use-cases/<name>/<name>.use-case.ts` |
-| `services/<name>.service.ts` | `application/services/<name>.service.ts` |
-| `infrastructure/persistence/*.ts` | `infrastructure/persistence/prisma/*.ts` |
-| `presentation/<name>.controller.ts` | `presentation/http/<name>.controller.ts` |
-| `dto/request/*.ts`, `dto/response/*.ts` | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
+| Old                                                | New                                                       |
+| -------------------------------------------------- | --------------------------------------------------------- |
+| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts`                |
+| `use-cases/<name>.use-case.ts`                     | `application/use-cases/<name>/<name>.use-case.ts`         |
+| `services/<name>.service.ts`                       | `application/services/<name>.service.ts`                  |
+| `infrastructure/persistence/*.ts`                  | `infrastructure/persistence/prisma/*.ts`                  |
+| `presentation/<name>.controller.ts`                | `presentation/http/<name>.controller.ts`                  |
+| `dto/request/*.ts`, `dto/response/*.ts`            | `presentation/http/dto/request/*.ts`, `.../response/*.ts` |
 
 `constants/` stays at the module root. `domain/entities/` does not move.
 
 **1. Find every external consumer first** — and for this service that includes
-the *other context* and `academic-service`.
+the _other context_ and `academic-service`.
 
 ```bash
 grep -rln "<module>/domain/interfaces\|<module>/use-cases\|<module>/dto/\|<module>/presentation/\|<module>/infrastructure/persistence" src
@@ -325,18 +325,18 @@ Stated once, here, so it isn't relitigated module by module:
 `src/presence/` and `src/payroll/` are owned. Three platform pieces are borrowed
 from `identity-service`, each narrowed to a read or a single write.
 
-| Here | May do | Left behind |
-| --- | --- | --- |
-| `platform/auth` | Verify a token, check the session is live | Login, refresh, logout, password reset, session cleanup |
-| `platform/access-control` | `PermissionGuard` asking if the caller holds a permission | The use cases, the controller, the catalog-sync hook |
-| `platform/audit-log` | Write an audit entry for a correction or an approval | Reading and searching the audit log |
+| Here                      | May do                                                    | Left behind                                             |
+| ------------------------- | --------------------------------------------------------- | ------------------------------------------------------- |
+| `platform/auth`           | Verify a token, check the session is live                 | Login, refresh, logout, password reset, session cleanup |
+| `platform/access-control` | `PermissionGuard` asking if the caller holds a permission | The use cases, the controller, the catalog-sync hook    |
+| `platform/audit-log`      | Write an audit entry for a correction or an approval      | Reading and searching the audit log                     |
 
 > **The narrowing rule:** if a controller here would answer the same URL as one
 > in `identity-service`, it does not belong here.
 
 ## What this service provides to others
 
-Unusually, this service is on the *supply* side of a boundary.
+Unusually, this service is on the _supply_ side of a boundary.
 `academic-service` borrowed `presence/daily-record` and narrowed it to **two
 methods** — gate suggestions and a monthly summary — leaving behind twenty-eight
 files covering scan, corrections, credentials, work patterns and audit.
@@ -352,8 +352,8 @@ the code rather than an HTTP call. Two rules follow:
 
 ## The one port out
 
-| Port | Method | Owned by |
-| --- | --- | --- |
+| Port                 | Method                  | Owned by           |
+| -------------------- | ----------------------- | ------------------ |
 | `IPayrollRosterPort` | `listActiveEmployees()` | `academic-service` |
 
 It stays a port because `academic-service` really is a separate service. Swap
@@ -377,7 +377,7 @@ reads or writes them, so migrating is simply how this service deploys.
 > nothing else. Do not "fix" this.
 
 That is no longer about racing another service for a shared schema — it is
-about who decides *when* the schema changes. Migrating on boot hands that
+about who decides _when_ the schema changes. Migrating on boot hands that
 decision to whichever replica starts first, and races every extra replica.
 Migration is an explicit deploy step: `--profile migrate` in
 `docker-compose.prod.yml`, per service.
@@ -392,14 +392,15 @@ it.
 - `pnpm prisma:generate` is required before anything else, and is always safe.
 - A schema change is made here and nowhere else. This service's schema is the
   only description of its database.
+
 ## Couplings, and what closing them means
 
-| # | Coupling | Status |
-| --- | --- | --- |
-| 1 | Authorization reads iam's tables | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma |
-| 2 | Payroll reads academic's `teachers` | **Port in place, adapter still local.** `IPayrollRosterPort` exists; its implementation reads Prisma |
-| 3 | Presence records join to `profiles` | **Open, deliberately.** While both tables sit in one database the join is the faster read |
-| 4 | `academic-service` holds a copy of `daily-record` | **Open.** Two methods, narrowed, but still a copy |
+| #   | Coupling                                          | Status                                                                                               |
+| --- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | Authorization reads iam's tables                  | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma               |
+| 2   | Payroll reads academic's `teachers`               | **Port in place, adapter still local.** `IPayrollRosterPort` exists; its implementation reads Prisma |
+| 3   | Presence records join to `profiles`               | **Open, deliberately.** While both tables sit in one database the join is the faster read            |
+| 4   | `academic-service` holds a copy of `daily-record` | **Open.** Two methods, narrowed, but still a copy                                                    |
 
 Coupling 1 is the next to close, and the shape is proven: `inventory-service`
 replaced exactly this with `IIdentityPort` + `HttpIdentityAdapter` calling

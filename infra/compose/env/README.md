@@ -27,11 +27,11 @@ same shape, just real credentials instead of the example ones. `TRUST_PROXY` is 
 number of proxies between the client and each service, and defaults to `1`,
 the gateway alone. Count every hop:
 
-| In front of the services | `TRUST_PROXY` |
-| --- | --- |
-| gateway | 1 |
-| Cloudflare → gateway, or host nginx → gateway | 2 |
-| Cloudflare → host nginx → gateway (the deployed setup) | 3 |
+| In front of the services                               | `TRUST_PROXY` |
+| ------------------------------------------------------ | ------------- |
+| gateway                                                | 1             |
+| Cloudflare → gateway, or host nginx → gateway          | 2             |
+| Cloudflare → host nginx → gateway (the deployed setup) | 3             |
 
 Set it in `compose/.env` (next to the compose files, gitignored) or in the
 shell that runs `docker compose`. With the wrong count every client looks like

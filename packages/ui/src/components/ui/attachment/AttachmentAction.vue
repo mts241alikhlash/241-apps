@@ -4,14 +4,17 @@ import type { ButtonVariants } from '../button'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { Button } from '@mts241alikhlash/ui/button'
 
-const props = withDefaults(defineProps<{
-  class?: HTMLAttributes['class']
-  variant?: ButtonVariants['variant']
-  size?: ButtonVariants['size']
-}>(), {
-  variant: 'ghost',
-  size: 'icon-xs',
-})
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes['class']
+    variant?: ButtonVariants['variant']
+    size?: ButtonVariants['size']
+  }>(),
+  {
+    variant: 'ghost',
+    size: 'icon-xs',
+  },
+)
 </script>
 
 <template>

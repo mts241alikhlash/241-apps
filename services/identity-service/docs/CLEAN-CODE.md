@@ -42,7 +42,7 @@ async execute(input: CreateUserInput) {
 ```
 
 That is the shape to copy: one decision (is the identifier taken), one write,
-one log line. Note what it does *not* do — it does not validate the identifier's
+one log line. Note what it does _not_ do — it does not validate the identifier's
 format, because `CreateUserDto` already did; it does not hash inline, because
 `hashPassword` is a shared helper; it does not build a response, because the
 controller does.
@@ -143,7 +143,10 @@ export interface UpdateUserRepositoryInput {
 }
 
 export abstract class IUserRepository {
-  abstract update(id: string, data: UpdateUserRepositoryInput): Promise<UserPublic>
+  abstract update(
+    id: string,
+    data: UpdateUserRepositoryInput,
+  ): Promise<UserPublic>
 }
 ```
 
@@ -180,8 +183,7 @@ if (attempts > 5)                 if (attempts > MAX_LOGIN_ATTEMPTS)
 
 ```ts
 // fine as-is — the meaning is the literal
-if (users.length === 0)
-return items.slice(0, 1)
+if (users.length === 0) return items.slice(0, 1)
 ```
 
 `permission-codes.constants.ts` is the extreme case of doing this right: 1759

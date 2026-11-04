@@ -5,10 +5,10 @@ agenda, gallery, announcements. Vue 3 + Vite, same stack as `academic-web`.
 
 ## Which services answer it
 
-| Service | Port | Answers |
-|---|---|---|
+| Service  | Port | Answers                                                                                             |
+| -------- | ---- | --------------------------------------------------------------------------------------------------- |
 | identity | 3000 | `/auth`, `/users`, `/profiles`, `/school-units`, `/school-unit-types`, `/religions`, `/blood-types` |
-| portal | 3600 | `/portal`, `/files` |
+| portal   | 3600 | `/portal`, `/files`                                                                                 |
 
 Two services, not one: the public pages are portal-service's, but signing in to
 the admin side is identity-service's, and so is every dropdown on the profile

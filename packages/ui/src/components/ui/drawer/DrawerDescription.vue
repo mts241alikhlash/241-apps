@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { DrawerDescription } from 'reka-ui'
 
-const props = defineProps<DrawerDescriptionProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  DrawerDescriptionProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>

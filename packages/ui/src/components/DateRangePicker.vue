@@ -4,7 +4,11 @@ import { parseDate } from '@internationalized/date'
 import type { DateRange } from 'reka-ui'
 import { Calendar as CalendarIcon } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@mts241alikhlash/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mts241alikhlash/ui/popover'
 import { RangeCalendar } from '@mts241alikhlash/ui/range-calendar'
 
 export interface DateRangeValue {
@@ -82,7 +86,9 @@ function onSelect(range: DateRange) {
         ]"
       >
         {{ displayLabel }}
-        <CalendarIcon class="ml-auto size-[var(--icon-control,0.875rem)] shrink-0 text-muted-foreground" />
+        <CalendarIcon
+          class="ml-auto size-[var(--icon-control,0.875rem)] shrink-0 text-muted-foreground"
+        />
       </Button>
     </PopoverTrigger>
     <PopoverContent

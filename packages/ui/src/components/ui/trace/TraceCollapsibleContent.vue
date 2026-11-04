@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { CollapsibleContent } from '@mts241alikhlash/ui/collapsible'
 
-const props = defineProps<CollapsibleContentProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  CollapsibleContentProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -18,7 +20,12 @@ const delegatedProps = reactiveOmit(props, 'class')
   >
     <div
       data-slot="trace-collapsible-content-inner"
-      :class="cn('mt-1.5 mb-1 ml-[calc(--spacing(1.75)-1px)] border-l pr-1 pl-3.75 min-w-0 wrap-break-word text-muted-foreground', props.class)"
+      :class="
+        cn(
+          'mt-1.5 mb-1 ml-[calc(--spacing(1.75)-1px)] border-l pr-1 pl-3.75 min-w-0 wrap-break-word text-muted-foreground',
+          props.class,
+        )
+      "
     >
       <slot />
     </div>

@@ -47,7 +47,8 @@ export const sidebarMenuButtonVariants = cva(
           'bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]',
       },
       size: {
-        default: 'h-[var(--control-h-md,1.75rem)] text-[length:var(--text-control,0.75rem)] text-muted-foreground [&>svg]:size-[var(--icon-control,0.875rem)]',
+        default:
+          'h-[var(--control-h-md,1.75rem)] text-[length:var(--text-control,0.75rem)] text-muted-foreground [&>svg]:size-[var(--icon-control,0.875rem)]',
         sm: 'h-[var(--control-h-sm,1.5rem)] text-[length:var(--text-control,0.75rem)] text-muted-foreground [&>svg]:size-[var(--icon-control,0.875rem)]',
         lg: 'h-12 [&>svg]:size-4 text-sm text-sidebar-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-0!',
       },

@@ -129,6 +129,7 @@ PASS. Format check, lint, typecheck, strict lint, test, and build all exited 0. 
 `pnpm exec cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPatterns=reference-data/condition/infrastructure/persistence/prisma`
 
 PASS. 1 test suite passed, 6 tests passed.
+
 - Added real `PermissionGuard` denial test using `ConditionController` permission metadata.
 - Added Nest `TestingModule` provider-resolution test proving `IConditionRepository` resolves to `PrismaConditionRepository`.
 - Added `GetMetadataUseCase` consumer test proving conditions are returned and `findMany()` is called.

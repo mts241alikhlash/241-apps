@@ -26,10 +26,15 @@ assert.match(httpConfig, /default_type application\/json;/)
 assert.match(httpConfig, /server_tokens off;/)
 assert.match(httpConfig, /^client_max_body_size 6m;$/m)
 for (const config of [httpConfig, renderConfig(model, { ssl: true })]) {
-  for (const location of ['location \\/assets\\/', 'location = \\/index\\.html']) {
+  for (const location of [
+    'location \\/assets\\/',
+    'location = \\/index\\.html',
+  ]) {
     assert.match(
       config,
-      new RegExp(`${location} \\{[^}]*X-Content-Type-Options[^}]*Content-Security-Policy[^}]*\\}`),
+      new RegExp(
+        `${location} \\{[^}]*X-Content-Type-Options[^}]*Content-Security-Policy[^}]*\\}`,
+      ),
       `${location} keeps the security headers its own add_header would drop`,
     )
   }
@@ -48,7 +53,16 @@ assert.match(
   /server_name [^;]*accounts[^;]*;[\s\S]*?location ~ \^\/\([^)]*\bsso\b[^)]*\)/,
   'the accounts host routes /sso to identity',
 )
-for (const app of ['academic', 'admin', 'admission', 'assessment', 'exam', 'hr', 'inventory', 'portal']) {
+for (const app of [
+  'academic',
+  'admin',
+  'admission',
+  'assessment',
+  'exam',
+  'hr',
+  'inventory',
+  'portal',
+]) {
   const manifest = model.manifests.find((entry) => entry.app === app)
   assert.ok(
     manifest.servicePrefixes.identity.includes('/sso'),
@@ -63,14 +77,23 @@ assert.doesNotMatch(
 )
 assert.match(httpConfig, /location ~ \^\/\(settings\)\(\/\|\$\)/)
 assert.match(httpConfig, /server_name portal\.mts241alikhlash\.sch\.id;/)
-assert.match(httpConfig, /upstream academic_web \{[\s\S]*server academic-web:8080 resolve;/)
+assert.match(
+  httpConfig,
+  /upstream academic_web \{[\s\S]*server academic-web:8080 resolve;/,
+)
 assert.match(httpConfig, /proxy_pass         http:\/\/academic_web;/)
 assert.doesNotMatch(httpConfig, /root \/usr\/share\/nginx\/html\//)
 assert.match(httpConfig, /server identity-service:3000 resolve;/)
 assert.match(renderConfig(model, { ssl: true }), /listen 443 ssl;/)
-assert.equal(validateModel({ manifests: model.manifests, upstreams: model.upstreams }), true)
+assert.equal(
+  validateModel({ manifests: model.manifests, upstreams: model.upstreams }),
+  true,
+)
 
-assert.match(httpConfig, /upstream exam_web \{[\s\S]*server exam-web:8080 resolve;/)
+assert.match(
+  httpConfig,
+  /upstream exam_web \{[\s\S]*server exam-web:8080 resolve;/,
+)
 assert.match(httpConfig, /server_name exam\.mts241alikhlash\.sch\.id;/)
 assert.deepEqual(requiredApps(), EXPECTED_APPS)
 
@@ -104,18 +127,26 @@ const composeStub = [
 ].join('\n')
 const exam = model.lock.apps.exam
 const withExam = addAppServices(composeStub, { exam })
-assert.ok(withExam.includes(`\n  exam-web:\n    <<: *web-defaults\n    image: ${exam.webImage}\n`))
+assert.ok(
+  withExam.includes(
+    `\n  exam-web:\n    <<: *web-defaults\n    image: ${exam.webImage}\n`,
+  ),
+)
 assert.match(withExam, / {6}exam-web:\n {8}condition: service_healthy\n/)
 assert.equal(addAppServices(withExam, { exam }), withExam)
 
-const academic = structuredClone(model.manifests.find(({ app }) => app === 'academic'))
+const academic = structuredClone(
+  model.manifests.find(({ app }) => app === 'academic'),
+)
 academic.servicePrefixes.identity.push('/auth')
 assert.throws(
   () => validateModel({ ...model, manifests: [academic] }),
   /duplicate/,
 )
 
-const overlapping = structuredClone(model.manifests.find(({ app }) => app === 'academic'))
+const overlapping = structuredClone(
+  model.manifests.find(({ app }) => app === 'academic'),
+)
 overlapping.servicePrefixes.identity.push('/auth/login')
 assert.throws(
   () => validateModel({ ...model, manifests: [overlapping] }),
@@ -138,7 +169,9 @@ assert.throws(
   /duplicate gateway server name/,
 )
 
-const unknownService = structuredClone(model.manifests.find(({ app }) => app === 'academic'))
+const unknownService = structuredClone(
+  model.manifests.find(({ app }) => app === 'academic'),
+)
 unknownService.servicePrefixes.unknown = ['/unknown']
 assert.throws(
   () => validateModel({ ...model, manifests: [unknownService] }),
@@ -148,7 +181,10 @@ assert.throws(
 const badUpstream = structuredClone(model)
 badUpstream.upstreams.identity.port = 3999
 assert.throws(
-  () => validateDeploymentLock(badUpstream.lock, { upstreams: badUpstream.upstreams }),
+  () =>
+    validateDeploymentLock(badUpstream.lock, {
+      upstreams: badUpstream.upstreams,
+    }),
   /deployment services\.identity\.upstream does not match upstream registry/,
 )
 
@@ -164,11 +200,18 @@ assert.throws(
   /pinned by sha256 digest/,
 )
 
-const invalidManifest = structuredClone(model.manifests.find(({ app }) => app === 'academic'))
+const invalidManifest = structuredClone(
+  model.manifests.find(({ app }) => app === 'academic'),
+)
 invalidManifest.schemaVersion = 2
-assert.throws(() => validateManifest(invalidManifest, model.schema), /schemaVersion must be 1/)
+assert.throws(
+  () => validateManifest(invalidManifest, model.schema),
+  /schemaVersion must be 1/,
+)
 
-const unsafePrefix = structuredClone(model.manifests.find(({ app }) => app === 'academic'))
+const unsafePrefix = structuredClone(
+  model.manifests.find(({ app }) => app === 'academic'),
+)
 unsafePrefix.servicePrefixes.identity.push('/auth$')
 assert.throws(
   () => validateManifest(unsafePrefix, model.schema),

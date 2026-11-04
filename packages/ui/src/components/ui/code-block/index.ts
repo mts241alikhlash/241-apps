@@ -19,8 +19,10 @@ export const codeBlockVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border border-input text-foreground dark:bg-input/30 has-[>[data-slot=code-block-content]:focus-visible]:border-ring',
-        destructive: 'border border-destructive/30 text-destructive dark:border-destructive/40',
+        default:
+          'border border-input text-foreground dark:bg-input/30 has-[>[data-slot=code-block-content]:focus-visible]:border-ring',
+        destructive:
+          'border border-destructive/30 text-destructive dark:border-destructive/40',
       },
     },
     defaultVariants: {
@@ -31,13 +33,13 @@ export const codeBlockVariants = cva(
 export type CodeBlockVariants = VariantProps<typeof codeBlockVariants>
 
 export const codeBlockLineVariants = cva(
-  '-mx-3 px-3 in-data-numbered:gap-x-3 before:min-w-6 before:text-end before:text-muted-foreground after:start-1 after:text-muted-foreground group-data-[size=sm]/code-block:-mx-2 group-data-[size=sm]/code-block:px-2 relative block min-h-lh after:absolute after:top-0 after:select-none in-data-numbered:col-span-2 in-data-numbered:grid in-data-numbered:grid-cols-subgrid in-data-numbered:[counter-increment:line] in-data-numbered:before:content-[counter(line)] in-data-numbered:before:select-none in-data-numbered:supports-[content:counter(line)_/_\'\']:before:content-[counter(line)_/_\'\']',
+  "-mx-3 px-3 in-data-numbered:gap-x-3 before:min-w-6 before:text-end before:text-muted-foreground after:start-1 after:text-muted-foreground group-data-[size=sm]/code-block:-mx-2 group-data-[size=sm]/code-block:px-2 relative block min-h-lh after:absolute after:top-0 after:select-none in-data-numbered:col-span-2 in-data-numbered:grid in-data-numbered:grid-cols-subgrid in-data-numbered:[counter-increment:line] in-data-numbered:before:content-[counter(line)] in-data-numbered:before:select-none in-data-numbered:supports-[content:counter(line)_/_'']:before:content-[counter(line)_/_'']",
   {
     variants: {
       variant: {
         default: '',
-        added: 'bg-muted after:content-[\'+\']',
-        removed: 'bg-destructive/10 after:text-destructive after:content-[\'−\']',
+        added: "bg-muted after:content-['+']",
+        removed: "bg-destructive/10 after:text-destructive after:content-['−']",
         highlighted: 'bg-muted',
       },
     },

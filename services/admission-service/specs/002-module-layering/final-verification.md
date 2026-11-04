@@ -10,16 +10,16 @@ were not changed.
 
 ## Required Gates
 
-| Command | Result | Exact evidence |
-| --- | --- | --- |
-| `pnpm run format:check` | PASS | `All matched files use Prettier code style!` |
-| `pnpm run lint` | PASS | ESLint exited 0 with `--max-warnings=0`; no output/errors |
-| `pnpm run typecheck` | PASS | `tsc --noEmit` exited 0 |
-| `pnpm run lint:strict` | PASS | strict ESLint exited 0 with `--max-warnings=0`; no output/errors |
-| `pnpm test` | PASS | 23 suites passed, 142 tests passed, 0 failed |
-| Direct ESM Jest: `pnpm exec cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests` | PASS | 23 suites passed, 142 tests passed, 0 failed |
-| `pnpm run build` | PASS | `nest build` exited 0 |
-| `pnpm run validate` | PASS | format check, lint, typecheck, strict lint, 23 suites/142 tests, and build all passed |
+| Command                                                                                              | Result | Exact evidence                                                                        |
+| ---------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| `pnpm run format:check`                                                                              | PASS   | `All matched files use Prettier code style!`                                          |
+| `pnpm run lint`                                                                                      | PASS   | ESLint exited 0 with `--max-warnings=0`; no output/errors                             |
+| `pnpm run typecheck`                                                                                 | PASS   | `tsc --noEmit` exited 0                                                               |
+| `pnpm run lint:strict`                                                                               | PASS   | strict ESLint exited 0 with `--max-warnings=0`; no output/errors                      |
+| `pnpm test`                                                                                          | PASS   | 23 suites passed, 142 tests passed, 0 failed                                          |
+| Direct ESM Jest: `pnpm exec cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests` | PASS   | 23 suites passed, 142 tests passed, 0 failed                                          |
+| `pnpm run build`                                                                                     | PASS   | `nest build` exited 0                                                                 |
+| `pnpm run validate`                                                                                  | PASS   | format check, lint, typecheck, strict lint, 23 suites/142 tests, and build all passed |
 
 ## Focused Boot Evidence
 
@@ -37,12 +37,12 @@ Jest was run without that wrapper forwarding issue and passed in full.
 
 - `pnpm test` emitted 3 copies of Node's existing
   `ExperimentalWarning: VM Modules is an experimental feature and might change
-  at any time`.
+at any time`.
 - Direct ESM Jest emitted 3 copies of the same Node experimental warning.
 - `pnpm run validate` emitted 3 copies of the same Node experimental warning.
 - Full tests emitted 3 existing fail-closed external-service log lines:
   `identity-service request failed or timed out` and `identity-service answered
-  503`.
+503`.
 - Direct ESM Jest emitted the same 3 external-service log lines.
 - No Jest test failed because of those warnings/logs.
 - `pnpm run validate` emitted the same 3 external-service log lines.
@@ -52,15 +52,15 @@ Jest was run without that wrapper forwarding issue and passed in full.
 
 All scans covered `src/**/*.ts` or the complete `src/admission/` tree as noted.
 
-| Scan | Result |
-| --- | --- |
-| Stale legacy source imports for old use-case, DTO, interface, Prisma-adapter, and controller paths | PASS, 0 matches |
-| Domain/application forbidden Prisma, `PrismaService`, DTO, HTTP, and infrastructure imports | PASS, 0 forbidden matches in audited layers |
-| Presentation repository, Prisma, and infrastructure-internal imports | PASS, 0 forbidden matches in audited presentations |
-| Forbidden application/document/applicant/payment/notification/announcement legacy paths | PASS, 0 matches |
-| Context public API imports | PASS, only documented intentional cross-context imports remain |
-| Empty directory scan under `src/admission/` | PASS, `NO_EMPTY_DIRECTORIES` |
-| Legacy directory scan | PASS, `NO_LEGACY_DIRECTORIES` |
+| Scan                                                                                               | Result                                                         |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Stale legacy source imports for old use-case, DTO, interface, Prisma-adapter, and controller paths | PASS, 0 matches                                                |
+| Domain/application forbidden Prisma, `PrismaService`, DTO, HTTP, and infrastructure imports        | PASS, 0 forbidden matches in audited layers                    |
+| Presentation repository, Prisma, and infrastructure-internal imports                               | PASS, 0 forbidden matches in audited presentations             |
+| Forbidden application/document/applicant/payment/notification/announcement legacy paths            | PASS, 0 matches                                                |
+| Context public API imports                                                                         | PASS, only documented intentional cross-context imports remain |
+| Empty directory scan under `src/admission/`                                                        | PASS, `NO_EMPTY_DIRECTORIES`                                   |
+| Legacy directory scan                                                                              | PASS, `NO_LEGACY_DIRECTORIES`                                  |
 
 Valid internal layer paths such as `application/use-cases/` and presentation
 DTO paths were excluded from stale-path scans. Their presence is required by

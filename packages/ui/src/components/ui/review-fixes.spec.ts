@@ -52,7 +52,9 @@ describe('review fixes', () => {
       props: { open: true },
       slots: {
         default: () =>
-          h(SelectContent, null, () => h(SelectItem, { value: 'a' }, () => 'A')),
+          h(SelectContent, null, () =>
+            h(SelectItem, { value: 'a' }, () => 'A'),
+          ),
       },
       attachTo: document.body,
     })
@@ -68,14 +70,18 @@ describe('review fixes', () => {
   it('floated label sits away from the rounded corner, resting label lines up with the text', () => {
     const css = source('./form/FloatingLabelField.vue')
     const base = css.slice(css.indexOf(".ff :deep([data-slot='ff-label']) {"))
-    expect(base.slice(0, base.indexOf('}'))).toContain('left: calc(0.375rem + 1px)')
+    expect(base.slice(0, base.indexOf('}'))).toContain(
+      'left: calc(0.375rem + 1px)',
+    )
     const resting = css.slice(css.indexOf('.ff.ff-empty:not'))
     expect(resting.slice(0, resting.indexOf('}'))).toContain(
       'left: calc(0.375rem + 1px)',
     )
     expect(base.slice(0, base.indexOf('}'))).toContain('left 150ms ease')
     expect(base.slice(0, base.indexOf('}'))).toContain('line-height: 0.5rem')
-    expect(base.slice(0, base.indexOf('}'))).toContain('padding-inline: 0.125rem')
+    expect(base.slice(0, base.indexOf('}'))).toContain(
+      'padding-inline: 0.125rem',
+    )
   })
 
   it('navigation menu link and combobox viewport use the reka attributes', () => {

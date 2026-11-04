@@ -5,9 +5,7 @@ import { h } from 'vue'
 import { SidebarProvider, SidebarToggle } from './index'
 
 const render = (defaultOpen: boolean) =>
-  mount(() =>
-    h(SidebarProvider, { defaultOpen }, () => h(SidebarToggle)),
-  )
+  mount(() => h(SidebarProvider, { defaultOpen }, () => h(SidebarToggle)))
 
 describe('SidebarToggle', () => {
   it('offers to collapse an open sidebar and expand a collapsed one', async () => {

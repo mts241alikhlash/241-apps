@@ -92,7 +92,7 @@ split by copying, the same Strangler Fig approach every backend split used.
 
 `classroom`'s enrollment screen ("available students to add to a class")
 and `classroom`/`teaching-assignment`'s supervisor/teacher pickers all call
-a students or teachers *list* endpoint, not a narrow "who am I" lookup, a
+a students or teachers _list_ endpoint, not a narrow "who am I" lookup, a
 real browse-and-pick UI. That endpoint is `student-service`'s and
 `hr-service`'s now, not academic-service's. Academic-service's
 backend never had a `/students` or `/employees` controller (confirmed by
@@ -124,12 +124,12 @@ empty on purpose: every request is relative, and a proxy decides which service
 answers: the Vite dev server in development, the nginx gateway in production,
 both generated from `api-routes.config.ts`. Four services sit behind it:
 
-| Service | Port | Answers |
-|---|---|---|
+| Service  | Port | Answers                                                                   |
+| -------- | ---- | ------------------------------------------------------------------------- |
 | identity | 3000 | `/auth`, `/profiles`, `/users`, `/roles`, `/religions`, `/blood-types`, … |
-| academic | 3200 | most of this app's screens |
-| student | 3900 | `/students`, `/student-enrollments`, `/parents`, … |
-| hr | 3800 | `/employees` |
+| academic | 3200 | most of this app's screens                                                |
+| student  | 3900 | `/students`, `/student-enrollments`, `/parents`, …                        |
+| hr       | 3800 | `/employees`                                                              |
 
 **All four must be running.** A screen that comes back empty is a service that
 is down, not a missing route.

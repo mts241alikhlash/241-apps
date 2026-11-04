@@ -50,7 +50,7 @@ one to watch.
 export class CloseAttendancePeriodUseCase {
   constructor(
     private readonly periods: IAttendancePeriodRepository,
-    private readonly prisma: PrismaService,       // ← the violation
+    private readonly prisma: PrismaService, // ← the violation
   ) {}
 
   private async findIncomplete(year: number, month: number) {
@@ -60,14 +60,14 @@ export class CloseAttendancePeriodUseCase {
 ```
 
 This is the sharpest rule break in the service, and it is worth being precise
-about *why* it is worse than the DTO imports elsewhere:
+about _why_ it is worse than the DTO imports elsewhere:
 
 - The use case now needs a database to be tested at all. Every other use case
   here can be tested with a fake port; this one cannot.
 - The query it runs is invisible to the port, so no one reading
   `IAttendancePeriodRepository` learns that closing a period reads daily
   records.
-- The rule it enforces — *a month with an unfinished day cannot close* — is the
+- The rule it enforces — _a month with an unfinished day cannot close_ — is the
   most consequential rule in the service, and it sits next to the plumbing that
   fetches its inputs.
 
@@ -82,8 +82,14 @@ export interface IncompleteRecord {
 }
 
 export abstract class IAttendancePeriodRepository {
-  abstract findByPeriod(year: number, month: number): Promise<AttendancePeriod | null>
-  abstract findIncompleteRecords(year: number, month: number): Promise<IncompleteRecord[]>
+  abstract findByPeriod(
+    year: number,
+    month: number,
+  ): Promise<AttendancePeriod | null>
+  abstract findIncompleteRecords(
+    year: number,
+    month: number,
+  ): Promise<IncompleteRecord[]>
 }
 ```
 
@@ -168,7 +174,8 @@ without a migration.
 
 ```ts
 // right — the domain declares its own values
-export type LeaveRequestStatusEnum = 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
+export type LeaveRequestStatusEnum =
+  'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN'
 ```
 
 A Prisma enum is a string union too, so the repository assigns one to the other
@@ -295,7 +302,9 @@ const all = await this.prisma.dailyPresence.findMany()
 return all.filter((r) => r.userId === userId && r.date >= from)
 
 // right
-return this.prisma.dailyPresence.findMany({ where: { userId, date: { gte: from, lt: to } } })
+return this.prisma.dailyPresence.findMany({
+  where: { userId, date: { gte: from, lt: to } },
+})
 ```
 
 **Month bounds are `gte` / `lt`, never `lte`.** A `lte` on the month's last day

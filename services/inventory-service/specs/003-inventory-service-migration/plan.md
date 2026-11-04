@@ -34,15 +34,15 @@ recorded in `quickstart.md`.
 
 ## File Map
 
-| Area | Responsibility |
-|---|---|
-| `src/inventory/reference-data/*` | Five independent lookup modules and metadata composition. |
-| `src/inventory/asset/` | Asset and asset-unit ownership, policies, and public ports. |
-| `src/inventory/circulation/` | Loan, loan-item, history, and transaction-type ownership. |
-| `src/inventory/approval/` | Workflow, approval instance/log ownership and orchestration boundary. |
-| `src/inventory/shared/` | Kernel-only types/constants/helpers; no business ownership. |
-| `specs/003-inventory-service-migration/` | Master program artifacts and execution evidence. |
-| `docs/ARCHITECTURE.md` | Measured final structure, ownership, order, and gates. |
+| Area                                     | Responsibility                                                        |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `src/inventory/reference-data/*`         | Five independent lookup modules and metadata composition.             |
+| `src/inventory/asset/`                   | Asset and asset-unit ownership, policies, and public ports.           |
+| `src/inventory/circulation/`             | Loan, loan-item, history, and transaction-type ownership.             |
+| `src/inventory/approval/`                | Workflow, approval instance/log ownership and orchestration boundary. |
+| `src/inventory/shared/`                  | Kernel-only types/constants/helpers; no business ownership.           |
+| `specs/003-inventory-service-migration/` | Master program artifacts and execution evidence.                      |
+| `docs/ARCHITECTURE.md`                   | Measured final structure, ownership, order, and gates.                |
 
 ## Wave 0: Baseline and Characterization
 

@@ -5,7 +5,12 @@ import HorizontalStepper from './HorizontalStepper.vue'
 
 const steps = [
   { key: 'a', label: 'Pendaftaran', caption: '3 Okt', status: 'done' as const },
-  { key: 'b', label: 'Keputusan', caption: '8 Okt', status: 'rejected' as const },
+  {
+    key: 'b',
+    label: 'Keputusan',
+    caption: '8 Okt',
+    status: 'rejected' as const,
+  },
   { key: 'c', label: 'Daftar ulang', status: 'upcoming' as const },
   { key: 'd', label: 'Berkas', status: 'current' as const },
 ]

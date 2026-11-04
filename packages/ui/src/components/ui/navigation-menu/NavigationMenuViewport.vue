@@ -3,12 +3,11 @@ import type { NavigationMenuViewportProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  NavigationMenuViewport,
-  useForwardProps,
-} from 'reka-ui'
+import { NavigationMenuViewport, useForwardProps } from 'reka-ui'
 
-const props = defineProps<NavigationMenuViewportProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  NavigationMenuViewportProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 

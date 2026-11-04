@@ -5,23 +5,26 @@ import { cn } from '@mts241alikhlash/ui/utils'
 import { Comment, Fragment, Text, useSlots } from 'vue'
 import { codeBlockLineVariants } from '.'
 
-const props = withDefaults(defineProps<{
-  variant?: CodeBlockLineVariants['variant']
-  class?: HTMLAttributes['class']
-}>(), {
-  variant: 'default',
-})
+const props = withDefaults(
+  defineProps<{
+    variant?: CodeBlockLineVariants['variant']
+    class?: HTMLAttributes['class']
+  }>(),
+  {
+    variant: 'default',
+  },
+)
 
 const slots = useSlots()
 
 function hasContent(nodes: VNode[]): boolean {
   return nodes.some((node) => {
-    if (node.type === Comment)
-      return false
-    if (node.type === Text)
-      return node.children !== ''
+    if (node.type === Comment) return false
+    if (node.type === Text) return node.children !== ''
     if (node.type === Fragment)
-      return Array.isArray(node.children) && hasContent(node.children as VNode[])
+      return (
+        Array.isArray(node.children) && hasContent(node.children as VNode[])
+      )
     return true
   })
 }
@@ -36,5 +39,10 @@ function isEmpty() {
     data-slot="code-block-line"
     :data-variant="variant"
     :class="cn(codeBlockLineVariants({ variant }), props.class)"
-  ><span data-slot="code-block-line-content" class="min-w-0"><template v-if="isEmpty()">{{ "\n" }}</template><slot v-else /></span></span>
+    ><span
+      data-slot="code-block-line-content"
+      class="min-w-0"
+      ><template v-if="isEmpty()">{{ '\n' }}</template
+      ><slot v-else /></span
+  ></span>
 </template>

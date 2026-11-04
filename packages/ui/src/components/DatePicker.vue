@@ -10,7 +10,11 @@ import {
 import { Calendar as CalendarIcon } from '@lucide/vue'
 import { Calendar } from '@mts241alikhlash/ui/calendar'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@mts241alikhlash/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mts241alikhlash/ui/popover'
 
 const props = withDefaults(
   defineProps<{
@@ -108,7 +112,9 @@ function onSelect(date: CalendarDate | undefined) {
         ]"
       >
         {{ displayLabel }}
-        <CalendarIcon class="ml-auto size-[var(--icon-control,0.875rem)] shrink-0 text-muted-foreground" />
+        <CalendarIcon
+          class="ml-auto size-[var(--icon-control,0.875rem)] shrink-0 text-muted-foreground"
+        />
       </Button>
     </PopoverTrigger>
     <PopoverContent

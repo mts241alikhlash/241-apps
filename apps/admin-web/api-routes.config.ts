@@ -16,13 +16,9 @@ export const SERVICE_PREFIXES = {
     '/regions',
   ],
 
-  portal: [
-    '/files',
-  ],
+  portal: ['/files'],
 
-  inventory: [
-    '/inventory/workflows/role-usage',
-  ],
+  inventory: ['/inventory/workflows/role-usage'],
 } as const
 
 export const UNROUTED_PREFIXES: readonly string[] = []

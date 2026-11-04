@@ -5,28 +5,28 @@ anything tied to one service's Prisma client stay in that service.
 
 ## Subpaths
 
-| Subpath | Contents |
-| --- | --- |
-| `config` | `AppConfigModule.forRoot(envSchema)`, `ROUTE_OPTIONS` |
-| `database` | `pgSslOptions` |
-| `health` | `HealthModule.forRoot(PrismaService)` |
-| `filters` | `HttpExceptionFilter` |
-| `interceptors` | `ResponseInterceptor` |
-| `logger` | `pinoLoggerConfig` |
-| `decorators` | `CurrentUser`, `Public` |
-| `guards` | `ProvisioningTokenGuard` |
-| `types` | `AuthenticatedUser`, `RequestUser`, the Express `Request.user` augmentation |
-| `auth` | `AuthModule`, `JwtAuthGuard`, `JwtStrategy` |
-| `identity` | `IdentityModule`, the identity port and HTTP adapter |
-| `access-control` | `PermissionModule`, `PermissionGuard`, `RequirePermissions`, `RequireAnyPermission` |
-| `audit-log` | `AuditLogModule`, `CreateAuditLogUseCase` |
-| `service-client` | `ServiceClientModule`, `ServiceClient` |
-| `cache`, `throttle`, `upload` | cache module, throttling helper, upload limits |
-| `domain` | base entity and value object, repository interface, shared types, enums that are the same in every service |
-| `dto` | pagination and address DTOs |
-| `helpers`, `validators` | HTML sanitizer, slug, plain summary, hash, resolve-once-by-key, boolean transformer |
-| `openapi` | the response envelope used by the contract emitter |
-| `testing` | architecture test helpers (`describeRouteCollisions`, `describeRouteRegistration`, `describeNoIgnoredCaller`) |
+| Subpath                       | Contents                                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `config`                      | `AppConfigModule.forRoot(envSchema)`, `ROUTE_OPTIONS`                                                         |
+| `database`                    | `pgSslOptions`                                                                                                |
+| `health`                      | `HealthModule.forRoot(PrismaService)`                                                                         |
+| `filters`                     | `HttpExceptionFilter`                                                                                         |
+| `interceptors`                | `ResponseInterceptor`                                                                                         |
+| `logger`                      | `pinoLoggerConfig`                                                                                            |
+| `decorators`                  | `CurrentUser`, `Public`                                                                                       |
+| `guards`                      | `ProvisioningTokenGuard`                                                                                      |
+| `types`                       | `AuthenticatedUser`, `RequestUser`, the Express `Request.user` augmentation                                   |
+| `auth`                        | `AuthModule`, `JwtAuthGuard`, `JwtStrategy`                                                                   |
+| `identity`                    | `IdentityModule`, the identity port and HTTP adapter                                                          |
+| `access-control`              | `PermissionModule`, `PermissionGuard`, `RequirePermissions`, `RequireAnyPermission`                           |
+| `audit-log`                   | `AuditLogModule`, `CreateAuditLogUseCase`                                                                     |
+| `service-client`              | `ServiceClientModule`, `ServiceClient`                                                                        |
+| `cache`, `throttle`, `upload` | cache module, throttling helper, upload limits                                                                |
+| `domain`                      | base entity and value object, repository interface, shared types, enums that are the same in every service    |
+| `dto`                         | pagination and address DTOs                                                                                   |
+| `helpers`, `validators`       | HTML sanitizer, slug, plain summary, hash, resolve-once-by-key, boolean transformer                           |
+| `openapi`                     | the response envelope used by the contract emitter                                                            |
+| `testing`                     | architecture test helpers (`describeRouteCollisions`, `describeRouteRegistration`, `describeNoIgnoredCaller`) |
 
 ## Build
 

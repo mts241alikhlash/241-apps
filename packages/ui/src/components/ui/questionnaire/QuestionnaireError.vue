@@ -6,12 +6,17 @@ import { Primitive } from 'reka-ui'
 import { computed, onBeforeUnmount, useId } from 'vue'
 import { injectQuestionnaireItemContext } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-  id?: string
-}>(), {
-  as: 'p',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+      id?: string
+    }
+  >(),
+  {
+    as: 'p',
+  },
+)
 
 const item = injectQuestionnaireItemContext()
 
@@ -21,7 +26,8 @@ const unregisterError = item.registerError(errorId)
 const fallback = computed(() =>
   item.required.value
     ? 'Choose an answer to continue.'
-    : 'Choose an answer or skip this question.')
+    : 'Choose an answer or skip this question.',
+)
 
 onBeforeUnmount(unregisterError)
 </script>

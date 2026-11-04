@@ -25,8 +25,7 @@ let resizeFrame = 0
 
 onMounted(() => {
   const content = contentRef.value
-  if (!content)
-    return
+  if (!content) return
 
   setContentElement(content)
   setSpacerElement(spacerRef.value ?? null)

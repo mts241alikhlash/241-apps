@@ -11,7 +11,10 @@ const props = defineProps<TabsListProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
-const variant = inject(tabsVariantKey, computed(() => 'default' as const))
+const variant = inject(
+  tabsVariantKey,
+  computed(() => 'default' as const),
+)
 
 const LINE_CLASSES =
   'text-muted-foreground flex h-auto items-center justify-start gap-0 overflow-x-auto overflow-y-hidden rounded-none border-b bg-transparent p-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
@@ -23,7 +26,9 @@ const DEFAULT_CLASSES =
   <TabsList
     data-slot="tabs-list"
     v-bind="delegatedProps"
-    :class="cn(variant === 'line' ? LINE_CLASSES : DEFAULT_CLASSES, props.class)"
+    :class="
+      cn(variant === 'line' ? LINE_CLASSES : DEFAULT_CLASSES, props.class)
+    "
   >
     <slot />
   </TabsList>

@@ -19,13 +19,13 @@ against the earlier design.
 
 # Who owns what
 
-| Piece | Owner | What every other service has |
-|---|---|---|
-| `POST /auth/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password` | identity-service | Nothing — no controller |
-| Token verification (`GET` on every authenticated route) | Both | `JwtStrategy` + `ValidateTokenUseCase` here verify the signature and check the session is live |
-| `GET/POST/PATCH/DELETE /users` | identity-service | Nothing — this repo has neither `teacher` nor `student` since the 2026-09-03 extraction; `hr-service`/`student-service` provision the account by calling identity-service's `POST /accounts` over HTTP, not by writing the table |
-| Role & permission CRUD, the permission-catalog sync | identity-service | `PermissionGuard` only — reads, never writes |
-| `auth_sessions`, `users`, `user_roles`, `roles`, `role_permissions`, `permissions` tables | identity-service's database | Nothing. Every service has its own database as of 2026-09-09, and no service reads identity's tables through Prisma any more — every answer arrives over HTTP through `src/platform/identity/` |
+| Piece                                                                                     | Owner                       | What every other service has                                                                                                                                                                                                     |
+| ----------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /auth/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password`          | identity-service            | Nothing — no controller                                                                                                                                                                                                          |
+| Token verification (`GET` on every authenticated route)                                   | Both                        | `JwtStrategy` + `ValidateTokenUseCase` here verify the signature and check the session is live                                                                                                                                   |
+| `GET/POST/PATCH/DELETE /users`                                                            | identity-service            | Nothing — this repo has neither `teacher` nor `student` since the 2026-09-03 extraction; `hr-service`/`student-service` provision the account by calling identity-service's `POST /accounts` over HTTP, not by writing the table |
+| Role & permission CRUD, the permission-catalog sync                                       | identity-service            | `PermissionGuard` only — reads, never writes                                                                                                                                                                                     |
+| `auth_sessions`, `users`, `user_roles`, `roles`, `role_permissions`, `permissions` tables | identity-service's database | Nothing. Every service has its own database as of 2026-09-09, and no service reads identity's tables through Prisma any more — every answer arrives over HTTP through `src/platform/identity/`                                   |
 
 If you are in identity-service reading this, the left column is yours in full.
 If you are anywhere else, the right column is all you get, and you get it over
@@ -127,7 +127,7 @@ Profile {
 A profile is read narrowly: `PROFILE_NAME_SELECT`, `PROFILE_DISPLAY_SELECT`
 or `PROFILE_ROSTER_SELECT` from `shared/infrastructure/prisma-selects.ts`, per the
 "Read only the fields the caller shows" rule in `NESTJS-RULES.md`. Reaching
-it *through* `User` needs the matching `USER_*_SELECT` — `User` owns
+it _through_ `User` needs the matching `USER_*_SELECT` — `User` owns
 `passwordHash`, and a bare `include` pulls every scalar column on the way to
 the relation.
 
@@ -201,31 +201,31 @@ of permissions, and the web checks permissions only. `admissions.apply` lets an
 applicant fill in and submit their own PPDB application; admission-service's
 `my-application` routes and PPDB's applicant pages require it.
 
-| Code | Name | Purpose |
-|---|---|---|
-| `ACADEMIC_ADMIN` | Admin Akademik | every academic permission |
-| `ASSESSMENT_ADMIN` | Admin Penilaian | assessment items, scores, report cards, attendance |
-| `ADMISSION_ADMIN` | Admin PPDB | every PPDB permission |
-| `HR_ADMIN` | Admin Kepegawaian | every HR permission |
-| `PRESENCE_ADMIN` | Admin Presensi | every presence permission, employees read |
-| `PAYROLL_ADMIN` | Admin Penggajian | every payroll permission, employees read |
-| `INVENTORY_ADMIN` | Admin Inventaris | every inventory permission |
-| `PORTAL_ADMIN` | Admin Portal | every portal permission and files |
-| `SYSTEM_ADMIN` | Admin Sistem | users, roles, settings, school units, audit logs, sessions |
-| `OPERATOR` | Operator | everything except portal and payroll (the former `ADMIN`) |
-| `PRINCIPAL` | Kepala Madrasah | every read, plus approvals; changes no data |
-| `CURRICULUM_STAFF` | TU Administrasi | classes, enrollments, calendar entries |
-| `VICE_PRINCIPAL_CURRICULUM` | Wakamad Kurikulum | `CURRICULUM_STAFF` plus curriculum, schedules, report-card publishing |
-| `STUDENT_AFFAIRS_STAFF` | TU Kesantrian | student and parent data, PPDB handling |
-| `VICE_PRINCIPAL_STUDENT_AFFAIRS` | Wakamad Kesantrian | `STUDENT_AFFAIRS_STAFF` plus graduation and PPDB decisions |
-| `HEAD_OF_ADMINISTRATION` | Kepala TU | employees, positions, work patterns, leave approval |
-| `FINANCE_STAFF` | TU Keuangan | prepares payroll |
-| `TREASURER` | Bendahara | `FINANCE_STAFF` plus payroll approval and PPDB payment verification |
-| `PUBLIC_RELATIONS` | Humas | school website and announcements |
-| `HOMEROOM_TEACHER` | Wali Kelas | attendance and report cards of the homeroom class |
-| `EXAM_TECHNICIAN` | Teknisi Ujian | technical actions in the exam rooms assigned to it |
-| `EMPLOYEE` | Pegawai | own employment record, attendance, leave, and payslip |
-| `PARENT` | Orang Tua | no permissions |
+| Code                             | Name               | Purpose                                                               |
+| -------------------------------- | ------------------ | --------------------------------------------------------------------- |
+| `ACADEMIC_ADMIN`                 | Admin Akademik     | every academic permission                                             |
+| `ASSESSMENT_ADMIN`               | Admin Penilaian    | assessment items, scores, report cards, attendance                    |
+| `ADMISSION_ADMIN`                | Admin PPDB         | every PPDB permission                                                 |
+| `HR_ADMIN`                       | Admin Kepegawaian  | every HR permission                                                   |
+| `PRESENCE_ADMIN`                 | Admin Presensi     | every presence permission, employees read                             |
+| `PAYROLL_ADMIN`                  | Admin Penggajian   | every payroll permission, employees read                              |
+| `INVENTORY_ADMIN`                | Admin Inventaris   | every inventory permission                                            |
+| `PORTAL_ADMIN`                   | Admin Portal       | every portal permission and files                                     |
+| `SYSTEM_ADMIN`                   | Admin Sistem       | users, roles, settings, school units, audit logs, sessions            |
+| `OPERATOR`                       | Operator           | everything except portal and payroll (the former `ADMIN`)             |
+| `PRINCIPAL`                      | Kepala Madrasah    | every read, plus approvals; changes no data                           |
+| `CURRICULUM_STAFF`               | TU Administrasi    | classes, enrollments, calendar entries                                |
+| `VICE_PRINCIPAL_CURRICULUM`      | Wakamad Kurikulum  | `CURRICULUM_STAFF` plus curriculum, schedules, report-card publishing |
+| `STUDENT_AFFAIRS_STAFF`          | TU Kesantrian      | student and parent data, PPDB handling                                |
+| `VICE_PRINCIPAL_STUDENT_AFFAIRS` | Wakamad Kesantrian | `STUDENT_AFFAIRS_STAFF` plus graduation and PPDB decisions            |
+| `HEAD_OF_ADMINISTRATION`         | Kepala TU          | employees, positions, work patterns, leave approval                   |
+| `FINANCE_STAFF`                  | TU Keuangan        | prepares payroll                                                      |
+| `TREASURER`                      | Bendahara          | `FINANCE_STAFF` plus payroll approval and PPDB payment verification   |
+| `PUBLIC_RELATIONS`               | Humas              | school website and announcements                                      |
+| `HOMEROOM_TEACHER`               | Wali Kelas         | attendance and report cards of the homeroom class                     |
+| `EXAM_TECHNICIAN`                | Teknisi Ujian      | technical actions in the exam rooms assigned to it                    |
+| `EMPLOYEE`                       | Pegawai            | own employment record, attendance, leave, and payslip                 |
+| `PARENT`                         | Orang Tua          | no permissions                                                        |
 
 `PRINCIPAL` holds `{ everyRead: true }`, which is not filtered by the
 explicit-only list: a new `*.read` code in any module lands on it automatically,
@@ -264,7 +264,7 @@ else — `single-role-bypass.spec.ts` sweeps the codebase for a second one.
 
 `ADMIN` used to bypass too, with a growing exemption list carved out
 per-area (ADR-0006, ADR-0008: `portal-`, `payroll-` prefixes). That shape
-failed silently — a new area needing separation had to be *remembered* into
+failed silently — a new area needing separation had to be _remembered_ into
 the list, and forgetting it meant ADMIN passed anyway, before any grant was
 even read. `ADMIN` is now an ordinary role: whatever its grants say, and
 nothing more. If you are about to add a role-name check outside

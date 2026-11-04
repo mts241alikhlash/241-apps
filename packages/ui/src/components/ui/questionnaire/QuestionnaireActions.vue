@@ -4,11 +4,16 @@ import type { HTMLAttributes } from 'vue'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { Primitive } from 'reka-ui'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-}>(), {
-  as: 'div',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+    }
+  >(),
+  {
+    as: 'div',
+  },
+)
 </script>
 
 <template>
@@ -16,10 +21,12 @@ const props = withDefaults(defineProps<PrimitiveProps & {
     data-slot="questionnaire-actions"
     :as="props.as"
     :as-child="props.asChild"
-    :class="cn(
-      'gap-1.5 sm:min-h-7 grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center',
-      props.class,
-    )"
+    :class="
+      cn(
+        'gap-1.5 sm:min-h-7 grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center',
+        props.class,
+      )
+    "
   >
     <slot />
   </Primitive>

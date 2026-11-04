@@ -9,11 +9,11 @@ from `academic-web` and `employee-service` became `hr-service`.
 
 ## Three domains, one app
 
-| Prefix | Features |
-|---|---|
-| `/employee/*` | teachers, positions, position categories, employment types, teacher accounts |
+| Prefix          | Features                                                                          |
+| --------------- | --------------------------------------------------------------------------------- |
+| `/employee/*`   | teachers, positions, position categories, employment types, teacher accounts      |
 | `/attendance/*` | credential cards, devices, the kiosk, shifts and holidays, leave, periods, recaps |
-| `/payroll/*` | salary components, per-person salaries, monthly runs, payslips |
+| `/payroll/*`    | salary components, per-person salaries, monthly runs, payslips                    |
 
 The staff register arrived here on 2026-09-10. It had been in `academic-web`
 since the split, which was wrong twice over: a teacher's NIP, employment type
@@ -28,13 +28,13 @@ form; no other extracted app carries them.
 
 ## Five services answer it: more than any other app
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/users`, `/profiles`, `/school-units`, `/school-unit-types`, `/religions`, `/blood-types` |
-| hr | 3800 | `/teachers`, `/teacher-positions`, `/positions`, `/position-categories`, `/employment-types`, `/payroll` |
-| presence | 3400 | `/presence` |
-| academic | 3200 | `/academic-years`, `/academic-calendars` |
-| student | 3900 | `/students` |
+| Service  | Port | Answers                                                                                                  |
+| -------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| identity | 3000 | `/auth`, `/users`, `/profiles`, `/school-units`, `/school-unit-types`, `/religions`, `/blood-types`      |
+| hr       | 3800 | `/teachers`, `/teacher-positions`, `/positions`, `/position-categories`, `/employment-types`, `/payroll` |
+| presence | 3400 | `/presence`                                                                                              |
+| academic | 3200 | `/academic-years`, `/academic-calendars`                                                                 |
+| student  | 3900 | `/students`                                                                                              |
 
 `/payroll` moved from presence (3400) to hr (3800) on 2026-09-10; the app is
 the only caller and the manifest is the only place that knew.

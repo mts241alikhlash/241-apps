@@ -22,7 +22,9 @@ it('action menu is compact like a Mira dropdown', async () => {
   await wrapper.get('button').trigger('keydown', { key: 'Enter' })
   await flushPromises()
 
-  const content = document.body.querySelector('[data-slot=dropdown-menu-content]')
+  const content = document.body.querySelector(
+    '[data-slot=dropdown-menu-content]',
+  )
   expect(content).not.toBeNull()
   const contentClass = content!.getAttribute('class') ?? ''
   expect(contentClass).not.toContain('w-[190px]')
@@ -35,9 +37,9 @@ it('action menu is compact like a Mira dropdown', async () => {
     const c = item.getAttribute('class') ?? ''
     expect(c).not.toContain('py-2.5')
     expect(c).not.toContain('px-3')
-    expect(item.querySelector('svg')?.getAttribute('class') ?? '').not.toContain(
-      'h-4 w-4',
-    )
+    expect(
+      item.querySelector('svg')?.getAttribute('class') ?? '',
+    ).not.toContain('h-4 w-4')
   }
   wrapper.unmount()
 })

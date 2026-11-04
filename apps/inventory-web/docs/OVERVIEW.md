@@ -29,10 +29,10 @@ school.
 
 ## Which services answer it
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/profiles`, `/school-unit-types`, `/religions`, `/blood-types` |
-| inventory | 3300 | `/inventory` |
+| Service   | Port | Answers                                                                  |
+| --------- | ---- | ------------------------------------------------------------------------ |
+| identity  | 3000 | `/auth`, `/profiles`, `/school-unit-types`, `/religions`, `/blood-types` |
+| inventory | 3300 | `/inventory`                                                             |
 
 identity is still here for sign-in and the profile form's dropdowns. The same
 shape as every other app.

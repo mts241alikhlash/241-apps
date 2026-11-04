@@ -8,7 +8,9 @@ import { SidebarProvider } from './ui/sidebar'
 const render = () =>
   mount(() =>
     h(SidebarProvider, null, () =>
-      h(NavUser, { user: { name: 'Ahmad Fauzi', email: 'a@b.id', avatar: '' } }),
+      h(NavUser, {
+        user: { name: 'Ahmad Fauzi', email: 'a@b.id', avatar: '' },
+      }),
     ),
   )
 
@@ -27,6 +29,8 @@ describe('NavUser', () => {
     const button = w.find('[data-sidebar="menu-button"]')
     const chevron = button.findAll('svg').at(-1)
     expect(chevron?.classes()).toContain('text-muted-foreground')
-    expect(w.find('[data-slot="avatar-fallback"]').classes()).toContain('bg-muted')
+    expect(w.find('[data-slot="avatar-fallback"]').classes()).toContain(
+      'bg-muted',
+    )
   })
 })

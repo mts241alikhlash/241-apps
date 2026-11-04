@@ -24,7 +24,12 @@ const isRender = computed(
     v-if="isRender"
     data-slot="command-empty"
     v-bind="delegatedProps"
-    :class="cn('py-6 text-center text-[length:var(--text-control,0.75rem)]', props.class)"
+    :class="
+      cn(
+        'py-6 text-center text-[length:var(--text-control,0.75rem)]',
+        props.class,
+      )
+    "
   >
     <slot />
   </Primitive>

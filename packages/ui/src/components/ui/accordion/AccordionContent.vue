@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { AccordionContent } from 'reka-ui'
 
-const props = defineProps<AccordionContentProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  AccordionContentProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>
@@ -17,10 +19,12 @@ const delegatedProps = reactiveOmit(props, 'class')
     class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up px-2 text-xs/relaxed overflow-hidden"
   >
     <div
-      :class="cn(
-        'pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
-        props.class,
-      )"
+      :class="
+        cn(
+          'pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4',
+          props.class,
+        )
+      "
     >
       <slot />
     </div>

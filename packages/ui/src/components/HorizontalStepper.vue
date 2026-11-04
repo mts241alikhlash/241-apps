@@ -22,7 +22,10 @@ const dotClass = {
 
 <template>
   <div class="flex flex-col gap-3">
-    <div role="list" class="flex overflow-x-auto pb-2 [scrollbar-width:thin]">
+    <div
+      role="list"
+      class="flex overflow-x-auto pb-2 [scrollbar-width:thin]"
+    >
       <div
         v-for="(step, index) in steps"
         :key="step.key"
@@ -48,18 +51,30 @@ const dotClass = {
             )
           "
         >
-          <Check v-if="step.status === 'done'" class="size-4" />
-          <X v-else-if="step.status === 'rejected'" class="size-4" />
+          <Check
+            v-if="step.status === 'done'"
+            class="size-4"
+          />
+          <X
+            v-else-if="step.status === 'rejected'"
+            class="size-4"
+          />
           <template v-else>{{ index + 1 }}</template>
         </span>
         <span
           :class="
-            cn('px-1 text-xs font-medium', step.status === 'current' && 'font-semibold')
+            cn(
+              'px-1 text-xs font-medium',
+              step.status === 'current' && 'font-semibold',
+            )
           "
         >
           {{ step.label }}
         </span>
-        <span v-if="step.caption" class="text-muted-foreground text-[11px]">
+        <span
+          v-if="step.caption"
+          class="text-muted-foreground text-[11px]"
+        >
           {{ step.caption }}
         </span>
       </div>

@@ -16,7 +16,7 @@ Four documents govern this repo, in this order of precedence:
 - `docs/ARCHITECTURE.md` — **start here for where code goes.** Part 1 is the
   Clean Architecture layering `src/admission/` is migrating to, with the measured
   current state and the conversion procedure. Part 2 is the service boundary.
-  Its two *structure* sections supersede `NESTJS-RULES.md`'s.
+  Its two _structure_ sections supersede `NESTJS-RULES.md`'s.
 - `docs/CLEAN-CODE.md` — **start here for what code looks like** once it is in
   the right place, worked through this service's real files rather than generic
   placeholders.
@@ -48,15 +48,15 @@ reason is not a read it could replace with an HTTP call.
 `PrismaAdmissionApplicationRepository.enrollAsStudent()` is **one transaction
 across three services' tables**:
 
-| Step | Table | Owned by |
-|---|---|---|
-| 1 | `profiles` | identity-service |
-| 2 | `students` | academic-service |
-| 3 | `parents`, `student_parents` | academic-service |
-| 4 | `addresses` | academic-service |
-| 5 | `user_roles` (grant STUDENT) | identity-service |
-| 6 | `semesters` read, `student_enrollments` | academic-service |
-| 7 | `admission_applications` → ENROLLED | this service |
+| Step | Table                                   | Owned by         |
+| ---- | --------------------------------------- | ---------------- |
+| 1    | `profiles`                              | identity-service |
+| 2    | `students`                              | academic-service |
+| 3    | `parents`, `student_parents`            | academic-service |
+| 4    | `addresses`                             | academic-service |
+| 5    | `user_roles` (grant STUDENT)            | identity-service |
+| 6    | `semesters` read, `student_enrollments` | academic-service |
+| 7    | `admission_applications` → ENROLLED     | this service     |
 
 It is atomic, and it is **right** that it is atomic. A half-enrolled child — an
 account with no student record, or a student with no class — is worse than a
@@ -93,7 +93,7 @@ be two services holding separate opinions about one rule.
 
 The second write is smaller and ordinary: registering an applicant creates their
 account through `AccountProvisioningService`, with a password hashed by
-`PasswordManagerService`. That one *is* a candidate for an HTTP call.
+`PasswordManagerService`. That one _is_ a candidate for an HTTP call.
 
 Every one of these reads and writes is concentrated in **two files** —
 `prisma-admission-application.repository.ts` and
@@ -128,13 +128,13 @@ nothing checks it automatically.
 
 ## What it borrows
 
-| Here | Why |
-|---|---|
-| `platform/auth` + `access-control` (19 files) + `PasswordManagerService` | applicants sign in; registration hashes a password |
-| `platform/user` — `AccountProvisioningService` only | the applicant's account |
-| `core/storage` | applicants upload a birth certificate, family card, payment proof |
-| `core/database`'s address guard | **kept here alone.** The `$extends` on `address.create` refusing a row with no owner is this service's business: it writes the applicant's address. The other five services dropped it. |
-| `platform/academic-lookup` | the three reference lists a PPDB form points at — see below |
+| Here                                                                     | Why                                                                                                                                                                                     |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform/auth` + `access-control` (19 files) + `PasswordManagerService` | applicants sign in; registration hashes a password                                                                                                                                      |
+| `platform/user` — `AccountProvisioningService` only                      | the applicant's account                                                                                                                                                                 |
+| `core/storage`                                                           | applicants upload a birth certificate, family card, payment proof                                                                                                                       |
+| `core/database`'s address guard                                          | **kept here alone.** The `$extends` on `address.create` refusing a row with no owner is this service's business: it writes the applicant's address. The other five services dropped it. |
+| `platform/academic-lookup`                                               | the three reference lists a PPDB form points at — see below                                                                                                                             |
 
 > **`start:prod` deliberately does not run `prisma migrate deploy`.**
 
@@ -147,11 +147,11 @@ those lists belongs somewhere else. Declared but unowned, they would each have
 become a **second copy of the table** on the first `prisma migrate`, drifting
 from the original with nothing to reconcile them.
 
-| Wanted | Now |
-|---|---|
+| Wanted                              | Now                                              |
+| ----------------------------------- | ------------------------------------------------ |
 | The academic year a wave belongs to | `POST /academic-years/by-ids` → academic-service |
-| A parent's occupation | `POST /occupations/by-ids` |
-| A parent's education level | `POST /educations/by-ids` |
+| A parent's occupation               | `POST /occupations/by-ids`                       |
+| A parent's education level          | `POST /educations/by-ids`                        |
 
 `Education` was the awkward one: admission-service and student-service both
 declared it and **neither served it**. It moved to academic-service's
@@ -188,8 +188,8 @@ does not own.
 Two things did **not** change, and both are deliberate:
 
 - **Session validation still reads `auth_sessions` and `users`** on every
-  request. That is a different question — *is this session still live and this
-  account still active* — and answering it from a token would mean a revoked
+  request. That is a different question — _is this session still live and this
+  account still active_ — and answering it from a token would mean a revoked
   session kept working until expiry. Revocation should be immediate.
 - **The fallback is still here.** `IPermissionRepository` remains wired, because
   a token can arrive without permissions: one minted before this change, or a

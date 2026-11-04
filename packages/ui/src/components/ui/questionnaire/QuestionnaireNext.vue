@@ -8,17 +8,22 @@ import { computed } from 'vue'
 import { buttonVariants } from '@mts241alikhlash/ui/button'
 import { injectQuestionnaireRootContext } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-  disabled?: boolean
-  size?: ButtonVariants['size']
-  variant?: ButtonVariants['variant']
-}>(), {
-  as: 'button',
-  disabled: false,
-  size: 'default',
-  variant: 'default',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+      disabled?: boolean
+      size?: ButtonVariants['size']
+      variant?: ButtonVariants['variant']
+    }
+  >(),
+  {
+    as: 'button',
+    disabled: false,
+    size: 'default',
+    variant: 'default',
+  },
+)
 
 const emits = defineEmits<{
   click: [event: MouseEvent]
@@ -27,7 +32,9 @@ const emits = defineEmits<{
 const root = injectQuestionnaireRootContext()
 
 const visible = computed(() => root.total.value > 1 && !root.last.value)
-const shortcut = computed(() => (visible.value && !props.disabled ? 'Enter' : null))
+const shortcut = computed(() =>
+  visible.value && !props.disabled ? 'Enter' : null,
+)
 
 function handleClick(event: MouseEvent) {
   emits('click', event)
@@ -63,11 +70,13 @@ function handleClick(event: MouseEvent) {
     :hidden="!visible"
     :inert="!visible"
     :tabindex="visible ? undefined : -1"
-    :class="cn(
-      buttonVariants({ size: props.size, variant: props.variant }),
-      'col-start-3 row-start-1 min-h-11 justify-self-end sm:min-h-0',
-      props.class,
-    )"
+    :class="
+      cn(
+        buttonVariants({ size: props.size, variant: props.variant }),
+        'col-start-3 row-start-1 min-h-11 justify-self-end sm:min-h-0',
+        props.class,
+      )
+    "
     @click="handleClick"
   >
     <slot>Next</slot>

@@ -11,11 +11,11 @@ whole platform. They are not inventory, and an account or a role edited from
 
 ## Two services answer it
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/sso`, `/users`, `/profiles`, `/roles`, `/permissions`, `/audit-logs`, `/school-units`, `/school-unit-addresses`, `/school-unit-social-medias`, `/school-unit-types`, `/religions`, `/blood-types` |
-| portal | 3600 | `/files` |
-| inventory | 3300 | `/inventory/workflows/role-usage` only: the role screen's warning about approval steps a role approves |
+| Service   | Port | Answers                                                                                                                                                                                                      |
+| --------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| identity  | 3000 | `/auth`, `/sso`, `/users`, `/profiles`, `/roles`, `/permissions`, `/audit-logs`, `/school-units`, `/school-unit-addresses`, `/school-unit-social-medias`, `/school-unit-types`, `/religions`, `/blood-types` |
+| portal    | 3600 | `/files`                                                                                                                                                                                                     |
+| inventory | 3300 | `/inventory/workflows/role-usage` only: the role screen's warning about approval steps a role approves                                                                                                       |
 
 **`UNROUTED_PREFIXES` is empty**. The only app where that is true. Everything
 this app calls has an owner.

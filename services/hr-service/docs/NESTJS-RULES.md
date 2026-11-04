@@ -67,9 +67,9 @@ src
 
 ├── core
 ├── shared
-├── platform     # narrowed slices borrowed from identity-service — see CLAUDE.md
-├── academic     # everything academic-service owns
-└── presence     # a 2-method slice borrowed from presence-service
+├── platform # narrowed slices borrowed from identity-service — see CLAUDE.md
+├── academic # everything academic-service owns
+└── presence # a 2-method slice borrowed from presence-service
 
 `inventory` and `admission` do not exist here — they are inventory-service's
 and admission-service's own domains now, each in its own repo with its own
@@ -87,7 +87,7 @@ sibling service (`inventory`, `admission`, `iam` proper). It is not a
 statement that those domains share a process with this one.
 
 > **This repo has diverged from what follows.** The layout described in
-> this section and the next is the *original* one. Every module under `src/`
+> this section and the next is the _original_ one. Every module under `src/`
 > has been migrated to a stricter Clean Architecture layering — see
 > `ARCHITECTURE.md`'s Part 1, which supersedes the two structure sections
 > below. The rest of this document (controller, use-case, DTO, validation,
@@ -108,7 +108,7 @@ migrated):
 - presentation (controllers — thin, HTTP only)
 - use-cases (one class per business operation)
 - domain (entities, enums, interfaces, exceptions)
-    interfaces/ holds the abstract repository = the port AND the DI token
+  interfaces/ holds the abstract repository = the port AND the DI token
 - infrastructure (persistence: Prisma impl + *.includes.ts; mappers; parsers)
 - dto (request/ and response/ — one DTO per file)
 - types, constants
@@ -128,18 +128,18 @@ Example
 academic/student
 
 student
-├── presentation/       # controllers (thin, HTTP only)
-├── use-cases/          # CreateStudentUseCase, UpdateStudentUseCase, ...
+├── presentation/ # controllers (thin, HTTP only)
+├── use-cases/ # CreateStudentUseCase, UpdateStudentUseCase, ...
 ├── domain/
-│   ├── entities/
-│   ├── enums/
-│   ├── exceptions/     # StudentNotFoundException, ... + index.ts
-│   └── interfaces/     # IStudentRepository — port + injection token
+│ ├── entities/
+│ ├── enums/
+│ ├── exceptions/ # StudentNotFoundException, ... + index.ts
+│ └── interfaces/ # IStudentRepository — port + injection token
 ├── infrastructure/
-│   ├── persistence/    # PrismaStudentRepository + *.includes.ts / .where.ts / .writer.ts
-│   ├── mappers/
-│   └── parsers/
-├── dto/                # request/ and response/ — one DTO per file
+│ ├── persistence/ # PrismaStudentRepository + *.includes.ts / .where.ts / .writer.ts
+│ ├── mappers/
+│ └── parsers/
+├── dto/ # request/ and response/ — one DTO per file
 ├── constants/
 └── student.module.ts
 
@@ -310,11 +310,11 @@ Controller
 
 ↓
 
-Use Case          (injected as IXxxRepository, never the Prisma class)
+Use Case (injected as IXxxRepository, never the Prisma class)
 
 ↓
 
-Repository        (the port; Prisma impl bound in the module)
+Repository (the port; Prisma impl bound in the module)
 
 ↓
 
@@ -333,9 +333,9 @@ One DTO per file.
 
 Split by direction into subfolders:
 
-dto/request/   (create / update / query)
+dto/request/ (create / update / query)
 
-dto/response/  (response DTOs)
+dto/response/ (response DTOs)
 
 ---
 
@@ -343,7 +343,7 @@ Allowed
 
 dto/request/create-student.dto.ts
 
-dto/request/update-student.dto.ts   (UpdateDto = PartialType of the Create DTO,
+dto/request/update-student.dto.ts (UpdateDto = PartialType of the Create DTO,
 unless a field set is intentionally restricted, e.g. immutable code/FK excluded)
 
 dto/request/student-query.dto.ts
@@ -370,11 +370,11 @@ every list, and silently adds any column defined later to every screen at once.
 `shared/infrastructure/prisma-selects.ts`. `profile: true`, or an inline profile select,
 is a defect.
 
-| Situation | Shape |
-|---|---|
-| A person appears as a label | `PROFILE_NAME_SELECT` |
-| A person's picture is drawn | `PROFILE_DISPLAY_SELECT` |
-| Student, teacher or enrollment list | `PROFILE_ROSTER_SELECT` |
+| Situation                                  | Shape                                                     |
+| ------------------------------------------ | --------------------------------------------------------- |
+| A person appears as a label                | `PROFILE_NAME_SELECT`                                     |
+| A person's picture is drawn                | `PROFILE_DISPLAY_SELECT`                                  |
+| Student, teacher or enrollment list        | `PROFILE_ROSTER_SELECT`                                   |
 | A spreadsheet export or the profile screen | Its own explicit select, at the call site, with a comment |
 
 Each shape carries `satisfies Prisma.ProfileDefaultArgs`, so a field that does
@@ -393,14 +393,18 @@ parameter, defaulting to the name.
 > four empty columns. A read whose fields must be present types them as
 > **required** — see `StudentExportWithDetails`.
 
-### Reaching a person *through their account*
+### Reaching a person _through their account_
 
 Narrowing the profile is only half of it. Prisma's `include` means "these
 relations **as well as** every scalar column I own", so this reads like a
 narrowed query and is not one:
 
 ```ts
-user: { include: { profile: PROFILE_NAME_SELECT } } // every column of User
+user: {
+  include: {
+    profile: PROFILE_NAME_SELECT
+  }
+} // every column of User
 ```
 
 `User` owns `passwordHash`. Combined with a use case that returns what the
@@ -445,10 +449,10 @@ Four rules, each of which has already been got wrong here at least once.
 
 ```ts
 // right — a supplied studentId cannot win
-return this.getReportCards.execute(query, { studentId: resolved });
+return this.getReportCards.execute(query, { studentId: resolved })
 
 // wrong — `?studentId=<someone else>` overrides the caller
-return this.getReportCards.execute({ studentId: resolved, ...query });
+return this.getReportCards.execute({ studentId: resolved, ...query })
 ```
 
 The wrong version returns a correctly formatted list of report cards belonging
@@ -506,12 +510,12 @@ Anything else reading as Indonesian under `src/` is a bug.
 Both exist on purpose. They are not interchangeable and neither replaces
 the other.
 
-| | `*Dto` | `*Input` |
-|---|---|---|
-| Boundary | HTTP (presentation) | domain port (repository) |
-| Form | class + class-validator + Swagger | plain interface, no decorators |
-| Lives in | `dto/request/`, `dto/response/` | `domain/interfaces/<x>-repository.interface.ts` |
-| Answers | what the wire accepts | what persistence needs |
+|          | `*Dto`                            | `*Input`                                        |
+| -------- | --------------------------------- | ----------------------------------------------- |
+| Boundary | HTTP (presentation)               | domain port (repository)                        |
+| Form     | class + class-validator + Swagger | plain interface, no decorators                  |
+| Lives in | `dto/request/`, `dto/response/`   | `domain/interfaces/<x>-repository.interface.ts` |
+| Answers  | what the wire accepts             | what persistence needs                          |
 
 The flow is layered:
 
@@ -539,7 +543,7 @@ Naming: `*QueryInput` for reads, `*RepositoryInput` for writes,
 Forbidden — forwarding the whole DTO:
 
 ```ts
-await this.subjectRepository.create(dto);
+await this.subjectRepository.create(dto)
 ```
 
 TypeScript is structural, so this compiles whenever the shapes happen to
@@ -554,7 +558,7 @@ Required — field by field:
 await this.subjectRepository.create({
   code: dto.code,
   name: dto.name,
-});
+})
 ```
 
 Note this is a review-time rule, not a test-enforced one: an existing spec
@@ -609,8 +613,8 @@ Also forbidden: repeating an object literal in a signature.
 Bad — this exact shape was copy-pasted across 27 files
 
 async findAll(...): Promise<{
-  data: StudentWithDetails[];
-  meta: { page: number; limit: number; total: number; totalPages: number };
+data: StudentWithDetails[];
+meta: { page: number; limit: number; total: number; totalPages: number };
 }>
 
 Good
@@ -621,9 +625,9 @@ async findAll(...): Promise<PaginatedResponse<StudentWithDetails>>
 
 Narrow projections in a signature are FINE and should stay inline:
 
-Promise<{ id: string } | null>      an id-only lookup
+Promise<{ id: string } | null> an id-only lookup
 
-Promise<{ count: number }>          a Prisma BatchPayload
+Promise<{ count: number }> a Prisma BatchPayload
 
 Naming those adds a hop without adding meaning. The rule targets duplicated or
 domain-bearing shapes, not every brace.
@@ -782,7 +786,7 @@ Example (`prisma-student.includes.ts`)
 export const STUDENT_INCLUDE = { ... } satisfies Prisma.StudentInclude
 
 export type StudentWithDetails =
-  Prisma.StudentGetPayload<{ include: typeof STUDENT_INCLUDE }>
+Prisma.StudentGetPayload<{ include: typeof STUDENT_INCLUDE }>
 
 ---
 
@@ -866,10 +870,10 @@ event + listener were deleted.
 Rule of thumb
 
 ONE business rule → ONE must-succeed consequence
-  = direct awaited call, so the error reaches the caller
+= direct awaited call, so the error reaches the caller
 
 ONE fact → MANY independent subscribers
-  = a genuine event; reintroduce the emitter when that case actually appears
+= a genuine event; reintroduce the emitter when that case actually appears
 
 ---
 
@@ -917,11 +921,11 @@ Use the shared types — do not re-declare the envelope inline:
 
 shared/domain/interfaces/repository.interface.ts
 
-  PaginatedResult<T>    repository side  { data, total, page, limit }
+PaginatedResult<T> repository side { data, total, page, limit }
 
-  PaginatedResponse<T>  HTTP side        { data, meta }
+PaginatedResponse<T> HTTP side { data, meta }
 
-  PaginationMeta                         { page, limit, total, totalPages }
+PaginationMeta { page, limit, total, totalPages }
 
 Response DTOs must import `PaginationMeta` with `import type` — it sits under a
 Swagger decorator, and `isolatedModules` + `emitDecoratorMetadata` reject a
@@ -939,15 +943,15 @@ The budget counts CODE. Import blocks and `@Api*` Swagger decorators do not
 count against it — they are documentation, and a well-documented controller
 routinely reaches ~190 physical lines while every handler body is one line.
 
-Use case / service     max 300 lines
+Use case / service max 300 lines
 
-Repository class       max 200 lines
+Repository class max 200 lines
 
-Any other file         max 300 lines
+Any other file max 300 lines
 
-Controller             max 150 lines of code
-                       (physical length is dominated by Swagger; judge the
-                        handler bodies, not `wc -l`)
+Controller max 150 lines of code
+(physical length is dominated by Swagger; judge the
+handler bodies, not `wc -l`)
 
 ---
 
@@ -957,16 +961,16 @@ When a Prisma repository outgrows 200 lines, do NOT split the class or the
 interface it implements. Move the details out into sibling files and leave the
 class as a flat map of contract method → one call:
 
-*.includes.ts    Prisma include/select objects + the derived payload type
+*.includes.ts Prisma include/select objects + the derived payload type
 
-*.where.ts       where-clause builders shared by list and export queries
+*.where.ts where-clause builders shared by list and export queries
 
-*.queries.ts     multi-step or grouped reads
+*.queries.ts multi-step or grouped reads
 
-*.writer.ts      multi-table writes taking a `Prisma.TransactionClient`
+*.writer.ts multi-table writes taking a `Prisma.TransactionClient`
 
-*.steps.ts       one function per stage of a long transaction
-                 (see prisma-rollover.steps.ts, prisma-promotion.steps.ts)
+*.steps.ts one function per stage of a long transaction
+(see prisma-rollover.steps.ts, prisma-promotion.steps.ts)
 
 ---
 
@@ -1011,7 +1015,7 @@ repositories). A lightweight DTO importing that barrel drags the whole graph in
 and closes an ESM import cycle, crashing boot with:
 
 "Nest cannot create the <X>Module instance.
- The module at index [0] of the imports array is undefined."
+The module at index [0] of the imports array is undefined."
 
 (Official NestJS: barrel files must be omitted when importing module or provider
 classes — https://docs.nestjs.com/faq/common-errors)
@@ -1025,7 +1029,7 @@ Good
 
 // role-response.dto.ts
 import { PermissionResponseDto }
-  from '../../../permissions/dto/response/permission-response.dto.js'
+from '../../../permissions/dto/response/permission-response.dto.js'
 
 For a genuine mutual module/provider dependency, use forwardRef() on both sides.
 
@@ -1064,11 +1068,11 @@ Add one when a rule is thrown from several call sites and deserves a domain
 name — not for every throw. `academic/student/domain/exceptions/` is the
 reference implementation:
 
-StudentNotFoundException            extends NotFoundException
+StudentNotFoundException extends NotFoundException
 
-StudentNisAlreadyExistsException    extends ConflictException
+StudentNisAlreadyExistsException extends ConflictException
 
-StudentCreationFailedException      extends InternalServerErrorException
+StudentCreationFailedException extends InternalServerErrorException
 
 ---
 
@@ -1086,13 +1090,13 @@ One file per exception, under the owning module's `domain/exceptions/`, plus an
 Use a Prisma transaction when several writes inside ONE module must land
 together:
 
-Student promotion / semester rollover  (classrooms → enrollments → schedules)
+Student promotion / semester rollover (classrooms → enrollments → schedules)
 
-Account provisioning  (User + Profile + Student/Teacher)
+Account provisioning (User + Profile + Student/Teacher)
 
 Bulk score import, bulk attendance
 
-Soft-deleting a student  (student row + its user account)
+Soft-deleting a student (student row + its user account)
 
 ---
 
@@ -1196,11 +1200,11 @@ against a service boundary that isn't real yet.
 
 ## What changes, concretely
 
-| Coupling (CLAUDE.md) | Today | Target |
-|---|---|---|
-| Session/permission read | `JwtStrategy` → `ValidateTokenUseCase` reads `auth_sessions` + `users` off the shared DB | Unchanged for now — see CLAUDE.md's own note: revocation must stay immediate, so this is the one coupling that may not move to a token-only check |
-| Provisioning write | `AccountProvisioningService` writes the account inside the same transaction as the academic record | A typed HTTP client call to identity-service's `POST /users`, with the academic write and the account write no longer atomic |
-| Profile join | `profile.name` read through a Prisma relation | A batch lookup (`POST /profiles/batch` or similar) against identity-service, cached — rosters are the hot path, per CLAUDE.md |
+| Coupling (CLAUDE.md)    | Today                                                                                              | Target                                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Session/permission read | `JwtStrategy` → `ValidateTokenUseCase` reads `auth_sessions` + `users` off the shared DB           | Unchanged for now — see CLAUDE.md's own note: revocation must stay immediate, so this is the one coupling that may not move to a token-only check |
+| Provisioning write      | `AccountProvisioningService` writes the account inside the same transaction as the academic record | A typed HTTP client call to identity-service's `POST /users`, with the academic write and the account write no longer atomic                      |
+| Profile join            | `profile.name` read through a Prisma relation                                                      | A batch lookup (`POST /profiles/batch` or similar) against identity-service, cached — rosters are the hot path, per CLAUDE.md                     |
 
 ## Rules for when a cross-service call is added
 
@@ -1223,7 +1227,7 @@ running.
 
 **A network call is not a domain event.** EVENT RULES' "direct, awaited
 call" default was written for in-process calls and still applies to the
-*shape* of the call (await it, let its failure surface) — but timeouts and
+_shape_ of the call (await it, let its failure surface) — but timeouts and
 retries are now the caller's problem in a way an in-process call never was.
 Set an explicit timeout; do not let a hung identity-service call hang the request
 that depends on it forever.

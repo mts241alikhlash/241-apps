@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { NumberFieldRoot, useForwardPropsEmits } from 'reka-ui'
 
-const props = defineProps<NumberFieldRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  NumberFieldRootProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<NumberFieldRootEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')
@@ -14,7 +16,11 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
-  <NumberFieldRoot v-slot="slotProps" v-bind="forwarded" :class="cn('grid gap-1.5', props.class)">
+  <NumberFieldRoot
+    v-slot="slotProps"
+    v-bind="forwarded"
+    :class="cn('grid gap-1.5', props.class)"
+  >
     <slot v-bind="slotProps" />
   </NumberFieldRoot>
 </template>

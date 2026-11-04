@@ -9,21 +9,29 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/80',
-        outline: 'border-border bg-background dark:bg-input/30 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
-        ghost: 'hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground',
-        destructive: 'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        outline:
+          'border-border bg-background dark:bg-input/30 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
+        ghost:
+          'hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground',
+        destructive:
+          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        'default': 'h-[var(--control-h-md,1.75rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
-        'xs': 'h-[var(--control-h-xs,1.25rem)] gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-2.5',
-        'sm': 'h-[var(--control-h-sm,1.5rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
-        'lg': 'h-[var(--control-h-lg,2rem)] gap-1 px-2.5 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
-        'icon': 'size-[var(--control-h-md,1.75rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
-        'icon-xs': 'size-[var(--control-h-xs,1.25rem)] rounded-sm [&_svg:not([class*=size-])]:size-2.5',
-        'icon-sm': 'size-[var(--control-h-sm,1.5rem)] [&_svg:not([class*=size-])]:size-3',
-        'icon-lg': 'size-[var(--control-h-lg,2rem)] [&_svg:not([class*=size-])]:size-4',
+        default:
+          'h-[var(--control-h-md,1.75rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+        xs: 'h-[var(--control-h-xs,1.25rem)] gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-2.5',
+        sm: 'h-[var(--control-h-sm,1.5rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
+        lg: 'h-[var(--control-h-lg,2rem)] gap-1 px-2.5 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
+        icon: 'size-[var(--control-h-md,1.75rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+        'icon-xs':
+          'size-[var(--control-h-xs,1.25rem)] rounded-sm [&_svg:not([class*=size-])]:size-2.5',
+        'icon-sm':
+          'size-[var(--control-h-sm,1.5rem)] [&_svg:not([class*=size-])]:size-3',
+        'icon-lg':
+          'size-[var(--control-h-lg,2rem)] [&_svg:not([class*=size-])]:size-4',
       },
     },
     defaultVariants: {

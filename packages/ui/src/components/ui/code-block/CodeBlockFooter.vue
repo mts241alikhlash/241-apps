@@ -10,7 +10,12 @@ const props = defineProps<{
 <template>
   <div
     data-slot="code-block-footer"
-    :class="cn('gap-2 px-3 pb-3 text-muted-foreground group-data-[size=sm]/code-block:px-2 group-data-[size=sm]/code-block:pb-2 flex min-w-0 shrink-0 items-center', props.class)"
+    :class="
+      cn(
+        'gap-2 px-3 pb-3 text-muted-foreground group-data-[size=sm]/code-block:px-2 group-data-[size=sm]/code-block:pb-2 flex min-w-0 shrink-0 items-center',
+        props.class,
+      )
+    "
   >
     <slot />
   </div>

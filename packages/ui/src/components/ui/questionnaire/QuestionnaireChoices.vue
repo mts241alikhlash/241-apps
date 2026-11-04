@@ -5,11 +5,16 @@ import { cn } from '@mts241alikhlash/ui/utils'
 import { Primitive } from 'reka-ui'
 import { injectQuestionnaireItemContext } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-}>(), {
-  as: 'div',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+    }
+  >(),
+  {
+    as: 'div',
+  },
+)
 
 const item = injectQuestionnaireItemContext()
 </script>

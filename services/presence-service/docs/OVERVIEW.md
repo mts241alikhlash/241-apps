@@ -39,12 +39,12 @@ deployable does not satisfy it.
 The three costs the 2026-08-30 merge was avoiding were all paid off before the
 move rather than paid again:
 
-| The 2026-08-29 cost | Why it does not recur |
-|---|---|
+| The 2026-08-29 cost                                            | Why it does not recur                                                                                                                                                                |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | A **verbatim copy** of `summarizeMonth` in payroll's read port | `POST /daily-presences/monthly-summary` serves that arithmetic. assessment-service has consumed it since 2026-09-09; hr-service is the second consumer. There is one implementation. |
-| Three cross-service edges, two of them to presence | Two, both to presence. The roster edge disappeared entirely — payroll now sits beside the employment record it reads. |
-| Two independence guards cut in half | Zero. Both FR-055/FR-056 sweeps live in hr-service now, in one repository, where neither can be deleted without the other turning red. |
-| No frontend of its own | `hr-web` is hr-service's frontend, exactly. |
+| Three cross-service edges, two of them to presence             | Two, both to presence. The roster edge disappeared entirely — payroll now sits beside the employment record it reads.                                                                |
+| Two independence guards cut in half                            | Zero. Both FR-055/FR-056 sweeps live in hr-service now, in one repository, where neither can be deleted without the other turning red.                                               |
+| No frontend of its own                                         | `hr-web` is hr-service's frontend, exactly.                                                                                                                                          |
 
 The copy is the one that mattered. It was kept verbatim in 2026-08-29 because a
 rewrite had got four things wrong — `LATE` counting as a present day,
@@ -91,11 +91,11 @@ rather than a silent divergence, which is the accurate thing to be told.
 
 Three services ask, all through `@Public()` + `ProvisioningTokenGuard`:
 
-| Route | Asked by | For |
-|---|---|---|
-| `POST /daily-presences/monthly-summary` | hr-service, assessment-service | a payslip's attendance driver; a teacher's monthly recap |
-| `POST /daily-presences/by-users` | assessment-service | pre-filling a class register from the gate |
-| `GET /presence/periods/:year/:month/closed` | hr-service | payroll refuses to run against an open month |
+| Route                                       | Asked by                       | For                                                      |
+| ------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| `POST /daily-presences/monthly-summary`     | hr-service, assessment-service | a payslip's attendance driver; a teacher's monthly recap |
+| `POST /daily-presences/by-users`            | assessment-service             | pre-filling a class register from the gate               |
+| `GET /presence/periods/:year/:month/closed` | hr-service                     | payroll refuses to run against an open month             |
 
 The last one was added on 2026-09-10 for the payroll move. A scan recorded
 after a payslip is issued would change a payslip already issued, so the month
@@ -113,7 +113,7 @@ Only identity-service, and only the calls every service makes:
 name beside a scan, and `POST /audit-logs`.
 
 Authorization touches none of identity-service's tables. `platform/identity`'s
-`HttpIdentityAdapter` asks `POST /auth/introspect` and gets liveness *and*
+`HttpIdentityAdapter` asks `POST /auth/introspect` and gets liveness _and_
 grants back in one answer. The trade is worth stating plainly, because it is
 the price of a separate database rather than a free win:
 
@@ -141,7 +141,7 @@ Four documents govern this repo, in this order of precedence:
   **it wins**.
 - `docs/ARCHITECTURE.md` — where code goes. Part 1 is the Clean Architecture
   layering `src/presence/` is migrating to, with the measured current state and
-  the conversion procedure. Part 2 is the service boundary. Its two *structure*
+  the conversion procedure. Part 2 is the service boundary. Its two _structure_
   sections supersede `NESTJS-RULES.md`'s.
 - `docs/CLEAN-CODE.md` — what code looks like once it is in the right place,
   worked through this service's real files.

@@ -1,5 +1,8 @@
 const clean = (value: string) =>
-  value.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim()
+  value
+    .replace(/[\\/:*?"<>|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 export function formatAttachmentName(
   document: string,

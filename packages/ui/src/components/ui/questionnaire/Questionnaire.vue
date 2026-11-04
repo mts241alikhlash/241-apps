@@ -6,7 +6,14 @@ import type {
   QuestionnaireShortcutMode,
 } from './useQuestionnaire'
 import { cn } from '@mts241alikhlash/ui/utils'
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  shallowRef,
+  watch,
+} from 'vue'
 import {
   compareDocumentOrder,
   createQuestionnaireCollection,
@@ -18,20 +25,23 @@ import {
   provideQuestionnaireRootContext,
 } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<{
-  class?: HTMLAttributes['class']
-  defaultItem?: string
-  item?: string
-  items?: readonly QuestionnaireItemDefinition[]
-  noValidate?: boolean
-  shortcuts?: QuestionnaireShortcutMode
-}>(), {
-  noValidate: true,
-})
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes['class']
+    defaultItem?: string
+    item?: string
+    items?: readonly QuestionnaireItemDefinition[]
+    noValidate?: boolean
+    shortcuts?: QuestionnaireShortcutMode
+  }>(),
+  {
+    noValidate: true,
+  },
+)
 
 const emits = defineEmits<{
-  'reset': [event: Event]
-  'submit': [event: Event]
+  reset: [event: Event]
+  submit: [event: Event]
   'update:item': [item: string]
 }>()
 
@@ -50,7 +60,9 @@ const uncontrolledItem = ref<string | null>(
   getInitialItemName(collection.value, props.defaultItem),
 )
 const controlled = computed(() => props.item !== undefined)
-const activeItemName = computed(() => (controlled.value ? props.item! : uncontrolledItem.value))
+const activeItemName = computed(() =>
+  controlled.value ? props.item! : uncontrolledItem.value,
+)
 const shortcuts = computed(() => props.shortcuts ?? null)
 const nativeValidation = computed(() => props.noValidate === false)
 
@@ -60,17 +72,24 @@ const runtimeItems = computed(() => {
   void domVersion.value
 
   return registrations.value
-    .filter(registration => !registration.isDisabled())
-    .sort((first, second) => compareDocumentOrder(first.element, second.element))
+    .filter((registration) => !registration.isDisabled())
+    .sort((first, second) =>
+      compareDocumentOrder(first.element, second.element),
+    )
 })
 const runtimeItemByName = computed(
-  () => new Map(runtimeItems.value.map(runtimeItem => [runtimeItem.name, runtimeItem])),
+  () =>
+    new Map(
+      runtimeItems.value.map((runtimeItem) => [runtimeItem.name, runtimeItem]),
+    ),
 )
 const logicalItems = computed<readonly { name: string }[]>(
   () => collection.value?.enabledItems ?? runtimeItems.value,
 )
-const currentIndex = computed(
-  () => logicalItems.value.findIndex(logicalItem => logicalItem.name === activeItemName.value),
+const currentIndex = computed(() =>
+  logicalItems.value.findIndex(
+    (logicalItem) => logicalItem.name === activeItemName.value,
+  ),
 )
 const activeItem = computed(() => {
   if (currentIndex.value < 0 || !activeItemName.value) {
@@ -80,7 +99,9 @@ const activeItem = computed(() => {
   return runtimeItemByName.value.get(activeItemName.value) ?? null
 })
 const activeDefinition = computed(() =>
-  activeItemName.value ? collection.value?.itemByName.get(activeItemName.value) : undefined,
+  activeItemName.value
+    ? collection.value?.itemByName.get(activeItemName.value)
+    : undefined,
 )
 const activeItemRequired = computed(() => {
   if (currentIndex.value < 0) {
@@ -96,7 +117,9 @@ const activeItemStatus = computed(() => {
     return null
   }
 
-  return activeItem.value?.status() ?? (activeItemName.value ? 'unanswered' : null)
+  return (
+    activeItem.value?.status() ?? (activeItemName.value ? 'unanswered' : null)
+  )
 })
 const orderedRegistrations = computed(() => {
   if (!collection.value) {
@@ -110,11 +133,18 @@ const orderedRegistrations = computed(() => {
   })
 })
 const total = computed(() => logicalItems.value.length)
-const current = computed(() => (currentIndex.value < 0 ? 0 : currentIndex.value + 1))
+const current = computed(() =>
+  currentIndex.value < 0 ? 0 : currentIndex.value + 1,
+)
 const first = computed(() => total.value > 0 && currentIndex.value === 0)
-const last = computed(() => total.value > 0 && currentIndex.value === total.value - 1)
+const last = computed(
+  () => total.value > 0 && currentIndex.value === total.value - 1,
+)
 
-function setItem(nextItem: string, focusTarget: PendingFocus['target'] = 'item') {
+function setItem(
+  nextItem: string,
+  focusTarget: PendingFocus['target'] = 'item',
+) {
   if (nextItem === activeItemName.value) {
     return
   }
@@ -131,17 +161,24 @@ function setItem(nextItem: string, focusTarget: PendingFocus['target'] = 'item')
 function registerItem(registration: ItemRegistration) {
   registrations.value = [
     ...registrations.value.filter(
-      current => current.element !== registration.element && current.name !== registration.name,
+      (current) =>
+        current.element !== registration.element &&
+        current.name !== registration.name,
     ),
     registration,
   ]
 
   return () => {
-    registrations.value = registrations.value.filter(current => current !== registration)
+    registrations.value = registrations.value.filter(
+      (current) => current !== registration,
+    )
   }
 }
 
-function setItemAt(index: number, focusTarget: PendingFocus['target'] = 'item') {
+function setItemAt(
+  index: number,
+  focusTarget: PendingFocus['target'] = 'item',
+) {
   const nextItem = logicalItems.value[index]
 
   if (nextItem) {
@@ -218,8 +255,9 @@ function handleReset(event: Event) {
 
   const resetItemName = collection.value
     ? getInitialItemName(collection.value, props.defaultItem)
-    : (runtimeItems.value.find(registration => registration.name === props.defaultItem)?.name
-      ?? runtimeItems.value[0]?.name)
+    : (runtimeItems.value.find(
+        (registration) => registration.name === props.defaultItem,
+      )?.name ?? runtimeItems.value[0]?.name)
 
   if (resetItemName) {
     setItem(resetItemName)
@@ -227,7 +265,9 @@ function handleReset(event: Event) {
 }
 
 function handleSubmit(event: Event) {
-  const firstInvalidItem = orderedRegistrations.value.find(registration => !registration.validate())
+  const firstInvalidItem = orderedRegistrations.value.find(
+    (registration) => !registration.validate(),
+  )
 
   if (firstInvalidItem) {
     event.preventDefault()
@@ -246,16 +286,21 @@ function handleSubmit(event: Event) {
 
 function handleKeydown(event: KeyboardEvent) {
   if (
-    event.defaultPrevented
-    || event.isComposing
-    || event.keyCode === 229
-    || !activeItem.value
-    || !(event.target instanceof Element)
+    event.defaultPrevented ||
+    event.isComposing ||
+    event.keyCode === 229 ||
+    !activeItem.value ||
+    !(event.target instanceof Element)
   ) {
     return
   }
 
-  if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && !event.altKey && !event.shiftKey) {
+  if (
+    event.key === 'Enter' &&
+    (event.metaKey || event.ctrlKey) &&
+    !event.altKey &&
+    !event.shiftKey
+  ) {
     event.preventDefault()
 
     if (!event.repeat) {
@@ -282,9 +327,9 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   if (
-    (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
-    && !isTextEntryTarget(event.target)
-    && !isRadioTarget(event.target)
+    (event.key === 'ArrowLeft' || event.key === 'ArrowRight') &&
+    !isTextEntryTarget(event.target) &&
+    !isRadioTarget(event.target)
   ) {
     event.preventDefault()
 
@@ -294,8 +339,7 @@ function handleKeydown(event: KeyboardEvent) {
 
     if (event.key === 'ArrowLeft') {
       goPrevious()
-    }
-    else if (activeItem.value.status() !== 'unanswered') {
+    } else if (activeItem.value.status() !== 'unanswered') {
       goNext()
     }
 
@@ -323,7 +367,9 @@ function handleKeydown(event: KeyboardEvent) {
   }
 
   const shortcut = getShortcutFromKey(event.key, shortcuts.value)
-  const answer = shortcut ? activeItem.value.getAnswerByShortcut(shortcut) : null
+  const answer = shortcut
+    ? activeItem.value.getAnswerByShortcut(shortcut)
+    : null
 
   if (!answer) {
     return
@@ -343,7 +389,13 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 watch(
-  () => [activeItemName.value, currentIndex.value, total.value, activeItem.value] as const,
+  () =>
+    [
+      activeItemName.value,
+      currentIndex.value,
+      total.value,
+      activeItem.value,
+    ] as const,
   () => {
     if (total.value === 0) {
       return
@@ -381,8 +433,7 @@ watch(
 
     if (focus.target === 'invalid') {
       activeItem.value?.focusInvalid()
-    }
-    else {
+    } else {
       activeItem.value?.focus()
     }
 
@@ -441,6 +492,11 @@ provideQuestionnaireRootContext({
     @reset="handleReset"
     @submit="handleSubmit"
   >
-    <slot :current="current" :first="first" :last="last" :total="total" />
+    <slot
+      :current="current"
+      :first="first"
+      :last="last"
+      :total="total"
+    />
   </form>
 </template>

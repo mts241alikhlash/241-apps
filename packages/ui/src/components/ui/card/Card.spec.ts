@@ -8,7 +8,14 @@ const classes = (w: ReturnType<typeof mount>) => w.classes()
 describe('Card family', () => {
   it('uses the Mira spacing without props', () => {
     expect(classes(mount(Card))).toEqual(
-      expect.arrayContaining(['gap-4', 'py-4', 'ring-1', 'rounded-md', 'flex', 'flex-col']),
+      expect.arrayContaining([
+        'gap-4',
+        'py-4',
+        'ring-1',
+        'rounded-md',
+        'flex',
+        'flex-col',
+      ]),
     )
     expect(classes(mount(CardHeader))).toEqual(
       expect.arrayContaining(['grid', 'px-4', 'gap-1']),
@@ -95,14 +102,20 @@ describe('Card family', () => {
     expect(classes(mount(CardTitle, { props: { size: 'md' } }))).toContain(
       'text-[length:var(--text-control,0.75rem)]',
     )
-    expect(classes(mount(CardTitle, { props: { size: 'lg' } }))).toContain('text-xl')
+    expect(classes(mount(CardTitle, { props: { size: 'lg' } }))).toContain(
+      'text-xl',
+    )
   })
 
   it('pads the content by variant', () => {
-    expect(classes(mount(CardContent, { props: { variant: 'standard' } }))).toEqual(
-      expect.arrayContaining(['p-4']),
-    )
-    expect(classes(mount(CardContent, { props: { variant: 'standard' } }))).not.toContain('sm:p-6')
-    expect(classes(mount(CardContent, { props: { variant: 'flush' } }))).toContain('p-0')
+    expect(
+      classes(mount(CardContent, { props: { variant: 'standard' } })),
+    ).toEqual(expect.arrayContaining(['p-4']))
+    expect(
+      classes(mount(CardContent, { props: { variant: 'standard' } })),
+    ).not.toContain('sm:p-6')
+    expect(
+      classes(mount(CardContent, { props: { variant: 'flush' } })),
+    ).toContain('p-0')
   })
 })

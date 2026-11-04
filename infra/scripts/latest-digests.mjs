@@ -15,13 +15,27 @@ if (!token) {
 }
 
 const APPS = [
-  'account-web', 'academic-web', 'admin-web', 'admission-web', 'assessment-web',
-  'exam-web', 'hr-web', 'inventory-web', 'portal-web',
+  'account-web',
+  'academic-web',
+  'admin-web',
+  'admission-web',
+  'assessment-web',
+  'exam-web',
+  'hr-web',
+  'inventory-web',
+  'portal-web',
 ]
 const SERVICES = [
-  'identity-service', 'academic-service', 'inventory-service',
-  'presence-service', 'portal-service', 'admission-service',
-  'hr-service', 'student-service', 'assessment-service', 'exam-service',
+  'identity-service',
+  'academic-service',
+  'inventory-service',
+  'presence-service',
+  'portal-service',
+  'admission-service',
+  'hr-service',
+  'student-service',
+  'assessment-service',
+  'exam-service',
 ]
 const COMPONENTS = [...APPS, ...SERVICES]
 
@@ -88,7 +102,11 @@ try {
 const rows = [
   ...COMPONENTS.map((name) => {
     const r = results[name]
-    return { name, version: r?.version ?? '(none published)', digest: r?.digest ?? '' }
+    return {
+      name,
+      version: r?.version ?? '(none published)',
+      digest: r?.digest ?? '',
+    }
   }),
   {
     name: 'gateway',
@@ -99,7 +117,9 @@ const rows = [
 const nameWidth = Math.max(...rows.map((r) => r.name.length))
 console.log()
 for (const r of rows) {
-  console.log(`  ${r.name.padEnd(nameWidth)}  ${r.version.padEnd(10)}  ${r.digest}`)
+  console.log(
+    `  ${r.name.padEnd(nameWidth)}  ${r.version.padEnd(10)}  ${r.digest}`,
+  )
 }
 console.log()
 
@@ -126,19 +146,24 @@ lock.gatewayImage = `ghcr.io/${org}/gateway@sha256:${gatewayResult.digest.replac
 for (const key of Object.keys(lock.apps)) {
   const r = results[`${key}-web`]
   lock.apps[key].webVersion = r.version
-  lock.apps[key].webImage = `ghcr.io/${org}/${key}-web@sha256:${r.digest.replace('sha256:', '')}`
+  lock.apps[key].webImage =
+    `ghcr.io/${org}/${key}-web@sha256:${r.digest.replace('sha256:', '')}`
 }
 for (const key of Object.keys(lock.services)) {
   const r = results[`${key}-service`]
   lock.services[key].version = r.version
-  lock.services[key].image = `ghcr.io/${org}/${key}-service@sha256:${r.digest.replace('sha256:', '')}`
+  lock.services[key].image =
+    `ghcr.io/${org}/${key}-service@sha256:${r.digest.replace('sha256:', '')}`
 }
 writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n')
 console.log(`wrote ${path.relative(root, lockPath)}`)
 
 const composePath = path.join(root, 'compose', 'compose.yaml')
 let compose = readFileSync(composePath, 'utf8')
-for (const [name, r] of [...COMPONENTS.map((n) => [n, results[n]]), ['gateway', gatewayResult]]) {
+for (const [name, r] of [
+  ...COMPONENTS.map((n) => [n, results[n]]),
+  ['gateway', gatewayResult],
+]) {
   const digest = r.digest.replace('sha256:', '')
   compose = compose.replaceAll(
     new RegExp(`ghcr\\.io/${org}/${name}@sha256:\\S+`, 'g'),

@@ -5,15 +5,15 @@
 
 ## Content Quality
 
-- [X] State machine is explicit
-- [X] Failure windows are explicit
-- [X] Retry behavior is explicit
-- [X] Cross-service contract is additive
+- [x] State machine is explicit
+- [x] Failure windows are explicit
+- [x] Retry behavior is explicit
+- [x] Cross-service contract is additive
 
 ## Completeness
 
-- [X] Remote failure is covered
-- [X] Local post-remote failure is covered
-- [X] Concurrent retry is covered
-- [X] Existing conflict behavior is preserved
-- [X] Notification ordering is explicit
+- [x] Remote failure is covered
+- [x] Local post-remote failure is covered
+- [x] Concurrent retry is covered
+- [x] Existing conflict behavior is preserved
+- [x] Notification ordering is explicit

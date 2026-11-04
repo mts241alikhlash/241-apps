@@ -44,11 +44,11 @@ One origin, four services behind it: `api-routes.config.ts` is the manifest,
 and it is read by `vite.config.ts` for the dev proxy and by
 `platform-infra/gateway/generate.mjs` for the gateway.
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/users`, `/profiles`, `/religions`, `/blood-types` |
-| academic | 3200 | `/academic-years` |
-| admission | 3700 | `/admissions` |
+| Service   | Port | Answers                                                      |
+| --------- | ---- | ------------------------------------------------------------ |
+| identity  | 3000 | `/auth`, `/users`, `/profiles`, `/religions`, `/blood-types` |
+| academic  | 3200 | `/academic-years`                                            |
+| admission | 3700 | `/admissions`                                                |
 
 **All three must be running.** `/academic-years` is there because an admission
 wave belongs to an academic year and admission-service stopped declaring
@@ -77,7 +77,7 @@ is down will go away and not come back.
 `ServiceUnavailable` (`@/ui`) is the in-page version for a primary read, and
 `isServiceUnavailable` / `serviceUnavailableMessage` are the primitives. A 503
 raised by a service's own `ServiceClient` names the service that failed, so the
-message can say *which*. A 502 from the gateway cannot, and stays general.
+message can say _which_. A 502 from the gateway cannot, and stays general.
 
 **The sidebar is not gated on any of this.** It answers what this person may
 do, not what happens to be up; see the note in
@@ -163,10 +163,10 @@ page.
 `LoginForm.vue` now renders a `Belum punya akun?` line with a `Daftar` link when
 the app configures one. It is driven by two new `authConfig` fields:
 
-| Field | Default | Meaning |
-|---|---|---|
-| `signUpUrl` | `null` | Where the link points. `null` renders no link at all. |
-| `signUpLabel` | `Belum punya akun?` | The sentence before the link. |
+| Field         | Default             | Meaning                                               |
+| ------------- | ------------------- | ----------------------------------------------------- |
+| `signUpUrl`   | `null`              | Where the link points. `null` renders no link at all. |
+| `signUpLabel` | `Belum punya akun?` | The sentence before the link.                         |
 
 `admission-web` sets `signUpUrl: '/register'` in `src/app/main.ts`, which redirects
 to `/login?signup=1`, so the link opens the sign-up dialog on the login page. The

@@ -4,13 +4,16 @@ import { cn } from '@mts241alikhlash/ui/utils'
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
 import { useMessageScrollerRegister } from './useMessageScroller'
 
-const props = withDefaults(defineProps<{
-  messageId?: string
-  scrollAnchor?: boolean
-  class?: HTMLAttributes['class']
-}>(), {
-  scrollAnchor: false,
-})
+const props = withDefaults(
+  defineProps<{
+    messageId?: string
+    scrollAnchor?: boolean
+    class?: HTMLAttributes['class']
+  }>(),
+  {
+    scrollAnchor: false,
+  },
+)
 
 const register = useMessageScrollerRegister()
 
@@ -21,15 +24,15 @@ onMounted(() => {
     register(props.messageId, itemEl.value, null)
 })
 
-watch(() => props.messageId, (messageId, previousMessageId) => {
-  const element = itemEl.value
-  if (!element)
-    return
-  if (previousMessageId)
-    register(previousMessageId, null, element)
-  if (messageId)
-    register(messageId, element, null)
-})
+watch(
+  () => props.messageId,
+  (messageId, previousMessageId) => {
+    const element = itemEl.value
+    if (!element) return
+    if (previousMessageId) register(previousMessageId, null, element)
+    if (messageId) register(messageId, element, null)
+  },
+)
 
 onBeforeUnmount(() => {
   if (props.messageId && itemEl.value)
@@ -43,10 +46,12 @@ onBeforeUnmount(() => {
     data-slot="message-scroller-item"
     :data-message-id="messageId"
     :data-scroll-anchor="scrollAnchor ? 'true' : 'false'"
-    :class="cn(
-      'min-w-0 shrink-0 [contain-intrinsic-size:auto_10rem] [content-visibility:auto]',
-      props.class,
-    )"
+    :class="
+      cn(
+        'min-w-0 shrink-0 [contain-intrinsic-size:auto_10rem] [content-visibility:auto]',
+        props.class,
+      )
+    "
   >
     <slot />
   </div>

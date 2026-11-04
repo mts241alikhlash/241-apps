@@ -17,7 +17,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@mts241alikhlash/ui/alert-dialog'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@mts241alikhlash/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@mts241alikhlash/ui/tooltip'
 
 const props = defineProps<{
   editLabel?: string
@@ -90,16 +94,14 @@ function confirmDelete() {
             <span class="sr-only">Opsi</span>
             <Settings2 />
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-          >
+          <DropdownMenuContent align="end">
             <DropdownMenuItem
               v-if="viewLabel"
               class="cursor-pointer"
               @click="fireView"
             >
               <div class="flex items-center gap-2">
-                <Eye  />
+                <Eye />
                 <span>{{ viewLabel }}</span>
               </div>
             </DropdownMenuItem>
@@ -109,7 +111,7 @@ function confirmDelete() {
               @click="fireManage"
             >
               <div class="flex items-center gap-2">
-                <UserCheck  />
+                <UserCheck />
                 <span>{{ manageLabel }}</span>
               </div>
             </DropdownMenuItem>
@@ -141,10 +143,7 @@ function confirmDelete() {
               @click="fireEdit"
             >
               <div class="flex items-center gap-2">
-                <component
-                  :is="EditIcon"
-                  
-                />
+                <component :is="EditIcon" />
                 <span>{{ editLabel || 'Edit' }}</span>
               </div>
             </DropdownMenuItem>

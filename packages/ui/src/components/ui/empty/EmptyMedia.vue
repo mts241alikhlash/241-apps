@@ -4,12 +4,15 @@ import type { EmptyMediaVariants } from '.'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { emptyMediaVariants } from '.'
 
-const props = withDefaults(defineProps<{
-  class?: HTMLAttributes['class']
-  variant?: EmptyMediaVariants['variant']
-}>(), {
-  variant: 'default',
-})
+const props = withDefaults(
+  defineProps<{
+    class?: HTMLAttributes['class']
+    variant?: EmptyMediaVariants['variant']
+  }>(),
+  {
+    variant: 'default',
+  },
+)
 </script>
 
 <template>

@@ -8,7 +8,6 @@ import {
   UNROUTED_PREFIXES,
 } from './api-routes.config.ts'
 
-
 const IDENTITY_URL = process.env.IDENTITY_SERVICE_URL ?? 'http://localhost:3000'
 const PRESENCE_URL = process.env.PRESENCE_SERVICE_URL ?? 'http://localhost:3400'
 const ACADEMIC_URL = process.env.ACADEMIC_SERVICE_URL ?? 'http://localhost:3200'

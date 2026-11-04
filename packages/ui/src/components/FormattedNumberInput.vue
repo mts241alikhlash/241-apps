@@ -55,7 +55,10 @@ function onPaste(event: ClipboardEvent) {
   const pasted = event.clipboardData?.getData('text') ?? ''
   commit(
     el,
-    (el.value.slice(0, start) + pasted + el.value.slice(end)).replace(/\D/g, ''),
+    (el.value.slice(0, start) + pasted + el.value.slice(end)).replace(
+      /\D/g,
+      '',
+    ),
   )
 }
 

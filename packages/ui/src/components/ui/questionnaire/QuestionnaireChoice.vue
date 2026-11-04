@@ -4,22 +4,28 @@ import type { HTMLAttributes } from 'vue'
 import { CheckIcon } from '@lucide/vue'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
-import { getAnswerKeyShortcuts, injectQuestionnaireItemContext } from './useQuestionnaire'
+import {
+  getAnswerKeyShortcuts,
+  injectQuestionnaireItemContext,
+} from './useQuestionnaire'
 
-const props = withDefaults(defineProps<{
-  checked?: boolean
-  class?: HTMLAttributes['class']
-  defaultChecked?: boolean
-  disabled?: boolean
-  value: string
-}>(), {
-  checked: undefined,
-  defaultChecked: false,
-  disabled: false,
-})
+const props = withDefaults(
+  defineProps<{
+    checked?: boolean
+    class?: HTMLAttributes['class']
+    defaultChecked?: boolean
+    disabled?: boolean
+    value: string
+  }>(),
+  {
+    checked: undefined,
+    defaultChecked: false,
+    disabled: false,
+  },
+)
 
 const emits = defineEmits<{
-  'change': [event: Event]
+  change: [event: Event]
   'update:checked': [checked: boolean]
 }>()
 
@@ -40,10 +46,12 @@ const checked = computed(() => {
   return item.status.value === 'skipped' ? false : props.checked!
 })
 const type = computed(() => (item.multiple.value ? 'checkbox' : 'radio'))
-const shortcut = computed(() =>
-  item.shortcutByChoiceValue.value?.get(props.value)
-  ?? item.shortcutByAnswerId.value.get(answerId)
-  ?? null)
+const shortcut = computed(
+  () =>
+    item.shortcutByChoiceValue.value?.get(props.value) ??
+    item.shortcutByAnswerId.value.get(answerId) ??
+    null,
+)
 
 function syncCheckedElement() {
   if (inputElement.value && inputElement.value.checked !== checked.value) {
@@ -75,49 +83,69 @@ function handleChange(event: Event) {
   item.requestControlSync()
 }
 
-const unregisterSelection = item.registerAnswerSelection(answerId, initialDefaultChecked)
+const unregisterSelection = item.registerAnswerSelection(
+  answerId,
+  initialDefaultChecked,
+)
 
 let unregisterControl: (() => void) | null = null
 
-watch([inputElement, disabled, () => props.disabled, () => props.value], ([element]) => {
-  unregisterControl?.()
-  unregisterControl = null
+watch(
+  [inputElement, disabled, () => props.disabled, () => props.value],
+  ([element]) => {
+    unregisterControl?.()
+    unregisterControl = null
 
-  if (!element) {
-    return
-  }
+    if (!element) {
+      return
+    }
 
-  unregisterControl = item.registerAnswerControl({
-    disabled: disabled.value,
-    element,
-    id: answerId,
-    ownDisabled: props.disabled,
-    type: 'choice',
-    value: props.value,
-  })
-}, { flush: 'post' })
+    unregisterControl = item.registerAnswerControl({
+      disabled: disabled.value,
+      element,
+      id: answerId,
+      ownDisabled: props.disabled,
+      type: 'choice',
+      value: props.value,
+    })
+  },
+  { flush: 'post' },
+)
 
-watch(() => props.defaultChecked, (defaultChecked) => {
-  item.setAnswerDefault(answerId, defaultChecked)
-})
+watch(
+  () => props.defaultChecked,
+  (defaultChecked) => {
+    item.setAnswerDefault(answerId, defaultChecked)
+  },
+)
 
-watch([() => props.checked, item.resetVersion], () => {
-  if (controlled.value) {
-    item.syncControlledAnswerSelection(answerId, props.checked!)
-  }
-}, { immediate: true })
+watch(
+  [() => props.checked, item.resetVersion],
+  () => {
+    if (controlled.value) {
+      item.syncControlledAnswerSelection(answerId, props.checked!)
+    }
+  },
+  { immediate: true },
+)
 
 watch(item.controlSyncVersion, syncCheckedElement, { flush: 'post' })
 
-watch([checked, inputElement, () => props.defaultChecked, item.resetVersion], () => {
-  if (!inputElement.value) {
-    return
-  }
+watch(
+  [checked, inputElement, () => props.defaultChecked, item.resetVersion],
+  () => {
+    if (!inputElement.value) {
+      return
+    }
 
-  inputElement.value.defaultChecked = controlled.value ? props.checked! : props.defaultChecked
+    inputElement.value.defaultChecked = controlled.value
+      ? props.checked!
+      : props.defaultChecked
 
-  syncCheckedElement()
-}, { flush: 'post' })
+    syncCheckedElement()
+  },
+  { flush: 'post' },
+)
 
 onBeforeUnmount(() => {
   unregisterControl?.()
@@ -135,11 +163,13 @@ onBeforeUnmount(() => {
     :data-shortcut="shortcut ?? undefined"
     :data-type="type"
     :data-unchecked="checked ? undefined : ''"
-    :class="cn(
-      'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-2.5 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start text-start transition-colors outline-none select-none',
-      'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50',
-      props.class,
-    )"
+    :class="
+      cn(
+        'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-2.5 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start text-start transition-colors outline-none select-none',
+        'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50',
+        props.class,
+      )
+    "
   >
     <input
       :id="answerId"
@@ -153,11 +183,15 @@ onBeforeUnmount(() => {
       :data-unchecked="checked ? undefined : ''"
       :disabled="disabled"
       :name="item.status.value === 'skipped' ? undefined : item.name.value"
-      :required="item.required.value && !item.multiple.value && !item.hasInputAnswer.value"
+      :required="
+        item.required.value &&
+        !item.multiple.value &&
+        !item.hasInputAnswer.value
+      "
       :type="type"
       :value="props.value"
       @change="handleChange"
-    >
+    />
     <span
       aria-hidden="true"
       data-slot="questionnaire-choice-indicator"
@@ -167,13 +201,21 @@ onBeforeUnmount(() => {
         data-slot="questionnaire-choice-indicator-dot"
         class="bg-primary-foreground size-2 hidden rounded-full group-data-[type=checkbox]/questionnaire-choice:hidden group-data-[state=checked]/questionnaire-choice:block"
       />
-      <CheckIcon data-slot="questionnaire-choice-indicator-check" class="size-3.5 hidden group-data-[type=radio]/questionnaire-choice:hidden group-data-[state=checked]/questionnaire-choice:block" />
+      <CheckIcon
+        data-slot="questionnaire-choice-indicator-check"
+        class="size-3.5 hidden group-data-[type=radio]/questionnaire-choice:hidden group-data-[state=checked]/questionnaire-choice:block"
+      />
     </span>
     <span
       data-slot="questionnaire-choice-label"
       class="gap-0.5 flex min-w-0 flex-1 flex-col leading-snug"
     >
-      <slot :checked="checked" :disabled="disabled" :shortcut="shortcut" :type="type" />
+      <slot
+        :checked="checked"
+        :disabled="disabled"
+        :shortcut="shortcut"
+        :type="type"
+      />
     </span>
     <span
       v-if="shortcut"

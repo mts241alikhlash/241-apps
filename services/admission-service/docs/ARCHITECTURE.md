@@ -12,7 +12,7 @@ They are independent: a module can be perfectly layered and still wrongly
 coupled, and the reverse.
 
 `NESTJS-RULES.md` holds the coding rules (controllers, DTOs, validation,
-naming). Its two *structure* sections — `DOMAIN STRUCTURE` and
+naming). Its two _structure_ sections — `DOMAIN STRUCTURE` and
 `MODULE STRUCTURE` — are superseded by Part 1 here. `IAM.md` holds how
 authorization works and which service owns it. `CLEAN-CODE.md` covers what a
 file looks like once it is in the right place.
@@ -25,19 +25,19 @@ file looks like once it is in the right place.
 
 Measured 2026-09-02 against `src/admission/`:
 
-| Signal | Count |
-| --- | --- |
-| Modules | **1** — everything is one flat `admission/` |
-| Use cases in a single `use-cases/` folder | **34** |
-| Use cases importing a `*.dto.js` (application → presentation) | **19 of 36** |
-| Controllers | 5 |
-| Repositories | 4 |
-| Files touching Prisma outside `infrastructure/` or `core/` | 1 |
-| `.spec.ts` files | 20 |
+| Signal                                                        | Count                                       |
+| ------------------------------------------------------------- | ------------------------------------------- |
+| Modules                                                       | **1** — everything is one flat `admission/` |
+| Use cases in a single `use-cases/` folder                     | **34**                                      |
+| Use cases importing a `*.dto.js` (application → presentation) | **19 of 36**                                |
+| Controllers                                                   | 5                                           |
+| Repositories                                                  | 4                                           |
+| Files touching Prisma outside `infrastructure/` or `core/`    | 1                                           |
+| `.spec.ts` files                                              | 20                                          |
 
-This service has the strongest *domain* layer of the five unmigrated services —
+This service has the strongest _domain_ layer of the five unmigrated services —
 `admission-status.transitions.ts` is a real state machine, and
-`enroll-as-student.rules.ts` has its own spec — and the weakest *module*
+`enroll-as-student.rules.ts` has its own spec — and the weakest _module_
 structure: one folder holding thirty-four use cases covering applicants, waves,
 announcements, documents, payments, verification and notifications.
 
@@ -48,18 +48,18 @@ no easier to navigate than what exists now.
 
 ## Stage 1 — the submodule split
 
-The bounded context is *admission*. Inside it, these are the aggregates, taken
+The bounded context is _admission_. Inside it, these are the aggregates, taken
 from the repositories and entities that already exist:
 
-| Submodule | Owns | Use cases today |
-| --- | --- | --- |
-| `applicant` | `AdmissionApplicant` — the person registering | register, get-my-application, update-my-application |
-| `application` | `AdmissionApplication` — the form and its status | submit, verify, accept, reject, request-revision, enroll, get-applications, get-application-by-id, get-admission-stats |
-| `wave` | `AdmissionWave` — the intake period | create, update, delete, get, get-by-id, get-active |
-| `announcement` | `AdmissionAnnouncement` | create, update, delete, publish, get, get-published |
-| `document` | `AdmissionDocument`, `AdmissionFile` | upload-admission-document, verify-document |
-| `payment` | `AdmissionPayment` | upload-payment-proof, verify-payment |
-| `notification` | applicant-facing notices | get-my-notifications, mark-notification-read |
+| Submodule      | Owns                                             | Use cases today                                                                                                        |
+| -------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `applicant`    | `AdmissionApplicant` — the person registering    | register, get-my-application, update-my-application                                                                    |
+| `application`  | `AdmissionApplication` — the form and its status | submit, verify, accept, reject, request-revision, enroll, get-applications, get-application-by-id, get-admission-stats |
+| `wave`         | `AdmissionWave` — the intake period              | create, update, delete, get, get-by-id, get-active                                                                     |
+| `announcement` | `AdmissionAnnouncement`                          | create, update, delete, publish, get, get-published                                                                    |
+| `document`     | `AdmissionDocument`, `AdmissionFile`             | upload-admission-document, verify-document                                                                             |
+| `payment`      | `AdmissionPayment`                               | upload-payment-proof, verify-payment                                                                                   |
+| `notification` | applicant-facing notices                         | get-my-notifications, mark-notification-read                                                                           |
 
 `admission-status.transitions.ts` belongs to `application` — it is that
 aggregate's invariant, and nothing else may import it except through a use case.
@@ -101,7 +101,7 @@ wave/
 
 The five current controllers do not map one-to-one onto submodules —
 `admission-admin.controller.ts` and `admission-public.controller.ts` are cut by
-*audience*, not by aggregate. Keep that cut: a submodule may own two
+_audience_, not by aggregate. Keep that cut: a submodule may own two
 controllers, one admin-facing and one public, and `presentation/http/` is where
 both live. What must not happen is one controller reaching into two submodules'
 use cases; if it would, the route belongs to whichever submodule owns the
@@ -129,7 +129,10 @@ boundaries".
 // domain/admission-status.transitions.ts
 import { ConflictException } from '@nestjs/common'
 
-export function assertTransition(from: AdmissionStatus, to: AdmissionStatus): void {
+export function assertTransition(
+  from: AdmissionStatus,
+  to: AdmissionStatus,
+): void {
   if (!ALLOWED_TRANSITIONS[from].includes(to)) {
     throw new ConflictException(`Invalid status transition: ${from} → ${to}`)
   }
@@ -181,15 +184,15 @@ self-contained rule.
 
 ## Three type boundaries
 
-| Type | Lives in | Carries |
-| --- | --- | --- |
-| `XxxDto` | `presentation/http/dto/` | `class-validator` + `@ApiProperty` |
-| `XxxInput` | `application/use-cases/<name>/` | nothing — a plain interface |
-| `XxxRepositoryInput` | `domain/repositories/` | nothing — a plain interface |
+| Type                 | Lives in                        | Carries                            |
+| -------------------- | ------------------------------- | ---------------------------------- |
+| `XxxDto`             | `presentation/http/dto/`        | `class-validator` + `@ApiProperty` |
+| `XxxInput`           | `application/use-cases/<name>/` | nothing — a plain interface        |
+| `XxxRepositoryInput` | `domain/repositories/`          | nothing — a plain interface        |
 
 They may be structurally identical. TypeScript is structural, so a controller
 passes a Dto straight into a use case expecting an Input. **Do not write a
-mapper for it.** What you must not do is let the use case *name* the Dto.
+mapper for it.** What you must not do is let the use case _name_ the Dto.
 
 Create `.input.ts` only when the use case takes structured input. One taking
 `(id: string)` or nothing needs no Input file.
@@ -206,15 +209,15 @@ NodeNext ESM: **every relative import ends in `.js`** though the source is
 `.ts`. A wrong `../` count is the most common conversion error, and
 `pnpm run typecheck` catches every one.
 
-| File location | → `src/` | → module root |
-| --- | --- | --- |
-| `<module>.module.ts`, `index.ts` | `../../` | `./` |
-| `domain/{entities,repositories,policies}/x.ts` | `../../../../` | `../../` |
-| `application/use-cases/<name>/x.ts` | `../../../../../` | `../../../` |
-| `application/services/x.ts` | `../../../../` | `../../` |
-| `infrastructure/persistence/prisma/x.ts` | `../../../../../` | `../../../` |
-| `presentation/http/x.controller.ts` | `../../../../` | `../../` |
-| `presentation/http/dto/request/x.dto.ts` | `../../../../../../` | `../../../../` |
+| File location                                  | → `src/`             | → module root  |
+| ---------------------------------------------- | -------------------- | -------------- |
+| `<module>.module.ts`, `index.ts`               | `../../`             | `./`           |
+| `domain/{entities,repositories,policies}/x.ts` | `../../../../`       | `../../`       |
+| `application/use-cases/<name>/x.ts`            | `../../../../../`    | `../../../`    |
+| `application/services/x.ts`                    | `../../../../`       | `../../`       |
+| `infrastructure/persistence/prisma/x.ts`       | `../../../../../`    | `../../../`    |
+| `presentation/http/x.controller.ts`            | `../../../../`       | `../../`       |
+| `presentation/http/dto/request/x.dto.ts`       | `../../../../../../` | `../../../../` |
 
 Depths assume a submodule at `src/admission/<submodule>/` after stage 1.
 
@@ -222,15 +225,15 @@ Depths assume a submodule at `src/admission/<submodule>/` after stage 1.
 
 One submodule per commit. Old layout → new:
 
-| Old | New |
-| --- | --- |
-| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts` |
-| `use-cases/<name>.use-case.ts` | `application/use-cases/<name>/<name>.use-case.ts` |
-| `services/<name>.service.ts` | `application/services/<name>.service.ts` |
-| `infrastructure/persistence/*.ts` | `infrastructure/persistence/prisma/*.ts` |
-| `presentation/<name>.controller.ts` | `presentation/http/<name>.controller.ts` |
-| `dto/request/*.ts` | `presentation/http/dto/request/*.ts` |
-| `domain/admission.serializers.ts` | `presentation/http/dto/response/*.dto.ts` |
+| Old                                                | New                                               |
+| -------------------------------------------------- | ------------------------------------------------- |
+| `domain/interfaces/<name>-repository.interface.ts` | `domain/repositories/<name>.repository.ts`        |
+| `use-cases/<name>.use-case.ts`                     | `application/use-cases/<name>/<name>.use-case.ts` |
+| `services/<name>.service.ts`                       | `application/services/<name>.service.ts`          |
+| `infrastructure/persistence/*.ts`                  | `infrastructure/persistence/prisma/*.ts`          |
+| `presentation/<name>.controller.ts`                | `presentation/http/<name>.controller.ts`          |
+| `dto/request/*.ts`                                 | `presentation/http/dto/request/*.ts`              |
+| `domain/admission.serializers.ts`                  | `presentation/http/dto/response/*.dto.ts`         |
 
 `constants/` stays at the module root. `domain/entities/` does not move.
 
@@ -312,11 +315,11 @@ Stated once, here, so it isn't relitigated module by module:
 `identity-service`, each narrowed to a read or a single write. **None is a second
 copy of identity-service.**
 
-| Here | May do | Left behind |
-| --- | --- | --- |
-| `platform/auth` | Verify a token, check the session is live | Login, refresh, logout, password reset, session cleanup |
+| Here                                 | May do                                                    | Left behind                                                |
+| ------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------- |
+| `platform/auth`                      | Verify a token, check the session is live                 | Login, refresh, logout, password reset, session cleanup    |
 | `platform/access-control/permission` | `PermissionGuard` asking if the caller holds a permission | The eight use cases, the controller, the catalog-sync hook |
-| `platform/user` | Read the account behind an applicant | `GET/POST/PATCH/DELETE /users` and their use cases |
+| `platform/user`                      | Read the account behind an applicant                      | `GET/POST/PATCH/DELETE /users` and their use cases         |
 
 > **The narrowing rule:** if a controller here would answer the same URL as one
 > in `identity-service`, it does not belong here.
@@ -365,7 +368,7 @@ a distributed transaction, for two reasons:
 This is the **Saga pattern**'s compensating form — a sequence of local
 transactions instead of one distributed one. The idempotency is load-bearing:
 `academic-service`'s `enroll-existing-account.use-case.spec.ts` guards that
-idempotency is checked *before* uniqueness, because it was once the other way
+idempotency is checked _before_ uniqueness, because it was once the other way
 round and a retry was rejected as a duplicate NIS by the very student it was
 confirming.
 
@@ -385,7 +388,7 @@ reads or writes them, so migrating is simply how this service deploys.
 > nothing else. Do not "fix" this.
 
 That is no longer about racing another service for a shared schema — it is
-about who decides *when* the schema changes. Migrating on boot hands that
+about who decides _when_ the schema changes. Migrating on boot hands that
 decision to whichever replica starts first, and races every extra replica.
 Migration is an explicit deploy step: `--profile migrate` in
 `docker-compose.prod.yml`, per service.
@@ -400,13 +403,14 @@ it.
 - `pnpm prisma:generate` is required before anything else, and is always safe.
 - A schema change is made here and nowhere else. This service's schema is the
   only description of its database.
+
 ## Couplings, and what closing them means
 
-| # | Coupling | Status |
-| --- | --- | --- |
-| 1 | Authorization reads iam's tables | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma |
-| 2 | Enrollment writes academic's tables | **Closed 2026-08-30.** Now `POST /students/enroll` behind a port |
-| 3 | Applicant rows join to `profiles` | **Open, deliberately.** While both tables sit in one database the join is the faster read |
+| #   | Coupling                            | Status                                                                                    |
+| --- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1   | Authorization reads iam's tables    | **Open.** `platform/auth` reads `auth_sessions` and `users` per request through Prisma    |
+| 2   | Enrollment writes academic's tables | **Closed 2026-08-30.** Now `POST /students/enroll` behind a port                          |
+| 3   | Applicant rows join to `profiles`   | **Open, deliberately.** While both tables sit in one database the join is the faster read |
 
 Coupling 1 is the next one to close, and the shape is already proven:
 `inventory-service` replaced exactly this with `IIdentityPort` +
@@ -423,7 +427,7 @@ does `prisma migrate` belong to it.
 applicant model into academic's `EnrollStudentInput`, it is a genuine
 **Anti-Corruption Layer**. Use that term for it.
 
-Do not call `platform/` an ACL. An ACL translates between two *different* domain
+Do not call `platform/` an ACL. An ACL translates between two _different_ domain
 models, and nothing there does that — `platform/auth` reads `auth_sessions` and
 `users` through the identical Prisma models `identity-service` itself uses. It
 becomes an accurate name only once coupling 1 closes into a real HTTP call.

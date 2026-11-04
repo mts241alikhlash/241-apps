@@ -8,17 +8,22 @@ import { computed } from 'vue'
 import { buttonVariants } from '@mts241alikhlash/ui/button'
 import { injectQuestionnaireRootContext } from './useQuestionnaire'
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  class?: HTMLAttributes['class']
-  disabled?: boolean
-  size?: ButtonVariants['size']
-  variant?: ButtonVariants['variant']
-}>(), {
-  as: 'button',
-  disabled: false,
-  size: 'default',
-  variant: 'outline',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      class?: HTMLAttributes['class']
+      disabled?: boolean
+      size?: ButtonVariants['size']
+      variant?: ButtonVariants['variant']
+    }
+  >(),
+  {
+    as: 'button',
+    disabled: false,
+    size: 'default',
+    variant: 'outline',
+  },
+)
 
 const emits = defineEmits<{
   click: [event: MouseEvent]
@@ -60,11 +65,13 @@ function handleClick(event: MouseEvent) {
     :hidden="!visible"
     :inert="!visible"
     :tabindex="visible ? undefined : -1"
-    :class="cn(
-      buttonVariants({ size: props.size, variant: props.variant }),
-      'col-start-1 row-start-1 min-h-11 justify-self-start sm:min-h-0',
-      props.class,
-    )"
+    :class="
+      cn(
+        buttonVariants({ size: props.size, variant: props.variant }),
+        'col-start-1 row-start-1 min-h-11 justify-self-start sm:min-h-0',
+        props.class,
+      )
+    "
     @click="handleClick"
   >
     <slot>Previous</slot>

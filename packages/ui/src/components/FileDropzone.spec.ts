@@ -7,13 +7,19 @@ const file = new File(['x'], 'kk.pdf', { type: 'application/pdf' })
 
 function dropOn(w: ReturnType<typeof mount>, files: File[]) {
   const input = w.get('input').element as HTMLInputElement
-  Object.defineProperty(input, 'files', { configurable: true, writable: true, value: files })
+  Object.defineProperty(input, 'files', {
+    configurable: true,
+    writable: true,
+    value: files,
+  })
   return w.get('label').trigger('drop', { dataTransfer: { files } })
 }
 
 describe('FileDropzone', () => {
   it('shows the placeholder and the hint until a file is chosen', () => {
-    const w = mount(FileDropzone, { props: { hint: 'JPG, PNG, atau PDF, maks. 5 MB' } })
+    const w = mount(FileDropzone, {
+      props: { hint: 'JPG, PNG, atau PDF, maks. 5 MB' },
+    })
     expect(w.text()).toContain('Klik atau tarik file ke sini')
     expect(w.text()).toContain('JPG, PNG, atau PDF, maks. 5 MB')
     expect(w.get('input').attributes('accept')).toBe('.jpg,.jpeg,.png,.pdf')
@@ -27,9 +33,13 @@ describe('FileDropzone', () => {
   })
 
   it('swaps to a removable row when clearable and a file is chosen', async () => {
-    const w = mount(FileDropzone, { props: { fileName: 'kk.pdf', clearable: true } })
+    const w = mount(FileDropzone, {
+      props: { fileName: 'kk.pdf', clearable: true },
+    })
     expect(w.find('[data-slot="file-dropzone"]').exists()).toBe(false)
-    expect(w.get('[data-slot="file-dropzone-selected"]').text()).toContain('kk.pdf')
+    expect(w.get('[data-slot="file-dropzone-selected"]').text()).toContain(
+      'kk.pdf',
+    )
     await w.get('button').trigger('click')
     expect(w.emitted('clear')).toHaveLength(1)
   })
@@ -55,7 +65,9 @@ describe('FileDropzone', () => {
   })
 
   it('marks the area and the input invalid', () => {
-    const w = mount(FileDropzone, { props: { invalid: true, ariaLabel: 'Pilih bukti transfer' } })
+    const w = mount(FileDropzone, {
+      props: { invalid: true, ariaLabel: 'Pilih bukti transfer' },
+    })
     expect(w.get('label').attributes('data-invalid')).toBeDefined()
     expect(w.get('input').attributes('aria-invalid')).toBe('true')
     expect(w.get('input').attributes('aria-label')).toBe('Pilih bukti transfer')

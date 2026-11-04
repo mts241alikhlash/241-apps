@@ -10,8 +10,7 @@ const mounted: ReturnType<typeof mount>[] = []
 function mountCell(props: Record<string, unknown> = {}) {
   const wrapper = mount(
     defineComponent({
-      render: () =>
-        h(TooltipProvider, null, () => h(ActionCell, props)),
+      render: () => h(TooltipProvider, null, () => h(ActionCell, props)),
     }),
     { attachTo: document.body },
   )

@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { MenubarTrigger, useForwardProps } from 'reka-ui'
 
-const props = defineProps<MenubarTriggerProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  MenubarTriggerProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 

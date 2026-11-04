@@ -85,7 +85,10 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   padding-bottom: 0;
 }
 
-.ff.ff-empty:not(.ff-error):not(:focus-within):not(:has(button[aria-expanded='true'])) :deep([data-slot='ff-label']) {
+.ff.ff-empty:not(.ff-error):not(:focus-within):not(
+    :has(button[aria-expanded='true'])
+  )
+  :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
   top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px);
   font-size: var(--text-control, 0.75rem);
@@ -100,14 +103,18 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   color: var(--primary);
 }
 
-.ff.ff-empty:not(.ff-error):has(button[aria-haspopup='dialog']:not([aria-expanded='true'])) :deep([data-slot='ff-label']) {
+.ff.ff-empty:not(.ff-error):has(
+    button[aria-haspopup='dialog']:not([aria-expanded='true'])
+  )
+  :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
   top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px);
   font-size: var(--text-control, 0.75rem);
   color: var(--muted-foreground);
 }
 
-.ff:has(button[aria-haspopup='dialog'][aria-expanded='true']) :deep([data-slot='ff-label']) {
+.ff:has(button[aria-haspopup='dialog'][aria-expanded='true'])
+  :deep([data-slot='ff-label']) {
   color: var(--primary);
 }
 

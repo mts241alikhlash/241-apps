@@ -40,15 +40,15 @@ tables directly. Everything that needed them now asks academic-service over
 HTTP through `platform/academic-lookup`, and the folders were deleted with
 their Prisma models.
 
-| Wanted | Now |
-|---|---|
+| Wanted                                  | Now                                                                                          |
+| --------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Classroom by id, code, or academic year | `GET /classrooms/{:id/detail,by-code/:code,by-academic-year/:id}`, `POST /classrooms/by-ids` |
-| Capacity, for the enrollment guard | `capacity` on the classroom detail |
-| Grade by level or id | `GET /grades/by-level/:level`, `POST /grades/by-ids` |
-| The active term, or a year's terms | `GET /semesters/{active,by-academic-year/:id}`, `POST /semesters/by-ids` |
-| Academic year by id | `GET /academic-years/{active,:id/summary}`, `POST /academic-years/by-ids` |
-| A classroom's officers and subjects | `GET /classrooms/:id/context` |
-| Occupation, for a parent | `GET /occupations/:id/summary`, `POST /occupations/by-ids` |
+| Capacity, for the enrollment guard      | `capacity` on the classroom detail                                                           |
+| Grade by level or id                    | `GET /grades/by-level/:level`, `POST /grades/by-ids`                                         |
+| The active term, or a year's terms      | `GET /semesters/{active,by-academic-year/:id}`, `POST /semesters/by-ids`                     |
+| Academic year by id                     | `GET /academic-years/{active,:id/summary}`, `POST /academic-years/by-ids`                    |
+| A classroom's officers and subjects     | `GET /classrooms/:id/context`                                                                |
+| Occupation, for a parent                | `GET /occupations/:id/summary`, `POST /occupations/by-ids`                                   |
 
 The batch endpoints exist because the row-labelling reads are lists: an
 enrollment page spans whichever classrooms and terms its rows happen to name, so

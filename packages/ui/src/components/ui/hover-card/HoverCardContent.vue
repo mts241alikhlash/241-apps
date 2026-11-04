@@ -3,11 +3,7 @@ import type { HoverCardContentProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  HoverCardContent,
-  HoverCardPortal,
-  useForwardProps,
-} from 'reka-ui'
+import { HoverCardContent, HoverCardPortal, useForwardProps } from 'reka-ui'
 
 defineOptions({
   inheritAttrs: false,

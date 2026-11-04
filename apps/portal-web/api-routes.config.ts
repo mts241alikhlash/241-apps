@@ -11,10 +11,7 @@ export const SERVICE_PREFIXES = {
     '/regions',
   ],
 
-  portal: [
-    '/portal',
-    '/files',
-  ],
+  portal: ['/portal', '/files'],
 } as const
 
 export const UNROUTED_PREFIXES: readonly string[] = ['/settings']

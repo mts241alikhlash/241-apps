@@ -71,8 +71,8 @@ async execute(applicationId: string, adminId: string) {
 ```
 
 The status transition is a named function in `domain/` with its own table of
-legal moves. The other two rules — *every required document is approved* and
-*the payment is verified* — are the same kind of rule, expressed as inline
+legal moves. The other two rules — _every required document is approved_ and
+_the payment is verified_ — are the same kind of rule, expressed as inline
 `filter`/`find` in the use case, where nothing tests them directly.
 
 Both are self-contained: given the application and the required types, they need
@@ -229,7 +229,7 @@ stays.
 
 This is a comment documenting a past bug, and the rule says a test documents a
 past bug. It is right that the knowledge is written down and wrong that it is
-written *here*: nothing fails if someone deletes `serializeWave` and returns the
+written _here_: nothing fails if someone deletes `serializeWave` and returns the
 row directly — a caller just receives `{s, e, d}` where a fee should be, and
 probably not in a way anyone notices before it reaches a screen.
 

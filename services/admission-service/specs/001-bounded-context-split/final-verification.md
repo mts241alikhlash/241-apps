@@ -29,15 +29,15 @@ All seven required context directories exist. Context-owned files total 80. The 
 
 Preflight comparison:
 
-| Context | Preflight expected moved source files | Final context files | Result |
-|---|---:|---:|---|
-| `wave` | 14 | 14 | PASS |
-| `announcement` | 13 | 13 | PASS |
-| `applicant` | 10 | 10 | PASS |
-| `document` | 5 | 5 | PASS |
-| `payment` | 6 | 6 | PASS |
-| `notification` | 4 | 4 | PASS |
-| `application` | 28 | 28 | PASS |
+| Context        | Preflight expected moved source files | Final context files | Result |
+| -------------- | ------------------------------------: | ------------------: | ------ |
+| `wave`         |                                    14 |                  14 | PASS   |
+| `announcement` |                                    13 |                  13 | PASS   |
+| `applicant`    |                                    10 |                  10 | PASS   |
+| `document`     |                                     5 |                   5 | PASS   |
+| `payment`      |                                     6 |                   6 | PASS   |
+| `notification` |                                     4 |                   4 | PASS   |
+| `application`  |                                    28 |                  28 | PASS   |
 
 ## T017: Stale Paths And Duplicates
 
@@ -200,9 +200,9 @@ No payment production source changed.
 
 ## T017-T019 Status
 
-- [X] T017 Search `src/admission/` for stale flat root imports and duplicate moved files; result recorded above.
-- [X] T018 Run `pnpm test`, `pnpm run build`, and `pnpm run validate`; exact counts and warnings recorded above.
-- [X] T019 Confirm route, permission, DTO, response, status, repository, storage, and integration behavior through existing contract/workflow evidence; Git limitation recorded above.
+- [x] T017 Search `src/admission/` for stale flat root imports and duplicate moved files; result recorded above.
+- [x] T018 Run `pnpm test`, `pnpm run build`, and `pnpm run validate`; exact counts and warnings recorded above.
+- [x] T019 Confirm route, permission, DTO, response, status, repository, storage, and integration behavior through existing contract/workflow evidence; Git limitation recorded above.
 
 ## Stage 1 Review Fixes
 

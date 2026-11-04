@@ -10,16 +10,21 @@ import { Button } from '@mts241alikhlash/ui/button'
 
 defineOptions({ inheritAttrs: false })
 
-const props = withDefaults(defineProps<PrimitiveProps & {
-  value: string
-  variant?: ButtonVariants['variant']
-  size?: ButtonVariants['size']
-  class?: HTMLAttributes['class']
-}>(), {
-  as: 'button',
-  variant: 'ghost',
-  size: 'icon-xs',
-})
+const props = withDefaults(
+  defineProps<
+    PrimitiveProps & {
+      value: string
+      variant?: ButtonVariants['variant']
+      size?: ButtonVariants['size']
+      class?: HTMLAttributes['class']
+    }
+  >(),
+  {
+    as: 'button',
+    variant: 'ghost',
+    size: 'icon-xs',
+  },
+)
 
 const { copy, copied } = useClipboard({ copiedDuring: 2000, legacy: true })
 </script>
@@ -40,5 +45,9 @@ const { copy, copied } = useClipboard({ copiedDuring: 2000, legacy: true })
     <CheckIcon v-if="copied" />
     <CopyIcon v-else />
   </Button>
-  <span aria-live="polite" class="sr-only">{{ copied ? "Copied" : "" }}</span>
+  <span
+    aria-live="polite"
+    class="sr-only"
+    >{{ copied ? 'Copied' : '' }}</span
+  >
 </template>

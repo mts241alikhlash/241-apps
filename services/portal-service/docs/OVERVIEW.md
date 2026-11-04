@@ -15,7 +15,7 @@ Four documents govern this repo, in this order of precedence:
 - `docs/ARCHITECTURE.md` — **start here for where code goes.** Part 1 is the
   Clean Architecture layering `src/portal/` is migrating to, with the measured
   current state and the conversion procedure. Part 2 is the service boundary.
-  Its two *structure* sections supersede `NESTJS-RULES.md`'s.
+  Its two _structure_ sections supersede `NESTJS-RULES.md`'s.
 - `docs/CLEAN-CODE.md` — **start here for what code looks like** once it is in
   the right place, worked through this service's real files rather than generic
   placeholders.
@@ -74,12 +74,12 @@ Thirteen Prisma models are portal's own, and **it reads none of identity-service
 no user lookup, no role read, no profile join. Its couplings are narrower than
 any service but presence:
 
-| Here | Why |
-|---|---|
-| `platform/auth` + `access-control`, verification only (19 files) | the management area is authenticated; the public site is not |
-| `platform/file` (16 files) | portal is the only service that stores media, and `PortalFileUsageModule` registers the veto that stops a file being deleted while visible content references it |
-| `platform/audit-log`, write side only | who published or unpublished what |
-| `core/storage`, `core/cache` | signed media URLs, and the public response cache |
+| Here                                                             | Why                                                                                                                                                              |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform/auth` + `access-control`, verification only (19 files) | the management area is authenticated; the public site is not                                                                                                     |
+| `platform/file` (16 files)                                       | portal is the only service that stores media, and `PortalFileUsageModule` registers the veto that stops a file being deleted while visible content references it |
+| `platform/audit-log`, write side only                            | who published or unpublished what                                                                                                                                |
+| `core/storage`, `core/cache`                                     | signed media URLs, and the public response cache                                                                                                                 |
 
 `core/cache` is kept here and in no other extracted service: `PortalCacheService`
 injects `CACHE_MANAGER`, which needs a globally registered `CacheModule`.
@@ -125,8 +125,8 @@ does not own.
 Two things did **not** change, and both are deliberate:
 
 - **Session validation still reads `auth_sessions` and `users`** on every
-  request. That is a different question — *is this session still live and this
-  account still active* — and answering it from a token would mean a revoked
+  request. That is a different question — _is this session still live and this
+  account still active_ — and answering it from a token would mean a revoked
   session kept working until expiry. Revocation should be immediate.
 - **The fallback is still here.** `IPermissionRepository` remains wired, because
   a token can arrive without permissions: one minted before this change, or a

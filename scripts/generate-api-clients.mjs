@@ -2,10 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import openapiTS, {
-  COMMENT_HEADER,
-  astToString,
-} from 'openapi-typescript'
+import openapiTS, { COMMENT_HEADER, astToString } from 'openapi-typescript'
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const contractsRoot = path.join(root, 'contracts')
@@ -66,7 +63,9 @@ for (const service of services) {
   await mkdir(generatedDir, { recursive: true })
 
   if (!existsSync(contract)) {
-    throw new Error(`missing OpenAPI contract: ${path.relative(root, contract)}`)
+    throw new Error(
+      `missing OpenAPI contract: ${path.relative(root, contract)}`,
+    )
   }
 
   const schema = JSON.parse(await readFile(contract, 'utf8'))
@@ -87,5 +86,7 @@ for (const service of services) {
 
   const readme = `# @mts241alikhlash/${service}-api\n\nGenerated from contracts/${service}/openapi.json.\n\nRun \`pnpm api:generate\` from the services repository root.\n`
   await writeOrCheck(path.join(packageDir, 'README.md'), readme)
-  console.log(`${check ? 'client current' : 'client written'}: @mts241alikhlash/${service}-api`)
+  console.log(
+    `${check ? 'client current' : 'client written'}: @mts241alikhlash/${service}-api`,
+  )
 }

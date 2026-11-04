@@ -45,13 +45,13 @@ with the score.
 
 Five platform pieces, copied wholesale:
 
-| Borrowed, wholesale | Why |
-|---|---|
-| `platform/auth` | Session liveness, `JwtAuthGuard` |
-| `platform/access-control/permission` | `PermissionGuard`, the permission catalog |
-| `platform/teacher-identity` | "which teacher record does this signed-in user own" — every `/me` route |
-| `platform/student-identity` | "which student record does this signed-in user own" — every `/me` route |
-| `platform/school-unit-identity` | Report card PDF header (school name, address, contact) |
+| Borrowed, wholesale                  | Why                                                                     |
+| ------------------------------------ | ----------------------------------------------------------------------- |
+| `platform/auth`                      | Session liveness, `JwtAuthGuard`                                        |
+| `platform/access-control/permission` | `PermissionGuard`, the permission catalog                               |
+| `platform/teacher-identity`          | "which teacher record does this signed-in user own" — every `/me` route |
+| `platform/student-identity`          | "which student record does this signed-in user own" — every `/me` route |
+| `platform/school-unit-identity`      | Report card PDF header (school name, address, contact)                  |
 
 **The five narrowed read-only slices are gone as of 2026-09-09** —
 `academic-setting`, `curriculum-subject`, `enrollment`, `teaching-assignment`
@@ -59,20 +59,20 @@ and `presence/daily-record` each carried a `domain/` and an
 `infrastructure/persistence/prisma/` folder reading another service's tables
 directly. Everything they answered now arrives over HTTP:
 
-| Wanted | Now |
-|---|---|
-| The teaching assignment an assessment item hangs off | `POST /teaching-assignments/by-ids` → academic |
-| A teacher's assignments for a term | `GET /teaching-assignments/by-teacher` |
-| May this teacher grade this item? | `GET /teaching-assignments/:id/exists?employeeId=` |
-| Is this teacher the homeroom teacher? | `GET /classrooms/supervises` |
-| Which classes is this teacher homeroom of? | `GET /classrooms/supervised` |
-| The enrollment a score, mark or card belongs to | `POST /student-enrollments/by-ids` → student |
-| Which enrollments match this class / term / student? | `POST /student-enrollments/search` |
-| How many students are in these classes? | `POST /student-enrollments/count-by-classrooms` |
-| A day of a timetable | `GET /schedules/lessons` |
-| The period an attendance record was taken in | `POST /schedules/by-ids` |
-| The gate record behind a class register | `POST /daily-presences/by-users` → presence |
-| Passing scores, the settings, the term, the classroom | as before |
+| Wanted                                                | Now                                                |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| The teaching assignment an assessment item hangs off  | `POST /teaching-assignments/by-ids` → academic     |
+| A teacher's assignments for a term                    | `GET /teaching-assignments/by-teacher`             |
+| May this teacher grade this item?                     | `GET /teaching-assignments/:id/exists?employeeId=` |
+| Is this teacher the homeroom teacher?                 | `GET /classrooms/supervises`                       |
+| Which classes is this teacher homeroom of?            | `GET /classrooms/supervised`                       |
+| The enrollment a score, mark or card belongs to       | `POST /student-enrollments/by-ids` → student       |
+| Which enrollments match this class / term / student?  | `POST /student-enrollments/search`                 |
+| How many students are in these classes?               | `POST /student-enrollments/count-by-classrooms`    |
+| A day of a timetable                                  | `GET /schedules/lessons`                           |
+| The period an attendance record was taken in          | `POST /schedules/by-ids`                           |
+| The gate record behind a class register               | `POST /daily-presences/by-users` → presence        |
+| Passing scores, the settings, the term, the classroom | as before                                          |
 
 Every one of them is batched by distinct id, so a page of thirty scores costs
 two calls rather than sixty, and every lookup fails closed: an unreachable

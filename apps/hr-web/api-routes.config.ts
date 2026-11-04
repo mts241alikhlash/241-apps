@@ -11,14 +11,9 @@ export const SERVICE_PREFIXES = {
     '/regions',
   ],
 
-  presence: [
-    '/presence',
-  ],
+  presence: ['/presence'],
 
-  academic: [
-    '/academic-years',
-    '/academic-calendars',
-  ],
+  academic: ['/academic-years', '/academic-calendars'],
 
   hr: [
     '/employees',
@@ -29,9 +24,7 @@ export const SERVICE_PREFIXES = {
     '/payroll',
   ],
 
-  student: [
-    '/students',
-  ],
+  student: ['/students'],
 } as const
 
 export const UNROUTED_PREFIXES: readonly string[] = ['/settings']

@@ -3,12 +3,11 @@ import type { AccordionRootEmits, AccordionRootProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
-import {
-  AccordionRoot,
-  useForwardPropsEmits,
-} from 'reka-ui'
+import { AccordionRoot, useForwardPropsEmits } from 'reka-ui'
 
-const props = defineProps<AccordionRootProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  AccordionRootProps & { class?: HTMLAttributes['class'] }
+>()
 const emits = defineEmits<AccordionRootEmits>()
 
 const delegatedProps = reactiveOmit(props, 'class')
@@ -20,7 +19,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     v-slot="slotProps"
     data-slot="accordion"
     v-bind="forwarded"
-    :class="cn('overflow-hidden rounded-md border flex w-full flex-col', props.class)"
+    :class="
+      cn('overflow-hidden rounded-md border flex w-full flex-col', props.class)
+    "
   >
     <slot v-bind="slotProps" />
   </AccordionRoot>

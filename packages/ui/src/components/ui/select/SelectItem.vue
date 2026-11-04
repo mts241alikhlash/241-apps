@@ -12,7 +12,9 @@ import {
   useForwardProps,
 } from 'reka-ui'
 
-const props = defineProps<SelectItemProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SelectItemProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
@@ -30,7 +32,9 @@ const forwardedProps = useForwardProps(delegatedProps)
       )
     "
   >
-    <span class="pointer-events-none absolute left-2 flex items-center justify-center">
+    <span
+      class="pointer-events-none absolute left-2 flex items-center justify-center"
+    >
       <SelectItemIndicator>
         <slot name="indicator-icon">
           <CheckIcon class="pointer-events-none" />

@@ -15,13 +15,13 @@ same pairing `hr-web` has with `hr-service` and `assessment-web` has with
 
 ## What it owns
 
-| Prefix | Feature |
-|---|---|
-| `/paket-soal`, `/paket-soal/:id`, `/paket-soal/:id/soal/baru`, `/paket-soal/:id/soal/:questionId`, `/paket-soal/:id/impor` | exam packages: questions live inside a package (write, import, take from another package) |
-| `/persetujuan-paket`, `/persetujuan-paket/:id` | package approval: read every question of a submitted package, note, approve or return |
-| `/jadwal-ujian` | exam schedules: a package for a classroom in a time window, cancel, and the access code students enter |
-| `/penilaian-ujian`, `/penilaian-ujian/:scheduleId`, `/penilaian-ujian/:scheduleId/:sessionId` | exam grading: the exams of the teacher's classes with how many students wait, then each short answer and essay |
-| `/ujian`, `/ujian/:scheduleId/token`, `/ujian/sesi/:sessionId` | the student exam sheet: enter the token, then sit the exam |
+| Prefix                                                                                                                     | Feature                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `/paket-soal`, `/paket-soal/:id`, `/paket-soal/:id/soal/baru`, `/paket-soal/:id/soal/:questionId`, `/paket-soal/:id/impor` | exam packages: questions live inside a package (write, import, take from another package)                      |
+| `/persetujuan-paket`, `/persetujuan-paket/:id`                                                                             | package approval: read every question of a submitted package, note, approve or return                          |
+| `/jadwal-ujian`                                                                                                            | exam schedules: a package for a classroom in a time window, cancel, and the access code students enter         |
+| `/penilaian-ujian`, `/penilaian-ujian/:scheduleId`, `/penilaian-ujian/:scheduleId/:sessionId`                              | exam grading: the exams of the teacher's classes with how many students wait, then each short answer and essay |
+| `/ujian`, `/ujian/:scheduleId/token`, `/ujian/sesi/:sessionId`                                                             | the student exam sheet: enter the token, then sit the exam                                                     |
 
 `landingPath` sends each signed-in user to the first of those their permissions
 allow — schedules, packages, grading, sitting — and to `/profile` otherwise, so
@@ -30,12 +30,12 @@ a screen they cannot open.
 
 ## Four services answer it
 
-| Service | Port | Answers |
-|---|---|---|
-| identity | 3000 | `/auth`, `/sso`, `/users`, `/profiles`, `/roles`, `/permissions`, `/school-units`, `/religions`, `/blood-types`, `/regions` |
-| exam | 4100 | `/exam-events`, `/exam-rooms`, `/exam-reports`, `/exam-files`, `/exam-grading`, `/exam-imports`, `/exam-packages`, `/exam-questions`, `/exam-schedules`, `/exam-sessions`, `/me/exams`, `/student-exams` |
-| academic | 3200 | `/academic-years`, `/classrooms`, `/grades`, `/semesters`, `/subjects`, `/teaching-assignments` |
-| student | 3900 | `/students`, `/student-enrollments` |
+| Service  | Port | Answers                                                                                                                                                                                                  |
+| -------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| identity | 3000 | `/auth`, `/sso`, `/users`, `/profiles`, `/roles`, `/permissions`, `/school-units`, `/religions`, `/blood-types`, `/regions`                                                                              |
+| exam     | 4100 | `/exam-events`, `/exam-rooms`, `/exam-reports`, `/exam-files`, `/exam-grading`, `/exam-imports`, `/exam-packages`, `/exam-questions`, `/exam-schedules`, `/exam-sessions`, `/me/exams`, `/student-exams` |
+| academic | 3200 | `/academic-years`, `/classrooms`, `/grades`, `/semesters`, `/subjects`, `/teaching-assignments`                                                                                                          |
+| student  | 3900 | `/students`, `/student-enrollments`                                                                                                                                                                      |
 
 The last two are reached only through `src/features/lookup/`. A scheduling or
 grading screen names a class, a term, a subject and a teaching assignment, and

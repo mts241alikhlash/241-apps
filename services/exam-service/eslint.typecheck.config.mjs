@@ -1,7 +1,7 @@
 // @ts-check
-import js from '@eslint/js';
-import prettier from 'eslint-config-prettier';
-import tseslint from 'typescript-eslint';
+import js from '@eslint/js'
+import prettier from 'eslint-config-prettier'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
@@ -27,7 +27,10 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-empty-object-type': 'error',
 
       '@typescript-eslint/prefer-nullish-coalescing': [
@@ -66,4 +69,4 @@ export default tseslint.config(
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
-);
+)

@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { SelectSeparator } from 'reka-ui'
 
-const props = defineProps<SelectSeparatorProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  SelectSeparatorProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 </script>

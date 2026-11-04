@@ -5,7 +5,9 @@ import { reactiveOmit } from '@vueuse/core'
 import { cn } from '@mts241alikhlash/ui/utils'
 import { NavigationMenuIndicator, useForwardProps } from 'reka-ui'
 
-const props = defineProps<NavigationMenuIndicatorProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<
+  NavigationMenuIndicatorProps & { class?: HTMLAttributes['class'] }
+>()
 
 const delegatedProps = reactiveOmit(props, 'class')
 
@@ -16,8 +18,15 @@ const forwardedProps = useForwardProps(delegatedProps)
   <NavigationMenuIndicator
     data-slot="navigation-menu-indicator"
     v-bind="forwardedProps"
-    :class="cn('data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in top-full z-1 flex h-1.5 items-end justify-center overflow-hidden', props.class)"
+    :class="
+      cn(
+        'data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in top-full z-1 flex h-1.5 items-end justify-center overflow-hidden',
+        props.class,
+      )
+    "
   >
-    <div class="bg-border rounded-tl-sm shadow-md relative top-[60%] h-2 w-2 rotate-45" />
+    <div
+      class="bg-border rounded-tl-sm shadow-md relative top-[60%] h-2 w-2 rotate-45"
+    />
   </NavigationMenuIndicator>
 </template>

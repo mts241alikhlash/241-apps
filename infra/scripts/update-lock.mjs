@@ -10,7 +10,8 @@ const org = 'mts241alikhlash'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.dirname(here)
 const manifestDir = path.join(root, 'gateway', 'manifests')
-const MISSING_REPOSITORY_RE = /not found|does not appear to be a git repository/i
+const MISSING_REPOSITORY_RE =
+  /not found|does not appear to be a git repository/i
 const MANIFEST_ACCEPT = [
   'application/vnd.oci.image.index.v1+json',
   'application/vnd.docker.distribution.manifest.list.v2+json',
@@ -44,7 +45,10 @@ export function manifestFileName(app, version) {
 
 export function needsPin(pin, version) {
   if (!version) return false
-  return version !== pin.webVersion || pin.webImage.endsWith('@sha256:REPLACE_BEFORE_DEPLOYMENT')
+  return (
+    version !== pin.webVersion ||
+    pin.webImage.endsWith('@sha256:REPLACE_BEFORE_DEPLOYMENT')
+  )
 }
 
 export function referencedManifests(locks) {
@@ -60,14 +64,25 @@ export function referencedManifests(locks) {
 export function remoteTags(repo, exec = execFileSync) {
   let output
   try {
-    output = exec('git', ['ls-remote', '--tags', '--refs', `https://github.com/${org}/${repo}.git`], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
+    output = exec(
+      'git',
+      [
+        'ls-remote',
+        '--tags',
+        '--refs',
+        `https://github.com/${org}/${repo}.git`,
+      ],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    )
   } catch (error) {
     const stderr = String(error.stderr ?? '')
     if (MISSING_REPOSITORY_RE.test(stderr)) return []
-    throw new Error(`git ls-remote ${repo} failed: ${stderr.trim() || error.message}`)
+    throw new Error(
+      `git ls-remote ${repo} failed: ${stderr.trim() || error.message}`,
+    )
   }
   return output
     .split('\n')
@@ -76,13 +91,18 @@ export function remoteTags(repo, exec = execFileSync) {
 }
 
 async function imageDigest(name, tag) {
-  const auth = await fetch(`https://ghcr.io/token?scope=repository:${org}/${name}:pull`)
+  const auth = await fetch(
+    `https://ghcr.io/token?scope=repository:${org}/${name}:pull`,
+  )
   if (!auth.ok) throw new Error(`ghcr token for ${name}: ${auth.status}`)
   const { token } = await auth.json()
-  const res = await fetch(`https://ghcr.io/v2/${org}/${name}/manifests/${tag}`, {
-    method: 'HEAD',
-    headers: { Authorization: `Bearer ${token}`, Accept: MANIFEST_ACCEPT },
-  })
+  const res = await fetch(
+    `https://ghcr.io/v2/${org}/${name}/manifests/${tag}`,
+    {
+      method: 'HEAD',
+      headers: { Authorization: `Bearer ${token}`, Accept: MANIFEST_ACCEPT },
+    },
+  )
   if (res.status === 404) return null
   if (!res.ok) throw new Error(`${name}:${tag} -> ${res.status}`)
   return res.headers.get('docker-content-digest')
@@ -98,14 +118,21 @@ async function fetchManifest(app, version) {
   const tag = encodeURIComponent(`${app}-web@${version}`)
   const base = `https://github.com/${org}/${app}-web/releases/download/${tag}/${app}-web-routes-${version}.json`
   const raw = await download(base)
-  const expected = (await download(`${base}.sha256`)).toString('utf8').trim().replace(/^sha256:/, '').split(/\s+/)[0]
+  const expected = (await download(`${base}.sha256`))
+    .toString('utf8')
+    .trim()
+    .replace(/^sha256:/, '')
+    .split(/\s+/)[0]
   const actual = createHash('sha256').update(raw).digest('hex')
-  if (actual !== expected) throw new Error(`${app} ${version}: manifest checksum mismatch`)
+  if (actual !== expected)
+    throw new Error(`${app} ${version}: manifest checksum mismatch`)
   return { raw, sha256: actual }
 }
 
 function readLock() {
-  return JSON.parse(readFileSync(path.join(root, 'deployment', 'lock.json'), 'utf8'))
+  return JSON.parse(
+    readFileSync(path.join(root, 'deployment', 'lock.json'), 'utf8'),
+  )
 }
 
 function image(name, digest) {
@@ -114,7 +141,8 @@ function image(name, digest) {
 
 async function updateApps(lock, changes) {
   const webTags = {}
-  for (const app of Object.keys(lock.apps)) webTags[app] = remoteTags(`${app}-web`)
+  for (const app of Object.keys(lock.apps))
+    webTags[app] = remoteTags(`${app}-web`)
   const serviceTags = remoteTags('services')
 
   for (const [app, pin] of Object.entries(lock.apps)) {
@@ -144,7 +172,9 @@ async function updateApps(lock, changes) {
 }
 
 async function updateGateway(lock, changes) {
-  const { version } = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'))
+  const { version } = JSON.parse(
+    readFileSync(path.join(root, 'package.json'), 'utf8'),
+  )
   const digest = await imageDigest('gateway', version)
   if (!digest) return
   const pinned = image('gateway', digest)
@@ -158,7 +188,10 @@ export function pinImages(compose, images) {
   for (const reference of images) {
     const name = reference.slice(0, reference.indexOf('@'))
     pinned = pinned.replace(
-      new RegExp(`${name.replaceAll('.', '\\.')}@sha256:(?:[a-f0-9]{64}|REPLACE_BEFORE_DEPLOYMENT)`, 'g'),
+      new RegExp(
+        `${name.replaceAll('.', '\\.')}@sha256:(?:[a-f0-9]{64}|REPLACE_BEFORE_DEPLOYMENT)`,
+        'g',
+      ),
       reference,
     )
   }
@@ -172,18 +205,24 @@ export function addAppServices(compose, apps) {
   if (missing.length === 0) return compose
 
   const services = missing
-    .map(([app, pin]) => `  ${app}-web:\n    <<: *web-defaults\n    image: ${pin.webImage}\n`)
+    .map(
+      ([app, pin]) =>
+        `  ${app}-web:\n    <<: *web-defaults\n    image: ${pin.webImage}\n`,
+    )
     .join('\n')
   const depends = missing
     .map(([app]) => `      ${app}-web:\n        condition: service_healthy\n`)
     .join('')
 
   const serviceAnchor = '\n  identity-service:\n'
-  const dependsAnchor = '      identity-service:\n        condition: service_healthy\n'
+  const dependsAnchor =
+    '      identity-service:\n        condition: service_healthy\n'
   const serviceAt = compose.indexOf(serviceAnchor)
   const dependsAt = compose.indexOf(dependsAnchor)
   if (serviceAt < 0 || dependsAt < 0) {
-    throw new Error('compose file has no identity-service block to anchor app services')
+    throw new Error(
+      'compose file has no identity-service block to anchor app services',
+    )
   }
 
   const withServices = `${compose.slice(0, serviceAt + 1)}\n${services}${compose.slice(serviceAt + 1)}`
@@ -206,7 +245,8 @@ function writeCompose(lock) {
 function pruneManifests() {
   const keep = referencedManifests([readLock()])
   for (const name of readdirSync(manifestDir)) {
-    if (name.endsWith('.json') && !keep.has(name)) unlinkSync(path.join(manifestDir, name))
+    if (name.endsWith('.json') && !keep.has(name))
+      unlinkSync(path.join(manifestDir, name))
   }
 }
 
@@ -219,7 +259,10 @@ async function main() {
     console.log('no changes')
     return
   }
-  writeFileSync(path.join(root, 'deployment', 'lock.json'), `${JSON.stringify(lock, null, 2)}\n`)
+  writeFileSync(
+    path.join(root, 'deployment', 'lock.json'),
+    `${JSON.stringify(lock, null, 2)}\n`,
+  )
   writeCompose(lock)
   pruneManifests()
   for (const change of changes) console.log(change)
