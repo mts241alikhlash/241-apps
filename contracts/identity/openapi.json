@@ -6202,6 +6202,7 @@
         "properties": {
           "userIds": {
             "minItems": 1,
+            "maxItems": 200,
             "description": "User IDs to resolve, up to 200 at a time.",
             "example": [
               "9a9e3ee8-4a56-4c74-a029-798dfb0a3909"

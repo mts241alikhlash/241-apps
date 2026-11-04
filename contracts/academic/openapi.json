@@ -14847,6 +14847,7 @@
         "properties": {
           "weeklyHolidays": {
             "uniqueItems": true,
+            "maxItems": 7,
             "description": "Weekdays school does not run, 0 (Sunday) to 6 (Saturday). [0] is a six-day week, [0, 6] a five-day week, [5] a Friday closure. An empty array means school runs every day.",
             "example": [
               0
@@ -18974,10 +18975,10 @@
             "type": "string"
           },
           "reason": {
-            "type": "string",
             "enum": [
               "ALREADY_ASSIGNED"
-            ]
+            ],
+            "type": "string"
           }
         },
         "required": [

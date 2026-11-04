@@ -6264,6 +6264,7 @@
           "questionIds": {
             "uniqueItems": true,
             "minItems": 1,
+            "maxItems": 200,
             "type": "array",
             "items": {
               "type": "string",
@@ -6282,6 +6283,7 @@
           "questionIds": {
             "uniqueItems": true,
             "minItems": 1,
+            "maxItems": 200,
             "description": "Every question of the package, in the new order",
             "type": "array",
             "items": {
@@ -6349,6 +6351,7 @@
             "maxLength": 1000
           },
           "questionNotes": {
+            "maxItems": 200,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PackageQuestionNoteDto"
