@@ -1,5 +1,5 @@
 import { useRoleGuard } from '@/features/platform/auth'
-import type { ReferenceDataConfig } from '@/reference-data'
+import type { ReferenceDataConfig } from '@mts241alikhlash/reference-data'
 import { referenceListService } from './referenceListService'
 import type {
   ReferenceList,

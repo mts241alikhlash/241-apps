@@ -8,10 +8,6 @@ import {
   UNROUTED_PREFIXES,
 } from './api-routes.config.ts'
 
-const referenceDataRoot = path.resolve(
-  import.meta.dirname,
-  'packages/reference-data/src',
-)
 const platformRoot = path.resolve(
   import.meta.dirname,
   'packages/platform/src/features',
@@ -76,11 +72,6 @@ export default defineConfig(({ mode }) => ({
     tsconfigPaths: true,
     dedupe: ['vue', 'pinia', 'vue-router'],
     alias: [
-      {
-        find: /^@\/reference-data\/(.+)$/,
-        replacement: path.resolve(referenceDataRoot, '$1'),
-      },
-      { find: /^@\/reference-data$/, replacement: referenceDataRoot },
       {
         find: /^@\/features\/platform\/(.+)$/,
         replacement: path.resolve(platformRoot, '$1'),

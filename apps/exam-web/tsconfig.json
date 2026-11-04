@@ -11,7 +11,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@/features/platform/*": ["./packages/platform/src/features/*"],
+      "@/features/platform/*": ["./packages/platform/src/features/*"]
     }
   }
 }

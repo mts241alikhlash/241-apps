@@ -11,7 +11,7 @@ vi.mock('vue-router', () => ({ useRoute: () => route }))
 vi.mock('@/features/platform/auth', () => ({
   useRoleGuard: () => ({ can: () => true }),
 }))
-vi.mock('@/reference-data', () => ({
+vi.mock('@mts241alikhlash/reference-data', () => ({
   ReferenceDataListView: defineComponent({
     props: {
       config: {

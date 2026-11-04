@@ -27,6 +27,7 @@
   "dependencies": {
     "@internationalized/date": "^3.12.3",
     "@lucide/vue": "^1.52.0",
+    "@mts241alikhlash/reference-data": "workspace:*",
     "@mts241alikhlash/ui": "workspace:*",
     "@mts241alikhlash/web-shared": "workspace:*",
     "@tailwindcss/vite": "^4.3.4",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ReferenceDataListView } from '@/reference-data'
+import { ReferenceDataListView } from '@mts241alikhlash/reference-data'
 import { useTagConfig } from '../config/tagConfig'
 
 const config = useTagConfig()

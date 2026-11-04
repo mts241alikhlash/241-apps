@@ -12,9 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/features/platform/*": ["./packages/platform/src/features/*"],
-      "@/reference-data": ["./packages/reference-data/src/index.ts"],
-      "@/reference-data/*": ["./packages/reference-data/src/*"]
+      "@/features/platform/*": ["./packages/platform/src/features/*"]
     }
   }
 }

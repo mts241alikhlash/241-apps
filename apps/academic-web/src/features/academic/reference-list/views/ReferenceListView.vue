@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { ReferenceDataListView } from '@/reference-data'
+import { ReferenceDataListView } from '@mts241alikhlash/reference-data'
 import { useReferenceListConfig } from '../config'
 import { REFERENCE_LISTS } from '../lists'
 
