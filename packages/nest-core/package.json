@@ -103,7 +103,8 @@
     }
   },
   "scripts": {
-    "build": "nest build -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "pnpm run clean && nest build -p tsconfig.build.json",
     "dev": "nest build -p tsconfig.build.json --watch",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\"",
