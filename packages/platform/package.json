@@ -17,6 +17,7 @@
   "scripts": {
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "lint": "eslint \"src/**/*.{ts,vue}\" --max-warnings=0",
+    "lint:strict": "eslint -c eslint.typecheck.config.mjs \"src/**/*.{ts,vue}\" --max-warnings=0",
     "test": "vitest run",
     "check": "pnpm run typecheck && pnpm run lint"
   },
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@lucide/vue": "^1.52.0",
+    "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@tanstack/vue-query": "^5.105.3",
     "@tanstack/vue-table": "^8.21.3",

@@ -58,6 +58,7 @@
     "@eslint/js": "^10.0.1",
     "@mts241alikhlash/academic-api": "workspace:*",
     "@mts241alikhlash/admission-api": "workspace:*",
+    "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.67.0",

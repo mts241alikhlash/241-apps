@@ -77,6 +77,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
