@@ -18,8 +18,6 @@ Record of dependencies kept below their latest version. Phase 2e moves these int
 | Dependency | Position and reason | Release condition |
 | --- | --- | --- |
 | `@tanstack/vue-table` | 8.x, latest 9.3.1 | release when the DataTable API migration in packages/ui is done as its own step |
-| `@vue/test-utils` | 2.5.0 pinned by patch 1b-3-pins | 2.5.1 with vue-component-type-helpers 3.3.14 leaves spec types unresolved in typed ESLint; release when that is fixed upstream |
-| `vue-component-type-helpers` | 3.3.11 pinned with @vue/test-utils | release together |
 | `@nestjs/swagger` | 12.0.1 pinned by patch 1b-3-pins | 12.1.0 emits OpenAPI that differs from tracked contracts; release when contracts are regenerated with 12.1.x |
 | `vue-tsc` | 3.3.11 pinned with @vue/language-core by patch 1b-3-pins | 3.3.14 breaks pinia store .value typing in portal-web typecheck; release when portal-web store usage is fixed |
 | `@vue/language-core` | 3.3.11 pinned with vue-tsc | release together |
