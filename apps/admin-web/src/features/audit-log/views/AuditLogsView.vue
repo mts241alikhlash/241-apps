@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { h, onMounted, ref, watch } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { toast } from 'vue-sonner'

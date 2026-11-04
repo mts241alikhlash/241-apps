@@ -1,11 +1,11 @@
 import { useRoleGuard } from '@/features/platform/auth'
 import type { ReferenceDataConfig } from '@mts241alikhlash/reference-data'
-import { religionService } from './services/religionService'
+import { religionService } from '@/features/platform/religion'
 import type {
   Religion,
   ReligionCreatePayload,
   ReligionUpdatePayload,
-} from './types'
+} from '@/features/platform/religion'
 
 export function useReligionConfig(): ReferenceDataConfig<
   Religion,

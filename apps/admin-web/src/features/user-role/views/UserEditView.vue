@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { BackButton } from '@mts241alikhlash/ui'
 import { onMounted, ref } from 'vue'

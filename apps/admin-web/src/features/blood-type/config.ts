@@ -1,11 +1,11 @@
 import { useRoleGuard } from '@/features/platform/auth'
 import type { ReferenceDataConfig } from '@mts241alikhlash/reference-data'
-import { bloodTypeService } from './services/bloodTypeService'
+import { bloodTypeService } from '@/features/platform/blood-type'
 import type {
   BloodType,
   BloodTypeCreatePayload,
   BloodTypeUpdatePayload,
-} from './types'
+} from '@/features/platform/blood-type'
 
 export function useBloodTypeConfig(): ReferenceDataConfig<
   BloodType,
