@@ -1,11 +1,11 @@
 import { HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus'
 import { Test } from '@nestjs/testing'
-import { HealthController } from '@mts241alikhlash/nest-core/health'
-import { PrismaHealthIndicator } from '@mts241alikhlash/nest-core/health'
+import { HealthController } from './health.controller.js'
+import { PrismaHealthIndicator } from './prisma.health.js'
 
 describe('HealthController', () => {
   it('runs the database and memory checks', async () => {
-    const check = jest.fn(
+    const check = vi.fn(
       async (indicators: (() => Promise<Record<string, unknown>>)[]) => {
         const details = Object.assign(
           {},
@@ -21,7 +21,7 @@ describe('HealthController', () => {
         {
           provide: PrismaHealthIndicator,
           useValue: {
-            isHealthy: jest.fn().mockResolvedValue({
+            isHealthy: vi.fn().mockResolvedValue({
               database: { status: 'up' },
             }),
           },
@@ -29,7 +29,7 @@ describe('HealthController', () => {
         {
           provide: MemoryHealthIndicator,
           useValue: {
-            checkHeap: jest.fn().mockResolvedValue({
+            checkHeap: vi.fn().mockResolvedValue({
               memory_heap: { status: 'up' },
             }),
           },
