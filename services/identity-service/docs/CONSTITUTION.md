@@ -448,7 +448,7 @@ should never be one — this *is* the platform.
 DTO is append-only.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`DATABASE_URL` names `identity_service` and nothing else writes there.
+`DATABASE_URL` names `identity` and nothing else writes there.
 `prisma/` declares 20 models across 7 `.prisma` files, none of them another
 service's. `prisma/migrations/` exists, `prisma:migrate` and `prisma:deploy`
 both ship and are safe to run, and `start:prod` is `node dist/src/main.js` —

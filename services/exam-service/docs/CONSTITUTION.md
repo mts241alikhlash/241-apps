@@ -452,7 +452,7 @@ publish scores. Every call is batched by distinct id where it can be and
 fails closed with a 503.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`exam_service`; `prisma:migrate` and `prisma:deploy` ship, `start:prod` does
+`exam`; `prisma:migrate` and `prisma:deploy` ship, `start:prod` does
 not migrate: migration is an explicit deploy step.
 
 **Layering status:** 4 of 4. Every module is built in the layered shape from

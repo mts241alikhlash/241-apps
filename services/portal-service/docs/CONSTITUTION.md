@@ -456,7 +456,7 @@ token, which sharpens Principle III and Principle IV:
   served back as executable content. Do not add an upload path that bypasses it.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`portal_service`, 15 models, none of them another service's; `prisma:migrate`
+`portal`, 15 models, none of them another service's; `prisma:migrate`
 and `prisma:deploy` both ship; `start:prod` does not migrate — migration is an
 explicit deploy step.
 

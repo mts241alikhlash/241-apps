@@ -358,7 +358,7 @@ HTML. Do not remove it, and do not add an upload path that bypasses it.
 
 ## Its own database, and who may migrate it
 
-This service owns `portal_service` alone: **15 models** across 3 `.prisma`
+This service owns `portal` alone: **15 models** across 3 `.prisma`
 files, every one of them a table this service is responsible for. Nothing else
 reads or writes them, so migrating is simply how this service deploys.
 

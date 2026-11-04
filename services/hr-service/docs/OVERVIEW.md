@@ -84,7 +84,7 @@ and it lives in `employee/`.
 
 ## Database — its own
 
-`prisma/` declares **10 models** in its own database (`hr_service`):
+`prisma/` declares **10 models** in its own database (`hr`):
 
 `Employee`, `EmployeePosition`, `Position`, `PositionCategory`,
 `EmploymentType`, `SalaryComponent`, `SalaryAssignment`, `PayrollRun`,
@@ -107,7 +107,7 @@ migration after it.
 
 It creates all eleven tables and contains no foreign key to a table another
 service owns. `prisma:migrate` and `prisma:deploy` both ship, and are safe to
-run: `DATABASE_URL` points at `hr_service`, which nothing else writes. The
+run: `DATABASE_URL` points at `hr`, which nothing else writes. The
 database was called `employee_service` until 2026-09-10 and was renamed with
 the service — it had never been migrated, so nothing had to be moved.
 

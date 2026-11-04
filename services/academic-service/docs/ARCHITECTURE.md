@@ -447,7 +447,7 @@ boundary on every request, and accept that the copy can lag.
 
 ## Its own database, and who may migrate it
 
-This service owns `academic_service` alone: **21 models** across 7 `.prisma`
+This service owns `academic` alone: **21 models** across 7 `.prisma`
 files, every one of them a table this service is responsible for. Nothing else
 reads or writes them, so migrating is simply how this service deploys.
 

@@ -466,7 +466,7 @@ were quietly, slightly wrong. `payroll/integration/README.md` records it.
 > module boundary; it is that arithmetic.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`presence_service`, 14 models, none of them another service's; `prisma:migrate`
+`presence`, 14 models, none of them another service's; `prisma:migrate`
 and `prisma:deploy` both ship; `start:prod` does not migrate — migration is an
 explicit deploy step.
 

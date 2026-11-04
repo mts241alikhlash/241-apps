@@ -2,7 +2,7 @@
 
 241 Academic — computer-based exams (CBT). NestJS + Prisma + PostgreSQL,
 NodeNext ESM: relative imports carry the `.js` extension even though the
-source is `.ts`. Port 4100, database `exam_service`.
+source is `.ts`. Port 4100, database `exam`.
 
 Designed in `platform-infra/docs/superpowers/specs/2026-10-24-exam-cbt-design.md`
 and `2026-10-28-exam-phase2-design.md` (gitignored, on the owner's laptop).

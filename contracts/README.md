@@ -1,4 +1,4 @@
-# Service contract staging
+# Service contracts
 
 OpenAPI baselines belong under `<service>/openapi.json`. Existing service emitters
 are preserved under `services/<service>/src/openapi/`.

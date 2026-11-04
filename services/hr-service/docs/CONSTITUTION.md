@@ -470,7 +470,7 @@ payroll lived in presence-service the two halves sat in repositories that could
 not see each other, and deleting either silently halved the rule.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`hr_service`, 10 models, none of them another service's; `prisma:migrate` and
+`hr`, 10 models, none of them another service's; `prisma:migrate` and
 `prisma:deploy` both ship; `start:prod` does not migrate — migration is an
 explicit deploy step.
 

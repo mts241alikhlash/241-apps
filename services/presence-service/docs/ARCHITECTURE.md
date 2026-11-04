@@ -367,7 +367,7 @@ are now the real repositories from `presence/`, imported directly. See
 
 ## Its own database, and who may migrate it
 
-This service owns `presence_service` alone: **14 models** across 2 `.prisma`
+This service owns `presence` alone: **14 models** across 2 `.prisma`
 files, every one of them a table this service is responsible for. Nothing else
 reads or writes them, so migrating is simply how this service deploys.
 

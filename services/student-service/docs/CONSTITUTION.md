@@ -464,7 +464,7 @@ who owns enrollment, and it has to be answered before those databases can be
 called separate in practice.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`student_service`, 6 models, none of them another service's; `prisma:migrate`
+`student`, 6 models, none of them another service's; `prisma:migrate`
 and `prisma:deploy` both ship; `start:prod` does not migrate — migration is an
 explicit deploy step.
 

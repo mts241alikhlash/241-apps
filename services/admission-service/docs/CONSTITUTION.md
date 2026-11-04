@@ -458,7 +458,7 @@ the action, because the enroll endpoint is idempotent. Do not restore
 `enrollAsStudent()`.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`admission_service`, 9 models, none of them another service's; `prisma:migrate`
+`admission`, 9 models, none of them another service's; `prisma:migrate`
 and `prisma:deploy` both ship; `start:prod` does not migrate — migration is an
 explicit deploy step.
 

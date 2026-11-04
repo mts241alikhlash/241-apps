@@ -460,7 +460,7 @@ fails closed with a 503.
 widest fan-out in the platform: assessment → academic + hr + student.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`assessment_service`, 6 models, none of them another service's;
+`assessment`, 6 models, none of them another service's;
 `prisma:migrate` and `prisma:deploy` both ship; `start:prod` does not migrate -
 migration is an explicit deploy step.
 

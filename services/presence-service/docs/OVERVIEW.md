@@ -79,7 +79,7 @@ migration after it.
 
 It creates all fourteen tables and contains no foreign key to a table another
 service owns. `prisma:migrate` and `prisma:deploy` both ship, and are safe to
-run: `DATABASE_URL` points at `presence_service`, which nothing else writes.
+run: `DATABASE_URL` points at `presence`, which nothing else writes.
 
 **The regenerated migration drops five tables from what the previous one
 created** — `salary_components`, `salary_assignments`, `payroll_runs`,

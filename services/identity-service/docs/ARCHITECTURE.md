@@ -526,7 +526,7 @@ stable and cheap.
 
 `prisma/` declares **20 models** across seven `.prisma` files (`auth`, `iam`,
 `profile`, `file`, `school-unit`, `region`, and the reference lists), and
-`DATABASE_URL` names `identity_service`, which nothing else writes. The schema
+`DATABASE_URL` names `identity`, which nothing else writes. The schema
 describes that database completely, which is the condition Principle VII asks
 for.
 

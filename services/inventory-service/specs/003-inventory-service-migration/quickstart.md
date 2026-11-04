@@ -257,7 +257,7 @@ HTTP/1.1 200 OK
 ```
 
 Inventory `.env` already configured `PORT=3300`, the database at
-`localhost:5433/inventory_service`, and identity at `http://localhost:3000`.
+`localhost:5433/inventory`, and identity at `http://localhost:3000`.
 The existing identity health endpoint and inventory database were available.
 
 ### Smoke commands
@@ -369,7 +369,7 @@ experimental VM-modules warning. No test failure occurred.
 ### Follow-up Verification: 2026-09-16
 
 The approved approval-state migration was applied to the configured local
-database at `localhost:5433/inventory_service`.
+database at `localhost:5433/inventory`.
 
 | Command                                                                                                                                                                                                                                                                                | Result                                                                                            |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |

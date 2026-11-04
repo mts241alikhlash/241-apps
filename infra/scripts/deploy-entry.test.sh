@@ -39,7 +39,7 @@ expect_exit() {
 }
 
 expect_exit 2 ""
-expect_exit 2 "production $main_sha"
+expect_exit 2 "extra $main_sha"
 expect_exit 2 "$main_sha extra"
 expect_exit 2 "${main_sha:0:7}"
 expect_exit 2 "${main_sha^^}"

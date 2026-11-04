@@ -111,7 +111,7 @@ over HTTP; it does not join. Referential integrity across that line was given up
 deliberately, and getting it back by adding a relation would undo the split.
 
 **This service has its own database and ships `prisma:migrate` /
-`prisma:deploy`.** That inverted on 2026-09-09: `identity_service` is its own
+`prisma:deploy`.** That inverted on 2026-09-09: `identity` is its own
 database, `prisma/` describes all **20** models in it, and nothing else writes
 there. The paragraph that used to sit here — warning that a `migrate deploy`
 would drop 103 tables belonging to other services — described a shared database
@@ -128,7 +128,7 @@ anywhere else, and `src/single-role-bypass.spec.ts` is the sweep that says so
 (ADR-0011). `ADMIN` bypassed too until 2026-08-15; it no longer does.
 
 The permission catalog and `STRUCTURAL_ROLES` ship with the code and are
-synced at bootstrap. Production is populated through the UI and never runs a
+synced at bootstrap. The deployed stack is populated through the UI and never runs a
 seed, so a permission that exists in code but not in the database cannot be
 granted at all — it simply does not appear on the role screen, with nothing to
 explain why.

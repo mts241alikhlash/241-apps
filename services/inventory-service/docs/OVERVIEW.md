@@ -61,7 +61,7 @@ tables. Session liveness and grants now come from `platform/identity`'s
 here and no profile join, so nothing else held it back.
 
 > **`prisma migrate` belongs to this service.** `DATABASE_URL` points at its own
-> `inventory_service` database and `prisma/` declares only the 15 models it
+> `inventory` database and `prisma/` declares only the 15 models it
 > owns, so `pnpm prisma:migrate` and `pnpm prisma:deploy` are safe to run here.
 
 **`start:prod` is `node dist/src/main.js` and does not migrate.** It ran

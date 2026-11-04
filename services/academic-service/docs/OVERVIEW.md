@@ -138,7 +138,7 @@ record now.
 ### Therefore: its own database, and it owns the schema
 
 **This changed on 2026-09-09, and again later the same day.** This service
-points at its own `DATABASE_URL` (`academic_service`), and `prisma/` declares
+points at its own `DATABASE_URL` (`academic`), and `prisma/` declares
 **36 models** — not the 119 of the shared schema it used to mirror, and no
 longer the 24 it had at the first cut. It was 20 until `Education` arrived
 here on 2026-09-09, having been declared by admission-service and

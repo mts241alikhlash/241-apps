@@ -450,7 +450,7 @@ or a single write. None is a second copy of the owning service.
 uniqueness — `enroll-existing-account.use-case.spec.ts` guards the ordering.
 
 **Database posture — Principle VII, satisfied by owning the database.**
-`academic_service`, 21 models across 7 `.prisma` files, none of them another
+`academic`, 21 models across 7 `.prisma` files, none of them another
 service's. `prisma:migrate` and `prisma:deploy` both ship and are safe to run.
 `start:prod` does not migrate — migration is an explicit deploy step.
 

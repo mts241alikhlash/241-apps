@@ -60,9 +60,8 @@ pnpm run dev        # http://localhost:5181
 pnpm run validate   # check:comments + format:check + lint + typecheck + lint:strict + test + build + routes:check
 ```
 
-The gateway serves it at `exam.localhost` on staging. Production has no exam
-upstream until this app's first release fills the staging lock pin; see
-`platform-infra/docs/OVERVIEW.md`. `platform-infra/gateway/nginx*.conf` are
+The gateway serves it at `exam.localhost`; see
+`infra/docs/OVERVIEW.md`. `infra/gateway/nginx*.conf` are
 generated from `api-routes.config.ts`. Never hand-edit them; run
 `node platform-infra/gateway/generate.mjs` from the workspace root after
 changing a prefix, and `--check` before a deploy.

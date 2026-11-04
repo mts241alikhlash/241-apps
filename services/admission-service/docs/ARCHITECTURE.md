@@ -375,7 +375,7 @@ one it replaced does not.
 
 ## Its own database, and who may migrate it
 
-This service owns `admission_service` alone: **9 models** across 3 `.prisma`
+This service owns `admission` alone: **9 models** across 3 `.prisma`
 files, every one of them a table this service is responsible for. Nothing else
 reads or writes them, so migrating is simply how this service deploys.
 
