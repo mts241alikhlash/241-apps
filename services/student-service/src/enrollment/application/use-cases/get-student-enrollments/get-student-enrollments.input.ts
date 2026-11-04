@@ -1,5 +1,5 @@
-import { EnrollmentStatus } from '../../../../shared/domain/enums/enrollment-status.enum.js'
-import { PaginationQueryInput } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
+import { PaginationQueryInput } from '@mts241alikhlash/nest-core/domain'
 
 export interface GetStudentEnrollmentsInput extends PaginationQueryInput {
   studentId?: string

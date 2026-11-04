@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../../core/database/prisma.service.js'
-import type { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IAssetUnitDetailsCapabilityPort } from '../../../../asset/index.js'
 import {
   IHistoryCapabilityPort,

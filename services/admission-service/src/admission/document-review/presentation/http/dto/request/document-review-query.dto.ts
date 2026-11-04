@@ -9,7 +9,7 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class DocumentReviewQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })

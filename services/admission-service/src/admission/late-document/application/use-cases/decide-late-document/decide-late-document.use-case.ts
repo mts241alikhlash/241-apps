@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { AdmissionDocumentStatus } from '../../../../../shared/domain/enums/admission-document-status.enum.js'
+import { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IAdmissionDocumentRepository } from '../../../../document/index.js'
 
 interface DecideLateDocumentInput {

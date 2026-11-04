@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs'
 import { ExportEmployeeInput } from './export-employee.input.js'
 import { IEmployeeRepository } from '../../../domain/repositories/employee.repository.js'
 import { mapEmployeeToExportRow } from '../../../constants/employee-export-columns.js'
-import type { ExcelRow } from '../../../../shared/domain/types/exceljs.type.js'
+import type { ExcelRow } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class ExportEmployeesUseCase {

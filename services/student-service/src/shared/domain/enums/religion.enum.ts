@@ -1,8 +1,0 @@
-export enum Religion {
-  ISLAM = 'ISLAM',
-  PROTESTANT = 'PROTESTANT',
-  CATHOLIC = 'CATHOLIC',
-  HINDU = 'HINDU',
-  BUDDHIST = 'BUDDHIST',
-  CONFUCIAN = 'CONFUCIAN',
-}

@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { AcademicCalendarEntity } from '../entities/academic-calendar.entity.js'
 import { CalendarWithDetails } from '../entities/academic-calendar.entity.js'
 

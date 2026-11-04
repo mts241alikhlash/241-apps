@@ -13,7 +13,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IBloodTypeRepository } from '../../domain/repositories/blood-type.repository.js'
 

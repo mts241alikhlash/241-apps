@@ -1,4 +1,4 @@
-import { JsonValue } from '../../../../../shared/domain/types/json.type.js'
+import { JsonValue } from '@mts241alikhlash/nest-core/domain'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class AuditLogUserDto {

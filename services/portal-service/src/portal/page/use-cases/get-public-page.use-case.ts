@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { toPlainSummary } from '../../../shared/helpers/plain-summary.helper.js'
+import { toPlainSummary } from '@mts241alikhlash/nest-core/helpers'
 import { IPageRepository } from '../domain/interfaces/page-repository.interface.js'
 
 export type PublicPageResult =

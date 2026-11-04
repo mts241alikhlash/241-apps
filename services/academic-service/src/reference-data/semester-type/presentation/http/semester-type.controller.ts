@@ -2,7 +2,7 @@ import {
   SemesterTypeItemResponseDto,
   SemesterTypePageResponseDto,
 } from './dto/response/semester-type-api-response.dto.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import {
   Body,

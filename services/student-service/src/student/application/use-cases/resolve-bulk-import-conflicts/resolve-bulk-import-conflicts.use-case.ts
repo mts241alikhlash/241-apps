@@ -7,7 +7,7 @@ import { UpdateStudentUseCase } from '../update-student/update-student.use-case.
 import { UpdateStudentProfileUseCase } from '../update-student-profile/update-student-profile.use-case.js'
 import { CreateStudentUseCase } from '../create-student/create-student.use-case.js'
 import { EnsureStudentEnrollmentUseCase } from '../../../../enrollment/application/use-cases/ensure-student-enrollment/ensure-student-enrollment.use-case.js'
-import { resolveOnceByKey } from '../../../../shared/utils/resolve-once-by-key.helper.js'
+import { resolveOnceByKey } from '@mts241alikhlash/nest-core/helpers'
 import { processBulkImportConflicts } from '../../../../shared/utils/process-bulk-import-conflicts.helper.js'
 
 @Injectable()

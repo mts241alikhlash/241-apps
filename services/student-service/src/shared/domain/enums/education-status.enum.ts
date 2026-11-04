@@ -1,6 +1,0 @@
-export enum EducationStatus {
-  GRADUATED = 'GRADUATED',
-  ACTIVE = 'ACTIVE',
-  TRANSFERRED = 'TRANSFERRED',
-  DROPPED = 'DROPPED',
-}

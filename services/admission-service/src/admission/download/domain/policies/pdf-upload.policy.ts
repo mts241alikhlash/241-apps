@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { MAX_UPLOAD_BYTES } from '../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 
 export const PDF_REJECTED = 'Berkas harus PDF dan maksimal 5 MB'
 

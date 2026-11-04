@@ -33,7 +33,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 import type { RequestUser } from '../../../core/types/request-user.type.js'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
@@ -53,7 +53,7 @@ import { CreateStudentWithRelationsDto } from './dto/request/create-student-with
 import { EnrollExistingAccountDto } from './dto/request/enroll-existing-account.dto.js'
 import { EnrollExistingAccountResponseDto } from './dto/response/enroll-existing-account-response.dto.js'
 import { EnrollExistingAccountUseCase } from '../../application/use-cases/enroll-existing-account/enroll-existing-account.use-case.js'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Students')
 @ApiBearerAuth()

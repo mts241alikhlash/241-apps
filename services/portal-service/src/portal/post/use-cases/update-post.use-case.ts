@@ -4,7 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { HtmlSanitizerService } from '../../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { PUBLISHED_STATUS } from '../constants/post.constants.js'
 import { PostType } from '../domain/enums/post-type.enum.js'
 import {

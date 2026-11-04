@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsOptional, IsUUID } from 'class-validator'
-import { DayEnum as Day } from '../../../../../shared/domain/enums/day.enum.js'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { DayEnum as Day } from '@mts241alikhlash/nest-core/domain'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class ScheduleQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional()

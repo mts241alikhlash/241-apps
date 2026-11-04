@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ScheduleSessionRow } from '../../../application/use-cases/list-schedule-sessions/list-schedule-sessions.use-case.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 

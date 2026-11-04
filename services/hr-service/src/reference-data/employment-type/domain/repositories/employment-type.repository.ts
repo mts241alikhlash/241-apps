@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { EmploymentTypeEntity } from '../entities/employment-type.entity.js'
 
 export interface EmploymentTypeQueryInput extends PaginationQueryInput {

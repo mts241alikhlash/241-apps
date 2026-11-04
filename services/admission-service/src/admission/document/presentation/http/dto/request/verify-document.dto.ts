@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsIn, IsOptional, IsString } from 'class-validator'
-import { AdmissionDocumentStatus } from '../../../../../../shared/domain/enums/admission-document-status.enum.js'
+import { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 
 export class VerifyDocumentDto {
   @ApiProperty({ enum: ['APPROVED', 'REJECTED'] })

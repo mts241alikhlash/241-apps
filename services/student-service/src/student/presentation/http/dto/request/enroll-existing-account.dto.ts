@@ -11,9 +11,9 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator'
-import { UserGender } from '../../../../../shared/domain/enums/user-gender.enum.js'
-import { ParentRelation } from '../../../../../shared/domain/enums/parent-relation.enum.js'
-import { IncomeRange } from '../../../../../shared/domain/enums/income-range.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
+import { IncomeRange } from '@mts241alikhlash/nest-core/domain'
 
 export class EnrollParentDto {
   @ApiProperty({ example: 'Ahmad Fauzi' })

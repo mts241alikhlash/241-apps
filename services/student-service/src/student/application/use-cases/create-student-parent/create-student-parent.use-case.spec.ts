@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { ParentRelation } from '../../../../shared/domain/enums/parent-relation.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 import { CreateStudentParentInput } from './create-student-parent.input.js'
 import { IStudentParentRepository } from '../../../domain/repositories/student-parent.repository.js'
 import { CreateStudentParentUseCase } from './create-student-parent.use-case.js'

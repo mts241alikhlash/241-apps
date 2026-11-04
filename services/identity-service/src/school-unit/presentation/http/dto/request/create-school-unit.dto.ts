@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchoolUnitStatus } from '../../../../../shared/domain/enums/school-unit-status.enum.js'
+import { SchoolUnitStatus } from '@mts241alikhlash/nest-core/domain'
 import {
   IsEmail,
   IsEnum,

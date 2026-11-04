@@ -1,4 +1,4 @@
-import { DayEnum } from '../../shared/domain/enums/day.enum.js'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 
 export const WEEKDAY_TO_SCHEDULE_DAY: readonly (DayEnum | null)[] = [
   null,

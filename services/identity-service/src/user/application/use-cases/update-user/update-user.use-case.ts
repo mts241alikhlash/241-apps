@@ -9,7 +9,7 @@ import {
   IUserRepository,
   UpdateUserRepositoryInput,
 } from '../../../domain/repositories/user.repository.js'
-import { hashPassword } from '../../../../shared/utils/hash.helper.js'
+import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
 @Injectable()
 export class UpdateUserUseCase {

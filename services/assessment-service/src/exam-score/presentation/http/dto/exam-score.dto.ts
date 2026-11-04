@@ -10,8 +10,8 @@ import {
   MaxLength,
   Min,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamScoreRow } from '../../../application/use-cases/list-exam-scores/list-exam-scores.use-case.js'
 
 export class ReceiveExamScoreDto {

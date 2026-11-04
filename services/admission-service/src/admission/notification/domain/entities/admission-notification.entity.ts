@@ -1,4 +1,4 @@
-import type { AdmissionNotificationType } from '../../../../shared/domain/enums/admission-notification-type.enum.js'
+import type { AdmissionNotificationType } from '@mts241alikhlash/nest-core/domain'
 
 export interface AdmissionNotificationEntity {
   id: string

@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { AdmissionDocumentStatus } from '../../../../../shared/domain/enums/admission-document-status.enum.js'
+import { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IAdmissionDocumentNotificationPort } from '../../../domain/repositories/admission-document-notification.port.js'
 import { IAdmissionDocumentRepository } from '../../../domain/repositories/admission-document-repository.js'
 import type { VerifyDocumentInput } from './verify-document.input.js'

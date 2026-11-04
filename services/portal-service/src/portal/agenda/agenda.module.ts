@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { HtmlSanitizerService } from '../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { MediaModule } from '../media/media.module.js'
 import { IAgendaRepository } from './domain/interfaces/agenda-repository.interface.js'
 import { PrismaAgendaRepository } from './infrastructure/persistence/prisma-agenda.repository.js'

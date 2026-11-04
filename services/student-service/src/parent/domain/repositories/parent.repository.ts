@@ -1,8 +1,8 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { IncomeRange } from '../../../shared/domain/enums/income-range.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { IncomeRange } from '@mts241alikhlash/nest-core/domain'
 import {
   ParentEntity,
   ParentWithDetails,

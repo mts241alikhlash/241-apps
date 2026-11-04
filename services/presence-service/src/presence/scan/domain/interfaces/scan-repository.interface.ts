@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { ScanEntity, ScanOutcomeEnum } from '../entities/scan.entity.js'
 
 export interface ScanQueryInput extends PaginationQueryInput {

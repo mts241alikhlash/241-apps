@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsOptional, IsString } from 'class-validator'
-import { AttendanceStatus } from '../../../../../shared/domain/enums/attendance-status.enum.js'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
 
 export class UpdateAttendanceDto {
   @ApiPropertyOptional({ enum: AttendanceStatus })

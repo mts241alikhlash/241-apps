@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { MAX_UPLOAD_BYTES } from '../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 
 export const LANDING_IMAGE_REJECTED =
   'Berkas harus gambar JPG, PNG, atau WebP dan maksimal 5 MB'

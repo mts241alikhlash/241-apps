@@ -1,5 +1,5 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common'
-import { InventoryStatusKey } from '../../../../../shared/domain/enums/inventory-status-key.enum.js'
+import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import { IStatusRepository } from '../../domain/repositories/status.repository.js'
 import { CreateStatusUseCase } from './create-status/create-status.use-case.js'
 import { DeleteStatusUseCase } from './delete-status/delete-status.use-case.js'

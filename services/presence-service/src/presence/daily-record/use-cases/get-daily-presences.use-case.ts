@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import {
   PaginatedResponse,
   PaginatedResult,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { DailyPresenceEntity } from '../domain/entities/daily-presence.entity.js'
 import { PresenceCorrectionWithActor } from '../domain/entities/presence-correction.entity.js'
 import {

@@ -29,7 +29,7 @@ import {
 } from '@nestjs/swagger'
 
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 
 import { BulkGenerateReportCardDto } from './dto/request/bulk-generate-report-card.dto.js'

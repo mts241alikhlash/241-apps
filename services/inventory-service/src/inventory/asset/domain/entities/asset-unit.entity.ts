@@ -1,5 +1,5 @@
 import type { CodedRef } from '../../../../shared/domain/entities/index.js'
-import type { DecimalValue } from '../../../../shared/domain/types/decimal.type.js'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
 
 export interface InventoryAssetUnitEntity {
   id: string

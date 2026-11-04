@@ -17,7 +17,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import {
   QUESTION_TYPES,
   type QuestionType,

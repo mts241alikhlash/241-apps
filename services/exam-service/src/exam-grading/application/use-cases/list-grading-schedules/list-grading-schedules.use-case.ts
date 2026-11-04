@@ -5,7 +5,7 @@ import { IExamScheduleRepository } from '../../../../exam-schedule/domain/reposi
 import type { ScheduleSessionCounts } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   GradingScopeService,
   type GradingUser,

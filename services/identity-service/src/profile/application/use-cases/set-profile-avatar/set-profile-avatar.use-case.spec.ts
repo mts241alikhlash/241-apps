@@ -3,7 +3,7 @@ import {
   UnsupportedMediaTypeException,
   BadRequestException,
 } from '@nestjs/common'
-import { MAX_UPLOAD_BYTES } from '../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 import { SetProfileAvatarUseCase } from './set-profile-avatar.use-case.js'
 
 const profile = { id: 'p-1' }

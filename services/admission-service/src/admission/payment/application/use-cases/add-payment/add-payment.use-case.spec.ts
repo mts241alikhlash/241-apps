@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException } from '@nestjs/common'
-import { AdmissionPaymentStatus } from '../../../../../shared/domain/enums/admission-payment-status.enum.js'
+import { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 import { AddPaymentUseCase } from './add-payment.use-case.js'
 
 const file = {

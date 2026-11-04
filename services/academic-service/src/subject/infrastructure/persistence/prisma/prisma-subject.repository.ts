@@ -8,7 +8,7 @@ import type {
   SubjectWithEmployees,
 } from '../../../domain/repositories/subject.repository.js'
 import { ISubjectRepository } from '../../../domain/repositories/subject.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { resolveEmployeeRefs } from '../../../../shared/utils/resolve-person-refs.helper.js'
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
 import { IEmployeeLookupPort } from '../../../../platform/employee-lookup/employee-lookup.port.js'

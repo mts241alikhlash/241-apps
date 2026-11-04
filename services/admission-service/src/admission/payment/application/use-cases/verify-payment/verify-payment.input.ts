@@ -1,4 +1,4 @@
-import type { AdmissionPaymentStatus } from '../../../../../shared/domain/enums/admission-payment-status.enum.js'
+import type { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 
 export interface VerifyPaymentInput {
   applicationId: string

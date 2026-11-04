@@ -1,7 +1,8 @@
 import { BadRequestException } from '@nestjs/common'
 import { RegisterApplicantUseCase } from './register-applicant.use-case.js'
 
-jest.mock('../../../../../shared/utils/hash.helper.js', () => ({
+jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
+  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
   hashPassword: jest.fn().mockResolvedValue('hash'),
 }))
 

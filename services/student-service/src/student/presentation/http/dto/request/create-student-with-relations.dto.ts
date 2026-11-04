@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { ParentRelation } from '../../../../../shared/domain/enums/parent-relation.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 import {
   IsArray,
   IsBoolean,
@@ -9,7 +9,7 @@ import {
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateStudentDto } from './create-student.dto.js'
-import { CreateAddressDto } from '../../../../../shared/dto/address.dto.js'
+import { CreateAddressDto } from '@mts241alikhlash/nest-core/dto'
 import { CreateParentDto } from '../../../../../parent/presentation/http/dto/request/create-parent.dto.js'
 
 export class ParentWithRelationDto extends CreateParentDto {

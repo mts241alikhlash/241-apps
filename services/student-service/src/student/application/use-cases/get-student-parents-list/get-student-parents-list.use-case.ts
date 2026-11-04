@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { StudentParentQueryInput } from './get-student-parents-list.input.js'
 import { IStudentParentRepository } from '../../../domain/repositories/student-parent.repository.js'
 import { StudentParentWithDetails } from '../../../domain/repositories/student-parent.repository.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class GetStudentParentsListUseCase {

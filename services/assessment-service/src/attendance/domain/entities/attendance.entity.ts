@@ -1,4 +1,4 @@
-import { AttendanceStatus } from '../../../shared/domain/enums/attendance-status.enum.js'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
 import { PersonRef } from '../../../shared/domain/entities/reference.entity.js'
 
 export type AttendanceStatusEnum = `${AttendanceStatus}`

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import { AppKey } from '../../../shared/domain/enums/app-key.enum.js'
-import { MAX_UPLOAD_BYTES } from '../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 import { UploadFileUseCase } from './upload-file.use-case.js'
 
 describe('UploadFileUseCase', () => {

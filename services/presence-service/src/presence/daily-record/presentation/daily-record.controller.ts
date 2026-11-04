@@ -18,11 +18,11 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { DailyPresenceEntity } from '../domain/entities/daily-presence.entity.js'
 import type {
   DailyPresenceWithDetails,

@@ -15,7 +15,7 @@ import type {
   UploadAdmissionDocumentForApplicationInput,
   UploadAdmissionDocumentInput,
 } from './upload-admission-document.input.js'
-import { MAX_UPLOAD_BYTES } from '../../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 
 export const ADMISSION_ALLOWED_MIME_TYPES = [
   'image/jpeg',

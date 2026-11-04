@@ -6,7 +6,7 @@ import type {
   RegionRef,
 } from '../../../../../platform/region-lookup/region-lookup.port.js'
 import type { IAdmissionApplicantRepository } from '../../../domain/repositories/admission-applicant-repository.js'
-import { ParentRelation } from '../../../../../shared/domain/enums/parent-relation.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 import { UpdateMyApplicationUseCase } from './update-my-application.use-case.js'
 
 const REGIONS: RegionRef[] = [

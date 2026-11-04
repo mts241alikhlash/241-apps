@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import type { PositionWithCategory } from '../../../../domain/entities/position.entity.js'
-import type { PaginationMeta } from '../../../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginationMeta } from '@mts241alikhlash/nest-core/domain'
 
 export class PositionCategoryResponseDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440007' }) id!: string

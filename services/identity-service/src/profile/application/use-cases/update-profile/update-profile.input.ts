@@ -1,5 +1,5 @@
-import { MaritalStatus } from '../../../../shared/domain/enums/marital-status.enum.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { MaritalStatus } from '@mts241alikhlash/nest-core/domain'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 export interface UpdateProfileInput {
   name?: string

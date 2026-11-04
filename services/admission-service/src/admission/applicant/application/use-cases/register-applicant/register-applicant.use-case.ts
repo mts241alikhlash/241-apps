@@ -4,7 +4,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common'
-import { hashPassword } from '../../../../../shared/utils/hash.helper.js'
+import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 import { IReferenceLookupPort } from '../../../../../platform/reference-lookup/reference-lookup.port.js'
 import { IAdmissionApplicantRepository } from '../../../domain/repositories/admission-applicant-repository.js'
 import type { RegisterApplicantInput } from './register-applicant.input.js'

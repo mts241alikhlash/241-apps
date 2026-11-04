@@ -1,4 +1,4 @@
-import { ParentRelation } from '../../../shared/domain/enums/parent-relation.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 import { NamedRef, PersonRef } from '../../../shared/domain/entities/index.js'
 
 export interface StudentParentEntity {

@@ -21,7 +21,7 @@ import { resolve } from 'node:path'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
 import { buildSwaggerConfig } from './swagger-config.js'
-import { wrapResponseEnvelope } from './wrap-response-envelope.js'
+import { wrapResponseEnvelope } from '@mts241alikhlash/nest-core/openapi'
 
 async function main(): Promise<void> {
   const { AppModule } = await import('../app.module.js')

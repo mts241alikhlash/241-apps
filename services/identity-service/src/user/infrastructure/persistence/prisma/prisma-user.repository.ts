@@ -17,7 +17,7 @@ import {
   UserQueryInput,
 } from '../../../domain/repositories/user.repository.js'
 import { PUBLIC_USER_SELECT } from './prisma-user.includes.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaUserRepository extends IUserRepository {

@@ -1,5 +1,5 @@
 ﻿import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 export class ProfileResponseDto {
   @ApiProperty({

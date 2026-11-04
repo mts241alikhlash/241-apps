@@ -23,7 +23,7 @@ import { SsoAuthorizeUseCase } from '../../application/use-cases/sso-authorize/s
 import { ListSsoAppsUseCase } from '../../application/use-cases/sso-apps/list-sso-apps.use-case.js'
 import { SsoExchangeUseCase } from '../../application/use-cases/sso-exchange/sso-exchange.use-case.js'
 import { safeRelativePath } from '../../domain/policies/sso-apps.policy.js'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { GoogleAuthGuard } from '../../guards/google-auth.guard.js'
 import { SameOriginGuard } from '../../guards/same-origin.guard.js'
 import { SsoLoginUseCase } from '../../application/use-cases/sso-login/sso-login.use-case.js'
@@ -34,7 +34,7 @@ import {
   SsoAppResponseDto,
   SsoExchangeResponseDto,
 } from './dto/response/auth-api-response.dto.js'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 import { JwtAuthGuard } from '../../index.js'
 import {

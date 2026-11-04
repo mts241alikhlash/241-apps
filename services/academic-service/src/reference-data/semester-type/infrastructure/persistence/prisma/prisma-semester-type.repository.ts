@@ -8,7 +8,7 @@ import {
   UpdateSemesterTypeRepositoryInput,
 } from '../../../domain/repositories/semester-type.repository.js'
 import { SemesterTypeEntity } from '../../../domain/entities/semester-type.entity.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaSemesterTypeRepository extends ISemesterTypeRepository {

@@ -5,7 +5,7 @@ import { StudentWithDetails } from '../../../domain/repositories/student.reposit
 import {
   hashPassword,
   randomPassword,
-} from '../../../../shared/utils/hash.helper.js'
+} from '@mts241alikhlash/nest-core/helpers'
 import {
   StudentNisAlreadyExistsException,
   StudentNisnAlreadyExistsException,

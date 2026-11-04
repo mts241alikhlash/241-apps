@@ -1,8 +1,8 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { AttendanceStatus } from '../../../shared/domain/enums/attendance-status.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
 import {
   AttendanceEntity,
   AttendanceWithDetails,

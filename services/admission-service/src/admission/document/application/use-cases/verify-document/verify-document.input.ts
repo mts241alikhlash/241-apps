@@ -1,4 +1,4 @@
-import type { AdmissionDocumentStatus } from '../../../../../shared/domain/enums/admission-document-status.enum.js'
+import type { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 
 export interface VerifyDocumentInput {
   applicationId: string

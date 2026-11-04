@@ -14,7 +14,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IReligionRepository } from '../../domain/repositories/religion.repository.js'
 

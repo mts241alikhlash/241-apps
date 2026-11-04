@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator'
-import { toBooleanFromTransform } from '../../../../../shared/validators/boolean.transformer.js'
+import { toBooleanFromTransform } from '@mts241alikhlash/nest-core/validators'
 
 export class ExportEmployeeQueryDto {
   @ApiPropertyOptional({ description: 'Search by name, NIP, or NUPTK' })

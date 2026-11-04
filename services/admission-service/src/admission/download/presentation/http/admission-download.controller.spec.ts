@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { StreamableFile } from '@nestjs/common'
 import { Readable } from 'node:stream'
-import { IS_PUBLIC_KEY } from '../../../../core/decorators/public.decorator.js'
+import { IS_PUBLIC_KEY } from '@mts241alikhlash/nest-core/decorators'
 import { PERMISSIONS_KEY } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { AdmissionDownloadController } from './admission-download.controller.js'
 import { AdmissionDownloadPublicController } from './admission-download-public.controller.js'

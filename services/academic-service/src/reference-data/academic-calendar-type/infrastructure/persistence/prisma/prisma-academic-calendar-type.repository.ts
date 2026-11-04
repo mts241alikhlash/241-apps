@@ -8,7 +8,7 @@ import {
   UpdateAcademicCalendarTypeRepositoryInput,
 } from '../../../domain/repositories/academic-calendar-type.repository.js'
 import { AcademicCalendarTypeEntity } from '../../../domain/entities/academic-calendar-type.entity.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaAcademicCalendarTypeRepository implements IAcademicCalendarTypeRepository {

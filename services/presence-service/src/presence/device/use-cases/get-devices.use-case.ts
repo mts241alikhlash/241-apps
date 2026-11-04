@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import {
   PaginatedResponse,
   PaginatedResult,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { DeviceEntity } from '../domain/entities/device.entity.js'
 import {
   DeviceQueryInput,

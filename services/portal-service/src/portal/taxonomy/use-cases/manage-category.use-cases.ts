@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { toSlug } from '../../../shared/helpers/slug.helper.js'
+import { toSlug } from '@mts241alikhlash/nest-core/helpers'
 import { ICategoryRepository } from '../domain/interfaces/category-repository.interface.js'
 import {
   CreateCategoryDto,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '../../../../generated/prisma/client.js'
-import { AssessmentType } from '../../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { resolveUserRefs } from '../../../../shared/utils/resolve-user-refs.helper.js'
 import { resolveAssessmentRefs } from '../../../../shared/utils/assessment-refs.helper.js'

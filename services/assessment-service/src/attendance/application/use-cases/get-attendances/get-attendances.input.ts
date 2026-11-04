@@ -1,5 +1,5 @@
-import { AttendanceStatus } from '../../../../shared/domain/enums/attendance-status.enum.js'
-import { PaginationQueryInput } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
+import { PaginationQueryInput } from '@mts241alikhlash/nest-core/domain'
 
 export interface GetAttendancesInput extends PaginationQueryInput {
   status?: AttendanceStatus

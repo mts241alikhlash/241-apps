@@ -4,7 +4,7 @@ import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IAccountProvisioningPort } from '../../../../platform/user/index.js'
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
 import { UserEntity } from '../../../../shared/domain/entities/user.entity.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { resolveUserRefs } from '../../../../shared/utils/resolve-user-refs.helper.js'
 import {
   ProfileRosterRef,
@@ -35,7 +35,7 @@ import {
   buildEmployeeExportWhere,
 } from './prisma-employee.where.js'
 import { createEmployeeInTx } from './prisma-employee.writer.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 
 type EmployeeRowWithUser = EmployeeRow & { user: UserRef<ProfileRosterRef> }

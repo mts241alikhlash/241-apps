@@ -22,7 +22,7 @@ import { resolveUserRefs } from '../../../../shared/utils/resolve-user-refs.help
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { graduateStudentSteps } from './prisma-graduation.steps.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   GRADUATION_WITH_DETAILS_INCLUDE,
   GraduationRow,

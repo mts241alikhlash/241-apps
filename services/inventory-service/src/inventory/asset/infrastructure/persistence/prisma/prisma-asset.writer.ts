@@ -11,7 +11,7 @@ import {
   type AssetRepositoryDependencies,
 } from './prisma-asset.reader.js'
 import { mapAsset, mapAssetRecord } from './prisma-asset.mapping.js'
-import { toNumericValue } from '../../../../../shared/domain/types/decimal.type.js'
+import { toNumericValue } from '@mts241alikhlash/nest-core/domain'
 
 export async function createAsset(
   dependencies: AssetRepositoryDependencies,

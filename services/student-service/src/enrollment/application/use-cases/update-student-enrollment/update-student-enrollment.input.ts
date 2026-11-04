@@ -1,4 +1,4 @@
-import { EnrollmentStatus } from '../../../../shared/domain/enums/enrollment-status.enum.js'
+import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
 
 export interface UpdateStudentEnrollmentInput {
   studentId?: string

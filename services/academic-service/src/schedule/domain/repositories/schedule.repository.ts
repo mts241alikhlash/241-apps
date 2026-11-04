@@ -1,8 +1,8 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { DayEnum } from '../../../shared/domain/enums/day.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 import {
   ScheduleWithDetails,
   ScheduleEntity,

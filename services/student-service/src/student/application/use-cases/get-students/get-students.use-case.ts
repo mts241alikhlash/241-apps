@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { StudentQueryInput } from './get-students.input.js'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
 import { StudentWithDetails } from '../../../domain/repositories/student.repository.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class GetStudentsUseCase {

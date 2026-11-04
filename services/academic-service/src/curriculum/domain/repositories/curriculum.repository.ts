@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { CurriculumEntity } from '../entities/curriculum.entity.js'
 import { CurriculumWithDetails } from '../entities/curriculum.entity.js'
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { IReligionRepository } from '../../../domain/repositories/religion.repository.js'
 import { ReligionEntity } from '../../../domain/entities/religion.entity.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListReligionsInput } from './get-religions.input.js'
 
 @Injectable()

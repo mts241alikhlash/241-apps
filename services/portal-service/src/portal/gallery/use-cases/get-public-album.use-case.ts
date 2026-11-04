@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { IGalleryRepository } from '../domain/interfaces/gallery-repository.interface.js'
 import { PublicAlbumQueryDto } from '../dto/request/gallery.dto.js'
 import {

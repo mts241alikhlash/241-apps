@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IEmployeeIdentityReadPort } from '../../../../platform/employee-identity/employee-identity.port.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamScore } from '../../../domain/entities/exam-score.entity.js'
 import { IExamScoreRepository } from '../../../domain/repositories/exam-score.repository.js'
 

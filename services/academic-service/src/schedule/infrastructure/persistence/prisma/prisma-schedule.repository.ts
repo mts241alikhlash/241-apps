@@ -32,7 +32,7 @@ import {
   findSoftDeletedRow,
   findEmployeeConflict,
 } from './prisma-schedule.conflicts.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 type ScheduleRowWithEmployeeUser = Omit<ScheduleRow, 'teachingAssignment'> & {
   teachingAssignment: ScheduleRow['teachingAssignment'] & {

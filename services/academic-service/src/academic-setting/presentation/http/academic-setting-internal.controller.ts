@@ -5,8 +5,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
-import { ProvisioningTokenGuard } from '../../../core/guards/provisioning-token.guard.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { IAcademicSettingRepository } from '../../domain/repositories/academic-setting.repository.js'
 
 export class AcademicSettingSummaryDto {

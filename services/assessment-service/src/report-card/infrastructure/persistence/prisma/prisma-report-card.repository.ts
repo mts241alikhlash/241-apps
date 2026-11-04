@@ -13,7 +13,7 @@ import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academ
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 import { decorateReportCards } from './prisma-report-card.refs.js'
 import { IReportCardRepository } from '../../../domain/repositories/report-card.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   REPORT_CARD_WITH_DETAILS_INCLUDE,
   ReportCardRow,

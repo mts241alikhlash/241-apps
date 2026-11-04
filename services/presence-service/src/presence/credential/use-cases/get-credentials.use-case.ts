@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import {
   PaginatedResponse,
   PaginatedResult,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { CredentialWithHolder } from '../domain/entities/credential.entity.js'
 import {
   CredentialQueryInput,

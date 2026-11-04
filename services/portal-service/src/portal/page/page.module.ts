@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { HtmlSanitizerService } from '../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { MediaModule } from '../media/media.module.js'
 import { INavigationRepository } from './domain/interfaces/navigation-repository.interface.js'
 import { IPageRepository } from './domain/interfaces/page-repository.interface.js'

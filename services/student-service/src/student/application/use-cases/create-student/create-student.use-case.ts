@@ -6,7 +6,7 @@ import { EnsureStudentEnrollmentUseCase } from '../../../../enrollment/applicati
 import {
   hashPassword,
   randomPassword,
-} from '../../../../shared/utils/hash.helper.js'
+} from '@mts241alikhlash/nest-core/helpers'
 import {
   StudentCreationFailedException,
   StudentNisAlreadyExistsException,

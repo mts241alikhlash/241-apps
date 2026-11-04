@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamScheduleView } from '../../../domain/entities/exam-schedule.entity.js'
 import { IScheduleSessionGuard } from '../../../domain/ports/schedule-session-guard.port.js'
 import {

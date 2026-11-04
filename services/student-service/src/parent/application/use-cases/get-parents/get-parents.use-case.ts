@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ParentListWithDetails } from '../../../domain/entities/parent.entity.js'
 import { IParentRepository } from '../../../domain/repositories/parent.repository.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListParentsInput } from './get-parents.input.js'
 
 @Injectable()

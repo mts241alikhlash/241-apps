@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { PaymentModule, VerifyPaymentUseCase } from '../../index.js'
-import { AdmissionPaymentStatus } from '../../../../shared/domain/enums/admission-payment-status.enum.js'
+import { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IAdmissionPaymentNotificationPort } from '../../domain/repositories/admission-payment-notification.port.js'
 import { IAdmissionPaymentRepository } from '../../domain/repositories/admission-payment-repository.js'
 import { IAdmissionFileStorage } from '../../../document/index.js'

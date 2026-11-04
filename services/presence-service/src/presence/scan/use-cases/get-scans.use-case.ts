@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import {
   PaginatedResponse,
   PaginatedResult,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import {
   ClockAnchor,
   ServerClockService,

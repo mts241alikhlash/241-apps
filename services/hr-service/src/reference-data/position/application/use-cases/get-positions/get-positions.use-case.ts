@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PositionWithCategory } from '../../../domain/entities/position.entity.js'
 import { IPositionRepository } from '../../../domain/repositories/position.repository.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListPositionsInput } from './get-positions.input.js'
 
 @Injectable()

@@ -8,7 +8,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import { EXAM_SESSION_STATUSES } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 import type { ExamSessionStatus } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 

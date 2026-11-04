@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { AdmissionPaymentStatus } from '../../../../../shared/domain/enums/admission-payment-status.enum.js'
+import { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 import { UploadPaymentProofUseCase } from '../upload-payment-proof/upload-payment-proof.use-case.js'
 import type { UploadPaymentProofForApplicationInput } from '../upload-payment-proof/upload-payment-proof.input.js'
 import { VerifyPaymentUseCase } from '../verify-payment/verify-payment.use-case.js'

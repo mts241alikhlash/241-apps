@@ -70,7 +70,7 @@ export class PrismaAssetUnitRepository
   findAll(
     query: AssetUnitQueryInput,
   ): Promise<
-    import('../../../../../shared/domain/interfaces/repository.interface.js').PaginatedResult<AssetUnitRepositoryOutput>
+    import('@mts241alikhlash/nest-core/domain').PaginatedResult<AssetUnitRepositoryOutput>
   > {
     return findAllUnits(this.dependencies(), query)
   }

@@ -2,8 +2,8 @@ import type { CodedRef } from '../../../../shared/domain/entities/reference.enti
 import type {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
-import type { DecimalValue } from '../../../../shared/domain/types/decimal.type.js'
+} from '@mts241alikhlash/nest-core/domain'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
 import type { AssetConditionLookupOutput } from './condition-lookup.port.js'
 import type { AssetLocationLookupOutput } from './location-lookup.port.js'
 import type { AssetStatusLookupOutput } from './status-lookup.port.js'

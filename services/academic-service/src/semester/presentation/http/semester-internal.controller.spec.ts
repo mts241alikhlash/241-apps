@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing'
-import { ProvisioningTokenGuard } from '../../../core/guards/provisioning-token.guard.js'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { ISemesterRepository } from '../../domain/repositories/semester.repository.js'
 import { SemesterInternalController } from './semester-internal.controller.js'
 

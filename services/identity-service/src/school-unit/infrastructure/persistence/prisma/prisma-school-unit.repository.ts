@@ -1,4 +1,4 @@
-import { SchoolUnitStatus } from '../../../../shared/domain/enums/school-unit-status.enum.js'
+import { SchoolUnitStatus } from '@mts241alikhlash/nest-core/domain'
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'

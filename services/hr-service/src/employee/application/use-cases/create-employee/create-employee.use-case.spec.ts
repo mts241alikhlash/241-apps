@@ -1,13 +1,13 @@
 import { ConflictException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { CreateEmployeeInput } from './create-employee.input.js'
 import { IEmployeeRepository } from '../../../domain/repositories/employee.repository.js'
 import { CreateEmployeeUseCase } from './create-employee.use-case.js'
-import { hashPassword } from '../../../../shared/utils/hash.helper.js'
+import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
-jest.mock('../../../../shared/utils/hash.helper.js', () => ({
-  ...jest.requireActual('../../../../shared/utils/hash.helper.js'),
+jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
+  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
   hashPassword: jest.fn(),
 }))
 

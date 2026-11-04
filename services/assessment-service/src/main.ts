@@ -10,7 +10,7 @@ import { Logger } from 'nestjs-pino'
 import { ROUTE_OPTIONS } from './core/config/route-options.js'
 import { AppModule } from './app.module.js'
 import { buildSwaggerConfig } from './openapi/swagger-config.js'
-import { wrapResponseEnvelope } from './openapi/wrap-response-envelope.js'
+import { wrapResponseEnvelope } from '@mts241alikhlash/nest-core/openapi'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {

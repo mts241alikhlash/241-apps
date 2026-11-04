@@ -5,7 +5,7 @@ import {
   IAssessmentWeightRepository,
   ReplaceAssessmentWeightsInput,
 } from '../../../domain/repositories/assessment-weight.repository.js'
-import { AssessmentType } from '../../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 
 function toWeightEntity(row: {
   type: keyof typeof AssessmentType

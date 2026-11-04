@@ -1,15 +1,15 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { EnrollmentStatus as EnrollmentStatusEnum } from '../../../shared/domain/enums/enrollment-status.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { EnrollmentStatus as EnrollmentStatusEnum } from '@mts241alikhlash/nest-core/domain'
 import {
   StudentEnrollmentEntity as EnrollmentEntity,
   EnrollmentWithDetails,
 } from '../entities/enrollment.entity.js'
 
-export { EnrollmentStatus } from '../../../shared/domain/enums/enrollment-status.enum.js'
-export { StudentStatusEnum as StudentStatus } from '../../../shared/domain/enums/student-status.enum.js'
+export { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
+export { StudentStatusEnum as StudentStatus } from '@mts241alikhlash/nest-core/domain'
 export type { EnrollmentWithDetails }
 
 export interface StudentEnrollmentQueryInput extends PaginationQueryInput {

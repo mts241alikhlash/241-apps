@@ -24,7 +24,7 @@ import {
 } from '@nestjs/swagger'
 import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { DeviceEntity } from '../domain/entities/device.entity.js'
 import { DeviceQueryDto } from '../dto/request/device-query.dto.js'
 import { RegisterDeviceDto } from '../dto/request/register-device.dto.js'

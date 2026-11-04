@@ -1,8 +1,8 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { AssessmentType } from '../../../shared/domain/enums/assessment-type.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import { AssessmentItemEntity } from '../entities/assessment-item.entity.js'
 import { AssessmentItemWithDetails } from '../entities/assessment-item.entity.js'
 

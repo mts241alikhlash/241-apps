@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { ReligionEntity } from '../entities/religion.entity.js'
 
 export type { ReligionEntity }

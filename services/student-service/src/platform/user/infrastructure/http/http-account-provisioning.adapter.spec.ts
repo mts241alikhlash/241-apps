@@ -1,6 +1,6 @@
 import { ConflictException, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { HttpAccountProvisioningAdapter } from './http-account-provisioning.adapter.js'
 
 describe('HttpAccountProvisioningAdapter', () => {

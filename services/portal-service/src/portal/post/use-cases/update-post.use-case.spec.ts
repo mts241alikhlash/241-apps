@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { HtmlSanitizerService } from '../../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { ContentStatus } from '../domain/enums/content-status.enum.js'
 import { PostType } from '../domain/enums/post-type.enum.js'
 import { SyncMediaUsageUseCase } from '../../media/use-cases/sync-media-usage.use-case.js'

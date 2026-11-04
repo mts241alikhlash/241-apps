@@ -10,7 +10,7 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import {
   EXAM_SCHEDULE_STATUSES,
   EXAM_TYPES,

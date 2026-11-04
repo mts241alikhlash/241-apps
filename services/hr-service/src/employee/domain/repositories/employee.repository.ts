@@ -1,8 +1,8 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
-import { UserGender } from '../../../shared/domain/enums/user-gender.enum.js'
+} from '@mts241alikhlash/nest-core/domain'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { UserEntity } from '../../../shared/domain/entities/user.entity.js'
 import {
   ProfileEntity,

@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserGender } from '../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { ProvisionAccountDto } from './dto/request/provision-account.dto.js'
 import { ProvisionAccountUseCase } from '../../application/use-cases/provision-account/provision-account.use-case.js'
 import { DeleteUserUseCase } from '../../application/use-cases/delete-user/delete-user.use-case.js'

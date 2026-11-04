@@ -10,7 +10,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator'
-import { toBooleanFromTransform } from '../../../../../../shared/validators/boolean.transformer.js'
+import { toBooleanFromTransform } from '@mts241alikhlash/nest-core/validators'
 
 export class CreateAdmissionDownloadDto {
   @ApiProperty({ example: 'Brosur PPDB 2026/2027' })

@@ -41,7 +41,7 @@ import {
   createManyEnrollments,
 } from './prisma-enrollment.bulk.js'
 import { resolveAcademicRefs } from './prisma-enrollment.refs.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 type EnrollmentRowWithRefs = Omit<EnrollmentRow, 'student'> & {
   student: EnrollmentRow['student'] & { user?: UserRef<ProfileRosterRef> }

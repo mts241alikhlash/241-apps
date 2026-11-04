@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { BloodTypeEntity } from '../entities/blood-type.entity.js'
 
 export type { BloodTypeEntity }

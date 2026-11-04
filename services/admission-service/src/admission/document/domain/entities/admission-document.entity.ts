@@ -1,4 +1,4 @@
-import { AdmissionDocumentStatus } from '../../../../shared/domain/enums/admission-document-status.enum.js'
+import { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionFileRef } from './admission-file.entity.js'
 
 export interface AdmissionDocumentTypeRef {

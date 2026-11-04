@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { DayEnum as Day } from '../../../shared/domain/enums/day.enum.js'
+import { DayEnum as Day } from '@mts241alikhlash/nest-core/domain'
 import { CreateScheduleDto } from './dto/request/create-schedule.dto.js'
 import { UpdateScheduleDto } from './dto/request/update-schedule.dto.js'
 import { CreateScheduleUseCase } from '../../application/use-cases/create-schedule/create-schedule.use-case.js'

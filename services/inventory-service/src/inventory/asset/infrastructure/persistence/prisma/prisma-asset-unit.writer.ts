@@ -1,5 +1,5 @@
 import { Prisma } from '../../../../../generated/prisma/client.js'
-import { toNumericValue } from '../../../../../shared/domain/types/decimal.type.js'
+import { toNumericValue } from '@mts241alikhlash/nest-core/domain'
 import type {
   AssetUnitRepositoryOutput,
   CreateAssetUnitRepositoryInput,

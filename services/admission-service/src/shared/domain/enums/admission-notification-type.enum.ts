@@ -1,7 +1,0 @@
-export enum AdmissionNotificationType {
-  STATUS_CHANGE = 'STATUS_CHANGE',
-  DOCUMENT = 'DOCUMENT',
-  PAYMENT = 'PAYMENT',
-  ANNOUNCEMENT = 'ANNOUNCEMENT',
-  GENERAL = 'GENERAL',
-}

@@ -22,7 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { JwtAuthGuard } from '../../../auth/index.js'
 import { RequirePermissions } from '../../../access-control/permission/decorators/require-permissions.decorator.js'
 import { GetProfileUseCase } from '../../application/use-cases/get-profile/get-profile.use-case.js'
@@ -31,7 +31,7 @@ import { SetProfileAvatarUseCase } from '../../application/use-cases/set-profile
 import { ClearProfileAvatarUseCase } from '../../application/use-cases/clear-profile-avatar/clear-profile-avatar.use-case.js'
 import { ProfileAvatarUrlService } from '../../application/services/profile-avatar-url.service.js'
 import { UpdateProfileDto } from './dto/request/update-profile.dto.js'
-import { UPLOAD_LIMITS } from '../../../core/upload/upload-limits.js'
+import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
 
 @ApiTags('Profiles')
 @ApiBearerAuth()

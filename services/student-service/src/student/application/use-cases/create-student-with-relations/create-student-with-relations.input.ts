@@ -1,7 +1,7 @@
 import { CreateStudentInput } from '../create-student/create-student.input.js'
 import { CreateAddressRepositoryInput } from '../../../../shared/domain/entities/address.entity.js'
-import { ParentRelation } from '../../../../shared/domain/enums/parent-relation.enum.js'
-import { IncomeRange } from '../../../../shared/domain/enums/income-range.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
+import { IncomeRange } from '@mts241alikhlash/nest-core/domain'
 
 export interface StudentParentSeedInputDto {
   name: string

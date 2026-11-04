@@ -1,5 +1,5 @@
 import { ConflictException } from '@nestjs/common'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { ProvisionAccountInput } from './provision-account.input.js'
 import { ProvisionAccountUseCase } from './provision-account.use-case.js'
 

@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { AssessmentType } from '../../../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import { IsEnum, IsOptional, IsUUID } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class AssessmentItemQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() teachingAssignmentId?: string

@@ -28,7 +28,7 @@ import {
 } from '@nestjs/swagger'
 
 import { JwtAuthGuard } from '../../auth/index.js'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '../../access-control/permission/decorators/require-permissions.decorator.js'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 
@@ -36,7 +36,7 @@ import { FileResponseDto } from '../dto/response/file-response.dto.js'
 import { UploadFileUseCase } from '../use-cases/upload-file.use-case.js'
 import { GetFilesUseCase } from '../use-cases/get-files.use-case.js'
 import { DeleteFileUseCase } from '../use-cases/delete-file.use-case.js'
-import { UPLOAD_LIMITS } from '../../../core/upload/upload-limits.js'
+import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
 
 @ApiTags('Files')
 @ApiBearerAuth()

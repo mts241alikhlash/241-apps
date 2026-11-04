@@ -35,7 +35,7 @@ import { DeleteClassroomStructureUseCase } from '../../application/use-cases/del
 import { GetClassroomStructuresUseCase } from '../../application/use-cases/get-classroom-structures/get-classroom-structures.use-case.js'
 import { UpdateClassroomStructureUseCase } from '../../application/use-cases/update-classroom-structure/update-classroom-structure.use-case.js'
 import { ClassroomStructureWithDetails } from '../../domain/repositories/classroom-structure.repository.js'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Classroom Structures')
 @ApiBearerAuth()

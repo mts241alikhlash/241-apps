@@ -23,7 +23,7 @@ import {
   TeachingAssignmentWithDetails,
   TeachingLoadSummary,
 } from '../../../domain/repositories/teaching-assignment.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   TEACHING_ASSIGNMENT_WITH_DETAILS_INCLUDE,
   TeachingAssignmentRow,

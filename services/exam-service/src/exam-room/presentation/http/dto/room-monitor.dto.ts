@@ -11,7 +11,7 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import { ROOM_EXECUTION_CONDITIONS } from '../../../../exam-room/domain/entities/exam-room-report.entity.js'
 import { MAKEUP_REASONS } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { CAMERA_BLOCKED_REASONS } from '../../../../exam-session/application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'

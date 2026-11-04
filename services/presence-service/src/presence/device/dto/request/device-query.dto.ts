@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { IsBoolean, IsOptional, IsString } from 'class-validator'
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class DeviceQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional()

@@ -1,4 +1,4 @@
-import { IS_PUBLIC_KEY } from '../../../../core/decorators/public.decorator.js'
+import { IS_PUBLIC_KEY } from '@mts241alikhlash/nest-core/decorators'
 import { AdmissionPublicController } from './admission-public.controller.js'
 
 describe('AdmissionPublicController', () => {

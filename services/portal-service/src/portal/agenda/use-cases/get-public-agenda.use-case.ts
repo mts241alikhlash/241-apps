@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { IAgendaRepository } from '../domain/interfaces/agenda-repository.interface.js'
 import { PublicAgendaQueryDto } from '../dto/request/agenda.dto.js'
 import { toPublicAgenda } from '../infrastructure/mappers/agenda.mapper.js'

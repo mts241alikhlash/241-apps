@@ -12,7 +12,7 @@ import type {
 import type {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionStatus } from '../../../../shared/domain/enums/admission-status.enum.js'
 import type { AdmissionDocumentTypeRow } from '../../../document/index.js'
 

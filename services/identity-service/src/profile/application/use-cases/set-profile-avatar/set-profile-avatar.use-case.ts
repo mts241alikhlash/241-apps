@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto'
 import { extname } from 'node:path'
 import { IProfileRepository } from '../../../domain/repositories/profile.repository.js'
 import { StorageService } from '../../../../core/storage/storage.service.js'
-import { MAX_UPLOAD_BYTES } from '../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',

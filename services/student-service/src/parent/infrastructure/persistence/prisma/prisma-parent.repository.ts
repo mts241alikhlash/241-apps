@@ -12,7 +12,7 @@ import type {
   UpdateParentRepositoryInput,
 } from '../../../domain/repositories/parent.repository.js'
 import { IParentRepository } from '../../../domain/repositories/parent.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   PARENT_LIST_INCLUDE,
   PARENT_DETAIL_INCLUDE,

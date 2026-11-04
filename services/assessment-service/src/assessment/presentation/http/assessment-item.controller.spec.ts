@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AssessmentType } from '../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import { CreateAssessmentItemDto } from './dto/request/create-assessment-item.dto.js'
 import { UpdateAssessmentItemDto } from './dto/request/update-assessment-item.dto.js'
 import { GetAssessmentItemsUseCase } from '../../application/use-cases/get-assessment-items/get-assessment-items.use-case.js'

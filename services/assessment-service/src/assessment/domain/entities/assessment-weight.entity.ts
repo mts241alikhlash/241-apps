@@ -1,4 +1,4 @@
-import { AssessmentType } from '../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 
 export interface AssessmentWeightEntity {
   type: AssessmentType

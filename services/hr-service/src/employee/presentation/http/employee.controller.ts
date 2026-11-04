@@ -37,7 +37,7 @@ import { ProfileResponseDto } from '../../../platform/profile/dto/response/profi
 import { UpdateEmployeeDto } from './dto/request/update-employee.dto.js'
 import { CreateEmployeeUseCase } from '../../application/use-cases/create-employee/create-employee.use-case.js'
 import { DeleteEmployeeUseCase } from '../../application/use-cases/delete-employee/delete-employee.use-case.js'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 import { GetMyEmployeeUseCase } from '../../application/use-cases/get-my-employee/get-my-employee.use-case.js'
 import { GetEmployeeByIdUseCase } from '../../application/use-cases/get-employee-by-id/get-employee-by-id.use-case.js'

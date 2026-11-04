@@ -18,7 +18,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
 import { CancelExamScheduleUseCase } from '../../application/use-cases/cancel-exam-schedule/cancel-exam-schedule.use-case.js'

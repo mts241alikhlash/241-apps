@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger'
-import { EnrollmentStatus } from '../../../../../shared/domain/enums/enrollment-status.enum.js'
+import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator'
 import { CreateStudentEnrollmentDto } from './create-student-enrollment.dto.js'
 

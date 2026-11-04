@@ -5,9 +5,9 @@ import { ResolveBulkImportResponseDto } from '../../../presentation/http/dto/res
 import { UpdateEmployeeUseCase } from '../update-employee/update-employee.use-case.js'
 import { UpdateEmployeeProfileUseCase } from '../update-employee-profile/update-employee-profile.use-case.js'
 import { CreateEmployeeUseCase } from '../create-employee/create-employee.use-case.js'
-import { resolveOnceByKey } from '../../../../shared/utils/resolve-once-by-key.helper.js'
+import { resolveOnceByKey } from '@mts241alikhlash/nest-core/helpers'
 import { processBulkImportConflicts } from '../../../../shared/utils/process-bulk-import-conflicts.helper.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class ResolveBulkImportConflictsUseCase {

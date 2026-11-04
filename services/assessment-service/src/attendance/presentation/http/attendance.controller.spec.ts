@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AttendanceStatus } from '../../../shared/domain/enums/attendance-status.enum.js'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
 import { BulkUpsertAttendanceDto } from './dto/request/bulk-upsert-attendance.dto.js'
 import { CreateAttendanceDto } from './dto/request/create-attendance.dto.js'
 import { UpdateAttendanceDto } from './dto/request/update-attendance.dto.js'

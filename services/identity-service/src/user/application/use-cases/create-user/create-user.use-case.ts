@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common'
 import { CreateUserInput } from './create-user.input.js'
 import { IUserRepository } from '../../../domain/repositories/user.repository.js'
-import { hashPassword } from '../../../../shared/utils/hash.helper.js'
+import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
 @Injectable()
 export class CreateUserUseCase {

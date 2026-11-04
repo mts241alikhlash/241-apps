@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsOptional, IsString, IsUUID } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class ParentQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ description: 'Search by name, NIK, email, or phone' })

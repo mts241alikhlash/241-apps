@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { MAX_UPLOAD_BYTES } from '../../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 import { PDF_REJECTED, toStoredPdf } from './pdf-upload.policy.js'
 
 const pdf = (extra = 10) =>

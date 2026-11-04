@@ -3,9 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { CreateUserInput } from './create-user.input.js'
 import { IUserRepository } from '../../../domain/repositories/user.repository.js'
 import { CreateUserUseCase } from './create-user.use-case.js'
-import { hashPassword } from '../../../../shared/utils/hash.helper.js'
+import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
-jest.mock('../../../../shared/utils/hash.helper.js', () => ({
+jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
+  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
   hashPassword: jest.fn(),
 }))
 

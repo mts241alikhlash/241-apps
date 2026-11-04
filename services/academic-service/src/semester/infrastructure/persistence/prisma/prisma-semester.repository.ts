@@ -12,7 +12,7 @@ import {
   SemesterTypeRow,
   UpdateSemesterRepositoryInput,
 } from '../../../domain/repositories/semester.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { SEMESTER_WITH_DETAILS_INCLUDE } from './prisma-semester.includes.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 

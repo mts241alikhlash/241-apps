@@ -19,7 +19,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { JwtAuthGuard } from '../../../auth/index.js'
 import { RequirePermissions } from '../../../access-control/permission/decorators/require-permissions.decorator.js'
 import { ProfileAddressService } from '../../application/services/profile-address.service.js'

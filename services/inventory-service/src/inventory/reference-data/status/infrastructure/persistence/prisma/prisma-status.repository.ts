@@ -4,7 +4,7 @@ import {
   Prisma,
 } from '../../../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../../../core/database/prisma.service.js'
-import { InventoryStatusKey } from '../../../../../../shared/domain/enums/inventory-status-key.enum.js'
+import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import {
   IStatusRepository,
   StatusCreateRepositoryInput,

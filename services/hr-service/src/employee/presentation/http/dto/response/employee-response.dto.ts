@@ -3,8 +3,8 @@ import { EmploymentTypeResponseDto } from '../../../../../reference-data/employm
 import { ProfileResponseDto } from '../../../../../platform/profile/dto/response/profile-response.dto.js'
 import type { ProfileEntity } from '../../../../../platform/profile/domain/entities/profile.entity.js'
 import type { UserEntity } from '../../../../../shared/domain/entities/user.entity.js'
-import { UserGender } from '../../../../../shared/domain/enums/user-gender.enum.js'
-import type { PaginationMeta } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
+import type { PaginationMeta } from '@mts241alikhlash/nest-core/domain'
 import type { EmployeeWithDetails } from '../../../../domain/entities/employee.entity.js'
 import { EmployeePositionResponseDto } from './employee-position-response.dto.js'
 

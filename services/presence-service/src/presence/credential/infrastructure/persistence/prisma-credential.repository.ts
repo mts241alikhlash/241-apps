@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   CredentialEntity,
   CredentialHolderRef,

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { AdmissionDocumentStatus } from '../../../../shared/domain/enums/admission-document-status.enum.js'
+import { AdmissionDocumentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IAdmissionDocumentNotificationPort } from '../../domain/repositories/admission-document-notification.port.js'
 import { IAdmissionDocumentRepository } from '../../domain/repositories/admission-document-repository.js'
 import { IAdmissionFileStorage } from '../../domain/repositories/admission-file-storage.js'

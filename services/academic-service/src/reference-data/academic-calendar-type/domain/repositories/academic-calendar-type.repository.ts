@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { AcademicCalendarTypeEntity } from '../entities/academic-calendar-type.entity.js'
 
 export interface AcademicCalendarTypeQueryInput extends PaginationQueryInput {

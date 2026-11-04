@@ -1,5 +1,5 @@
-import type { AdmissionPaymentStatus } from '../../../../shared/domain/enums/admission-payment-status.enum.js'
-import type { DecimalValue } from '../../../../shared/domain/types/decimal.type.js'
+import type { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionFileRef } from '../../../document/index.js'
 import type { AdmissionPaymentBankAccountRef } from '../entities/admission-payment.entity.js'
 

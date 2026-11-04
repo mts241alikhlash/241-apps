@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Response } from 'express'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { GetLandingImageUseCase } from '../../application/use-cases/get-landing-image/get-landing-image.use-case.js'
 import { GetLandingUseCase } from '../../application/use-cases/get-landing/get-landing.use-case.js'
 import { AdmissionLandingPublishedResponseDto } from './dto/response/landing-response.dto.js'

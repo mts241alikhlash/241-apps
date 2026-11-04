@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs'
 import { ExportStudentQueryInput } from './export-student.input.js'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
 import { mapStudentToExportRow } from '../../../constants/student-export-columns.js'
-import type { ExcelRow } from '../../../../shared/domain/types/exceljs.type.js'
+import type { ExcelRow } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class ExportStudentsUseCase {

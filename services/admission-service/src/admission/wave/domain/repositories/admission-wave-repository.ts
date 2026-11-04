@@ -1,7 +1,7 @@
 import type {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import type {
   ActiveWaveRow,
   AdmissionWaveEntity,

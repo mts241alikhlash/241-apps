@@ -10,7 +10,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsUUID } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { IProfileAddressRepository } from '../../domain/repositories/profile-address.repository.js'
 import { ProfileAddressService } from '../../application/services/profile-address.service.js'

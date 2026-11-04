@@ -8,7 +8,7 @@ import type {
 } from '../../../domain/repositories/position-category.repository.js'
 import { IPositionCategoryRepository } from '../../../domain/repositories/position-category.repository.js'
 import { PositionCategoryEntity } from '../../../domain/entities/position-category.entity.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaPositionCategoryRepository implements IPositionCategoryRepository {

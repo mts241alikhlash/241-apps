@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
-import type { PaginatedResponse } from '../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { SimpleListRepository } from './simple-list.repository.js'
 import type {
   ISimpleListUsage,

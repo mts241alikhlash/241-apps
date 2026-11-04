@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { toPlainSummary } from '../../../shared/helpers/plain-summary.helper.js'
+import { toPlainSummary } from '@mts241alikhlash/nest-core/helpers'
 import { IAgendaRepository } from '../../agenda/domain/interfaces/agenda-repository.interface.js'
 import { IGalleryRepository } from '../../gallery/domain/interfaces/gallery-repository.interface.js'
 import { GetPublicPageUseCase } from '../../page/use-cases/get-public-page.use-case.js'

@@ -8,7 +8,7 @@ import type {
 } from '../../../domain/repositories/employment-type.repository.js'
 import { IEmploymentTypeRepository } from '../../../domain/repositories/employment-type.repository.js'
 import { EmploymentTypeEntity } from '../../../domain/entities/employment-type.entity.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaEmploymentTypeRepository implements IEmploymentTypeRepository {

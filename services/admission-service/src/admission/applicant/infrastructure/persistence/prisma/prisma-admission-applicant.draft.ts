@@ -4,10 +4,7 @@ import {
   Prisma,
 } from '../../../../../generated/prisma/client.js'
 import { countFilledByWave, isWaveFull } from '../../../../wave/index.js'
-import {
-  DecimalValue,
-  toNumericValue,
-} from '../../../../../shared/domain/types/decimal.type.js'
+import { DecimalValue, toNumericValue } from '@mts241alikhlash/nest-core/domain'
 
 export async function createDraftApplication(
   tx: Prisma.TransactionClient,

@@ -16,7 +16,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../guards/provisioning-token.guard.js'
 import { IEmployeeIdentityReadPort } from '../../domain/repositories/employee-identity-read.port.js'
 import { EmployeeRosterResponseDto } from './dto/response/employee-roster-response.dto.js'

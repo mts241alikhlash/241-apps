@@ -5,7 +5,7 @@ import type {
   ExamEventStatus,
   NewExamEvent,
 } from '../../../domain/entities/exam-event.entity.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
 
 export interface EventListFilter {

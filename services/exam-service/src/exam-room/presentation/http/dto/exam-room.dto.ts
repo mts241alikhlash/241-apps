@@ -13,7 +13,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator'
-import { PaginationQueryDto } from '../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import {
   EXAM_TYPES,
   type ExamType,

@@ -24,7 +24,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { UPLOAD_LIMITS } from '../../../../core/upload/upload-limits.js'
+import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
 import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../../../platform/auth/index.js'
 import { DeleteDownloadUseCase } from '../../application/use-cases/delete-download/delete-download.use-case.js'

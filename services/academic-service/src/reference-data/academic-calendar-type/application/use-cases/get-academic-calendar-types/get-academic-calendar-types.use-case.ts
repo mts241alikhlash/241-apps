@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { AcademicCalendarTypeEntity } from '../../../domain/entities/academic-calendar-type.entity.js'
 import { IAcademicCalendarTypeRepository } from '../../../domain/repositories/academic-calendar-type.repository.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListAcademicCalendarTypesInput } from './get-academic-calendar-types.input.js'
 
 @Injectable()

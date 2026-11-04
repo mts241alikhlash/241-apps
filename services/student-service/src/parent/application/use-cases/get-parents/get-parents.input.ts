@@ -1,4 +1,4 @@
-import { PaginationQueryInput } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginationQueryInput } from '@mts241alikhlash/nest-core/domain'
 
 export interface ListParentsInput extends PaginationQueryInput {
   search?: string

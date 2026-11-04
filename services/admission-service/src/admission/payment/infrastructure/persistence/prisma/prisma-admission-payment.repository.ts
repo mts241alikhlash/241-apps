@@ -19,7 +19,7 @@ import {
   withFilledCount,
 } from '../../../../wave/index.js'
 import { canCancelVerification } from '../../../domain/policies/payment-cancellation.policy.js'
-import { toNumericValue } from '../../../../../shared/domain/types/decimal.type.js'
+import { toNumericValue } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaAdmissionPaymentRepository extends IAdmissionPaymentRepository {

@@ -1,4 +1,4 @@
-import { EnrollmentStatus } from '../../../../shared/domain/enums/enrollment-status.enum.js'
+import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
 import { buildEnrollmentListWhere } from './prisma-enrollment.queries.js'
 
 describe('buildEnrollmentListWhere', () => {

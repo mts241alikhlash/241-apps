@@ -7,7 +7,7 @@ import type {
   UpdateGradeRepositoryInput,
 } from '../../../domain/repositories/grade.repository.js'
 import { IGradeRepository } from '../../../domain/repositories/grade.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { GradeEntity } from '../../../domain/entities/grade.entity.js'
 
 @Injectable()

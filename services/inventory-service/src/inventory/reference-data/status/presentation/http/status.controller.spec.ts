@@ -26,7 +26,7 @@ import { PermissionGuard } from '../../../../../platform/access-control/permissi
 import { CreateStatusDto } from './dto/request/create-status.dto.js'
 import { UpdateStatusDto } from './dto/request/update-status.dto.js'
 import { InventoryStatusResponseDto } from './dto/response/status-response.dto.js'
-import { InventoryStatusKey } from '../../../../../shared/domain/enums/inventory-status-key.enum.js'
+import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import { StatusController } from './status.controller.js'
 
 describe('StatusController', () => {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { toNumericValue } from '../../../../../shared/domain/types/decimal.type.js'
+import { toNumericValue } from '@mts241alikhlash/nest-core/domain'
 import { IAdmissionPaymentQueueRepository } from '../../../domain/repositories/admission-payment-queue-repository.js'
 
 const LIMIT = 20

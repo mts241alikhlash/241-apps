@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import { IPostRepository } from '../domain/interfaces/post-repository.interface.js'
 import { PostQueryDto } from '../dto/request/post-query.dto.js'
 import { PostAdminSummaryDto } from '../dto/response/post-admin.dto.js'

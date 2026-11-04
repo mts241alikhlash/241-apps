@@ -28,7 +28,7 @@ import { ResolveBulkImportResponseDto } from './dto/response/resolve-bulk-import
 import { BulkImportStudentsUseCase } from '../../application/use-cases/bulk-import-student/bulk-import-student.use-case.js'
 import { ResolveBulkImportConflictsUseCase } from '../../application/use-cases/resolve-bulk-import-conflicts/resolve-bulk-import-conflicts.use-case.js'
 import { ExportStudentsUseCase } from '../../application/use-cases/export-student/export-student.use-case.js'
-import { UPLOAD_LIMITS } from '../../../core/upload/upload-limits.js'
+import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
 
 @ApiTags('Students')
 @ApiBearerAuth()

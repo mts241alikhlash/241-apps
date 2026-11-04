@@ -1,7 +1,7 @@
 import { ConflictException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { CreateStudentInput } from './create-student.input.js'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
 import { CreateStudentUseCase } from './create-student.use-case.js'

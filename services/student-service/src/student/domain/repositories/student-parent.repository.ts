@@ -2,7 +2,7 @@ import {
   StudentParentEntity,
   StudentParentWithDetails,
 } from '../entities/student-parent.entity.js'
-import { ParentRelation } from '../../../shared/domain/enums/parent-relation.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
 
 export type { StudentParentWithDetails }
 

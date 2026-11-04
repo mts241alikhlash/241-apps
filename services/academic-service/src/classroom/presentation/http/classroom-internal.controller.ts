@@ -23,9 +23,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { withDisplayName } from '../../../shared/utils/classroom-display-name.helper.js'
-import { ProvisioningTokenGuard } from '../../../core/guards/provisioning-token.guard.js'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { IClassroomRepository } from '../../domain/repositories/classroom.repository.js'
 import { IClassroomStructureRepository } from '../../domain/repositories/classroom-structure.repository.js'
 import { IClassroomSupervisorRepository } from '../../domain/repositories/classroom-supervisor.repository.js'

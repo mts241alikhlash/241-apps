@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { toSlug } from '../../../shared/helpers/slug.helper.js'
+import { toSlug } from '@mts241alikhlash/nest-core/helpers'
 import { ITagRepository } from '../domain/interfaces/tag-repository.interface.js'
 import { CreateTagDto, UpdateTagDto } from '../dto/request/tag.dto.js'
 

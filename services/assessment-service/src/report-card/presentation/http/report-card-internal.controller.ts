@@ -13,8 +13,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { ArrayMaxSize, IsArray, IsUUID } from 'class-validator'
-import { Public } from '../../../core/decorators/public.decorator.js'
-import { ProvisioningTokenGuard } from '../../../core/guards/provisioning-token.guard.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { IReportCardRepository } from '../../domain/repositories/report-card.repository.js'
 
 export class EnrollmentIdsDto {

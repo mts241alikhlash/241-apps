@@ -22,7 +22,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 
 import { JwtAuthGuard } from '../../../platform/auth/index.js'
-import { CurrentUser } from '../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../core/types/authenticated-user.type.js'
 
 import { CreateStudentScoreDto } from './dto/request/create-student-score.dto.js'

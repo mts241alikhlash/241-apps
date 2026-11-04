@@ -34,7 +34,7 @@ import { GetStudentParentByIdUseCase } from '../../application/use-cases/get-stu
 import { GetStudentParentsListUseCase } from '../../application/use-cases/get-student-parents-list/get-student-parents-list.use-case.js'
 import { UpdateStudentParentUseCase } from '../../application/use-cases/update-student-parent/update-student-parent.use-case.js'
 import { StudentParentWithDetails } from '../../domain/repositories/student-parent.repository.js'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 
 @ApiTags('Student Parents')
 @ApiBearerAuth()

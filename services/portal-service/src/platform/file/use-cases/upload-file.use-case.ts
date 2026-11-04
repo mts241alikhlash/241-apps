@@ -6,7 +6,7 @@ import { CreateFileDto } from '../dto/request/create-file.dto.js'
 import { ImageOptimizerService } from '../domain/interfaces/image-optimizer.interface.js'
 import { StorageService } from '../../../core/storage/storage.service.js'
 import { StorageKeyBuilder } from '../../../core/storage/storage-key-builder.service.js'
-import { MAX_UPLOAD_BYTES } from '../../../core/upload/upload-limits.js'
+import { MAX_UPLOAD_BYTES } from '@mts241alikhlash/nest-core/upload'
 import {
   ACCEPTED_UPLOAD_FORMATS_LABEL,
   ALLOWED_UPLOAD_MIME_TYPES,

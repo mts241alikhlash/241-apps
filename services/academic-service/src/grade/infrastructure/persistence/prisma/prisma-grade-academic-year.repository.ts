@@ -9,7 +9,7 @@ import {
 } from '../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IGradeAcademicYearRepository } from '../../../domain/repositories/grade-academic-year.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   GRADE_AY_WITH_DETAILS_INCLUDE,
   GradeAcademicYearWithDetails,

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { IBloodTypeRepository } from '../../../domain/repositories/blood-type.repository.js'
 import { BloodTypeEntity } from '../../../domain/entities/blood-type.entity.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListBloodTypesInput } from './get-blood-types.input.js'
 
 @Injectable()

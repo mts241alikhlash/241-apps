@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { HtmlSanitizerService } from '../../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { SyncMediaUsageUseCase } from '../../media/use-cases/sync-media-usage.use-case.js'
 import { ContentStatus } from '../../post/domain/enums/content-status.enum.js'
 import { IPageRepository } from '../domain/interfaces/page-repository.interface.js'

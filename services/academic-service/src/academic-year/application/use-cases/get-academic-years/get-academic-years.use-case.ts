@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { AcademicYear } from '../../../domain/entities/academic-year.entity.js'
 import { IAcademicYearRepository } from '../../../domain/repositories/academic-year.repository.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListAcademicYearsInput } from './get-academic-years.input.js'
 
 @Injectable()

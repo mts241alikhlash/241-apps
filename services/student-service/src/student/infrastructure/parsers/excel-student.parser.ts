@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
 import { StudentImportRow } from '../../domain/entities/student-import-row.entity.js'
 import { ExcelStudentParser as IExcelStudentParser } from '../../domain/repositories/student-excel-parser.interface.js'
-import { randomPassword } from '../../../shared/utils/hash.helper.js'
+import { randomPassword } from '@mts241alikhlash/nest-core/helpers'
 
 type ExcelRow = Record<string, ExcelJS.CellValue>
 

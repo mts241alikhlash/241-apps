@@ -4,7 +4,7 @@ import { resolveUserRefs } from '../../../../shared/utils/resolve-user-refs.help
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
-import { DayEnum } from '../../../../shared/domain/enums/day.enum.js'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 import {
   ActiveSemesterRef,
   AttendanceRecap,

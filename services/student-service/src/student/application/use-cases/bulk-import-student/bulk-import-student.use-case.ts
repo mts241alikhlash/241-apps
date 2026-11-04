@@ -9,7 +9,7 @@ import {
 import { BulkImportStudentRowDto } from '../../../presentation/http/dto/request/bulk-import-student.dto.js'
 import { IStudentRepository } from '../../../domain/repositories/student.repository.js'
 import { ExcelStudentParser } from '../../../domain/repositories/student-excel-parser.interface.js'
-import { resolveOnceByKey } from '../../../../shared/utils/resolve-once-by-key.helper.js'
+import { resolveOnceByKey } from '@mts241alikhlash/nest-core/helpers'
 
 @Injectable()
 export class BulkImportStudentsUseCase {

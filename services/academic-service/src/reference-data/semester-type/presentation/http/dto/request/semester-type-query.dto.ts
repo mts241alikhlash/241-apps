@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsBoolean, IsOptional, IsString } from 'class-validator'
-import { PaginationQueryDto } from '../../../../../../shared/dto/pagination.dto.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import { Transform } from 'class-transformer'
 
 export class SemesterTypeQueryDto extends PaginationQueryDto {

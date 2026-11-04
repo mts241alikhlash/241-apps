@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserGender } from '../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { CreateStudentDto } from './dto/request/create-student.dto.js'
 import { ExportStudentQueryDto } from './dto/request/export-student-query.dto.js'
 import { StudentQueryDto } from './dto/request/student-query.dto.js'

@@ -7,7 +7,7 @@ import {
   BloodTypeQueryInput,
   IBloodTypeRepository,
 } from '../../../domain/repositories/blood-type.repository.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaBloodTypeRepository extends IBloodTypeRepository {

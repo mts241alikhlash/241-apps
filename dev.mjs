@@ -219,6 +219,12 @@ if (startStorage) {
   )
 }
 
+execFileSync('pnpm', ['--filter', '@mts241alikhlash/nest-core', 'run', 'build'], {
+  cwd: workspace,
+  stdio: ['ignore', 'ignore', 'inherit'],
+})
+run('nest-core', 'pnpm', ['--filter', '@mts241alikhlash/nest-core', 'run', 'dev'], workspace)
+
 for (const service of services) {
   if (await portBusy(SERVICE_PORTS[service])) {
     console.log(`${service}-service already on :${SERVICE_PORTS[service]}, skipping`)

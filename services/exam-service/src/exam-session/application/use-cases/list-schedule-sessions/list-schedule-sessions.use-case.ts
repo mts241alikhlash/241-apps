@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 

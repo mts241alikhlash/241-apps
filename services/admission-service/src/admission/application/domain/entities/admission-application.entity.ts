@@ -1,9 +1,9 @@
 import type { AcademicYearRef } from '../../../../shared/domain/entities/index.js'
-import { AdmissionPaymentStatus } from '../../../../shared/domain/enums/admission-payment-status.enum.js'
+import { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 import { AdmissionStatus } from '../../../../shared/domain/enums/admission-status.enum.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionApplicationParentEntity } from './admission-application-parent.entity.js'
-import type { DecimalValue } from '../../../../shared/domain/types/decimal.type.js'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionFileRef } from '../../../document/index.js'
 import type {
   AdmissionDocumentRow,

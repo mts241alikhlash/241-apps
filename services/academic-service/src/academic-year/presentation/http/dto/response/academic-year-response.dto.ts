@@ -1,4 +1,4 @@
-import type { PaginationMeta } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginationMeta } from '@mts241alikhlash/nest-core/domain'
 import { ApiProperty } from '@nestjs/swagger'
 import { AcademicYear } from '../../../../domain/entities/academic-year.entity.js'
 

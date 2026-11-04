@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { ParentRelation } from '../../../../../../shared/domain/enums/parent-relation.enum.js'
-import { UserGender } from '../../../../../../shared/domain/enums/user-gender.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { Type } from 'class-transformer'
 import {
   ArrayMaxSize,

@@ -1,4 +1,4 @@
-import type { JsonObject } from '../../../../shared/domain/types/json.type.js'
+import type { JsonObject } from '@mts241alikhlash/nest-core/domain'
 
 export interface CreateAuditLogInput {
   userId?: string | null

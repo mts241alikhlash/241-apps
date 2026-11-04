@@ -1,8 +1,8 @@
-import { JsonObject } from '../../../shared/domain/types/json.type.js'
+import { JsonObject } from '@mts241alikhlash/nest-core/domain'
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { AuditLogEntity } from '../entities/audit-log.entity.js'
 
 export interface AuditLogQueryInput extends PaginationQueryInput {

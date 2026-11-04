@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { AuditLogModule } from '../../platform/audit-log/audit-log.module.js'
-import { HtmlSanitizerService } from '../../shared/helpers/html-sanitizer.service.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
 import { MediaModule } from '../media/media.module.js'
 import { TaxonomyModule } from '../taxonomy/taxonomy.module.js'
 import { IPostRepository } from './domain/interfaces/post-repository.interface.js'

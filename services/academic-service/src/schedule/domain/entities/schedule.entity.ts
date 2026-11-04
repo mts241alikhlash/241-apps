@@ -3,7 +3,7 @@ import {
   SubjectRef,
 } from '../../../shared/domain/entities/index.js'
 import type { EmployeePersonRef } from '../../../shared/utils/resolve-person-refs.helper.js'
-import { DayEnum } from '../../../shared/domain/enums/day.enum.js'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 
 export interface ScheduleEntity {
   id: string

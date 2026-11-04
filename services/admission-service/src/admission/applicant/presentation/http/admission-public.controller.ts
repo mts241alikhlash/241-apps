@@ -5,7 +5,7 @@ import {
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Throttle } from '@nestjs/throttler'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { PublicRegisterApplicantDto } from './dto/request/public-register-applicant.dto.js'
 import { AdmissionGradeListResponseDto } from './dto/response/admission-grade-response.dto.js'
 import { GetActiveWavesUseCase } from '../../../wave/index.js'

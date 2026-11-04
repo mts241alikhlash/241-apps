@@ -1,7 +1,7 @@
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IAccountProvisioningPort } from '../../../../platform/user/index.js'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { PrismaEmployeeRepository } from './prisma-employee.repository.js'
 
 describe('PrismaEmployeeRepository.create', () => {

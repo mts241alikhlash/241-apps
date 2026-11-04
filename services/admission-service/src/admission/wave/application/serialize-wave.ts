@@ -1,5 +1,5 @@
-import type { DecimalValue } from '../../../shared/domain/types/decimal.type.js'
-import { toNumericValue } from '../../../shared/domain/types/decimal.type.js'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
+import { toNumericValue } from '@mts241alikhlash/nest-core/domain'
 
 export function serializeWave<T extends { registrationFee: DecimalValue }>(
   wave: T,

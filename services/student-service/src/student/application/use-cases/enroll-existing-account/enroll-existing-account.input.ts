@@ -1,7 +1,7 @@
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { CreateAddressRepositoryInput } from '../../../../shared/domain/entities/address.entity.js'
-import { ParentRelation } from '../../../../shared/domain/enums/parent-relation.enum.js'
-import { IncomeRange } from '../../../../shared/domain/enums/income-range.enum.js'
+import { ParentRelation } from '@mts241alikhlash/nest-core/domain'
+import { IncomeRange } from '@mts241alikhlash/nest-core/domain'
 
 export interface EnrollProfileInput {
   name: string

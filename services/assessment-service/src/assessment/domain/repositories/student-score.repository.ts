@@ -1,8 +1,8 @@
-import { AssessmentType } from '../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { StudentScoreEntity } from '../entities/student-score.entity.js'
 import { StudentScoreWithDetails } from '../entities/student-score.entity.js'
 

@@ -30,7 +30,7 @@ import { ResolveBulkImportResponseDto } from './dto/response/resolve-bulk-import
 import { BulkImportEmployeesUseCase } from '../../application/use-cases/bulk-import-employee/bulk-import-employee.use-case.js'
 import { ResolveBulkImportConflictsUseCase } from '../../application/use-cases/resolve-bulk-import-conflicts/resolve-bulk-import-conflicts.use-case.js'
 import { ExportEmployeesUseCase } from '../../application/use-cases/export-employee/export-employee.use-case.js'
-import { UPLOAD_LIMITS } from '../../../core/upload/upload-limits.js'
+import { UPLOAD_LIMITS } from '@mts241alikhlash/nest-core/upload'
 
 @ApiTags('Employees')
 @ApiBearerAuth()

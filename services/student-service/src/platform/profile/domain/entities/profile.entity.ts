@@ -1,5 +1,5 @@
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
-import { MaritalStatus } from '../../../../shared/domain/enums/marital-status.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
+import { MaritalStatus } from '@mts241alikhlash/nest-core/domain'
 import type { NamedRef } from '../../../../shared/domain/entities/index.js'
 
 export interface ProfileEntity {

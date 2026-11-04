@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import type { Response } from 'express'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { contentDisposition } from '../../../file/presentation/http/content-disposition.js'
 import { GetDownloadFileUseCase } from '../../application/use-cases/get-download-file/get-download-file.use-case.js'
 import { GetDownloadsUseCase } from '../../application/use-cases/get-downloads/get-downloads.use-case.js'

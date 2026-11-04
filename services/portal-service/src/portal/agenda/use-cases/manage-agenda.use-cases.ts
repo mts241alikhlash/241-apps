@@ -5,9 +5,9 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { PaginatedResponse } from '../../../shared/domain/interfaces/repository.interface.js'
-import { HtmlSanitizerService } from '../../../shared/helpers/html-sanitizer.service.js'
-import { toSlug, toUniqueSlug } from '../../../shared/helpers/slug.helper.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
+import { toSlug, toUniqueSlug } from '@mts241alikhlash/nest-core/helpers'
 import { SyncMediaUsageUseCase } from '../../media/use-cases/sync-media-usage.use-case.js'
 import { ContentStatus } from '../../post/domain/enums/content-status.enum.js'
 import {

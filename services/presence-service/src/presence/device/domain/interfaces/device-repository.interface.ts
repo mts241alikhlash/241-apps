@@ -1,7 +1,7 @@
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import { DeviceAuthContext, DeviceEntity } from '../entities/device.entity.js'
 
 export type { DeviceAuthContext }

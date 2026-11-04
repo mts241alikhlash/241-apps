@@ -1,4 +1,4 @@
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { PresenceSubjectTypeEnum } from '../../../credential/domain/entities/credential.entity.js'
 import {
   DailyPresenceQueryInput,

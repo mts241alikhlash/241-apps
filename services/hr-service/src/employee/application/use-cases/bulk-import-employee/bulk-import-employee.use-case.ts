@@ -8,7 +8,7 @@ import {
   BulkImportEmployeeRowResultDto,
   BulkImportEmployeesResponseDto,
 } from '../../../presentation/http/dto/response/bulk-import-employee-response.dto.js'
-import { resolveOnceByKey } from '../../../../shared/utils/resolve-once-by-key.helper.js'
+import { resolveOnceByKey } from '@mts241alikhlash/nest-core/helpers'
 
 @Injectable()
 export class BulkImportEmployeesUseCase {

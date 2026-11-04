@@ -17,7 +17,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../guards/provisioning-token.guard.js'
 import { ProvisionAccountDto } from './dto/request/provision-account.dto.js'
 import { SetAccountActiveDto } from './dto/request/set-account-active.dto.js'

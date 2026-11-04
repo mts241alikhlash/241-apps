@@ -1,6 +1,6 @@
 import { applyDecorators, UseInterceptors } from '@nestjs/common'
 import { SkipThrottle, Throttle } from '@nestjs/throttler'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { PortalCacheInterceptor } from '../interceptors/portal-cache.interceptor.js'
 
 export function PortalPublic() {

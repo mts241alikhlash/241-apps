@@ -13,7 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { ArrayMaxSize, IsArray, Matches } from 'class-validator'
-import { Public } from '../../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IRegionRepository } from '../../domain/repositories/region.repository.js'
 import {

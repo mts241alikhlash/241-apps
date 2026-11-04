@@ -4,7 +4,7 @@ import {
   Prisma,
 } from '../../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../../core/database/prisma.service.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { AcademicYearRef } from '../../../../../shared/domain/entities/reference.entity.js'
 import { admissionToday } from '../../../domain/policies/admission-calendar.js'
 import { withFilledCount } from './wave-capacity.queries.js'

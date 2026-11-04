@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import type { ScopeUser } from '../../../../question/application/teacher-scope.service.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamPackageSummary } from '../../../domain/entities/exam-package.entity.js'
 import {
   IExamPackageRepository,

@@ -11,7 +11,7 @@ import {
   isEligibleAdmissionParent,
   hasCompleteAddress,
 } from '../../../domain/policies/enroll-as-student.rules.js'
-import type { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IAccountProvisioningPort } from '../../../../../platform/user/index.js'
 import { IReferenceLookupPort } from '../../../../../platform/reference-lookup/reference-lookup.port.js'
 import {

@@ -1,4 +1,4 @@
-import { InventoryStatusKey } from '../../../../../shared/domain/enums/inventory-status-key.enum.js'
+import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import type { StatusRepositoryOutput } from './status.repository.js'
 
 type Equal<Actual, Expected> =

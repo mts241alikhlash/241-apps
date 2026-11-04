@@ -1,7 +1,7 @@
 import type {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 import type { LoanItemUnitRepositoryOutput } from './loan.repository.js'
 
 export interface HistoryTransactionTypeRepositoryOutput {

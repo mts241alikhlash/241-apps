@@ -37,12 +37,12 @@ import {
   MaxLength,
   Min,
 } from 'class-validator'
-import { Public } from '../../core/decorators/public.decorator.js'
-import { ProvisioningTokenGuard } from '../../core/guards/provisioning-token.guard.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { RequirePermissions } from '../../platform/access-control/permission/decorators/require-permissions.decorator.js'
 import { JwtAuthGuard } from '../../platform/auth/index.js'
-import { PaginationQueryDto } from '../../shared/dto/pagination.dto.js'
-import { toBooleanFromTransform } from '../../shared/validators/boolean.transformer.js'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
+import { toBooleanFromTransform } from '@mts241alikhlash/nest-core/validators'
 import type { SimpleListService } from './simple-list.service.js'
 import type {
   SimpleListDefinition,

@@ -1,4 +1,4 @@
-import { StudentStatusEnum } from '../../../shared/domain/enums/student-status.enum.js'
+import { StudentStatusEnum } from '@mts241alikhlash/nest-core/domain'
 
 export interface StudentEntity {
   id: string

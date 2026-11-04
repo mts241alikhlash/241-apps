@@ -25,7 +25,7 @@ import type {
   CreateClassroomStructureRepositoryInput,
   UpdateClassroomStructureRepositoryInput,
 } from '../../../domain/repositories/classroom-structure.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaClassroomStructureRepository extends IClassroomStructureRepository {

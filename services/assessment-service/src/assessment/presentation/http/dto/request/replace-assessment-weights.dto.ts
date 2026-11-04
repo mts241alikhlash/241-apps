@@ -12,7 +12,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator'
-import { AssessmentType } from '../../../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 
 export class AssessmentWeightRecordDto {
   @ApiProperty({ enum: AssessmentType })

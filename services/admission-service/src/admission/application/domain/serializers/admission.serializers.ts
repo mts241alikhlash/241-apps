@@ -1,7 +1,4 @@
-import {
-  DecimalValue,
-  toNumericValue,
-} from '../../../../shared/domain/types/decimal.type.js'
+import { DecimalValue, toNumericValue } from '@mts241alikhlash/nest-core/domain'
 
 function serializePayment<T extends { amount: DecimalValue }>(payment: T) {
   return { ...payment, amount: toNumericValue(payment.amount) }

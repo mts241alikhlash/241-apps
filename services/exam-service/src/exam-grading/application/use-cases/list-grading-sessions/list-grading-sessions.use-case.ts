@@ -6,7 +6,7 @@ import type {
 } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
   GradingScopeService,
   type GradingUser,

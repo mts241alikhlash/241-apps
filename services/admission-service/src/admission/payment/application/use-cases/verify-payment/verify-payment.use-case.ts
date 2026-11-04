@@ -1,4 +1,4 @@
-import { AdmissionPaymentStatus } from '../../../../../shared/domain/enums/admission-payment-status.enum.js'
+import { AdmissionPaymentStatus } from '@mts241alikhlash/nest-core/domain'
 import {
   BadRequestException,
   ConflictException,

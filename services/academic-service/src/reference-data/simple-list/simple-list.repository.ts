@@ -1,6 +1,6 @@
 import { ConflictException } from '@nestjs/common'
 import { Prisma } from '../../generated/prisma/client.js'
-import type { PaginatedResult } from '../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
   SimpleListCreate,
   SimpleListDelegate,

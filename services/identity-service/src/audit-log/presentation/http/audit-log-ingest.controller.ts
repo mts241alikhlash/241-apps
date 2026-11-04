@@ -1,7 +1,7 @@
 import { AuditLogEntryResponseDto } from './dto/response/audit-log-api-response.dto.js'
 import { Body, Controller, Post, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { CreateAuditLogUseCase } from '../../application/use-cases/create-audit-log/create-audit-log.use-case.js'
 import { IngestAuditLogDto } from './dto/request/ingest-audit-log.dto.js'

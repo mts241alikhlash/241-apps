@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { EmploymentTypeEntity } from '../../../domain/entities/employment-type.entity.js'
 import { IEmploymentTypeRepository } from '../../../domain/repositories/employment-type.repository.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListEmploymentTypesInput } from './get-employment-types.input.js'
 
 @Injectable()

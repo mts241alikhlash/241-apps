@@ -22,7 +22,7 @@ import {
   AddressResponseDto,
   CreateAddressDto,
   UpdateAddressDto,
-} from '../../../shared/dto/address.dto.js'
+} from '@mts241alikhlash/nest-core/dto'
 import { SchoolUnitAddressUseCase } from '../../application/use-cases/school-unit-address/school-unit-address.use-case.js'
 
 @ApiTags('School Unit Addresses')

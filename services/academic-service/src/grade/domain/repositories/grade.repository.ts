@@ -2,7 +2,7 @@ import { GradeEntity } from '../entities/grade.entity.js'
 import {
   PaginatedResult,
   PaginationQueryInput,
-} from '../../../shared/domain/interfaces/repository.interface.js'
+} from '@mts241alikhlash/nest-core/domain'
 
 export interface GradeQueryInput extends PaginationQueryInput {
   search?: string

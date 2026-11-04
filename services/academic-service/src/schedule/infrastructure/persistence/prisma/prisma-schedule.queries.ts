@@ -5,7 +5,7 @@ import {
   SCHEDULE_WITH_DETAILS_INCLUDE,
   ScheduleRow,
 } from './prisma-schedule.includes.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 export const LIVE_ACADEMIC_YEAR = {
   classroom: { academicYear: { deletedAt: null } },

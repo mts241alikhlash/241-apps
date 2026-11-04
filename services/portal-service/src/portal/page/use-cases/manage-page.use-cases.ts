@@ -5,8 +5,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { HtmlSanitizerService } from '../../../shared/helpers/html-sanitizer.service.js'
-import { toSlug, toUniqueSlug } from '../../../shared/helpers/slug.helper.js'
+import { HtmlSanitizerService } from '@mts241alikhlash/nest-core/helpers'
+import { toSlug, toUniqueSlug } from '@mts241alikhlash/nest-core/helpers'
 import { SyncMediaUsageUseCase } from '../../media/use-cases/sync-media-usage.use-case.js'
 import {
   IPageRepository,

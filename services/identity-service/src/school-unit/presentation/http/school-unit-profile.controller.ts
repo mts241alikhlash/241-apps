@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { ISchoolUnitRepository } from '../../domain/repositories/school-unit.repository.js'
 import { SchoolUnitProfileResponseDto } from './dto/response/school-unit-profile-response.dto.js'

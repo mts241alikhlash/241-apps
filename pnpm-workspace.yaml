@@ -27,6 +27,7 @@ allowBuilds:
   '@parcel/watcher': true
   '@nestjs/core': true
   '@prisma/client': true
+  '@swc/core': true
   '@prisma/engines': true
   '@scarf/scarf': true
   'bcrypt': true

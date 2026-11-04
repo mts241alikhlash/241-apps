@@ -14,8 +14,8 @@ import {
 } from '@nestjs/swagger'
 import { ArrayMaxSize, IsArray, IsUUID, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { Public } from '../../../core/decorators/public.decorator.js'
-import { ProvisioningTokenGuard } from '../../../core/guards/provisioning-token.guard.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { ICurriculumSubjectRepository } from '../../domain/repositories/curriculum-subject.repository.js'
 
 export class PassingScoreQueryDto {

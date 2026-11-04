@@ -6,11 +6,11 @@ import type {
 } from '../../../application/index.js'
 import type { AdmissionAnnouncementWithWave } from '../../../announcement/index.js'
 import type { AdmissionDocumentTypeRow } from '../../../document/index.js'
-import type { DecimalValue } from '../../../../shared/domain/types/decimal.type.js'
+import type { DecimalValue } from '@mts241alikhlash/nest-core/domain'
 import type { AdmissionNotificationEntity } from '../../../notification/index.js'
-import type { AdmissionNotificationType } from '../../../../shared/domain/enums/admission-notification-type.enum.js'
-import type { ParentRelation } from '../../../../shared/domain/enums/parent-relation.enum.js'
-import type { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import type { AdmissionNotificationType } from '@mts241alikhlash/nest-core/domain'
+import type { ParentRelation } from '@mts241alikhlash/nest-core/domain'
+import type { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 export type { ActiveWaveRow, AdmissionDocumentTypeRow }
 

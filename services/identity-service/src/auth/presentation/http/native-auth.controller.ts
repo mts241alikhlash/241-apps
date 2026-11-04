@@ -9,7 +9,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Throttle } from '@nestjs/throttler'
 import type { Request } from 'express'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { NativeLoginUseCase } from '../../application/use-cases/native-auth/native-login.use-case.js'
 import { NativeLogoutUseCase } from '../../application/use-cases/native-auth/native-logout.use-case.js'
 import { NativeRefreshUseCase } from '../../application/use-cases/native-auth/native-refresh.use-case.js'

@@ -1,5 +1,5 @@
 import type { PrismaService } from '../../../../../../core/database/prisma.service.js'
-import { InventoryStatusKey } from '../../../../../../shared/domain/enums/inventory-status-key.enum.js'
+import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import { PrismaStatusRepository } from './prisma-status.repository.js'
 
 describe('PrismaStatusRepository', () => {

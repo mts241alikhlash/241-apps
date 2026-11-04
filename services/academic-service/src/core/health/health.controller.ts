@@ -7,7 +7,7 @@ import {
   MemoryHealthIndicator,
 } from '@nestjs/terminus'
 import { PrismaHealthIndicator } from './prisma.health.js'
-import { Public } from '../decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 
 @ApiTags('Health')
 @Controller('health')

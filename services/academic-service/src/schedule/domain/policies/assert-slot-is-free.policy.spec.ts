@@ -1,5 +1,5 @@
 import { ConflictException } from '@nestjs/common'
-import { DayEnum as Day } from '../../../shared/domain/enums/day.enum.js'
+import { DayEnum as Day } from '@mts241alikhlash/nest-core/domain'
 import {
   IScheduleRepository,
   ScheduleWithDetails,

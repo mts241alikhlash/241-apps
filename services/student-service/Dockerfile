@@ -6,7 +6,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY services/ ./services/
 COPY packages/ ./packages/
 RUN pnpm install --frozen-lockfile
-RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter student-service prisma:generate && pnpm --filter student-service build
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter student-service prisma:generate && pnpm --filter student-service... run build
 RUN pnpm --filter student-service deploy --prod --legacy /out
 
 FROM node:24.22.1-alpine AS runner

@@ -1,4 +1,4 @@
 export {
   StudentStatusEnum,
   StudentStatusEnum as StudentStatus,
-} from '../../../shared/domain/enums/student-status.enum.js'
+} from '@mts241alikhlash/nest-core/domain'

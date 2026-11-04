@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { GetProfilesByIdsUseCase } from './get-profiles-by-ids.use-case.js'
 import { IUserRepository } from '../../../domain/repositories/user.repository.js'
-import { UserGender } from '../../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 describe('GetProfilesByIdsUseCase', () => {
   let useCase: GetProfilesByIdsUseCase

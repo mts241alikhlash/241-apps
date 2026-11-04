@@ -3,7 +3,7 @@ import {
   ISemesterTypeRepository,
   SemesterType,
 } from '../../../domain/repositories/semester-type.repository.js'
-import { PaginatedResponse } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListSemesterTypesInput } from './get-semester-types.input.js'
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import type { PaginationMeta } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginationMeta } from '@mts241alikhlash/nest-core/domain'
 import { SemesterWithDetails } from '../../../../domain/entities/semester.entity.js'
 
 export class SemesterAcademicYearDto {

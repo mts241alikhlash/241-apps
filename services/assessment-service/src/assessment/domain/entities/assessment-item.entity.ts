@@ -1,5 +1,5 @@
 import { PersonRef, SubjectRef } from '../../../shared/domain/entities/index.js'
-import { AssessmentType } from '../../../shared/domain/enums/assessment-type.enum.js'
+import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 
 export interface AssessmentItemEntity {
   id: string

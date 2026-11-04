@@ -27,7 +27,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { CurrentUser } from '../../../../core/decorators/current-user.decorator.js'
+import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '../../../../core/types/authenticated-user.type.js'
 import { APPLICATION_CHANGED_MESSAGE } from '../../domain/policies/admission-status.transitions.js'
 import { RequirePermissions } from '../../../../platform/access-control/permission/decorators/require-permissions.decorator.js'

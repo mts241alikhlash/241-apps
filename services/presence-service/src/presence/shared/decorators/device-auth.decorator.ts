@@ -1,5 +1,5 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common'
-import { Public } from '../../../core/decorators/public.decorator.js'
+import { Public } from '@mts241alikhlash/nest-core/decorators'
 
 export const IS_DEVICE_AUTH_KEY = 'isDeviceAuth'
 

@@ -10,7 +10,7 @@ import {
   IAcademicYearRepository,
   UpdateAcademicYearRepositoryInput,
 } from '../../../domain/repositories/academic-year.repository.js'
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 const ACADEMIC_YEAR_SELECT = {
   id: true,

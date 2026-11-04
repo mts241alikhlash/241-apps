@@ -1,4 +1,4 @@
-import { DayEnum } from '../../../shared/domain/enums/day.enum.js'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 
 export interface TimeSlotTypeEntity {
   id: string

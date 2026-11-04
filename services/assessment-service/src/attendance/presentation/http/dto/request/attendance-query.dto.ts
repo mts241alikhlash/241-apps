@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
 import { IsDateString, IsEnum, IsOptional, IsUUID } from 'class-validator'
-import { AttendanceStatus } from '../../../../../shared/domain/enums/attendance-status.enum.js'
-import { PaginationQueryDto } from '../../../../../shared/dto/pagination.dto.js'
+import { AttendanceStatus } from '@mts241alikhlash/nest-core/domain'
+import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 
 export class AttendanceQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() enrollmentId?: string

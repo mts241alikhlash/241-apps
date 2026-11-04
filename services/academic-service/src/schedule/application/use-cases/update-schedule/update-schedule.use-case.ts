@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { IScheduleRepository } from '../../../domain/repositories/schedule.repository.js'
 import { IScheduleLookupRepository } from '../../../domain/repositories/schedule-lookup.repository.js'
-import { DayEnum } from '../../../../shared/domain/enums/day.enum.js'
+import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 import { assertSlotIsFree } from '../../../domain/policies/assert-slot-is-free.policy.js'
 import type { UpdateScheduleInput } from './update-schedule.input.js'
 

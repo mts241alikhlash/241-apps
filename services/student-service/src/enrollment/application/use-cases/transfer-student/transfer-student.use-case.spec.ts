@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { EnrollmentStatus } from '../../../../shared/domain/enums/enrollment-status.enum.js'
+import { EnrollmentStatus } from '@mts241alikhlash/nest-core/domain'
 import { IEnrollmentRepository } from '../../../domain/repositories/enrollment.repository.js'
 import { ClassroomCapacityService } from '../../services/classroom-capacity.service.js'
 import { TransferStudentUseCase } from './transfer-student.use-case.js'

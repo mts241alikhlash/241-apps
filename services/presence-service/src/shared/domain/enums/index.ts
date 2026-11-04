@@ -1,1 +1,1 @@
-export * from './user-gender.enum.js'
+export * from '@mts241alikhlash/nest-core/domain'

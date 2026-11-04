@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { IS_PUBLIC_KEY } from '../../../core/decorators/public.decorator.js'
+import { IS_PUBLIC_KEY } from '@mts241alikhlash/nest-core/decorators'
 import { NativeAuthController } from './native-auth.controller.js'
 
 describe('NativeAuthController', () => {

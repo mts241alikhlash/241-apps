@@ -4,7 +4,7 @@ import { IEmployeeRepository } from '../../../domain/repositories/employee.repos
 import {
   hashPassword,
   randomPassword,
-} from '../../../../shared/utils/hash.helper.js'
+} from '@mts241alikhlash/nest-core/helpers'
 
 @Injectable()
 export class CreateEmployeeUseCase {

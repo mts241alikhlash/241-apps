@@ -9,7 +9,7 @@ import type { Server } from 'node:http'
 import request from 'supertest'
 import { PrismaModule } from '../src/core/database/prisma.module.js'
 import { PrismaService } from '../src/core/database/prisma.service.js'
-import { ResponseInterceptor } from '../src/core/interceptors/response.interceptor.js'
+import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
 import { AuthModule } from '../src/auth/auth.module.js'
 
 const TEST_JWT_SECRET = 'test-jwt-secret-for-e2e-testing-minimum-32-chars'

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { SemesterWithDetails } from '../../../domain/entities/semester.entity.js'
 import { ISemesterRepository } from '../../../domain/repositories/semester.repository.js'
-import { PaginatedResponse } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResponse } from '@mts241alikhlash/nest-core/domain'
 import type { ListSemestersInput } from './get-semesters.input.js'
 
 @Injectable()

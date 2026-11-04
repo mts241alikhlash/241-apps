@@ -1,0 +1,116 @@
+{
+  "name": "@mts241alikhlash/nest-core",
+  "version": "0.1.0",
+  "description": "Infrastructure and cross-cutting code shared by the 241 Apps services",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./cache": {
+      "types": "./dist/cache/index.d.ts",
+      "default": "./dist/cache/index.js"
+    },
+    "./decorators": {
+      "types": "./dist/decorators/index.d.ts",
+      "default": "./dist/decorators/index.js"
+    },
+    "./domain": {
+      "types": "./dist/domain/index.d.ts",
+      "default": "./dist/domain/index.js"
+    },
+    "./dto": {
+      "types": "./dist/dto/index.d.ts",
+      "default": "./dist/dto/index.js"
+    },
+    "./guards": {
+      "types": "./dist/guards/index.d.ts",
+      "default": "./dist/guards/index.js"
+    },
+    "./helpers": {
+      "types": "./dist/helpers/index.d.ts",
+      "default": "./dist/helpers/index.js"
+    },
+    "./interceptors": {
+      "types": "./dist/interceptors/index.d.ts",
+      "default": "./dist/interceptors/index.js"
+    },
+    "./openapi": {
+      "types": "./dist/openapi/index.d.ts",
+      "default": "./dist/openapi/index.js"
+    },
+    "./throttle": {
+      "types": "./dist/throttle/index.d.ts",
+      "default": "./dist/throttle/index.js"
+    },
+    "./upload": {
+      "types": "./dist/upload/index.d.ts",
+      "default": "./dist/upload/index.js"
+    },
+    "./validators": {
+      "types": "./dist/validators/index.d.ts",
+      "default": "./dist/validators/index.js"
+    }
+  },
+  "scripts": {
+    "build": "nest build -p tsconfig.build.json",
+    "dev": "nest build -p tsconfig.build.json --watch",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
+    "lint:strict": "eslint -c eslint.typecheck.config.mjs \"src/**/*.ts\" --max-warnings=0",
+    "check": "pnpm run format:check && pnpm run lint",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@nestjs/cache-manager": "^12.0.0",
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/swagger": "^12.1.0",
+    "@nestjs/throttler": "^6.5.0",
+    "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "exceljs": "^4.4.0",
+    "rxjs": "^7.8.2",
+    "sanitize-html": "^2.17.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nestjs/cache-manager": "^12.0.0",
+    "@nestjs/cli": "^12.0.0",
+    "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.0",
+    "@nestjs/core": "^12.0.1",
+    "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/schematics": "^12.0.0",
+    "@nestjs/swagger": "^12.1.0",
+    "@nestjs/testing": "^12.0.1",
+    "@nestjs/throttler": "^6.5.0",
+    "@swc/core": "^1.16.21",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.0",
+    "@types/sanitize-html": "^2.16.1",
+    "@types/supertest": "^7.2.1",
+    "bcrypt": "^6.0.0",
+    "cache-manager": "^7.2.9",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "exceljs": "^4.4.0",
+    "prettier": "^3.9.10",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "sanitize-html": "^2.17.7",
+    "supertest": "^7.2.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "unplugin-swc": "^2.0.0",
+    "vitest": "^5.1.0"
+  }
+}

@@ -5,7 +5,7 @@ import {
   type ExamScheduleKind,
   type ExamType,
 } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
-import type { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { GradingSessionDetail } from '../../../application/use-cases/get-grading-session/get-grading-session.use-case.js'
 import type { GradingItem } from '../../../application/grading-item.js'
 import type { GradingSchedule } from '../../../application/use-cases/list-grading-schedules/list-grading-schedules.use-case.js'

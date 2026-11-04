@@ -1,4 +1,4 @@
-import { PaginatedResult } from '../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { ContentStatus } from '../enums/content-status.enum.js'
 import { PostType } from '../enums/post-type.enum.js'
 import { PostEntity, PostWithDetails } from '../entities/post.entity.js'

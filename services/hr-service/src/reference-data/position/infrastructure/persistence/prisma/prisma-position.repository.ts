@@ -12,7 +12,7 @@ import {
   PositionEntity,
   PositionWithCategory,
 } from '../../../domain/entities/position.entity.js'
-import { PaginatedResult } from '../../../../../shared/domain/interfaces/repository.interface.js'
+import { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 
 @Injectable()
 export class PrismaPositionRepository implements IPositionRepository {

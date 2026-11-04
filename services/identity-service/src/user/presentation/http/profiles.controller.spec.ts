@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserGender } from '../../../shared/domain/enums/user-gender.enum.js'
+import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { BatchProfileLookupDto } from './dto/request/batch-profile-lookup.dto.js'
 import { GetProfilesByIdsUseCase } from '../../application/use-cases/get-profiles-by-ids/get-profiles-by-ids.use-case.js'
 import { ProfilesController } from './profiles.controller.js'

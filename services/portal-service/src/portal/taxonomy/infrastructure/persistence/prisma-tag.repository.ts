@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
-import { toSlug } from '../../../../shared/helpers/slug.helper.js'
+import { toSlug } from '@mts241alikhlash/nest-core/helpers'
 import {
   CreateTagInput,
   ITagRepository,
