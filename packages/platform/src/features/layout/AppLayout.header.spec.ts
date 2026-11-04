@@ -3,16 +3,18 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { describe, expect, it, vi } from 'vitest'
+import { createPinia } from 'pinia'
 import AppLayout from './AppLayout.vue'
 
-const { changePassword } = vi.hoisted(() => ({
+const { changePassword, legacyChangePassword } = vi.hoisted(() => ({
   changePassword: vi.fn().mockResolvedValue({}),
+  legacyChangePassword: vi.fn(),
 }))
-vi.mock('@mts241alikhlash/platform/auth', () => ({
+vi.mock('../auth', () => ({
   useAuthSession: () => ({
     user: ref({ id: 'user-1', name: 'Admin', roles: ['ADMIN'] }),
     logoutUser: vi.fn(),
-    changePassword: vi.fn(),
+    changePassword: legacyChangePassword,
   }),
   authApi: { changePassword },
 }))
@@ -24,20 +26,21 @@ const router = () =>
     history: createMemoryHistory(),
     routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }],
   })
-
 function mountLayout() {
   return mount(AppLayout, {
+    props: { menuSections: [] },
+    slots: { 'app-switcher': '<header-app-switcher-stub />' },
     global: {
-      plugins: [router()],
+      plugins: [createPinia(), router()],
       stubs: {
         AppSidebar: true,
-        HeaderAppSwitcher: true,
         RouterView: true,
         Dialog: passthrough,
         DialogContent: passthrough,
         DialogHeader: passthrough,
         DialogTitle: passthrough,
         DialogDescription: passthrough,
+        DialogFooter: passthrough,
         DropdownMenu: passthrough,
         DropdownMenuContent: passthrough,
         DropdownMenuGroup: passthrough,
@@ -72,7 +75,7 @@ describe('header controls', () => {
     wrapper.unmount()
   })
 
-  it('puts the page in an inset card under a full-width top bar', () => {
+  it('puts the page under a full-width top bar', () => {
     const wrapper = mountLayout()
     expect(wrapper.find('[data-slot="sidebar-inset"]').exists()).toBe(true)
     const topBar = wrapper.get('header[data-app-topbar]')
@@ -89,6 +92,7 @@ describe('header controls', () => {
     expect(topBar.find('header-app-switcher-stub').exists()).toBe(true)
     const search = topBar.get('button[aria-label="Cari halaman"]')
     expect(search.classes()).toContain('size-8')
+    expect(search.classes()).not.toContain('md:size-7')
     const trigger = topBar.get('button[aria-label="Buka menu"]')
     expect(trigger.classes()).toContain('size-8')
     wrapper.unmount()
@@ -107,7 +111,7 @@ describe('header controls', () => {
     wrapper.unmount()
   })
 
-  it('opens the profile password dialog with current password and eight-character validation', async () => {
+  it('uses the profile password-change flow, including current password and eight-character validation', async () => {
     const wrapper = mountLayout()
     await wrapper
       .findAll('button')
@@ -129,6 +133,7 @@ describe('header controls', () => {
         newPassword: 'new-password',
       }),
     )
+    expect(legacyChangePassword).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 })

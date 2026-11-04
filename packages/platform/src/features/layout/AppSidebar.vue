@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@mts241alikhlash/ui/sidebar'
 
-import { useAuthSession } from '@mts241alikhlash/platform/auth'
-import { useMenuVisibility } from '@/composables/useMenuVisibility'
+import type { MenuSection } from '@mts241alikhlash/web-shared/types/menu.types'
+import { useAuthSession } from '../auth'
+import { useMenuVisibility } from './useMenuVisibility'
 import NavMain from './NavMain.vue'
 import {
   Sidebar,
@@ -12,13 +13,25 @@ import {
 } from '@mts241alikhlash/ui/sidebar'
 import { onMounted, ref } from 'vue'
 
-const props = withDefaults(defineProps<SidebarProps>(), {
-  variant: 'inset',
-  collapsible: 'icon',
-})
+const props = withDefaults(
+  defineProps<
+    SidebarProps & {
+      menuSections: MenuSection[]
+      permissionsFor?: (codes: string[]) => string[]
+    }
+  >(),
+  {
+    variant: 'sidebar',
+    collapsible: 'icon',
+    permissionsFor: (codes: string[]) => codes,
+  },
+)
 
 const { user, syncAuthenticatedUserProfile } = useAuthSession()
-const { filteredSections } = useMenuVisibility()
+const { filteredSections } = useMenuVisibility(
+  props.menuSections,
+  props.permissionsFor,
+)
 
 const scrollContainer = ref<HTMLDivElement | null>(null)
 const STORAGE_KEY = 'sidebar-scroll-position'
@@ -41,7 +54,10 @@ function handleScroll(e: Event) {
 </script>
 
 <template>
-  <Sidebar v-bind="props">
+  <Sidebar
+    :variant="props.variant"
+    :collapsible="props.collapsible"
+  >
     <SidebarContent>
       <div
         ref="scrollContainer"

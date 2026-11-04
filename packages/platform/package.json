@@ -11,7 +11,8 @@
     "./religion": "./src/features/religion/index.ts",
     "./school-unit-type": "./src/features/school-unit-type/index.ts",
     "./dashboard": "./src/features/dashboard/index.ts",
-    "./reference-data": "./src/features/reference-data/index.ts"
+    "./reference-data": "./src/features/reference-data/index.ts",
+    "./layout": "./src/features/layout/index.ts"
   },
   "scripts": {
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
@@ -32,6 +33,7 @@
     "pinia": "^4.1.0",
     "vee-validate": "^4.15.1",
     "vue": "^3.5.41",
+    "vue-i18n": "^11.4.10",
     "vue-router": "^5.1.0",
     "vue-sonner": "^2.0.9",
     "zod": "^3.25.76"
@@ -61,6 +63,7 @@
     "vitest": "^5.1.0",
     "vue": "^3.5.41",
     "vue-eslint-parser": "^10.4.0",
+    "vue-i18n": "^11.4.10",
     "vue-router": "^5.1.0",
     "vue-sonner": "^2.0.9",
     "vue-tsc": "^3.3.10",

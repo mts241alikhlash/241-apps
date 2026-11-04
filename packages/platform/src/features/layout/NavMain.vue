@@ -17,7 +17,11 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@mts241alikhlash/ui/sidebar'
-import type { MenuItem, MenuSection, SubMenuItem } from '@/config/menuConfig'
+import type {
+  MenuItem,
+  MenuSection,
+  SubMenuItem,
+} from '@mts241alikhlash/web-shared/types/menu.types'
 import { ChevronRight } from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
 
