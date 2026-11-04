@@ -107,11 +107,9 @@
     "build": "pnpm run clean && nest build -p tsconfig.build.json",
     "dev": "nest build -p tsconfig.build.json --watch",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
     "lint:strict": "eslint -c eslint.typecheck.config.mjs \"src/**/*.ts\" --max-warnings=0",
-    "check": "pnpm run format:check && pnpm run lint",
+    "check": "pnpm run lint",
     "test": "vitest run"
   },
   "peerDependencies": {

@@ -17,16 +17,21 @@
     "version:check": "node scripts/check-contract-versions.mjs",
     "api:generate": "node scripts/generate-api-clients.mjs",
     "api:check": "node scripts/generate-api-clients.mjs --check",
-    "api:typecheck": "pnpm --filter '@mts241alikhlash/*-api' --if-present run typecheck"
+    "api:typecheck": "pnpm --filter '@mts241alikhlash/*-api' --if-present run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "prettier --check . && pnpm -r --if-present run lint",
+    "fix": "prettier --write . && pnpm -r --if-present run lint --fix"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "openapi-typescript": "^7.13.0",
-    "typescript": "~5.9.3",
     "@vitejs/plugin-vue": "^6.0.9",
     "@vue/test-utils": "^2.5.1",
     "@vue/tsconfig": "^0.9.1",
     "happy-dom": "^21.0.4",
+    "openapi-typescript": "^7.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
     "vitest": "^5.1.0",
     "vue": "^3.5.43",
     "vue-tsc": "^3.3.10"

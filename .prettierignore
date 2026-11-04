@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+**/CHANGELOG.md
+contracts/**
+packages/*-api/src/**
+services/*/openapi.json
+**/src/generated/**
+infra/gateway/nginx*.conf
+infra/gateway/manifests/**

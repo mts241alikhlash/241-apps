@@ -17,9 +17,8 @@
   "scripts": {
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "lint": "eslint \"src/**/*.{ts,vue}\" --max-warnings=0",
-    "format:check": "prettier --check \"src/**/*.{ts,vue}\"",
     "test": "vitest run",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check"
+    "check": "pnpm run typecheck && pnpm run lint"
   },
   "dependencies": {
     "@mts241alikhlash/ui": "workspace:*",
