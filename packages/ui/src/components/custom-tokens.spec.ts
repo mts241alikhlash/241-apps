@@ -12,6 +12,9 @@ const md = 'h-[var(--control-h-md,1.75rem)]'
 
 const source = (name: string) =>
   readFileSync(fileURLToPath(new URL(name, import.meta.url)), 'utf8')
+    .replace(/\s+/g, ' ')
+    .replace(/\( /g, '(')
+    .replace(/ \)/g, ')')
 
 describe('custom components on the control tokens', () => {
   it('date picker trigger is a md control', () => {
@@ -21,8 +24,12 @@ describe('custom components on the control tokens', () => {
   })
 
   it('date picker and combobox triggers look like inputs: transparent with the input border', () => {
-    const picker = mount(DatePicker, { props: { modelValue: '' } }).get('button').classes()
-    const combo = mount(AppCombobox, { props: { options: [] } }).get('button').classes()
+    const picker = mount(DatePicker, { props: { modelValue: '' } })
+      .get('button')
+      .classes()
+    const combo = mount(AppCombobox, { props: { options: [] } })
+      .get('button')
+      .classes()
     for (const c of [picker, combo]) {
       expect(c).toContain('bg-transparent')
       expect(c).toContain('border-input')
@@ -76,7 +83,9 @@ describe('custom components on the control tokens', () => {
 
   it('floating field hides the placeholder text of a date trigger while it is empty', () => {
     const css = source('./ui/form/FloatingLabelField.vue')
-    const rule = css.slice(css.indexOf(".ff.ff-empty :deep(button[aria-haspopup='dialog'])"))
+    const rule = css.slice(
+      css.indexOf(".ff.ff-empty :deep(button[aria-haspopup='dialog'])"),
+    )
     expect(rule.slice(0, rule.indexOf('}'))).toContain('color: transparent')
   })
 
@@ -87,7 +96,9 @@ describe('custom components on the control tokens', () => {
     const at = css.indexOf(selector)
     expect(at).toBeGreaterThan(-1)
     const rule = css.slice(at, css.indexOf('}', at))
-    expect(rule).toContain('top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px)')
+    expect(rule).toContain(
+      'top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px)',
+    )
     expect(rule).toContain('left: calc(0.375rem + 1px)')
     expect(rule).toContain('color: var(--muted-foreground)')
     expect(css).toContain(
@@ -100,7 +111,9 @@ describe('custom components on the control tokens', () => {
 
   it('floating field label rests in the middle of a md control and floats at 10px', () => {
     const css = source('./ui/form/FloatingLabelField.vue')
-    expect(css).toContain('top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px)')
+    expect(css).toContain(
+      'top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px)',
+    )
     expect(css).toContain('font-size: var(--text-control, 0.75rem)')
     expect(css).toContain('font-size: 0.625rem')
   })
@@ -109,7 +122,10 @@ describe('custom components on the control tokens', () => {
     const command = source('ui/command/CommandInput.vue')
     expect(command).not.toMatch(/\bh-9\b/)
     expect(command).toContain('h-[var(--control-h-lg,2rem)]')
-    for (const file of ['ui/number-field/NumberFieldInput.vue', 'ui/tags-input/TagsInputInput.vue']) {
+    for (const file of [
+      'ui/number-field/NumberFieldInput.vue',
+      'ui/tags-input/TagsInputInput.vue',
+    ]) {
       const text = source(file)
       expect(text, file).toMatch(/(?<![\w:-])text-sm\b/)
     }
