@@ -1753,6 +1753,46 @@
         ]
       }
     },
+    "/employees/summary": {
+      "get": {
+        "operationId": "EmployeeController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/EmployeeSummaryResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Active employees by employment type and category",
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
     "/employees/{id}": {
       "get": {
         "operationId": "EmployeeController_findOne",
@@ -3055,6 +3095,46 @@
         ]
       }
     },
+    "/payroll/payslips/me/latest-period": {
+      "get": {
+        "operationId": "PayslipController_latestPeriod",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LatestPayslipPeriodResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Period of my newest approved payslip, without amounts or audit",
+        "tags": [
+          "Payroll — Payslips"
+        ]
+      }
+    },
     "/payroll/payslips/{id}": {
       "get": {
         "operationId": "PayslipController_detail",
@@ -3958,6 +4038,46 @@
         "required": [
           "data",
           "meta"
+        ]
+      },
+      "NamedTotalResponseDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "total"
+        ]
+      },
+      "EmployeeSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "activeTotal": {
+            "type": "number"
+          },
+          "byEmploymentType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NamedTotalResponseDto"
+            }
+          },
+          "byPositionCategory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NamedTotalResponseDto"
+            }
+          }
+        },
+        "required": [
+          "activeTotal",
+          "byEmploymentType",
+          "byPositionCategory"
         ]
       },
       "CreateEmployeeDto": {
@@ -5057,6 +5177,21 @@
           "gross",
           "deductions",
           "net"
+        ]
+      },
+      "LatestPayslipPeriodResponseDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number"
+          },
+          "month": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "year",
+          "month"
         ]
       },
       "PayslipSummaryResponseDto": {

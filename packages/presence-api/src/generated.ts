@@ -233,6 +233,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/presence/dashboard/attendance-today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today's attendance counts for employees */
+        get: operations["PresenceDashboardController_attendance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/presence/dashboard/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your day and, with leave-requests.read-own, your leave balances */
+        get: operations["PresenceDashboardController_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/presence/dashboard/pending-leaves": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Leave requests waiting for a decision */
+        get: operations["PresenceDashboardController_leaves"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/presence/devices": {
         parameters: {
             query?: never;
@@ -738,6 +789,14 @@ export interface components {
             updatedAt: string;
             year: number;
         };
+        AttendanceTodayResponseDto: {
+            /** Format: date-time */
+            date: string;
+            late: number;
+            notScanned: number;
+            onLeave: number;
+            present: number;
+        };
         BatchScanResultResponseDto: {
             accepted: boolean;
             clientEventId: string;
@@ -1227,6 +1286,21 @@ export interface components {
             month: number;
             year: number;
         };
+        MyLeaveBalanceResponseDto: {
+            leaveTypeName: string;
+            remainingDays: number;
+        };
+        MyPresenceDashboardResponseDto: {
+            leaveBalance: components["schemas"]["MyLeaveBalanceResponseDto"][];
+            today: components["schemas"]["MyPresenceTodayResponseDto"] | null;
+        };
+        MyPresenceTodayResponseDto: {
+            /** Format: date-time */
+            clockIn: string | null;
+            /** Format: date-time */
+            clockOut: string | null;
+            status: string;
+        };
         NonWorkingDayDto: {
             /** @example 2026-08-17 */
             date: string;
@@ -1252,6 +1326,9 @@ export interface components {
             sourceCalendarId?: string | null;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        PendingLeavesResponseDto: {
+            total: number;
         };
         PresenceRecapExportRowResponseDto: {
             Alpa: number;
@@ -2144,6 +2221,81 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["PresenceRecapExportRowResponseDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    PresenceDashboardController_attendance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AttendanceTodayResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    PresenceDashboardController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["MyPresenceDashboardResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    PresenceDashboardController_leaves: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["PendingLeavesResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

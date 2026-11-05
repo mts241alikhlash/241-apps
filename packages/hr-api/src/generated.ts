@@ -273,6 +273,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employees/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Active employees by employment type and category */
+        get: operations["EmployeeController_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employment-types": {
         parameters: {
             query?: never;
@@ -434,6 +451,23 @@ export interface paths {
         };
         /** My payslip — resolved from the token, approved runs only */
         get: operations["PayslipController_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/payslips/me/latest-period": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Period of my newest approved payslip, without amounts or audit */
+        get: operations["PayslipController_latestPeriod"];
         put?: never;
         post?: never;
         delete?: never;
@@ -908,6 +942,11 @@ export interface components {
              */
             data: string[];
         };
+        EmployeeSummaryResponseDto: {
+            activeTotal: number;
+            byEmploymentType: components["schemas"]["NamedTotalResponseDto"][];
+            byPositionCategory: components["schemas"]["NamedTotalResponseDto"][];
+        };
         EmployeeUserResponseDto: {
             /** @example 550e8400-e29b-41d4-a716-446655440001 */
             id: string;
@@ -936,6 +975,14 @@ export interface components {
             id: string;
             /** @example Civil Servant */
             name: string;
+        };
+        LatestPayslipPeriodResponseDto: {
+            month: number;
+            year: number;
+        };
+        NamedTotalResponseDto: {
+            name: string;
+            total: number;
         };
         PayrollActorResponseDto: {
             displayName: string | null;
@@ -2097,6 +2144,31 @@ export interface operations {
             };
         };
     };
+    EmployeeController_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["EmployeeSummaryResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     EmploymentTypeController_findAll: {
         parameters: {
             query?: {
@@ -2749,6 +2821,31 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["PayslipResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    PayslipController_latestPeriod: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["LatestPayslipPeriodResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

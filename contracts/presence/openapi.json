@@ -1965,48 +1965,10 @@
         ]
       }
     },
-    "/presence/devices": {
+    "/presence/dashboard/attendance-today": {
       "get": {
-        "operationId": "DeviceController_list",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "isActive",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "PresenceDashboardController_attendance",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -2024,13 +1986,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/DeviceListItemResponseDto"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/DeviceListResponseMetaDto"
+                      "$ref": "#/components/schemas/AttendanceTodayResponseDto"
                     }
                   }
                 }
@@ -2043,368 +1999,16 @@
             "bearer": []
           }
         ],
-        "summary": "List gate devices with their last-seen time",
+        "summary": "Today's attendance counts for employees",
         "tags": [
-          "Presence — Gate Devices"
-        ]
-      },
-      "post": {
-        "operationId": "DeviceController_register",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterDeviceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/DeviceWithTokenResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Register a gate — the token is shown once",
-        "tags": [
-          "Presence — Gate Devices"
+          "Presence — Dashboard"
         ]
       }
     },
-    "/presence/devices/{id}/rotate-token": {
-      "post": {
-        "operationId": "DeviceController_rotate",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/DeviceWithTokenResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Issue a new token — the old one stops working",
-        "tags": [
-          "Presence — Gate Devices"
-        ]
-      }
-    },
-    "/presence/devices/{id}": {
-      "patch": {
-        "operationId": "DeviceController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateDeviceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/DeviceResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "Presence — Gate Devices"
-        ]
-      },
-      "delete": {
-        "operationId": "DeviceController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/DeviceResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Retire a gate — its scan history is kept",
-        "tags": [
-          "Presence — Gate Devices"
-        ]
-      }
-    },
-    "/presence/scans/pair": {
-      "post": {
-        "operationId": "ScanController_pair",
-        "parameters": [],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Keep a gate device token in an HttpOnly cookie on this browser",
-        "tags": [
-          "Presence — Scans"
-        ]
-      }
-    },
-    "/presence/scans/unpair": {
-      "post": {
-        "operationId": "ScanController_unpair",
-        "parameters": [],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "summary": "Forget the gate device paired on this browser",
-        "tags": [
-          "Presence — Scans"
-        ]
-      }
-    },
-    "/presence/scans": {
-      "post": {
-        "operationId": "ScanController_scan",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordScanDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ScanResultResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Record one scan from a gate device",
-        "tags": [
-          "Presence — Scans"
-        ]
-      },
+    "/presence/dashboard/pending-leaves": {
       "get": {
-        "operationId": "ScanController_list",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "deviceId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "credentialId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "outcome",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "ACCEPTED",
-                "DUPLICATE",
-                "REJECTED_UNKNOWN",
-                "REJECTED_REVOKED",
-                "REJECTED_INACTIVE",
-                "REJECTED_STALE"
-              ]
-            }
-          },
-          {
-            "name": "dateFrom",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          },
-          {
-            "name": "dateTo",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          }
-        ],
+        "operationId": "PresenceDashboardController_leaves",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -2422,13 +2026,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ScanListItemResponseDto"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/ScanListResponseMetaDto"
+                      "$ref": "#/components/schemas/PendingLeavesResponseDto"
                     }
                   }
                 }
@@ -2441,63 +2039,15 @@
             "bearer": []
           }
         ],
-        "summary": "The scan log, including rejected attempts",
+        "summary": "Leave requests waiting for a decision",
         "tags": [
-          "Presence — Scans"
+          "Presence — Dashboard"
         ]
       }
     },
-    "/presence/scans/batch": {
-      "post": {
-        "operationId": "ScanController_batch",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordScanBatchDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/BatchScanResultResponseDto"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Flush scans queued while the device was offline",
-        "tags": [
-          "Presence — Scans"
-        ]
-      }
-    },
-    "/presence/scans/clock": {
+    "/presence/dashboard/me": {
       "get": {
-        "operationId": "ScanController_clock",
+        "operationId": "PresenceDashboardController_me",
         "parameters": [],
         "responses": {
           "200": {
@@ -2516,7 +2066,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/ClockAnchorResponseDto"
+                      "$ref": "#/components/schemas/MyPresenceDashboardResponseDto"
                     }
                   }
                 }
@@ -2524,9 +2074,14 @@
             }
           }
         },
-        "summary": "The anchor a device pins its monotonic clock to",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Your day and, with leave-requests.read-own, your leave balances",
         "tags": [
-          "Presence — Scans"
+          "Presence — Dashboard"
         ]
       }
     },
@@ -3252,6 +2807,571 @@
         ],
         "tags": [
           "Presence — Leave"
+        ]
+      }
+    },
+    "/presence/devices": {
+      "get": {
+        "operationId": "DeviceController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DeviceListItemResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/DeviceListResponseMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List gate devices with their last-seen time",
+        "tags": [
+          "Presence — Gate Devices"
+        ]
+      },
+      "post": {
+        "operationId": "DeviceController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeviceWithTokenResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register a gate — the token is shown once",
+        "tags": [
+          "Presence — Gate Devices"
+        ]
+      }
+    },
+    "/presence/devices/{id}/rotate-token": {
+      "post": {
+        "operationId": "DeviceController_rotate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeviceWithTokenResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue a new token — the old one stops working",
+        "tags": [
+          "Presence — Gate Devices"
+        ]
+      }
+    },
+    "/presence/devices/{id}": {
+      "patch": {
+        "operationId": "DeviceController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeviceResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Presence — Gate Devices"
+        ]
+      },
+      "delete": {
+        "operationId": "DeviceController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeviceResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retire a gate — its scan history is kept",
+        "tags": [
+          "Presence — Gate Devices"
+        ]
+      }
+    },
+    "/presence/scans/pair": {
+      "post": {
+        "operationId": "ScanController_pair",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Keep a gate device token in an HttpOnly cookie on this browser",
+        "tags": [
+          "Presence — Scans"
+        ]
+      }
+    },
+    "/presence/scans/unpair": {
+      "post": {
+        "operationId": "ScanController_unpair",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Forget the gate device paired on this browser",
+        "tags": [
+          "Presence — Scans"
+        ]
+      }
+    },
+    "/presence/scans": {
+      "post": {
+        "operationId": "ScanController_scan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordScanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ScanResultResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Record one scan from a gate device",
+        "tags": [
+          "Presence — Scans"
+        ]
+      },
+      "get": {
+        "operationId": "ScanController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "deviceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "credentialId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "outcome",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACCEPTED",
+                "DUPLICATE",
+                "REJECTED_UNKNOWN",
+                "REJECTED_REVOKED",
+                "REJECTED_INACTIVE",
+                "REJECTED_STALE"
+              ]
+            }
+          },
+          {
+            "name": "dateFrom",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateTo",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ScanListItemResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ScanListResponseMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The scan log, including rejected attempts",
+        "tags": [
+          "Presence — Scans"
+        ]
+      }
+    },
+    "/presence/scans/batch": {
+      "post": {
+        "operationId": "ScanController_batch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordScanBatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BatchScanResultResponseDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Flush scans queued while the device was offline",
+        "tags": [
+          "Presence — Scans"
+        ]
+      }
+    },
+    "/presence/scans/clock": {
+      "get": {
+        "operationId": "ScanController_clock",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ClockAnchorResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "The anchor a device pins its monotonic clock to",
+        "tags": [
+          "Presence — Scans"
         ]
       }
     }
@@ -5115,6 +5235,536 @@
           "reason"
         ]
       },
+      "AttendanceTodayResponseDto": {
+        "type": "object",
+        "properties": {
+          "present": {
+            "type": "number"
+          },
+          "late": {
+            "type": "number"
+          },
+          "onLeave": {
+            "type": "number"
+          },
+          "notScanned": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "present",
+          "late",
+          "onLeave",
+          "notScanned",
+          "date"
+        ]
+      },
+      "PendingLeavesResponseDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total"
+        ]
+      },
+      "MyPresenceTodayResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "clockIn": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "clockOut": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "clockIn",
+          "clockOut"
+        ]
+      },
+      "MyLeaveBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "leaveTypeName": {
+            "type": "string"
+          },
+          "remainingDays": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "leaveTypeName",
+          "remainingDays"
+        ]
+      },
+      "MyPresenceDashboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "today": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MyPresenceTodayResponseDto"
+              }
+            ]
+          },
+          "leaveBalance": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyLeaveBalanceResponseDto"
+            }
+          }
+        },
+        "required": [
+          "today",
+          "leaveBalance"
+        ]
+      },
+      "LeaveTypeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "treatment": {
+            "enum": [
+              "ON_LEAVE",
+              "OFFICIAL_DUTY"
+            ],
+            "type": "string"
+          },
+          "consumesQuota": {
+            "type": "boolean"
+          },
+          "annualQuota": {
+            "type": "number",
+            "nullable": true
+          },
+          "requiresDocument": {
+            "type": "boolean"
+          },
+          "appliesTo": {
+            "enum": [
+              "STUDENT",
+              "EMPLOYEE"
+            ],
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "treatment",
+          "consumesQuota",
+          "requiresDocument",
+          "appliesTo",
+          "isActive"
+        ]
+      },
+      "CreateLeaveTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{1,29}$",
+            "example": "CUTI_MELAHIRKAN"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "Cuti Melahirkan"
+          },
+          "treatment": {
+            "enum": [
+              "ON_LEAVE",
+              "OFFICIAL_DUTY"
+            ],
+            "type": "string",
+            "description": "OFFICIAL_DUTY means working elsewhere — it must not read as leave in a recap."
+          },
+          "consumesQuota": {
+            "type": "boolean"
+          },
+          "annualQuota": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 365,
+            "example": 12
+          },
+          "requiresDocument": {
+            "type": "boolean"
+          },
+          "appliesTo": {
+            "enum": [
+              "STUDENT",
+              "EMPLOYEE"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "treatment",
+          "consumesQuota",
+          "requiresDocument",
+          "appliesTo"
+        ]
+      },
+      "UpdateLeaveTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{1,29}$",
+            "example": "CUTI_MELAHIRKAN"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "Cuti Melahirkan"
+          },
+          "treatment": {
+            "enum": [
+              "ON_LEAVE",
+              "OFFICIAL_DUTY"
+            ],
+            "type": "string",
+            "description": "OFFICIAL_DUTY means working elsewhere — it must not read as leave in a recap."
+          },
+          "consumesQuota": {
+            "type": "boolean"
+          },
+          "annualQuota": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 365,
+            "example": 12
+          },
+          "requiresDocument": {
+            "type": "boolean"
+          },
+          "appliesTo": {
+            "enum": [
+              "STUDENT",
+              "EMPLOYEE"
+            ],
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Deactivating stops new requests"
+          }
+        }
+      },
+      "LeaveRequestResponseRequesterDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "displayName"
+        ]
+      },
+      "LeaveRequestResponseApproverDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "displayName"
+        ]
+      },
+      "LeaveRequestResponseLeaveTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "treatment": {
+            "enum": [
+              "ON_LEAVE",
+              "OFFICIAL_DUTY"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "treatment"
+        ]
+      },
+      "LeaveRequestResponseDto": {
+        "type": "object",
+        "properties": {
+          "requester": {
+            "$ref": "#/components/schemas/LeaveRequestResponseRequesterDto"
+          },
+          "approver": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LeaveRequestResponseApproverDto"
+              }
+            ]
+          },
+          "leaveType": {
+            "$ref": "#/components/schemas/LeaveRequestResponseLeaveTypeDto"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "requesterId": {
+            "type": "string"
+          },
+          "leaveTypeId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "documentFileId": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "WITHDRAWN"
+            ],
+            "type": "string"
+          },
+          "approverId": {
+            "type": "string",
+            "nullable": true
+          },
+          "decidedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "decisionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "workingDayCount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "requester",
+          "leaveType",
+          "days",
+          "id",
+          "requesterId",
+          "leaveTypeId",
+          "startDate",
+          "endDate",
+          "reason",
+          "status",
+          "workingDayCount",
+          "createdAt"
+        ]
+      },
+      "SubmitLeaveRequestDto": {
+        "type": "object",
+        "properties": {
+          "leaveTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-09-01"
+          },
+          "endDate": {
+            "type": "string",
+            "example": "2026-09-02"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "example": "Keperluan keluarga"
+          },
+          "documentFileId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Surat pendukung"
+          }
+        },
+        "required": [
+          "leaveTypeId",
+          "startDate",
+          "endDate",
+          "reason"
+        ]
+      },
+      "DecideLeaveRequestDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 255,
+            "example": "Clashes with the exam timetable",
+            "description": "Required on rejection — the requester is told why (FR-031)."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "RecordStudentAbsenceDto": {
+        "type": "object",
+        "properties": {
+          "studentUserId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The student, by user id"
+          },
+          "leaveTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2026-09-01"
+          },
+          "endDate": {
+            "type": "string",
+            "example": "2026-09-02",
+            "description": "Defaults to the start date for a single day."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 1000,
+            "example": "Sick note from the parents"
+          },
+          "documentFileId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "studentUserId",
+          "leaveTypeId",
+          "startDate",
+          "reason"
+        ]
+      },
+      "LeaveBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "leaveTypeId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "year": {
+            "type": "number"
+          },
+          "quota": {
+            "type": "number"
+          },
+          "used": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "leaveTypeId",
+          "code",
+          "name",
+          "year",
+          "quota",
+          "used",
+          "remaining"
+        ]
+      },
       "DeviceListItemResponseDto": {
         "type": "object",
         "properties": {
@@ -5617,435 +6267,6 @@
         "required": [
           "data",
           "meta"
-        ]
-      },
-      "LeaveTypeResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "treatment": {
-            "enum": [
-              "ON_LEAVE",
-              "OFFICIAL_DUTY"
-            ],
-            "type": "string"
-          },
-          "consumesQuota": {
-            "type": "boolean"
-          },
-          "annualQuota": {
-            "type": "number",
-            "nullable": true
-          },
-          "requiresDocument": {
-            "type": "boolean"
-          },
-          "appliesTo": {
-            "enum": [
-              "STUDENT",
-              "EMPLOYEE"
-            ],
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "treatment",
-          "consumesQuota",
-          "requiresDocument",
-          "appliesTo",
-          "isActive"
-        ]
-      },
-      "CreateLeaveTypeDto": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "pattern": "^[A-Z][A-Z0-9_]{1,29}$",
-            "example": "CUTI_MELAHIRKAN"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 100,
-            "example": "Cuti Melahirkan"
-          },
-          "treatment": {
-            "enum": [
-              "ON_LEAVE",
-              "OFFICIAL_DUTY"
-            ],
-            "type": "string",
-            "description": "OFFICIAL_DUTY means working elsewhere — it must not read as leave in a recap."
-          },
-          "consumesQuota": {
-            "type": "boolean"
-          },
-          "annualQuota": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 365,
-            "example": 12
-          },
-          "requiresDocument": {
-            "type": "boolean"
-          },
-          "appliesTo": {
-            "enum": [
-              "STUDENT",
-              "EMPLOYEE"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "code",
-          "name",
-          "treatment",
-          "consumesQuota",
-          "requiresDocument",
-          "appliesTo"
-        ]
-      },
-      "UpdateLeaveTypeDto": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "pattern": "^[A-Z][A-Z0-9_]{1,29}$",
-            "example": "CUTI_MELAHIRKAN"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 100,
-            "example": "Cuti Melahirkan"
-          },
-          "treatment": {
-            "enum": [
-              "ON_LEAVE",
-              "OFFICIAL_DUTY"
-            ],
-            "type": "string",
-            "description": "OFFICIAL_DUTY means working elsewhere — it must not read as leave in a recap."
-          },
-          "consumesQuota": {
-            "type": "boolean"
-          },
-          "annualQuota": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 365,
-            "example": 12
-          },
-          "requiresDocument": {
-            "type": "boolean"
-          },
-          "appliesTo": {
-            "enum": [
-              "STUDENT",
-              "EMPLOYEE"
-            ],
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean",
-            "description": "Deactivating stops new requests"
-          }
-        }
-      },
-      "LeaveRequestResponseRequesterDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "displayName"
-        ]
-      },
-      "LeaveRequestResponseApproverDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "displayName"
-        ]
-      },
-      "LeaveRequestResponseLeaveTypeDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "treatment": {
-            "enum": [
-              "ON_LEAVE",
-              "OFFICIAL_DUTY"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "treatment"
-        ]
-      },
-      "LeaveRequestResponseDto": {
-        "type": "object",
-        "properties": {
-          "requester": {
-            "$ref": "#/components/schemas/LeaveRequestResponseRequesterDto"
-          },
-          "approver": {
-            "nullable": true,
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LeaveRequestResponseApproverDto"
-              }
-            ]
-          },
-          "leaveType": {
-            "$ref": "#/components/schemas/LeaveRequestResponseLeaveTypeDto"
-          },
-          "days": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "id": {
-            "type": "string"
-          },
-          "requesterId": {
-            "type": "string"
-          },
-          "leaveTypeId": {
-            "type": "string"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "documentFileId": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "WITHDRAWN"
-            ],
-            "type": "string"
-          },
-          "approverId": {
-            "type": "string",
-            "nullable": true
-          },
-          "decidedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "decisionReason": {
-            "type": "string",
-            "nullable": true
-          },
-          "workingDayCount": {
-            "type": "number"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "requester",
-          "leaveType",
-          "days",
-          "id",
-          "requesterId",
-          "leaveTypeId",
-          "startDate",
-          "endDate",
-          "reason",
-          "status",
-          "workingDayCount",
-          "createdAt"
-        ]
-      },
-      "SubmitLeaveRequestDto": {
-        "type": "object",
-        "properties": {
-          "leaveTypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "startDate": {
-            "type": "string",
-            "example": "2026-09-01"
-          },
-          "endDate": {
-            "type": "string",
-            "example": "2026-09-02"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 1000,
-            "example": "Keperluan keluarga"
-          },
-          "documentFileId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Surat pendukung"
-          }
-        },
-        "required": [
-          "leaveTypeId",
-          "startDate",
-          "endDate",
-          "reason"
-        ]
-      },
-      "DecideLeaveRequestDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 255,
-            "example": "Clashes with the exam timetable",
-            "description": "Required on rejection — the requester is told why (FR-031)."
-          }
-        },
-        "required": [
-          "reason"
-        ]
-      },
-      "RecordStudentAbsenceDto": {
-        "type": "object",
-        "properties": {
-          "studentUserId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "The student, by user id"
-          },
-          "leaveTypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "startDate": {
-            "type": "string",
-            "example": "2026-09-01"
-          },
-          "endDate": {
-            "type": "string",
-            "example": "2026-09-02",
-            "description": "Defaults to the start date for a single day."
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 1000,
-            "example": "Sick note from the parents"
-          },
-          "documentFileId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "studentUserId",
-          "leaveTypeId",
-          "startDate",
-          "reason"
-        ]
-      },
-      "LeaveBalanceResponseDto": {
-        "type": "object",
-        "properties": {
-          "leaveTypeId": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "year": {
-            "type": "number"
-          },
-          "quota": {
-            "type": "number"
-          },
-          "used": {
-            "type": "number"
-          },
-          "remaining": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "leaveTypeId",
-          "code",
-          "name",
-          "year",
-          "quota",
-          "used",
-          "remaining"
         ]
       }
     }
