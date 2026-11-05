@@ -4,6 +4,7 @@ import { defineConfig, mergeConfig } from 'vitest/config'
 const DOM_SPECS = [
   '**/KioskView.spec.ts',
   '**/EmployeeProfileTabFields.spec.ts',
+  '**/DashboardView.spec.ts',
 ]
 
 export default mergeConfig(
