@@ -10,7 +10,7 @@ node_modules/
 *.crt
 secrets/
 compose/env/*
-!compose/env/README.md
+!compose/env/.gitkeep
 compose/compose.override.yaml
 .claude/
 .agents/

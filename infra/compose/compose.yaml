@@ -128,7 +128,6 @@ services:
     image: ghcr.io/mts241alikhlash/identity-service@sha256:d2256d7b1142b19bf2088afc75acccbc9740acd223934cd3131289c357774e2a
     env_file:
       - path: env/identity-service.env
-        required: false
     expose:
       - '3000'
     healthcheck:
@@ -143,7 +142,6 @@ services:
     image: ghcr.io/mts241alikhlash/academic-service@sha256:90640fa607abbd90108d448a2419f8d13e18310198721d3581d708fdbd7bd433
     env_file:
       - path: env/academic-service.env
-        required: false
     expose:
       - '3200'
     healthcheck:
@@ -158,7 +156,6 @@ services:
     image: ghcr.io/mts241alikhlash/inventory-service@sha256:f166960ffd64e377ee87f759600d681e8dfe7c6f6d5940f61ad83e6718237560
     env_file:
       - path: env/inventory-service.env
-        required: false
     expose:
       - '3300'
     healthcheck:
@@ -173,7 +170,6 @@ services:
     image: ghcr.io/mts241alikhlash/presence-service@sha256:e1ddfa564d87d1a42d48a382aad67277214ef61687d76eb714952410da925456
     env_file:
       - path: env/presence-service.env
-        required: false
     expose:
       - '3400'
     healthcheck:
@@ -188,7 +184,6 @@ services:
     image: ghcr.io/mts241alikhlash/portal-service@sha256:5a4845a446cc59c76c9e8d5f032b99dd2df29872c23b1c880bc8fc2b30b8ca1e
     env_file:
       - path: env/portal-service.env
-        required: false
     expose:
       - '3600'
     healthcheck:
@@ -203,7 +198,6 @@ services:
     image: ghcr.io/mts241alikhlash/admission-service@sha256:c63ac220ca1bddc36015d9a5d7884a0a38f9457e4604da484eb29ea829eb1176
     env_file:
       - path: env/admission-service.env
-        required: false
     expose:
       - '3700'
     healthcheck:
@@ -218,7 +212,6 @@ services:
     image: ghcr.io/mts241alikhlash/hr-service@sha256:9d7769e290635c61f206cfee2fd7e2614d7e1646ad8a9e031361ec391fa5b032
     env_file:
       - path: env/hr-service.env
-        required: false
     expose:
       - '3800'
     healthcheck:
@@ -233,7 +226,6 @@ services:
     image: ghcr.io/mts241alikhlash/student-service@sha256:62947f497c8f4852e6a549126ec803353c4cba7c14b1f28d7987cad13381da1b
     env_file:
       - path: env/student-service.env
-        required: false
     expose:
       - '3900'
     healthcheck:
@@ -248,7 +240,6 @@ services:
     image: ghcr.io/mts241alikhlash/assessment-service@sha256:a736a7ed7b3a86d0f80acd86edbaba9aa139f29c763ab0662fb5baf2de6a195f
     env_file:
       - path: env/assessment-service.env
-        required: false
     expose:
       - '4000'
     healthcheck:
@@ -263,7 +254,6 @@ services:
     image: ghcr.io/mts241alikhlash/exam-service@sha256:bfd9c939e8c118549bad643d06265d626f47e1ca4e862a91526ea981237c74b5
     env_file:
       - path: env/exam-service.env
-        required: false
     expose:
       - '4100'
     healthcheck:
@@ -279,7 +269,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/identity-service.env
-        required: false
 
   academic-service-migrate:
     <<: *migrate-defaults
@@ -287,7 +276,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/academic-service.env
-        required: false
 
   inventory-service-migrate:
     <<: *migrate-defaults
@@ -295,7 +283,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/inventory-service.env
-        required: false
 
   presence-service-migrate:
     <<: *migrate-defaults
@@ -303,7 +290,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/presence-service.env
-        required: false
 
   portal-service-migrate:
     <<: *migrate-defaults
@@ -311,7 +297,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/portal-service.env
-        required: false
 
   admission-service-migrate:
     <<: *migrate-defaults
@@ -319,7 +304,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/admission-service.env
-        required: false
 
   hr-service-migrate:
     <<: *migrate-defaults
@@ -327,7 +311,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/hr-service.env
-        required: false
 
   student-service-migrate:
     <<: *migrate-defaults
@@ -335,7 +318,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/student-service.env
-        required: false
 
   assessment-service-migrate:
     <<: *migrate-defaults
@@ -343,7 +325,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/assessment-service.env
-        required: false
 
   exam-service-migrate:
     <<: *migrate-defaults
@@ -351,7 +332,6 @@ services:
     profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
-        required: false
 
   postgres:
     profiles: ['storage']

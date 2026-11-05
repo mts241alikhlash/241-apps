@@ -227,6 +227,14 @@ for (const { port, container, label } of STORAGE) {
 }
 if (startStorage) {
   console.log('starting the local Postgres and S3 (compose profile storage)')
+  for (const service of Object.keys(SERVICE_PORTS)) {
+    const file = path.join(
+      workspace,
+      'infra/compose/env',
+      `${service}-service.env`,
+    )
+    if (!existsSync(file)) writeFileSync(file, '')
+  }
   execFileSync(
     'docker',
     [
