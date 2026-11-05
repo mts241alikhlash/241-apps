@@ -48,6 +48,7 @@ export function nest({ root = process.cwd() } = {}) {
     test: {
       environment: 'node',
       globals: true,
+      env: { SCHOOL_TIME_ZONE: 'Asia/Jakarta' },
       include: ['src/**/*.spec.ts'],
       exclude: [...configDefaults.exclude, 'dist/**'],
     },
