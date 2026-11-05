@@ -3,7 +3,7 @@
 ## Branches and commits
 
 - Branch from `main`: `feat/<topic>`, `fix/<topic>`, `chore/<topic>`, `docs/<topic>`.
-- Conventional Commits (`feat(admission): ...`), no AI attribution, one logical change per commit. Stage files by path.
+- Conventional Commits (`feat(admission): ...`), no AI attribution, one logical change per commit.
 - A pre-commit hook formats staged files with Prettier and fixes ESLint findings in the owning package.
 
 ## Changesets and versions

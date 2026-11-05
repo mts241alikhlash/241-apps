@@ -8,4 +8,4 @@ Read [README.md](README.md) first, then the root [AGENTS.md](../../AGENTS.md).
 
 ## Working here
 
-- Never edit generated files; regenerate with `pnpm run api:generate` and check with `pnpm run api:check`.
+- This package is generated: see [README.md](README.md) and the [api standard](../../docs/standards/api.md).

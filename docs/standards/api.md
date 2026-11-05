@@ -24,9 +24,7 @@ Applies to every HTTP handler in `services/`, the contracts in `contracts/`, and
 **Why.** Clients page the same way everywhere.
 **Check.** review.
 
-**Rule.** Never add secret columns (`passwordHash`, `tokenHash`, reset tokens, credential `code`) to entities, DTOs or responses.
-**Why.** A response is a public surface.
-**Check.** `no-user-scalar-overfetch.spec.ts` for user rows; review. More in [security](security.md).
+Secret columns never appear in DTOs or responses: see [security](security.md).
 
 ## Contracts and clients
 

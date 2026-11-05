@@ -98,8 +98,8 @@ The response envelope and DTO building rules are in [api](api.md).
 **Why.** An over-budget file has usually absorbed a second responsibility.
 **Check.** review.
 
-**Rule.** No comments in code. A disabled lint rule carries `-- <reason>` in the directive; unused directives are errors.
-**Why.** A line that needs a comment has a wrong name or is too long; tests document past bugs.
+**Rule.** A disabled lint rule carries `-- <reason>` in the directive; unused directives are errors. The no-comments rule is in the root [AGENTS.md](../../AGENTS.md).
+**Why.** An unexplained suppression hides a defect.
 **Check.** ESLint `eslint-comments/require-description` and `reportUnusedDisableDirectives`.
 
 **Rule.** New use cases ship with a `*.spec.ts`; a refactor neither adds specs to untested use cases nor deletes existing ones.

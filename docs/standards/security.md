@@ -56,6 +56,6 @@ Applies to every service, every web app and the deployment. Each rule is **Rule*
 
 ## Network
 
-**Rule.** Authorization fails closed: when identity is unreachable the answer is 503. Services are reachable only through the gateway; Postgres and S3 are not exposed to the internet.
+**Rule.** Authorization fails closed with 503 when identity is unreachable (see [backend](backend.md)). Services are reachable only through the gateway; Postgres and S3 are not exposed to the internet.
 **Why.** A degraded platform must not grant access.
-**Check.** the identity adapter specs; deploy review ([deploy](../guides/deploy.md)).
+**Check.** deploy review ([deploy](../guides/deploy.md)).

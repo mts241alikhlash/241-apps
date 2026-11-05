@@ -50,13 +50,11 @@ Applies to the Vue 3 + Vite apps in `apps/` and the Vue packages in `packages/` 
 **Why.** Consistent, checkable components.
 **Check.** the vue ESLint preset and `vue-tsc` (`validate`).
 
-**Rule.** No comments in code, and no hard-coded user-visible text outside the app's i18n or feature config. Spelling in code and tests is American English.
+**Rule.** No hard-coded user-visible text outside the app's i18n or feature config.
 **Why.** Copy changes belong in one place; names stay consistent.
 **Check.** review; exam-web's `check-no-comments.mjs`.
 
-**Rule.** Server-paginated lists use the server's `page`, `limit` and `meta.total`; there is no client-side paging over a loaded slice and no "load more".
-**Why.** Lists grow; the server owns the count.
-**Check.** review. The pagination envelope is in [api](api.md); the table component is in [ui](ui.md).
+List paging rules are in [ui](ui.md) (the table) and [api](api.md) (the endpoint).
 
 ## Gates
 
