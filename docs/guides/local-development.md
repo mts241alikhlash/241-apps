@@ -48,6 +48,16 @@ Open `http://localhost:5180` (account-web) and sign in as `admin` with that pass
 
 Result: after sign-in the app's home page loads (for academic, `/academic/info`).
 
+## Run the end-to-end suites
+
+With the local stack's Postgres running (step 3 starts it, or `docker compose -f infra/compose/compose.yaml --profile storage up -d postgres`):
+
+```
+pnpm run test:e2e
+```
+
+Result: every service with a `test/*.e2e-spec.ts` reports its suite passing; the portal suite creates and migrates its own `portal_e2e` database.
+
 ## Notes
 
 - A machine with little memory cannot run ten services under `nest start --watch` at once; start only the apps you need.

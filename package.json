@@ -24,7 +24,8 @@
     "fix": "prettier --write . && pnpm -r --if-present run lint --fix",
     "prepare": "husky",
     "knip": "DATABASE_URL=postgresql://knip:knip@localhost:5432/knip DIRECT_URL=postgresql://knip:knip@localhost:5432/knip knip",
-    "docs:check": "node scripts/check-docs.mjs"
+    "docs:check": "node scripts/check-docs.mjs",
+    "test:e2e": "pnpm -r --if-present run test:e2e"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",

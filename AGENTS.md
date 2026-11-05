@@ -16,7 +16,7 @@ Every package has a `README.md` (purpose, dependencies, rules, gotchas, open wor
 ## Commands
 
 - pnpm is not on every shell PATH: `export PATH=$HOME/.local/share/pnpm/bin:$PATH`.
-- Scripts live in each `package.json` and the root one. Validate an app with `pnpm --filter <app> run validate`; a service with `pnpm --filter <service> run check` and `run test`; the contracts with the root `openapi:check`, `api:check`, `version:check`, `runtime:check`.
+- Scripts live in each `package.json` and the root one. Validate an app with `pnpm --filter <app> run validate`; a service with `pnpm --filter <service> run check` and `run test`; the contracts with the root `openapi:check`, `api:check`, `version:check`, `runtime:check`; end-to-end suites with `pnpm run test:e2e` (needs the local Postgres).
 - Which check to run, and when: [testing](docs/standards/testing.md). Services need `pnpm --filter @mts241alikhlash/nest-core run build` first after `nest-core` changes.
 - Local stack: `node dev.mjs <app>` (see [local development](docs/guides/local-development.md)).
 

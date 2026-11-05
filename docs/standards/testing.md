@@ -29,6 +29,10 @@ Applies to all packages. Each rule is **Rule**, **Why**, **Check**.
 
 ## Tooling
 
+**Rule.** End-to-end suites (`test/*.e2e-spec.ts`, run with `pnpm run test:e2e`) boot `AppModule`, override the outbound HTTP ports and `IIdentityPort` (a real signed token carries the request), and use `overrideProvider(PrismaService)` with a mock. A suite that needs a database uses its own `<service>_e2e` database on the local Postgres (the `storage` profile, port 5433), created by the suite's setup with `prisma migrate deploy` and checked by name before any write; it never touches the development database.
+**Why.** A hand-picked module list misses globally provided lookups and tests a shape the service never runs; a shared database is data loss waiting.
+**Check.** `pnpm run test:e2e`.
+
 **Rule.** Services and `nest-core` run Vitest through the `nest()` preset of `@mts241alikhlash/vitest-config` (`unplugin-swc` with legacy decorators and metadata); apps and Vue packages use the `vue()` preset. Packages do not hand-roll their own Vitest config beyond `mergeConfig` additions.
 **Why.** One configuration for decorators, globals and environments.
 **Check.** `packages/vitest-config`; each package's `vitest.config.ts`.
