@@ -16,6 +16,7 @@ export function vue({ root, alias = true } = {}) {
     test: {
       environment: 'node',
       globals: true,
+      maxWorkers: 2,
       exclude: [...configDefaults.exclude, 'smoke/**'],
     },
   })

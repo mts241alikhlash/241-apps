@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Vitest presets: `nest({ root })` for services and `nest-core` (`unplugin-swc` with legacy decorators and decorator metadata, Node environment, globals, `src/**/*.spec.ts`) and `vue({ root })` for apps and Vue packages (`@vitejs/plugin-vue`, the `@` alias, Node environment, globals, `smoke/` excluded).
+Vitest presets: `nest({ root })` for services and `nest-core` (`unplugin-swc` with legacy decorators and decorator metadata, Node environment, globals, `src/**/*.spec.ts`) and `vue({ root })` for apps and Vue packages (`@vitejs/plugin-vue`, the `@` alias, Node environment, globals, at most 2 workers per package, `smoke/` excluded).
 
 ## Depends on
 

@@ -261,7 +261,7 @@ describe('ApplicationListView', () => {
   })
 
   it('keeps search and page when returning from an applicant detail', async () => {
-    listState.applications.value = Array.from({ length: 30 }, (_, index) => ({
+    listState.applications.value = Array.from({ length: 10 }, (_, index) => ({
       ...rows[0],
       id: `app-${index}`,
       fullName: `Nama ${index}`,

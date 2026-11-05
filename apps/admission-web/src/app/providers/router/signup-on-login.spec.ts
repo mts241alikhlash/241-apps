@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { afterEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
@@ -12,6 +12,14 @@ import router from './index'
 
 enableAutoUnmount(afterEach)
 afterEach(() => vi.restoreAllMocks())
+beforeEach(() => {
+  vi.spyOn(admissionApi, 'getActiveDownloads').mockResolvedValue({
+    data: { data: [] },
+  } as unknown as Awaited<ReturnType<typeof admissionApi.getActiveDownloads>>)
+  vi.spyOn(admissionApi, 'getGrades').mockResolvedValue({
+    data: { data: [] },
+  } as unknown as Awaited<ReturnType<typeof admissionApi.getGrades>>)
+})
 
 async function mountLanding(path = '/') {
   vi.spyOn(publicAdmissionService, 'fetchActiveWaves').mockResolvedValue({
