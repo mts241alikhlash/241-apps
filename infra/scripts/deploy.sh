@@ -19,6 +19,23 @@ if (( free_kb < 5 * 1024 * 1024 )); then
   exit 1
 fi
 
+gateway_port=8082
+holders="$(docker ps --filter "publish=$gateway_port" --format '{{.Names}} {{.Label "com.docker.compose.project"}}')"
+while read -r name project; do
+  [[ -z "$name" ]] && continue
+  if [[ "$project" != "241-apps" ]]; then
+    echo "127.0.0.1:$gateway_port is held by container $name outside project 241-apps; stop it first" >&2
+    exit 1
+  fi
+done <<< "$holders"
+if [[ -z "$holders" ]] && ss -ltn "sport = :$gateway_port" 2> /dev/null | grep -q LISTEN; then
+  echo "127.0.0.1:$gateway_port is held by a process that is not a 241-apps container" >&2
+  exit 1
+fi
+
+echo "==> bootstrap"
+scripts/bootstrap.sh
+
 echo "==> pull"
 dc --profile migrate pull
 
@@ -32,6 +49,11 @@ done
 
 echo "==> seed permissions"
 dc run --rm --entrypoint ./node_modules/.bin/tsx identity-service prisma/seed-permissions.ts
+
+if grep -q '^SEED_ADMIN_PASSWORD=' compose/env/identity-service.env; then
+  echo "==> seed admin"
+  dc run --rm --entrypoint ./node_modules/.bin/tsx identity-service prisma/seed-admin-minimal.ts
+fi
 
 trap report ERR
 echo "==> up"
@@ -62,22 +84,23 @@ while read -r host path; do
 done <<< "$checks"
 
 echo "==> remove unused platform images"
-# Dangling images carry no tag and no container reference, so dropping them is
-# always safe. This is the case that used to leak: a re-pinned digest untags the
-# previous image, and the old awk filter skipped it because .Repository was
-# empty for those rows.
-docker image prune -f > /dev/null 2>&1 || true
+pinned="$(python3 - <<'PY'
+import json
 
-# Tagged platform images that no container (running or stopped) references.
-# Other projects on the host keep their images: the awk filter only matches
-# this registry.
-used_images="$(docker ps -aq | xargs -r docker inspect --format '{{.Image}}' 2>/dev/null | sort -u)"
-docker image ls --no-trunc --format '{{.ID}} {{.Repository}}' |
-  awk '$2 ~ /^ghcr\.io\/mts241alikhlash\// { print $1 }' |
-  sort -u |
-  while read -r id; do
-    printf '%s\n' "$used_images" | grep -qx "$id" ||
-      docker image rm "$id" > /dev/null 2>&1 || true
+lock = json.load(open("deployment/lock.json"))
+images = [lock["gatewayImage"]]
+images += [pin["webImage"] for pin in lock["apps"].values()]
+images += [pin["image"] for pin in lock["services"].values()]
+print("\n".join(images))
+PY
+)"
+used_images="$(docker ps -aq | xargs -r docker inspect --format '{{.Image}}' 2> /dev/null | sort -u)"
+docker image ls --no-trunc --digests --format '{{.ID}} {{.Repository}}@{{.Digest}}' |
+  awk '$2 ~ /^ghcr\.io\/mts241alikhlash\// { print $1, $2 }' |
+  while read -r id reference; do
+    printf '%s\n' "$used_images" | grep -qx "$id" && continue
+    printf '%s\n' "$pinned" | grep -qxF "$reference" && continue
+    docker image rm "$id" > /dev/null 2>&1 || true
   done
 
 echo "==> deployed $(git rev-parse --short HEAD)"
