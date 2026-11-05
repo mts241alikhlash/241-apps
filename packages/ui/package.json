@@ -30,22 +30,22 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@internationalized/date": "^3.12.3",
-    "@lucide/vue": "^1.52.0",
+    "@internationalized/date": "catalog:",
+    "@lucide/vue": "catalog:",
     "@mts241alikhlash/web-shared": "workspace:*",
-    "@tanstack/vue-table": "^8.21.3",
+    "@tanstack/vue-table": "catalog:",
     "@unovis/vue": "^1.7.1",
-    "@vueuse/core": "^14.4.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
+    "@vueuse/core": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
     "dompurify": "^3.4.16",
     "embla-carousel-vue": "8.6.0",
     "reka-ui": "^2.10.5",
     "shiki": "^4.6.0",
-    "tailwind-merge": "^3.6.0",
-    "vee-validate": "^4.15.1",
+    "tailwind-merge": "catalog:",
+    "vee-validate": "catalog:",
     "vue-input-otp": "0.4.0",
-    "vue-sonner": "^2.0.9"
+    "vue-sonner": "catalog:"
   },
   "peerDependencies": {
     "vue": "^3.5.41"

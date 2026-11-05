@@ -22,11 +22,11 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@lucide/vue": "^1.52.0",
-    "axios": "^1.19.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.6.0",
-    "vue-sonner": "^2.0.9"
+    "@lucide/vue": "catalog:",
+    "axios": "catalog:",
+    "clsx": "catalog:",
+    "tailwind-merge": "catalog:",
+    "vue-sonner": "catalog:"
   },
   "peerDependencies": {
     "vue": "^3.5.41",

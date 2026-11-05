@@ -23,6 +23,6 @@
     "unplugin-swc": "^2.0.0"
   },
   "devDependencies": {
-    "vitest": "^5.1.0"
+    "vitest": "catalog:"
   }
 }

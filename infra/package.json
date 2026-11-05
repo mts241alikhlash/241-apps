@@ -10,6 +10,6 @@
     "release": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.3"
+    "@changesets/cli": "catalog:"
   }
 }

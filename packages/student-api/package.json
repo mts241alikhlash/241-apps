@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "openapi-fetch": "^0.17.0"
+    "openapi-fetch": "catalog:"
   },
   "devDependencies": {
     "@mts241alikhlash/typescript-config": "workspace:*"
