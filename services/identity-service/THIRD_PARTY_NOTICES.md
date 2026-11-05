@@ -3,7 +3,7 @@
 ## cahyadsn/wilayah
 
 The administrative areas in migration
-`prisma/migrations/20261004000000_init` come from
+`prisma/migrations/20261105000000_init` come from
 [cahyadsn/wilayah](https://github.com/cahyadsn/wilayah) (`db/wilayah.sql`,
 Kepmendagri No 300.2.2-2138 Tahun 2025), used under this licence:
 

@@ -1,9 +1,13 @@
+-- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
+-- CreateEnum
 CREATE TYPE "AssessmentType" AS ENUM ('DAILY', 'MIDTERM', 'FINAL', 'ASSIGNMENT', 'PRACTICAL');
 
+-- CreateEnum
 CREATE TYPE "AttendanceStatus" AS ENUM ('PRESENT', 'ABSENT', 'LATE', 'EXCUSED', 'SICK');
 
+-- CreateTable
 CREATE TABLE "assessment_weights" (
     "id" UUID NOT NULL,
     "teaching_assignment_id" UUID NOT NULL,
@@ -13,6 +17,7 @@ CREATE TABLE "assessment_weights" (
     CONSTRAINT "assessment_weights_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "assessment_items" (
     "id" UUID NOT NULL,
     "teaching_assignment_id" UUID NOT NULL,
@@ -25,6 +30,7 @@ CREATE TABLE "assessment_items" (
     CONSTRAINT "assessment_items_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "student_scores" (
     "id" UUID NOT NULL,
     "enrollment_id" UUID NOT NULL,
@@ -40,6 +46,7 @@ CREATE TABLE "student_scores" (
     CONSTRAINT "student_scores_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "attendances" (
     "id" UUID NOT NULL,
     "enrollment_id" UUID NOT NULL,
@@ -52,6 +59,7 @@ CREATE TABLE "attendances" (
     CONSTRAINT "attendances_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "report_cards" (
     "id" UUID NOT NULL,
     "enrollment_id" UUID NOT NULL,
@@ -66,6 +74,7 @@ CREATE TABLE "report_cards" (
     CONSTRAINT "report_cards_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "report_card_subjects" (
     "id" UUID NOT NULL,
     "report_card_id" UUID NOT NULL,
@@ -81,32 +90,80 @@ CREATE TABLE "report_card_subjects" (
     CONSTRAINT "report_card_subjects_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "exam_scores" (
+    "id" UUID NOT NULL,
+    "exam_session_id" UUID NOT NULL,
+    "enrollment_id" UUID NOT NULL,
+    "student_id" UUID NOT NULL,
+    "student_name" VARCHAR(200),
+    "student_nis" VARCHAR(50),
+    "subject_id" UUID NOT NULL,
+    "grade_id" UUID NOT NULL,
+    "classroom_id" UUID NOT NULL,
+    "semester_id" UUID NOT NULL,
+    "exam_title" VARCHAR(200) NOT NULL,
+    "raw_score" DOUBLE PRECISION NOT NULL,
+    "max_score" DOUBLE PRECISION NOT NULL,
+    "score" DOUBLE PRECISION NOT NULL,
+    "graded_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "exam_scores_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
 CREATE INDEX "assessment_weights_teaching_assignment_id_idx" ON "assessment_weights"("teaching_assignment_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "assessment_weights_teaching_assignment_id_type_key" ON "assessment_weights"("teaching_assignment_id", "type");
 
+-- CreateIndex
 CREATE INDEX "assessment_items_teaching_assignment_id_idx" ON "assessment_items"("teaching_assignment_id");
 
+-- CreateIndex
 CREATE INDEX "student_scores_enrollment_id_idx" ON "student_scores"("enrollment_id");
 
+-- CreateIndex
 CREATE INDEX "student_scores_assessment_item_id_idx" ON "student_scores"("assessment_item_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "student_scores_enrollment_id_assessment_item_id_key" ON "student_scores"("enrollment_id", "assessment_item_id");
 
+-- CreateIndex
 CREATE INDEX "attendances_enrollment_id_idx" ON "attendances"("enrollment_id");
 
+-- CreateIndex
 CREATE INDEX "attendances_schedule_id_idx" ON "attendances"("schedule_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "attendances_enrollment_id_date_schedule_id_key" ON "attendances"("enrollment_id", "date", "schedule_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "report_cards_enrollment_id_key" ON "report_cards"("enrollment_id");
 
+-- CreateIndex
 CREATE INDEX "report_card_subjects_report_card_id_idx" ON "report_card_subjects"("report_card_id");
 
+-- CreateIndex
 CREATE INDEX "report_card_subjects_subject_id_idx" ON "report_card_subjects"("subject_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "report_card_subjects_report_card_id_subject_id_key" ON "report_card_subjects"("report_card_id", "subject_id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "exam_scores_exam_session_id_key" ON "exam_scores"("exam_session_id");
+
+-- CreateIndex
+CREATE INDEX "exam_scores_classroom_id_subject_id_semester_id_idx" ON "exam_scores"("classroom_id", "subject_id", "semester_id");
+
+-- CreateIndex
+CREATE INDEX "exam_scores_student_id_idx" ON "exam_scores"("student_id");
+
+-- AddForeignKey
 ALTER TABLE "student_scores" ADD CONSTRAINT "student_scores_assessment_item_id_fkey" FOREIGN KEY ("assessment_item_id") REFERENCES "assessment_items"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "report_card_subjects" ADD CONSTRAINT "report_card_subjects_report_card_id_fkey" FOREIGN KEY ("report_card_id") REFERENCES "report_cards"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

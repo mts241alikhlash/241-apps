@@ -1,17 +1,31 @@
+-- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
+-- CreateEnum
 CREATE TYPE "UserGender" AS ENUM ('MALE', 'FEMALE');
 
+-- CreateEnum
+CREATE TYPE "AdmissionType" AS ENUM ('NEW', 'TRANSFER');
+
+-- CreateEnum
 CREATE TYPE "AdmissionStatus" AS ENUM ('DRAFT', 'SUBMITTED', 'REVISION_NEEDED', 'VERIFIED', 'ACCEPTED', 'ENROLLING', 'REJECTED', 'ENROLLED');
 
+-- CreateEnum
+CREATE TYPE "AdmissionDocumentRequirement" AS ENUM ('REQUIRED', 'LATER', 'OPTIONAL');
+
+-- CreateEnum
 CREATE TYPE "AdmissionDocumentStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
+-- CreateEnum
 CREATE TYPE "AdmissionPaymentStatus" AS ENUM ('UNPAID', 'PENDING', 'VERIFIED', 'REJECTED');
 
+-- CreateEnum
 CREATE TYPE "AdmissionNotificationType" AS ENUM ('STATUS_CHANGE', 'DOCUMENT', 'PAYMENT', 'ANNOUNCEMENT', 'GENERAL');
 
+-- CreateEnum
 CREATE TYPE "ParentRelation" AS ENUM ('FATHER', 'MOTHER', 'GUARDIAN');
 
+-- CreateTable
 CREATE TABLE "admission_waves" (
     "id" UUID NOT NULL,
     "name" VARCHAR(100) NOT NULL,
@@ -31,12 +45,17 @@ CREATE TABLE "admission_waves" (
     CONSTRAINT "admission_waves_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_applications" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
     "wave_id" UUID NOT NULL,
     "registration_number" VARCHAR(30) NOT NULL,
     "status" "AdmissionStatus" NOT NULL DEFAULT 'DRAFT',
+    "admission_type" "AdmissionType",
+    "target_grade_id" UUID,
+    "target_grade_level" INTEGER,
+    "nis" VARCHAR(20),
     "full_name" VARCHAR(100) NOT NULL,
     "nickname" VARCHAR(50),
     "gender" "UserGender",
@@ -90,6 +109,7 @@ CREATE TABLE "admission_applications" (
     CONSTRAINT "admission_applications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_application_parents" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -125,6 +145,7 @@ CREATE TABLE "admission_application_parents" (
     CONSTRAINT "admission_application_parents_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_achievements" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -141,6 +162,7 @@ CREATE TABLE "admission_achievements" (
     CONSTRAINT "admission_achievements_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_scholarships" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -159,17 +181,21 @@ CREATE TABLE "admission_scholarships" (
     CONSTRAINT "admission_scholarships_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_document_types" (
     "id" UUID NOT NULL,
     "code" VARCHAR(30) NOT NULL,
     "name" VARCHAR(100) NOT NULL,
     "is_required" BOOLEAN NOT NULL DEFAULT true,
+    "requirement" "AdmissionDocumentRequirement" NOT NULL DEFAULT 'REQUIRED',
+    "late_due_months" INTEGER,
     "sort_order" INTEGER NOT NULL DEFAULT 0,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "admission_document_types_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_documents" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -185,6 +211,7 @@ CREATE TABLE "admission_documents" (
     CONSTRAINT "admission_documents_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_payments" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -204,6 +231,7 @@ CREATE TABLE "admission_payments" (
     CONSTRAINT "admission_payments_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_announcements" (
     "id" UUID NOT NULL,
     "wave_id" UUID,
@@ -219,6 +247,7 @@ CREATE TABLE "admission_announcements" (
     CONSTRAINT "admission_announcements_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_notifications" (
     "id" UUID NOT NULL,
     "application_id" UUID NOT NULL,
@@ -231,6 +260,7 @@ CREATE TABLE "admission_notifications" (
     CONSTRAINT "admission_notifications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "admission_bank_accounts" (
     "id" UUID NOT NULL,
     "bank_name" VARCHAR(100) NOT NULL,
@@ -245,6 +275,59 @@ CREATE TABLE "admission_bank_accounts" (
     CONSTRAINT "admission_bank_accounts_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "admission_nis_locks" (
+    "id" UUID NOT NULL,
+    "academic_year_id" UUID NOT NULL,
+    "locked_by_id" UUID NOT NULL,
+    "locked_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "admission_nis_locks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "admission_downloads" (
+    "id" UUID NOT NULL,
+    "title" VARCHAR(100) NOT NULL,
+    "description" VARCHAR(255),
+    "file_key" VARCHAR(255) NOT NULL,
+    "file_name" VARCHAR(255) NOT NULL,
+    "size_bytes" INTEGER NOT NULL,
+    "sort_order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "admission_downloads_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "admission_landing_sections" (
+    "key" VARCHAR(20) NOT NULL,
+    "published" JSONB,
+    "draft" JSONB,
+    "published_at" TIMESTAMP(3),
+    "published_by_id" UUID,
+    "draft_updated_at" TIMESTAMP(3),
+    "draft_updated_by_id" UUID,
+
+    CONSTRAINT "admission_landing_sections_pkey" PRIMARY KEY ("key")
+);
+
+-- CreateTable
+CREATE TABLE "admission_landing_images" (
+    "id" UUID NOT NULL,
+    "file_key" VARCHAR(255) NOT NULL,
+    "width" INTEGER NOT NULL,
+    "height" INTEGER NOT NULL,
+    "size_bytes" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_by_id" UUID NOT NULL,
+
+    CONSTRAINT "admission_landing_images_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "files" (
     "id" UUID NOT NULL,
     "category_id" UUID,
@@ -261,74 +344,112 @@ CREATE TABLE "files" (
     CONSTRAINT "files_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_waves_code_key" ON "admission_waves"("code");
 
+-- CreateIndex
 CREATE INDEX "admission_waves_academic_year_id_idx" ON "admission_waves"("academic_year_id");
 
+-- CreateIndex
 CREATE INDEX "admission_waves_is_active_idx" ON "admission_waves"("is_active");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_applications_user_id_key" ON "admission_applications"("user_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_applications_registration_number_key" ON "admission_applications"("registration_number");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "admission_applications_nis_key" ON "admission_applications"("nis");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_applications_enrolled_student_id_key" ON "admission_applications"("enrolled_student_id");
 
+-- CreateIndex
 CREATE INDEX "admission_applications_status_idx" ON "admission_applications"("status");
 
+-- CreateIndex
 CREATE INDEX "admission_applications_wave_id_idx" ON "admission_applications"("wave_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_application_parents_application_id_relation_key" ON "admission_application_parents"("application_id", "relation");
 
+-- CreateIndex
 CREATE INDEX "admission_achievements_application_id_idx" ON "admission_achievements"("application_id");
 
+-- CreateIndex
 CREATE INDEX "admission_scholarships_application_id_idx" ON "admission_scholarships"("application_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_document_types_code_key" ON "admission_document_types"("code");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_documents_application_id_document_type_id_key" ON "admission_documents"("application_id", "document_type_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "admission_payments_application_id_key" ON "admission_payments"("application_id");
 
+-- CreateIndex
 CREATE INDEX "admission_announcements_is_published_idx" ON "admission_announcements"("is_published");
 
+-- CreateIndex
 CREATE INDEX "admission_notifications_application_id_read_at_idx" ON "admission_notifications"("application_id", "read_at");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "admission_nis_locks_academic_year_id_key" ON "admission_nis_locks"("academic_year_id");
+
+-- CreateIndex
 CREATE INDEX "files_category_id_idx" ON "files"("category_id");
 
+-- AddForeignKey
 ALTER TABLE "admission_applications" ADD CONSTRAINT "admission_applications_wave_id_fkey" FOREIGN KEY ("wave_id") REFERENCES "admission_waves"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_application_parents" ADD CONSTRAINT "admission_application_parents_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_achievements" ADD CONSTRAINT "admission_achievements_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_achievements" ADD CONSTRAINT "admission_achievements_file_id_fkey" FOREIGN KEY ("file_id") REFERENCES "files"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_scholarships" ADD CONSTRAINT "admission_scholarships_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_scholarships" ADD CONSTRAINT "admission_scholarships_file_id_fkey" FOREIGN KEY ("file_id") REFERENCES "files"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_documents" ADD CONSTRAINT "admission_documents_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_documents" ADD CONSTRAINT "admission_documents_document_type_id_fkey" FOREIGN KEY ("document_type_id") REFERENCES "admission_document_types"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_documents" ADD CONSTRAINT "admission_documents_file_id_fkey" FOREIGN KEY ("file_id") REFERENCES "files"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_payments" ADD CONSTRAINT "admission_payments_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_payments" ADD CONSTRAINT "admission_payments_proof_file_id_fkey" FOREIGN KEY ("proof_file_id") REFERENCES "files"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_payments" ADD CONSTRAINT "admission_payments_bank_account_id_fkey" FOREIGN KEY ("bank_account_id") REFERENCES "admission_bank_accounts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_announcements" ADD CONSTRAINT "admission_announcements_wave_id_fkey" FOREIGN KEY ("wave_id") REFERENCES "admission_waves"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "admission_notifications" ADD CONSTRAINT "admission_notifications_application_id_fkey" FOREIGN KEY ("application_id") REFERENCES "admission_applications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-INSERT INTO "admission_document_types" ("id", "code", "name", "is_required", "sort_order") VALUES
-  (gen_random_uuid(), 'FAMILY_CARD', 'Kartu Keluarga', true, 1),
-  (gen_random_uuid(), 'BIRTH_CERTIFICATE', 'Akta Kelahiran', true, 2),
-  (gen_random_uuid(), 'PHOTO', 'Pas Foto 3×4', true, 3),
-  (gen_random_uuid(), 'GRADUATION_CERTIFICATE', 'Ijazah/SKL SD/MI', false, 4),
-  (gen_random_uuid(), 'REPORT_CARD', 'Rapor Kelas 5–6', false, 5),
-  (gen_random_uuid(), 'SOCIAL_AID_CARD', 'KIP/PKH/KKS', false, 6),
-  (gen_random_uuid(), 'PARENT_ID_CARD', 'KTP Orang Tua/Wali', false, 7)
+
+INSERT INTO "admission_document_types" ("id", "code", "name", "is_required", "requirement", "sort_order") VALUES
+  (gen_random_uuid(), 'FAMILY_CARD', 'Kartu Keluarga', true, 'REQUIRED'::"AdmissionDocumentRequirement", 1),
+  (gen_random_uuid(), 'BIRTH_CERTIFICATE', 'Akta Kelahiran', true, 'REQUIRED'::"AdmissionDocumentRequirement", 2),
+  (gen_random_uuid(), 'PHOTO', 'Pas Foto 3×4', true, 'REQUIRED'::"AdmissionDocumentRequirement", 3),
+  (gen_random_uuid(), 'GRADUATION_CERTIFICATE', 'Ijazah/SKL SD/MI', false, 'OPTIONAL'::"AdmissionDocumentRequirement", 4),
+  (gen_random_uuid(), 'REPORT_CARD', 'Rapor Kelas 5–6', false, 'OPTIONAL'::"AdmissionDocumentRequirement", 5),
+  (gen_random_uuid(), 'SOCIAL_AID_CARD', 'KIP/PKH/KKS', false, 'OPTIONAL'::"AdmissionDocumentRequirement", 6),
+  (gen_random_uuid(), 'PARENT_ID_CARD', 'KTP Orang Tua/Wali', false, 'OPTIONAL'::"AdmissionDocumentRequirement", 7)
 ON CONFLICT DO NOTHING;

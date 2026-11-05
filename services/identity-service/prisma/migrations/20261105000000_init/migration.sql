@@ -1,13 +1,19 @@
+-- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
+-- CreateEnum
 CREATE TYPE "UserGender" AS ENUM ('MALE', 'FEMALE');
 
+-- CreateEnum
 CREATE TYPE "MaritalStatus" AS ENUM ('SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED');
 
+-- CreateEnum
 CREATE TYPE "RegionLevel" AS ENUM ('PROVINCE', 'REGENCY', 'DISTRICT', 'VILLAGE');
 
+-- CreateEnum
 CREATE TYPE "SchoolUnitStatus" AS ENUM ('PRIVATE', 'PUBLIC');
 
+-- CreateTable
 CREATE TABLE "users" (
     "id" UUID NOT NULL,
     "identifier" VARCHAR(100) NOT NULL,
@@ -21,10 +27,13 @@ CREATE TABLE "users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "auth_sessions" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
     "token_hash" VARCHAR(255) NOT NULL,
+    "previous_token_hash" VARCHAR(255),
+    "previous_rotated_at" TIMESTAMP(3),
     "user_agent" VARCHAR(512),
     "ip_address" VARCHAR(64),
     "expires_at" TIMESTAMP(3) NOT NULL,
@@ -39,6 +48,7 @@ CREATE TABLE "auth_sessions" (
     CONSTRAINT "auth_sessions_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "oauth_accounts" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
@@ -50,6 +60,7 @@ CREATE TABLE "oauth_accounts" (
     CONSTRAINT "oauth_accounts_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "password_reset_tokens" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
@@ -61,6 +72,7 @@ CREATE TABLE "password_reset_tokens" (
     CONSTRAINT "password_reset_tokens_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "sso_authorization_codes" (
     "id" UUID NOT NULL,
     "code_hash" VARCHAR(64) NOT NULL,
@@ -76,6 +88,7 @@ CREATE TABLE "sso_authorization_codes" (
     CONSTRAINT "sso_authorization_codes_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "file_categories" (
     "id" UUID NOT NULL,
     "code" VARCHAR(50) NOT NULL,
@@ -86,6 +99,7 @@ CREATE TABLE "file_categories" (
     CONSTRAINT "file_categories_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "files" (
     "id" UUID NOT NULL,
     "category_id" UUID,
@@ -101,6 +115,7 @@ CREATE TABLE "files" (
     CONSTRAINT "files_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "roles" (
     "id" UUID NOT NULL,
     "name" VARCHAR(100) NOT NULL,
@@ -113,6 +128,7 @@ CREATE TABLE "roles" (
     CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "permissions" (
     "id" UUID NOT NULL,
     "module" VARCHAR(50) NOT NULL,
@@ -125,6 +141,7 @@ CREATE TABLE "permissions" (
     CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "user_roles" (
     "user_id" UUID NOT NULL,
     "role_id" UUID NOT NULL,
@@ -132,6 +149,7 @@ CREATE TABLE "user_roles" (
     CONSTRAINT "user_roles_pkey" PRIMARY KEY ("user_id","role_id")
 );
 
+-- CreateTable
 CREATE TABLE "role_permissions" (
     "role_id" UUID NOT NULL,
     "permission_id" UUID NOT NULL,
@@ -139,6 +157,7 @@ CREATE TABLE "role_permissions" (
     CONSTRAINT "role_permissions_pkey" PRIMARY KEY ("role_id","permission_id")
 );
 
+-- CreateTable
 CREATE TABLE "audit_logs" (
     "id" UUID NOT NULL,
     "user_id" UUID,
@@ -153,6 +172,7 @@ CREATE TABLE "audit_logs" (
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "profiles" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
@@ -173,6 +193,7 @@ CREATE TABLE "profiles" (
     CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "religions" (
     "id" UUID NOT NULL,
     "name" VARCHAR(50) NOT NULL,
@@ -182,6 +203,7 @@ CREATE TABLE "religions" (
     CONSTRAINT "religions_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "blood_types" (
     "id" UUID NOT NULL,
     "name" VARCHAR(10) NOT NULL,
@@ -191,6 +213,7 @@ CREATE TABLE "blood_types" (
     CONSTRAINT "blood_types_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "regions" (
     "code" VARCHAR(13) NOT NULL,
     "name" VARCHAR(100) NOT NULL,
@@ -200,6 +223,7 @@ CREATE TABLE "regions" (
     CONSTRAINT "regions_pkey" PRIMARY KEY ("code")
 );
 
+-- CreateTable
 CREATE TABLE "school_unit_types" (
     "id" UUID NOT NULL,
     "code" VARCHAR(20) NOT NULL,
@@ -209,6 +233,7 @@ CREATE TABLE "school_unit_types" (
     CONSTRAINT "school_unit_types_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "school_units" (
     "id" UUID NOT NULL,
     "type_id" UUID,
@@ -227,6 +252,7 @@ CREATE TABLE "school_units" (
     CONSTRAINT "school_units_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "social_medias" (
     "id" UUID NOT NULL,
     "name" VARCHAR(50) NOT NULL,
@@ -236,6 +262,7 @@ CREATE TABLE "social_medias" (
     CONSTRAINT "social_medias_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "school_unit_social_medias" (
     "id" UUID NOT NULL,
     "social_media_id" UUID NOT NULL,
@@ -246,6 +273,7 @@ CREATE TABLE "school_unit_social_medias" (
     CONSTRAINT "school_unit_social_medias_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
 CREATE TABLE "addresses" (
     "id" UUID NOT NULL,
     "school_unit_id" UUID,
@@ -271,105 +299,156 @@ CREATE TABLE "addresses" (
     CONSTRAINT "addresses_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
 CREATE UNIQUE INDEX "users_identifier_key" ON "users"("identifier");
 
+-- CreateIndex
 CREATE INDEX "auth_sessions_user_id_idx" ON "auth_sessions"("user_id");
 
+-- CreateIndex
 CREATE INDEX "auth_sessions_expires_at_idx" ON "auth_sessions"("expires_at");
 
+-- CreateIndex
 CREATE INDEX "auth_sessions_token_hash_idx" ON "auth_sessions"("token_hash");
 
+-- CreateIndex
 CREATE INDEX "auth_sessions_parent_session_id_idx" ON "auth_sessions"("parent_session_id");
 
+-- CreateIndex
 CREATE INDEX "oauth_accounts_user_id_idx" ON "oauth_accounts"("user_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "oauth_accounts_provider_provider_user_id_key" ON "oauth_accounts"("provider", "provider_user_id");
 
+-- CreateIndex
 CREATE INDEX "password_reset_tokens_token_hash_idx" ON "password_reset_tokens"("token_hash");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "sso_authorization_codes_code_hash_key" ON "sso_authorization_codes"("code_hash");
 
+-- CreateIndex
 CREATE INDEX "sso_authorization_codes_expires_at_idx" ON "sso_authorization_codes"("expires_at");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "file_categories_code_key" ON "file_categories"("code");
 
+-- CreateIndex
 CREATE INDEX "files_category_id_idx" ON "files"("category_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "roles_code_key" ON "roles"("code");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "permissions_code_key" ON "permissions"("code");
 
+-- CreateIndex
 CREATE INDEX "audit_logs_user_id_idx" ON "audit_logs"("user_id");
 
+-- CreateIndex
 CREATE INDEX "audit_logs_action_idx" ON "audit_logs"("action");
 
+-- CreateIndex
 CREATE INDEX "audit_logs_created_at_idx" ON "audit_logs"("created_at");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "profiles_user_id_key" ON "profiles"("user_id");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "profiles_nik_key" ON "profiles"("nik");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "profiles_email_key" ON "profiles"("email");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "profiles_phone_key" ON "profiles"("phone");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "religions_name_key" ON "religions"("name");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "blood_types_name_key" ON "blood_types"("name");
 
+-- CreateIndex
 CREATE INDEX "regions_parent_code_idx" ON "regions"("parent_code");
 
+-- CreateIndex
 CREATE INDEX "regions_level_idx" ON "regions"("level");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "school_unit_types_code_key" ON "school_unit_types"("code");
 
+-- CreateIndex
 CREATE UNIQUE INDEX "school_units_npsn_key" ON "school_units"("npsn");
 
+-- CreateIndex
 CREATE INDEX "addresses_profile_id_idx" ON "addresses"("profile_id");
 
+-- AddForeignKey
 ALTER TABLE "auth_sessions" ADD CONSTRAINT "auth_sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "auth_sessions" ADD CONSTRAINT "auth_sessions_parent_session_id_fkey" FOREIGN KEY ("parent_session_id") REFERENCES "auth_sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "oauth_accounts" ADD CONSTRAINT "oauth_accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "sso_authorization_codes" ADD CONSTRAINT "sso_authorization_codes_parent_session_id_fkey" FOREIGN KEY ("parent_session_id") REFERENCES "auth_sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "files" ADD CONSTRAINT "files_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "file_categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "files" ADD CONSTRAINT "files_uploaded_by_fkey" FOREIGN KEY ("uploaded_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_permission_id_fkey" FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_religion_id_fkey" FOREIGN KEY ("religion_id") REFERENCES "religions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_blood_type_id_fkey" FOREIGN KEY ("blood_type_id") REFERENCES "blood_types"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_avatar_file_id_fkey" FOREIGN KEY ("avatar_file_id") REFERENCES "files"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "regions" ADD CONSTRAINT "regions_parent_code_fkey" FOREIGN KEY ("parent_code") REFERENCES "regions"("code") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "school_units" ADD CONSTRAINT "school_units_type_id_fkey" FOREIGN KEY ("type_id") REFERENCES "school_unit_types"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "school_unit_social_medias" ADD CONSTRAINT "school_unit_social_medias_social_media_id_fkey" FOREIGN KEY ("social_media_id") REFERENCES "social_medias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "school_unit_social_medias" ADD CONSTRAINT "school_unit_social_medias_school_unit_id_fkey" FOREIGN KEY ("school_unit_id") REFERENCES "school_units"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "addresses" ADD CONSTRAINT "addresses_school_unit_id_fkey" FOREIGN KEY ("school_unit_id") REFERENCES "school_units"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
 ALTER TABLE "addresses" ADD CONSTRAINT "addresses_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
 
 INSERT INTO "religions" ("id", "name") VALUES
   (gen_random_uuid(), 'Islam'),
@@ -92265,3 +92344,4 @@ INSERT INTO "regions" ("code", "name", "level", "parent_code") VALUES
   ('96.71.10.1003', 'Saoka', 'VILLAGE', '96.71.10'),
   ('96.71.10.1004', 'Tanjung Kasuari', 'VILLAGE', '96.71.10')
 ON CONFLICT ("code") DO UPDATE SET "name" = EXCLUDED."name", "level" = EXCLUDED."level", "parent_code" = EXCLUDED."parent_code";
+
