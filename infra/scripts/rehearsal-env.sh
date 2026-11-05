@@ -51,7 +51,7 @@ done
 ln -sf "$state/compose.env" "$repo/infra/compose/.env"
 
 dns="$(podman network inspect 241-apps --format '{{range .Subnets}}{{.Gateway}}{{end}}')"
-sed -e "s#^resolver 127.0.0.11#resolver $dns#" -e 's/\(proxy_set_header   Host   *\)\$host;/\1$http_host;/' "$repo/infra/gateway/nginx.conf" > "$state/nginx.conf"
+sed -e "s#^resolver 127.0.0.11#resolver $dns#" -e "s/\(proxy_set_header   Host   *\)\\\$host;/\1\\\$http_host;/" "$repo/infra/gateway/nginx.conf" > "$state/nginx.conf"
 
 REHEARSAL_STATE="$state" REHEARSAL_TAG="$tag" python3 "$here/rehearsal-override.py" "$repo/infra/compose/compose.yaml" > "$state/compose.override.yaml"
 
