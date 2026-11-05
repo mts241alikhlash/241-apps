@@ -16,6 +16,7 @@ import {
   TabsTrigger,
 } from '@mts241alikhlash/ui/tabs'
 import { AlertCircle, LayoutDashboard } from '@lucide/vue'
+import InstitutionDashboard from '../components/InstitutionDashboard.vue'
 import StudentDashboard from '../components/StudentDashboard.vue'
 import EmployeeDashboard from '../components/EmployeeDashboard.vue'
 import { useMyDashboard } from '../composables/useMyDashboard'
@@ -57,19 +58,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div
-      v-if="!needsPersonal"
-      class="space-y-6 p-4 sm:p-6"
-    >
-      <Card gap="none">
-        <CardHeader standard>
-          <CardTitle size="lg">Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent variant="standard">
-          <p class="text-muted-foreground">Belum ada ringkasan.</p>
-        </CardContent>
-      </Card>
-    </div>
+    <InstitutionDashboard v-if="!needsPersonal" />
 
     <div
       v-else

@@ -75,3 +75,21 @@ export interface MyDashboard {
   student: MyStudentDashboard | null
   employee: MyEmployeeDashboard | null
 }
+
+export interface InstitutionDashboard {
+  semester: { id: string; name: string } | null
+  scoreCompleteness: {
+    classroomId: string
+    classroomName: string
+    filled: number
+    expected: number
+  }[]
+  attendanceToday: {
+    present: number
+    sick: number
+    permit: number
+    absent: number
+    date: string
+  }
+  examScores: { published: number; unpublished: number }
+}
