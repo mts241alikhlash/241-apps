@@ -10,7 +10,7 @@
     "check": "pnpm -r --if-present run check",
     "test": "pnpm -r --if-present run test",
     "changeset": "changeset",
-    "runtime:check": "node --test scripts/runtime-config.spec.mjs",
+    "runtime:check": "node --test scripts/runtime-config.spec.mjs scripts/lint-staged-eslint.spec.mjs",
     "openapi:emit": "node scripts/emit-openapi.mjs",
     "openapi:check": "node scripts/emit-openapi.mjs --check",
     "db:smoke": "node scripts/db-smoke.mjs",
@@ -21,7 +21,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "prettier --check . && pnpm -r --if-present run lint",
-    "fix": "prettier --write . && pnpm -r --if-present run lint --fix"
+    "fix": "prettier --write . && pnpm -r --if-present run lint --fix",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
@@ -29,6 +30,8 @@
     "@vue/test-utils": "catalog:",
     "@vue/tsconfig": "catalog:",
     "happy-dom": "catalog:",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "openapi-typescript": "^7.13.0",
     "prettier": "catalog:",
     "typescript": "catalog:",
