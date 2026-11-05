@@ -1,17 +1,3 @@
-import path from 'node:path'
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
+import { vue } from '@mts241alikhlash/vitest-config'
 
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(import.meta.dirname, './src') },
-    ],
-  },
-  test: {
-    environment: 'node',
-    globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', 'smoke/**'],
-  },
-})
+export default vue({ root: import.meta.dirname })

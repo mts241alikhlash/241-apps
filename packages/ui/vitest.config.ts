@@ -1,4 +1,3 @@
-import vue from '@vitejs/plugin-vue'
-import { defineConfig } from 'vitest/config'
+import { vue } from '@mts241alikhlash/vitest-config'
 
-export default defineConfig({ plugins: [vue()] })
+export default vue()

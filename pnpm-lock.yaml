@@ -333,6 +333,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -511,6 +514,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -692,6 +698,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -855,6 +864,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -1051,6 +1063,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/katex':
         specifier: ^0.16.8
         version: 0.16.8
@@ -1226,6 +1241,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/katex':
         specifier: ^0.16.8
         version: 0.16.8
@@ -1395,6 +1413,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -1573,6 +1594,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/leaflet':
         specifier: ^1.9.22
         version: 1.9.22
@@ -1745,6 +1769,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@types/node':
         specifier: ^24.10.0
         version: 24.19.2
@@ -2057,6 +2084,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
       '@tanstack/vue-query':
         specifier: ^5.105.3
         version: 5.105.3(vue@3.5.44(typescript@5.9.3))
@@ -2180,6 +2210,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
       '@tanstack/vue-table':
         specifier: ^8.21.3
         version: 8.21.3(vue@3.5.44(typescript@5.9.3))
@@ -2308,6 +2341,9 @@ importers:
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@mts241alikhlash/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2

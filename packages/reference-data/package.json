@@ -30,6 +30,7 @@
     "@lucide/vue": "^1.52.0",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
+    "@mts241alikhlash/vitest-config": "workspace:*",
     "@tanstack/vue-table": "^8.21.3",
     "@types/node": "^24.10.0",
     "@vee-validate/zod": "^4.15.1",

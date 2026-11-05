@@ -60,6 +60,7 @@
     "@mts241alikhlash/admission-api": "workspace:*",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
+    "@mts241alikhlash/vitest-config": "workspace:*",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
     "@typescript-eslint/parser": "^8.67.0",

@@ -69,6 +69,7 @@
     "@eslint/js": "^10.0.1",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
+    "@mts241alikhlash/vitest-config": "workspace:*",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.67.0",

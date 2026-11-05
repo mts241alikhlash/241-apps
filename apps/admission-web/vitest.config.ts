@@ -1,31 +1,3 @@
-import path from 'node:path'
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
+import { vue } from '@mts241alikhlash/vitest-config'
 
-const uiRoot = path.resolve(import.meta.dirname, './packages/ui/src')
-const sharedRoot = path.resolve(import.meta.dirname, './packages/shared/src')
-
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: [
-      { find: /^@\/ui\/utils$/, replacement: path.resolve(uiRoot, 'utils') },
-      {
-        find: /^@\/ui\/(.+)$/,
-        replacement: path.resolve(uiRoot, 'components/ui/$1'),
-      },
-      { find: /^@\/ui$/, replacement: uiRoot },
-      {
-        find: /^@\/shared\/(.+)$/,
-        replacement: path.resolve(sharedRoot, '$1'),
-      },
-      { find: /^@\/shared$/, replacement: sharedRoot },
-      { find: '@', replacement: path.resolve(import.meta.dirname, './src') },
-    ],
-  },
-  test: {
-    environment: 'node',
-    globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', 'smoke/**'],
-  },
-})
+export default vue({ root: import.meta.dirname })
