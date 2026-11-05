@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { ICredentialRepository } from '../../credential/domain/interfaces/credential-repository.interface.js'
 import { IDailyPresenceRepository } from '../../daily-record/domain/interfaces/daily-presence-repository.interface.js'
 import { DayStatusService } from '../../daily-record/services/day-status.service.js'
@@ -54,6 +56,12 @@ describe('RecordScanUseCase', () => {
         { provide: IDeviceRepository, useValue: devices },
         { provide: DayStatusService, useValue: dayStatus },
         { provide: ServerClockService, useValue: clock },
+        {
+          provide: SchoolTimeService,
+          useValue: new SchoolTimeService({
+            getOrThrow: () => 'Asia/Jakarta',
+          } as unknown as ConfigService),
+        },
       ],
     }).compile()
 
@@ -83,6 +91,28 @@ describe('RecordScanUseCase', () => {
         leaveRequestId: null,
       }),
     )
+  })
+
+  describe('school day', () => {
+    it('keys a scan at 06:45 WIB to that local day, not the UTC day before', async () => {
+      const occurredAt = new Date('2026-08-10T06:45:00+07:00')
+      clock.resolveOccurredAt.mockReturnValue({ accepted: true, occurredAt })
+      await useCase.execute(DEVICE_ID, dto())
+      expect(dailyPresence.findByUserAndDate).toHaveBeenCalledWith(
+        USER_ID,
+        new Date('2026-08-10T00:00:00Z'),
+      )
+    })
+
+    it('keys a scan at exactly 00:00 WIB to the new local day', async () => {
+      const occurredAt = new Date('2026-08-10T00:00:00+07:00')
+      clock.resolveOccurredAt.mockReturnValue({ accepted: true, occurredAt })
+      await useCase.execute(DEVICE_ID, dto())
+      expect(dailyPresence.findByUserAndDate).toHaveBeenCalledWith(
+        USER_ID,
+        new Date('2026-08-10T00:00:00Z'),
+      )
+    })
   })
 
   describe('check-in', () => {

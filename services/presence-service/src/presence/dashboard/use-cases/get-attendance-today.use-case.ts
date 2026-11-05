@@ -1,5 +1,5 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
-import { dayOf } from '../../shared/day.js'
 import { ServerClockService } from '../../shared/services/server-clock.service.js'
 import { IPresenceDashboardRepository } from '../domain/presence-dashboard-repository.interface.js'
 
@@ -16,10 +16,11 @@ export class GetAttendanceTodayUseCase {
   constructor(
     private readonly dashboard: IPresenceDashboardRepository,
     private readonly clock: ServerClockService,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async execute(): Promise<AttendanceToday> {
-    const date = dayOf(this.clock.now())
+    const date = this.schoolTime.today(this.clock.now())
     const [counts, holders] = await Promise.all([
       this.dashboard.countStatusesOn(date, 'EMPLOYEE'),
       this.dashboard.countActiveCredentialHolders('EMPLOYEE'),

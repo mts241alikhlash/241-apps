@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { AuditLogModule } from '@mts241alikhlash/nest-core/audit-log'
 import { AttendancePeriodModule } from '../attendance-period/attendance-period.module.js'
@@ -27,6 +28,7 @@ import { UpdateDailyPresenceUseCase } from './use-cases/update-daily-presence.us
 @Module({
   controllers: [DailyRecordInternalController, DailyRecordController],
   imports: [
+    SchoolTimeModule,
     CredentialModule,
     WorkPatternModule,
     AttendancePeriodModule,

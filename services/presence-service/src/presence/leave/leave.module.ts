@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { CredentialModule } from '../credential/credential.module.js'
 import { WorkPatternModule } from '../work-pattern/work-pattern.module.js'
@@ -23,7 +24,7 @@ import { RecordStudentExcusedAbsenceUseCase } from './use-cases/record-student-e
 import { SubmitLeaveRequestUseCase } from './use-cases/submit-leave-request.use-case.js'
 
 @Module({
-  imports: [WorkPatternModule, CredentialModule],
+  imports: [SchoolTimeModule, WorkPatternModule, CredentialModule],
   controllers: [LeaveTypeController, LeaveController],
   providers: [
     { provide: ILeaveRepository, useClass: PrismaLeaveRepository },

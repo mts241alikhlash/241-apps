@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { ICredentialRepository } from './domain/interfaces/credential-repository.interface.js'
 import { PrismaCredentialRepository } from './infrastructure/persistence/prisma-credential.repository.js'
@@ -13,6 +14,7 @@ import { ReplaceCredentialUseCase } from './use-cases/replace-credential.use-cas
 import { RevokeCredentialUseCase } from './use-cases/revoke-credential.use-case.js'
 
 @Module({
+  imports: [SchoolTimeModule],
   controllers: [CredentialController],
   providers: [
     { provide: ICredentialRepository, useClass: PrismaCredentialRepository },

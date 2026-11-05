@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
@@ -28,6 +29,7 @@ export class PrismaCredentialRepository implements ICredentialRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly profileLookupPort: IProfileLookupPort,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   private async attachHolders<T extends { userId: string }>(
@@ -123,7 +125,7 @@ export class PrismaCredentialRepository implements ICredentialRepository {
 
   async wasValidOnDate(userId: string, date: Date): Promise<boolean> {
     const count = await this.prisma.presenceCredential.count({
-      where: validOnDateWhere(userId, date),
+      where: validOnDateWhere(userId, this.schoolTime.dayRange(date)),
     })
 
     return count > 0

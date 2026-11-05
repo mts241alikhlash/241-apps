@@ -1,8 +1,8 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
 import { PresenceDayStatusEnum } from '../../daily-record/domain/entities/daily-presence.entity.js'
 import { IDailyPresenceRepository } from '../../daily-record/domain/interfaces/daily-presence-repository.interface.js'
 import { ILeaveRepository } from '../../leave/domain/interfaces/leave-repository.interface.js'
-import { dayOf } from '../../shared/day.js'
 import { ServerClockService } from '../../shared/services/server-clock.service.js'
 
 export interface MyPresenceDashboard {
@@ -20,6 +20,7 @@ export class GetMyPresenceDashboardUseCase {
     private readonly presence: IDailyPresenceRepository,
     private readonly leave: ILeaveRepository,
     private readonly clock: ServerClockService,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async execute(
@@ -27,9 +28,15 @@ export class GetMyPresenceDashboardUseCase {
     canReadLeave: boolean,
   ): Promise<MyPresenceDashboard> {
     const now = this.clock.now()
-    const day = await this.presence.findByUserAndDate(userId, dayOf(now))
+    const day = await this.presence.findByUserAndDate(
+      userId,
+      this.schoolTime.today(now),
+    )
     const balances = canReadLeave
-      ? await this.leave.findBalances(userId, now.getUTCFullYear())
+      ? await this.leave.findBalances(
+          userId,
+          this.schoolTime.yearMonth(now).year,
+        )
       : []
     return {
       today: day

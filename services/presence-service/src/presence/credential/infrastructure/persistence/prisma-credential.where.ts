@@ -16,24 +16,12 @@ export function credentialWhere(
 
 export function validOnDateWhere(
   userId: string,
-  date: Date,
+  day: { from: Date; to: Date },
 ): Prisma.PresenceCredentialWhereInput {
   return {
     ...NOT_DELETED,
     userId,
-    issuedAt: { lte: endOfDay(date) },
-    OR: [{ revokedAt: null }, { revokedAt: { gte: startOfDay(date) } }],
+    issuedAt: { lte: day.to },
+    OR: [{ revokedAt: null }, { revokedAt: { gte: day.from } }],
   }
-}
-
-function startOfDay(date: Date): Date {
-  const start = new Date(date)
-  start.setUTCHours(0, 0, 0, 0)
-  return start
-}
-
-function endOfDay(date: Date): Date {
-  const end = new Date(date)
-  end.setUTCHours(23, 59, 59, 999)
-  return end
 }

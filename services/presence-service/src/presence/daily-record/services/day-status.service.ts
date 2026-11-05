@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
 import { ICredentialRepository } from '../../credential/domain/interfaces/credential-repository.interface.js'
 import {
@@ -17,15 +18,12 @@ function toMinutes(time: string): number {
   return hours * 60 + minutes
 }
 
-function minutesOfDay(at: Date): number {
-  return at.getUTCHours() * 60 + at.getUTCMinutes()
-}
-
 @Injectable()
 export class DayStatusService {
   constructor(
     private readonly workPatterns: IWorkPatternRepository,
     private readonly credentials: ICredentialRepository,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async expectation(
@@ -61,7 +59,7 @@ export class DayStatusService {
     }
 
     const lateBy =
-      minutesOfDay(arrivedAt) -
+      this.schoolTime.minutesOfDay(arrivedAt) -
       toMinutes(pattern.startTime) -
       pattern.graceMinutes
 
@@ -81,6 +79,9 @@ export class DayStatusService {
 
     if (!expected || !pattern.endTime) return 0
 
-    return Math.max(0, toMinutes(pattern.endTime) - minutesOfDay(leftAt))
+    return Math.max(
+      0,
+      toMinutes(pattern.endTime) - this.schoolTime.minutesOfDay(leftAt),
+    )
   }
 }

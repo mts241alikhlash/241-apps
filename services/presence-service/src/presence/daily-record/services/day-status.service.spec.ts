@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { ICredentialRepository } from '../../credential/domain/interfaces/credential-repository.interface.js'
 import { IWorkPatternRepository } from '../../work-pattern/domain/interfaces/work-pattern-repository.interface.js'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { DayStatusService } from './day-status.service.js'
 
 const USER_ID = '11111111-1111-4111-8111-111111111111'
@@ -16,7 +18,7 @@ const STANDARD = {
 }
 
 function at(time: string): Date {
-  return new Date(`2026-08-10T${time}:00.000Z`)
+  return new Date(`2026-08-10T${time}:00.000+07:00`)
 }
 
 describe('DayStatusService', () => {
@@ -33,6 +35,12 @@ describe('DayStatusService', () => {
         DayStatusService,
         { provide: IWorkPatternRepository, useValue: workPatterns },
         { provide: ICredentialRepository, useValue: credentials },
+        {
+          provide: SchoolTimeService,
+          useValue: new SchoolTimeService({
+            getOrThrow: () => 'Asia/Jakarta',
+          } as unknown as ConfigService),
+        },
       ],
     }).compile()
 

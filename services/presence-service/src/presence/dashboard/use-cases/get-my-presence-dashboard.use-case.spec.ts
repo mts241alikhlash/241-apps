@@ -1,11 +1,17 @@
 import { IDailyPresenceRepository } from '../../daily-record/domain/interfaces/daily-presence-repository.interface.js'
 import { ILeaveRepository } from '../../leave/domain/interfaces/leave-repository.interface.js'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { ServerClockService } from '../../shared/services/server-clock.service.js'
 import { GetMyPresenceDashboardUseCase } from './get-my-presence-dashboard.use-case.js'
 
 const clock = {
   now: () => new Date('2026-11-05T03:00:00Z'),
 } as ServerClockService
+
+const schoolTime = new SchoolTimeService({
+  getOrThrow: () => 'Asia/Jakarta',
+} as unknown as ConfigService)
 
 function setup(day: unknown) {
   const presence = {
@@ -21,7 +27,12 @@ function setup(day: unknown) {
   return {
     presence,
     leave,
-    useCase: new GetMyPresenceDashboardUseCase(presence, leave, clock),
+    useCase: new GetMyPresenceDashboardUseCase(
+      presence,
+      leave,
+      clock,
+      schoolTime,
+    ),
   }
 }
 

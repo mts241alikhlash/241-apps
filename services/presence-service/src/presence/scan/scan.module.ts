@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { CredentialModule } from '../credential/credential.module.js'
 import { DailyRecordModule } from '../daily-record/daily-record.module.js'
@@ -16,6 +17,7 @@ import { RecordScanUseCase } from './use-cases/record-scan.use-case.js'
 
 @Module({
   imports: [
+    SchoolTimeModule,
     PresenceSharedModule,
     CredentialModule,
     DailyRecordModule,

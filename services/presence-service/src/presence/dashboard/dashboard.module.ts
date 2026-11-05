@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { DailyRecordModule } from '../daily-record/daily-record.module.js'
 import { LeaveModule } from '../leave/leave.module.js'
@@ -10,7 +11,12 @@ import { GetMyPresenceDashboardUseCase } from './use-cases/get-my-presence-dashb
 import { GetPendingLeavesUseCase } from './use-cases/get-pending-leaves.use-case.js'
 
 @Module({
-  imports: [DailyRecordModule, LeaveModule, PresenceSharedModule],
+  imports: [
+    SchoolTimeModule,
+    DailyRecordModule,
+    LeaveModule,
+    PresenceSharedModule,
+  ],
   controllers: [PresenceDashboardController],
   providers: [
     {

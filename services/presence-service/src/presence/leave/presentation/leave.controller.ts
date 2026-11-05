@@ -15,6 +15,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
@@ -48,6 +49,7 @@ export class LeaveController {
     private readonly withdrawUC: WithdrawLeaveRequestUseCase,
     private readonly getBalances: GetLeaveBalancesUseCase,
     private readonly studentAbsenceUC: RecordStudentExcusedAbsenceUseCase,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   @Get('leave-requests')
@@ -151,7 +153,7 @@ export class LeaveController {
     return (
       await this.getBalances.execute(
         user.id,
-        year ? Number(year) : new Date().getUTCFullYear(),
+        year ? Number(year) : this.schoolTime.yearMonth().year,
       )
     ).map((item) => LeaveBalanceResponseDto.fromDomain(item))
   }
@@ -166,7 +168,7 @@ export class LeaveController {
     return (
       await this.getBalances.execute(
         userId,
-        year ? Number(year) : new Date().getUTCFullYear(),
+        year ? Number(year) : this.schoolTime.yearMonth().year,
       )
     ).map((item) => LeaveBalanceResponseDto.fromDomain(item))
   }

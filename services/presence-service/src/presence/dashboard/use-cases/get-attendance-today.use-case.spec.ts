@@ -1,6 +1,12 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { ServerClockService } from '../../shared/services/server-clock.service.js'
 import { IPresenceDashboardRepository } from '../domain/presence-dashboard-repository.interface.js'
 import { GetAttendanceTodayUseCase } from './get-attendance-today.use-case.js'
+
+const schoolTime = new SchoolTimeService({
+  getOrThrow: () => 'Asia/Jakarta',
+} as unknown as ConfigService)
 
 function setup(now: string, statuses: Record<string, number>, holders: number) {
   const repo = {
@@ -9,7 +15,10 @@ function setup(now: string, statuses: Record<string, number>, holders: number) {
     countPendingLeaveRequests: vi.fn(),
   } as unknown as IPresenceDashboardRepository
   const clock = { now: () => new Date(now) } as ServerClockService
-  return { repo, useCase: new GetAttendanceTodayUseCase(repo, clock) }
+  return {
+    repo,
+    useCase: new GetAttendanceTodayUseCase(repo, clock, schoolTime),
+  }
 }
 
 describe('GetAttendanceTodayUseCase', () => {
@@ -40,11 +49,11 @@ describe('GetAttendanceTodayUseCase', () => {
     expect((await useCase.execute()).notScanned).toBe(0)
   })
 
-  it('asks for the day a scan at 00:30 local time is keyed to', async () => {
+  it('asks for the local day: 17:30 UTC is already the next day in WIB', async () => {
     const { repo, useCase } = setup('2026-11-05T17:30:00Z', {}, 0)
     await useCase.execute()
     expect(repo.countStatusesOn).toHaveBeenCalledWith(
-      new Date('2026-11-05T00:00:00Z'),
+      new Date('2026-11-06T00:00:00Z'),
       'EMPLOYEE',
     )
   })

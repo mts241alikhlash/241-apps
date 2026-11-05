@@ -22,6 +22,7 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { CreateDailyPresenceDto } from '../dto/request/create-daily-presence.dto.js'
 import { DailyPresenceQueryDto } from '../dto/request/daily-presence-query.dto.js'
 import { MyPresenceQueryDto } from '../dto/request/my-presence-query.dto.js'
@@ -52,6 +53,7 @@ export class DailyRecordController {
     private readonly exportRecap: ExportPresenceRecapUseCase,
     private readonly createUC: CreateDailyPresenceUseCase,
     private readonly updateUC: UpdateDailyPresenceUseCase,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   @Get()
@@ -72,12 +74,12 @@ export class DailyRecordController {
     @Query() query: MyPresenceQueryDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<MyDailyPresenceResponseDto> {
-    const now = new Date()
+    const current = this.schoolTime.yearMonth()
     return MyDailyPresenceResponseDto.fromDomain(
       await this.getMine.execute(
         user.id,
-        query.year ?? now.getUTCFullYear(),
-        query.month ?? now.getUTCMonth() + 1,
+        query.year ?? current.year,
+        query.month ?? current.month,
       ),
     )
   }

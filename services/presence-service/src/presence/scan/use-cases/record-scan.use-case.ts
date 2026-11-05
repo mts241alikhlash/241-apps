@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable, Logger } from '@nestjs/common'
 import { CredentialResolution } from '../../credential/domain/entities/credential.entity.js'
 import { ICredentialRepository } from '../../credential/domain/interfaces/credential-repository.interface.js'
@@ -8,7 +9,6 @@ import { DUPLICATE_SCAN_WINDOW_SECONDS } from '../../shared/constants/presence.c
 import { ServerClockService } from '../../shared/services/server-clock.service.js'
 import { ScanOutcomeEnum, ScanResult } from '../domain/entities/scan.entity.js'
 import { IScanRepository } from '../domain/interfaces/scan-repository.interface.js'
-import { dayOf } from '../../shared/day.js'
 import { RecordScanDto } from '../dto/request/record-scan.dto.js'
 
 @Injectable()
@@ -22,6 +22,7 @@ export class RecordScanUseCase {
     private readonly devices: IDeviceRepository,
     private readonly dayStatus: DayStatusService,
     private readonly clock: ServerClockService,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async execute(deviceId: string, dto: RecordScanDto): Promise<ScanResult> {
@@ -99,7 +100,7 @@ export class RecordScanUseCase {
       return this.feedback('DUPLICATE', 'NONE', credential, occurredAt, 0)
     }
 
-    const date = dayOf(occurredAt)
+    const date = this.schoolTime.today(occurredAt)
     const existing = await this.dailyPresence.findByUserAndDate(
       credential.userId,
       date,
