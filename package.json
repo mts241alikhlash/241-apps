@@ -10,7 +10,7 @@
     "check": "pnpm -r --if-present run check",
     "test": "pnpm -r --if-present run test",
     "changeset": "changeset",
-    "runtime:check": "node --test scripts/runtime-config.spec.mjs scripts/lint-staged-eslint.spec.mjs",
+    "runtime:check": "node --test scripts/runtime-config.spec.mjs scripts/lint-staged-eslint.spec.mjs scripts/check-docs.spec.mjs",
     "openapi:emit": "node scripts/emit-openapi.mjs",
     "openapi:check": "node scripts/emit-openapi.mjs --check",
     "db:smoke": "node scripts/db-smoke.mjs",
@@ -20,10 +20,11 @@
     "api:typecheck": "pnpm --filter '@mts241alikhlash/*-api' --if-present run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "prettier --check . && pnpm -r --if-present run lint",
+    "lint": "prettier --check . && node scripts/check-docs.mjs && pnpm -r --if-present run lint",
     "fix": "prettier --write . && pnpm -r --if-present run lint --fix",
     "prepare": "husky",
-    "knip": "DATABASE_URL=postgresql://knip:knip@localhost:5432/knip DIRECT_URL=postgresql://knip:knip@localhost:5432/knip knip"
+    "knip": "DATABASE_URL=postgresql://knip:knip@localhost:5432/knip DIRECT_URL=postgresql://knip:knip@localhost:5432/knip knip",
+    "docs:check": "node scripts/check-docs.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
