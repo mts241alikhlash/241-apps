@@ -21,7 +21,8 @@ export function limitDateOf(
   if (!startDate || months === null) return null
   const year = startDate.getUTCFullYear()
   const month = startDate.getUTCMonth() + months
-  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
+  const monthEnd = new Date(Date.UTC(year, month + 1, 0))
+  const lastDay = monthEnd.getUTCDate()
   return endOfDayJakarta(year, month, Math.min(startDate.getUTCDate(), lastDay))
 }
 
