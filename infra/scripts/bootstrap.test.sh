@@ -40,4 +40,39 @@ other_after="$(q "SELECT string_agg(datname, ',' ORDER BY datname) FROM pg_datab
 status="$(curl -s -o /dev/null -w '%{http_code}' -I --aws-sigv4 "aws:amz:us-east-1:s3" --user "test:test" "$s3/$bucket")"
 [[ "$status" == 200 ]] || fail "the bucket was not created (HEAD $status)"
 
+work="$(mktemp -d)"
+trap 'rm -rf "$work"; cleanup' EXIT
+real_curl="$(command -v curl)"
+mkdir -p "$work/stubs" "$work/env"
+cat > "$work/stubs/psql" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$@" >> "$work/argv.log"
+printf '%s\n' "\$PGPASSFILE" >> "$work/pgpass.paths"
+cat "\$PGPASSFILE" >> "$work/pgpass.seen"
+read -r -a cmd <<< "$psql_cmd"
+exec "\${cmd[@]}" -v ON_ERROR_STOP=1 "\$@"
+STUB
+cat > "$work/stubs/curl" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$@" >> "$work/argv.log"
+exec "$real_curl" "\$@"
+STUB
+chmod +x "$work/stubs/psql" "$work/stubs/curl"
+printf 'DATABASE_URL="postgresql://mts241:PGSECRET9@localhost:5433/identity?sslmode=disable"\n' > "$work/env/identity-service.env"
+printf 'S3_ENDPOINT=%s\nS3_ACCESS_KEY_ID=KEYIDSECRET9\nS3_SECRET_ACCESS_KEY=S3SECRET9\n' "$s3" > "$work/env/portal-service.env"
+
+PATH="$work/stubs:$PATH" BOOTSTRAP_ENV_DIR="$work/env" BOOTSTRAP_DB_PREFIX="$prefix" BOOTSTRAP_BUCKET="$bucket" \
+  bash "$here/bootstrap.sh" > /dev/null || fail "the run with env files and stubs failed"
+
+[[ -s "$work/argv.log" ]] || fail "the stubs recorded no arguments"
+grep -q 'ON_ERROR_STOP' "$work/argv.log" || fail "psql was not called through the stub"
+grep -q 'aws:amz' "$work/pgpass.seen" 2> /dev/null && fail "unexpected content in the password file"
+grep -q 'PGSECRET9' "$work/pgpass.seen" || fail "the password did not reach psql through PGPASSFILE"
+for secret in PGSECRET9 KEYIDSECRET9 S3SECRET9 'postgresql://'; do
+  if grep -qF -- "$secret" "$work/argv.log"; then fail "'$secret' appeared in argv"; fi
+done
+while read -r pgpass_path; do
+  [[ ! -e "$pgpass_path" ]] || fail "the password file $pgpass_path was left behind"
+done < "$work/pgpass.paths"
+
 echo "bootstrap test passed ($total_before databases before)"

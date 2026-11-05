@@ -24,7 +24,7 @@ Result: the output lists the user, the Docker network, the PostgreSQL role, the 
 sudo infra/scripts/provision.sh
 ```
 
-It prompts for the PostgreSQL password of the role `mts241`, the MinIO root credentials and URL, the PostgreSQL host the containers use, the first admin password (12 characters or more) and the deploy public key. Secrets are read without echo and written only to files with mode 600.
+It prompts for the PostgreSQL password of the role `mts241`, the MinIO root credentials and URL, the PostgreSQL host the containers use, the first admin password (12 characters or more) and the deploy public key. Secrets are read without echo and written only to files with mode 600; none is ever passed as a command-line argument (PostgreSQL gets its SQL on stdin, MinIO prints the generated access key, the env files are written by `infra/scripts/provision-env.py` from environment variables).
 
 ## 3. Check each result
 
