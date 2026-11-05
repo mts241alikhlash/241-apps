@@ -50,6 +50,7 @@ for service in "${services[@]}"; do
 done
 ln -sf "$state/compose.env" "$repo/infra/compose/.env"
 
+podman network inspect 241-apps > /dev/null 2>&1 || podman network create 241-apps > /dev/null
 dns="$(podman network inspect 241-apps --format '{{range .Subnets}}{{.Gateway}}{{end}}')"
 sed -e "s#^resolver 127.0.0.11#resolver $dns#" -e "s/\(proxy_set_header   Host   *\)\\\$host;/\1\\\$http_host;/" "$repo/infra/gateway/nginx.conf" > "$state/nginx.conf"
 
