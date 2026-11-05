@@ -53,3 +53,9 @@ From the Actions tab run `Deploy` with `ref` set to a branch, sha or `deploy-*` 
 ## Migrations that fail
 
 A failed Prisma migration stays in `_prisma_migrations`; fix it on the server with `prisma migrate resolve` before the next deploy.
+
+## Environment files
+
+Each service reads real values from `infra/compose/env/<service>-service.env` on the server (gitignored; filled from the service's `.env.example`). The web apps are static builds and need none. `TRUST_PROXY` is the number of proxies between the client and each service and defaults to 1 (the gateway alone); count every hop (Cloudflare, host nginx, gateway) and set it in `infra/compose/.env` or the shell that runs Compose. With the wrong count every client looks like the same address and the login and registration rate limits are shared by everyone.
+
+Result: after a deploy, the client address in identity's request log is the real one, not a proxy's.

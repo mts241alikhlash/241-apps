@@ -10,7 +10,7 @@ An app is a Vue 3 + Vite package under `apps/`. Copy the layout of a current sma
    Result: `pnpm --filter <name>-web run routes:check` prints `routing manifest valid`.
 4. **Sign-on.** Register the app and its `https://<host>/oauth/callback` in identity's `SSO_APPS` ([ADR 0007](../adr/0007-single-sign-on-through-account-web.md)) ; the launcher is served from the same list (`/sso/apps`).
    Result: signing in at account-web lists the app and opens it without a password.
-5. **Gateway and deploy.** Run `node infra/gateway/generate.mjs`, add a `Dockerfile` and its service block in `infra/compose/compose.yaml`, and its pin in `infra/deployment/lock.json`.
+5. **Gateway and deploy.** Copy the emitted manifest to `infra/gateway/manifests/<app>-<version>.json`, run `node infra/gateway/generate.mjs`, add a `Dockerfile` and its service block in `infra/compose/compose.yaml`, and its pin in `infra/deployment/lock.json`.
    Result: `pnpm --filter ./infra run check` and `node infra/gateway/generate.self-check.mjs` pass.
 6. **Standards and docs.** Pages follow [frontend](../standards/frontend.md) and [ui](../standards/ui.md); write the package `README.md` and `AGENTS.md`.
    Result: `pnpm --filter <name>-web run validate` and `pnpm run docs:check` pass.

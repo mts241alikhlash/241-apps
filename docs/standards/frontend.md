@@ -36,7 +36,7 @@ Applies to the Vue 3 + Vite apps in `apps/` and the Vue packages in `packages/` 
 
 ## Routing and API access
 
-**Rule.** Each app declares which service owns each API prefix in `api-routes.config.ts`; the dev proxy and the gateway are generated from it. A prefix with no owner goes in `UNROUTED_PREFIXES`, which the dev proxy refuses as loudly as the gateway does.
+**Rule.** Each app declares which service owns each API prefix in `api-routes.config.ts`; the dev proxy reads it directly and the routing manifest the gateway is generated from is emitted from it (`routes:emit`). A prefix with no owner goes in `UNROUTED_PREFIXES`, which the dev proxy refuses as loudly as the gateway does.
 **Why.** A route that works in dev and 404s in production is found in review of one file.
 **Check.** `pnpm --filter <app> run routes:check`; `infra/gateway/generate.mjs --check`.
 

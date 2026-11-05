@@ -45,7 +45,7 @@ export function nest({
                 {
                   group: ['@prisma/client', '**/generated/prisma/**'],
                   message:
-                    'domain/ must not import the Prisma client (CONSTITUTION, Principle I).',
+                    'domain/ must not import the Prisma client (docs/standards/backend.md, Layering).',
                 },
               ],
             },

@@ -10,7 +10,7 @@ A service is a NestJS + Prisma package with its own database. Copy the layout of
    Result: `node dev.mjs <app>` creates `.env` and the database.
 4. **Contract.** Add the service to the contract scripts (`scripts/emit-openapi.mjs`, `scripts/generate-api-clients.mjs`), run `pnpm run openapi:emit` and `pnpm run api:generate`, and add `packages/<name>-api` as the generated client.
    Result: `pnpm run openapi:check && pnpm run api:check && pnpm run version:check` pass.
-5. **Gateway and routes.** Add the service's prefixes to the consuming apps' `api-routes.config.ts` and to the generator inputs, then run `node infra/gateway/generate.mjs`.
+5. **Gateway and routes.** Register the service in `infra/upstreams/services.json`, add its prefixes to the consuming apps' `api-routes.config.ts` and re-emit their manifests (`routes:emit`), then run `node infra/gateway/generate.mjs`.
    Result: `node infra/gateway/generate.mjs --check` and `node infra/gateway/generate.self-check.mjs` pass.
 6. **Image and deploy.** Add a `Dockerfile` modelled on a current service, a service block and a migrate job in `infra/compose/compose.yaml`, the database in `infra/gateway-source/postgres/init-databases.sql`, its pin in `infra/deployment/lock.json`, and its env example in `infra/compose/env/`.
    Result: `pnpm --filter ./infra run check` passes.

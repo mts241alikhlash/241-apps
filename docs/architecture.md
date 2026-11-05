@@ -34,7 +34,7 @@ The calls that exist are the adapters under each service's `platform/` and `inte
 
 ## Web apps and the gateway
 
-Each app owns a set of API prefixes declared in its `api-routes.config.ts`. `infra/gateway/generate.mjs` renders the nginx configuration of the gateway from those files and the deployment lock, and the apps' dev proxies read the same files, so a prefix is routed the same way in development and production. `nginx*.conf` files are generated, never edited.
+Each app declares which service owns each API prefix in its `api-routes.config.ts`; the dev proxy reads that file directly, and `pnpm --filter <app> run routes:emit` turns it into a routing manifest published with the app's release. `infra/gateway/generate.mjs` renders the gateway's nginx configuration from the manifests of the pinned app versions (`infra/gateway/manifests/`), the service registry (`infra/upstreams/services.json`) and the lock, so a prefix is routed the same way in development and production. The `nginx*.conf` files are generated, never edited.
 
 Apps share code through packages: `@mts241alikhlash/ui` (components), `web-shared` (API instance, types, composables), `platform` (auth, profile, address, layout and other features used by several apps) and `reference-data` (the reference list view). Services share `nest-core` ([ADR 0006](adr/0006-nest-core-as-a-built-package.md)). Contracts are emitted from the services into `contracts/` and clients are generated into `packages/*-api` ([api standard](standards/api.md)).
 
