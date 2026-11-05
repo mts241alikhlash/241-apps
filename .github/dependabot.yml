@@ -1,0 +1,176 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      nest:
+        patterns: ['@nestjs/*', 'nestjs-*', 'rxjs', 'reflect-metadata']
+      vue:
+        patterns:
+          [
+            'vue',
+            'vue-*',
+            '@vue/*',
+            'pinia',
+            '@vitejs/*',
+            'vite',
+            '@tanstack/*',
+            'reka-ui',
+            '@vueuse/*',
+          ]
+      lint:
+        patterns:
+          [
+            'eslint',
+            'eslint-*',
+            '@eslint/*',
+            'typescript-eslint',
+            '@typescript-eslint/*',
+            'prettier',
+            'globals',
+            'knip',
+            'husky',
+            'lint-staged',
+          ]
+      test:
+        patterns:
+          [
+            'vitest',
+            '@vitest/*',
+            'happy-dom',
+            '@vue/test-utils',
+            'supertest',
+            'unplugin-swc',
+          ]
+      types:
+        patterns: ['@types/*']
+      minor-and-patch:
+        update-types: ['minor', 'patch']
+    ignore:
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vueuse/core'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'prisma'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@prisma/client'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'zod'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@tanstack/vue-table'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@fullcalendar/core'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@fullcalendar/daygrid'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@fullcalendar/interaction'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@fullcalendar/vue3'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'vue-tsc'
+      - dependency-name: '@vue/language-core'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/academic-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/account-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/admin-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/admission-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/assessment-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/exam-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/hr-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/inventory-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /apps/portal-web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/academic-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/admission-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/assessment-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/exam-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/hr-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/identity-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/inventory-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/portal-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/presence-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: /services/student-service
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10

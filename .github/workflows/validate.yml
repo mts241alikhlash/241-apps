@@ -1,0 +1,174 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      filter: ${{ steps.plan.outputs.filter }}
+      e2e: ${{ steps.plan.outputs.e2e }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            filter=all
+          else
+            filter="$(node scripts/affected.mjs "$BASE_SHA")"
+          fi
+          e2e=false
+          if [ "$filter" = all ] || git diff --name-only "$BASE_SHA...HEAD" | grep -Eq '^(services|packages/nest-core)/'; then
+            e2e=true
+          fi
+          echo "filter=$filter" >> "$GITHUB_OUTPUT"
+          echo "e2e=$e2e" >> "$GITHUB_OUTPUT"
+
+  root:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm dedupe --check
+      - run: pnpm --filter @mts241alikhlash/nest-core run build
+      - run: pnpm run lint
+      - run: pnpm run openapi:check
+      - run: pnpm run api:check
+      - run: pnpm run version:check
+      - run: pnpm run runtime:check
+      - run: pnpm run knip
+      - if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CHANGESET_BRANCH: ${{ github.head_ref }}
+        run: node .github/scripts/require-changeset.mjs "$BASE_SHA" HEAD
+      - if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/check-contract-compatibility.mjs "$BASE_SHA"
+
+  packages:
+    needs: plan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: mts241
+          POSTGRES_PASSWORD: mts241
+          POSTGRES_DB: identity
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U mts241 -d identity"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @mts241alikhlash/nest-core run build
+      - env:
+          DATABASE_URL: postgresql://build:build@localhost:5432/build
+        run: pnpm --filter "./services/*" --if-present run prisma:generate
+      - env:
+          FILTER: ${{ needs.plan.outputs.filter }}
+        run: |
+          if [ "$FILTER" = all ]; then
+            args=(--filter "./apps/*" --filter "./services/*" --filter "./packages/*" --filter ./infra)
+          else
+            args=(--filter "$FILTER")
+          fi
+          pnpm "${args[@]}" --workspace-concurrency=2 --if-present run ci
+
+  e2e:
+    needs: plan
+    if: needs.plan.outputs.e2e == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: mts241
+          POSTGRES_PASSWORD: mts241
+          POSTGRES_DB: identity
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U mts241 -d identity"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @mts241alikhlash/nest-core run build
+      - env:
+          DATABASE_URL: postgresql://build:build@localhost:5432/build
+        run: pnpm --filter "./services/*" --if-present run prisma:generate
+      - run: pnpm run test:e2e
+
+  ci-ok:
+    if: always()
+    needs: [plan, root, packages, e2e]
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in $RESULTS; do
+            if [ "$result" = failure ] || [ "$result" = cancelled ]; then
+              echo "a required job finished with: $result" >&2
+              exit 1
+            fi
+          done
