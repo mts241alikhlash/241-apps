@@ -1,15 +1,20 @@
-import { ExecutionContext, INestApplication } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
-import { APP_GUARD } from '@nestjs/core'
+process.env.DATABASE_URL ??= 'postgresql://e2e:e2e@localhost:5432/e2e'
+process.env.JWT_SECRET ??= 'test-jwt-secret-for-e2e-testing-minimum-32-chars'
+process.env.S3_ENDPOINT ??= 'http://localhost:9000'
+process.env.S3_BUCKET ??= 'e2e'
+process.env.S3_ACCESS_KEY_ID ??= 'e2e'
+process.env.S3_SECRET_ACCESS_KEY ??= 'e2e'
+process.env.IDENTITY_SERVICE_URL ??= 'http://localhost:3000'
+process.env.PROVISIONING_SERVICE_TOKEN ??= 'e2e-test-provisioning-token'
+
+import { INestApplication } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'
 import type { Server } from 'node:http'
-import { LoggerModule } from 'nestjs-pino'
 import request from 'supertest'
-import { PrismaModule } from '../src/core/database/prisma.module.js'
+import { AppModule } from '../src/app.module.js'
 import { PrismaService } from '../src/core/database/prisma.service.js'
-import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
-import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
-import { PresenceModule } from '../src/presence/presence.module.js'
+import { IIdentityPort } from '@mts241alikhlash/nest-core/identity'
 
 const TEACHER_ID = '11111111-1111-4111-8111-111111111111'
 const SOMEONE_ELSE = '22222222-2222-4222-8222-222222222222'
@@ -21,19 +26,18 @@ describe('presence self-service (FR-061)', () => {
   let server: Server
   let granted: string[] = READ_OWN
 
-  function authenticateAs(userId: string) {
-    return {
-      canActivate: (context: ExecutionContext) => {
-        context.switchToHttp().getRequest<{ user: unknown }>().user = {
-          id: userId,
-          identifier: 'guru',
-          roles: ['GURU'],
-          permissions: granted,
-        }
-        return true
-      },
-    }
+  const identity = {
+    resolve: () =>
+      Promise.resolve({
+        userId: TEACHER_ID,
+        identifier: 'guru',
+        sessionId: '33333333-3333-4333-8333-333333333333',
+        roles: ['GURU'],
+        permissions: granted,
+      }),
   }
+
+  const bearer = `Bearer ${new JwtService({ secret: process.env.JWT_SECRET }).sign({ sub: TEACHER_ID, type: 'access' })}`
 
   const dailyPresence = { findMany: vi.fn().mockResolvedValue([]) }
 
@@ -46,30 +50,12 @@ describe('presence self-service (FR-061)', () => {
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          ignoreEnvFile: true,
-          load: [
-            () => ({
-              JWT_SECRET: 'test-jwt-secret-for-e2e-testing-minimum-32-chars',
-              NODE_ENV: 'test',
-            }),
-          ],
-        }),
-        LoggerModule.forRoot({ pinoHttp: { enabled: false } }),
-        PrismaModule,
-        PresenceModule,
-      ],
-      providers: [
-        { provide: APP_GUARD, useValue: authenticateAs(TEACHER_ID) },
-        { provide: APP_GUARD, useClass: PermissionGuard },
-      ],
+      imports: [AppModule],
     })
       .overrideProvider(PrismaService)
       .useValue(prismaMock)
-      .overrideGuard(JwtAuthGuard)
-      .useValue(authenticateAs(TEACHER_ID))
+      .overrideProvider(IIdentityPort)
+      .useValue(identity)
       .compile()
 
     app = moduleRef.createNestApplication()
@@ -91,6 +77,7 @@ describe('presence self-service (FR-061)', () => {
     it('queries the caller, not a parameter', async () => {
       await request(server)
         .get('/presence/daily-records/me')
+        .set('Authorization', bearer)
         .query({ year: 2026, month: 7 })
         .expect(200)
 
@@ -103,6 +90,7 @@ describe('presence self-service (FR-061)', () => {
     it('ignores a userId smuggled in as a query parameter', async () => {
       await request(server)
         .get('/presence/daily-records/me')
+        .set('Authorization', bearer)
         .query({ year: 2026, month: 7, userId: SOMEONE_ELSE })
         .expect(200)
 
@@ -120,7 +108,9 @@ describe('presence self-service (FR-061)', () => {
       `/presence/daily-records/${SOMEONE_ELSE}`,
       '/presence/daily-records/recap?year=2026&month=7',
     ])('refuses %s for a read-own holder', async (path) => {
-      const response = await request(server).get(path)
+      const response = await request(server)
+        .get(path)
+        .set('Authorization', bearer)
 
       expect(response.status).toBe(403)
     })
