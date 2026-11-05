@@ -50,7 +50,7 @@ jobs:
           routes_changed=false
           if ! cmp -s "$RUNNER_TEMP/before.conf" "$RUNNER_TEMP/after.conf"; then
             routes_changed=true
-            printf -- '---\n"241-platform-infra": patch\n---\n\nRebuild the gateway for the new routes.\n' > ".changeset/gateway-routes.md"
+            printf -- '---\n"infra": patch\n---\n\nRebuild the gateway for the new routes.\n' > ".changeset/gateway-routes.md"
           fi
 
           branch="automation/update-lock"

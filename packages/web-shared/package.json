@@ -1,16 +1,8 @@
 {
   "name": "@mts241alikhlash/web-shared",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "type": "module",
-  "files": [
-    "src",
-    "!src/**/*.spec.ts"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mts241alikhlash/web-packages"
-  },
   "exports": {
     ".": "./src/index.ts",
     "./env.d.ts": "./src/env.d.ts",
@@ -31,9 +23,6 @@
   "peerDependencies": {
     "vue": "^3.5.41",
     "vue-router": "^5.1.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
     "@mts241alikhlash/typescript-config": "workspace:*"

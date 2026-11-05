@@ -1,12 +1,8 @@
 {
   "name": "@mts241alikhlash/ui",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "type": "module",
-  "files": [
-    "src",
-    "!src/**/*.spec.ts"
-  ],
   "bin": {
     "check-card-overrides": "./src/tools/check-card-overrides.mjs",
     "check-field-style": "./src/tools/check-field-style.mjs"
@@ -14,10 +10,6 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mts241alikhlash/web-packages"
-  },
   "exports": {
     ".": "./src/index.ts",
     "./*": "./src/components/ui/*/index.ts",
@@ -49,9 +41,6 @@
   },
   "peerDependencies": {
     "vue": "^3.5.41"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
     "@mts241alikhlash/typescript-config": "workspace:*",
