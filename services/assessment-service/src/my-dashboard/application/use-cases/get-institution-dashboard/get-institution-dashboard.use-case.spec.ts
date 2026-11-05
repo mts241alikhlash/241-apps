@@ -1,5 +1,11 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { IInstitutionDashboardRepository } from '../../../domain/repositories/institution-dashboard.repository.js'
 import { GetInstitutionDashboardUseCase } from './get-institution-dashboard.use-case.js'
+
+const schoolTime = new SchoolTimeService({
+  getOrThrow: () => 'Asia/Jakarta',
+} as unknown as ConfigService)
 
 function repo(overrides: Partial<IInstitutionDashboardRepository> = {}) {
   return {
@@ -41,7 +47,10 @@ describe('GetInstitutionDashboardUseCase', () => {
         },
       ]),
     })
-    const result = await new GetInstitutionDashboardUseCase(port).execute()
+    const result = await new GetInstitutionDashboardUseCase(
+      port,
+      schoolTime,
+    ).execute()
     expect(result.scoreCompleteness).toEqual([
       { classroomId: 'c1', classroomName: '7A', filled: 15, expected: 20 },
       { classroomId: 'c2', classroomName: '7B', filled: 0, expected: 4 },
@@ -49,13 +58,25 @@ describe('GetInstitutionDashboardUseCase', () => {
     expect(result.semester).toEqual({ id: 'sem-1', name: 'Ganjil' })
   })
 
-  it('asks for the attendance of the day a scan at 00:30 local time belongs to', async () => {
+  it('asks for the local day: 17:30 UTC is 00:30 WIB of the next day', async () => {
     const port = repo()
-    const result = await new GetInstitutionDashboardUseCase(port).execute()
+    const result = await new GetInstitutionDashboardUseCase(
+      port,
+      schoolTime,
+    ).execute()
     expect(port.countAttendanceOn).toHaveBeenCalledWith(
-      new Date('2026-11-05T00:00:00Z'),
+      new Date('2026-11-06T00:00:00Z'),
     )
     expect(result.attendanceToday.date).toEqual(
+      new Date('2026-11-06T00:00:00Z'),
+    )
+  })
+
+  it('keeps 16:59 UTC on the same local day', async () => {
+    vi.setSystemTime(new Date('2026-11-05T16:59:00Z'))
+    const port = repo()
+    await new GetInstitutionDashboardUseCase(port, schoolTime).execute()
+    expect(port.countAttendanceOn).toHaveBeenCalledWith(
       new Date('2026-11-05T00:00:00Z'),
     )
   })
@@ -67,13 +88,17 @@ describe('GetInstitutionDashboardUseCase', () => {
         .mockResolvedValue({ published: 3, unpublished: 9 }),
     })
     expect(
-      (await new GetInstitutionDashboardUseCase(port).execute()).examScores,
+      (await new GetInstitutionDashboardUseCase(port, schoolTime).execute())
+        .examScores,
     ).toEqual({ published: 3, unpublished: 9 })
   })
 
   it('returns empty completeness and zero report cards without an active semester', async () => {
     const port = repo({ findActiveSemester: vi.fn().mockResolvedValue(null) })
-    const result = await new GetInstitutionDashboardUseCase(port).execute()
+    const result = await new GetInstitutionDashboardUseCase(
+      port,
+      schoolTime,
+    ).execute()
     expect(result.semester).toBeNull()
     expect(result.scoreCompleteness).toEqual([])
     expect(result.examScores).toEqual({ published: 0, unpublished: 0 })

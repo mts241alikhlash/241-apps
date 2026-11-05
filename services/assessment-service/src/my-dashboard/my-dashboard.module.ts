@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { StudentIdentityModule } from '../platform/student-identity/student-identity.module.js'
 import { EmployeeIdentityModule } from '../platform/employee-identity/employee-identity.module.js'
@@ -10,7 +11,7 @@ import { MyDashboardController } from './presentation/http/my-dashboard.controll
 import { GetMyDashboardUseCase } from './application/use-cases/get-my-dashboard/get-my-dashboard.use-case.js'
 
 @Module({
-  imports: [StudentIdentityModule, EmployeeIdentityModule],
+  imports: [SchoolTimeModule, StudentIdentityModule, EmployeeIdentityModule],
   controllers: [MyDashboardController],
   providers: [
     {

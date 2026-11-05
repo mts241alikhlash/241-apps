@@ -3,6 +3,8 @@ import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academ
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
 import { IEmployeeIdentityReadPort } from '../../../../platform/employee-identity/employee-identity.port.js'
 import { IMyDashboardRepository } from '../../../domain/repositories/my-dashboard.repository.js'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { GetMyDashboardUseCase } from './get-my-dashboard.use-case.js'
 
 describe('GetMyDashboardUseCase', () => {
@@ -40,6 +42,12 @@ describe('GetMyDashboardUseCase', () => {
         { provide: IStudentIdentityReadPort, useValue: studentIdentity },
         { provide: IEmployeeIdentityReadPort, useValue: employeeIdentity },
         { provide: IAcademicLookupPort, useValue: academicSetting },
+        {
+          provide: SchoolTimeService,
+          useValue: new SchoolTimeService({
+            getOrThrow: () => 'Asia/Jakarta',
+          } as unknown as ConfigService),
+        },
       ],
     }).compile()
 
@@ -67,6 +75,17 @@ describe('GetMyDashboardUseCase', () => {
     repo.findSupervisedClassrooms.mockResolvedValue([])
     repo.findUngradedAssessments.mockResolvedValue({ rows: [], total: 0 })
     academicSetting.findSetting.mockResolvedValue({ weeklyHolidays: [0] })
+  })
+
+  it('reads the weekday and date in the school zone: 17:30 UTC Thursday is Friday 00:30 WIB', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-11-05T17:30:00Z'))
+    academicSetting.findSetting.mockResolvedValue({ weeklyHolidays: [5] })
+    studentIdentity.findStudentIdByUserId.mockResolvedValue(null)
+    employeeIdentity.findEmployeeIdByUserId.mockResolvedValue(null)
+    const result = await useCase.execute('user-1')
+    vi.useRealTimers()
+    expect(result.today).toEqual({ date: '2026-11-06', isWeeklyHoliday: true })
   })
 
   it('answers with neither half for someone who is neither', async () => {

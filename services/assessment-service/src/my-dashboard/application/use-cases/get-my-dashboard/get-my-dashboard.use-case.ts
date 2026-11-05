@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
@@ -20,6 +21,7 @@ export class GetMyDashboardUseCase {
     private readonly studentIdentity: IStudentIdentityReadPort,
     private readonly employeeIdentity: IEmployeeIdentityReadPort,
     private readonly academicLookup: IAcademicLookupPort,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async execute(userId: string): Promise<MyDashboardResult> {
@@ -30,10 +32,11 @@ export class GetMyDashboardUseCase {
       this.academicLookup.findSetting(),
     ])
 
-    const today = new Date()
+    const today = this.schoolTime.today()
+    const weekday = this.schoolTime.weekday()
     const weeklyHolidays = setting?.weeklyHolidays ?? []
-    const isWeeklyHoliday = weeklyHolidays.includes(today.getDay())
-    const scheduleDay = WEEKDAY_TO_SCHEDULE_DAY[today.getDay()] ?? null
+    const isWeeklyHoliday = weeklyHolidays.includes(weekday)
+    const scheduleDay = WEEKDAY_TO_SCHEDULE_DAY[weekday] ?? null
 
     const [student, employee] = await Promise.all([
       this.studentHalf(studentId, semester?.id ?? null, scheduleDay),

@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import { Injectable } from '@nestjs/common'
 import {
   AttendanceDayCounts,
@@ -19,13 +20,13 @@ export interface InstitutionDashboard {
 
 @Injectable()
 export class GetInstitutionDashboardUseCase {
-  constructor(private readonly repository: IInstitutionDashboardRepository) {}
+  constructor(
+    private readonly repository: IInstitutionDashboardRepository,
+    private readonly schoolTime: SchoolTimeService,
+  ) {}
 
   async execute(): Promise<InstitutionDashboard> {
-    const now = new Date()
-    const date = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-    )
+    const date = this.schoolTime.today()
     const semester = await this.repository.findActiveSemester()
     const [stats, attendance, reportCards] = await Promise.all([
       semester
