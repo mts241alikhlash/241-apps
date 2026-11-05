@@ -67,6 +67,20 @@ jobs:
       - run: pnpm run version:check
       - run: pnpm run runtime:check
       - run: pnpm run knip
+      - name: Compose config with empty service env files
+        run: |
+          grep -oE 'env/[a-z-]+-service\.env' infra/compose/compose.yaml | sort -u | while read -r file; do
+            : > "infra/compose/$file"
+          done
+          docker compose -f infra/compose/compose.yaml config --quiet
+          services="$(docker compose -f infra/compose/compose.yaml config --services)"
+          if grep -qxE 'postgres|s3' <<< "$services"; then
+            echo "postgres or s3 is listed without the storage profile" >&2
+            exit 1
+          fi
+          storage="$(docker compose -f infra/compose/compose.yaml --profile storage config --services)"
+          grep -qx postgres <<< "$storage"
+          grep -qx s3 <<< "$storage"
       - if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
