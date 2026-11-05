@@ -16,7 +16,7 @@ Locally, `node infra/scripts/update-lock.mjs` writes the pins into `lock.json` a
 
 Result: the pull request changes only `infra/deployment/lock.json`, `infra/compose/compose.yaml` and, when routes changed, `infra/gateway/`, and `pnpm --filter ./infra run check` passes on it.
 
-A pull request created with the default `GITHUB_TOKEN` does not start the `Validate` workflow, so the required check `ci-ok` would never report. Give the workflow a personal access token or an app token in the repository secret `UPDATE_LOCK_TOKEN`; it is used when present.
+A pull request created with the default `GITHUB_TOKEN` does not start the `Validate` workflow, so the required check `ci-ok` would never report. The workflow therefore creates the pull request with a GitHub App token (`actions/create-github-app-token`); set the App up once as described in [release](release.md#github-app-for-the-lock-pull-request).
 
 ## 2. Merge
 
