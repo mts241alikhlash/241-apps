@@ -1,18 +1,22 @@
-import { ExecutionContext, INestApplication } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
-import { APP_GUARD } from '@nestjs/core'
+process.env.DATABASE_URL ??= 'postgresql://e2e:e2e@localhost:5432/e2e'
+process.env.JWT_SECRET ??= 'test-jwt-secret-for-e2e-testing-minimum-32-chars'
+process.env.IDENTITY_SERVICE_URL ??= 'http://localhost:3000'
+process.env.ACADEMIC_SERVICE_URL ??= 'http://localhost:3200'
+process.env.PRESENCE_SERVICE_URL ??= 'http://localhost:3400'
+process.env.PROVISIONING_SERVICE_TOKEN ??= 'e2e-test-provisioning-token'
+
+import { INestApplication } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'
 import type { Server } from 'node:http'
-import { LoggerModule } from 'nestjs-pino'
 import request from 'supertest'
-import { PrismaModule } from '../src/core/database/prisma.module.js'
+import { AppModule } from '../src/app.module.js'
 import { PrismaService } from '../src/core/database/prisma.service.js'
-import { PayrollModule } from '../src/payroll/payroll.module.js'
-import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
-import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import { IIdentityPort } from '@mts241alikhlash/nest-core/identity'
 
 const ADMIN_ID = '11111111-1111-4111-8111-111111111111'
 const UUID = '22222222-2222-4222-8222-222222222222'
+const SESSION_ID = '33333333-3333-4333-8333-333333333333'
 
 interface Route {
   method: 'get' | 'post' | 'patch' | 'delete'
@@ -107,19 +111,18 @@ describe('payroll authorization (ADR-0008)', () => {
   let grantedPermissions: string[] = []
   let roleCodes = ['ADMIN']
 
-  function authenticateAs(userId: string) {
-    return {
-      canActivate: (context: ExecutionContext) => {
-        context.switchToHttp().getRequest<{ user: unknown }>().user = {
-          id: userId,
-          identifier: 'admin',
-          roles: roleCodes,
-          permissions: grantedPermissions,
-        }
-        return true
-      },
-    }
+  const identity = {
+    resolve: () =>
+      Promise.resolve({
+        userId: ADMIN_ID,
+        identifier: 'admin',
+        sessionId: SESSION_ID,
+        roles: roleCodes,
+        permissions: grantedPermissions,
+      }),
   }
+
+  const bearer = `Bearer ${new JwtService({ secret: process.env.JWT_SECRET }).sign({ sub: ADMIN_ID, type: 'access' })}`
 
   const prismaMock = {
     salaryComponent: { findMany: vi.fn().mockResolvedValue([]) },
@@ -138,30 +141,12 @@ describe('payroll authorization (ADR-0008)', () => {
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-          ignoreEnvFile: true,
-          load: [
-            () => ({
-              JWT_SECRET: 'test-jwt-secret-for-e2e-testing-minimum-32-chars',
-              NODE_ENV: 'test',
-            }),
-          ],
-        }),
-        LoggerModule.forRoot({ pinoHttp: { enabled: false } }),
-        PrismaModule,
-        PayrollModule,
-      ],
-      providers: [
-        { provide: APP_GUARD, useValue: authenticateAs(ADMIN_ID) },
-        { provide: APP_GUARD, useClass: PermissionGuard },
-      ],
+      imports: [AppModule],
     })
       .overrideProvider(PrismaService)
       .useValue(prismaMock)
-      .overrideGuard(JwtAuthGuard)
-      .useValue(authenticateAs(ADMIN_ID))
+      .overrideProvider(IIdentityPort)
+      .useValue(identity)
       .compile()
 
     app = moduleRef.createNestApplication()
@@ -180,7 +165,10 @@ describe('payroll authorization (ADR-0008)', () => {
 
   describe.each(ROUTES)('$method $path', (route) => {
     it(`denies an ADMIN with no explicit ${route.permission}`, async () => {
-      const response = await request(server)[route.method](route.path).send({})
+      const response = await request(server)
+        [route.method](route.path)
+        .set('Authorization', bearer)
+        .send({})
 
       expect(response.status).toBe(403)
     })
@@ -188,7 +176,10 @@ describe('payroll authorization (ADR-0008)', () => {
     it(`admits the same account once ${route.permission} is granted`, async () => {
       grantedPermissions = [route.permission]
 
-      const response = await request(server)[route.method](route.path).send({})
+      const response = await request(server)
+        [route.method](route.path)
+        .set('Authorization', bearer)
+        .send({})
 
       expect(response.status).not.toBe(403)
     })
@@ -197,7 +188,9 @@ describe('payroll authorization (ADR-0008)', () => {
   it('lets SUPER_ADMIN through without an explicit grant', async () => {
     roleCodes = ['SUPER_ADMIN']
 
-    const response = await request(server).get('/payroll/components')
+    const response = await request(server)
+      .get('/payroll/components')
+      .set('Authorization', bearer)
 
     expect(response.status).not.toBe(403)
   })
@@ -205,7 +198,9 @@ describe('payroll authorization (ADR-0008)', () => {
   it('denies an account holding no role at all', async () => {
     roleCodes = []
 
-    const response = await request(server).get('/payroll/components')
+    const response = await request(server)
+      .get('/payroll/components')
+      .set('Authorization', bearer)
 
     expect(response.status).toBe(403)
   })
