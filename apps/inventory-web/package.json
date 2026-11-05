@@ -52,6 +52,7 @@
     "@mts241alikhlash/vitest-config": "workspace:*",
     "@types/node": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
     "eslint": "catalog:",
     "happy-dom": "catalog:",
     "typescript": "catalog:",
