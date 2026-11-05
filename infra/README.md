@@ -11,7 +11,7 @@ Deployment definitions: the one Compose stack (project `241-apps`), the nginx ga
 
 ## Rules specific to this package
 
-- `gateway/nginx*.conf` and `gateway/manifests/**` are generated; run `node gateway/generate.mjs` and `--check` before a deploy.
+- `gateway/nginx*.conf` is generated; run `node gateway/generate.mjs` and `--check` before a deploy. `gateway/manifests/*.json` are routing manifests emitted by each app's `routes:emit` and copied in from its release, not edited by hand.
 - The lock is changed by the `Update lock` workflow or `scripts/update-lock.mjs`, never by editing digests by hand.
 - There is one environment; no name carries an environment word ([ADR 0002](../docs/adr/0002-one-environment.md)).
 - The deploy entry runs from the checkout, so only a commit on `main` can change what the forced command does.

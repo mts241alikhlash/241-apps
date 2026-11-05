@@ -17,14 +17,13 @@ Port 3000 locally; database `identity` (21 models: `User`, `AuthSession`, `OAuth
 - Owns `users`; nothing outside joins to it. A service that needs the person behind a `userId` asks over HTTP.
 - Owns login, refresh, logout, password flows and role and permission CRUD; consumers only verify tokens.
 - The school unit lives here because every service eventually reads institution config and already calls this one for auth.
-- Structural roles (`APPLICANT`, `STUDENT`) are protected from deletion; admission-service grants them by name.
+- Structural roles (`SUPER_ADMIN`, `EMPLOYEE`, `TEACHER`, `STUDENT`, `APPLICANT`, in `structural-roles.policy.ts`) cannot be deleted and are ensured at startup; other services name some of them (`requiredBy`).
 
 ## Gotchas
 
-- Sign-in, refresh, logout and SSO exchange refuse a request whose `Origin` is not the host itself: the gateway and any proxy in front must pass `Host` unchanged.
-- A token may arrive without `permissions` when the grant list is too large for the header; the guard then reads the database.
+- Sign-in, refresh, logout and SSO exchange refuse a request whose `Origin` does not match the `Host` (`SameOriginGuard`; in production it must be `https://<host>`): the gateway and any proxy in front must pass `Host` unchanged.
 - Profile photo storage (S3) is optional here; without it the photo endpoints refuse.
 
 ## Open work
 
-- Nothing checks automatically that the structural roles admission-service names still exist.
+- None recorded.

@@ -14,7 +14,7 @@ Port 3200 locally; database `academic` (36 models: `AcademicSetting`, `AcademicY
 
 ## Rules specific to this package
 
-- Reference lists live in the generic module `src/reference-data/simple-list/`, configured in `lists.ts`; they are admin-managed data, not enums, and carry no EMIS codes.
+- Reference lists live in the generic module `src/reference-data/simple-list/`, defined in `src/reference-data/lists.ts` (`SIMPLE_LISTS`); they are admin-managed data, not enums, and carry no EMIS codes.
 - A time slot type carries how long its slots run.
 - Reads employees from hr-service and students from student-service over HTTP.
 

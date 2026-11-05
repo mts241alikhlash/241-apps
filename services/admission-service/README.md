@@ -14,14 +14,13 @@ Port 3700 locally; database `admission` (16 models: `AdmissionWave`, `AdmissionA
 
 ## Rules specific to this package
 
-- The wave is resolved by the service (`findActiveWave`), never chosen by the client; with no open wave, registration answers 400.
-- New admission work does not extend the flat `admission/` module; use sub-modules with the layering in the backend standard.
+- Without a `waveId` the service resolves the active wave itself (`findActiveWave`); with no open wave, registration answers 400.
 - It names `APPLICANT` and `STUDENT` only to grant them, never to decide an authorization outcome.
 - NIS numbers are composed from the school-year code, grade level and an alphabetical sequence, and the lock (`AdmissionNisLock`) is one-way.
 
 ## Gotchas
 
-- The public landing answer is cached for 60 seconds.
+- The public landing answer is sent with `Cache-Control: public, max-age=60`.
 - Late documents are computed, not stored: the limit comes from the first semester start plus the type's months.
 
 ## Open work
