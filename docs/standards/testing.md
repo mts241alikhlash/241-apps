@@ -19,7 +19,7 @@ Applies to all packages. Each rule is **Rule**, **Why**, **Check**.
 **Why.** It proves the bug existed and stays fixed.
 **Check.** review.
 
-**Rule.** Test counts never drop: a refactor does not delete specs, and does not add specs to code that never had them.
+**Rule.** A refactor keeps the test count: no spec is deleted to make it pass. New behavior and bug fixes add tests.
 **Why.** A refactor that changes coverage is two changes in one diff.
 **Check.** compare the per-package counts of `test` before and after; review.
 

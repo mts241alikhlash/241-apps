@@ -6,7 +6,7 @@ A service is a NestJS + Prisma package with its own database. Copy the layout of
    Result: `pnpm install` links it; `pnpm --filter <name>-service run prisma:generate` succeeds.
 2. **Structure and rules.** Follow the [backend standard](../standards/backend.md): `src/<module>/{domain,application,infrastructure,presentation}`, `platform/` for ports to other services, `AppModule` using the `nest-core` modules, and the architecture specs (`app.module.boots.spec.ts`, `api-response-types.spec.ts`, `route-collisions.spec.ts`, `route-conflicts.spec.ts`, `no-ignored-caller.spec.ts`, `single-role-bypass.spec.ts`).
    Result: `pnpm --filter <name>-service run test` passes.
-3. **Env.** Add `.env.example` (names and local-only values), and pick the next free port in `dev.mjs` (`SERVICE_PORTS`).
+3. **Env.** Add the service's own `.env.example` (names and local-only values; on the server it is copied to `infra/compose/env/<service>-service.env`), and pick the next free port in `dev.mjs` (`SERVICE_PORTS`).
    Result: `node dev.mjs <app>` creates `.env` and the database.
 4. **Contract.** Add the service to the contract scripts (`scripts/emit-openapi.mjs`, `scripts/generate-api-clients.mjs`), run `pnpm run openapi:emit` and `pnpm run api:generate`, and add `packages/<name>-api` as the generated client.
    Result: `pnpm run openapi:check && pnpm run api:check && pnpm run version:check` pass.

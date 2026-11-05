@@ -1,30 +1,10 @@
-# public/ — where portal-web's build output goes
+# public/
 
-`PORTAL_DIST_PATH` points here by default. It used to default to
-`../apps/portal/dist`, which meant something because the backend and the frontend
-shared a workspace; this service does not, so the path became explicit.
+Default location of the portal single-page app's build output. `PORTAL_DIST_PATH` overrides it; when unset, the service reads `public/` under its working directory.
 
-**What is here now is a stand-in, not a build.** It is `apps/portal/index.html`
-from the monorepo — the source template, with the `<!-- speckit:meta:start -->` /
-`<!-- speckit:meta:end -->` markers `PortalHtmlController` replaces at serve time,
-but without the bundled JavaScript and CSS a real `vite build` produces. It is
-enough to exercise the metadata injection and not enough to render the site.
+`index.html` here is a stand-in: the source template with the `<!-- speckit:meta:start -->` and `<!-- speckit:meta:end -->` markers that `PortalHtmlController` replaces per request, without the bundled JavaScript and CSS of a real build. It is enough to exercise metadata injection, not to render the site.
 
-Replace it with the real thing:
+For the real site build `portal-web` (`pnpm --filter portal-web run build`) and point `PORTAL_DIST_PATH` at `apps/portal-web/dist`.
 
-```bash
-pnpm --filter portal-web build     # in the monorepo
-cp -r apps/portal/dist/* <this>/public/
-```
-
-or point `PORTAL_DIST_PATH` at that `dist` directory instead of copying.
-
-Two things about those markers are load-bearing:
-
-- **Keep them.** Everything between them is replaced per request with values from
-  `GetPageMetaUseCase`. WhatsApp and Facebook crawlers do not execute JavaScript,
-  so without this every article on the site shares one identical share card.
-- **Keep the tags between them as a sensible default.** A path that resolves to
-  nothing public falls back to them rather than 404ing — a broken share card is a
-  worse outcome than a generic one, and an HTTP 404 with no HTML would replace the
-  site's own not-found page with the server's.
+- Keep the markers: everything between them is replaced with values from `GetPageMetaUseCase`, because social crawlers do not run JavaScript.
+- Keep sensible default tags between them: a path that resolves to nothing public falls back to them instead of returning a 404 with no HTML.

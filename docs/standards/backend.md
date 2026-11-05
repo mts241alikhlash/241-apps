@@ -26,7 +26,7 @@ Applies to every NestJS service in `services/` and to `packages/nest-core`. Each
 **Why.** Services evolve and deploy independently; a copied type drifts silently.
 **Check.** Nest ESLint preset (`no-restricted-imports` on `services/*/src`); review for read models.
 
-**Rule.** Inside a service, a module is reached through its public API; `platform/` supplies every module; business modules do not reach into each other's internals. A Nest `Module` class or a cross-module DTO is imported from its own file, never through a barrel.
+**Rule.** Inside a service, a module is reached through its public API; business modules do not reach into each other's internals. Shared infrastructure comes from `@mts241alikhlash/nest-core`, imported only through its subpath exports (the ESLint boundary rule forbids `src` and `dist` paths); `src/platform/` holds only the service's own lookup ports and adapters. A Nest `Module` class or a cross-module DTO is imported from its own file, never through a barrel.
 **Why.** A DTO importing a barrel closes an ESM cycle and crashes boot.
 **Check.** `app.module.boots.spec.ts`; review.
 
@@ -44,8 +44,8 @@ Applies to every NestJS service in `services/` and to `packages/nest-core`. Each
 **Why.** Every untyped edge is a silent runtime failure.
 **Check.** ESLint `no-explicit-any` and the type-aware `no-unsafe-*` rules (`lint:strict`).
 
-**Rule.** Errors are NestJS HTTP exceptions; `throw new Error()` is not used, and custom exceptions extend a built-in.
-**Why.** The shared filter maps them to the response envelope.
+**Rule.** Request-path failures throw NestJS HTTP exceptions (or a subclass of one). A plain `Error` is only for startup and configuration invariants (`AppConfigModule` validation, `SSO_APPS`, default roles), impossible states in mappers, and test fakes.
+**Why.** The shared filter maps HTTP exceptions to the response envelope; startup failures should stop the process.
 **Check.** review.
 
 **Rule.** Domain events are not used: `@nestjs/event-emitter` is not a dependency. A must-succeed consequence is a direct awaited call.
