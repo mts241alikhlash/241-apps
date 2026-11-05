@@ -3,8 +3,10 @@ set -euo pipefail
 
 services=(identity academic admission hr inventory presence portal student assessment exam)
 
+override="${DEPLOY_OVERRIDE:-compose/compose.override.yaml}"
+
 dc() {
-  docker compose -f compose/compose.yaml -f compose/compose.override.yaml "$@"
+  docker compose -f compose/compose.yaml -f "$override" "$@"
 }
 
 report() {
@@ -36,8 +38,10 @@ fi
 echo "==> bootstrap"
 scripts/bootstrap.sh
 
-echo "==> pull"
-dc --profile migrate pull
+if [[ "${DEPLOY_PULL:-always}" != never ]]; then
+  echo "==> pull"
+  dc --profile migrate pull
+fi
 
 for service in "${services[@]}"; do
   echo "==> migrate $service"
