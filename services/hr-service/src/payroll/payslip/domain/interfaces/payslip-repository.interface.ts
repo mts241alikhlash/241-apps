@@ -17,5 +17,9 @@ export abstract class IPayslipRepository {
     query: MyPayslipQueryInput,
   ): Promise<PayslipDetail | null>
 
+  abstract findLatestOwnPeriod(
+    userId: string,
+  ): Promise<{ year: number; month: number } | null>
+
   abstract findOwnerId(id: string): Promise<string | null>
 }

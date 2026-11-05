@@ -10,6 +10,7 @@ import { DeleteEmployeeUseCase } from '../../application/use-cases/delete-employ
 import { ExportEmployeesUseCase } from '../../application/use-cases/export-employee/export-employee.use-case.js'
 import { GetEmployeeByIdUseCase } from '../../application/use-cases/get-employee-by-id/get-employee-by-id.use-case.js'
 import { GetEmployeesUseCase } from '../../application/use-cases/get-employees/get-employees.use-case.js'
+import { GetEmployeeSummaryUseCase } from '../../application/use-cases/get-employee-summary/get-employee-summary.use-case.js'
 import { GetMyEmployeeUseCase } from '../../application/use-cases/get-my-employee/get-my-employee.use-case.js'
 import { ResolveBulkImportConflictsUseCase } from '../../application/use-cases/resolve-bulk-import-conflicts/resolve-bulk-import-conflicts.use-case.js'
 import { ToggleEmployeeActiveUseCase } from '../../application/use-cases/toggle-employee-active/toggle-employee-active.use-case.js'
@@ -102,6 +103,7 @@ describe('EmployeeController & EmployeeImportExportController', () => {
       providers: [
         { provide: GetEmployeesUseCase, useValue: mockGetEmployeesUseCase },
         { provide: GetMyEmployeeUseCase, useValue: mockGetMyEmployeeUseCase },
+        { provide: GetEmployeeSummaryUseCase, useValue: {} },
         {
           provide: GetEmployeeByIdUseCase,
           useValue: mockGetEmployeeByIdUseCase,

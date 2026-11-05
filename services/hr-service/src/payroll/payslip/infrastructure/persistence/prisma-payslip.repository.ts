@@ -112,6 +112,27 @@ export class PrismaPayslipRepository implements IPayslipRepository {
     return toDetail(row, profile)
   }
 
+  async findLatestOwnPeriod(
+    userId: string,
+  ): Promise<{ year: number; month: number } | null> {
+    const row = await this.prisma.payslip.findFirst({
+      where: {
+        userId,
+        deletedAt: null,
+        payrollRun: { deletedAt: null, status: 'APPROVED' },
+      },
+      select: { payrollRun: { select: { year: true, month: true } } },
+      orderBy: [
+        { payrollRun: { year: 'desc' } },
+        { payrollRun: { month: 'desc' } },
+        { payrollRun: { sequence: 'desc' } },
+      ],
+    })
+    return row
+      ? { year: row.payrollRun.year, month: row.payrollRun.month }
+      : null
+  }
+
   async findOwn(
     userId: string,
     query: MyPayslipQueryInput,

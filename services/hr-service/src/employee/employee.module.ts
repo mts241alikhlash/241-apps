@@ -15,6 +15,9 @@ import { ExcelEmployeeParser } from './domain/repositories/employee-excel-parser
 import { CreateEmployeeUseCase } from './application/use-cases/create-employee/create-employee.use-case.js'
 import { DeleteEmployeeUseCase } from './application/use-cases/delete-employee/delete-employee.use-case.js'
 import { GetEmployeeByIdUseCase } from './application/use-cases/get-employee-by-id/get-employee-by-id.use-case.js'
+import { GetEmployeeSummaryUseCase } from './application/use-cases/get-employee-summary/get-employee-summary.use-case.js'
+import { IEmployeeSummaryReadPort } from './domain/repositories/employee-summary-read.port.js'
+import { PrismaEmployeeSummaryReadPort } from './infrastructure/persistence/prisma/prisma-employee-summary.read-port.js'
 import { GetMyEmployeeUseCase } from './application/use-cases/get-my-employee/get-my-employee.use-case.js'
 import { GetEmployeesUseCase } from './application/use-cases/get-employees/get-employees.use-case.js'
 import { UpdateEmployeeUseCase } from './application/use-cases/update-employee/update-employee.use-case.js'
@@ -48,6 +51,11 @@ import { EmployeePositionUseCase } from './application/use-cases/employee-positi
     DeleteEmployeeUseCase,
     GetEmployeeByIdUseCase,
     GetMyEmployeeUseCase,
+    GetEmployeeSummaryUseCase,
+    {
+      provide: IEmployeeSummaryReadPort,
+      useClass: PrismaEmployeeSummaryReadPort,
+    },
     GetEmployeesUseCase,
     UpdateEmployeeUseCase,
     UpdateEmployeeProfileUseCase,

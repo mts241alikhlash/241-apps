@@ -4,6 +4,7 @@ import { PayrollAccessFilter } from '../shared/filters/payroll-access.filter.js'
 import { IPayslipRepository } from './domain/interfaces/payslip-repository.interface.js'
 import { PrismaPayslipRepository } from './infrastructure/persistence/prisma-payslip.repository.js'
 import { PayslipController } from './presentation/payslip.controller.js'
+import { GetMyLatestPayslipPeriodUseCase } from './use-cases/get-my-latest-payslip-period.use-case.js'
 import { GetMyPayslipUseCase } from './use-cases/get-my-payslip.use-case.js'
 import {
   GetPayslipByIdUseCase,
@@ -17,6 +18,7 @@ import {
     { provide: IPayslipRepository, useClass: PrismaPayslipRepository },
     PayrollAccessFilter,
     GetMyPayslipUseCase,
+    GetMyLatestPayslipPeriodUseCase,
     GetPayslipByIdUseCase,
     GetRunPayslipsUseCase,
   ],

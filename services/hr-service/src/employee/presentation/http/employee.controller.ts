@@ -25,6 +25,8 @@ import {
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 
 import { UpdateProfileDto } from '../../../platform/profile/index.js'
+import { EmployeeSummaryResponseDto } from './dto/response/employee-summary-response.dto.js'
+import { GetEmployeeSummaryUseCase } from '../../application/use-cases/get-employee-summary/get-employee-summary.use-case.js'
 import { CreateEmployeeDto } from './dto/request/create-employee.dto.js'
 import { EmployeeQueryDto } from './dto/request/employee-query.dto.js'
 import {
@@ -55,6 +57,7 @@ export class EmployeeController {
     private readonly getEmployeesUseCase: GetEmployeesUseCase,
     private readonly getEmployeeByIdUseCase: GetEmployeeByIdUseCase,
     private readonly getMyEmployeeUseCase: GetMyEmployeeUseCase,
+    private readonly getSummaryUseCase: GetEmployeeSummaryUseCase,
     private readonly createEmployeeUseCase: CreateEmployeeUseCase,
     private readonly updateEmployeeUseCase: UpdateEmployeeUseCase,
     private readonly deleteEmployeeUseCase: DeleteEmployeeUseCase,
@@ -94,6 +97,16 @@ export class EmployeeController {
   ): Promise<EmployeeResponseDto> {
     return EmployeeResponseDto.fromDomain(
       await this.getMyEmployeeUseCase.execute(user.id),
+    )
+  }
+
+  @Get('summary')
+  @RequirePermissions('employees.read')
+  @ApiOperation({ summary: 'Active employees by employment type and category' })
+  @ApiResponse({ status: 200, type: EmployeeSummaryResponseDto })
+  async summary(): Promise<EmployeeSummaryResponseDto> {
+    return EmployeeSummaryResponseDto.fromDomain(
+      await this.getSummaryUseCase.execute(),
     )
   }
 
