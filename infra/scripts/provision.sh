@@ -96,11 +96,10 @@ if $need_env; then
 JSON
     MC_HOST_provision="${minio_url%%://*}://$minio_root_user:$minio_root_password@${minio_url#*://}"
     export MC_HOST_provision
-    creds="$(mc admin accesskey create provision --policy "$policy" 2> /dev/null || mc admin user svcacct add provision "$minio_root_user" --policy "$policy")"
+    creds="$(mc --json admin accesskey create provision --policy "$policy" 2> /dev/null || mc --json admin user svcacct add provision "$minio_root_user" --policy "$policy")"
     rm -f "$policy"
     unset MC_HOST_provision
-    s3_key="$(awk '/Access Key:/ { print $3 }' <<< "$creds")"
-    s3_secret="$(awk '/Secret Key:/ { print $3 }' <<< "$creds")"
+    read -r s3_key s3_secret < <(python3 "$here/mc-credentials.py" <<< "$creds") || true
     if [[ -z "$s3_key" || -z "$s3_secret" ]]; then
       echo "mc did not return an access key" >&2
       exit 1
