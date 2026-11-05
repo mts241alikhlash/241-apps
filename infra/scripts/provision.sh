@@ -6,7 +6,8 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 dry_run=false
 [[ "${1:-}" == "--dry-run" ]] && dry_run=true
 
-root=/srv/241-apps
+root="${DEPLOY_ROOT:-/srv/241-apps}"
+only_env="${PROVISION_ONLY_ENV:-}"
 repo_url="${PROVISION_REPO_URL:-https://github.com/mts241alikhlash/241-apps.git}"
 bucket=241-apps
 db_role=mts241
@@ -21,7 +22,7 @@ act() {
     "$@"
   fi
 }
-db_password="" minio_root_user="" minio_root_password="" minio_url="" db_host="" admin_password="" public_key=""
+db_password="" minio_url="" s3_key="" s3_secret="" db_host="" admin_password="" public_key=""
 ask() {
   local -n target="$1"
   local label="$2" secret="${3:-}"
@@ -39,14 +40,16 @@ ask() {
 }
 random() { openssl rand -hex 24; }
 
-if ! $dry_run && [[ "$(id -u)" -ne 0 ]]; then
+if ! $dry_run && [[ -z "$only_env" && "$(id -u)" -ne 0 ]]; then
   echo "run as root" >&2
   exit 1
 fi
-for tool in git docker psql curl openssl python3 mc; do
-  command -v "$tool" > /dev/null || { echo "missing tool: $tool" >&2; $dry_run || exit 1; }
+for tool in git docker psql curl openssl python3; do
+  command -v "$tool" > /dev/null || { echo "missing tool: $tool" >&2; $dry_run || [[ -n "$only_env" ]] || exit 1; }
 done
 
+ask db_password "password for the PostgreSQL role $db_role" secret
+if [[ -z "$only_env" ]]; then
 step "user deploy"
 if ! id deploy > /dev/null 2>&1; then
   act useradd -m -s /bin/bash -G docker deploy
@@ -58,7 +61,6 @@ if ! docker network inspect 241-apps > /dev/null 2>&1; then
 fi
 
 step "PostgreSQL role $db_role with CREATEDB"
-ask db_password "password for the PostgreSQL role $db_role" secret
 if $dry_run; then
   echo "    would create or update the role $db_role (LOGIN CREATEDB) with that password"
 else
@@ -75,40 +77,27 @@ ALTER ROLE $db_role LOGIN CREATEDB PASSWORD '$escaped_password';
 SQL
 fi
 
+fi
+
 need_env=false
 for service in "${services[@]}"; do
   [[ -f "$root/infra/compose/env/$service-service.env" ]] || need_env=true
 done
 
-step "MinIO access key limited to bucket $bucket"
-s3_key=""
-s3_secret=""
+step "MinIO access key: prompt"
 if $need_env; then
-  ask minio_root_user "MinIO root user"
-  ask minio_root_password "MinIO root password" secret
   ask minio_url "MinIO URL (for example http://127.0.0.1:9000)"
-  if $dry_run; then
-    echo "    would create an access key restricted to s3://$bucket with mc (MinIO prints the key, it is never an argument)"
-  else
-    policy="$(mktemp)"
-    cat > "$policy" <<JSON
-{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["s3:*"],"Resource":["arn:aws:s3:::$bucket","arn:aws:s3:::$bucket/*"]}]}
-JSON
-    MC_HOST_provision="${minio_url%%://*}://$minio_root_user:$minio_root_password@${minio_url#*://}"
-    export MC_HOST_provision
-    creds="$(mc --json admin accesskey create provision --policy "$policy" 2> /dev/null || mc --json admin user svcacct add provision "$minio_root_user" --policy "$policy")"
-    rm -f "$policy"
-    unset MC_HOST_provision
-    read -r s3_key s3_secret < <(python3 "$here/mc-credentials.py" <<< "$creds") || true
-    if [[ -z "$s3_key" || -z "$s3_secret" ]]; then
-      echo "mc did not return an access key" >&2
-      exit 1
-    fi
+  ask s3_key "MinIO access key id (bound to a policy limited to bucket $bucket)"
+  ask s3_secret "MinIO secret key" secret
+  if ! $dry_run && [[ -z "$s3_key" || -z "$s3_secret" ]]; then
+    echo "the access key id and the secret key are required" >&2
+    exit 1
   fi
 else
-  echo "    env files exist, no new access key"
+  echo "    env files exist, no access key needed"
 fi
 
+if [[ -z "$only_env" ]]; then
 step "checkout of infra at $root"
 if [[ ! -d "$root/.git" ]]; then
   act git clone --filter=blob:none --no-checkout "$repo_url" "$root"
@@ -124,6 +113,8 @@ if [[ ! -f "$root/infra/compose/compose.override.yaml" ]]; then
   else
     cp "$root/infra/compose/compose.override.example.yaml" "$root/infra/compose/compose.override.yaml"
   fi
+fi
+
 fi
 
 step "service env files"
@@ -152,7 +143,7 @@ for service in "${services[@]}"; do
     continue
   fi
   python3 "$here/provision-env.py" "$root/services/$service-service/.env.example" "$target" "$service" "$ports_json"
-  chown deploy:deploy "$target"
+  [[ -n "$only_env" ]] || chown deploy:deploy "$target"
   echo "    wrote $target"
 done
 unset PROV_DB_HOST PROV_DB_USER PROV_DB_PASSWORD PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD PROV_S3_KEY PROV_S3_SECRET PROV_S3_ENDPOINT PROV_BUCKET
@@ -162,6 +153,7 @@ if ! $dry_run; then
   done
 fi
 
+if [[ -z "$only_env" ]]; then
 step "authorized_keys for deploy"
 ask public_key "SSH public key of the deploy workflow (one line)"
 entry="restrict,command=\"$root/infra/scripts/deploy-entry.sh\" $public_key"
@@ -175,6 +167,7 @@ else
   fi
   chown deploy:deploy /home/deploy/.ssh/authorized_keys
   chmod 600 /home/deploy/.ssh/authorized_keys
+fi
 fi
 
 step "done"

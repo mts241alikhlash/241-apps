@@ -12,7 +12,7 @@ Result: `git show main:infra/deployment/lock.json | grep -c REPLACE_BEFORE_DEPLO
 
 ## 1. Provision
 
-As root on the server: `provision.sh --dry-run`, read it, then `provision.sh`.
+As root on the server, with the MinIO access key from [provision-vps](provision-vps.md#1-create-the-minio-access-key): `provision.sh --dry-run`, read it, then `provision.sh`.
 
 Result: every check of the provisioning table passes.
 
