@@ -58,6 +58,20 @@ pnpm run test:e2e
 
 Result: every service with a `test/*.e2e-spec.ts` reports its suite passing; the portal suite creates and migrates its own `portal_e2e` database.
 
+## Rehearse a deploy
+
+Run the whole deploy path (`deploy.sh`, `bootstrap.sh`, migrations, seeds, health checks) on the laptop, behind a local TLS front that answers to the production host names. It needs Podman with the Podman socket and a `docker compose` provider, and it uses the Compose project `241-apps`, so stop the `dev.mjs` storage containers first (`podman stop 241-apps_postgres_1 241-apps_s3_1`). Rehearsal state (env files, override, Caddy data) lives in `~/.local/share/241-apps-rehearsal/`; its volumes are named `241-apps-rehearsal-*`, so `dev.mjs` data is never touched.
+
+1. `infra/scripts/rehearsal-build.sh` builds the 20 images as `localhost/241-apps/<name>:rehearsal`.
+2. `infra/scripts/rehearsal-env.sh` writes the override and the ten env files (random secrets; the admin password is printed once and kept in `admin-password`), and links them into the gitignored `infra/compose/env/`.
+3. `podman network create 241-apps`, then start the storage services: `docker compose -f infra/compose/compose.yaml -f ~/.local/share/241-apps-rehearsal/compose.override.yaml --profile storage up -d --wait postgres s3`.
+4. `infra/scripts/rehearsal-caddy.sh up` starts the TLS front on port 8443 (resolve `*.mts241alikhlash.sch.id` to `127.0.0.1` in the browser, for example with Chrome's `--host-resolver-rules`).
+5. From `infra/`: `DEPLOY_OVERRIDE=<state>/compose.override.yaml DEPLOY_PULL=never BOOTSTRAP_PSQL="podman exec -i 241-apps-postgres-1 psql -U mts241 -d postgres" BOOTSTRAP_S3_ENDPOINT=http://127.0.0.1:9000 BOOTSTRAP_S3_KEY=rehearsal BOOTSTRAP_S3_SECRET=rehearsal bash scripts/deploy.sh`; run it twice.
+
+Result: both runs exit 0, the second creates nothing and changes no data, and `https://accounts.mts241alikhlash.sch.id:8443` signs in. Tear down with `docker compose ... down -v`, `rehearsal-caddy.sh down`, removing the links in `infra/compose/env/` and `infra/compose/.env`, `podman network rm 241-apps`, and `podman start 241-apps_postgres_1 241-apps_s3_1`.
+
+The knobs that exist only for the rehearsal: `DEPLOY_OVERRIDE`, `DEPLOY_PULL=never`, `BOOTSTRAP_PSQL`, `BOOTSTRAP_S3_*` (their VPS defaults are `compose/compose.override.yaml`, pull, native `psql` through `PGPASSFILE`, the S3 values in the env file), and a gateway `nginx.conf` mounted with the Podman DNS resolver and `Host $http_host` (the VPS image uses Docker's `127.0.0.11` and `Host $host`).
+
 ## Notes
 
 - A machine with little memory cannot run ten services under `nest start --watch` at once; start only the apps you need.
