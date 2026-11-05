@@ -1,12 +1,15 @@
 # syntax=docker/dockerfile:1
 FROM node:24.22.1-alpine AS build
-RUN corepack enable && corepack prepare pnpm@11.25.0 --activate
+ENV PNPM_HOME=/pnpm
+ENV npm_config_store_dir=/pnpm/store
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable
 WORKDIR /workspace
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY services/ ./services/
-COPY packages/ ./packages/
-RUN pnpm install --frozen-lockfile
-RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter presence-service prisma:generate && pnpm --filter presence-service... run build
+COPY . .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --filter presence-service...
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter presence-service prisma:generate \
+    && pnpm --filter presence-service... run build
 RUN pnpm --filter presence-service deploy --prod --legacy /out
 
 FROM node:24.22.1-alpine AS runner
