@@ -92,7 +92,8 @@ Indonesian domain terms, the name used in code, and what they mean. One heading 
 
 - **Butir Penilaian** — `AssessmentItem` — a graded item (quiz, assignment); its weight is `AssessmentWeight`.
 - **Nilai Siswa** — `StudentScore` — a student's score on an item.
-- **Nilai Ujian** — `ExamScore` — a score from an exam.
+- **Nilai Rapor** — `ReportCardSubject` score — the final report grade of one subject on a `Rapor`; the only grade assessment treats as final.
+- **Salinan Nilai Ujian** — `ExamScore` — an exam score kept in assessment for reference; it is not a report grade.
 - **Presensi (kelas)** — `Attendance` — lesson attendance.
 - **Rapor** — `ReportCard` — the term report, with one line per subject (`ReportCardSubject`).
 
@@ -104,4 +105,5 @@ Indonesian domain terms, the name used in code, and what they mean. One heading 
 - **Jadwal Ujian** — `ExamSchedule` — when a package is sat, by which participants (`ExamScheduleParticipant`).
 - **Ruang Ujian** — `ExamRoom` — an exam room with seats and supervisors (**pengawas**).
 - **Sesi Ujian** — `ExamSession` — one participant's sitting, with answers (`ExamAnswer`).
+- **Nilai Ujian** — an exam score from grading a session; it may or may not be taken into a **Nilai Rapor**.
 - **Penilaian Ujian** — grading — scoring answers; results are released as a `ScorePublication`.
