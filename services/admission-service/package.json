@@ -55,7 +55,6 @@
     "class-validator": "catalog:",
     "cookie-parser": "catalog:",
     "dotenv": "catalog:",
-    "file-type": "catalog:",
     "helmet": "catalog:",
     "nestjs-pino": "catalog:",
     "passport": "catalog:",
@@ -69,7 +68,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "catalog:",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@mts241alikhlash/vitest-config": "workspace:*",
@@ -82,17 +80,10 @@
     "@types/multer": "catalog:",
     "@types/node": "catalog:",
     "@types/passport-jwt": "catalog:",
-    "@types/supertest": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
-    "source-map-support": "catalog:",
-    "supertest": "catalog:",
     "ts-loader": "catalog:",
-    "ts-node": "catalog:",
-    "tsx": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

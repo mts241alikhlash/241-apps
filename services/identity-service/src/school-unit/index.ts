@@ -1,5 +1,0 @@
-export { ISchoolUnitRepository } from './domain/repositories/school-unit.repository.js'
-export { GetSchoolUnitUseCase } from './application/use-cases/get-school-unit/get-school-unit.use-case.js'
-export { ISchoolUnitSocialMediaRepository } from './domain/repositories/school-unit-social-media.repository.js'
-export { SchoolUnitSocialMediaResponseDto } from './presentation/http/dto/response/school-unit-social-media-response.dto.js'
-export { SchoolUnitModule } from './school-unit.module.js'

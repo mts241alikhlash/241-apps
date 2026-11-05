@@ -21,21 +21,11 @@ const services = [
   'student',
 ]
 
-const tsconfig = `${JSON.stringify(
-  {
-    compilerOptions: {
-      module: 'nodenext',
-      moduleResolution: 'nodenext',
-      target: 'ES2023',
-      strict: true,
-      skipLibCheck: true,
-      noEmit: true,
-    },
-    include: ['src/**/*.ts'],
-  },
-  null,
-  2,
-)}\n`
+const tsconfig = `{
+  "extends": "@mts241alikhlash/typescript-config/library.json",
+  "include": ["src/**/*.ts"]
+}
+`
 
 const client = `import createClient from 'openapi-fetch'\nimport type { paths } from './generated.js'\n\nexport type ApiClientOptions = {\n  baseUrl: string\n  fetch?: typeof globalThis.fetch\n  headers?: HeadersInit\n}\n\nexport function createApiClient({\n  baseUrl,\n  fetch,\n  headers,\n}: ApiClientOptions) {\n  return createClient<paths>({\n    baseUrl,\n    ...(fetch ? { fetch } : {}),\n    headers,\n  })\n}\n`
 

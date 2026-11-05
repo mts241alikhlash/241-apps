@@ -17,6 +17,7 @@ const SKIPPED = [/^src\/generated\//, /^packages\/[^/]+\/src\/generated\.ts$/]
 const DIRECTIVES = [
   /^\s*\/\/\/\s*<reference\b/,
   /^\s*\/\/\s*@vitest-environment\b/,
+  /^\s*<!--\s*eslint-(disable|enable)\b/,
 ]
 
 function isDirective(sourceLine, column) {

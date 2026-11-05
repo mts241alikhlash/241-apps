@@ -1,0 +1,35 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": { "entry": ["scripts/*.mjs"], "project": ["scripts/*.mjs"] },
+    "apps/*": {
+      "entry": ["scripts/*.{mjs,ts}"],
+      "project": ["src/**/*.{ts,vue,css}", "scripts/**"]
+    },
+    "services/*": {
+      "entry": ["src/main.ts", "src/openapi/emit-openapi.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "packages/*-api": { "project": ["src/**/*.ts"] },
+    "packages/ui": { "project": ["src/**/*.{ts,vue}"] },
+    "packages/web-shared": { "project": ["src/**/*.ts"] },
+    "packages/nest-core": { "project": ["src/**/*.ts"] },
+    "packages/platform": {
+      "entry": ["src/**/*.spec.ts"],
+      "project": ["src/**/*.{ts,vue}"]
+    },
+    "packages/reference-data": { "project": ["src/**/*.{ts,vue}"] },
+    "infra": { "entry": ["**/*.mjs"], "project": ["**/*.mjs"] }
+  },
+  "ignoreBinaries": ["eslint"],
+  "ignoreDependencies": ["pino-pretty", "@types/express"],
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "classMembers": "off",
+    "enumMembers": "off",
+    "duplicates": "off"
+  }
+}

@@ -22,15 +22,15 @@
     "format:check": "prettier --check .",
     "lint": "prettier --check . && pnpm -r --if-present run lint",
     "fix": "prettier --write . && pnpm -r --if-present run lint --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "knip": "DATABASE_URL=postgresql://knip:knip@localhost:5432/knip DIRECT_URL=postgresql://knip:knip@localhost:5432/knip knip"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
-    "@vitejs/plugin-vue": "^6.0.9",
     "@vue/test-utils": "catalog:",
-    "@vue/tsconfig": "catalog:",
     "happy-dom": "catalog:",
     "husky": "^9.1.7",
+    "knip": "^6.44.1",
     "lint-staged": "^17.6.0",
     "openapi-typescript": "^7.13.0",
     "prettier": "catalog:",

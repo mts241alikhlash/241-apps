@@ -281,9 +281,6 @@ catalogs:
     '@types/express':
       specifier: ^5.0.6
       version: 5.0.6
-    '@types/katex':
-      specifier: ^0.16.8
-      version: 0.16.8
     '@types/leaflet':
       specifier: ^1.9.22
       version: 1.9.22
@@ -305,12 +302,6 @@ catalogs:
     '@types/supertest':
       specifier: ^7.2.1
       version: 7.2.1
-    '@typescript-eslint/eslint-plugin':
-      specifier: ^8.67.0
-      version: 8.72.1
-    '@typescript-eslint/parser':
-      specifier: ^8.67.0
-      version: 8.72.1
     '@unovis/ts':
       specifier: ^1.7.0
       version: 1.7.1
@@ -446,9 +437,6 @@ catalogs:
     sharp:
       specifier: ^0.35.5
       version: 0.35.5
-    source-map-support:
-      specifier: ^0.5.21
-      version: 0.5.21
     supertest:
       specifier: ^7.2.2
       version: 7.3.1
@@ -461,9 +449,6 @@ catalogs:
     ts-loader:
       specifier: ^9.6.0
       version: 9.6.2
-    ts-node:
-      specifier: ^10.9.2
-      version: 10.9.2
     tsx:
       specifier: ^4.23.12
       version: 4.23.15
@@ -488,12 +473,6 @@ catalogs:
     vue:
       specifier: ^3.5.41
       version: 3.5.44
-    vue-chrts:
-      specifier: ^2.2.1
-      version: 2.2.3
-    vue-eslint-parser:
-      specifier: ^10.4.0
-      version: 10.4.1
     vue-i18n:
       specifier: ^11.4.10
       version: 11.4.17
@@ -530,21 +509,18 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@vitejs/plugin-vue':
-        specifier: ^6.0.9
-        version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
       husky:
         specifier: ^9.1.7
         version: 9.1.7
+      knip:
+        specifier: ^6.44.1
+        version: 6.44.1
       lint-staged:
         specifier: ^17.6.0
         version: 17.6.0
@@ -611,9 +587,6 @@ importers:
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
@@ -623,27 +596,15 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
       date-fns:
         specifier: 'catalog:'
         version: 4.4.0
-      leaflet:
-        specifier: 'catalog:'
-        version: 1.9.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       reka-ui:
         specifier: 'catalog:'
         version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -656,9 +617,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -675,9 +633,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -687,81 +642,36 @@ importers:
       '@mts241alikhlash/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
-      '@types/leaflet':
-        specifier: 'catalog:'
-        version: 1.9.22
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/account-web:
     dependencies:
-      '@fullcalendar/core':
-        specifier: 'catalog:'
-        version: 6.1.22
-      '@fullcalendar/daygrid':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/interaction':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/vue3':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)(vue@3.5.44(typescript@5.9.3))
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -780,51 +690,18 @@ importers:
       '@tanstack/vue-query':
         specifier: 'catalog:'
         version: 5.105.3(vue@3.5.44(typescript@5.9.3))
-      '@tanstack/vue-table':
-        specifier: 'catalog:'
-        version: 8.21.3(vue@3.5.44(typescript@5.9.3))
-      '@types/qrcode':
-        specifier: 'catalog:'
-        version: 1.5.6
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 14.4.0(vue@3.5.44(typescript@5.9.3))
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
-      leaflet:
-        specifier: 'catalog:'
-        version: 1.9.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      qrcode:
-        specifier: 'catalog:'
-        version: 1.5.4
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -837,9 +714,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -856,9 +730,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -868,81 +739,33 @@ importers:
       '@mts241alikhlash/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
-      '@types/leaflet':
-        specifier: 'catalog:'
-        version: 1.9.22
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
-      '@vue/test-utils':
-        specifier: 'catalog:'
-        version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/admin-web:
     dependencies:
-      '@fullcalendar/core':
-        specifier: 'catalog:'
-        version: 6.1.22
-      '@fullcalendar/daygrid':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/interaction':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/vue3':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)(vue@3.5.44(typescript@5.9.3))
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -967,15 +790,9 @@ importers:
       '@tanstack/vue-table':
         specifier: 'catalog:'
         version: 8.21.3(vue@3.5.44(typescript@5.9.3))
-      '@types/qrcode':
-        specifier: 'catalog:'
-        version: 1.5.6
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
@@ -985,30 +802,12 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
       leaflet:
         specifier: 'catalog:'
         version: 1.9.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      qrcode:
-        specifier: 'catalog:'
-        version: 1.5.4
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1021,9 +820,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -1040,9 +836,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1058,63 +851,30 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
-      '@vue/test-utils':
-        specifier: 'catalog:'
-        version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/admission-web:
     dependencies:
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -1139,9 +899,6 @@ importers:
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
@@ -1151,24 +908,12 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       reka-ui:
         specifier: 'catalog:'
         version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1181,9 +926,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -1200,9 +942,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/academic-api':
         specifier: workspace:*
         version: link:../../packages/academic-api
@@ -1221,75 +960,33 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/assessment-web:
     dependencies:
-      '@fullcalendar/core':
-        specifier: 'catalog:'
-        version: 6.1.22
-      '@fullcalendar/daygrid':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/interaction':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/vue3':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)(vue@3.5.44(typescript@5.9.3))
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -1311,27 +1008,6 @@ importers:
       '@tanstack/vue-table':
         specifier: 'catalog:'
         version: 8.21.3(vue@3.5.44(typescript@5.9.3))
-      '@tiptap/core':
-        specifier: 'catalog:'
-        version: 3.32.2(@tiptap/pm@3.32.2)
-      '@tiptap/extension-subscript':
-        specifier: 'catalog:'
-        version: 3.32.2(@tiptap/core@3.32.2(@tiptap/pm@3.32.2))(@tiptap/pm@3.32.2)
-      '@tiptap/extension-superscript':
-        specifier: 'catalog:'
-        version: 3.32.2(@tiptap/core@3.32.2(@tiptap/pm@3.32.2))(@tiptap/pm@3.32.2)
-      '@tiptap/extension-table':
-        specifier: 'catalog:'
-        version: 3.32.2(@tiptap/core@3.32.2(@tiptap/pm@3.32.2))(@tiptap/pm@3.32.2)
-      '@tiptap/pm':
-        specifier: 'catalog:'
-        version: 3.32.2
-      '@tiptap/starter-kit':
-        specifier: 'catalog:'
-        version: 3.32.2
-      '@tiptap/vue-3':
-        specifier: 'catalog:'
-        version: 3.32.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.32.2(@tiptap/pm@3.32.2))(@tiptap/pm@3.32.2)(vue@3.5.44(typescript@5.9.3))
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
@@ -1341,39 +1017,12 @@ importers:
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 14.4.0(vue@3.5.44(typescript@5.9.3))
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
-      dompurify:
-        specifier: 'catalog:'
-        version: 3.4.17
-      katex:
-        specifier: 'catalog:'
-        version: 0.19.1
-      leaflet:
-        specifier: 'catalog:'
-        version: 1.9.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1386,9 +1035,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -1405,9 +1051,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1417,66 +1060,33 @@ importers:
       '@mts241alikhlash/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
-      '@types/katex':
-        specifier: 'catalog:'
-        version: 0.16.8
-      '@types/leaflet':
-        specifier: 'catalog:'
-        version: 1.9.22
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
       jsdom:
         specifier: 'catalog:'
         version: 30.1.3(@noble/hashes@1.8.0)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
@@ -1534,12 +1144,6 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
       dompurify:
         specifier: 'catalog:'
         version: 3.4.17
@@ -1549,12 +1153,6 @@ importers:
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1583,9 +1181,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1595,72 +1190,39 @@ importers:
       '@mts241alikhlash/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
-      '@types/katex':
-        specifier: 'catalog:'
-        version: 0.16.8
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
       jsdom:
         specifier: 'catalog:'
         version: 30.1.3(@noble/hashes@1.8.0)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/hr-web:
     dependencies:
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -1688,9 +1250,6 @@ importers:
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
@@ -1700,15 +1259,6 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
@@ -1718,9 +1268,6 @@ importers:
       reka-ui:
         specifier: 'catalog:'
         version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1733,9 +1280,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -1752,9 +1296,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1773,75 +1314,33 @@ importers:
       '@types/qrcode':
         specifier: 'catalog:'
         version: 1.5.6
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/inventory-web:
     dependencies:
-      '@fullcalendar/core':
-        specifier: 'catalog:'
-        version: 6.1.22
-      '@fullcalendar/daygrid':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/interaction':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)
-      '@fullcalendar/vue3':
-        specifier: 'catalog:'
-        version: 6.1.22(@fullcalendar/core@6.1.22)(vue@3.5.44(typescript@5.9.3))
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -1863,15 +1362,9 @@ importers:
       '@tanstack/vue-table':
         specifier: 'catalog:'
         version: 8.21.3(vue@3.5.44(typescript@5.9.3))
-      '@types/qrcode':
-        specifier: 'catalog:'
-        version: 1.5.6
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
@@ -1881,30 +1374,9 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
-      leaflet:
-        specifier: 'catalog:'
-        version: 1.9.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      qrcode:
-        specifier: 'catalog:'
-        version: 1.5.4
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -1917,9 +1389,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -1936,9 +1405,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -1948,69 +1414,33 @@ importers:
       '@mts241alikhlash/vitest-config':
         specifier: workspace:*
         version: link:../../packages/vitest-config
-      '@types/leaflet':
-        specifier: 'catalog:'
-        version: 1.9.22
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
-      '@vue/test-utils':
-        specifier: 'catalog:'
-        version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
 
   apps/portal-web:
     dependencies:
-      '@internationalized/date':
-        specifier: 'catalog:'
-        version: 3.12.4
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -2050,36 +1480,15 @@ importers:
       '@unovis/ts':
         specifier: 'catalog:'
         version: 1.7.1(supports-color@10.2.2)
-      '@unovis/vue':
-        specifier: 'catalog:'
-        version: 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 14.4.0(vue@3.5.44(typescript@5.9.3))
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      class-variance-authority:
-        specifier: 'catalog:'
-        version: 0.7.1
-      clsx:
-        specifier: 'catalog:'
-        version: 2.1.1
-      date-fns:
-        specifier: 'catalog:'
-        version: 4.4.0
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      reka-ui:
-        specifier: 'catalog:'
-        version: 2.11.0(vue@3.5.44(typescript@5.9.3))
-      tailwind-merge:
-        specifier: 'catalog:'
-        version: 3.7.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.4
@@ -2092,9 +1501,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-chrts:
-        specifier: 'catalog:'
-        version: 2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3))
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -2111,9 +1517,6 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -2126,54 +1529,27 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
-      '@typescript-eslint/eslint-plugin':
-        specifier: 'catalog:'
-        version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vite:
         specifier: 'catalog:'
         version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
@@ -2281,9 +1657,6 @@ importers:
 
   packages/nest-core:
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
@@ -2368,9 +1741,6 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       exceljs:
         specifier: 'catalog:'
         version: 4.4.0
@@ -2404,9 +1774,6 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -2423,9 +1790,6 @@ importers:
         specifier: workspace:*
         version: link:../web-shared
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -2441,54 +1805,30 @@ importers:
       '@tanstack/vue-query':
         specifier: 'catalog:'
         version: 5.105.3(vue@3.5.44(typescript@5.9.3))
-      '@tanstack/vue-table':
-        specifier: 'catalog:'
-        version: 8.21.3(vue@3.5.44(typescript@5.9.3))
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
       '@vue/test-utils':
         specifier: 'catalog:'
         version: 2.5.1(@vue/compiler-dom@3.5.44)(@vue/server-renderer@3.5.44)(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       axios:
         specifier: 'catalog:'
         version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
       happy-dom:
         specifier: 'catalog:'
         version: 21.0.4
       pinia:
         specifier: 'catalog:'
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vee-validate:
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))
@@ -2501,9 +1841,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-i18n:
         specifier: 'catalog:'
         version: 11.4.17(vue@3.5.44(typescript@5.9.3))
@@ -2545,13 +1882,7 @@ importers:
       '@mts241alikhlash/ui':
         specifier: workspace:*
         version: link:../ui
-      '@mts241alikhlash/web-shared':
-        specifier: workspace:*
-        version: link:../web-shared
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@lucide/vue':
         specifier: 'catalog:'
         version: 1.66.0(vue@3.5.44(typescript@5.9.3))
@@ -2573,33 +1904,12 @@ importers:
       '@vee-validate/zod':
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))(zod@3.25.76)
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.10(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.44(typescript@5.9.3))
-      '@vue/tsconfig':
-        specifier: 'catalog:'
-        version: 0.9.1(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 10.1.8
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
-      eslint-plugin-vue:
-        specifier: 'catalog:'
-        version: 10.12.0(@typescript-eslint/parser@8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3))(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(vue-eslint-parser@10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2))
-      globals:
-        specifier: 'catalog:'
-        version: 17.14.0
-      prettier:
-        specifier: 'catalog:'
-        version: 3.9.10
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vee-validate:
         specifier: 'catalog:'
         version: 4.15.1(vue@3.5.44(typescript@5.9.3))
@@ -2609,9 +1919,6 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.44(typescript@5.9.3)
-      vue-eslint-parser:
-        specifier: 'catalog:'
-        version: 10.4.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       vue-tsc:
         specifier: 3.3.11
         version: 3.3.11(typescript@5.9.3)
@@ -2745,12 +2052,6 @@ importers:
 
   services/academic-service:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 'catalog:'
-        version: 3.1161.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: 'catalog:'
-        version: 3.1161.0
       '@mts241alikhlash/nest-core':
         specifier: workspace:*
         version: link:../../packages/nest-core
@@ -2835,9 +2136,6 @@ importers:
       prisma:
         specifier: 7.10.0
         version: 7.10.0(@types/node@24.19.2)(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3)
-      puppeteer:
-        specifier: 'catalog:'
-        version: 25.16.0
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -2854,9 +2152,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -2902,30 +2197,18 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -2989,9 +2272,6 @@ importers:
       dotenv:
         specifier: 'catalog:'
         version: 18.0.9
-      file-type:
-        specifier: 'catalog:'
-        version: 22.3.0(supports-color@10.2.2)
       helmet:
         specifier: 'catalog:'
         version: 8.3.0
@@ -3026,9 +2306,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3065,51 +2342,24 @@ importers:
       '@types/passport-jwt':
         specifier: 'catalog:'
         version: 4.0.1
-      '@types/supertest':
-        specifier: 'catalog:'
-        version: 7.2.1
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
-      supertest:
-        specifier: 'catalog:'
-        version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   services/assessment-service:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 'catalog:'
-        version: 3.1161.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: 'catalog:'
-        version: 3.1161.0
       '@mts241alikhlash/nest-core':
         specifier: workspace:*
         version: link:../../packages/nest-core
@@ -3210,9 +2460,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3258,33 +2505,21 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      express:
+        specifier: ^5.3.0
+        version: 5.3.0(supports-color@10.2.2)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -3400,9 +2635,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3442,51 +2674,24 @@ importers:
       '@types/sanitize-html':
         specifier: 'catalog:'
         version: 2.16.2
-      '@types/supertest':
-        specifier: 'catalog:'
-        version: 7.2.1
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
-      supertest:
-        specifier: 'catalog:'
-        version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   services/hr-service:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 'catalog:'
-        version: 3.1161.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: 'catalog:'
-        version: 3.1161.0
       '@mts241alikhlash/nest-core':
         specifier: workspace:*
         version: link:../../packages/nest-core
@@ -3584,9 +2789,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3632,33 +2834,18 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -3765,9 +2952,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3816,30 +3000,21 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
+      express:
+        specifier: ^5.3.0
+        version: 5.3.0(supports-color@10.2.2)
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -3925,9 +3100,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -3958,39 +3130,18 @@ importers:
       '@types/passport-jwt':
         specifier: 'catalog:'
         version: 4.0.1
-      '@types/supertest':
-        specifier: 'catalog:'
-        version: 7.2.1
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
-      supertest:
-        specifier: 'catalog:'
-        version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -4103,9 +3254,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -4148,33 +3296,18 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -4263,9 +3396,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -4302,45 +3432,24 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
       supertest:
         specifier: 'catalog:'
         version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   services/student-service:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 'catalog:'
-        version: 3.1161.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: 'catalog:'
-        version: 3.1161.0
       '@mts241alikhlash/nest-core':
         specifier: workspace:*
         version: link:../../packages/nest-core
@@ -4438,9 +3547,6 @@ importers:
         specifier: ^4.4.3
         version: 4.6.7
     devDependencies:
-      '@eslint/js':
-        specifier: 'catalog:'
-        version: 10.0.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       '@mts241alikhlash/academic-api':
         specifier: workspace:*
         version: link:../../packages/academic-api
@@ -4483,39 +3589,18 @@ importers:
       '@types/sanitize-html':
         specifier: 'catalog:'
         version: 2.16.2
-      '@types/supertest':
-        specifier: 'catalog:'
-        version: 7.2.1
       eslint:
         specifier: 'catalog:'
         version: 10.14.0(jiti@2.7.0)(supports-color@10.2.2)
-      eslint-config-prettier:
-        specifier: 'catalog:'
-        version: 10.1.8(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
-      source-map-support:
-        specifier: 'catalog:'
-        version: 0.5.21
-      supertest:
-        specifier: 'catalog:'
-        version: 7.3.1(supports-color@10.2.2)
       ts-loader:
         specifier: 'catalog:'
         version: 9.6.2(typescript@5.9.3)(webpack@5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3))
-      ts-node:
-        specifier: 'catalog:'
-        version: 10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3)
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.15
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typescript-eslint:
-        specifier: 'catalog:'
-        version: 8.72.1(eslint@10.14.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.9.3)
       vitest:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(happy-dom@21.0.4)(jsdom@30.1.3(@noble/hashes@1.8.0))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
@@ -4785,10 +3870,6 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@cspotcode/source-map-support@0.8.1':
-    resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
-    engines: {node: '>=12'}
-
   '@csstools/color-helpers@6.1.2':
     resolution: {integrity: sha512-grhRy3OKmniaAEKXMjua5z/EODX0MSqBGjunw8+j/3HQjOnahs2AGhvEOIYVUWcU6ScApbhLhVrQTX8XqrMrow==}
     engines: {node: '>=20.19.0'}
@@ -4839,8 +3920,17 @@ packages:
   '@electric-sql/pglite@0.4.3':
     resolution: {integrity: sha512-ichuWTgtd4mOM1G4SpyGJa5trT03lWbMypDV0fUXUCXg5hiHqVAz/bZyV68NqmkLB7WcYmj1RMJVSp8HV/v/ZQ==}
 
+  '@emnapi/core@1.11.2':
+    resolution: {integrity: sha512-TC8MkTuZUtcTSiFeuC0ksCh9QIJ5+F21MvZ4Wn4ORfYaFJ/0dsiudv5tVkejgwZlwQ39jL9WWDe2lz8x0WglOA==}
+
+  '@emnapi/runtime@1.11.2':
+    resolution: {integrity: sha512-kyOl3X0DuTiT1h2ft8r2fYO8JYtU9a9Xis/zBSiGArNaagCOWx90N1k2wxp18czFDH+OgcWGb5ZP/XMt3dcyPA==}
+
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
+
+  '@emnapi/wasi-threads@1.2.2':
+    resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
 
   '@emotion/babel-plugin@11.13.5':
     resolution: {integrity: sha512-pxHCpT2ex+0q+HH91/zsdHkw/lXd468DIN2zvfvLtPKLLMo6gQj7oLObq8PhkrxOZb/gGCq03S3Z7PDhS8pduQ==}
@@ -5487,9 +4577,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@jridgewell/trace-mapping@0.3.9':
-    resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
   '@juggle/resize-observer@3.4.0':
     resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
 
@@ -5558,6 +4645,13 @@ packages:
 
   '@microsoft/tsdoc@0.17.1':
     resolution: {integrity: sha512-VHyYyyoH63jFoO3shpw9Zfijk5v/9p/VrClW35z0/q6ooK7sSmxpzOkS4iZPxs3vO4XtBW4H38HRAKkAMIK7DA==}
+
+  '@napi-rs/wasm-runtime@1.2.7':
+    resolution: {integrity: sha512-zJccwplOAbgfZju95IUHazLnx9RAPtPN2YGJXI6UbrgeaR9QfPjGrQL6ERkSAtnVCA4Q+83ApGyaX5zdpCaKkQ==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
+    peerDependencies:
+      '@emnapi/core': ^1.7.1 || 2.0.0-beta.2 || 2.0.0-beta.3
+      '@emnapi/runtime': ^1.7.1 || 2.0.0-beta.2 || 2.0.0-beta.3
 
   '@nestjs/cache-manager@12.0.2':
     resolution: {integrity: sha512-Z3tW9itvr75gLPt+nWJinu4JJxi7qveTw3IU3/kPAqfwF0m6pwzcdoWXA9fj+qGg79Gxbye55cocItTohkOEGw==}
@@ -5806,8 +4900,236 @@ packages:
   '@one-ini/wasm@0.2.1':
     resolution: {integrity: sha512-TUqERXGNTifZ9y2g3wPxQrw3HpHv/02DsW3D90T9x0hhonrL1ZqpSmNrU2XkoIq0fP1N6gZfVQzy2Fw1ZvGBNg==}
 
+  '@oxc-parser/binding-android-arm-eabi@0.155.0':
+    resolution: {integrity: sha512-A6xv7hDtnTm+xlZ7utn6rRQpRMJHRhVr3gjRGqlx0RUX84mNk0pAsy6YN/wWhuOTkaZhRrrzaLxf0NfbH77j2w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [android]
+
+  '@oxc-parser/binding-android-arm64@0.155.0':
+    resolution: {integrity: sha512-T1wWwH9/JI5g7Z4kEQwDOwhToxdDhRyOTklH+uuNpJ16m3MZFmGl+l2rKc0NHQdbVRG2LTOBsNjpW3h1BWytPA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [android]
+
+  '@oxc-parser/binding-darwin-arm64@0.155.0':
+    resolution: {integrity: sha512-ZoRB3qJxJ8DWA41jHja+YeB0lLfjBy4T+Kr15vnN1k65X3zbJt3rPZftEwN4Ju4tmA4K/T9dWWD7Z8ewQLnrVA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxc-parser/binding-darwin-x64@0.155.0':
+    resolution: {integrity: sha512-vxtL86BtM+IgrpejA86nbTk5j0HKTIMeuaJ1fQciw6p9RfavPtIPjI7gN34owap0yG9txXBaAWpGdxokNwdqIw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxc-parser/binding-freebsd-x64@0.155.0':
+    resolution: {integrity: sha512-tN6Ru5e0UVnWaIuiH8jEwnvxuxg7FvhWwSd3oe5oDhOD4ObsSr9/N6WfHLjilUWlPPj65ptwrSDH0Y7lzwTzmw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxc-parser/binding-linux-arm-gnueabihf@0.155.0':
+    resolution: {integrity: sha512-h4ozA5n6L6lwolsz9iwunEhKWnIVbmFRots5QxEix0H6nJ5ICpuDa7PuShuhfpIDFe3+Qvyscioyiv+9g+4Syg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-arm-musleabihf@0.155.0':
+    resolution: {integrity: sha512-058/+LardpfuUlsKIvBGk/CYoakEVcMgqYx8GgyUZeOxFWTojYLlCc1Gb60/y21v3esDhHidgiY/Zbq9LpBhaQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.155.0':
+    resolution: {integrity: sha512-nrOt2Y3xIAzu+lSPzH0864ieO+iCCXgoo9qFlGANE8Xh0cQ+RP8Wstfp+/wXN2YCyb98cAGzX0VruKYw7it/jw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-arm64-musl@0.155.0':
+    resolution: {integrity: sha512-KYAayyN5hQbJPtGKtRxlyc8XYmyntOplyXSQzTDrmbz7l/GCrzQbSswvyJFBTH1LGtsZrbXOAfN52i/Kz6kLKg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-linux-ppc64-gnu@0.155.0':
+    resolution: {integrity: sha512-CSuSY5hfjtsBnHXydOj8jiNfS1qHbdPZuPz1YL1cSgK7VmNYP+QlZIbG0BBYYBgX/vYEgZwbG9mBdW4YairZ5w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-riscv64-gnu@0.155.0':
+    resolution: {integrity: sha512-7KCfOQm+Nz2N8trAXbQkal4TQ5756WVEmhm35y816YHvyFnEfVsICsiV5k0pEszNf/fRm4cm2i6i18SJ6/iCWg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-riscv64-musl@0.155.0':
+    resolution: {integrity: sha512-JSlhgoK+/g1TGJI5NuADx2+6syhxnQNLCWLXyO5QLFyetomcr/vIxSdiNlmyAv963YXUzCuwAwRG6npZ5xyJ1A==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-linux-s390x-gnu@0.155.0':
+    resolution: {integrity: sha512-WFIX+dPokWp64mi434Md3U3lJaTwNxAphvGjpltoyQjGUsdXavOIRrnp9dOS34Hd75HOAwDxAI+YwWOwqmJbtg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-x64-gnu@0.155.0':
+    resolution: {integrity: sha512-g6xSDC/JpbnVOz5uafMGyK3txBVRFMQTx8opv/yHXGxqV3ZMVl3bf7W8XrSnF68dmy3gM4dgReNryuE53+WkeQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-parser/binding-linux-x64-musl@0.155.0':
+    resolution: {integrity: sha512-6/4xlxKlZJWrQ0uwDFPc0H9+xLu7068CKhX3vIDW3SbvP/lVgnVuT5v6dyugeWskWpuxqF/WJ4WKwhxjU3pG2w==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-parser/binding-openharmony-arm64@0.155.0':
+    resolution: {integrity: sha512-tltklL0J0XjDxIRTBXWOBhvc2mitcmES45pIxhwDWfxRyqz7Vkeu0NekTZEIxGE4f/lXgq3vZcjjffteQOVorg==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.155.0':
+    resolution: {integrity: sha512-alAb9TzjatUEsOeoncAziUnfdTDxfyswhalFZ9sC6plUgATIUx2NIZ0+bMn6aJ28AduS1OpG/OAisr/YISn4Ig==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxc-parser/binding-win32-ia32-msvc@0.155.0':
+    resolution: {integrity: sha512-yc5cbSfcGmRv/KpxDFuyk8adEBaWd/9HilWvBbQ4bFbus1V2PUh2mGB2Cfq9rqZTqLeiMT8x0skV+LKp9hOMgQ==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [ia32]
+    os: [win32]
+
+  '@oxc-parser/binding-win32-x64-msvc@0.155.0':
+    resolution: {integrity: sha512-8heq6jGq+rfpTDRDjoQiBHw0maQZf3IXkS99pdHQZPoTL5kyF5qyPS0RidUlSdnWDIqxXb5nux7GBD9cT+imUw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    cpu: [x64]
+    os: [win32]
+
+  '@oxc-project/types@0.155.0':
+    resolution: {integrity: sha512-SeE8JPwW1xs1tHeNycjUtUBdhorRa8o4jlvjwk49R7/Z291i+4DQa7JJIgOm/TaYQZx+QrPQbVJ/9c8dMIZN8Q==}
+
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
+
+  '@oxc-resolver/binding-android-arm-eabi@11.24.2':
+    resolution: {integrity: sha512-y09e0L0SRI2OA2tUIrjBgoV3eH5hvUKXNkJqXmNo5V2WxIjyC7I7aJfRLMEVpA8yi95f90gFDvO0VMgrDw+vwA==}
+    cpu: [arm]
+    os: [android]
+
+  '@oxc-resolver/binding-android-arm64@11.24.2':
+    resolution: {integrity: sha512-cl4icWaZFnLdg8m6qtnh5rBMuGbxc/ptStFHLeCNwr+2cZjkjNwQu/jYRS0CHlnPecOJMpuS5M6/BH+0J/YkEg==}
+    cpu: [arm64]
+    os: [android]
+
+  '@oxc-resolver/binding-darwin-arm64@11.24.2':
+    resolution: {integrity: sha512-At29QEMF6HajbQvgY8K6OXnHD1x9rad74xBEfmCB6ZqCGsdq75aK7tOYcTbOanMy8qdIBrfL3SMr3p/lfSlb9w==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxc-resolver/binding-darwin-x64@11.24.2':
+    resolution: {integrity: sha512-A5Kqr1EUj4oIL5CF4WRssq/o5P0Y11cwoFouMRmQ7YnC/A8V93nv1nb7aSU8HwcgmXropjLNkVTl4MN87cu28Q==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxc-resolver/binding-freebsd-x64@11.24.2':
+    resolution: {integrity: sha512-R5xkRBRRz7ceH/P5Jrc6G7FmdUdgpLYyESFAUDVTNQ9K0sGPxcp4ljiwEwEqsvNcQ4sYbMRrWcHHBCu7ksAJVw==}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxc-resolver/binding-linux-arm-gnueabihf@11.24.2':
+    resolution: {integrity: sha512-k/RuYL4L/R58IBn3wT5ma3Wh4k62bp1eYCFRWCmMsasUOqL+H6sW0VGFadEzKWXFFlz+2uIMoeMk9ySSZJHgbg==}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-resolver/binding-linux-arm-musleabihf@11.24.2':
+    resolution: {integrity: sha512-bnHAak3ujYfH5pKk4NieFNbvYvernfoQDgwLddbZ3OtMYrem87/qjlA+u+aKG0oZcqSLGCful/6/CEA+aeAgaA==}
+    cpu: [arm]
+    os: [linux]
+
+  '@oxc-resolver/binding-linux-arm64-gnu@11.24.2':
+    resolution: {integrity: sha512-vDT3KHgzYp47gmtNOqL2VNhCyl5Zv643eyxm//A68J8DeUGXrvD1pZFiaT4jSfe+RInfnn1R2yVHye4enx6RnA==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-arm64-musl@11.24.2':
+    resolution: {integrity: sha512-+kMlQvbzfyEYtu5FcjE4p+ttBLpKW4d/AsAsuE69BxV6V4twZJeIQZFfD8gh/wqglY0MkPSezWXQH0jBV13MUw==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-linux-ppc64-gnu@11.24.2':
+    resolution: {integrity: sha512-shjfMhmZ3gq9fv/w7bi3PnZlgOPG+2QAOFf0BJF0EgBSIGZ6PMLN2zbGEblTUYB/NKVDRyYhE2ff3dJ1QqNPkA==}
+    cpu: [ppc64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-riscv64-gnu@11.24.2':
+    resolution: {integrity: sha512-zGelwFR5oRo+b69k8Lrzun86DyUHzfKN6cnjbR9l7Z7NIRznOE/2ZvPa1IUKqAL2PzAXOdwkfVqNvO1H2RlpAw==}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-riscv64-musl@11.24.2':
+    resolution: {integrity: sha512-qxZ1SWCXJY0eyhAlP6Lmo9F2Nrtx7EkYj9oCgL8apDPCwXwCEDA2U697bbT81JIc2IrVjxO4KX6WU2N+oN9Z4w==}
+    cpu: [riscv64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-linux-s390x-gnu@11.24.2':
+    resolution: {integrity: sha512-sGCecF3cx2DFlH4t/z7ApnOnXqN48p5p5mlHDEnHTAukQa2P+qMVE4CwyWE9W+q/m3QJ7kKfGrIjax31f44oFQ==}
+    cpu: [s390x]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-x64-gnu@11.24.2':
+    resolution: {integrity: sha512-k/VlMMcSzMlahb3/fENM4rTlsJ0s3fFROA0KXPBmKggqmTSaE383sl8F3KCOXPLmVsYfW6hCitMhXCEtNeZxxg==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@oxc-resolver/binding-linux-x64-musl@11.24.2':
+    resolution: {integrity: sha512-8hbnZyNi97b/8wapYaIF9+t9GmZKBW2vunaOc3h9HGJptH7b7XpvZqOTBSm/MpTjr7H497BlgOaSfLUdhmy2bw==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@oxc-resolver/binding-openharmony-arm64@11.24.2':
+    resolution: {integrity: sha512-MvyGik3a6pVgZ0t/kWlbmFxFLmXQJwgLsY2eYFHLpy0wGwRbfzeIGgDwQ3kXqE30z+kSXennRkCrT7TUvkptNg==}
+    cpu: [arm64]
+    os: [openharmony]
+
+  '@oxc-resolver/binding-wasm32-wasi@11.24.2':
+    resolution: {integrity: sha512-vHcssMPwO08RTvj/c0iOBz90attxyG3wQJ0dTcyEQK43LRpcdLWZlV5feBhv6Isn6ahbQIzHbCgfa81+RiML0Q==}
+    engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
+
+  '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
+    resolution: {integrity: sha512-uokJqro2iBqkFvJdKQLP7d8/BUmFwESQFVmIJUQKj1Xn1a/LysJoe1vmeECLF5b3jsV8CAL5sEMJXX6SdK9Nhg==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxc-resolver/binding-win32-x64-msvc@11.24.2':
+    resolution: {integrity: sha512-UqGPmo56KDfLlfXFAFIrNflHT8tFxWGEivWg3Zeyp4Uy2NlKN1FGPr6/BxcLGG3+kZ6Wp14g5Uj+n71boqZfiw==}
+    cpu: [x64]
+    os: [win32]
 
   '@paralleldrive/cuid2@2.3.1':
     resolution: {integrity: sha512-XO7cAxhnTZl0Yggq6jOgjiOHhbgcO4NqFqwSmQpjK3b6TEE6Uj/jfSk6wzYyemh3+I0sHirKSetjQwn5cZktFw==}
@@ -6560,26 +5882,8 @@ packages:
   '@tokenizer/token@0.3.0':
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
 
-  '@tsconfig/node10@1.0.13':
-    resolution: {integrity: sha512-gcLdvR9HO1ZJBypsOGqaP6TFEzb6vIta0KSTLt9NAQ6pXQO3cRgSVyCN6pzYqI9DlJgY71XKO0dpDhCf08b3pg==}
-
-  '@tsconfig/node12@1.0.11':
-    resolution: {integrity: sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==}
-
-  '@tsconfig/node14@1.0.3':
-    resolution: {integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==}
-
-  '@tsconfig/node16@1.0.4':
-    resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
-
-  '@turf/boolean-point-in-polygon@7.4.0':
-    resolution: {integrity: sha512-GQrHc6WSDHhf32GB/b9AGyOeC05AQ3nGN7ooWTrlCYefKn7X9/2wG9BNexF47AuyDq5jPdOvITVR26BLFWV+mA==}
-
-  '@turf/helpers@7.4.0':
-    resolution: {integrity: sha512-7PAwLZqOdRzTI5g9bHvUwlloAXPDH/mlajtryk0tw4ZwGMtmXsAyF4QundsAMfy4u48Fyd3AUqMXY0SMxqJGWg==}
-
-  '@turf/invariant@7.4.0':
-    resolution: {integrity: sha512-OAsc3qdNx+tRqzWmMNFMnVlWWACIqnYqIejZKvb2oKkKPYJJrURPXZ6OdrGD58ljJMolLoqwIZGSx3VndaEjxg==}
+  '@tybys/wasm-util@0.10.4':
+    resolution: {integrity: sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A==}
 
   '@types/bcrypt@6.0.0':
     resolution: {integrity: sha512-/oJGukuH3D2+D+3H4JWLaAsJ/ji86dhRidzZ/Od7H/i8g+aCmvkeCc6Ni/f9uxGLSQVCRZkX2/lqEFG2BvWtlQ==}
@@ -6768,9 +6072,6 @@ packages:
 
   '@types/jsonwebtoken@9.0.10':
     resolution: {integrity: sha512-asx5hIG9Qmf/1oStypjanR7iKTv0gXQ1Ov/jfrX6kS/EO0OFni8orbmGCn0672NHR3kXHwpAwR+B368ZGN/2rA==}
-
-  '@types/katex@0.16.8':
-    resolution: {integrity: sha512-trgaNyfU+Xh2Tc+ABIb44a5AYUpicB3uwirOioeOkNPPbmgRNtcWyDeeFRzjPZENO9Vq8gvVqfhaaXWLlevVwg==}
 
   '@types/leaflet@1.7.6':
     resolution: {integrity: sha512-Emkz3V08QnlelSbpT46OEAx+TBZYTOX2r1yM7W+hWg5+djHtQ1GbEXBDRLaqQDOYcDI51Ss0ayoqoKD4CtLUDA==}
@@ -7218,10 +6519,6 @@ packages:
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  acorn-walk@8.3.5:
-    resolution: {integrity: sha512-HEHNfbars9v4pgpW6SO1KSPkfoS0xVOM/9UzkJltjlsHZmJasxg8aXkuZa7SMf8vKGIBhpUsPluQSqhJFCqebw==}
-    engines: {node: '>=0.4.0'}
-
   acorn@8.19.0:
     resolution: {integrity: sha512-oJlA3XiRm7Cyk6qFD2Jn8ak9B7jSy0qy00ADO3+8dpT0LSjFihQYv4C02LFCSYJV3Q37xYwwRy5m+IpIiUzqWw==}
     engines: {node: '>=0.4.0'}
@@ -7295,9 +6592,6 @@ packages:
   archiver@5.3.2:
     resolution: {integrity: sha512-+25nxyyznAXF7Nef3y0EbBeqmGZgeN/BxHX29Rs39djAfaFalmQ89SE6CWyDCHzGL0yt/ycBtNOmGTW0FyGWNw==}
     engines: {node: '>= 10'}
-
-  arg@4.1.3:
-    resolution: {integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==}
 
   argparse@1.0.10:
     resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
@@ -7715,9 +7009,6 @@ packages:
     resolution: {integrity: sha512-NT7w2JVU7DFroFdYkeq8cywxrgjPHWkdX1wjpRQXPX5Asews3tA+Ght6lddQO5Mkumffp3X7GEqku3epj2toIw==}
     engines: {node: '>= 10'}
 
-  create-require@1.1.1:
-    resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
-
   cron@4.4.0:
     resolution: {integrity: sha512-fkdfq+b+AHI4cKdhZlppHveI/mgz2qpiYxcm+t5E5TsxX7QrLS1VE0+7GENEk9z0EeGPcpSciGv6ez24duWhwQ==}
     engines: {node: '>=18.x'}
@@ -7993,10 +7284,6 @@ packages:
 
   dezalgo@1.0.4:
     resolution: {integrity: sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==}
-
-  diff@4.0.4:
-    resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
-    engines: {node: '>=0.3.1'}
 
   dijkstrajs@1.0.3:
     resolution: {integrity: sha512-qiSlmBq9+BCdCA/L46dw8Uy93mloxsPSbwnm5yrKn2vMPiy8KyAskTF6zuV/j5BMsmOGZDPs7KjU+mjb670kfA==}
@@ -8320,6 +7607,9 @@ packages:
   fast-wrap-ansi@0.2.2:
     resolution: {integrity: sha512-7F2Fl+TjRSenLqlU3UjSH0iyqopqoZIu7eZVpEirP2g1GtWa2G/ecEmBdgz31+Mxr+ELclgg6sokpSFIQiZ02Q==}
 
+  fd-package-json@2.0.0:
+    resolution: {integrity: sha512-jKmm9YtsNXN789RS/0mSzOC1NUq9mkVd65vbSSVsKdjGvYXBuE4oWe2QOEoFeRmJg+lPuZxpmrfFclNhoRMneQ==}
+
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
@@ -8385,6 +7675,11 @@ packages:
   form-data@4.0.6:
     resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
     engines: {node: '>= 6'}
+
+  formatly@0.11.4:
+    resolution: {integrity: sha512-TeCC10lP8KCgoX+Fe5lryILIT0/Dy+nP0OSVnsuB5CwXoLuOdqxCYlPFF1inR8S/zTy1ec7TjhS2TeRKWzzImA==}
+    engines: {node: '>=18.14.0'}
+    hasBin: true
 
   formidable@3.5.4:
     resolution: {integrity: sha512-YikH+7CUTOtP44ZTnUhR7Ic2UASBPOqmaRkRKxRbywPTe5VxF7RRCck4af9wutiZ/QKM5nME9Bie2fFaPz5Gug==}
@@ -8457,6 +7752,9 @@ packages:
   get-symbol-description@1.1.0:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
+
+  get-tsconfig@4.14.3:
+    resolution: {integrity: sha512-++QEw4DIY7WGoukz+/+A/8dGYPT9l9yIadnmSgZ8Rjr3YVSVDipQSO9CdnJo9ePqFqUUqh+wk9uIaoiAwsiPkA==}
 
   giget@3.3.1:
     resolution: {integrity: sha512-r+mvuDjrjMpsdw46Kmeydb8bdHm7wOKw8wNBtTndkjbPjgAp5oUJUxRE76wZFknxIPokfWvep2qSXK37aXE6zg==}
@@ -8891,6 +8189,11 @@ packages:
   keyv@5.6.0:
     resolution: {integrity: sha512-CYDD3SOtsHtyXeEORYRx2qBtpDJFjRTGXUtmNEMGyzYOKj1TE3tycdlho7kA1Ufx9OYWZzg52QFBGALTirzDSw==}
 
+  knip@6.44.1:
+    resolution: {integrity: sha512-Hbd8nvkIsNgFfXgC7Jsb5LHv7jj6VwA3tmfHd53XPX2z9Vc9RnAZqV0BIiP4OrtYqKwCoLseFHQZerb1bNlbSw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+
   launch-editor@2.14.2:
     resolution: {integrity: sha512-NHJEb30MGBCkmZXLZwz25t37QR4aY03ZzPYUJXOJaOa92uWwExI9SBQUuIznBYc1xkD7cJNGX7oc3Nl3sq2kQQ==}
 
@@ -9125,9 +8428,6 @@ packages:
   magic-string@1.4.5:
     resolution: {integrity: sha512-oLLC2+YvQUfAa+vxoufE/yc1icb87M9iXIRqAoR/2EhE/8cb3SF/+Gi0c2By1B+5Vz2e2vQtUvHiu1+63Znh+w==}
 
-  make-error@1.3.6:
-    resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
-
   mammoth@1.13.0:
     resolution: {integrity: sha512-2cawcYFcP7ISfXbBcL9lmVgTNWo88v/52ND1gnywHtVT/pX0//puPnf0iMPV9ZgmuvNOE+zkIhDgZ9M2c2dDDg==}
     engines: {node: '>=12.0.0'}
@@ -9165,9 +8465,6 @@ packages:
   methods@1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
     engines: {node: '>= 0.6'}
-
-  mgrs@1.0.0:
-    resolution: {integrity: sha512-awNbTOqCxK1DBGjalK3xqWIstBZgN6fxsMSiXLs9/spqWkF2pAhb2rrYCFSsr1/tT7PhcDGjZndG8SWYn0byYA==}
 
   micromark-util-character@2.1.1:
     resolution: {integrity: sha512-wv8tdUTJ3thSFFFJKtpYKOYiGP2+v96Hvk4Tu8KpCAsTMs6yi+nVmGh1syvSCsaxz45J6Jbw+9DD6g97+NV67Q==}
@@ -9453,6 +8750,13 @@ packages:
     resolution: {integrity: sha512-19YVAg7T+WTrxggPukVq7DjTv6+PJ867TmhCvBsYwmbFCsZd344rq2Ld1p0wo8f8Qrrhgp82c6FJRqdXWtSEhg==}
     engines: {node: '>= 0.4'}
 
+  oxc-parser@0.155.0:
+    resolution: {integrity: sha512-C/ReSf1JUFukK/zvk6jhcNibSssvas5+ktIzK7fbKVd3CedWe59C3QwHEOrEZj/4Rt9+xg0Jeis/Jv1F/KM1mw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+
+  oxc-resolver@11.24.2:
+    resolution: {integrity: sha512-FY91FiDBj7ls5MsFS9jN3tjz2o0/zsdSsymlakySaBwVJZorHhkWyICLZMKxlu1R9vYo+sd3z1jwb4J8x7bNDw==}
+
   p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
     engines: {node: '>=6'}
@@ -9647,9 +8951,6 @@ packages:
     resolution: {integrity: sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==}
     engines: {node: '>=10.13.0'}
 
-  point-in-polygon-hao@1.2.4:
-    resolution: {integrity: sha512-x2pcvXeqhRHlNRdhLs/tgFapAbSSe86wa/eqmj1G6pWftbEs5aVRJhRGM6FYSUERKu0PjekJzMq0gsI2XyiclQ==}
-
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -9719,14 +9020,6 @@ packages:
 
   process-warning@5.1.1:
     resolution: {integrity: sha512-oCkNVj4OKnKEcocVBcDfiIugN1/cE6rgfT3nCtzeqZPA8+rIxMaQ0xXzIkGP8Gj2qUaP1UR7uhJ1VD8lUCpzCg==}
-
-  proj4@2.22.0:
-    resolution: {integrity: sha512-MVvH09QrYm3A235rcX39WDiCKanrBiblu28l0KYIn/B2DofmYhvP/LLS43kE66jNDfx/P1l/nah3JmsAq8UgbQ==}
-    peerDependencies:
-      geotiff: '*'
-    peerDependenciesMeta:
-      geotiff:
-        optional: true
 
   proper-lockfile@4.1.2:
     resolution: {integrity: sha512-TjNPblN4BwAWMXU8s9AEz4JmQxnD1NNL7bNOY/AKUzyamc379FWASUhc/K1pL2noVb+XmZKLL68cjzLsiOAMaA==}
@@ -9910,6 +9203,9 @@ packages:
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
+
+  resolve-pkg-maps@1.0.0:
+    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
 
   resolve-protobuf-schema@2.1.0:
     resolution: {integrity: sha512-kI5ffTiZWmJaS/huM8wZfEMer1eRd7oJQhDuxeCLe3t7N7mX3z94CN0xPxBQxFYQTSNz9T0i+v6inKqSdK8xrQ==}
@@ -10108,6 +9404,10 @@ packages:
   skin-tone@2.0.0:
     resolution: {integrity: sha512-kUMbT1oBJCpgrnKoSr0o6wPtvRWT9W9UKvGLwfJYO2WuahZRHOpEyL1ckyMGgMWh0UdpmaoFqKKD29WTomNEGA==}
     engines: {node: '>=8'}
+
+  smol-toml@1.9.1:
+    resolution: {integrity: sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==}
+    engines: {node: '>= 18'}
 
   sonic-boom@4.2.1:
     resolution: {integrity: sha512-w6AxtubXa2wTXAUsZMMWERrsIRAdrK0Sc+FUytWvYAhBJLyuI4llrMIC1DtlNSdI99EI86KZum2MMq3EAZlF9Q==}
@@ -10375,20 +9675,6 @@ packages:
       loader-utils:
         optional: true
 
-  ts-node@10.9.2:
-    resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
-    hasBin: true
-    peerDependencies:
-      '@swc/core': '>=1.2.50'
-      '@swc/wasm': '>=1.2.50'
-      '@types/node': '*'
-      typescript: '>=2.7'
-    peerDependenciesMeta:
-      '@swc/core':
-        optional: true
-      '@swc/wasm':
-        optional: true
-
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -10481,6 +9767,10 @@ packages:
   uint8array-extras@1.6.0:
     resolution: {integrity: sha512-8iAasVS4wUx0gPLjH8Xtz2PeDzTSiy8QiLGu2DT3X5GU+egFEQhpnbtkehbAwjvDcxIERmCYcysiODFmE3Ud0Q==}
     engines: {node: '>=18'}
+
+  unbash@6.0.3:
+    resolution: {integrity: sha512-hRzSpMeM8uYMQkrnIVaVy3f44oLlokglVeEyP5hIQj88z60bKPO9VVbEpGfxChGBh9lBkzuWKOTOzPdfD6KNEA==}
+    engines: {node: '>=14'}
 
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
@@ -10590,9 +9880,6 @@ packages:
   uuid@11.1.1:
     resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
     hasBin: true
-
-  v8-compile-cache-lib@3.0.1:
-    resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
   valibot@1.5.0:
     resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
@@ -10708,11 +9995,6 @@ packages:
   vscode-uri@3.2.0:
     resolution: {integrity: sha512-m2gXo3bn0G1kT9InzMf07fTbqMbGtyckj3bH5ktLO+1Ssv+yiATZ4dhwaQv9UZWxJh6E9IFGnQyjgWVDWVBDrg==}
 
-  vue-chrts@2.2.3:
-    resolution: {integrity: sha512-VrcOGD8xIgK5JZHm6DgGWfUwEmi5YkJo3NPwVBddriFOtMv7TYYLwy7o/0R4qIbrUomlruLWCX9Kty3J1/WyyA==}
-    peerDependencies:
-      vue: ^3.5.13
-
   vue-component-type-helpers@3.3.14:
     resolution: {integrity: sha512-Pq3+OnbCiPCHk0R7KSZrx+j/XXaUn2kSQ1epxq60w8CPbByLjC1EJgV51n4WY851sTXUVzsNMuitywdkdVyKjA==}
 
@@ -10797,6 +10079,10 @@ packages:
     resolution: {integrity: sha512-4Nsy8K5Tr6SPDH9jhKJOHf7ChDrc1zufZTVSF7x72hwuEXBqxqk9G6cK+K2NRUtB3iELRJqjXb4JPDMBjMTl2Q==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
+  walk-up-path@4.0.0:
+    resolution: {integrity: sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A==}
+    engines: {node: 20 || >=22}
+
   watchpack@2.6.3:
     resolution: {integrity: sha512-s3NZy0QpTY9qGqzc0wtz4qI28z3+5qKbbAec4MV4G9N3CfgZ9wgvQRr0cl2jh/tqkWG1NWHkmVMHZpCamev5Wg==}
     engines: {node: '>=10.13.0'}
@@ -10865,9 +10151,6 @@ packages:
     resolution: {integrity: sha512-Tb2FUhB4vUsGQlfSquQLYkApkuPAFQXGFzxWKHHumVz2dK+X1RUm/HnID4+TfIGYJ1kTcwOaCk/buYCEJr6YjQ==}
     engines: {node: '>=20.11'}
     hasBin: true
-
-  wkt-parser@1.6.0:
-    resolution: {integrity: sha512-O2WMUagkdOKkgcfqZBUauysHVeifCwcs+zUd2QG7UIzVljLwK9g5xHUfL/TkQFwmQ3eF7oHFKGnMcb/kZdvbaw==}
 
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
@@ -10949,10 +10232,6 @@ packages:
   yargs@18.2.0:
     resolution: {integrity: sha512-9OpKOLeaoNFecEp7P6iYbzze/5CqWoH7N3SMs/6y1XF4nMvFMspEGZzJ6uFi9MmQwXhyzqYoSEKO3tvA3Z/o2w==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=23}
-
-  yn@3.1.1:
-    resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
-    engines: {node: '>=6'}
 
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
@@ -11426,10 +10705,6 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@cspotcode/source-map-support@0.8.1':
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.9
-
   '@csstools/color-helpers@6.1.2': {}
 
   '@csstools/css-calc@3.4.3(@csstools/css-parser-algorithms@4.0.2(@csstools/css-tokenizer@4.0.2))(@csstools/css-tokenizer@4.0.2)':
@@ -11464,7 +10739,23 @@ snapshots:
 
   '@electric-sql/pglite@0.4.3': {}
 
+  '@emnapi/core@1.11.2':
+    dependencies:
+      '@emnapi/wasi-threads': 1.2.2
+      tslib: 2.9.1
+    optional: true
+
+  '@emnapi/runtime@1.11.2':
+    dependencies:
+      tslib: 2.9.1
+    optional: true
+
   '@emnapi/runtime@1.11.3':
+    dependencies:
+      tslib: 2.9.1
+    optional: true
+
+  '@emnapi/wasi-threads@1.2.2':
     dependencies:
       tslib: 2.9.1
     optional: true
@@ -12004,11 +11295,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@jridgewell/trace-mapping@0.3.9':
-    dependencies:
-      '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.6.0
-
   '@juggle/resize-observer@3.4.0': {}
 
   '@keyv/bigmap@1.3.1(keyv@5.6.0)':
@@ -12087,6 +11373,13 @@ snapshots:
       pbf: 5.1.2
 
   '@microsoft/tsdoc@0.17.1': {}
+
+  '@napi-rs/wasm-runtime@1.2.7(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
+      '@tybys/wasm-util': 0.10.4
+    optional: true
 
   '@nestjs/cache-manager@12.0.2(@nestjs/common@12.3.2(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@12.3.2)(cache-manager@7.2.9)(keyv@5.6.0)(rxjs@7.8.2)':
     dependencies:
@@ -12275,7 +11568,127 @@ snapshots:
 
   '@one-ini/wasm@0.2.1': {}
 
+  '@oxc-parser/binding-android-arm-eabi@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-android-arm64@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-darwin-arm64@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-darwin-x64@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-freebsd-x64@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm-gnueabihf@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm-musleabihf@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-gnu@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-arm64-musl@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-ppc64-gnu@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-riscv64-gnu@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-riscv64-musl@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-s390x-gnu@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-gnu@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-linux-x64-musl@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-openharmony-arm64@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-win32-arm64-msvc@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-win32-ia32-msvc@0.155.0':
+    optional: true
+
+  '@oxc-parser/binding-win32-x64-msvc@0.155.0':
+    optional: true
+
+  '@oxc-project/types@0.155.0': {}
+
   '@oxc-project/types@0.156.0': {}
+
+  '@oxc-resolver/binding-android-arm-eabi@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-android-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-darwin-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-darwin-x64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-freebsd-x64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm-gnueabihf@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm-musleabihf@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-arm64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-ppc64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-riscv64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-riscv64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-s390x-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-x64-gnu@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-linux-x64-musl@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-openharmony-arm64@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-wasm32-wasi@11.24.2':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
+      '@napi-rs/wasm-runtime': 1.2.7(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
+    optional: true
+
+  '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
+    optional: true
+
+  '@oxc-resolver/binding-win32-x64-msvc@11.24.2':
+    optional: true
 
   '@paralleldrive/cuid2@2.3.1':
     dependencies:
@@ -12971,32 +12384,10 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@tsconfig/node10@1.0.13': {}
-
-  '@tsconfig/node12@1.0.11': {}
-
-  '@tsconfig/node14@1.0.3': {}
-
-  '@tsconfig/node16@1.0.4': {}
-
-  '@turf/boolean-point-in-polygon@7.4.0':
+  '@tybys/wasm-util@0.10.4':
     dependencies:
-      '@turf/helpers': 7.4.0
-      '@turf/invariant': 7.4.0
-      '@types/geojson': 7946.0.16
-      point-in-polygon-hao: 1.2.4
       tslib: 2.9.1
-
-  '@turf/helpers@7.4.0':
-    dependencies:
-      '@types/geojson': 7946.0.16
-      tslib: 2.9.1
-
-  '@turf/invariant@7.4.0':
-    dependencies:
-      '@turf/helpers': 7.4.0
-      '@types/geojson': 7946.0.16
-      tslib: 2.9.1
+    optional: true
 
   '@types/bcrypt@6.0.0':
     dependencies:
@@ -13214,8 +12605,6 @@ snapshots:
     dependencies:
       '@types/ms': 2.1.0
       '@types/node': 24.19.2
-
-  '@types/katex@0.16.8': {}
 
   '@types/leaflet@1.7.6':
     dependencies:
@@ -13913,10 +13302,6 @@ snapshots:
     dependencies:
       acorn: 8.19.0
 
-  acorn-walk@8.3.5:
-    dependencies:
-      acorn: 8.19.0
-
   acorn@8.19.0: {}
 
   agent-base@6.0.2(supports-color@10.2.2):
@@ -14003,8 +13388,6 @@ snapshots:
       readdir-glob: 1.1.3
       tar-stream: 2.2.0
       zip-stream: 4.1.1
-
-  arg@4.1.3: {}
 
   argparse@1.0.10:
     dependencies:
@@ -14414,8 +13797,6 @@ snapshots:
       crc-32: 1.2.2
       readable-stream: 3.6.2
 
-  create-require@1.1.1: {}
-
   cron@4.4.0:
     dependencies:
       '@types/luxon': 3.7.6
@@ -14710,8 +14091,6 @@ snapshots:
     dependencies:
       asap: 2.0.6
       wrappy: 1.0.2
-
-  diff@4.0.4: {}
 
   dijkstrajs@1.0.3: {}
 
@@ -15140,6 +14519,10 @@ snapshots:
     dependencies:
       fast-string-width: 3.0.2
 
+  fd-package-json@2.0.0:
+    dependencies:
+      walk-up-path: 4.0.0
+
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
       picomatch: 4.0.7
@@ -15224,6 +14607,11 @@ snapshots:
       hasown: 2.0.4
       mime-types: 2.1.35
 
+  formatly@0.11.4:
+    dependencies:
+      fd-package-json: 2.0.0
+      package-manager-detector: 1.9.0
+
   formidable@3.5.4:
     dependencies:
       '@paralleldrive/cuid2': 2.3.1
@@ -15301,6 +14689,10 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
+
+  get-tsconfig@4.14.3:
+    dependencies:
+      resolve-pkg-maps: 1.0.0
 
   giget@3.3.1: {}
 
@@ -15748,6 +15140,21 @@ snapshots:
     dependencies:
       '@keyv/serialize': 1.1.1
 
+  knip@6.44.1:
+    dependencies:
+      formatly: 0.11.4
+      get-tsconfig: 4.14.3
+      jiti: 2.7.0
+      oxc-parser: 0.155.0
+      oxc-resolver: 11.24.2
+      picomatch: 4.0.7
+      smol-toml: 1.9.1
+      strip-json-comments: 5.0.3
+      tinyglobby: 0.2.17
+      unbash: 6.0.3
+      yaml: 2.9.1
+      zod: 4.6.7
+
   launch-editor@2.14.2:
     dependencies:
       picocolors: 1.1.1
@@ -15934,8 +15341,6 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  make-error@1.3.6: {}
-
   mammoth@1.13.0:
     dependencies:
       '@xmldom/xmldom': 0.8.15
@@ -15993,8 +15398,6 @@ snapshots:
   merge-stream@2.0.0: {}
 
   methods@1.1.2: {}
-
-  mgrs@1.0.0: {}
 
   micromark-util-character@2.1.1:
     dependencies:
@@ -16234,6 +15637,52 @@ snapshots:
       object-keys: 1.1.1
       safe-push-apply: 1.0.0
 
+  oxc-parser@0.155.0:
+    dependencies:
+      '@oxc-project/types': 0.155.0
+    optionalDependencies:
+      '@oxc-parser/binding-android-arm-eabi': 0.155.0
+      '@oxc-parser/binding-android-arm64': 0.155.0
+      '@oxc-parser/binding-darwin-arm64': 0.155.0
+      '@oxc-parser/binding-darwin-x64': 0.155.0
+      '@oxc-parser/binding-freebsd-x64': 0.155.0
+      '@oxc-parser/binding-linux-arm-gnueabihf': 0.155.0
+      '@oxc-parser/binding-linux-arm-musleabihf': 0.155.0
+      '@oxc-parser/binding-linux-arm64-gnu': 0.155.0
+      '@oxc-parser/binding-linux-arm64-musl': 0.155.0
+      '@oxc-parser/binding-linux-ppc64-gnu': 0.155.0
+      '@oxc-parser/binding-linux-riscv64-gnu': 0.155.0
+      '@oxc-parser/binding-linux-riscv64-musl': 0.155.0
+      '@oxc-parser/binding-linux-s390x-gnu': 0.155.0
+      '@oxc-parser/binding-linux-x64-gnu': 0.155.0
+      '@oxc-parser/binding-linux-x64-musl': 0.155.0
+      '@oxc-parser/binding-openharmony-arm64': 0.155.0
+      '@oxc-parser/binding-win32-arm64-msvc': 0.155.0
+      '@oxc-parser/binding-win32-ia32-msvc': 0.155.0
+      '@oxc-parser/binding-win32-x64-msvc': 0.155.0
+
+  oxc-resolver@11.24.2:
+    optionalDependencies:
+      '@oxc-resolver/binding-android-arm-eabi': 11.24.2
+      '@oxc-resolver/binding-android-arm64': 11.24.2
+      '@oxc-resolver/binding-darwin-arm64': 11.24.2
+      '@oxc-resolver/binding-darwin-x64': 11.24.2
+      '@oxc-resolver/binding-freebsd-x64': 11.24.2
+      '@oxc-resolver/binding-linux-arm-gnueabihf': 11.24.2
+      '@oxc-resolver/binding-linux-arm-musleabihf': 11.24.2
+      '@oxc-resolver/binding-linux-arm64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-arm64-musl': 11.24.2
+      '@oxc-resolver/binding-linux-ppc64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-riscv64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-riscv64-musl': 11.24.2
+      '@oxc-resolver/binding-linux-s390x-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-x64-gnu': 11.24.2
+      '@oxc-resolver/binding-linux-x64-musl': 11.24.2
+      '@oxc-resolver/binding-openharmony-arm64': 11.24.2
+      '@oxc-resolver/binding-wasm32-wasi': 11.24.2
+      '@oxc-resolver/binding-win32-arm64-msvc': 11.24.2
+      '@oxc-resolver/binding-win32-x64-msvc': 11.24.2
+
   p-limit@2.3.0:
     dependencies:
       p-try: 2.2.0
@@ -16443,10 +15892,6 @@ snapshots:
 
   pngjs@5.0.0: {}
 
-  point-in-polygon-hao@1.2.4:
-    dependencies:
-      robust-predicates: 3.0.3
-
   possible-typed-array-names@1.1.0: {}
 
   postcss-selector-parser@7.1.7:
@@ -16503,11 +15948,6 @@ snapshots:
   process-nextick-args@2.0.1: {}
 
   process-warning@5.1.1: {}
-
-  proj4@2.22.0:
-    dependencies:
-      mgrs: 1.0.0
-      wkt-parser: 1.6.0
 
   proper-lockfile@4.1.2:
     dependencies:
@@ -16761,6 +16201,8 @@ snapshots:
   require-main-filename@2.0.0: {}
 
   resolve-from@4.0.0: {}
+
+  resolve-pkg-maps@1.0.0: {}
 
   resolve-protobuf-schema@2.1.0:
     dependencies:
@@ -17037,6 +16479,8 @@ snapshots:
     dependencies:
       unicode-emoji-modifier-base: 1.0.0
 
+  smol-toml@1.9.1: {}
+
   sonic-boom@4.2.1:
     dependencies:
       atomic-sleep: 1.0.0
@@ -17297,26 +16741,6 @@ snapshots:
       typescript: 5.9.3
       webpack: 5.112.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(sharp@0.35.5(@types/node@24.19.2))(uglify-js@3.19.3)
 
-  ts-node@10.9.2(@swc/core@1.16.21(@swc/helpers@0.5.23))(@types/node@24.19.2)(typescript@5.9.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.13
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 24.19.2
-      acorn: 8.19.0
-      acorn-walk: 8.3.5
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.4
-      make-error: 1.3.6
-      typescript: 5.9.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optionalDependencies:
-      '@swc/core': 1.16.21(@swc/helpers@0.5.23)
-
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -17425,6 +16849,8 @@ snapshots:
 
   uint8array-extras@1.6.0: {}
 
+  unbash@6.0.3: {}
+
   unbox-primitive@1.1.0:
     dependencies:
       call-bound: 1.0.4
@@ -17531,8 +16957,6 @@ snapshots:
 
   uuid@11.1.1: {}
 
-  v8-compile-cache-lib@3.0.1: {}
-
   valibot@1.5.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
@@ -17597,18 +17021,6 @@ snapshots:
       - msw
 
   vscode-uri@3.2.0: {}
-
-  vue-chrts@2.2.3(supports-color@10.2.2)(vue@3.5.44(typescript@5.9.3)):
-    dependencies:
-      '@turf/boolean-point-in-polygon': 7.4.0
-      '@unovis/ts': 1.7.1(supports-color@10.2.2)
-      '@unovis/vue': 1.7.1(@unovis/ts@1.7.1(supports-color@10.2.2))(vue@3.5.44(typescript@5.9.3))
-      d3-geo: 3.1.1
-      proj4: 2.22.0
-      vue: 3.5.44(typescript@5.9.3)
-    transitivePeerDependencies:
-      - geotiff
-      - supports-color
 
   vue-component-type-helpers@3.3.14: {}
 
@@ -17701,6 +17113,8 @@ snapshots:
   w3c-xmlserializer@6.0.0:
     dependencies:
       xml-name-validator: 5.0.0
+
+  walk-up-path@4.0.0: {}
 
   watchpack@2.6.3:
     dependencies:
@@ -17812,8 +17226,6 @@ snapshots:
 
   why-is-node-running@3.2.1: {}
 
-  wkt-parser@1.6.0: {}
-
   word-wrap@1.2.5: {}
 
   wrap-ansi@6.2.0:
@@ -17881,8 +17293,6 @@ snapshots:
       string-width: 8.3.0
       y18n: 5.0.8
       yargs-parser: 22.0.0
-
-  yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
 

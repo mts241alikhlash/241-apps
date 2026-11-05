@@ -1,7 +1,7 @@
 {
   "name": "identity-service",
   "version": "0.1.0",
-  "description": "241 Console — identity and access: users, roles, permissions, sessions, audit, school profile",
+  "description": "241 Console \u2014 identity and access: users, roles, permissions, sessions, audit, school profile",
   "author": "mhrmnvl",
   "private": true,
   "license": "UNLICENSED",
@@ -76,7 +76,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "catalog:",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@mts241alikhlash/vitest-config": "workspace:*",
@@ -93,14 +92,11 @@
     "@types/passport-jwt": "catalog:",
     "@types/supertest": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "catalog:",
+    "express": "^5.3.0",
     "prettier": "catalog:",
-    "source-map-support": "catalog:",
     "supertest": "catalog:",
     "ts-loader": "catalog:",
-    "ts-node": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

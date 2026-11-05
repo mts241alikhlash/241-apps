@@ -137,7 +137,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "catalog:",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@mts241alikhlash/vitest-config": "workspace:*",
@@ -166,7 +165,6 @@
     "class-transformer": "catalog:",
     "class-validator": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "catalog:",
     "exceljs": "catalog:",
     "nestjs-pino": "catalog:",
     "passport": "catalog:",
@@ -178,7 +176,6 @@
     "sanitize-html": "catalog:",
     "supertest": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:",
     "zod": "^4.4.3"
   },

@@ -39,8 +39,6 @@
     "seed:reference-data": "tsx prisma/seed-reference-data.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "catalog:",
-    "@aws-sdk/s3-request-presigner": "catalog:",
     "@mts241alikhlash/nest-core": "workspace:*",
     "@nestjs/cache-manager": "catalog:",
     "@nestjs/common": "catalog:",
@@ -69,7 +67,6 @@
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
     "prisma": "7.10.0",
-    "puppeteer": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "sanitize-html": "catalog:",
@@ -77,7 +74,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "catalog:",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@mts241alikhlash/vitest-config": "workspace:*",
@@ -93,14 +89,10 @@
     "@types/sanitize-html": "catalog:",
     "@types/supertest": "catalog:",
     "eslint": "catalog:",
-    "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
-    "source-map-support": "catalog:",
     "supertest": "catalog:",
     "ts-loader": "catalog:",
-    "ts-node": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

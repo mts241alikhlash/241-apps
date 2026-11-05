@@ -1,4 +1,4 @@
 {
   "*": "prettier --write --ignore-unknown",
-  "*.{ts,vue,js,mjs}": "node scripts/lint-staged-eslint.mjs"
+  "**/{src,test}/**/*.{ts,vue,js}": "node scripts/lint-staged-eslint.mjs"
 }
