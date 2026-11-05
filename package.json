@@ -10,7 +10,7 @@
     "check": "pnpm -r --if-present run check",
     "test": "pnpm -r --if-present run test",
     "changeset": "changeset",
-    "runtime:check": "node --test scripts/runtime-config.spec.mjs scripts/lint-staged-eslint.spec.mjs scripts/check-docs.spec.mjs scripts/check-contract-compatibility.spec.mjs .github/scripts/require-changeset.spec.mjs scripts/affected.spec.mjs",
+    "runtime:check": "node --test scripts/runtime-config.spec.mjs scripts/lint-staged-eslint.spec.mjs scripts/check-docs.spec.mjs scripts/check-contract-compatibility.spec.mjs .github/scripts/require-changeset.spec.mjs scripts/affected.spec.mjs scripts/release-targets.spec.mjs scripts/release-version.spec.mjs .github/scripts/changelog-section.spec.mjs",
     "openapi:emit": "node scripts/emit-openapi.mjs",
     "openapi:check": "node scripts/emit-openapi.mjs --check",
     "db:smoke": "node scripts/db-smoke.mjs",

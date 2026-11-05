@@ -1,0 +1,145 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.hasChangesets }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - id: changesets
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version: node scripts/release-version.mjs
+          title: Release
+          commit: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  targets:
+    needs: version
+    if: needs.version.outputs.has_changesets == 'false'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      all: ${{ steps.targets.outputs.all }}
+      images: ${{ steps.targets.outputs.images }}
+      has_images: ${{ steps.targets.outputs.has_images }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - id: targets
+        run: |
+          all="$(node scripts/release-targets.mjs)"
+          images="$(jq -c '[.[] | select(.kind != "library")]' <<< "$all")"
+          {
+            echo "all=$all"
+            echo "images=$images"
+            echo "has_images=$(jq 'length > 0' <<< "$images")"
+          } >> "$GITHUB_OUTPUT"
+
+  image:
+    needs: targets
+    if: needs.targets.outputs.has_images == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.targets.outputs.images) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ matrix.target.dir }}/Dockerfile
+          push: true
+          tags: ghcr.io/mts241alikhlash/${{ matrix.target.name }}:${{ matrix.target.version }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ matrix.target.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.target.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.target.name }}
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ghcr.io/mts241alikhlash/${{ matrix.target.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+  tag:
+    needs: [targets, image]
+    if: always() && needs.targets.result == 'success' && needs.image.result != 'failure' && needs.image.result != 'cancelled'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Create tags and releases
+        env:
+          TARGETS: ${{ needs.targets.outputs.all }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          jq -c '.[]' <<< "$TARGETS" | while read -r target; do
+            name="$(jq -r .name <<< "$target")"
+            version="$(jq -r .version <<< "$target")"
+            dir="$(jq -r .dir <<< "$target")"
+            kind="$(jq -r .kind <<< "$target")"
+            tag="$name@$version"
+            git tag "$tag"
+            git push origin "refs/tags/$tag"
+            if [ "$kind" != library ]; then
+              node .github/scripts/changelog-section.mjs "$dir/CHANGELOG.md" "$version" > "$RUNNER_TEMP/notes.md"
+              gh release create "$tag" --title "$tag" --notes-file "$RUNNER_TEMP/notes.md"
+            fi
+          done
