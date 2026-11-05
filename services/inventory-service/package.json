@@ -34,7 +34,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "ci": "pnpm run typecheck && pnpm run lint && pnpm run lint:strict && pnpm run test && pnpm run build"
+    "ci": "pnpm run typecheck && pnpm run lint && pnpm run lint:strict && pnpm run test && pnpm run build",
+    "test:e2e": "vitest run --config vitest.e2e.config.mts"
   },
   "dependencies": {
     "@mts241alikhlash/nest-core": "workspace:*",
@@ -75,8 +76,10 @@
     "@types/express": "catalog:",
     "@types/node": "catalog:",
     "@types/passport-jwt": "catalog:",
+    "@types/supertest": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "supertest": "catalog:",
     "ts-loader": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
