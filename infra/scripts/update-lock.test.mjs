@@ -5,7 +5,9 @@ import {
   needsPin,
   pinImages,
   referencedManifests,
-  remoteTags,
+  applyPins,
+  gatewayTag,
+  sha256Hex,
 } from './update-lock.mjs'
 
 assert.equal(
@@ -88,29 +90,83 @@ assert.equal(
   `  hr-web:\n    image: ghcr.io/mts241alikhlash/hr-web@sha256:${'d'.repeat(64)}\n`,
 )
 
-assert.deepEqual(
-  remoteTags('exam-web', () => `${'1'.repeat(40)}\trefs/tags/exam-web@1.0.0\n`),
-  ['exam-web@1.0.0'],
+const sha = 'e'.repeat(64)
+const lock = {
+  schemaVersion: 1,
+  gatewayImage: 'ghcr.io/mts241alikhlash/gateway@sha256:' + '0'.repeat(64),
+  apps: {
+    hr: {
+      host: 'hr.localhost',
+      webVersion: '0.1.0',
+      webImage: 'ghcr.io/mts241alikhlash/hr-web@sha256:' + '1'.repeat(64),
+      routesVersion: '0.1.0',
+      routesSha256: '2'.repeat(64),
+    },
+    portal: {
+      host: 'portal.localhost',
+      webVersion: '0.1.0',
+      webImage: 'ghcr.io/mts241alikhlash/portal-web@sha256:' + '3'.repeat(64),
+      routesVersion: '0.1.0',
+      routesSha256: '4'.repeat(64),
+    },
+  },
+  services: {
+    hr: {
+      version: '0.1.0',
+      image: 'ghcr.io/mts241alikhlash/hr-service@sha256:' + '5'.repeat(64),
+    },
+  },
+}
+const found = applyPins({
+  lock,
+  tags: [
+    'hr-web@0.1.0',
+    'hr-web@0.2.0',
+    'portal-web@0.1.0',
+    'hr-service@0.1.0',
+  ],
+  digest: (name, version) => `sha256:${sha}${name}${version}`.slice(0, 71),
+  manifest: (app, version) =>
+    app === 'hr' && version === '0.2.0' ? '{"a":1}\n' : null,
+})
+assert.deepEqual(found.changes, ['hr-web 0.2.0'])
+assert.equal(found.lock.apps.hr.webVersion, '0.2.0')
+assert.equal(found.lock.apps.hr.routesVersion, '0.2.0')
+assert.equal(found.lock.apps.hr.routesSha256, sha256Hex('{"a":1}\n'))
+assert.equal(
+  JSON.stringify(found.lock.apps.portal),
+  JSON.stringify(lock.apps.portal),
+  'an unchanged pin is kept byte for byte',
 )
+assert.equal(JSON.stringify(found.lock.services), JSON.stringify(lock.services))
+assert.equal(lock.apps.hr.webVersion, '0.1.0', 'the input lock is not mutated')
+
+const skipped = applyPins({
+  lock,
+  tags: ['hr-web@0.2.0'],
+  digest: () => null,
+  manifest: () => '{}',
+})
 assert.deepEqual(
-  remoteTags('exam-web', () => {
-    const error = new Error('exit 128')
-    error.stderr =
-      "remote: Repository not found.\nfatal: repository 'https://github.com/mts241alikhlash/exam-web.git/' not found"
-    throw error
-  }),
+  skipped.changes,
   [],
-  'an unreleased app repo is not a failure',
+  'a version whose image is not built yet is not pinned',
 )
-assert.throws(
-  () =>
-    remoteTags('exam-web', () => {
-      const error = new Error('exit 128')
-      error.stderr = 'fatal: unable to access: Could not resolve host'
-      throw error
-    }),
-  /git ls-remote exam-web failed: fatal: unable to access: Could not resolve host/,
-  'a generic git failure must not read as "no tags"',
+
+const files = [
+  { name: 'nginx.ssl.conf', content: 'b' },
+  { name: 'nginx.conf', content: 'a' },
+]
+const tag = gatewayTag(files)
+assert.match(tag, /^[a-f0-9]{12}$/)
+assert.equal(
+  gatewayTag([...files].reverse()),
+  tag,
+  'file order does not matter',
+)
+assert.notEqual(
+  gatewayTag([files[0], { name: 'nginx.conf', content: 'changed' }]),
+  tag,
 )
 
 console.log('update-lock test passed')
