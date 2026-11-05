@@ -74,7 +74,30 @@ for (const service of services) {
   await writeOrCheck(path.join(generatedDir, 'index.ts'), index)
   await writeOrCheck(path.join(packageDir, 'tsconfig.json'), tsconfig)
 
-  const readme = `# @mts241alikhlash/${service}-api\n\nGenerated from contracts/${service}/openapi.json.\n\nRun \`pnpm api:generate\` from the services repository root.\n`
+  const readme = `# @mts241alikhlash/${service}-api
+
+## Purpose
+
+The generated TypeScript client of ${service}-service: types from \`contracts/${service}/openapi.json\` and a typed \`createApiClient\`. Nothing here is written by hand.
+
+## Depends on
+
+- The contract \`contracts/${service}/openapi.json\`, emitted from ${service}-service.
+- \`openapi-fetch\`.
+
+## Rules specific to this package
+
+- Generated: never edit \`src/**\`. Change the DTO or decorator in the service, then run \`pnpm run openapi:emit\` and \`pnpm run api:generate\` from the root.
+- The package version equals the contract's \`info.version\` and the service version (\`pnpm run version:check\`).
+
+## Gotchas
+
+- \`pnpm run api:check\` fails when a generated file is stale.
+
+## Open work
+
+- None recorded.
+`
   await writeOrCheck(path.join(packageDir, 'README.md'), readme)
   console.log(
     `${check ? 'client current' : 'client written'}: @mts241alikhlash/${service}-api`,
