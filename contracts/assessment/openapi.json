@@ -2804,6 +2804,46 @@
           "Dashboards"
         ]
       }
+    },
+    "/dashboards/institution": {
+      "get": {
+        "operationId": "MyDashboardController_findInstitution",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/InstitutionDashboardResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "School-wide dashboard: scores, attendance today, report cards",
+        "tags": [
+          "Dashboards"
+        ]
+      }
     }
   },
   "info": {
@@ -5573,6 +5613,119 @@
         "required": [
           "semester",
           "today"
+        ]
+      },
+      "InstitutionSemesterResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ScoreCompletenessResponseDto": {
+        "type": "object",
+        "properties": {
+          "classroomId": {
+            "type": "string"
+          },
+          "classroomName": {
+            "type": "string"
+          },
+          "filled": {
+            "type": "number"
+          },
+          "expected": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "classroomId",
+          "classroomName",
+          "filled",
+          "expected"
+        ]
+      },
+      "InstitutionAttendanceTodayResponseDto": {
+        "type": "object",
+        "properties": {
+          "present": {
+            "type": "number"
+          },
+          "sick": {
+            "type": "number"
+          },
+          "permit": {
+            "type": "number"
+          },
+          "absent": {
+            "type": "number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "present",
+          "sick",
+          "permit",
+          "absent",
+          "date"
+        ]
+      },
+      "InstitutionExamScoresResponseDto": {
+        "type": "object",
+        "properties": {
+          "published": {
+            "type": "number"
+          },
+          "unpublished": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "published",
+          "unpublished"
+        ]
+      },
+      "InstitutionDashboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "semester": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InstitutionSemesterResponseDto"
+              }
+            ]
+          },
+          "scoreCompleteness": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreCompletenessResponseDto"
+            }
+          },
+          "attendanceToday": {
+            "$ref": "#/components/schemas/InstitutionAttendanceTodayResponseDto"
+          },
+          "examScores": {
+            "$ref": "#/components/schemas/InstitutionExamScoresResponseDto"
+          }
+        },
+        "required": [
+          "semester",
+          "scoreCompleteness",
+          "attendanceToday",
+          "examScores"
         ]
       }
     }

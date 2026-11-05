@@ -187,6 +187,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/dashboards/institution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** School-wide dashboard: scores, attendance today, report cards */
+        get: operations["MyDashboardController_findInstitution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dashboards/me": {
         parameters: {
             query?: never;
@@ -947,6 +964,28 @@ export interface components {
             isPublished?: boolean;
             rank?: number;
         };
+        InstitutionAttendanceTodayResponseDto: {
+            absent: number;
+            /** Format: date-time */
+            date: string;
+            permit: number;
+            present: number;
+            sick: number;
+        };
+        InstitutionDashboardResponseDto: {
+            attendanceToday: components["schemas"]["InstitutionAttendanceTodayResponseDto"];
+            examScores: components["schemas"]["InstitutionExamScoresResponseDto"];
+            scoreCompleteness: components["schemas"]["ScoreCompletenessResponseDto"][];
+            semester: components["schemas"]["InstitutionSemesterResponseDto"] | null;
+        };
+        InstitutionExamScoresResponseDto: {
+            published: number;
+            unpublished: number;
+        };
+        InstitutionSemesterResponseDto: {
+            id: string;
+            name: string;
+        };
         MyDashboardResponseDto: {
             /** @description Null when the caller has no employee record. */
             employee?: components["schemas"]["MyEmployeeDashboardResponseDto"] | null;
@@ -1173,6 +1212,12 @@ export interface components {
             subjectCode?: string | null;
             subjectId: string;
             subjectName: string;
+        };
+        ScoreCompletenessResponseDto: {
+            classroomId: string;
+            classroomName: string;
+            expected: number;
+            filled: number;
         };
         StudentScoreBulkResultResponseDto: {
             saved: number;
@@ -1810,6 +1855,31 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AttendanceSuggestionsResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    MyDashboardController_findInstitution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["InstitutionDashboardResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
