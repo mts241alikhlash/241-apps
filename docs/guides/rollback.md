@@ -12,7 +12,7 @@ Result: the range lists no migration that drops or renames something the older c
 
 1. Find the tag to return to: `git tag --list 'deploy-*' --sort=-creatordate | head`.
    Result: the newest tags print with their dates.
-2. In the Actions tab run `Deploy`, `ref` set to that tag, and let the owner approve it.
+2. In the Actions tab run `Deploy` (`.github/workflows/deploy.yml`), `ref` set to that tag, and let the owner approve it. The forced command accepts only a commit on `main`, so the tag must point at one.
    Result: the run goes through the same checks as a deploy and ends with `==> deployed <sha>`.
 3. The rollback pulls the pinned digests from the registry again, so nothing needs to be kept on the server. A failed deploy prunes nothing.
    Result: `/health/<service>` answers for every service.

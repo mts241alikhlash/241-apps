@@ -29,4 +29,4 @@ Test counts never drop. Commands and presets are described in [testing](docs/sta
 
 ## Deploying
 
-Deploy and rollback are described in [deploy](docs/guides/deploy.md) and [rollback](docs/guides/rollback.md).
+Releases: [release](docs/guides/release.md). Server and deployment: [provision-vps](docs/guides/provision-vps.md), [deploy](docs/guides/deploy.md), [rollback](docs/guides/rollback.md), [cutover](docs/guides/cutover.md).
