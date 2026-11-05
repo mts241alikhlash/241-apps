@@ -92,6 +92,12 @@ The response envelope and DTO building rules are in [api](api.md).
 **Why.** A copied rule does not move when the original does (a copied month summary once shipped four defects that no build caught).
 **Check.** review.
 
+## Time
+
+**Rule.** Instants are UTC everywhere. A calendar day, a month default, the time of day against a work pattern and a due date are derived from an instant with `@mts241alikhlash/nest-core/time` and the required `SCHOOL_TIME_ZONE` (an IANA zone such as `Asia/Jakarta`); `@db.Date` columns hold the local calendar date as a UTC-midnight `Date`.
+**Why.** A scan at 06:45 WIB is 23:45 UTC of the day before: reading the UTC day filed it under the wrong date and judged it late.
+**Check.** the `nest` ESLint preset forbids `getUTC*` on `new Date()`, `now`, `today` and `current`, and `new Date().toISOString().slice(…)`, in `src`.
+
 ## Size and style
 
 **Rule.** Budgets, counting code only (imports, `@Api*` decorators and pure data files excluded): use case or service 300 lines, repository class 200, controller 150, any other file 300. An over-budget repository splits into sibling `*.includes.ts`, `*.where.ts`, `*.reader.ts`, `*.writer.ts`; the interface is not split.

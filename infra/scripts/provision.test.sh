@@ -60,6 +60,7 @@ grep -q "^SSO_APPS=.*account=https://accounts.mts241alikhlash.sch.id/oauth/callb
 grep -qx "SSO_ACCOUNTS_ORIGIN=https://accounts.mts241alikhlash.sch.id" "$root/infra/compose/env/identity-service.env" || fail "SSO_ACCOUNTS_ORIGIN is not the production origin"
 grep -qx "S3_ACCESS_KEY_ID=$key_id" "$root/infra/compose/env/identity-service.env" || fail "identity did not get the S3 key (profile photos need it)"
 if grep -q "change-me" "$root/infra/compose/env/exam-service.env"; then fail "the exam env file still holds a placeholder"; fi
+for s in presence inventory assessment exam; do grep -qx "SCHOOL_TIME_ZONE=Asia/Jakarta" "$root/infra/compose/env/$s-service.env" || fail "$s env file has no SCHOOL_TIME_ZONE"; done
 
 for secret in "$key_id" "$key_secret" "$db_pw" "$admin_pw" "$google_secret"; do
   if grep -qF -- "$secret" "$work/argv.log"; then fail "'$secret' appeared in argv"; fi

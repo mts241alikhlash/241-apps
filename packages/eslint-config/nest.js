@@ -53,6 +53,33 @@ export function nest({
         },
       },
       {
+        files: ['src/**/*.ts'],
+        ignores: ['src/**/*.spec.ts'],
+        rules: {
+          'no-restricted-syntax': [
+            'error',
+            {
+              selector:
+                "CallExpression[callee.property.name=/^getUTC(FullYear|Month|Date|Day)$/][callee.object.type='NewExpression']",
+              message:
+                'Derive the calendar day of an instant with @mts241alikhlash/nest-core/time and SCHOOL_TIME_ZONE (docs/standards/backend.md, Time).',
+            },
+            {
+              selector:
+                'CallExpression[callee.property.name=/^getUTC(FullYear|Month|Date|Day)$/][callee.object.name=/^(now|today|current)$/]',
+              message:
+                'Derive the calendar day of an instant with @mts241alikhlash/nest-core/time and SCHOOL_TIME_ZONE (docs/standards/backend.md, Time).',
+            },
+            {
+              selector:
+                "CallExpression[callee.property.name='slice'][callee.object.callee.property.name='toISOString'][callee.object.callee.object.type='NewExpression']",
+              message:
+                'Derive the calendar day of an instant with @mts241alikhlash/nest-core/time and SCHOOL_TIME_ZONE (docs/standards/backend.md, Time).',
+            },
+          ],
+        },
+      },
+      {
         files: TEST_FILES,
         rules: TEST_RULES,
       },
