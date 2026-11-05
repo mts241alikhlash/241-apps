@@ -1,11 +1,26 @@
-# 241 Account Web
+# account-web
 
-The sign-in, app launcher and own-profile app of the 241 Apps school platform, served at `accounts.mts241alikhlash.sch.id`.
+## Purpose
 
-```bash
-pnpm install
-pnpm run dev         # http://localhost:5180, against identity on 3000
-pnpm run validate    # format:check + lint + typecheck + lint:strict + test + build
-```
+Accounts: the sign-on host. Staff sign in here once; it also holds the profile and password pages.
 
-See `docs/OVERVIEW.md` for what this app owns and which service answers it.
+Dev port 5180.
+
+## Depends on
+
+- Packages: `@mts241alikhlash/platform`, `@mts241alikhlash/ui`, `@mts241alikhlash/web-shared`.
+- Services (API prefixes in `api-routes.config.ts`): `identity-service`.
+- Sign-on through account-web; the app is registered in identity's `SSO_APPS`.
+
+## Rules specific to this package
+
+- It is the required entry in identity's `SSO_APPS`.
+
+## Gotchas
+
+- A class used only inside a shared package needs the `@source` lines in `src/style.css`; without them the page renders unstyled with no build error.
+- `api-routes.config.ts` drives both the dev proxy and the generated gateway; `routes:check` verifies the manifest.
+
+## Open work
+
+- None recorded.

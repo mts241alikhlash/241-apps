@@ -1,18 +1,26 @@
-# 241 Inventory Web
+# inventory-web
 
-The Vue 3 + Vite frontend for **241 Inventory** — assets and their units,
-circulation, approvals, and the reference lists behind them. Part of the 241
-Apps school platform.
+## Purpose
 
-Shared UI and utilities come from the published `@mts241alikhlash/ui` and
-`@mts241alikhlash/web-shared` packages (GitHub Packages) — never copied or
-vendored.
+Inventory: assets, label printing, loans, circulation and approvals.
 
-```bash
-pnpm install
-pnpm run dev         # http://localhost:5174
-pnpm run validate    # format:check + lint + typecheck + lint:strict + test + build
-```
+Dev port 5174.
 
-See `docs/OVERVIEW.md` for what this app owns, its known gaps, and which
-backend services it depends on.
+## Depends on
+
+- Packages: `@mts241alikhlash/platform`, `@mts241alikhlash/ui`, `@mts241alikhlash/web-shared`.
+- Services (API prefixes in `api-routes.config.ts`): `identity-service`, `inventory-service`.
+- Sign-on through account-web; the app is registered in identity's `SSO_APPS`.
+
+## Rules specific to this package
+
+- Label sheet geometry lives in `src/features/inventory/logic/labelSheetLayout.ts`.
+
+## Gotchas
+
+- A class used only inside a shared package needs the `@source` lines in `src/style.css`; without them the page renders unstyled with no build error.
+- `api-routes.config.ts` drives both the dev proxy and the generated gateway; `routes:check` verifies the manifest.
+
+## Open work
+
+- None recorded.

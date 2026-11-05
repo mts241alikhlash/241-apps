@@ -10,7 +10,7 @@ const HEADINGS = [
   'Open work',
 ]
 const AGENTS_MAX_LINES = 40
-const SHAPE_PACKAGES = 'none'
+const SHAPE_PACKAGES = 'all'
 
 function stripFences(text) {
   let fenced = false

@@ -1,9 +1,10 @@
 # @mts241alikhlash/nest-core
 
-Infrastructure and cross-cutting code shared by the ten NestJS services. Domain models, lookup ports and
-anything tied to one service's Prisma client stay in that service.
+## Purpose
 
-## Subpaths
+Infrastructure and cross-cutting code shared by the ten NestJS services: configuration, health, filters, the response interceptor, logging, authentication and the identity port, permissions, audit log, the service client, domain base types, pagination DTOs, helpers and the architecture-test helpers. Domain models, lookup ports and anything tied to one service's Prisma client stay in the service.
+
+### Subpaths
 
 | Subpath                       | Contents                                                                                                      |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -28,24 +29,22 @@ anything tied to one service's Prisma client stay in that service.
 | `openapi`                     | the response envelope used by the contract emitter                                                            |
 | `testing`                     | architecture test helpers (`describeRouteCollisions`, `describeRouteRegistration`, `describeNoIgnoredCaller`) |
 
-## Build
+## Depends on
 
-The package is compiled with `nest build` (TypeScript plus the `@nestjs/swagger` plugin, as the services) to
-`dist`, which the exports point at. Build it before a service needs it:
+- Nest, Prisma and the other libraries as `peerDependencies`, so every service shares one instance of each.
+- No service and no service's Prisma client, ever.
 
-- `pnpm --filter <service>... run build` builds it first (the Dockerfiles do this);
-- `node dev.mjs` builds it once and keeps `pnpm --filter @mts241alikhlash/nest-core run dev` watching;
-- `pnpm --filter @mts241alikhlash/nest-core run build` before a service `typecheck` or `test` after editing it.
+## Rules specific to this package
 
-Nest, Prisma and the other libraries are `peerDependencies`, so every service shares one instance of each.
+- Only code identical in every service that uses it lives here. A difference a service needs becomes a module option or an argument; when it cannot, the file stays in the service.
+- The package is compiled with `nest build` to `dist`, which the exports point at ([ADR 0006](../../docs/adr/0006-nest-core-as-a-built-package.md)): `pnpm --filter <service>... run build` builds it first, `node dev.mjs` builds it once and keeps `pnpm --filter @mts241alikhlash/nest-core run dev` watching.
+- A change here changes every service: run the verification suite for all services.
 
-## Rules
+## Gotchas
 
-- Only code that is the same in every service that uses it lives here. A difference a service needs becomes a
-  module option or an argument; when it cannot, the file stays in the service.
-- Never import a service from here, and never import a service's generated Prisma client.
-- Changing a file here changes every service: run the verification suite for all services.
+- Build it before a service `typecheck` or `test` after editing it.
+- Under Vitest, `nestjs-pino` and `@prisma/client/runtime/client` resolve to one CommonJS instance shared with the service under test (see `@mts241alikhlash/vitest-config`).
 
-## Tests
+## Open work
 
-`pnpm --filter @mts241alikhlash/nest-core run test` (Vitest with `unplugin-swc` for decorator metadata).
+- None recorded.

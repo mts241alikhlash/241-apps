@@ -1,14 +1,26 @@
 # student-service
 
-241 Academic — student lifecycle: students, parents, enrollment, graduation, promotion
+## Purpose
 
-**[`docs/OVERVIEW.md`](docs/OVERVIEW.md) is the document to read first** — what
-this service owns, what it borrows, what it answers for others, and what is
-still broken. Everything else in `docs/` is governed by it.
+Owns the student lifecycle: students, parents and their links, class enrollment, graduation and graduation holds.
 
-```bash
-pnpm install
-pnpm prisma:generate
-pnpm dev
-pnpm run validate
-```
+Port 3900 locally; database `student` (6 models: `StudentEnrollment`, `StudentGraduation`, `StudentGraduationHold`, `Parent`, `StudentParent`, `Student`). The terms are in the [glossary](../../GLOSSARY.md).
+
+## Depends on
+
+- Packages: `@mts241alikhlash/nest-core` (shared infrastructure), `@mts241alikhlash/academic-api`.
+- Other services (HTTP, through ports and adapters in `src/platform/` or `integration/`): `assessment-service`, `academic-service`; and always identity, for token introspection and permissions.
+- PostgreSQL (its own database) and, where uploads exist, the S3 bucket.
+
+## Rules specific to this package
+
+- A person's address is not stored here; it lives in identity-service and is read over HTTP.
+- Enrollment from admission arrives through `POST /students/enroll`.
+
+## Gotchas
+
+- Classroom, semester and academic year data are read from academic-service; keep the narrow read models in `platform/`.
+
+## Open work
+
+- None recorded.

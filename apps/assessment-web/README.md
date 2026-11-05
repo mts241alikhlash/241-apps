@@ -1,18 +1,26 @@
-# 241 Assessment Web
+# assessment-web
 
-The Vue 3 + Vite frontend for **241 Assessment** — the school's marking desk:
-assessment items, student scores, report cards, the class attendance register,
-and the teacher's own dashboard. Part of the 241 Apps school platform.
+## Purpose
 
-Shared UI and utilities come from the published `@mts241alikhlash/ui` and
-`@mts241alikhlash/web-shared` packages (GitHub Packages) — never copied or
-vendored.
+Assessment: scores, report cards and lesson attendance for teachers, and the student's own views.
 
-```bash
-pnpm install
-pnpm run dev         # http://localhost:5179
-pnpm run validate    # format:check + lint + typecheck + lint:strict + test + build
-```
+Dev port 5179.
 
-See `docs/OVERVIEW.md` for what this app owns, its known gaps, and which
-backend services it depends on.
+## Depends on
+
+- Packages: `@mts241alikhlash/platform`, `@mts241alikhlash/ui`, `@mts241alikhlash/web-shared`.
+- Services (API prefixes in `api-routes.config.ts`): `identity-service`, `assessment-service`, `exam-service`, `academic-service`, `student-service`.
+- Sign-on through account-web; the app is registered in identity's `SSO_APPS`.
+
+## Rules specific to this package
+
+- None beyond the [frontend](../../docs/standards/frontend.md) and [ui](../../docs/standards/ui.md) standards.
+
+## Gotchas
+
+- A class used only inside a shared package needs the `@source` lines in `src/style.css`; without them the page renders unstyled with no build error.
+- `api-routes.config.ts` drives both the dev proxy and the generated gateway; `routes:check` verifies the manifest.
+
+## Open work
+
+- None recorded.

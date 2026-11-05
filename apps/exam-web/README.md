@@ -1,24 +1,27 @@
-# 241 Exam Web
+# exam-web
 
-The Vue 3 + Vite frontend for **241 Exam** — question authoring and package
-approval, exam scheduling, exam grading, and the student exam sheet. Part of
-the 241 Apps school platform.
+## Purpose
 
-Shared UI and utilities come from the published `@mts241alikhlash/ui` and
-`@mts241alikhlash/web-shared` packages (GitHub Packages) — never copied or
-vendored.
+Exam: question bank, packages, schedules, rooms and the student exam session.
 
-```bash
-pnpm install
-pnpm run dev         # http://localhost:5181
-pnpm run validate    # check:comments + format:check + lint + typecheck + lint:strict + test + build + routes:check
-```
+Dev port 5181.
 
-`pnpm run check:comments` is a gate, not a formatter: `scripts/check-no-comments.mjs`
-fails the build on any comment in `src/`, `packages/` and the root
-`.ts`/`.mjs` config files. Explain the code in its names and structure; the
-only exemptions are the `vite/client` reference and the `@vitest-environment`
-pragma.
+## Depends on
 
-See `docs/OVERVIEW.md` for what this app owns, its known gaps, and which
-backend services it depends on.
+- Packages: `@mts241alikhlash/platform`, `@mts241alikhlash/ui`, `@mts241alikhlash/web-shared`.
+- Services (API prefixes in `api-routes.config.ts`): `identity-service`, `exam-service`, `academic-service`, `student-service`.
+- Sign-on through account-web; the app is registered in identity's `SSO_APPS`.
+
+## Rules specific to this package
+
+- `scripts/check-no-comments.mjs` runs in `validate`; HTML `eslint-disable` directives with a reason are allowed.
+- Specs that need a DOM declare `// @vitest-environment happy-dom`.
+
+## Gotchas
+
+- A class used only inside a shared package needs the `@source` lines in `src/style.css`; without them the page renders unstyled with no build error.
+- `api-routes.config.ts` drives both the dev proxy and the generated gateway; `routes:check` verifies the manifest.
+
+## Open work
+
+- Camera proctoring UI and AI import are not finished.
