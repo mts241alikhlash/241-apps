@@ -27,6 +27,10 @@ values = {
 }
 if service == "identity":
     values["SEED_ADMIN_PASSWORD"] = env["PROV_ADMIN_PASSWORD"]
+    values["GOOGLE_CLIENT_ID"] = env["PROV_GOOGLE_ID"]
+    values["GOOGLE_CLIENT_SECRET"] = env["PROV_GOOGLE_SECRET"]
+if service == "exam":
+    values["EXAM_ACCESS_CODE_SECRET"] = env["PROV_EXAM_ACCESS_SECRET"]
 
 lines = []
 for line in open(source):

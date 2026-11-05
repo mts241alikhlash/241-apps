@@ -39,7 +39,9 @@ key_id="TESTKEYID7788"
 key_secret="TESTKEYSECRET7788"
 db_pw="TESTDBPW7788"
 admin_pw="TESTADMINPW7788"
-out="$(printf '%s\n' "$db_pw" "http://127.0.0.1:9000" "$key_id" "$key_secret" "postgres" "$admin_pw" |
+google_id="TESTGOOGLEID7788"
+google_secret="TESTGOOGLESECRET7788"
+out="$(printf '%s\n' "$db_pw" "http://127.0.0.1:9000" "$key_id" "$key_secret" "postgres" "$admin_pw" "$google_id" "$google_secret" |
   PATH="$work/stubs:$PATH" DEPLOY_ROOT="$root" PROVISION_ONLY_ENV=1 bash "$here/provision.sh" 2>&1)" || fail "the env-only run failed: $out"
 
 for s in "${services[@]}"; do
@@ -52,7 +54,10 @@ grep -qx "S3_ACCESS_KEY_ID=$key_id" "$portal" || fail "the key id did not reach 
 grep -qx "S3_SECRET_ACCESS_KEY=$key_secret" "$portal" || fail "the key secret did not reach the portal env file"
 grep -q "^SEED_ADMIN_PASSWORD=$admin_pw" "$root/infra/compose/env/identity-service.env" || fail "the admin password did not reach the identity env file"
 
-for secret in "$key_id" "$key_secret" "$db_pw" "$admin_pw"; do
+grep -qx "GOOGLE_CLIENT_SECRET=$google_secret" "$root/infra/compose/env/identity-service.env" || fail "the Google secret did not reach the identity env file"
+if grep -q "change-me" "$root/infra/compose/env/exam-service.env"; then fail "the exam env file still holds a placeholder"; fi
+
+for secret in "$key_id" "$key_secret" "$db_pw" "$admin_pw" "$google_secret"; do
   if grep -qF -- "$secret" "$work/argv.log"; then fail "'$secret' appeared in argv"; fi
   if grep -qF -- "$secret" <<< "$out"; then fail "'$secret' appeared in the output"; fi
 done

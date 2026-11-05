@@ -18,8 +18,13 @@ cp -r "$infra/gateway/manifests" "$work/infra/gateway/manifests"
 cat > "$work/stubs/docker" <<STUB
 #!/usr/bin/env bash
 printf '%s\n' "docker \$*" >> "$work/calls.log"
+if [[ "\$1" == ps && -n "\${STUB_FOREIGN:-}" ]]; then printf 'intruder\t127.0.0.1:8082->80/tcp\n'; exit 0; fi
+if [[ "\$1" == inspect && -n "\${STUB_FOREIGN:-}" ]]; then echo "someone-else"; exit 0; fi
 case "\$1 \$2" in
-  "info --format") echo "$work" ;;
+  "info --format")
+    if [[ "\$3" == *DockerRootDir* && -n "\${STUB_NO_DOCKER_ROOT:-}" ]]; then exit 1; fi
+    echo "$work"
+    ;;
   "compose -f") if [[ "\$*" == *" port gateway 80"* ]]; then echo "127.0.0.1:8082"; fi ;;
 esac
 exit 0
@@ -41,5 +46,12 @@ grep -q 'compose -f compose/compose.yaml -f compose/compose.override.yaml --prof
 DEPLOY_PULL=never DEPLOY_OVERRIDE=/somewhere/override.yaml bash -c "cd '$work/infra' && PATH='$work/stubs:$PATH' bash scripts/deploy.sh" > "$work/out.log" 2>&1 || { cat "$work/out.log" >&2; fail "the knob deploy failed"; }
 if grep -q ' pull' "$work/calls.log"; then fail "DEPLOY_PULL=never still pulled"; fi
 grep -q 'compose -f compose/compose.yaml -f /somewhere/override.yaml' "$work/calls.log" || fail "DEPLOY_OVERRIDE was not used"
+
+STUB_NO_DOCKER_ROOT=1 bash -c "cd '$work/infra' && PATH='$work/stubs:$PATH' bash scripts/deploy.sh" > "$work/out.log" 2>&1 || { cat "$work/out.log" >&2; fail "the deploy did not fall back to the Podman storage root"; }
+
+: > "$work/calls.log"
+if STUB_FOREIGN=1 bash -c "cd '$work/infra' && PATH='$work/stubs:$PATH' bash scripts/deploy.sh" > "$work/out.log" 2>&1; then fail "a foreign container on 8082 did not stop the deploy"; fi
+grep -q 'held by container intruder outside project 241-apps' "$work/out.log" || fail "the refusal message is missing"
+if grep -qE 'compose .* (pull|run|up)' "$work/calls.log"; then fail "the deploy changed something before refusing"; fi
 
 echo "deploy test passed"

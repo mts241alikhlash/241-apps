@@ -14,7 +14,7 @@ report() {
   echo "==> read logs on the VPS: docker logs --tail 100 <name>"
 }
 
-docker_root="$(docker info --format '{{.DockerRootDir}}')"
+docker_root="$(docker info --format '{{.DockerRootDir}}' 2> /dev/null || docker info --format '{{.Store.GraphRoot}}')"
 free_kb="$(df --output=avail -k "$docker_root" | tail -1)"
 if (( free_kb < 5 * 1024 * 1024 )); then
   echo "less than 5 GB free under $docker_root; free space before deploying" >&2
@@ -22,9 +22,10 @@ if (( free_kb < 5 * 1024 * 1024 )); then
 fi
 
 gateway_port=8082
-holders="$(docker ps --filter "publish=$gateway_port" --format '{{.Names}} {{.Label "com.docker.compose.project"}}')"
-while read -r name project; do
+holders="$(docker ps --format '{{.Names}}'$'\t''{{.Ports}}' | awk -F'\t' -v port=":$gateway_port->" 'index($2, port) { print $1 }')"
+while read -r name; do
   [[ -z "$name" ]] && continue
+  project="$(docker inspect --format '{{index .Config.Labels "com.docker.compose.project"}}' "$name")"
   if [[ "$project" != "241-apps" ]]; then
     echo "127.0.0.1:$gateway_port is held by container $name outside project 241-apps; stop it first" >&2
     exit 1

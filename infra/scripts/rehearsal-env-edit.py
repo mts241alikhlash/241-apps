@@ -21,6 +21,7 @@ values = {
     "S3_PUBLIC_ENDPOINT": f"https://storage.mts241alikhlash.sch.id:{port}",
     "GOOGLE_OAUTH_REDIRECT_ALLOWLIST": all_origins,
     "PORTAL_BASE_URL": origin("portal"),
+    "GOOGLE_CALLBACK_URL": f"{origin('account')}/auth/google/callback",
 }
 lines = []
 for line in open(target):

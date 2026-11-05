@@ -22,7 +22,7 @@ act() {
     "$@"
   fi
 }
-db_password="" minio_url="" s3_key="" s3_secret="" db_host="" admin_password="" public_key=""
+db_password="" minio_url="" s3_key="" s3_secret="" db_host="" admin_password="" google_id="" google_secret="" public_key=""
 ask() {
   local -n target="$1"
   local label="$2" secret="${3:-}"
@@ -121,10 +121,14 @@ step "service env files"
 if $need_env; then
   ask db_host "PostgreSQL host reachable from the containers (for example the docker bridge address)"
   ask admin_password "admin password for the first deploy (12 characters or more)" secret
+  ask google_id "Google OAuth client id (Google Cloud Console)"
+  ask google_secret "Google OAuth client secret" secret
   PROV_JWT_SECRET="$(random)"
   PROV_TOKEN="$(random)"
   export PROV_DB_HOST="$db_host" PROV_DB_USER="$db_role" PROV_DB_PASSWORD="$db_password"
-  export PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD="$admin_password"
+  PROV_EXAM_ACCESS_SECRET="$(openssl rand -hex 32)"
+  export PROV_JWT_SECRET PROV_TOKEN PROV_EXAM_ACCESS_SECRET PROV_ADMIN_PASSWORD="$admin_password"
+  export PROV_GOOGLE_ID="$google_id" PROV_GOOGLE_SECRET="$google_secret"
   export PROV_S3_KEY="$s3_key" PROV_S3_SECRET="$s3_secret" PROV_S3_ENDPOINT="$minio_url" PROV_BUCKET="$bucket"
 fi
 ports_json="{"
@@ -146,7 +150,7 @@ for service in "${services[@]}"; do
   [[ -n "$only_env" ]] || chown deploy:deploy "$target"
   echo "    wrote $target"
 done
-unset PROV_DB_HOST PROV_DB_USER PROV_DB_PASSWORD PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD PROV_S3_KEY PROV_S3_SECRET PROV_S3_ENDPOINT PROV_BUCKET
+unset PROV_GOOGLE_ID PROV_GOOGLE_SECRET PROV_EXAM_ACCESS_SECRET PROV_DB_HOST PROV_DB_USER PROV_DB_PASSWORD PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD PROV_S3_KEY PROV_S3_SECRET PROV_S3_ENDPOINT PROV_BUCKET
 if ! $dry_run; then
   grep -lE 'example\.com|change-me' "$root"/infra/compose/env/*.env 2> /dev/null | while read -r file; do
     echo "    still holds example values, edit it: $file"

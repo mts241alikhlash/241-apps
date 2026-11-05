@@ -22,10 +22,13 @@ for name, service in sorted(config["services"].items()):
         lines.append(f"    image: localhost/241-apps/{local}:{tag}")
         lines.append("    pull_policy: never")
         if name == "gateway":
+            lines.append("    volumes:")
+            lines.append(f"      - {os.environ['REHEARSAL_STATE']}/nginx.conf:/etc/nginx/conf.d/default.conf:ro,z")
             lines.append("    ports: !override")
             lines.append("      - '127.0.0.1:8082:80'")
     elif name in ("postgres", "s3"):
         lines.append(f"  {name}:")
         lines.append("    networks: !override")
         lines.append("      - platform-net")
+lines += ["volumes:", "  postgres-data:", "    name: 241-apps-rehearsal-postgres-data", "  s3-data:", "    name: 241-apps-rehearsal-s3-data"]
 print("\n".join(lines))
