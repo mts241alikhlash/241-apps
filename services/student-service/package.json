@@ -1,7 +1,7 @@
 {
   "name": "student-service",
   "version": "0.1.0",
-  "description": "241 Academic — student lifecycle: students, parents, enrollment, graduation, promotion",
+  "description": "241 Academic \u2014 student lifecycle: students, parents, enrollment, graduation, promotion",
   "author": "mhrmnvl",
   "private": true,
   "license": "UNLICENSED",
@@ -30,7 +30,6 @@
     "validate": "pnpm run lint && pnpm run typecheck && pnpm run lint:strict && pnpm test && pnpm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "vitest run --config vitest.e2e.config.mts",
     "openapi:emit": "nest build && node dist/src/openapi/emit-openapi.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
