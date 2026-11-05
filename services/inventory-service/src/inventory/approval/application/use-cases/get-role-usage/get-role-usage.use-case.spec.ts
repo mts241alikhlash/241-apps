@@ -6,7 +6,7 @@ const step = (approverRoleCode: string) => ({ approverRoleCode })
 describe('GetRoleUsageUseCase', () => {
   it('counts the active steps each role approves, with their workflows', async () => {
     const repository = {
-      findAllWorkflows: jest.fn().mockResolvedValue([
+      findAllWorkflows: vi.fn().mockResolvedValue([
         {
           name: 'Peminjaman',
           isActive: true,

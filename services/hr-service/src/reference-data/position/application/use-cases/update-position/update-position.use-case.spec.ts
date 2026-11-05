@@ -8,9 +8,9 @@ describe('UpdatePositionUseCase', () => {
   let useCase: UpdatePositionUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByName: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('UpdatePositionUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdatePositionUseCase>(UpdatePositionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

@@ -9,12 +9,12 @@ describe('DropStudentUseCase', () => {
   let useCase: DropStudentUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
   }
 
   const mockStudentRepository = {
-    updateStatus: jest.fn(),
+    updateStatus: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('DropStudentUseCase', () => {
     }).compile()
 
     useCase = module.get<DropStudentUseCase>(DropStudentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

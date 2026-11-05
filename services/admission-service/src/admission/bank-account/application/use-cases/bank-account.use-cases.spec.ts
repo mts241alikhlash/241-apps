@@ -16,11 +16,11 @@ const account = {
 
 function repository(found: typeof account | null = account) {
   return {
-    findAll: jest.fn().mockResolvedValue([account]),
-    findById: jest.fn().mockResolvedValue(found),
-    create: jest.fn().mockResolvedValue(account),
-    update: jest.fn().mockResolvedValue(account),
-    softDelete: jest.fn().mockResolvedValue(account),
+    findAll: vi.fn().mockResolvedValue([account]),
+    findById: vi.fn().mockResolvedValue(found),
+    create: vi.fn().mockResolvedValue(account),
+    update: vi.fn().mockResolvedValue(account),
+    softDelete: vi.fn().mockResolvedValue(account),
   }
 }
 

@@ -23,12 +23,12 @@ function dto(overrides: Record<string, unknown> = {}) {
 describe('CreateDailyPresenceUseCase', () => {
   let useCase: CreateDailyPresenceUseCase
   const dailyPresence = {
-    findByUserAndDate: jest.fn(),
-    createManual: jest.fn(),
+    findByUserAndDate: vi.fn(),
+    createManual: vi.fn(),
   }
-  const workPatterns = { resolveForUserAndDate: jest.fn() }
-  const periods = { isClosed: jest.fn() }
-  const audit = { record: jest.fn() }
+  const workPatterns = { resolveForUserAndDate: vi.fn() }
+  const periods = { isClosed: vi.fn() }
+  const audit = { record: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,7 +42,7 @@ describe('CreateDailyPresenceUseCase', () => {
     }).compile()
 
     useCase = module.get(CreateDailyPresenceUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     dailyPresence.findByUserAndDate.mockResolvedValue(null)
     dailyPresence.createManual.mockResolvedValue({ id: 'day-1' })
     workPatterns.resolveForUserAndDate.mockResolvedValue({

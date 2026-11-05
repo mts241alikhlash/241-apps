@@ -13,11 +13,11 @@ import { StudentParentController } from './student-parent.controller.js'
 describe('StudentParentController', () => {
   let controller: StudentParentController
 
-  const mockGetStudentParentsListService = { execute: jest.fn() }
-  const mockGetStudentParentByIdService = { execute: jest.fn() }
-  const mockCreateStudentParentService = { execute: jest.fn() }
-  const mockUpdateStudentParentService = { execute: jest.fn() }
-  const mockDeleteStudentParentService = { execute: jest.fn() }
+  const mockGetStudentParentsListService = { execute: vi.fn() }
+  const mockGetStudentParentByIdService = { execute: vi.fn() }
+  const mockCreateStudentParentService = { execute: vi.fn() }
+  const mockUpdateStudentParentService = { execute: vi.fn() }
+  const mockDeleteStudentParentService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -47,7 +47,7 @@ describe('StudentParentController', () => {
     }).compile()
 
     controller = module.get<StudentParentController>(StudentParentController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

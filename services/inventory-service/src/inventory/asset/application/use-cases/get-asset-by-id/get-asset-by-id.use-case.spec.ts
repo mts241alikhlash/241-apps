@@ -5,7 +5,7 @@ import { IAssetRepository } from '../../../domain/repositories/asset.repository.
 describe('GetAssetByIdUseCase', () => {
   it('returns the repository asset', async () => {
     const asset = { id: 'asset-1', assetNumber: 'AST-COMP/2026/001' }
-    const findById = jest.fn().mockResolvedValue(asset)
+    const findById = vi.fn().mockResolvedValue(asset)
     const repository = { findById } as unknown as IAssetRepository
     const useCase = new GetAssetByIdUseCase(repository)
 
@@ -14,7 +14,7 @@ describe('GetAssetByIdUseCase', () => {
   })
 
   it('throws not found when repository returns no asset', async () => {
-    const findById = jest.fn().mockResolvedValue(null)
+    const findById = vi.fn().mockResolvedValue(null)
     const repository = { findById } as unknown as IAssetRepository
     const useCase = new GetAssetByIdUseCase(repository)
 
@@ -26,7 +26,7 @@ describe('GetAssetByIdUseCase', () => {
   it('propagates repository read errors', async () => {
     const error = new Error('database unavailable')
     const repository = {
-      findById: jest.fn().mockRejectedValue(error),
+      findById: vi.fn().mockRejectedValue(error),
     } as unknown as IAssetRepository
     const useCase = new GetAssetByIdUseCase(repository)
 

@@ -5,15 +5,13 @@ import type { AssetUnitQueryInput } from '../../../domain/repositories/asset-uni
 
 describe('lendable asset units', () => {
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(1)
-    const assetFindReferenceById = jest.fn().mockResolvedValue(null)
-    const conditionFindById = jest.fn().mockResolvedValue(null)
-    const statusFindById = jest.fn().mockResolvedValue(null)
-    const findIdsAllowingTransactions = jest
-      .fn()
-      .mockResolvedValue(['status-1'])
-    const locationFindById = jest.fn().mockResolvedValue(null)
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(1)
+    const assetFindReferenceById = vi.fn().mockResolvedValue(null)
+    const conditionFindById = vi.fn().mockResolvedValue(null)
+    const statusFindById = vi.fn().mockResolvedValue(null)
+    const findIdsAllowingTransactions = vi.fn().mockResolvedValue(['status-1'])
+    const locationFindById = vi.fn().mockResolvedValue(null)
     const prisma = {
       inventoryAssetUnit: { findMany, count },
     } as unknown as PrismaService

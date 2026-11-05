@@ -7,9 +7,9 @@ describe('DeleteSemesterUseCase', () => {
   let useCase: DeleteSemesterUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findFirstDependent: jest.fn(),
-    softDelete: jest.fn(),
+    findById: vi.fn(),
+    findFirstDependent: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('DeleteSemesterUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteSemesterUseCase>(DeleteSemesterUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

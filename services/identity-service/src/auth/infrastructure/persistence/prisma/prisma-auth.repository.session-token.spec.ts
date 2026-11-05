@@ -2,7 +2,7 @@ import { PrismaAuthRepository } from './prisma-auth.repository.js'
 
 describe('PrismaAuthRepository.updateSessionToken', () => {
   it('stores the replaced token hash and when it was replaced next to the new one', async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 })
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
     const repository = new PrismaAuthRepository({
       authSession: { updateMany },
     } as never)
@@ -31,7 +31,7 @@ describe('PrismaAuthRepository.updateSessionToken', () => {
   })
 
   it('returns false when another refresh rotated first', async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 0 })
+    const updateMany = vi.fn().mockResolvedValue({ count: 0 })
     const repository = new PrismaAuthRepository({
       authSession: { updateMany },
     } as never)

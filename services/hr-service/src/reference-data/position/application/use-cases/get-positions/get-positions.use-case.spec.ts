@@ -7,7 +7,7 @@ describe('GetPositionsUseCase', () => {
   let useCase: GetPositionsUseCase
 
   const mockRepo = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetPositionsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetPositionsUseCase>(GetPositionsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

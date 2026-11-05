@@ -8,9 +8,9 @@ describe('UpdateCurriculumSubjectUseCase', () => {
   let useCase: UpdateCurriculumSubjectUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findDuplicate: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findDuplicate: vi.fn(),
+    update: vi.fn(),
   }
 
   const existing = {
@@ -31,7 +31,7 @@ describe('UpdateCurriculumSubjectUseCase', () => {
     useCase = module.get<UpdateCurriculumSubjectUseCase>(
       UpdateCurriculumSubjectUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

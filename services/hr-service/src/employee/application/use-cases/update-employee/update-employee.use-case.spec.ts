@@ -8,10 +8,10 @@ describe('UpdateEmployeeUseCase', () => {
   let useCase: UpdateEmployeeUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findByNip: jest.fn(),
-    findByNuptk: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByNip: vi.fn(),
+    findByNuptk: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -23,7 +23,7 @@ describe('UpdateEmployeeUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateEmployeeUseCase>(UpdateEmployeeUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

@@ -31,10 +31,10 @@ function record(overrides: Record<string, unknown> = {}) {
 
 describe('UpdateDailyPresenceUseCase', () => {
   let useCase: UpdateDailyPresenceUseCase
-  const dailyPresence = { findById: jest.fn(), correct: jest.fn() }
-  const corrections = { recordMany: jest.fn() }
-  const periods = { isClosed: jest.fn() }
-  const audit = { record: jest.fn() }
+  const dailyPresence = { findById: vi.fn(), correct: vi.fn() }
+  const corrections = { recordMany: vi.fn() }
+  const periods = { isClosed: vi.fn() }
+  const audit = { record: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,7 +48,7 @@ describe('UpdateDailyPresenceUseCase', () => {
     }).compile()
 
     useCase = module.get(UpdateDailyPresenceUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     dailyPresence.findById.mockResolvedValue(record())
     dailyPresence.correct.mockResolvedValue(record({ status: 'PRESENT' }))
     periods.isClosed.mockResolvedValue(false)

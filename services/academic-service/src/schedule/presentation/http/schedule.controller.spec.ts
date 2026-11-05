@@ -15,20 +15,20 @@ import { ScheduleController } from './schedule.controller.js'
 describe('ScheduleController', () => {
   let controller: ScheduleController
 
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockGetByClassroom = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockBatchUpsert = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockGetByClassroom = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockBatchUpsert = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ScheduleController],
       providers: [
         { provide: GetSchedulesUseCase, useValue: mockGetAll },
-        { provide: GetMyScheduleUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetMyScheduleUseCase, useValue: { execute: vi.fn() } },
         { provide: GetScheduleByIdUseCase, useValue: mockGetById },
         {
           provide: GetSchedulesByClassroomUseCase,
@@ -42,7 +42,7 @@ describe('ScheduleController', () => {
     }).compile()
 
     controller = module.get<ScheduleController>(ScheduleController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -7,15 +7,15 @@ function makePrisma(
   } | null,
 ) {
   const tx = {
-    $queryRaw: jest.fn().mockResolvedValue([]),
+    $queryRaw: vi.fn().mockResolvedValue([]),
     admissionPayment: {
-      findFirst: jest.fn().mockResolvedValue(found),
-      update: jest.fn().mockResolvedValue({ id: 'pay1', status: 'PENDING' }),
+      findFirst: vi.fn().mockResolvedValue(found),
+      update: vi.fn().mockResolvedValue({ id: 'pay1', status: 'PENDING' }),
     },
-    admissionApplication: { update: jest.fn().mockResolvedValue({}) },
+    admissionApplication: { update: vi.fn().mockResolvedValue({}) },
   }
   const prisma = {
-    $transaction: jest.fn((run: (client: typeof tx) => unknown) => run(tx)),
+    $transaction: vi.fn((run: (client: typeof tx) => unknown) => run(tx)),
   }
   return { prisma, tx }
 }

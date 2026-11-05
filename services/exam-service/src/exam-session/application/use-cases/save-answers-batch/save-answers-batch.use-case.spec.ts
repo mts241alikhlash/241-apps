@@ -53,7 +53,7 @@ describe('SaveAnswersBatchUseCase', () => {
 
   it('loads the paper once for a batch of 46 and confirms every answer', async () => {
     const { useCase, questionIds } = await setup(46)
-    const findPinned = jest.spyOn(questions, 'findPinned')
+    const findPinned = vi.spyOn(questions, 'findPinned')
 
     const result = await useCase.execute(
       STUDENT_USER,

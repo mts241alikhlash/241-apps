@@ -39,14 +39,14 @@ const record = {
 function makePrisma() {
   return {
     admissionPayment: {
-      findMany: jest.fn().mockResolvedValue([record]),
-      count: jest.fn().mockResolvedValue(1),
-      groupBy: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([record]),
+      count: vi.fn().mockResolvedValue(1),
+      groupBy: vi.fn().mockResolvedValue([
         { status: 'PENDING', _count: { _all: 1 } },
         { status: 'VERIFIED', _count: { _all: 4 } },
       ]),
     },
-    admissionApplication: { findMany: jest.fn().mockResolvedValue([]) },
+    admissionApplication: { findMany: vi.fn().mockResolvedValue([]) },
   }
 }
 

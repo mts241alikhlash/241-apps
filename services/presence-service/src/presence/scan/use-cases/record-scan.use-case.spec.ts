@@ -29,20 +29,20 @@ function dto(overrides: Record<string, unknown> = {}) {
 describe('RecordScanUseCase', () => {
   let useCase: RecordScanUseCase
   const scans = {
-    findByClientEventId: jest.fn(),
-    findLastAccepted: jest.fn(),
-    record: jest.fn(),
-    findAll: jest.fn(),
+    findByClientEventId: vi.fn(),
+    findLastAccepted: vi.fn(),
+    record: vi.fn(),
+    findAll: vi.fn(),
   }
-  const credentials = { findByCode: jest.fn() }
+  const credentials = { findByCode: vi.fn() }
   const dailyPresence = {
-    findByUserAndDate: jest.fn(),
-    upsertCheckIn: jest.fn(),
-    recordCheckOut: jest.fn(),
+    findByUserAndDate: vi.fn(),
+    upsertCheckIn: vi.fn(),
+    recordCheckOut: vi.fn(),
   }
-  const devices = { touchLastSeen: jest.fn() }
-  const dayStatus = { judgeArrival: jest.fn(), judgeDeparture: jest.fn() }
-  const clock = { resolveOccurredAt: jest.fn(), now: jest.fn() }
+  const devices = { touchLastSeen: vi.fn() }
+  const dayStatus = { judgeArrival: vi.fn(), judgeDeparture: vi.fn() }
+  const clock = { resolveOccurredAt: vi.fn(), now: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +58,7 @@ describe('RecordScanUseCase', () => {
     }).compile()
 
     useCase = module.get(RecordScanUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     scans.findByClientEventId.mockResolvedValue(null)
     scans.findLastAccepted.mockResolvedValue(null)

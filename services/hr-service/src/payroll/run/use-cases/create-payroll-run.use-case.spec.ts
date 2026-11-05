@@ -12,13 +12,13 @@ const AHMAD = '11111111-1111-4111-8111-111111111111'
 describe('CreatePayrollRunUseCase', () => {
   let useCase: CreatePayrollRunUseCase
   const runs = {
-    findByPeriod: jest.fn(),
-    nextSequence: jest.fn(),
-    create: jest.fn(),
+    findByPeriod: vi.fn(),
+    nextSequence: vi.fn(),
+    create: vi.fn(),
   }
-  const periods = { isClosed: jest.fn() }
-  const roster = { list: jest.fn(), name: jest.fn() }
-  const composer = { compose: jest.fn() }
+  const periods = { isClosed: vi.fn() }
+  const roster = { list: vi.fn(), name: vi.fn() }
+  const composer = { compose: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +32,7 @@ describe('CreatePayrollRunUseCase', () => {
     }).compile()
 
     useCase = module.get(CreatePayrollRunUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     periods.isClosed.mockResolvedValue(true)
     runs.findByPeriod.mockResolvedValue(null)

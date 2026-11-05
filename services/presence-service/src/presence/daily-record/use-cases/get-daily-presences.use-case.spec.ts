@@ -15,11 +15,11 @@ describe('daily presence read use cases', () => {
   let byId: GetDailyPresenceByIdUseCase
   let mine: GetMyDailyPresencesUseCase
   const dailyPresence = {
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    findByUserAndMonth: jest.fn(),
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    findByUserAndMonth: vi.fn(),
   }
-  const corrections = { findByDailyPresence: jest.fn() }
+  const corrections = { findByDailyPresence: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +35,7 @@ describe('daily presence read use cases', () => {
     list = module.get(GetDailyPresencesUseCase)
     byId = module.get(GetDailyPresenceByIdUseCase)
     mine = module.get(GetMyDailyPresencesUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     dailyPresence.findAll.mockResolvedValue({
       data: [{ id: 'day-1', corrected: true }],
       total: 1,

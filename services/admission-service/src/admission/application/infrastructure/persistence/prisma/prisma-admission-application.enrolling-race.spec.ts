@@ -3,20 +3,18 @@ import { PrismaAdmissionApplicationRepository } from './prisma-admission-applica
 
 function setup(count: number) {
   const admissionApplication = {
-    updateMany: jest.fn().mockResolvedValue({ count }),
-    findUniqueOrThrow: jest.fn().mockResolvedValue({ id: 'app1' }),
+    updateMany: vi.fn().mockResolvedValue({ count }),
+    findUniqueOrThrow: vi.fn().mockResolvedValue({ id: 'app1' }),
   }
   const repo = new PrismaAdmissionApplicationRepository(
     { admissionApplication } as never,
     {} as never,
     {} as never,
   )
-  jest
-    .spyOn(
-      repo as unknown as { attachAccountSummary: (row: unknown) => unknown },
-      'attachAccountSummary',
-    )
-    .mockImplementation((row: unknown) => Promise.resolve(row))
+  vi.spyOn(
+    repo as unknown as { attachAccountSummary: (row: unknown) => unknown },
+    'attachAccountSummary',
+  ).mockImplementation((row: unknown) => Promise.resolve(row))
   return { repo, admissionApplication }
 }
 

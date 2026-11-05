@@ -7,8 +7,8 @@ describe('ToggleEmployeeActiveUseCase', () => {
   let useCase: ToggleEmployeeActiveUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    toggleUserActive: jest.fn(),
+    findById: vi.fn(),
+    toggleUserActive: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('ToggleEmployeeActiveUseCase', () => {
     useCase = module.get<ToggleEmployeeActiveUseCase>(
       ToggleEmployeeActiveUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

@@ -4,13 +4,13 @@ import type { PrismaService } from '../../../../../core/database/prisma.service.
 function makeRepository(claimedCount: number) {
   const tx = {
     admissionPayment: {
-      updateMany: jest.fn().mockResolvedValue({ count: claimedCount }),
-      update: jest.fn().mockResolvedValue({ id: 'pay1', proofFileId: 'f1' }),
+      updateMany: vi.fn().mockResolvedValue({ count: claimedCount }),
+      update: vi.fn().mockResolvedValue({ id: 'pay1', proofFileId: 'f1' }),
     },
-    file: { create: jest.fn().mockResolvedValue({ id: 'f1' }) },
+    file: { create: vi.fn().mockResolvedValue({ id: 'f1' }) },
   }
   const prisma = {
-    $transaction: jest.fn((run: (client: typeof tx) => unknown) => run(tx)),
+    $transaction: vi.fn((run: (client: typeof tx) => unknown) => run(tx)),
   }
   return {
     tx,

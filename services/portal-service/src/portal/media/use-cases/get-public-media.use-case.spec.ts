@@ -8,13 +8,13 @@ import { PortalCacheService } from '../../shared/services/portal-cache.service.j
 
 const FILE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetPublicMediaUseCase', () => {
   let useCase: GetPublicMediaUseCase
-  const mediaUsage = { isPubliclyReferenced: jest.fn() }
-  const files = { findById: jest.fn() }
-  const storage = { getSignedUrl: jest.fn() }
+  const mediaUsage = { isPubliclyReferenced: vi.fn() }
+  const files = { findById: vi.fn() }
+  const storage = { getSignedUrl: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,7 +28,7 @@ describe('GetPublicMediaUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPublicMediaUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mediaUsage.isPubliclyReferenced.mockResolvedValue(true)
     files.findById.mockResolvedValue({
       id: FILE_ID,

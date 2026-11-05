@@ -6,7 +6,7 @@ import { GetReportCardByIdUseCase } from './get-report-card-by-id.use-case.js'
 describe('GetReportCardByIdUseCase', () => {
   let useCase: GetReportCardByIdUseCase
 
-  const mockRepo = { findById: jest.fn() }
+  const mockRepo = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('GetReportCardByIdUseCase', () => {
     }).compile()
 
     useCase = module.get<GetReportCardByIdUseCase>(GetReportCardByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

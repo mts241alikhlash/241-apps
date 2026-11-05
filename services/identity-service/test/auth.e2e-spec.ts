@@ -56,18 +56,18 @@ describe('Auth (e2e)', () => {
   let hashedPassword: string
 
   const mockPrismaService = {
-    user: { findUnique: jest.fn(), findFirst: jest.fn() },
+    user: { findUnique: vi.fn(), findFirst: vi.fn() },
     authSession: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      deleteMany: jest.fn(),
-      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
-      findFirst: jest.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      deleteMany: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      findFirst: vi.fn(),
     },
-    userRole: { findMany: jest.fn().mockResolvedValue([]) },
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    userRole: { findMany: vi.fn().mockResolvedValue([]) },
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
   }
 
   const TEST_USER_ID = 'b3d7f1a0-1234-4abc-9def-000000000001'
@@ -178,7 +178,7 @@ describe('Auth (e2e)', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('POST /auth/login', () => {

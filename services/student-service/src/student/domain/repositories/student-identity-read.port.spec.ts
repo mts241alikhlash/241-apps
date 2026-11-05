@@ -3,7 +3,7 @@ import type { PrismaService } from '../../../core/database/prisma.service.js'
 
 describe('identity read ports', () => {
   function studentPortWith(row: { id: string } | null) {
-    const findFirst = jest.fn().mockResolvedValue(row)
+    const findFirst = vi.fn().mockResolvedValue(row)
     const prisma = { student: { findFirst } } as unknown as PrismaService
     return { port: new PrismaStudentIdentityReadPort(prisma), findFirst }
   }

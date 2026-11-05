@@ -7,7 +7,7 @@ describe('GetEmployeesUseCase', () => {
   let useCase: GetEmployeesUseCase
 
   const mockRepository = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetEmployeesUseCase', () => {
     }).compile()
 
     useCase = module.get<GetEmployeesUseCase>(GetEmployeesUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

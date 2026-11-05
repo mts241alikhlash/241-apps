@@ -12,11 +12,11 @@ import { ParentController } from './parent.controller.js'
 describe('ParentController', () => {
   let controller: ParentController
 
-  const mockGetParentsService = { execute: jest.fn() }
-  const mockGetParentByIdService = { execute: jest.fn() }
-  const mockCreateParentService = { execute: jest.fn() }
-  const mockUpdateParentService = { execute: jest.fn() }
-  const mockDeleteParentService = { execute: jest.fn() }
+  const mockGetParentsService = { execute: vi.fn() }
+  const mockGetParentByIdService = { execute: vi.fn() }
+  const mockCreateParentService = { execute: vi.fn() }
+  const mockUpdateParentService = { execute: vi.fn() }
+  const mockDeleteParentService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +31,7 @@ describe('ParentController', () => {
     }).compile()
 
     controller = module.get<ParentController>(ParentController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

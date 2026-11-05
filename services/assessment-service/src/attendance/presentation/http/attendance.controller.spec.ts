@@ -39,15 +39,15 @@ const attendanceResponse = {
 describe('AttendanceController', () => {
   let controller: AttendanceController
 
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockBulkUpsert = { execute: jest.fn() }
-  const mockRecap = { execute: jest.fn() }
-  const mockSuggestions = { execute: jest.fn() }
-  const mockTrend = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockBulkUpsert = { execute: vi.fn() }
+  const mockRecap = { execute: vi.fn() }
+  const mockSuggestions = { execute: vi.fn() }
+  const mockTrend = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -56,7 +56,7 @@ describe('AttendanceController', () => {
         { provide: GetAttendancesUseCase, useValue: mockGetAll },
         {
           provide: GetMyAttendancesUseCase,
-          useValue: { execute: jest.fn() },
+          useValue: { execute: vi.fn() },
         },
         { provide: GetAttendanceByIdUseCase, useValue: mockGetById },
         { provide: CreateAttendanceUseCase, useValue: mockCreate },
@@ -73,7 +73,7 @@ describe('AttendanceController', () => {
     }).compile()
 
     controller = module.get<AttendanceController>(AttendanceController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

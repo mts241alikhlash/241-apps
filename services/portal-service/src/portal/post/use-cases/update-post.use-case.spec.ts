@@ -44,24 +44,24 @@ function row(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('UpdatePostUseCase', () => {
   let useCase: UpdatePostUseCase
 
   const mockSyncMediaUsage = {
-    execute: jest.fn().mockResolvedValue(undefined),
+    execute: vi.fn().mockResolvedValue(undefined),
   }
 
   const mockTagRepository = {
-    resolveOrCreate: jest.fn().mockResolvedValue([]),
-    setPostTags: jest.fn().mockResolvedValue(undefined),
+    resolveOrCreate: vi.fn().mockResolvedValue([]),
+    setPostTags: vi.fn().mockResolvedValue(undefined),
   }
 
   const mockRepository = {
-    findById: jest.fn(),
-    update: jest.fn(),
-    recordSlugHistory: jest.fn().mockResolvedValue(undefined),
+    findById: vi.fn(),
+    update: vi.fn(),
+    recordSlugHistory: vi.fn().mockResolvedValue(undefined),
   }
 
   beforeEach(async () => {
@@ -77,7 +77,7 @@ describe('UpdatePostUseCase', () => {
     }).compile()
 
     useCase = module.get(UpdatePostUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.recordSlugHistory.mockResolvedValue(undefined)
     mockRepository.findById.mockResolvedValue(row())
     mockRepository.update.mockResolvedValue(row({ version: 4 }))

@@ -28,11 +28,11 @@ const positionResponse = {
 describe('PositionController', () => {
   let controller: PositionController
 
-  const mockGetPositionsService = { execute: jest.fn() }
-  const mockGetPositionByIdService = { execute: jest.fn() }
-  const mockCreatePositionService = { execute: jest.fn() }
-  const mockUpdatePositionService = { execute: jest.fn() }
-  const mockDeletePositionService = { execute: jest.fn() }
+  const mockGetPositionsService = { execute: vi.fn() }
+  const mockGetPositionByIdService = { execute: vi.fn() }
+  const mockCreatePositionService = { execute: vi.fn() }
+  const mockUpdatePositionService = { execute: vi.fn() }
+  const mockDeletePositionService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -50,7 +50,7 @@ describe('PositionController', () => {
     }).compile()
 
     controller = module.get<PositionController>(PositionController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('findAll', () => {

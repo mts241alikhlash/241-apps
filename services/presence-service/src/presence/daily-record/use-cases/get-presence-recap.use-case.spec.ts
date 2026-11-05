@@ -26,8 +26,8 @@ function row(overrides: Partial<PresenceRecapRow> = {}): PresenceRecapRow {
 describe('GetPresenceRecapUseCase', () => {
   let recap: GetPresenceRecapUseCase
   let exportRecap: ExportPresenceRecapUseCase
-  const dailyPresence = { getRecap: jest.fn(), countWorkingDays: jest.fn() }
-  const periods = { findByPeriod: jest.fn() }
+  const dailyPresence = { getRecap: vi.fn(), countWorkingDays: vi.fn() }
+  const periods = { findByPeriod: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,7 +41,7 @@ describe('GetPresenceRecapUseCase', () => {
 
     recap = module.get(GetPresenceRecapUseCase)
     exportRecap = module.get(ExportPresenceRecapUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     dailyPresence.getRecap.mockResolvedValue([row()])
     dailyPresence.countWorkingDays.mockResolvedValue(21)
     periods.findByPeriod.mockResolvedValue(null)

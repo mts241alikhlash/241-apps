@@ -6,17 +6,17 @@ import { IReportCardRepository } from '../../../domain/repositories/report-card.
 import { PdfService } from '../../services/pdf.service.js'
 import { ExportReportCardPdfUseCase } from './export-report-card-pdf.use-case.js'
 
-jest.mock('../../services/pdf.service.js', () => ({
-  PdfService: jest.fn(),
+vi.mock('../../services/pdf.service.js', () => ({
+  PdfService: vi.fn(),
 }))
 
 describe('ExportReportCardPdfUseCase', () => {
   let useCase: ExportReportCardPdfUseCase
 
-  const mockRepo = { findById: jest.fn() }
-  const mockAttendanceRepository = { getStatusCounts: jest.fn() }
-  const mockPdfService = { generatePdf: jest.fn() }
-  const mockSchoolUnitIdentityReadPort = { findSchoolUnitProfile: jest.fn() }
+  const mockRepo = { findById: vi.fn() }
+  const mockAttendanceRepository = { getStatusCounts: vi.fn() }
+  const mockPdfService = { generatePdf: vi.fn() }
+  const mockSchoolUnitIdentityReadPort = { findSchoolUnitProfile: vi.fn() }
 
   const baseReportCard = {
     id: 'rap-1',
@@ -60,7 +60,7 @@ describe('ExportReportCardPdfUseCase', () => {
     }).compile()
 
     useCase = module.get<ExportReportCardPdfUseCase>(ExportReportCardPdfUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     mockAttendanceRepository.getStatusCounts.mockResolvedValue({
       sick: 0,

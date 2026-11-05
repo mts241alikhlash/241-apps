@@ -17,20 +17,20 @@ describe('GetMyDashboardUseCase', () => {
   }
 
   const repo = {
-    findActiveSemester: jest.fn(),
-    findEnrolledClassroom: jest.fn(),
-    findClassroomLessons: jest.fn(),
-    summarizeAttendance: jest.fn(),
-    findLatestScores: jest.fn(),
-    findLatestPublishedReportCard: jest.fn(),
-    findTeachingLessons: jest.fn(),
-    summarizeTeachingLoad: jest.fn(),
-    findSupervisedClassrooms: jest.fn(),
-    findUngradedAssessments: jest.fn(),
+    findActiveSemester: vi.fn(),
+    findEnrolledClassroom: vi.fn(),
+    findClassroomLessons: vi.fn(),
+    summarizeAttendance: vi.fn(),
+    findLatestScores: vi.fn(),
+    findLatestPublishedReportCard: vi.fn(),
+    findTeachingLessons: vi.fn(),
+    summarizeTeachingLoad: vi.fn(),
+    findSupervisedClassrooms: vi.fn(),
+    findUngradedAssessments: vi.fn(),
   }
-  const studentIdentity = { findStudentIdByUserId: jest.fn() }
-  const employeeIdentity = { findEmployeeIdByUserId: jest.fn() }
-  const academicSetting = { findSetting: jest.fn() }
+  const studentIdentity = { findStudentIdByUserId: vi.fn() }
+  const employeeIdentity = { findEmployeeIdByUserId: vi.fn() }
+  const academicSetting = { findSetting: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,7 +44,7 @@ describe('GetMyDashboardUseCase', () => {
     }).compile()
 
     useCase = module.get(GetMyDashboardUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     repo.findActiveSemester.mockResolvedValue({
       id: 'sem-1',

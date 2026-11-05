@@ -4,13 +4,13 @@ import type { IAssetRepository } from '../../../domain/repositories/asset.reposi
 import type { PrismaService } from '../../../../../core/database/prisma.service.js'
 
 const lookup = {
-  findById: jest.fn().mockResolvedValue(null),
-  findIdsAllowingTransactions: jest.fn().mockResolvedValue([]),
+  findById: vi.fn().mockResolvedValue(null),
+  findIdsAllowingTransactions: vi.fn().mockResolvedValue([]),
 }
 
 describe('latest asset records', () => {
   it('excludes soft-deleted assets when selecting a prefix sequence', async () => {
-    const findFirst = jest.fn().mockResolvedValue(null)
+    const findFirst = vi.fn().mockResolvedValue(null)
     const prisma = {
       inventoryAsset: { findFirst },
     } as unknown as PrismaService
@@ -38,16 +38,16 @@ describe('latest asset records', () => {
 
 describe('latest asset units', () => {
   it('excludes soft-deleted units', async () => {
-    const findFirst = jest.fn().mockResolvedValue(null)
+    const findFirst = vi.fn().mockResolvedValue(null)
     const prisma = {
       inventoryAssetUnit: { findFirst },
     } as unknown as PrismaService
     const repository = new PrismaAssetUnitRepository(
       prisma,
-      { findReferenceById: jest.fn() } as unknown as IAssetRepository,
-      { findById: jest.fn() },
-      { findById: jest.fn(), findIdsAllowingTransactions: jest.fn() },
-      { findById: jest.fn() },
+      { findReferenceById: vi.fn() } as unknown as IAssetRepository,
+      { findById: vi.fn() },
+      { findById: vi.fn(), findIdsAllowingTransactions: vi.fn() },
+      { findById: vi.fn() },
     )
 
     await repository.findLatestUnit('asset-1')

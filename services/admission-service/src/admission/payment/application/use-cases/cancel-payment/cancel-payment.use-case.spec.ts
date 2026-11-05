@@ -7,8 +7,8 @@ import { CancelPaymentUseCase } from './cancel-payment.use-case.js'
 
 function setup(outcome: Record<string, unknown> | null = null) {
   const payments = {
-    findPayment: jest.fn().mockResolvedValue({ id: 'pay1' }),
-    cancelVerification: jest.fn().mockResolvedValue(
+    findPayment: vi.fn().mockResolvedValue({ id: 'pay1' }),
+    cancelVerification: vi.fn().mockResolvedValue(
       outcome ?? {
         outcome: 'CANCELLED',
         payment: { id: 'pay1', status: 'PENDING', amount: 150000 },
@@ -16,7 +16,7 @@ function setup(outcome: Record<string, unknown> | null = null) {
       },
     ),
   }
-  const notifications = { notify: jest.fn() }
+  const notifications = { notify: vi.fn() }
   const useCase = new CancelPaymentUseCase(payments as never, notifications)
   return { payments, notifications, useCase }
 }

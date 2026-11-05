@@ -38,24 +38,24 @@ function page(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const repository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findPublicBySlug: jest.fn(),
-  findByHistoricalSlug: jest.fn(),
-  recordSlugHistory: jest.fn(),
-  findTakenSlugs: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  publish: jest.fn(),
-  unpublish: jest.fn(),
-  softDelete: jest.fn(),
-  findAllVisible: jest.fn(),
+  findAll: vi.fn(),
+  findById: vi.fn(),
+  findPublicBySlug: vi.fn(),
+  findByHistoricalSlug: vi.fn(),
+  recordSlugHistory: vi.fn(),
+  findTakenSlugs: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  publish: vi.fn(),
+  unpublish: vi.fn(),
+  softDelete: vi.fn(),
+  findAllVisible: vi.fn(),
 }
 
-const syncMediaUsage = { execute: jest.fn() }
+const syncMediaUsage = { execute: vi.fn() }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
   const module: TestingModule = await Test.createTestingModule({
@@ -71,7 +71,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findById.mockResolvedValue(page())
   repository.findTakenSlugs.mockResolvedValue([])
   repository.create.mockImplementation((data: Record<string, unknown>) =>

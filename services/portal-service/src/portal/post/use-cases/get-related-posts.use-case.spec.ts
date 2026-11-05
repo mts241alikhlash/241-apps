@@ -41,13 +41,13 @@ function row(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetRelatedPostsUseCase', () => {
   let useCase: GetRelatedPostsUseCase
   const mockRepository = {
-    findPublicBySlug: jest.fn(),
-    findRelated: jest.fn(),
+    findPublicBySlug: vi.fn(),
+    findRelated: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -60,7 +60,7 @@ describe('GetRelatedPostsUseCase', () => {
     }).compile()
 
     useCase = module.get(GetRelatedPostsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findPublicBySlug.mockResolvedValue(row())
     mockRepository.findRelated.mockResolvedValue([])
   })

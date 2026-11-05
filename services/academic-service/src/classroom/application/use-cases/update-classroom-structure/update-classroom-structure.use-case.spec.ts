@@ -7,10 +7,10 @@ describe('UpdateClassroomStructureUseCase', () => {
   let useCase: UpdateClassroomStructureUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findActiveEnrollment: jest.fn(),
-    findByStudentAndSemester: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findActiveEnrollment: vi.fn(),
+    findByStudentAndSemester: vi.fn(),
+    update: vi.fn(),
   }
 
   const existing = {
@@ -34,7 +34,7 @@ describe('UpdateClassroomStructureUseCase', () => {
     useCase = module.get<UpdateClassroomStructureUseCase>(
       UpdateClassroomStructureUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should throw NotFoundException when not found', async () => {

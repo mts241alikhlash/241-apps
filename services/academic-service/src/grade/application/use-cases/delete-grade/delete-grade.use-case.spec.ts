@@ -7,8 +7,8 @@ describe('DeleteGradeUseCase', () => {
   let useCase: DeleteGradeUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    softDelete: jest.fn(),
+    findById: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('DeleteGradeUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteGradeUseCase>(DeleteGradeUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

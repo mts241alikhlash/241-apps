@@ -11,12 +11,12 @@ const SITI = '22222222-2222-4222-8222-222222222222'
 describe('RecalculatePayrollRunUseCase', () => {
   let useCase: RecalculatePayrollRunUseCase
   const runs = {
-    findRunById: jest.fn(),
-    snapshotNets: jest.fn(),
-    replacePayslips: jest.fn(),
+    findRunById: vi.fn(),
+    snapshotNets: vi.fn(),
+    replacePayslips: vi.fn(),
   }
-  const roster = { list: jest.fn(), name: jest.fn() }
-  const composer = { compose: jest.fn() }
+  const roster = { list: vi.fn(), name: vi.fn() }
+  const composer = { compose: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +29,7 @@ describe('RecalculatePayrollRunUseCase', () => {
     }).compile()
 
     useCase = module.get(RecalculatePayrollRunUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     runs.findRunById.mockResolvedValue({
       id: 'run-1',

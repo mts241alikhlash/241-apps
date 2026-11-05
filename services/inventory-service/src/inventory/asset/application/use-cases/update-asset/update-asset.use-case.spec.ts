@@ -19,8 +19,8 @@ describe('UpdateAssetUseCase', () => {
 
   it('checks existence, maps update fields, and returns updated asset', async () => {
     const result = { id: 'asset-1', name: 'Updated laptop' }
-    const findById = jest.fn().mockResolvedValue({ id: 'asset-1' })
-    const update = jest.fn().mockResolvedValue(result)
+    const findById = vi.fn().mockResolvedValue({ id: 'asset-1' })
+    const update = vi.fn().mockResolvedValue(result)
     const repository = { findById, update } as unknown as IAssetRepository
     const useCase = new UpdateAssetUseCase(repository)
 
@@ -42,9 +42,9 @@ describe('UpdateAssetUseCase', () => {
   })
 
   it('maps omitted optional values to undefined', async () => {
-    const update = jest.fn().mockResolvedValue({ id: 'asset-1' })
+    const update = vi.fn().mockResolvedValue({ id: 'asset-1' })
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'asset-1' }),
+      findById: vi.fn().mockResolvedValue({ id: 'asset-1' }),
       update,
     } as unknown as IAssetRepository
     const useCase = new UpdateAssetUseCase(repository)
@@ -69,9 +69,9 @@ describe('UpdateAssetUseCase', () => {
   })
 
   it('rejects missing assets before updating', async () => {
-    const update = jest.fn()
+    const update = vi.fn()
     const repository = {
-      findById: jest.fn().mockResolvedValue(null),
+      findById: vi.fn().mockResolvedValue(null),
       update,
     } as unknown as IAssetRepository
     const useCase = new UpdateAssetUseCase(repository)
@@ -85,8 +85,8 @@ describe('UpdateAssetUseCase', () => {
   it('propagates update conflicts without translating them', async () => {
     const conflict = new ConflictException('asset number already exists')
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'asset-1' }),
-      update: jest.fn().mockRejectedValue(conflict),
+      findById: vi.fn().mockResolvedValue({ id: 'asset-1' }),
+      update: vi.fn().mockRejectedValue(conflict),
     } as unknown as IAssetRepository
     const useCase = new UpdateAssetUseCase(repository)
 

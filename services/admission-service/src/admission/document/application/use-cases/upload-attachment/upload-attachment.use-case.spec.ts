@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -16,25 +17,25 @@ const file = (overrides: Record<string, unknown> = {}) => ({
 
 describe('UploadAttachmentUseCase', () => {
   let documents: {
-    findApplicationForUpload: jest.Mock
-    findByApplicationId: jest.Mock
-    saveAttachment: jest.Mock
+    findApplicationForUpload: Mock
+    findByApplicationId: Mock
+    saveAttachment: Mock
   }
-  let storage: { save: jest.Mock }
+  let storage: { save: Mock }
   let useCase: UploadAttachmentUseCase
 
   beforeEach(() => {
     documents = {
-      findApplicationForUpload: jest
+      findApplicationForUpload: vi
         .fn()
         .mockResolvedValue({ id: 'app1', status: 'DRAFT' }),
-      findByApplicationId: jest
+      findByApplicationId: vi
         .fn()
         .mockResolvedValue({ id: 'app1', status: 'DRAFT' }),
-      saveAttachment: jest.fn().mockResolvedValue({ id: 'file1' }),
+      saveAttachment: vi.fn().mockResolvedValue({ id: 'file1' }),
     }
     storage = {
-      save: jest.fn().mockResolvedValue({
+      save: vi.fn().mockResolvedValue({
         filename: 'a.pdf',
         storageKey: 'attachments/a.pdf',
       }),

@@ -4,13 +4,13 @@ import { IntrospectTokenUseCase } from './introspect-token.use-case.js'
 
 describe('IntrospectTokenUseCase', () => {
   const repository = {
-    findSessionWithUser: jest.fn(),
-    findGrants: jest
+    findSessionWithUser: vi.fn(),
+    findGrants: vi
       .fn()
       .mockResolvedValue({ roles: ['TEACHER'], permissions: [] }),
   }
   const tokens = {
-    verifyAccessToken: jest.fn().mockResolvedValue({ sessionId: 'app-1' }),
+    verifyAccessToken: vi.fn().mockResolvedValue({ sessionId: 'app-1' }),
   }
   const useCase = new IntrospectTokenUseCase(
     repository as unknown as IAuthRepository,

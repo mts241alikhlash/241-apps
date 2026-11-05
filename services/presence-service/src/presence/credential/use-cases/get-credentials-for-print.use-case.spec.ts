@@ -5,7 +5,7 @@ import { GetCredentialsForPrintUseCase } from './get-credentials-for-print.use-c
 
 describe('GetCredentialsForPrintUseCase', () => {
   let useCase: GetCredentialsForPrintUseCase
-  const repository = { findForPrint: jest.fn() }
+  const repository = { findForPrint: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,7 +16,7 @@ describe('GetCredentialsForPrintUseCase', () => {
     }).compile()
 
     useCase = module.get(GetCredentialsForPrintUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findForPrint.mockResolvedValue([
       { id: 'cred-1', code: 'abc', holder: { displayName: 'Ahmad' } },
     ])

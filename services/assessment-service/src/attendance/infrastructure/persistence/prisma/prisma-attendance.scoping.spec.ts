@@ -6,23 +6,23 @@ import type { IEnrollmentLookupPort } from '../../../../platform/enrollment-look
 
 describe('attendance list scoping', () => {
   function repositoryWithSpy(enrollmentIds = ['enr-1']) {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(0)
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(0)
     const prisma = {
       attendance: { findMany, count },
     } as unknown as PrismaService
 
-    const search = jest
+    const search = vi
       .fn()
       .mockResolvedValue(enrollmentIds.map((id) => ({ id })))
     const enrollmentLookup = {
       search,
-      listByIds: jest.fn().mockResolvedValue([]),
+      listByIds: vi.fn().mockResolvedValue([]),
     } as unknown as IEnrollmentLookupPort
 
     const academicLookup = {
-      listSchedules: jest.fn().mockResolvedValue([]),
-      listTeachingAssignments: jest.fn().mockResolvedValue([]),
+      listSchedules: vi.fn().mockResolvedValue([]),
+      listTeachingAssignments: vi.fn().mockResolvedValue([]),
     } as unknown as IAcademicLookupPort
 
     return {

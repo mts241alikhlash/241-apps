@@ -10,19 +10,19 @@ describe('EnsureStudentEnrollmentUseCase', () => {
   let useCase: EnsureStudentEnrollmentUseCase
 
   const mockEnrollmentRepository = {
-    findDuplicate: jest.fn(),
+    findDuplicate: vi.fn(),
   }
 
   const mockAcademicLookup = {
-    findActiveSemester: jest.fn(),
+    findActiveSemester: vi.fn(),
   }
 
   const mockCreateStudentEnrollment = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockTransferStudent = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const activeSemester = { id: 'sem-1' }
@@ -44,7 +44,7 @@ describe('EnsureStudentEnrollmentUseCase', () => {
     useCase = module.get<EnsureStudentEnrollmentUseCase>(
       EnsureStudentEnrollmentUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

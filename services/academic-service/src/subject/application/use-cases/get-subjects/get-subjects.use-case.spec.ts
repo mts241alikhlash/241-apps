@@ -6,7 +6,7 @@ import { GetSubjectsUseCase } from './get-subjects.use-case.js'
 describe('GetSubjectsUseCase', () => {
   let useCase: GetSubjectsUseCase
 
-  const mockRepo = { findAll: jest.fn() }
+  const mockRepo = { findAll: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('GetSubjectsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetSubjectsUseCase>(GetSubjectsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

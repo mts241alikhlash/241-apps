@@ -11,7 +11,7 @@ import { RejectFromQueueUseCase } from './reject-from-queue/reject-from-queue.us
 
 describe('GetDecisionQueueUseCase', () => {
   it('defaults to Menunggu keputusan, summarizes the documents and pages the meta', async () => {
-    const findQueue = jest.fn().mockResolvedValue({
+    const findQueue = vi.fn().mockResolvedValue({
       records: [
         {
           applicationId: 'app1',
@@ -63,10 +63,10 @@ describe('GetDecisionQueueUseCase', () => {
 describe('RejectFromQueueUseCase', () => {
   it('rejects a verified applicant with a trimmed reason', async () => {
     const decisions = {
-      findStatus: jest.fn().mockResolvedValue({ status: 'VERIFIED' }),
+      findStatus: vi.fn().mockResolvedValue({ status: 'VERIFIED' }),
     }
     const reject = {
-      execute: jest.fn().mockResolvedValue({ id: 'app1', status: 'REJECTED' }),
+      execute: vi.fn().mockResolvedValue({ id: 'app1', status: 'REJECTED' }),
     }
 
     const result = await new RejectFromQueueUseCase(
@@ -87,11 +87,11 @@ describe('RejectFromQueueUseCase', () => {
   })
 
   it('needs a reason', async () => {
-    const reject = { execute: jest.fn() }
+    const reject = { execute: vi.fn() }
 
     await expect(
       new RejectFromQueueUseCase(
-        { findStatus: jest.fn() } as never,
+        { findStatus: vi.fn() } as never,
         reject as never,
       ).execute({
         applicationId: 'app1',
@@ -105,11 +105,11 @@ describe('RejectFromQueueUseCase', () => {
   it.each(['SUBMITTED', 'ACCEPTED', 'REJECTED', 'ENROLLED'])(
     'leaves a %s applicant to the detail page',
     async (status) => {
-      const reject = { execute: jest.fn() }
+      const reject = { execute: vi.fn() }
 
       await expect(
         new RejectFromQueueUseCase(
-          { findStatus: jest.fn().mockResolvedValue({ status }) } as never,
+          { findStatus: vi.fn().mockResolvedValue({ status }) } as never,
           reject as never,
         ).execute({ applicationId: 'app1', reason: 'x', adminId: 'admin1' }),
       ).rejects.toThrow(
@@ -124,8 +124,8 @@ describe('RejectFromQueueUseCase', () => {
   it('answers 404 for an unknown applicant', async () => {
     await expect(
       new RejectFromQueueUseCase(
-        { findStatus: jest.fn().mockResolvedValue(null) } as never,
-        { execute: jest.fn() } as never,
+        { findStatus: vi.fn().mockResolvedValue(null) } as never,
+        { execute: vi.fn() } as never,
       ).execute({ applicationId: 'x', reason: 'x', adminId: 'admin1' }),
     ).rejects.toBeInstanceOf(NotFoundException)
   })
@@ -134,7 +134,7 @@ describe('RejectFromQueueUseCase', () => {
 describe('AcceptManyUseCase', () => {
   it('accepts each applicant once and reports what happened to every id', async () => {
     const accept = {
-      execute: jest
+      execute: vi
         .fn()
         .mockResolvedValueOnce({ id: 'a' })
         .mockRejectedValueOnce(
@@ -180,7 +180,7 @@ describe('AcceptManyUseCase', () => {
   })
 
   it('passes no note when none is given', async () => {
-    const accept = { execute: jest.fn().mockResolvedValue({ id: 'a' }) }
+    const accept = { execute: vi.fn().mockResolvedValue({ id: 'a' }) }
 
     await new AcceptManyUseCase(accept as never).execute({
       applicationIds: ['a'],
@@ -195,7 +195,7 @@ describe('AcceptManyUseCase', () => {
   })
 
   it.each([[0], [51]])('refuses %i ids', async (size) => {
-    const accept = { execute: jest.fn() }
+    const accept = { execute: vi.fn() }
 
     await expect(
       new AcceptManyUseCase(accept as never).execute({
@@ -213,10 +213,10 @@ describe('AcceptManyUseCase', () => {
 describe('CancelAcceptanceUseCase', () => {
   function setup(status: string | null, cancelled = true) {
     const decisions = {
-      findStatus: jest.fn().mockResolvedValue(status ? { status } : null),
-      cancelAcceptance: jest.fn().mockResolvedValue(cancelled),
+      findStatus: vi.fn().mockResolvedValue(status ? { status } : null),
+      cancelAcceptance: vi.fn().mockResolvedValue(cancelled),
     }
-    const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
+    const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
     return {
       decisions,
       notifications,
@@ -303,11 +303,11 @@ describe('CancelAcceptanceUseCase', () => {
 describe('CancelRejectionUseCase', () => {
   function setup(status: string | null, verified = false, cancelled = true) {
     const decisions = {
-      findStatus: jest.fn().mockResolvedValue(status ? { status } : null),
-      cancelRejection: jest.fn().mockResolvedValue(cancelled),
+      findStatus: vi.fn().mockResolvedValue(status ? { status } : null),
+      cancelRejection: vi.fn().mockResolvedValue(cancelled),
     }
-    const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
-    const verifyWhenReady = { execute: jest.fn().mockResolvedValue(verified) }
+    const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
+    const verifyWhenReady = { execute: vi.fn().mockResolvedValue(verified) }
     return {
       decisions,
       notifications,

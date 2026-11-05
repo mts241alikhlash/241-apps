@@ -41,11 +41,11 @@ function row(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetPostsUseCase', () => {
   let useCase: GetPostsUseCase
-  const mockRepository = { findAll: jest.fn() }
+  const mockRepository = { findAll: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,7 +57,7 @@ describe('GetPostsUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPostsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findAll.mockResolvedValue({
       data: [row()],
       total: 25,
@@ -115,7 +115,7 @@ describe('GetPostsUseCase', () => {
 
 describe('GetPostByIdUseCase', () => {
   let useCase: GetPostByIdUseCase
-  const mockRepository = { findById: jest.fn() }
+  const mockRepository = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -127,7 +127,7 @@ describe('GetPostByIdUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPostByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('throws NotFound for an unknown id', async () => {

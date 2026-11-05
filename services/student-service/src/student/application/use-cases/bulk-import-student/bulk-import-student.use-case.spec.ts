@@ -41,15 +41,15 @@ describe('BulkImportStudentsUseCase', () => {
   let useCase: BulkImportStudentsUseCase
 
   const mockStudentRepository = {
-    findByNis: jest.fn(),
-    findByNisn: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
+    findByNis: vi.fn(),
+    findByNisn: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
   }
 
   const mockAcademicLookup = {
-    findClassroomByCode: jest.fn(),
-    findGradeByLevel: jest.fn(),
+    findClassroomByCode: vi.fn(),
+    findGradeByLevel: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -63,7 +63,7 @@ describe('BulkImportStudentsUseCase', () => {
     }).compile()
 
     useCase = module.get<BulkImportStudentsUseCase>(BulkImportStudentsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

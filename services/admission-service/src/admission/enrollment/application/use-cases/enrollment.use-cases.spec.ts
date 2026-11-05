@@ -26,14 +26,14 @@ const candidate = (
 })
 
 const yearLookup = {
-  listAcademicYears: jest
+  listAcademicYears: vi
     .fn()
     .mockResolvedValue([{ id: 'y1', name: '2026/2027' }]),
 }
 
 describe('GetEnrollmentQueueUseCase', () => {
   it('defaults to Siap diproses and names the school years', async () => {
-    const findQueue = jest.fn().mockResolvedValue({
+    const findQueue = vi.fn().mockResolvedValue({
       records: [],
       total: 41,
       counts: { ready: 41, held: 1, done: 2 },
@@ -85,11 +85,11 @@ describe('SetPlacementUseCase', () => {
     grades = [{ id: 'g8', level: 8, name: 'Kelas 8' }],
   ) {
     const repository = {
-      findPlacementState: jest.fn().mockResolvedValue(state),
-      isNisLocked: jest.fn().mockResolvedValue(locked),
-      setPlacement: jest.fn().mockResolvedValue(undefined),
+      findPlacementState: vi.fn().mockResolvedValue(state),
+      isNisLocked: vi.fn().mockResolvedValue(locked),
+      setPlacement: vi.fn().mockResolvedValue(undefined),
     }
-    const lookup = { activeGrades: jest.fn().mockResolvedValue(grades) }
+    const lookup = { activeGrades: vi.fn().mockResolvedValue(grades) }
     return {
       repository,
       useCase: new SetPlacementUseCase(repository as never, lookup as never),
@@ -192,8 +192,8 @@ describe('SetPlacementUseCase', () => {
 describe('PreviewNisUseCase', () => {
   function setup(candidates: unknown[], locked = false, years = yearLookup) {
     const repository = {
-      findNisCandidates: jest.fn().mockResolvedValue(candidates),
-      isNisLocked: jest.fn().mockResolvedValue(locked),
+      findNisCandidates: vi.fn().mockResolvedValue(candidates),
+      isNisLocked: vi.fn().mockResolvedValue(locked),
     }
     return new PreviewNisUseCase(repository as never, years as never)
   }
@@ -250,9 +250,9 @@ describe('PreviewNisUseCase', () => {
   })
 
   it('answers a clear error for an unknown or unreadable school year', async () => {
-    const unknown = { listAcademicYears: jest.fn().mockResolvedValue([]) }
+    const unknown = { listAcademicYears: vi.fn().mockResolvedValue([]) }
     const unreadable = {
-      listAcademicYears: jest
+      listAcademicYears: vi
         .fn()
         .mockResolvedValue([{ id: 'y1', name: 'Ganjil' }]),
     }
@@ -269,11 +269,11 @@ describe('PreviewNisUseCase', () => {
 describe('ComposeNisUseCase', () => {
   function setup(candidates: unknown[], locked = false) {
     const repository = {
-      findNisCandidates: jest.fn().mockResolvedValue(candidates),
-      isNisLocked: jest.fn().mockResolvedValue(locked),
-      writeNis: jest.fn().mockResolvedValue(undefined),
+      findNisCandidates: vi.fn().mockResolvedValue(candidates),
+      isNisLocked: vi.fn().mockResolvedValue(locked),
+      writeNis: vi.fn().mockResolvedValue(undefined),
     }
-    const enrollment = { updateNis: jest.fn().mockResolvedValue(undefined) }
+    const enrollment = { updateNis: vi.fn().mockResolvedValue(undefined) }
     return {
       repository,
       enrollment,
@@ -488,7 +488,7 @@ describe('ComposeNisUseCase', () => {
 describe('LockNisUseCase', () => {
   it('locks a year once and says who and when', async () => {
     const lockedAt = new Date('2026-10-08T00:00:00Z')
-    const repository = { lockNis: jest.fn().mockResolvedValue({ lockedAt }) }
+    const repository = { lockNis: vi.fn().mockResolvedValue({ lockedAt }) }
 
     await expect(
       new LockNisUseCase(repository as never).execute({
@@ -504,7 +504,7 @@ describe('LockNisUseCase', () => {
   })
 
   it('refuses a second lock', async () => {
-    const repository = { lockNis: jest.fn().mockResolvedValue(null) }
+    const repository = { lockNis: vi.fn().mockResolvedValue(null) }
 
     await expect(
       new LockNisUseCase(repository as never).execute({
@@ -527,12 +527,12 @@ describe('ProcessEnrollmentsUseCase', () => {
 
   function setup(states: Record<string, unknown>) {
     const repository = {
-      findProcessState: jest.fn((id: string) =>
+      findProcessState: vi.fn((id: string) =>
         Promise.resolve(states[id] ?? null),
       ),
-      setNisn: jest.fn().mockResolvedValue(undefined),
+      setNisn: vi.fn().mockResolvedValue(undefined),
     }
-    const enroll = { execute: jest.fn().mockResolvedValue({ id: 'x' }) }
+    const enroll = { execute: vi.fn().mockResolvedValue({ id: 'x' }) }
     return {
       repository,
       enroll,

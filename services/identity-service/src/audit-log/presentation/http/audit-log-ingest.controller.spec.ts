@@ -7,19 +7,19 @@ import { AuditLogIngestController } from './audit-log-ingest.controller.js'
 describe('AuditLogIngestController', () => {
   let controller: AuditLogIngestController
 
-  const mockCreateAuditLogUseCase = { execute: jest.fn() }
+  const mockCreateAuditLogUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuditLogIngestController],
       providers: [
         { provide: CreateAuditLogUseCase, useValue: mockCreateAuditLogUseCase },
-        { provide: ConfigService, useValue: { get: jest.fn() } },
+        { provide: ConfigService, useValue: { get: vi.fn() } },
       ],
     }).compile()
 
     controller = module.get<AuditLogIngestController>(AuditLogIngestController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

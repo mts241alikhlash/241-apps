@@ -9,11 +9,11 @@ describe('ReplaceAssessmentWeightsUseCase', () => {
   let useCase: ReplaceAssessmentWeightsUseCase
 
   const mockWeightRepository = {
-    findByTeachingAssignment: jest.fn(),
-    replaceForTeachingAssignment: jest.fn(),
+    findByTeachingAssignment: vi.fn(),
+    replaceForTeachingAssignment: vi.fn(),
   }
   const mockTeachingAssignmentRepository = {
-    teachingAssignmentExists: jest.fn(),
+    teachingAssignmentExists: vi.fn(),
   }
 
   function input(
@@ -41,7 +41,7 @@ describe('ReplaceAssessmentWeightsUseCase', () => {
     }).compile()
 
     useCase = module.get(ReplaceAssessmentWeightsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     mockTeachingAssignmentRepository.teachingAssignmentExists.mockResolvedValue(
       true,

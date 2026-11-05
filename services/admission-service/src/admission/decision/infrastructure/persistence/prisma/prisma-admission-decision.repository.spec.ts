@@ -3,11 +3,11 @@ import { PrismaAdmissionDecisionRepository } from './prisma-admission-decision.r
 const scope = { deletedAt: null }
 
 function queueRepository(counts = [4, 3, 2, 1]) {
-  const findMany = jest.fn().mockResolvedValue([])
-  const count = jest.fn()
+  const findMany = vi.fn().mockResolvedValue([])
+  const count = vi.fn()
   counts.forEach((value) => count.mockResolvedValueOnce(value))
   count.mockResolvedValue(0)
-  const findTypes = jest.fn().mockResolvedValue([{ id: 'kk' }])
+  const findTypes = vi.fn().mockResolvedValue([{ id: 'kk' }])
   const prisma = {
     admissionDocumentType: { findMany: findTypes },
     admissionApplication: { findMany, count },
@@ -151,7 +151,7 @@ describe('PrismaAdmissionDecisionRepository.findQueue', () => {
 
 describe('PrismaAdmissionDecisionRepository decisions', () => {
   it('reads the status of a live application', async () => {
-    const findFirst = jest.fn().mockResolvedValue({ status: 'ACCEPTED' })
+    const findFirst = vi.fn().mockResolvedValue({ status: 'ACCEPTED' })
     const repository = new PrismaAdmissionDecisionRepository({
       admissionApplication: { findFirst },
     } as never)
@@ -166,7 +166,7 @@ describe('PrismaAdmissionDecisionRepository decisions', () => {
   })
 
   it('returns an accepted application to the queue and clears the decision', async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 })
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
     const repository = new PrismaAdmissionDecisionRepository({
       admissionApplication: { updateMany },
     } as never)
@@ -185,7 +185,7 @@ describe('PrismaAdmissionDecisionRepository decisions', () => {
   })
 
   it('returns a rejected application to review and clears the decision', async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 })
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
     const repository = new PrismaAdmissionDecisionRepository({
       admissionApplication: { updateMany },
     } as never)
@@ -205,7 +205,7 @@ describe('PrismaAdmissionDecisionRepository decisions', () => {
   it('answers false when another request changed the status first', async () => {
     const repository = new PrismaAdmissionDecisionRepository({
       admissionApplication: {
-        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+        updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
     } as never)
 

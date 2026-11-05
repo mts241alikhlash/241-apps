@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import {
   IAssetUnitCapabilityPort,
@@ -33,41 +34,41 @@ describe('CreateLoanUseCase', () => {
     },
   ]
 
-  function make(overrides: Record<string, jest.Mock> = {}) {
+  function make(overrides: Record<string, Mock> = {}) {
     const loan = {
       findLatestLoan:
-        overrides.findLatestLoan ?? jest.fn().mockResolvedValue(null),
+        overrides.findLatestLoan ?? vi.fn().mockResolvedValue(null),
       processCreateLoanTransaction:
         overrides.processCreateLoanTransaction ??
-        jest.fn().mockResolvedValue({ id: 'loan-1' }),
+        vi.fn().mockResolvedValue({ id: 'loan-1' }),
       updateLoan:
-        overrides.updateLoan ?? jest.fn().mockResolvedValue({ id: 'loan-1' }),
+        overrides.updateLoan ?? vi.fn().mockResolvedValue({ id: 'loan-1' }),
     } as unknown as ILoanRepository
     const status = {
       findBySystemKey:
         overrides.findBySystemKey ??
-        jest.fn().mockResolvedValue({ id: 'status-pending' }),
+        vi.fn().mockResolvedValue({ id: 'status-pending' }),
     } satisfies IStatusLookupPort
     const unitsPort = {
-      findByIds: overrides.findByIds ?? jest.fn().mockResolvedValue(units),
+      findByIds: overrides.findByIds ?? vi.fn().mockResolvedValue(units),
     } satisfies IAssetUnitCapabilityPort
     const mutation = {
       updateStatuses:
-        overrides.updateStatuses ?? jest.fn().mockResolvedValue(undefined),
-      updateCondition: jest.fn().mockResolvedValue(undefined),
+        overrides.updateStatuses ?? vi.fn().mockResolvedValue(undefined),
+      updateCondition: vi.fn().mockResolvedValue(undefined),
     } satisfies IAssetUnitMutationPort
     const approval = {
       findActiveWorkflow:
-        overrides.findActiveWorkflow ?? jest.fn().mockResolvedValue(null),
-      createInstance: jest.fn().mockResolvedValue({ id: 'instance-1' }),
+        overrides.findActiveWorkflow ?? vi.fn().mockResolvedValue(null),
+      createInstance: vi.fn().mockResolvedValue({ id: 'instance-1' }),
     } satisfies IApprovalCapabilityPort
     const transactionType = {
-      findTransactionTypeByCode: jest
+      findTransactionTypeByCode: vi
         .fn()
         .mockResolvedValue({ id: 'tx-loan-out' }),
     } satisfies ITransactionTypeCapabilityPort
     const history = {
-      record: jest.fn().mockResolvedValue(undefined),
+      record: vi.fn().mockResolvedValue(undefined),
     } satisfies IHistoryCapabilityPort
 
     return {
@@ -91,9 +92,9 @@ describe('CreateLoanUseCase', () => {
   }
 
   it('preserves missing pending status error before unit lookup', async () => {
-    const findByIds = jest.fn()
+    const findByIds = vi.fn()
     const { useCase } = make({
-      findBySystemKey: jest.fn().mockResolvedValue(null),
+      findBySystemKey: vi.fn().mockResolvedValue(null),
       findByIds,
     })
 
@@ -106,10 +107,10 @@ describe('CreateLoanUseCase', () => {
   })
 
   it('preserves missing-unit and unavailable-unit errors', async () => {
-    const findLatestLoan = jest.fn()
-    const processCreateLoanTransaction = jest.fn()
+    const findLatestLoan = vi.fn()
+    const processCreateLoanTransaction = vi.fn()
     const { useCase } = make({
-      findByIds: jest.fn().mockResolvedValue([units[0]]),
+      findByIds: vi.fn().mockResolvedValue([units[0]]),
       findLatestLoan,
       processCreateLoanTransaction,
     })
@@ -122,7 +123,7 @@ describe('CreateLoanUseCase', () => {
     const unavailable = { ...units[0], status: { allowTransactions: false } }
     await expect(
       make({
-        findByIds: jest.fn().mockResolvedValue([unavailable, units[1]]),
+        findByIds: vi.fn().mockResolvedValue([unavailable, units[1]]),
       }).useCase.execute(input, 'requester-1'),
     ).rejects.toEqual(
       new BadRequestException(
@@ -134,7 +135,7 @@ describe('CreateLoanUseCase', () => {
   it('awaits loan, asset, and approval calls in order', async () => {
     const events: string[] = []
     const { useCase, loan, mutation, approval } = make()
-    ;(loan.processCreateLoanTransaction as jest.Mock).mockImplementation(() => {
+    ;(loan.processCreateLoanTransaction as Mock).mockImplementation(() => {
       events.push('loan')
       return { id: 'loan-1' }
     })

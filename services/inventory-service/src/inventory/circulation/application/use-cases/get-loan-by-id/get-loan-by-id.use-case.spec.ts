@@ -5,7 +5,7 @@ import { GetLoanByIdUseCase } from './get-loan-by-id.use-case.js'
 describe('GetLoanByIdUseCase', () => {
   it('delegates the ID and returns the found loan', async () => {
     const loan = { id: 'loan-1', loanNumber: 'LN-20260914-0001' }
-    const findLoanById = jest.fn().mockResolvedValue(loan)
+    const findLoanById = vi.fn().mockResolvedValue(loan)
     const repository = { findLoanById } as unknown as ILoanRepository
     const useCase = new GetLoanByIdUseCase(repository)
 
@@ -14,7 +14,7 @@ describe('GetLoanByIdUseCase', () => {
   })
 
   it('throws when the loan does not exist', async () => {
-    const findLoanById = jest.fn().mockResolvedValue(null)
+    const findLoanById = vi.fn().mockResolvedValue(null)
     const repository = { findLoanById } as unknown as ILoanRepository
     const useCase = new GetLoanByIdUseCase(repository)
 

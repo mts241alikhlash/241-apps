@@ -28,23 +28,21 @@ describe('PrismaAssetUnitRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([unit])
-    const count = jest.fn().mockResolvedValue(1)
-    const findFirst = jest.fn().mockResolvedValue(unit)
-    const create = jest.fn().mockResolvedValue(unit)
-    const createMany = jest.fn().mockResolvedValue({ count: 1 })
-    const update = jest.fn().mockResolvedValue(unit)
-    const remove = jest.fn().mockResolvedValue(unit)
-    const assetFindReferenceById = jest.fn().mockResolvedValue(unit.asset)
-    const conditionFindById = jest.fn().mockResolvedValue(unit.condition)
-    const statusFindById = jest.fn().mockResolvedValue({
+    const findMany = vi.fn().mockResolvedValue([unit])
+    const count = vi.fn().mockResolvedValue(1)
+    const findFirst = vi.fn().mockResolvedValue(unit)
+    const create = vi.fn().mockResolvedValue(unit)
+    const createMany = vi.fn().mockResolvedValue({ count: 1 })
+    const update = vi.fn().mockResolvedValue(unit)
+    const remove = vi.fn().mockResolvedValue(unit)
+    const assetFindReferenceById = vi.fn().mockResolvedValue(unit.asset)
+    const conditionFindById = vi.fn().mockResolvedValue(unit.condition)
+    const statusFindById = vi.fn().mockResolvedValue({
       ...unit.status,
       allowTransactions: true,
     })
-    const findIdsAllowingTransactions = jest
-      .fn()
-      .mockResolvedValue(['status-1'])
-    const locationFindById = jest.fn().mockResolvedValue(unit.location)
+    const findIdsAllowingTransactions = vi.fn().mockResolvedValue(['status-1'])
+    const locationFindById = vi.fn().mockResolvedValue(unit.location)
     const prisma = {
       inventoryAssetUnit: {
         findMany,

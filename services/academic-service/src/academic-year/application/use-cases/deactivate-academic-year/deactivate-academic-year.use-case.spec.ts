@@ -7,11 +7,11 @@ describe('DeactivateAcademicYearUseCase', () => {
   let useCase: DeactivateAcademicYearUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    hasRelatedData: jest.fn(),
-    update: jest.fn(),
-    countActive: jest.fn(),
-    deactivateSemestersByAcademicYearId: jest.fn(),
+    findById: vi.fn(),
+    hasRelatedData: vi.fn(),
+    update: vi.fn(),
+    countActive: vi.fn(),
+    deactivateSemestersByAcademicYearId: vi.fn(),
   }
 
   const activeYear = {
@@ -31,7 +31,7 @@ describe('DeactivateAcademicYearUseCase', () => {
     useCase = module.get<DeactivateAcademicYearUseCase>(
       DeactivateAcademicYearUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

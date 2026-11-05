@@ -6,12 +6,12 @@ import { DeletePositionCategoryUseCase } from './delete-position-category/delete
 
 describe('position category writes', () => {
   const repository = {
-    findByCode: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-    countPositionsWithCategory: jest.fn(),
+    findByCode: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn(),
+    countPositionsWithCategory: vi.fn(),
   }
   const port = repository as unknown as IPositionCategoryRepository
   const create = new CreatePositionCategoryUseCase(port)
@@ -19,7 +19,7 @@ describe('position category writes', () => {
   const remove = new DeletePositionCategoryUseCase(port)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     repository.findByCode.mockResolvedValue(null)
     repository.findById.mockResolvedValue({ id: 'cat-1' })
     repository.create.mockResolvedValue({ id: 'cat-1', code: 'ACADEMIC' })

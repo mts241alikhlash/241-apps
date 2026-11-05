@@ -4,7 +4,7 @@ import { IAssetRepository } from '../../../domain/repositories/asset.repository.
 describe('GetAssetsUseCase', () => {
   it('maps every asset filter and returns repository pagination', async () => {
     const result = { data: [{ id: 'asset-1' }], total: 1, page: 2, limit: 5 }
-    const findAll = jest.fn().mockResolvedValue(result)
+    const findAll = vi.fn().mockResolvedValue(result)
     const repository = { findAll } as unknown as IAssetRepository
     const useCase = new GetAssetsUseCase(repository)
     const query = {
@@ -23,7 +23,7 @@ describe('GetAssetsUseCase', () => {
   })
 
   it('forwards empty queries with explicit undefined fields', async () => {
-    const findAll = jest.fn().mockResolvedValue({ data: [] })
+    const findAll = vi.fn().mockResolvedValue({ data: [] })
     const repository = { findAll } as unknown as IAssetRepository
     const useCase = new GetAssetsUseCase(repository)
 
@@ -44,7 +44,7 @@ describe('GetAssetsUseCase', () => {
   it('propagates repository read errors', async () => {
     const error = new Error('database unavailable')
     const repository = {
-      findAll: jest.fn().mockRejectedValue(error),
+      findAll: vi.fn().mockRejectedValue(error),
     } as unknown as IAssetRepository
     const useCase = new GetAssetsUseCase(repository)
 

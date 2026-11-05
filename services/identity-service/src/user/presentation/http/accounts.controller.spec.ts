@@ -14,13 +14,13 @@ import { AccountsController } from './accounts.controller.js'
 describe('AccountsController', () => {
   let controller: AccountsController
 
-  const mockProvisionAccountUseCase = { execute: jest.fn() }
-  const mockDeleteUserUseCase = { execute: jest.fn() }
-  const mockSetAccountActiveUseCase = { execute: jest.fn() }
-  const mockUpdateAccountProfileUseCase = { execute: jest.fn() }
-  const mockLookupAccountUseCase = { execute: jest.fn() }
-  const mockAssignAccountRoleUseCase = { execute: jest.fn() }
-  const mockGetUserByIdUseCase = { execute: jest.fn() }
+  const mockProvisionAccountUseCase = { execute: vi.fn() }
+  const mockDeleteUserUseCase = { execute: vi.fn() }
+  const mockSetAccountActiveUseCase = { execute: vi.fn() }
+  const mockUpdateAccountProfileUseCase = { execute: vi.fn() }
+  const mockLookupAccountUseCase = { execute: vi.fn() }
+  const mockAssignAccountRoleUseCase = { execute: vi.fn() }
+  const mockGetUserByIdUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,12 +45,12 @@ describe('AccountsController', () => {
           useValue: mockAssignAccountRoleUseCase,
         },
         { provide: GetUserByIdUseCase, useValue: mockGetUserByIdUseCase },
-        { provide: ConfigService, useValue: { get: jest.fn() } },
+        { provide: ConfigService, useValue: { get: vi.fn() } },
       ],
     }).compile()
 
     controller = module.get<AccountsController>(AccountsController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

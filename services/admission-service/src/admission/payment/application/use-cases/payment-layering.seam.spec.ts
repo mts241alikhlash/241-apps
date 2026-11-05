@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -16,22 +17,22 @@ function makePaymentRepository(
   overrides: Partial<IAdmissionPaymentRepository> = {},
 ): IAdmissionPaymentRepository {
   return {
-    findApplicationWithPayment: jest.fn(),
-    findByApplicationId: jest.fn(),
-    savePaymentProof: jest.fn(),
-    findPayment: jest.fn(),
-    updatePaymentStatus: jest.fn(),
-    verifyWithinQuota: jest.fn(),
-    cancelVerification: jest.fn(),
-    isWaveFull: jest.fn(),
+    findApplicationWithPayment: vi.fn(),
+    findByApplicationId: vi.fn(),
+    savePaymentProof: vi.fn(),
+    findPayment: vi.fn(),
+    updatePaymentStatus: vi.fn(),
+    verifyWithinQuota: vi.fn(),
+    cancelVerification: vi.fn(),
+    isWaveFull: vi.fn(),
     ...overrides,
   }
 }
 
 function makeVerification(verified = false) {
   return {
-    execute: jest.fn().mockResolvedValue(verified),
-  } as unknown as VerifyApplicationWhenReadyUseCase & { execute: jest.Mock }
+    execute: vi.fn().mockResolvedValue(verified),
+  } as unknown as VerifyApplicationWhenReadyUseCase & { execute: Mock }
 }
 
 describe('Payment layering', () => {
@@ -43,7 +44,7 @@ describe('Payment layering', () => {
   it('requires a note when rejecting payment', async () => {
     const payments = makePaymentRepository()
     const notifications: Pick<IAdmissionPaymentNotificationPort, 'notify'> = {
-      notify: jest.fn(),
+      notify: vi.fn(),
     }
     const useCase = new VerifyPaymentUseCase(
       payments,
@@ -62,13 +63,13 @@ describe('Payment layering', () => {
 
   it('refuses to reject a payment that is already verified', async () => {
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'VERIFIED',
         proofFileId: 'file1',
       }),
     })
-    const notifications = { notify: jest.fn() }
+    const notifications = { notify: vi.fn() }
     const useCase = new VerifyPaymentUseCase(
       payments,
       notifications,
@@ -93,14 +94,14 @@ describe('Payment layering', () => {
 
   it('refuses a rejection when the payment is verified in the meantime', async () => {
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'file1',
       }),
-      updatePaymentStatus: jest.fn().mockResolvedValue(null),
+      updatePaymentStatus: vi.fn().mockResolvedValue(null),
     })
-    const notifications = { notify: jest.fn() }
+    const notifications = { notify: vi.fn() }
     const useCase = new VerifyPaymentUseCase(
       payments,
       notifications,
@@ -124,13 +125,13 @@ describe('Payment layering', () => {
 
   it('refuses to verify a payment whose proof was never uploaded', async () => {
     const payments = makePaymentRepository({
-      findPayment: jest
+      findPayment: vi
         .fn()
         .mockResolvedValue({ id: 'pay1', status: 'UNPAID', proofFileId: null }),
     })
     const useCase = new VerifyPaymentUseCase(
       payments,
-      { notify: jest.fn() },
+      { notify: vi.fn() },
       makeVerification(),
     )
 
@@ -145,14 +146,14 @@ describe('Payment layering', () => {
   })
 
   it('verifies an uploaded proof through the quota check and tells the applicant', async () => {
-    const notify = jest.fn()
+    const notify = vi.fn()
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      verifyWithinQuota: jest.fn().mockResolvedValue({
+      verifyWithinQuota: vi.fn().mockResolvedValue({
         outcome: 'VERIFIED',
         payment: { id: 'pay1', status: 'VERIFIED', amount: 150000 },
         movedApplicationIds: [],
@@ -187,14 +188,14 @@ describe('Payment layering', () => {
   })
 
   it('refuses to verify into a full wave', async () => {
-    const notify = jest.fn()
+    const notify = vi.fn()
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      verifyWithinQuota: jest.fn().mockResolvedValue({ outcome: 'FULL' }),
+      verifyWithinQuota: vi.fn().mockResolvedValue({ outcome: 'FULL' }),
     })
     const useCase = new VerifyPaymentUseCase(
       payments,
@@ -213,14 +214,14 @@ describe('Payment layering', () => {
   })
 
   it('tells every moved applicant their new wave and fee', async () => {
-    const notify = jest.fn()
+    const notify = vi.fn()
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      verifyWithinQuota: jest.fn().mockResolvedValue({
+      verifyWithinQuota: vi.fn().mockResolvedValue({
         outcome: 'VERIFIED',
         payment: { id: 'pay1', status: 'VERIFIED', amount: 150000 },
         movedApplicationIds: ['app2', 'app3'],
@@ -261,7 +262,7 @@ describe('Payment layering', () => {
       updatedAt: new Date(),
     }
     const bankAccounts = {
-      findById: jest
+      findById: vi
         .fn()
         .mockImplementation((id: string) =>
           Promise.resolve(id === 'acc-1' ? activeAccount : null),
@@ -269,7 +270,7 @@ describe('Payment layering', () => {
     } as unknown as IAdmissionBankAccountRepository
 
     const storage: IAdmissionFileStorage = {
-      save: jest.fn(),
+      save: vi.fn(),
     }
     const file = {
       buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
@@ -280,7 +281,7 @@ describe('Payment layering', () => {
 
     it('resolves the application by id, not by user', async () => {
       const payments = makePaymentRepository({
-        findByApplicationId: jest.fn().mockResolvedValue(null),
+        findByApplicationId: vi.fn().mockResolvedValue(null),
       })
       const useCase = new UploadPaymentProofUseCase(
         payments,
@@ -303,7 +304,7 @@ describe('Payment layering', () => {
 
     it('refuses a destination account that is unknown or inactive', async () => {
       const payments = makePaymentRepository({
-        findApplicationWithPayment: jest.fn().mockResolvedValue({
+        findApplicationWithPayment: vi.fn().mockResolvedValue({
           status: 'DRAFT',
           payment: { id: 'pay1', status: 'UNPAID' },
         }),
@@ -328,7 +329,7 @@ describe('Payment layering', () => {
 
     it('refuses a transfer date after today', async () => {
       const payments = makePaymentRepository({
-        findApplicationWithPayment: jest.fn().mockResolvedValue({
+        findApplicationWithPayment: vi.fn().mockResolvedValue({
           status: 'DRAFT',
           payment: { id: 'pay1', status: 'UNPAID' },
         }),
@@ -354,18 +355,18 @@ describe('Payment layering', () => {
 
     it('accepts a proof after the application is submitted', async () => {
       const payments = makePaymentRepository({
-        findApplicationWithPayment: jest.fn().mockResolvedValue({
+        findApplicationWithPayment: vi.fn().mockResolvedValue({
           status: 'SUBMITTED',
           payment: { id: 'pay1', status: 'UNPAID' },
         }),
-        savePaymentProof: jest.fn().mockResolvedValue({
+        savePaymentProof: vi.fn().mockResolvedValue({
           id: 'pay1',
           status: 'PENDING',
           proofFile: null,
         }),
       })
       const savingStorage: IAdmissionFileStorage = {
-        save: jest.fn().mockResolvedValue({
+        save: vi.fn().mockResolvedValue({
           filename: 'stored.png',
           storageKey: 'payments/stored.png',
         }),
@@ -389,14 +390,14 @@ describe('Payment layering', () => {
 
     it('refuses a proof when the payment is verified while the file uploads', async () => {
       const payments = makePaymentRepository({
-        findApplicationWithPayment: jest.fn().mockResolvedValue({
+        findApplicationWithPayment: vi.fn().mockResolvedValue({
           status: 'SUBMITTED',
           payment: { id: 'pay1', status: 'PENDING' },
         }),
-        savePaymentProof: jest.fn().mockResolvedValue(null),
+        savePaymentProof: vi.fn().mockResolvedValue(null),
       })
       const savingStorage: IAdmissionFileStorage = {
-        save: jest.fn().mockResolvedValue({
+        save: vi.fn().mockResolvedValue({
           filename: 'stored.png',
           storageKey: 'payments/stored.png',
         }),
@@ -420,7 +421,7 @@ describe('Payment layering', () => {
 
     it('refuses a proof once the application has been verified', async () => {
       const payments = makePaymentRepository({
-        findApplicationWithPayment: jest.fn().mockResolvedValue({
+        findApplicationWithPayment: vi.fn().mockResolvedValue({
           status: 'VERIFIED',
           payment: { id: 'pay1', status: 'PENDING' },
         }),
@@ -444,7 +445,7 @@ describe('Payment layering', () => {
 
     it('refuses an upload once the payment is verified', async () => {
       const payments = makePaymentRepository({
-        findByApplicationId: jest.fn().mockResolvedValue({
+        findByApplicationId: vi.fn().mockResolvedValue({
           status: 'DRAFT',
           payment: { id: 'pay1', status: 'VERIFIED' },
         }),
@@ -469,12 +470,12 @@ describe('Payment layering', () => {
 
     it('refuses a proof upload while the wave is full', async () => {
       const payments = makePaymentRepository({
-        findByApplicationId: jest.fn().mockResolvedValue({
+        findByApplicationId: vi.fn().mockResolvedValue({
           status: 'SUBMITTED',
           waveId: 'w1',
           payment: { id: 'pay1', status: 'UNPAID' },
         }),
-        isWaveFull: jest.fn().mockResolvedValue(true),
+        isWaveFull: vi.fn().mockResolvedValue(true),
       })
       const useCase = new UploadPaymentProofUseCase(
         payments,
@@ -498,18 +499,18 @@ describe('Payment layering', () => {
 
     it('attributes the saved proof to the acting administrator', async () => {
       const payments = makePaymentRepository({
-        findByApplicationId: jest.fn().mockResolvedValue({
+        findByApplicationId: vi.fn().mockResolvedValue({
           status: 'DRAFT',
           payment: { id: 'pay1', status: 'UNPAID' },
         }),
-        savePaymentProof: jest.fn().mockResolvedValue({
+        savePaymentProof: vi.fn().mockResolvedValue({
           id: 'pay1',
           status: 'PENDING',
           proofFile: null,
         }),
       })
       const savingStorage: IAdmissionFileStorage = {
-        save: jest.fn().mockResolvedValue({
+        save: vi.fn().mockResolvedValue({
           filename: 'stored.png',
           storageKey: 'payments/stored.png',
         }),
@@ -541,12 +542,12 @@ describe('Payment layering', () => {
   it('tries to verify the application after a payment verification', async () => {
     const verification = makeVerification(true)
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      verifyWithinQuota: jest.fn().mockResolvedValue({
+      verifyWithinQuota: vi.fn().mockResolvedValue({
         outcome: 'VERIFIED',
         payment: { id: 'pay1', status: 'VERIFIED', amount: 150000 },
         movedApplicationIds: [],
@@ -555,7 +556,7 @@ describe('Payment layering', () => {
     })
     const useCase = new VerifyPaymentUseCase(
       payments,
-      { notify: jest.fn() },
+      { notify: vi.fn() },
       verification,
     )
 
@@ -571,18 +572,18 @@ describe('Payment layering', () => {
   it('does not try to verify the application when the payment is rejected', async () => {
     const verification = makeVerification()
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      updatePaymentStatus: jest
+      updatePaymentStatus: vi
         .fn()
         .mockResolvedValue({ id: 'pay1', status: 'REJECTED', amount: 1 }),
     })
     const useCase = new VerifyPaymentUseCase(
       payments,
-      { notify: jest.fn() },
+      { notify: vi.fn() },
       verification,
     )
 
@@ -599,16 +600,16 @@ describe('Payment layering', () => {
   it('does not try to verify the application when the wave is full', async () => {
     const verification = makeVerification()
     const payments = makePaymentRepository({
-      findPayment: jest.fn().mockResolvedValue({
+      findPayment: vi.fn().mockResolvedValue({
         id: 'pay1',
         status: 'PENDING',
         proofFileId: 'f1',
       }),
-      verifyWithinQuota: jest.fn().mockResolvedValue({ outcome: 'FULL' }),
+      verifyWithinQuota: vi.fn().mockResolvedValue({ outcome: 'FULL' }),
     })
     const useCase = new VerifyPaymentUseCase(
       payments,
-      { notify: jest.fn() },
+      { notify: vi.fn() },
       verification,
     )
 

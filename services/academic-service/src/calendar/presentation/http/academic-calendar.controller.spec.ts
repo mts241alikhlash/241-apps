@@ -27,12 +27,12 @@ const calendarResponse = {
 describe('AcademicCalendarController', () => {
   let controller: AcademicCalendarController
 
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockBulkDelete = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockBulkDelete = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +53,7 @@ describe('AcademicCalendarController', () => {
     controller = module.get<AcademicCalendarController>(
       AcademicCalendarController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -11,11 +11,11 @@ describe('RegisterDeviceUseCase', () => {
   let register: RegisterDeviceUseCase
   let rotate: RotateDeviceTokenUseCase
   const repository = {
-    create: jest.fn(),
-    findById: jest.fn(),
-    rotateToken: jest.fn(),
+    create: vi.fn(),
+    findById: vi.fn(),
+    rotateToken: vi.fn(),
   }
-  const tokens = { issue: jest.fn() }
+  const tokens = { issue: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +29,7 @@ describe('RegisterDeviceUseCase', () => {
 
     register = module.get(RegisterDeviceUseCase)
     rotate = module.get(RotateDeviceTokenUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     tokens.issue.mockReturnValue({ token: 'plain-token', hash: 'hashed' })
     repository.create.mockResolvedValue({ id: 'device-1' })
     repository.findById.mockResolvedValue({ id: 'device-1' })

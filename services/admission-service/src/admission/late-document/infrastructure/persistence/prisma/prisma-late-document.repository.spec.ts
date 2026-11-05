@@ -2,16 +2,16 @@ import { PrismaLateDocumentRepository } from './prisma-late-document.repository.
 
 function build(overrides: Record<string, unknown> = {}) {
   const prisma = {
-    admissionWave: { findFirst: jest.fn() },
+    admissionWave: { findFirst: vi.fn() },
     admissionDocumentType: {
-      findMany: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([
         { id: 'ijazah', code: 'IJAZAH', name: 'Ijazah SD', lateDueMonths: 2 },
         { id: 'rapor', code: 'RAPOR', name: 'Rapor', lateDueMonths: null },
       ]),
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
     admissionApplication: {
-      findMany: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([
         {
           id: 'app1',
           registrationNumber: 'PSB-001',
@@ -31,7 +31,7 @@ function build(overrides: Record<string, unknown> = {}) {
           ],
         },
       ]),
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
     ...overrides,
   }

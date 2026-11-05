@@ -7,7 +7,7 @@ describe('GetAcademicYearsUseCase', () => {
   let useCase: GetAcademicYearsUseCase
 
   const mockRepository = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetAcademicYearsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetAcademicYearsUseCase>(GetAcademicYearsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

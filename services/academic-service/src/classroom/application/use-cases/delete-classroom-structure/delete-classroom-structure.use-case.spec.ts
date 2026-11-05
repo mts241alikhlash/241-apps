@@ -6,7 +6,7 @@ import { DeleteClassroomStructureUseCase } from './delete-classroom-structure.us
 describe('DeleteClassroomStructureUseCase', () => {
   let useCase: DeleteClassroomStructureUseCase
 
-  const mockRepo = { findById: jest.fn(), remove: jest.fn() }
+  const mockRepo = { findById: vi.fn(), remove: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('DeleteClassroomStructureUseCase', () => {
     useCase = module.get<DeleteClassroomStructureUseCase>(
       DeleteClassroomStructureUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should soft-delete successfully', async () => {

@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { NotFoundException } from '@nestjs/common'
 import { ICategoryRepository } from '../../domain/repositories/category.repository.js'
 import { CreateCategoryUseCase } from './create-category/create-category.use-case.js'
@@ -14,12 +15,12 @@ describe('category use cases', () => {
 
   function makeRepository() {
     return {
-      findMany: jest.fn().mockResolvedValue([category]),
-      findById: jest.fn().mockResolvedValue(category),
-      create: jest.fn().mockResolvedValue(category),
-      update: jest.fn().mockResolvedValue(category),
-      delete: jest.fn().mockResolvedValue(category),
-    } as unknown as jest.Mocked<ICategoryRepository>
+      findMany: vi.fn().mockResolvedValue([category]),
+      findById: vi.fn().mockResolvedValue(category),
+      create: vi.fn().mockResolvedValue(category),
+      update: vi.fn().mockResolvedValue(category),
+      delete: vi.fn().mockResolvedValue(category),
+    } as unknown as Mocked<ICategoryRepository>
   }
 
   it('maps create input before delegating', async () => {

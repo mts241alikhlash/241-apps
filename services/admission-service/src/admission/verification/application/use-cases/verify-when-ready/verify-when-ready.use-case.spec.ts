@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   APPLICATION_VERIFIED_NOTIFICATION,
   VerifyApplicationWhenReadyUseCase,
@@ -9,14 +10,14 @@ const ready = {
   paymentStatus: 'VERIFIED',
 }
 
-function setup(overrides: Record<string, jest.Mock> = {}) {
+function setup(overrides: Record<string, Mock> = {}) {
   const verification = {
-    findSnapshot: jest.fn().mockResolvedValue(ready),
-    findRequiredTypeIds: jest.fn().mockResolvedValue(['kk']),
-    markVerified: jest.fn().mockResolvedValue(true),
+    findSnapshot: vi.fn().mockResolvedValue(ready),
+    findRequiredTypeIds: vi.fn().mockResolvedValue(['kk']),
+    markVerified: vi.fn().mockResolvedValue(true),
     ...overrides,
   }
-  const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
+  const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
   const useCase = new VerifyApplicationWhenReadyUseCase(
     verification,
     notifications as never,
@@ -57,7 +58,7 @@ describe('VerifyApplicationWhenReadyUseCase', () => {
     ['already verified', { ...ready, status: 'VERIFIED' }],
   ])('does nothing while %s', async (_name, snapshot) => {
     const { useCase, verification, notifications } = setup({
-      findSnapshot: jest.fn().mockResolvedValue(snapshot),
+      findSnapshot: vi.fn().mockResolvedValue(snapshot),
     })
 
     await expect(useCase.execute('app1', 'admin1')).resolves.toBe(false)
@@ -67,7 +68,7 @@ describe('VerifyApplicationWhenReadyUseCase', () => {
 
   it('does nothing for an unknown application', async () => {
     const { useCase, verification } = setup({
-      findSnapshot: jest.fn().mockResolvedValue(null),
+      findSnapshot: vi.fn().mockResolvedValue(null),
     })
 
     await expect(useCase.execute('missing', 'admin1')).resolves.toBe(false)
@@ -76,7 +77,7 @@ describe('VerifyApplicationWhenReadyUseCase', () => {
 
   it('is silent when another request verified it first', async () => {
     const { useCase, notifications } = setup({
-      markVerified: jest.fn().mockResolvedValue(false),
+      markVerified: vi.fn().mockResolvedValue(false),
     })
 
     await expect(useCase.execute('app1', 'admin1')).resolves.toBe(false)
@@ -85,7 +86,7 @@ describe('VerifyApplicationWhenReadyUseCase', () => {
 
   it('never throws when the database fails', async () => {
     const { useCase } = setup({
-      findSnapshot: jest.fn().mockRejectedValue(new Error('connection reset')),
+      findSnapshot: vi.fn().mockRejectedValue(new Error('connection reset')),
     })
 
     await expect(useCase.execute('app1', 'admin1')).resolves.toBe(false)

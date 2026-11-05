@@ -8,15 +8,15 @@ import type { IAdmissionBankAccountRepository } from '../../../../bank-account/i
 
 describe('GetFormOptionsUseCase', () => {
   it('returns every option list and the religions, asking once per list', async () => {
-    const activeReligions = jest
+    const activeReligions = vi
       .fn()
       .mockResolvedValue([{ id: 'r1', name: 'Islam', isActive: true }])
-    const activeOptions = jest
+    const activeOptions = vi
       .fn()
       .mockImplementation((key: OptionListKey) =>
         Promise.resolve([{ id: `${key}-1`, name: key, isActive: true }]),
       )
-    const findAll = jest.fn().mockResolvedValue([
+    const findAll = vi.fn().mockResolvedValue([
       {
         id: 'acc-1',
         bankName: 'BSI',

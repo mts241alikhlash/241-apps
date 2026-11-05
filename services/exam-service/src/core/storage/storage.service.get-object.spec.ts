@@ -1,8 +1,9 @@
+import type { Mock } from 'vitest'
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { Readable } from 'node:stream'
 import { StorageService } from './storage.service.js'
 
-function storageWith(send: jest.Mock) {
+function storageWith(send: Mock) {
   const settings: Record<string, unknown> = {
     S3_BUCKET: 'bucket',
     S3_SIGNED_URL_EXPIRY_SECONDS: 60,
@@ -12,16 +13,16 @@ function storageWith(send: jest.Mock) {
     S3_SECRET_ACCESS_KEY: 'secret',
   }
   const storage = new StorageService({
-    get: jest.fn((name: string) => settings[name]),
+    get: vi.fn((name: string) => settings[name]),
   } as never)
-  ;(storage as unknown as { client: { send: jest.Mock } }).client = { send }
+  ;(storage as unknown as { client: { send: Mock } }).client = { send }
   return storage
 }
 
 describe('StorageService.getObject', () => {
   it('returns the stream with its type and length', async () => {
     const body = Readable.from(['abc'])
-    const send = jest.fn().mockResolvedValue({
+    const send = vi.fn().mockResolvedValue({
       Body: body,
       ContentType: 'application/pdf',
       ContentLength: 3,
@@ -41,7 +42,7 @@ describe('StorageService.getObject', () => {
   })
 
   it.each(['NoSuchKey', 'NotFound'])('answers 404 for %s', async (name) => {
-    const send = jest
+    const send = vi
       .fn()
       .mockRejectedValue(Object.assign(new Error('missing'), { name }))
 
@@ -51,7 +52,7 @@ describe('StorageService.getObject', () => {
   })
 
   it('answers 500 for any other storage failure', async () => {
-    const send = jest.fn().mockRejectedValue(new Error('connection reset'))
+    const send = vi.fn().mockRejectedValue(new Error('connection reset'))
 
     await expect(storageWith(send).getObject('k')).rejects.toBeInstanceOf(
       InternalServerErrorException,

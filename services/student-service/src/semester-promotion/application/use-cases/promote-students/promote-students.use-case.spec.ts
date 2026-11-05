@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { BadRequestException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { PromotionAction } from '../../../domain/enums/promotion-action.enum.js'
@@ -9,12 +10,12 @@ import { PromoteStudentsUseCase } from './promote-students.use-case.js'
 describe('PromoteStudentsUseCase', () => {
   let useCase: PromoteStudentsUseCase
 
-  const mockRepository: Record<string, jest.Mock> = {
-    findEdgeSemesterOfAcademicYear: jest.fn(),
-    findLatestEnrolledSemesterOfAcademicYear: jest.fn(),
-    findAcademicYearName: jest.fn(),
-    findClassroomById: jest.fn(),
-    executePromotion: jest.fn(),
+  const mockRepository: Record<string, Mock> = {
+    findEdgeSemesterOfAcademicYear: vi.fn(),
+    findLatestEnrolledSemesterOfAcademicYear: vi.fn(),
+    findAcademicYearName: vi.fn(),
+    findClassroomById: vi.fn(),
+    executePromotion: vi.fn(),
   }
 
   const sourceSemester = {
@@ -54,7 +55,7 @@ describe('PromoteStudentsUseCase', () => {
     }).compile()
 
     useCase = module.get(PromoteStudentsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

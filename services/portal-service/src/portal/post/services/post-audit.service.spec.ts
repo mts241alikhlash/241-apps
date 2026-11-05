@@ -5,7 +5,7 @@ import { PostType } from '../domain/enums/post-type.enum.js'
 import { PostAuditService } from './post-audit.service.js'
 import { PortalCacheService } from '../../shared/services/portal-cache.service.js'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const post = {
   id: 'post-1',
@@ -16,7 +16,7 @@ const post = {
 
 describe('PostAuditService', () => {
   let service: PostAuditService
-  const createAuditLog = { execute: jest.fn() }
+  const createAuditLog = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,7 +28,7 @@ describe('PostAuditService', () => {
     }).compile()
 
     service = module.get(PostAuditService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     createAuditLog.execute.mockResolvedValue({})
   })
 

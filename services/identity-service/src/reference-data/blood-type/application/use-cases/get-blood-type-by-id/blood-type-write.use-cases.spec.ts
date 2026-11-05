@@ -10,12 +10,12 @@ describe('BloodType write use cases', () => {
   const entity = { id: 'id-1', name: 'O+', isActive: true }
 
   const repository = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
-    countProfilesUsing: jest.fn(),
+    findById: vi.fn(),
+    findByName: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
+    countProfilesUsing: vi.fn(),
   }
 
   let getById: GetBloodTypeByIdUseCase
@@ -38,7 +38,7 @@ describe('BloodType write use cases', () => {
     create = moduleRef.get(CreateBloodTypeUseCase)
     update = moduleRef.get(UpdateBloodTypeUseCase)
     remove = moduleRef.get(DeleteBloodTypeUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('reads one by id', async () => {

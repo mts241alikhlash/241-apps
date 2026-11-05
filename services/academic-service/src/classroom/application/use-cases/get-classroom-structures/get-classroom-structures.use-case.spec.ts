@@ -6,7 +6,7 @@ import { GetClassroomStructuresUseCase } from './get-classroom-structures.use-ca
 describe('GetClassroomStructuresUseCase', () => {
   let useCase: GetClassroomStructuresUseCase
 
-  const mockRepo = { findAll: jest.fn() }
+  const mockRepo = { findAll: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('GetClassroomStructuresUseCase', () => {
     useCase = module.get<GetClassroomStructuresUseCase>(
       GetClassroomStructuresUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -12,15 +12,15 @@ describe('AddUnitsUseCase', () => {
   }
 
   it('rejects missing assets before reading latest unit or creating rows', async () => {
-    const findLatestUnit = jest.fn()
-    const createMany = jest.fn()
+    const findLatestUnit = vi.fn()
+    const createMany = vi.fn()
     const assetRepository = {
-      findById: jest.fn().mockResolvedValue(null),
+      findById: vi.fn().mockResolvedValue(null),
     } as unknown as IAssetRepository
     const unitRepository = {
       findLatestUnit,
       createMany,
-      findByAsset: jest.fn(),
+      findByAsset: vi.fn(),
     } as unknown as IAssetUnitRepository
     const useCase = new AddUnitsUseCase(assetRepository, unitRepository)
 
@@ -33,16 +33,16 @@ describe('AddUnitsUseCase', () => {
 
   it('continues unit numbering from latest record and returns refreshed units', async () => {
     const result = [{ id: 'unit-3' }, { id: 'unit-4' }]
-    const findById = jest.fn().mockResolvedValue({
+    const findById = vi.fn().mockResolvedValue({
       id: 'asset-1',
       assetNumber: 'AST-COMP/2026/001',
       purchasePrice: 15000000,
     })
-    const findLatestUnit = jest
+    const findLatestUnit = vi
       .fn()
       .mockResolvedValue({ unitNumber: 'AST-COMP/2026/001-02' })
-    const createMany = jest.fn().mockResolvedValue(2)
-    const findByAsset = jest.fn().mockResolvedValue(result)
+    const createMany = vi.fn().mockResolvedValue(2)
+    const findByAsset = vi.fn().mockResolvedValue(result)
     const unitRepository = {
       findLatestUnit,
       createMany,
@@ -87,14 +87,14 @@ describe('AddUnitsUseCase', () => {
   })
 
   it('starts at unit 01 and defaults to one unit when no latest unit exists', async () => {
-    const createMany = jest.fn().mockResolvedValue(1)
-    const findByAsset = jest.fn().mockResolvedValue([{ id: 'unit-1' }])
-    const findById = jest.fn().mockResolvedValue({
+    const createMany = vi.fn().mockResolvedValue(1)
+    const findByAsset = vi.fn().mockResolvedValue([{ id: 'unit-1' }])
+    const findById = vi.fn().mockResolvedValue({
       id: 'asset-1',
       assetNumber: 'AST-COMP/2026/001',
       purchasePrice: 15000000,
     })
-    const findLatestUnit = jest.fn().mockResolvedValue(null)
+    const findLatestUnit = vi.fn().mockResolvedValue(null)
     const assetRepository = { findById } as unknown as IAssetRepository
     const unitRepository = {
       findLatestUnit,
@@ -131,17 +131,17 @@ describe('AddUnitsUseCase', () => {
 
   it('propagates createMany errors without reloading units', async () => {
     const error = new Error('database unavailable')
-    const createMany = jest.fn().mockRejectedValue(error)
-    const findByAsset = jest.fn()
+    const createMany = vi.fn().mockRejectedValue(error)
+    const findByAsset = vi.fn()
     const assetRepository = {
-      findById: jest.fn().mockResolvedValue({
+      findById: vi.fn().mockResolvedValue({
         id: 'asset-1',
         assetNumber: 'AST-COMP/2026/001',
         purchasePrice: 15000000,
       }),
     } as unknown as IAssetRepository
     const unitRepository = {
-      findLatestUnit: jest.fn().mockResolvedValue(null),
+      findLatestUnit: vi.fn().mockResolvedValue(null),
       createMany,
       findByAsset,
     } as unknown as IAssetUnitRepository
@@ -153,17 +153,17 @@ describe('AddUnitsUseCase', () => {
 
   it('propagates reload errors after creating units', async () => {
     const error = new Error('database unavailable')
-    const findByAsset = jest.fn().mockRejectedValue(error)
+    const findByAsset = vi.fn().mockRejectedValue(error)
     const assetRepository = {
-      findById: jest.fn().mockResolvedValue({
+      findById: vi.fn().mockResolvedValue({
         id: 'asset-1',
         assetNumber: 'AST-COMP/2026/001',
         purchasePrice: 15000000,
       }),
     } as unknown as IAssetRepository
     const unitRepository = {
-      findLatestUnit: jest.fn().mockResolvedValue(null),
-      createMany: jest.fn().mockResolvedValue(1),
+      findLatestUnit: vi.fn().mockResolvedValue(null),
+      createMany: vi.fn().mockResolvedValue(1),
       findByAsset,
     } as unknown as IAssetUnitRepository
     const useCase = new AddUnitsUseCase(assetRepository, unitRepository)

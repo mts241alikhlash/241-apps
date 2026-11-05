@@ -269,7 +269,7 @@ describe('SubmitExamSessionUseCase', () => {
       },
       NOW,
     )
-    const finalize = jest.spyOn(finalizer, 'finalize')
+    const finalize = vi.spyOn(finalizer, 'finalize')
 
     const result = await useCase.execute(STUDENT_USER, 'a', {}, NOW)
 
@@ -371,7 +371,7 @@ describe('SubmitExamSessionUseCase', () => {
 
   it('counts the stored answers without loading every row', async () => {
     const { useCase } = await setup()
-    const listAnswers = jest.spyOn(sessions, 'listAnswers')
+    const listAnswers = vi.spyOn(sessions, 'listAnswers')
 
     await useCase.execute(STUDENT_USER, 'a', { expectedAnswerCount: 0 }, NOW)
 

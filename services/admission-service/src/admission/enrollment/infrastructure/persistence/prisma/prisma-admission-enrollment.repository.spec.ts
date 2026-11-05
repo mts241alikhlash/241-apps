@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { PrismaAdmissionEnrollmentRepository } from './prisma-admission-enrollment.repository.js'
 
 const scope = { deletedAt: null }
@@ -10,7 +11,7 @@ interface QueueFixture {
 }
 
 function queueRepository(fixture: QueueFixture = {}) {
-  const findMany = jest.fn((arg: Record<string, unknown>) => {
+  const findMany = vi.fn((arg: Record<string, unknown>) => {
     if (arg.distinct) return Promise.resolve(fixture.yearRows ?? [])
     if ((arg.where as { id?: unknown }).id) {
       const ids = (arg.where as { id: { in: string[] } }).id.in
@@ -22,14 +23,14 @@ function queueRepository(fixture: QueueFixture = {}) {
     }
     return Promise.resolve(fixture.ordering ?? [])
   })
-  const count = jest.fn()
+  const count = vi.fn()
   ;(fixture.counts ?? [3, 2, 1]).forEach((value) =>
     count.mockResolvedValueOnce(value),
   )
   count.mockResolvedValue(0)
   const prisma = {
     admissionApplication: { findMany, count },
-    admissionNisLock: { findMany: jest.fn().mockResolvedValue([]) },
+    admissionNisLock: { findMany: vi.fn().mockResolvedValue([]) },
   }
   return {
     repository: new PrismaAdmissionEnrollmentRepository(prisma as never),
@@ -39,7 +40,7 @@ function queueRepository(fixture: QueueFixture = {}) {
   }
 }
 
-const orderingCalls = (findMany: jest.Mock) =>
+const orderingCalls = (findMany: Mock) =>
   findMany.mock.calls
     .map(([arg]) => arg as { where: unknown; select: Record<string, unknown> })
     .filter(
@@ -236,7 +237,7 @@ describe('PrismaAdmissionEnrollmentRepository.findQueue', () => {
 
 describe('PrismaAdmissionEnrollmentRepository NIS', () => {
   it('reads the candidates of a school year in the three enrollment statuses', async () => {
-    const findMany = jest.fn().mockResolvedValue([
+    const findMany = vi.fn().mockResolvedValue([
       {
         id: 'a',
         fullName: 'Ahmad',
@@ -275,11 +276,11 @@ describe('PrismaAdmissionEnrollmentRepository NIS', () => {
     const calls: unknown[] = []
     const tx = {
       admissionApplication: {
-        updateMany: jest.fn((arg) => {
+        updateMany: vi.fn((arg) => {
           calls.push(['clear', arg])
           return Promise.resolve({ count: 2 })
         }),
-        update: jest.fn((arg) => {
+        update: vi.fn((arg) => {
           calls.push(['set', arg])
           return Promise.resolve({})
         }),
@@ -302,7 +303,7 @@ describe('PrismaAdmissionEnrollmentRepository NIS', () => {
   })
 
   it('does nothing for no changes', async () => {
-    const transaction = jest.fn()
+    const transaction = vi.fn()
     const repository = new PrismaAdmissionEnrollmentRepository({
       $transaction: transaction,
     } as never)
@@ -313,11 +314,11 @@ describe('PrismaAdmissionEnrollmentRepository NIS', () => {
   })
 
   it('reports a lock and creates it once', async () => {
-    const findUnique = jest
+    const findUnique = vi
       .fn()
       .mockResolvedValueOnce({ id: 'l1' })
       .mockResolvedValueOnce(null)
-    const create = jest
+    const create = vi
       .fn()
       .mockResolvedValue({ lockedAt: new Date('2026-10-08T00:00:00Z') })
     const repository = new PrismaAdmissionEnrollmentRepository({
@@ -336,7 +337,7 @@ describe('PrismaAdmissionEnrollmentRepository NIS', () => {
   })
 
   it('answers null when two people lock at once', async () => {
-    const create = jest
+    const create = vi
       .fn()
       .mockRejectedValue(Object.assign(new Error('unique'), { code: 'P2002' }))
     const repository = new PrismaAdmissionEnrollmentRepository({
@@ -349,7 +350,7 @@ describe('PrismaAdmissionEnrollmentRepository NIS', () => {
 
 describe('PrismaAdmissionEnrollmentRepository placement and processing', () => {
   it('reads the placement state with the school year of the wave', async () => {
-    const findFirst = jest.fn().mockResolvedValue({
+    const findFirst = vi.fn().mockResolvedValue({
       status: 'ACCEPTED',
       nis: '262707001',
       targetGradeLevel: 7,
@@ -368,7 +369,7 @@ describe('PrismaAdmissionEnrollmentRepository placement and processing', () => {
   })
 
   it('stores the placement and clears the NIS only when asked', async () => {
-    const update = jest.fn().mockResolvedValue({})
+    const update = vi.fn().mockResolvedValue({})
     const repository = new PrismaAdmissionEnrollmentRepository({
       admissionApplication: { update },
     } as never)
@@ -392,7 +393,7 @@ describe('PrismaAdmissionEnrollmentRepository placement and processing', () => {
   })
 
   it('reads what processing needs', async () => {
-    const findFirst = jest.fn().mockResolvedValue({
+    const findFirst = vi.fn().mockResolvedValue({
       status: 'ACCEPTED',
       nis: '262707001',
       nisn: '0091234567',
@@ -417,7 +418,7 @@ describe('PrismaAdmissionEnrollmentRepository placement and processing', () => {
 
 describe('PrismaAdmissionEnrollmentRepository.setNisn', () => {
   it('stores the NISN of an application', async () => {
-    const update = jest.fn().mockResolvedValue({})
+    const update = vi.fn().mockResolvedValue({})
     const repository = new PrismaAdmissionEnrollmentRepository({
       admissionApplication: { update },
     } as never)

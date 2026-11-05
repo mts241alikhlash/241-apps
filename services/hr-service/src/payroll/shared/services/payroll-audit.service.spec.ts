@@ -9,7 +9,7 @@ const ACTOR = '11111111-1111-4111-8111-111111111111'
 
 describe('PayrollAuditService', () => {
   let service: PayrollAuditService
-  const createAuditLog = { execute: jest.fn() }
+  const createAuditLog = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,7 +20,7 @@ describe('PayrollAuditService', () => {
     }).compile()
 
     service = module.get(PayrollAuditService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('writes onto the existing AuditLog, not a payroll-specific table', async () => {

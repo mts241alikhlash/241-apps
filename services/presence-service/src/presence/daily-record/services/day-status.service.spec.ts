@@ -22,10 +22,10 @@ function at(time: string): Date {
 describe('DayStatusService', () => {
   let service: DayStatusService
   const workPatterns = {
-    resolveForUserAndDate: jest.fn(),
-    isNonWorkingDay: jest.fn(),
+    resolveForUserAndDate: vi.fn(),
+    isNonWorkingDay: vi.fn(),
   }
-  const credentials = { wasValidOnDate: jest.fn() }
+  const credentials = { wasValidOnDate: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,7 +37,7 @@ describe('DayStatusService', () => {
     }).compile()
 
     service = module.get(DayStatusService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     workPatterns.resolveForUserAndDate.mockResolvedValue(STANDARD)
     workPatterns.isNonWorkingDay.mockResolvedValue(false)
     credentials.wasValidOnDate.mockResolvedValue(true)

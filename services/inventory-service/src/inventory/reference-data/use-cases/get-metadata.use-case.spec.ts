@@ -12,14 +12,14 @@ describe('GetMetadataUseCase condition consumer', () => {
       },
     ]
     const conditionRepository = {
-      findMany: jest.fn().mockResolvedValue(conditions),
+      findMany: vi.fn().mockResolvedValue(conditions),
     }
     const useCase = new GetMetadataUseCase(
-      { findMany: jest.fn().mockResolvedValue([]) } as never,
-      { findMany: jest.fn().mockResolvedValue([]) } as never,
+      { findMany: vi.fn().mockResolvedValue([]) } as never,
+      { findMany: vi.fn().mockResolvedValue([]) } as never,
       conditionRepository as never,
-      { findMany: jest.fn().mockResolvedValue([]) } as never,
-      { findMany: jest.fn().mockResolvedValue([]) } as never,
+      { findMany: vi.fn().mockResolvedValue([]) } as never,
+      { findMany: vi.fn().mockResolvedValue([]) } as never,
     )
 
     const result = await useCase.execute()

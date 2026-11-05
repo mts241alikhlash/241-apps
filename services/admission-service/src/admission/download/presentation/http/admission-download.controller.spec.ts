@@ -33,7 +33,7 @@ describe('AdmissionDownloadController permissions', () => {
   })
 
   it('never exposes the object key', async () => {
-    const list = { all: jest.fn().mockResolvedValue([download]) }
+    const list = { all: vi.fn().mockResolvedValue([download]) }
     const controller = new AdmissionDownloadController(
       list as never,
       {} as never,
@@ -67,7 +67,7 @@ describe('AdmissionDownloadPublicController', () => {
   })
 
   it('lists only what visitors need', async () => {
-    const list = { active: jest.fn().mockResolvedValue([download]) }
+    const list = { active: vi.fn().mockResolvedValue([download]) }
     const controller = new AdmissionDownloadPublicController(
       list as never,
       {} as never,
@@ -89,9 +89,9 @@ describe('AdmissionDownloadPublicController', () => {
   it('streams the PDF as a cacheable attachment', async () => {
     const stream = Readable.from(['x'])
     const getFile = {
-      execute: jest.fn().mockResolvedValue({ download, stream }),
+      execute: vi.fn().mockResolvedValue({ download, stream }),
     }
-    const res = { set: jest.fn() }
+    const res = { set: vi.fn() }
     const controller = new AdmissionDownloadPublicController(
       {} as never,
       getFile as never,

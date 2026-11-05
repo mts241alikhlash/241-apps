@@ -6,7 +6,7 @@ import { GetTeachingAssignmentByIdUseCase } from './get-teaching-assignment-by-i
 describe('GetTeachingAssignmentByIdUseCase', () => {
   let useCase: GetTeachingAssignmentByIdUseCase
   const mockRepo = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('GetTeachingAssignmentByIdUseCase', () => {
     useCase = module.get<GetTeachingAssignmentByIdUseCase>(
       GetTeachingAssignmentByIdUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should return a teaching assignment', async () => {

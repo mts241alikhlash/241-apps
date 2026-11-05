@@ -30,23 +30,23 @@ const upload = {
 
 function repository(found: typeof download | null = download) {
   return {
-    findAll: jest.fn().mockResolvedValue([download]),
-    findActive: jest.fn().mockResolvedValue([download]),
-    findById: jest.fn().mockResolvedValue(found),
-    titleTaken: jest.fn().mockResolvedValue(false),
-    maxSortOrder: jest.fn().mockResolvedValue(4),
-    create: jest.fn().mockResolvedValue(download),
-    update: jest.fn().mockResolvedValue(download),
-    reorder: jest.fn().mockResolvedValue(undefined),
-    delete: jest.fn().mockResolvedValue(undefined),
+    findAll: vi.fn().mockResolvedValue([download]),
+    findActive: vi.fn().mockResolvedValue([download]),
+    findById: vi.fn().mockResolvedValue(found),
+    titleTaken: vi.fn().mockResolvedValue(false),
+    maxSortOrder: vi.fn().mockResolvedValue(4),
+    create: vi.fn().mockResolvedValue(download),
+    update: vi.fn().mockResolvedValue(download),
+    reorder: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn().mockResolvedValue(undefined),
   }
 }
 
 function storage() {
   return {
-    put: jest.fn().mockResolvedValue(undefined),
-    read: jest.fn().mockResolvedValue({ stream: Readable.from(['x']) }),
-    remove: jest.fn().mockResolvedValue(undefined),
+    put: vi.fn().mockResolvedValue(undefined),
+    read: vi.fn().mockResolvedValue({ stream: Readable.from(['x']) }),
+    remove: vi.fn().mockResolvedValue(undefined),
   }
 }
 

@@ -8,7 +8,7 @@ describe('PrismaAdmissionFileRepository.findServable', () => {
       mimeType: 'application/pdf',
       storageKey: 'admission/documents/kk.pdf',
     }
-    const findFirst = jest.fn().mockResolvedValue(found)
+    const findFirst = vi.fn().mockResolvedValue(found)
     const repository = new PrismaAdmissionFileRepository({
       file: { findFirst },
     } as never)
@@ -38,7 +38,7 @@ describe('PrismaAdmissionFileRepository.findServable', () => {
 
   it('answers null for a file nothing refers to', async () => {
     const repository = new PrismaAdmissionFileRepository({
-      file: { findFirst: jest.fn().mockResolvedValue(null) },
+      file: { findFirst: vi.fn().mockResolvedValue(null) },
     } as never)
 
     await expect(repository.findServable('other')).resolves.toBeNull()

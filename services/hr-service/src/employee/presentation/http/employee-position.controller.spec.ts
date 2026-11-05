@@ -37,10 +37,10 @@ describe('EmployeePositionsController', () => {
   let controller: EmployeePositionsController
 
   const mockPositionUseCase = {
-    findAll: jest.fn(),
-    assign: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
+    findAll: vi.fn(),
+    assign: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -54,7 +54,7 @@ describe('EmployeePositionsController', () => {
     controller = module.get<EmployeePositionsController>(
       EmployeePositionsController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('findAll', () => {

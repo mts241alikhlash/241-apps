@@ -22,13 +22,13 @@ describe('CreateAssetUseCase', () => {
 
   it('looks up category and latest sequence before creating mapped units', async () => {
     const result = { id: 'asset-1' }
-    const findCategoryById = jest
+    const findCategoryById = vi
       .fn()
       .mockResolvedValue({ id: 'category-1', code: 'comp' })
-    const findLatestAssetByPrefix = jest
+    const findLatestAssetByPrefix = vi
       .fn()
       .mockResolvedValue({ assetNumber: 'AST-COMP/2026/007' })
-    const create = jest.fn().mockResolvedValue(result)
+    const create = vi.fn().mockResolvedValue(result)
     const repository = {
       findCategoryById,
       findLatestAssetByPrefix,
@@ -79,10 +79,10 @@ describe('CreateAssetUseCase', () => {
   })
 
   it('defaults missing category and quantity while preserving a single barcode', async () => {
-    const create = jest.fn().mockResolvedValue({ id: 'asset-1' })
+    const create = vi.fn().mockResolvedValue({ id: 'asset-1' })
     const repository = {
-      findCategoryById: jest.fn().mockResolvedValue(null),
-      findLatestAssetByPrefix: jest.fn().mockResolvedValue(null),
+      findCategoryById: vi.fn().mockResolvedValue(null),
+      findLatestAssetByPrefix: vi.fn().mockResolvedValue(null),
       create,
     } as unknown as IAssetRepository
     const useCase = new CreateAssetUseCase(repository)
@@ -107,12 +107,12 @@ describe('CreateAssetUseCase', () => {
   })
 
   it('uses an optional custom asset number for the asset and its units', async () => {
-    const create = jest.fn().mockResolvedValue({ id: 'asset-1' })
+    const create = vi.fn().mockResolvedValue({ id: 'asset-1' })
     const repository = {
-      findCategoryById: jest
+      findCategoryById: vi
         .fn()
         .mockResolvedValue({ id: 'category-1', code: 'comp' }),
-      findLatestAssetByPrefix: jest.fn().mockResolvedValue({
+      findLatestAssetByPrefix: vi.fn().mockResolvedValue({
         assetNumber: 'AST-COMP/2026/007',
       }),
       create,
@@ -143,9 +143,9 @@ describe('CreateAssetUseCase', () => {
   })
 
   it('maps omitted create fields and falls back to one unit for non-positive quantity', async () => {
-    const create = jest.fn().mockResolvedValue({ id: 'asset-1' })
-    const findCategoryById = jest.fn().mockResolvedValue(null)
-    const findLatestAssetByPrefix = jest.fn().mockResolvedValue(null)
+    const create = vi.fn().mockResolvedValue({ id: 'asset-1' })
+    const findCategoryById = vi.fn().mockResolvedValue(null)
+    const findLatestAssetByPrefix = vi.fn().mockResolvedValue(null)
     const repository = {
       findCategoryById,
       findLatestAssetByPrefix,
@@ -197,11 +197,11 @@ describe('CreateAssetUseCase', () => {
   it('propagates repository conflicts without translating them', async () => {
     const conflict = new ConflictException('asset number already exists')
     const repository = {
-      findCategoryById: jest
+      findCategoryById: vi
         .fn()
         .mockResolvedValue({ id: 'category-1', code: 'comp' }),
-      findLatestAssetByPrefix: jest.fn().mockResolvedValue(null),
-      create: jest.fn().mockRejectedValue(conflict),
+      findLatestAssetByPrefix: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockRejectedValue(conflict),
     } as unknown as IAssetRepository
     const useCase = new CreateAssetUseCase(repository)
 

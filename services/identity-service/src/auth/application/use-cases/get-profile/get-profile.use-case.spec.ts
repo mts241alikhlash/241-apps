@@ -7,7 +7,7 @@ describe('GetProfileUseCase', () => {
   let useCase: GetProfileUseCase
 
   const mockAuthRepository = {
-    findUserById: jest.fn(),
+    findUserById: vi.fn(),
   }
 
   const mockUser = {
@@ -34,7 +34,7 @@ describe('GetProfileUseCase', () => {
     }).compile()
 
     useCase = module.get<GetProfileUseCase>(GetProfileUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -12,11 +12,11 @@ describe('PrismaCategoryRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const findUnique = jest.fn().mockResolvedValue(prismaCategory)
-    const create = jest.fn().mockResolvedValue(prismaCategory)
-    const update = jest.fn().mockResolvedValue(prismaCategory)
-    const deleteCategory = jest.fn().mockResolvedValue(prismaCategory)
+    const findMany = vi.fn().mockResolvedValue([])
+    const findUnique = vi.fn().mockResolvedValue(prismaCategory)
+    const create = vi.fn().mockResolvedValue(prismaCategory)
+    const update = vi.fn().mockResolvedValue(prismaCategory)
+    const deleteCategory = vi.fn().mockResolvedValue(prismaCategory)
     const prisma = {
       inventoryCategory: {
         findMany,

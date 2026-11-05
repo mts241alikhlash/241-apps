@@ -7,7 +7,7 @@ import type { UpdateReportCardInput } from './update-report-card.input.js'
 describe('UpdateReportCardUseCase', () => {
   let useCase: UpdateReportCardUseCase
 
-  const mockRepo = { findById: jest.fn(), update: jest.fn() }
+  const mockRepo = { findById: vi.fn(), update: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,7 +18,7 @@ describe('UpdateReportCardUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateReportCardUseCase>(UpdateReportCardUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

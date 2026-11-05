@@ -59,9 +59,9 @@ describe('AssetUnitController', () => {
   }
 
   function controllerWithSpies() {
-    const getAssetUnitsUseCase = { execute: jest.fn() }
-    const updateUnitUseCase = { execute: jest.fn() }
-    const deleteUnitUseCase = { execute: jest.fn() }
+    const getAssetUnitsUseCase = { execute: vi.fn() }
+    const updateUnitUseCase = { execute: vi.fn() }
+    const deleteUnitUseCase = { execute: vi.fn() }
     return {
       controller: new AssetUnitController(
         getAssetUnitsUseCase as never,

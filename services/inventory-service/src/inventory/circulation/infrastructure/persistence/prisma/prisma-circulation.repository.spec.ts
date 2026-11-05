@@ -5,8 +5,8 @@ import { PrismaCirculationRepository } from './prisma-circulation.repository.js'
 describe('PrismaCirculationRepository', () => {
   function unitDetailsCapability() {
     return {
-      findLiveIds: jest.fn().mockResolvedValue([]),
-      findDetailsByIds: jest.fn().mockResolvedValue([]),
+      findLiveIds: vi.fn().mockResolvedValue([]),
+      findDetailsByIds: vi.fn().mockResolvedValue([]),
     }
   }
 
@@ -36,7 +36,7 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('maps paginated loans and applies keyword, status, and requester filters', async () => {
-    const findMany = jest.fn().mockResolvedValue([
+    const findMany = vi.fn().mockResolvedValue([
       {
         id: 'loan-1',
         loanNumber: 'LN-20260914-0001',
@@ -51,7 +51,7 @@ describe('PrismaCirculationRepository', () => {
         items: [],
       },
     ])
-    const count = jest.fn().mockResolvedValue(1)
+    const count = vi.fn().mockResolvedValue(1)
     const prisma = {
       inventoryLoan: { findMany, count },
     } as unknown as PrismaService
@@ -156,11 +156,11 @@ describe('PrismaCirculationRepository', () => {
         createdAt: new Date('2026-01-01T00:00:00.000Z'),
       },
     }
-    const findMany = jest.fn().mockResolvedValue([history])
-    const count = jest.fn().mockResolvedValue(1)
+    const findMany = vi.fn().mockResolvedValue([history])
+    const count = vi.fn().mockResolvedValue(1)
     const unitDetails = {
-      findLiveIds: jest.fn().mockResolvedValue(['unit-1']),
-      findDetailsByIds: jest.fn().mockResolvedValue([history.unit]),
+      findLiveIds: vi.fn().mockResolvedValue(['unit-1']),
+      findDetailsByIds: vi.fn().mockResolvedValue([history.unit]),
     }
     const prisma = {
       inventoryHistory: { findMany, count },
@@ -194,8 +194,8 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('scopes loan item reads to live asset units', async () => {
-    const findMany = jest.fn().mockResolvedValue([])
-    const findLiveIds = jest.fn().mockResolvedValue([])
+    const findMany = vi.fn().mockResolvedValue([])
+    const findLiveIds = vi.fn().mockResolvedValue([])
     const prisma = {
       inventoryLoanItem: { findMany },
     } as unknown as PrismaService
@@ -212,9 +212,9 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('scopes history reads to live asset units in the database', async () => {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(0)
-    const findLiveIds = jest.fn().mockResolvedValue([])
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(0)
+    const findLiveIds = vi.fn().mockResolvedValue([])
     const prisma = {
       inventoryHistory: { findMany, count },
     } as unknown as PrismaService
@@ -238,7 +238,7 @@ describe('PrismaCirculationRepository', () => {
   it('propagates create transaction errors', async () => {
     const error = new Error('transaction failed')
     const prisma = {
-      $transaction: jest.fn().mockRejectedValue(error),
+      $transaction: vi.fn().mockRejectedValue(error),
     } as unknown as PrismaService
     const repository = new PrismaCirculationRepository(
       prisma,
@@ -260,7 +260,7 @@ describe('PrismaCirculationRepository', () => {
   it('propagates return write errors', async () => {
     const error = new Error('return write failed')
     const prisma = {
-      inventoryLoan: { update: jest.fn().mockRejectedValue(error) },
+      inventoryLoan: { update: vi.fn().mockRejectedValue(error) },
     } as unknown as PrismaService
     const repository = new PrismaCirculationRepository(
       prisma,
@@ -357,8 +357,8 @@ describe('PrismaCirculationRepository', () => {
       ],
       legacyField: 'must not escape adapter',
     }
-    const findUnique = jest.fn().mockResolvedValue(loan)
-    const findDetailsByIds = jest.fn().mockResolvedValue([loan.items[0].unit])
+    const findUnique = vi.fn().mockResolvedValue(loan)
+    const findDetailsByIds = vi.fn().mockResolvedValue([loan.items[0].unit])
     const prisma = {
       inventoryLoan: { findUnique },
     } as unknown as PrismaService
@@ -453,7 +453,7 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('loads loan details in one bulk query and maps each result', async () => {
-    const findMany = jest.fn().mockResolvedValue([
+    const findMany = vi.fn().mockResolvedValue([
       {
         id: 'loan-1',
         loanNumber: 'LN-20260914-0001',
@@ -479,10 +479,10 @@ describe('PrismaCirculationRepository', () => {
         items: [],
       },
     ])
-    const findUnique = jest.fn()
+    const findUnique = vi.fn()
     const unitDetails = {
-      findLiveIds: jest.fn(),
-      findDetailsByIds: jest.fn().mockResolvedValue([
+      findLiveIds: vi.fn(),
+      findDetailsByIds: vi.fn().mockResolvedValue([
         {
           id: 'unit-1',
           assetId: 'asset-1',
@@ -563,8 +563,8 @@ describe('PrismaCirculationRepository', () => {
       updatedAt: new Date('2026-09-14T00:00:00.000Z'),
       items: [],
     }
-    const create = jest.fn().mockResolvedValue(loan)
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const create = vi.fn().mockResolvedValue(loan)
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ inventoryLoan: { create } }),
     )
     const prisma = { $transaction: transaction } as unknown as PrismaService
@@ -586,7 +586,7 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('updates loan-owned return fields without requiring asset Prisma models', async () => {
-    const update = jest.fn().mockResolvedValue({
+    const update = vi.fn().mockResolvedValue({
       id: 'loan-1',
       loanNumber: 'LN-20260914-0001',
       requesterId: 'user-1',
@@ -613,7 +613,7 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('does not open a transaction for a single circulation-owned return write', async () => {
-    const update = jest.fn().mockResolvedValue({
+    const update = vi.fn().mockResolvedValue({
       id: 'loan-1',
       loanNumber: 'LN-20260914-0001',
       requesterId: 'user-1',
@@ -625,7 +625,7 @@ describe('PrismaCirculationRepository', () => {
       createdAt: new Date('2026-09-14T00:00:00.000Z'),
       updatedAt: new Date('2026-09-14T00:00:00.000Z'),
     })
-    const transaction = jest.fn()
+    const transaction = vi.fn()
     const prisma = {
       inventoryLoan: { update },
       $transaction: transaction,
@@ -652,8 +652,8 @@ describe('PrismaCirculationRepository', () => {
   })
 
   it('upserts keyed history capability writes and preserves unkeyed creates', async () => {
-    const upsert = jest.fn().mockResolvedValue(undefined)
-    const create = jest.fn().mockResolvedValue({})
+    const upsert = vi.fn().mockResolvedValue(undefined)
+    const create = vi.fn().mockResolvedValue({})
     const prisma = {
       inventoryHistory: { upsert, create },
     } as unknown as PrismaService

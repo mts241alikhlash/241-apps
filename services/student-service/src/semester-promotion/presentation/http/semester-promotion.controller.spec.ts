@@ -10,9 +10,9 @@ import { SemesterPromotionController } from './semester-promotion.controller.js'
 describe('SemesterPromotionController', () => {
   let controller: SemesterPromotionController
 
-  const mockPromoteStudentsService = { execute: jest.fn() }
-  const mockPreviewPromotionService = { execute: jest.fn() }
-  const mockGenerateRecommendationService = { execute: jest.fn() }
+  const mockPromoteStudentsService = { execute: vi.fn() }
+  const mockPreviewPromotionService = { execute: vi.fn() }
+  const mockGenerateRecommendationService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('SemesterPromotionController', () => {
     controller = module.get<SemesterPromotionController>(
       SemesterPromotionController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

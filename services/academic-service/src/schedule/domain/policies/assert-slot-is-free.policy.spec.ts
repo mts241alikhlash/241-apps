@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { ConflictException } from '@nestjs/common'
 import { DayEnum as Day } from '@mts241alikhlash/nest-core/domain'
 import {
@@ -10,7 +11,7 @@ import {
 } from './assert-slot-is-free.policy.js'
 
 describe('assertSlotIsFree', () => {
-  let mockRepo: jest.Mocked<IScheduleRepository>
+  let mockRepo: Mocked<IScheduleRepository>
 
   const lesson: PlannedLesson = {
     employeeId: 'tea-1',
@@ -22,9 +23,9 @@ describe('assertSlotIsFree', () => {
 
   beforeEach(() => {
     mockRepo = {
-      findClassroomConflictingSchedule: jest.fn().mockResolvedValue(null),
-      findEmployeeConflictingSchedule: jest.fn().mockResolvedValue(null),
-    } as unknown as jest.Mocked<IScheduleRepository>
+      findClassroomConflictingSchedule: vi.fn().mockResolvedValue(null),
+      findEmployeeConflictingSchedule: vi.fn().mockResolvedValue(null),
+    } as unknown as Mocked<IScheduleRepository>
   })
 
   it('allows the lesson when neither classroom nor employee is busy', async () => {

@@ -1,7 +1,8 @@
 {
   "extends": "@mts241alikhlash/typescript-config/nest.json",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["node_modules", "dist", "packages"]
 }

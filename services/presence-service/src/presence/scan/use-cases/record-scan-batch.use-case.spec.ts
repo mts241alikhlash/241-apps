@@ -7,7 +7,7 @@ const DEVICE_ID = '33333333-3333-4333-8333-333333333333'
 
 describe('RecordScanBatchUseCase', () => {
   let useCase: RecordScanBatchUseCase
-  const recordScan = { execute: jest.fn() }
+  const recordScan = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,7 +18,7 @@ describe('RecordScanBatchUseCase', () => {
     }).compile()
 
     useCase = module.get(RecordScanBatchUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     recordScan.execute.mockResolvedValue({ outcome: 'ACCEPTED' })
   })
 

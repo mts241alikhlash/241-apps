@@ -5,7 +5,7 @@ import { UserGender } from '@mts241alikhlash/nest-core/domain'
 
 describe('GetProfilesByIdsUseCase', () => {
   let useCase: GetProfilesByIdsUseCase
-  const mockUserRepository = { findProfilesByUserIds: jest.fn() }
+  const mockUserRepository = { findProfilesByUserIds: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,7 +16,7 @@ describe('GetProfilesByIdsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetProfilesByIdsUseCase>(GetProfilesByIdsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('delegates to the repository with the ids it was given', async () => {

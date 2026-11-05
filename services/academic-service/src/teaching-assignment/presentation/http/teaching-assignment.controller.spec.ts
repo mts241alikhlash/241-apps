@@ -11,12 +11,12 @@ import { TeachingAssignmentController } from './teaching-assignment.controller.j
 
 describe('TeachingAssignmentController', () => {
   let controller: TeachingAssignmentController
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetMine = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetMine = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('TeachingAssignmentController', () => {
     controller = module.get<TeachingAssignmentController>(
       TeachingAssignmentController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

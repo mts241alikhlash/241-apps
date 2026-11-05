@@ -10,11 +10,11 @@ describe('PrismaRoleRepository.ensureStructuralPermissions', () => {
     held = 0,
   ) {
     const prisma = {
-      role: { findUnique: jest.fn().mockResolvedValue(role) },
-      permission: { findMany: jest.fn().mockResolvedValue(permissions) },
+      role: { findUnique: vi.fn().mockResolvedValue(role) },
+      permission: { findMany: vi.fn().mockResolvedValue(permissions) },
       rolePermission: {
-        count: jest.fn().mockResolvedValue(held),
-        createMany: jest.fn().mockResolvedValue({ count: 1 }),
+        count: vi.fn().mockResolvedValue(held),
+        createMany: vi.fn().mockResolvedValue({ count: 1 }),
       },
     }
     return {

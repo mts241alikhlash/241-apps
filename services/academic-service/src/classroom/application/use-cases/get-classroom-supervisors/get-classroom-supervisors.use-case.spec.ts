@@ -7,7 +7,7 @@ describe('GetClassroomSupervisorsUseCase', () => {
   let useCase: GetClassroomSupervisorsUseCase
 
   const mockRepo = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('GetClassroomSupervisorsUseCase', () => {
     useCase = module.get<GetClassroomSupervisorsUseCase>(
       GetClassroomSupervisorsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -27,29 +27,29 @@ describe('ResolveBulkImportConflictsUseCase', () => {
   let useCase: ResolveBulkImportConflictsUseCase
 
   const mockStudentRepository = {
-    findByNis: jest.fn(),
-    findByNisn: jest.fn(),
+    findByNis: vi.fn(),
+    findByNisn: vi.fn(),
   }
 
   const mockAcademicLookup = {
-    findGradeByLevel: jest.fn(),
-    findClassroomByCode: jest.fn(),
+    findGradeByLevel: vi.fn(),
+    findClassroomByCode: vi.fn(),
   }
 
   const mockUpdateStudent = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockUpdateStudentProfile = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockCreateStudent = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockEnsureStudentEnrollment = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -74,7 +74,7 @@ describe('ResolveBulkImportConflictsUseCase', () => {
     useCase = module.get<ResolveBulkImportConflictsUseCase>(
       ResolveBulkImportConflictsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockStudentRepository.findByNis.mockResolvedValue(null)
     mockStudentRepository.findByNisn.mockResolvedValue(null)
   })

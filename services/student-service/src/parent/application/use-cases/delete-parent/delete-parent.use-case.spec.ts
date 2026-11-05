@@ -7,8 +7,8 @@ describe('DeleteParentUseCase', () => {
   let useCase: DeleteParentUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    softDelete: jest.fn(),
+    findById: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('DeleteParentUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteParentUseCase>(DeleteParentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

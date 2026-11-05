@@ -61,10 +61,10 @@ describe('StatusController', () => {
   }
 
   function controllerWithSpies() {
-    const getStatusesUseCase = { execute: jest.fn() }
-    const createStatusUseCase = { execute: jest.fn() }
-    const updateStatusUseCase = { execute: jest.fn() }
-    const deleteStatusUseCase = { execute: jest.fn() }
+    const getStatusesUseCase = { execute: vi.fn() }
+    const createStatusUseCase = { execute: vi.fn() }
+    const updateStatusUseCase = { execute: vi.fn() }
+    const deleteStatusUseCase = { execute: vi.fn() }
     return {
       controller: new StatusController(
         getStatusesUseCase as never,

@@ -8,10 +8,10 @@ describe('UpdateGradeUseCase', () => {
   let useCase: UpdateGradeUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findByLevel: jest.fn(),
-    findByName: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByLevel: vi.fn(),
+    findByName: vi.fn(),
+    update: vi.fn(),
   }
 
   const existing = { id: 'lvl-1', level: 7, name: 'VII', isActive: true }
@@ -25,7 +25,7 @@ describe('UpdateGradeUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateGradeUseCase>(UpdateGradeUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

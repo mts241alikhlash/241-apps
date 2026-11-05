@@ -5,8 +5,8 @@ import { ProvisionAccountUseCase } from './provision-account.use-case.js'
 
 describe('ProvisionAccountUseCase', () => {
   const mockUserRepository = {
-    existsByIdentifier: jest.fn(),
-    provisionAccount: jest.fn(),
+    existsByIdentifier: vi.fn(),
+    provisionAccount: vi.fn(),
   }
 
   const useCase = new ProvisionAccountUseCase(mockUserRepository as never)
@@ -25,7 +25,7 @@ describe('ProvisionAccountUseCase', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('provisions the account and converts the birth date', async () => {

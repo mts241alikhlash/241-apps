@@ -6,7 +6,7 @@ import { SemesterRolloverController } from './semester-rollover.controller.js'
 describe('SemesterRolloverController', () => {
   let controller: SemesterRolloverController
 
-  const mockRolloverSemesterService = { execute: jest.fn() }
+  const mockRolloverSemesterService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,7 +22,7 @@ describe('SemesterRolloverController', () => {
     controller = module.get<SemesterRolloverController>(
       SemesterRolloverController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

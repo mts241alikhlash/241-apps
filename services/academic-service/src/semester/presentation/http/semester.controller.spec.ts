@@ -14,13 +14,13 @@ import { SemesterController } from './semester.controller.js'
 describe('SemesterController', () => {
   let controller: SemesterController
 
-  const mockGetSemestersService = { execute: jest.fn() }
-  const mockGetSemesterByIdService = { execute: jest.fn() }
-  const mockCreateSemesterService = { execute: jest.fn() }
-  const mockUpdateSemesterService = { execute: jest.fn() }
-  const mockDeleteSemesterService = { execute: jest.fn() }
-  const mockActivateSemesterService = { execute: jest.fn() }
-  const mockDeactivateSemesterService = { execute: jest.fn() }
+  const mockGetSemestersService = { execute: vi.fn() }
+  const mockGetSemesterByIdService = { execute: vi.fn() }
+  const mockCreateSemesterService = { execute: vi.fn() }
+  const mockUpdateSemesterService = { execute: vi.fn() }
+  const mockDeleteSemesterService = { execute: vi.fn() }
+  const mockActivateSemesterService = { execute: vi.fn() }
+  const mockDeactivateSemesterService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -46,7 +46,7 @@ describe('SemesterController', () => {
     }).compile()
 
     controller = module.get<SemesterController>(SemesterController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

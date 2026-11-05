@@ -60,10 +60,10 @@ describe('FundingSourceController', () => {
   }
 
   function controllerWithSpies() {
-    const getFundingSourcesUseCase = { execute: jest.fn() }
-    const createFundingSourceUseCase = { execute: jest.fn() }
-    const updateFundingSourceUseCase = { execute: jest.fn() }
-    const deleteFundingSourceUseCase = { execute: jest.fn() }
+    const getFundingSourcesUseCase = { execute: vi.fn() }
+    const createFundingSourceUseCase = { execute: vi.fn() }
+    const updateFundingSourceUseCase = { execute: vi.fn() }
+    const deleteFundingSourceUseCase = { execute: vi.fn() }
 
     return {
       controller: new FundingSourceController(

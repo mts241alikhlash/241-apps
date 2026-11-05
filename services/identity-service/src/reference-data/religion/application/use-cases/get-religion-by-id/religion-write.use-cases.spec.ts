@@ -10,12 +10,12 @@ describe('Religion write use cases', () => {
   const entity = { id: 'id-1', name: 'Islam', isActive: true }
 
   const repository = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
-    countProfilesUsing: jest.fn(),
+    findById: vi.fn(),
+    findByName: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
+    countProfilesUsing: vi.fn(),
   }
 
   let getById: GetReligionByIdUseCase
@@ -38,7 +38,7 @@ describe('Religion write use cases', () => {
     create = moduleRef.get(CreateReligionUseCase)
     update = moduleRef.get(UpdateReligionUseCase)
     remove = moduleRef.get(DeleteReligionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('reads one by id', async () => {

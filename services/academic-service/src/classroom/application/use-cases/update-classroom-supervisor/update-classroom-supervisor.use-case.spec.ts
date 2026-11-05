@@ -8,12 +8,12 @@ describe('UpdateClassroomSupervisorUseCase', () => {
   let useCase: UpdateClassroomSupervisorUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findClassroomById: jest.fn(),
-    findEmployeeById: jest.fn(),
-    findSemesterById: jest.fn(),
-    findAssignment: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findClassroomById: vi.fn(),
+    findEmployeeById: vi.fn(),
+    findSemesterById: vi.fn(),
+    findAssignment: vi.fn(),
+    update: vi.fn(),
   }
 
   const mockExisting = {
@@ -34,7 +34,7 @@ describe('UpdateClassroomSupervisorUseCase', () => {
     useCase = module.get<UpdateClassroomSupervisorUseCase>(
       UpdateClassroomSupervisorUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -2,11 +2,11 @@ import { GetMyApplicationUseCase } from './get-my-application.use-case.js'
 
 describe('GetMyApplicationUseCase', () => {
   const repo = {
-    findMyDetail: jest.fn(),
-    findActiveDocumentTypes: jest.fn(),
-    isWaveFull: jest.fn(),
+    findMyDetail: vi.fn(),
+    findActiveDocumentTypes: vi.fn(),
+    isWaveFull: vi.fn(),
   }
-  const lookup = { firstSemesterOf: jest.fn().mockResolvedValue(null) }
+  const lookup = { firstSemesterOf: vi.fn().mockResolvedValue(null) }
   const getMyApplication = new GetMyApplicationUseCase(
     repo as never,
     lookup as never,

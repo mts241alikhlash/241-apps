@@ -7,10 +7,10 @@ describe('BulkCreateCurriculumSubjectsUseCase', () => {
   let useCase: BulkCreateCurriculumSubjectsUseCase
 
   const mockRepository = {
-    findDuplicate: jest.fn(),
-    findSoftDeleted: jest.fn(),
-    restore: jest.fn(),
-    create: jest.fn(),
+    findDuplicate: vi.fn(),
+    findSoftDeleted: vi.fn(),
+    restore: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe('BulkCreateCurriculumSubjectsUseCase', () => {
     useCase = module.get<BulkCreateCurriculumSubjectsUseCase>(
       BulkCreateCurriculumSubjectsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

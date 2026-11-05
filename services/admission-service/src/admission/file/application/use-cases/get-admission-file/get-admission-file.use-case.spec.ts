@@ -12,8 +12,8 @@ const file = {
 describe('GetAdmissionFileUseCase', () => {
   it('reads the stored object of a servable file', async () => {
     const stream = Readable.from(['x'])
-    const files = { findServable: jest.fn().mockResolvedValue(file) }
-    const content = { read: jest.fn().mockResolvedValue({ stream }) }
+    const files = { findServable: vi.fn().mockResolvedValue(file) }
+    const content = { read: vi.fn().mockResolvedValue({ stream }) }
 
     const result = await new GetAdmissionFileUseCase(files, content).execute(
       'f1',
@@ -24,8 +24,8 @@ describe('GetAdmissionFileUseCase', () => {
   })
 
   it('answers 404 without touching storage when the file is not an admission file', async () => {
-    const files = { findServable: jest.fn().mockResolvedValue(null) }
-    const content = { read: jest.fn() }
+    const files = { findServable: vi.fn().mockResolvedValue(null) }
+    const content = { read: vi.fn() }
 
     await expect(
       new GetAdmissionFileUseCase(files as never, content as never).execute(
@@ -36,9 +36,9 @@ describe('GetAdmissionFileUseCase', () => {
   })
 
   it('lets a missing object surface as 404', async () => {
-    const files = { findServable: jest.fn().mockResolvedValue(file) }
+    const files = { findServable: vi.fn().mockResolvedValue(file) }
     const content = {
-      read: jest
+      read: vi
         .fn()
         .mockRejectedValue(
           new NotFoundException('Berkas tidak ditemukan di penyimpanan'),

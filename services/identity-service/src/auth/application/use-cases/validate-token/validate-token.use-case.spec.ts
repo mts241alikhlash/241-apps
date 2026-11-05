@@ -8,7 +8,7 @@ describe('ValidateTokenUseCase', () => {
   let useCase: ValidateTokenUseCase
 
   const mockAuthRepository = {
-    findSessionWithUser: jest.fn(),
+    findSessionWithUser: vi.fn(),
   }
 
   const validPayload: JwtTokenPayload = {
@@ -39,7 +39,7 @@ describe('ValidateTokenUseCase', () => {
     }).compile()
 
     useCase = module.get<ValidateTokenUseCase>(ValidateTokenUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

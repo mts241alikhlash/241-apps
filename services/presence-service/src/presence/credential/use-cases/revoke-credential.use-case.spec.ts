@@ -5,7 +5,7 @@ import { RevokeCredentialUseCase } from './revoke-credential.use-case.js'
 
 describe('RevokeCredentialUseCase', () => {
   let useCase: RevokeCredentialUseCase
-  const repository = { findById: jest.fn(), revoke: jest.fn() }
+  const repository = { findById: vi.fn(), revoke: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,7 +16,7 @@ describe('RevokeCredentialUseCase', () => {
     }).compile()
 
     useCase = module.get(RevokeCredentialUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findById.mockResolvedValue({ id: 'cred-1', status: 'ACTIVE' })
   })
 

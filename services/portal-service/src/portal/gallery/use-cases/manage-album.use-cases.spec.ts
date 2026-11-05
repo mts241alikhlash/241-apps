@@ -40,31 +40,31 @@ function album(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const repository = {
-  findAllAlbums: jest.fn(),
-  findAlbumById: jest.fn(),
-  findPublicAlbums: jest.fn(),
-  findPublicAlbumBySlug: jest.fn(),
-  findLatestPublicAlbums: jest.fn(),
-  findTakenSlugs: jest.fn(),
-  findPhotos: jest.fn(),
-  countPhotos: jest.fn(),
-  findPhotoIds: jest.fn(),
-  findPhotoFileIds: jest.fn(),
-  createAlbum: jest.fn(),
-  updateAlbum: jest.fn(),
-  publishAlbum: jest.fn(),
-  unpublishAlbum: jest.fn(),
-  softDeleteAlbum: jest.fn(),
-  addPhoto: jest.fn(),
-  removePhoto: jest.fn(),
-  reorderPhotos: jest.fn(),
-  findAllVisibleAlbums: jest.fn(),
+  findAllAlbums: vi.fn(),
+  findAlbumById: vi.fn(),
+  findPublicAlbums: vi.fn(),
+  findPublicAlbumBySlug: vi.fn(),
+  findLatestPublicAlbums: vi.fn(),
+  findTakenSlugs: vi.fn(),
+  findPhotos: vi.fn(),
+  countPhotos: vi.fn(),
+  findPhotoIds: vi.fn(),
+  findPhotoFileIds: vi.fn(),
+  createAlbum: vi.fn(),
+  updateAlbum: vi.fn(),
+  publishAlbum: vi.fn(),
+  unpublishAlbum: vi.fn(),
+  softDeleteAlbum: vi.fn(),
+  addPhoto: vi.fn(),
+  removePhoto: vi.fn(),
+  reorderPhotos: vi.fn(),
+  findAllVisibleAlbums: vi.fn(),
 }
 
-const syncMediaUsage = { execute: jest.fn() }
+const syncMediaUsage = { execute: vi.fn() }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
   const module: TestingModule = await Test.createTestingModule({
@@ -79,7 +79,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findAlbumById.mockResolvedValue(album())
   repository.findTakenSlugs.mockResolvedValue([])
   repository.createAlbum.mockImplementation((data: Record<string, unknown>) =>

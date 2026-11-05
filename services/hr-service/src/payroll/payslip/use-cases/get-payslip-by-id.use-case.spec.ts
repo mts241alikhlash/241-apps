@@ -13,8 +13,8 @@ const BENDAHARA = '33333333-3333-4333-8333-333333333333'
 describe('Payslip reads for other people', () => {
   let byId: GetPayslipByIdUseCase
   let forRun: GetRunPayslipsUseCase
-  const payslips = { findById: jest.fn(), findByRun: jest.fn() }
-  const audit = { record: jest.fn() }
+  const payslips = { findById: vi.fn(), findByRun: vi.fn() }
+  const audit = { record: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,7 +28,7 @@ describe('Payslip reads for other people', () => {
 
     byId = module.get(GetPayslipByIdUseCase)
     forRun = module.get(GetRunPayslipsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     audit.record.mockResolvedValue(undefined)
   })
 

@@ -14,12 +14,12 @@ function makeTx(options: {
   ]
   const calls: string[] = []
   const tx = {
-    $queryRaw: jest.fn().mockImplementation(() => {
+    $queryRaw: vi.fn().mockImplementation(() => {
       calls.push('lock')
       return Promise.resolve([])
     }),
     admissionApplication: {
-      findFirstOrThrow: jest.fn().mockResolvedValue({
+      findFirstOrThrow: vi.fn().mockResolvedValue({
         id: 'app1',
         waveId: 'w1',
         wave: {
@@ -29,19 +29,19 @@ function makeTx(options: {
           quota: options.quota,
         },
       }),
-      groupBy: jest.fn().mockImplementation(() => {
+      groupBy: vi.fn().mockImplementation(() => {
         calls.push('count')
         const n = filledCounts.shift() ?? 0
         return Promise.resolve(n ? [{ waveId: 'w1', _count: { _all: n } }] : [])
       }),
-      findMany: jest.fn().mockResolvedValue([{ id: 'app2' }, { id: 'app3' }]),
-      updateMany: jest.fn().mockResolvedValue({ count: 2 }),
+      findMany: vi.fn().mockResolvedValue([{ id: 'app2' }, { id: 'app3' }]),
+      updateMany: vi.fn().mockResolvedValue({ count: 2 }),
     },
     admissionWave: {
-      findMany: jest.fn().mockResolvedValue(options.candidates ?? []),
+      findMany: vi.fn().mockResolvedValue(options.candidates ?? []),
     },
     admissionPayment: {
-      findFirst: jest.fn().mockImplementation(() => {
+      findFirst: vi.fn().mockImplementation(() => {
         calls.push('payment')
         return Promise.resolve(
           options.payment === undefined
@@ -55,12 +55,12 @@ function makeTx(options: {
             : options.payment,
         )
       }),
-      update: jest.fn().mockResolvedValue({ id: 'pay1', status: 'VERIFIED' }),
-      updateMany: jest.fn().mockResolvedValue({ count: 2 }),
+      update: vi.fn().mockResolvedValue({ id: 'pay1', status: 'VERIFIED' }),
+      updateMany: vi.fn().mockResolvedValue({ count: 2 }),
     },
   }
   const prisma = {
-    $transaction: jest.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
+    $transaction: vi.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
   } as unknown as PrismaService
   return { prisma, tx, calls }
 }

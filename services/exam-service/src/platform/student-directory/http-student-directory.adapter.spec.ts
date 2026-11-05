@@ -3,10 +3,10 @@ import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { HttpStudentDirectoryAdapter } from './http-student-directory.adapter.js'
 
 function build(students: unknown, profiles: unknown) {
-  const postData = jest.fn((key: string) =>
+  const postData = vi.fn((key: string) =>
     Promise.resolve(key === 'STUDENT_SERVICE_URL' ? students : profiles),
   )
-  const malformed = jest.fn((): never => {
+  const malformed = vi.fn((): never => {
     throw new ServiceUnavailableException('malformed')
   })
   const client = { postData, malformed } as unknown as ServiceClient

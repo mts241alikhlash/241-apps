@@ -24,15 +24,15 @@ const slotType = {
 describe('TimeSlotController', () => {
   let controller: TimeSlotController
 
-  const mockGetTimeSlotsService = { execute: jest.fn() }
-  const mockGetTimeSlotTypesService = { execute: jest.fn() }
-  const mockGetTimeSlotByIdService = { execute: jest.fn() }
-  const mockCreateTimeSlotService = { execute: jest.fn() }
-  const mockUpdateTimeSlotService = { execute: jest.fn() }
-  const mockDeleteTimeSlotService = { execute: jest.fn() }
-  const mockCreateTimeSlotTypeService = { execute: jest.fn() }
-  const mockUpdateTimeSlotTypeService = { execute: jest.fn() }
-  const mockDeleteTimeSlotTypeService = { execute: jest.fn() }
+  const mockGetTimeSlotsService = { execute: vi.fn() }
+  const mockGetTimeSlotTypesService = { execute: vi.fn() }
+  const mockGetTimeSlotByIdService = { execute: vi.fn() }
+  const mockCreateTimeSlotService = { execute: vi.fn() }
+  const mockUpdateTimeSlotService = { execute: vi.fn() }
+  const mockDeleteTimeSlotService = { execute: vi.fn() }
+  const mockCreateTimeSlotTypeService = { execute: vi.fn() }
+  const mockUpdateTimeSlotTypeService = { execute: vi.fn() }
+  const mockDeleteTimeSlotTypeService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -66,7 +66,7 @@ describe('TimeSlotController', () => {
     }).compile()
 
     controller = module.get<TimeSlotController>(TimeSlotController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

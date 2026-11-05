@@ -6,26 +6,24 @@ function setup(current: {
   payment: { status: string } | null
 }) {
   const tx = {
-    $queryRaw: jest.fn().mockResolvedValue([]),
+    $queryRaw: vi.fn().mockResolvedValue([]),
     admissionApplication: {
-      findUnique: jest.fn().mockResolvedValue(current),
-      update: jest.fn().mockResolvedValue({ id: 'app1' }),
+      findUnique: vi.fn().mockResolvedValue(current),
+      update: vi.fn().mockResolvedValue({ id: 'app1' }),
     },
   }
   const prisma = {
-    $transaction: jest.fn((run: (client: typeof tx) => unknown) => run(tx)),
+    $transaction: vi.fn((run: (client: typeof tx) => unknown) => run(tx)),
   }
   const repo = new PrismaAdmissionApplicationRepository(
     prisma as never,
     {} as never,
     {} as never,
   )
-  jest
-    .spyOn(
-      repo as unknown as { attachAccountSummary: (row: unknown) => unknown },
-      'attachAccountSummary',
-    )
-    .mockImplementation((row: unknown) => Promise.resolve(row))
+  vi.spyOn(
+    repo as unknown as { attachAccountSummary: (row: unknown) => unknown },
+    'attachAccountSummary',
+  ).mockImplementation((row: unknown) => Promise.resolve(row))
   return { repo, tx }
 }
 

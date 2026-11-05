@@ -19,10 +19,10 @@ function period(overrides: Record<string, unknown> = {}) {
 describe('GetAttendancePeriodsUseCase', () => {
   let useCase: GetAttendancePeriodsUseCase
   const repository = {
-    findAll: jest.fn(),
-    findByPeriod: jest.fn(),
-    isClosed: jest.fn(),
-    close: jest.fn(),
+    findAll: vi.fn(),
+    findByPeriod: vi.fn(),
+    isClosed: vi.fn(),
+    close: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -34,7 +34,7 @@ describe('GetAttendancePeriodsUseCase', () => {
     }).compile()
 
     useCase = module.get(GetAttendancePeriodsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAll.mockResolvedValue([period()])
   })
 

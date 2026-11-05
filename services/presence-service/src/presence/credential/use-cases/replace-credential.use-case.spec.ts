@@ -16,8 +16,8 @@ const ACTIVE_CARD = {
 
 describe('ReplaceCredentialUseCase', () => {
   let useCase: ReplaceCredentialUseCase
-  const repository = { findById: jest.fn(), replace: jest.fn() }
-  const codes = { generate: jest.fn() }
+  const repository = { findById: vi.fn(), replace: vi.fn() }
+  const codes = { generate: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +29,7 @@ describe('ReplaceCredentialUseCase', () => {
     }).compile()
 
     useCase = module.get(ReplaceCredentialUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findById.mockResolvedValue(ACTIVE_CARD)
     codes.generate.mockReturnValue('new-code')
   })

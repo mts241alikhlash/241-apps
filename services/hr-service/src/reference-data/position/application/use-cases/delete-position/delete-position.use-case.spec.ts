@@ -7,9 +7,9 @@ describe('DeletePositionUseCase', () => {
   let useCase: DeletePositionUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    countActiveAssignments: jest.fn(),
-    remove: jest.fn(),
+    findById: vi.fn(),
+    countActiveAssignments: vi.fn(),
+    remove: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('DeletePositionUseCase', () => {
     }).compile()
 
     useCase = module.get<DeletePositionUseCase>(DeletePositionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

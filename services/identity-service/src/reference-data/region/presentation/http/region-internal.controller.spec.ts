@@ -7,7 +7,7 @@ import { RegionInternalController } from './region-internal.controller.js'
 
 describe('RegionInternalController', () => {
   let app: INestApplication
-  const findByCodes = jest
+  const findByCodes = vi
     .fn()
     .mockResolvedValue([
       { code: '32', name: 'JAWA BARAT', level: 'PROVINCE', parentCode: null },

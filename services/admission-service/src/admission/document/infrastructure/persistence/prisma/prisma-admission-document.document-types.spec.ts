@@ -1,7 +1,7 @@
 import { PrismaAdmissionDocumentRepository } from './prisma-admission-document.repository.js'
 
 it('resolves an upload code only to an active document type', async () => {
-  const findFirst = jest.fn().mockResolvedValue(null)
+  const findFirst = vi.fn().mockResolvedValue(null)
   const repo = new PrismaAdmissionDocumentRepository({
     admissionDocumentType: { findFirst },
   } as never)
@@ -14,7 +14,7 @@ it('resolves an upload code only to an active document type', async () => {
 })
 
 it('lists only active REQUIRED types as required', async () => {
-  const findMany = jest.fn().mockResolvedValue([])
+  const findMany = vi.fn().mockResolvedValue([])
   const repo = new PrismaAdmissionDocumentRepository({
     admissionDocumentType: { findMany },
   } as never)

@@ -22,13 +22,13 @@ const input = {
 function setup() {
   const order: string[] = []
   const upload = {
-    executeForApplication: jest.fn(() => {
+    executeForApplication: vi.fn(() => {
       order.push('upload')
       return Promise.resolve({ id: 'pay1', status: 'PENDING' })
     }),
   }
   const verify = {
-    execute: jest.fn(() => {
+    execute: vi.fn(() => {
       order.push('verify')
       return Promise.resolve({ id: 'pay1', status: 'VERIFIED' })
     }),

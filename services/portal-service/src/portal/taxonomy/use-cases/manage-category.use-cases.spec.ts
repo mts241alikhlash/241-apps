@@ -14,7 +14,7 @@ import {
 } from './manage-category.use-cases.js'
 import { PortalCacheService } from '../../shared/services/portal-cache.service.js'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const category = {
   id: 'cat-1',
@@ -26,15 +26,15 @@ const category = {
 }
 
 const repository = {
-  findAll: jest.fn(),
-  findAllActive: jest.fn(),
-  findById: jest.fn(),
-  findBySlug: jest.fn(),
-  findActiveWithPublishedCounts: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  findUsage: jest.fn(),
-  softDelete: jest.fn(),
+  findAll: vi.fn(),
+  findAllActive: vi.fn(),
+  findById: vi.fn(),
+  findBySlug: vi.fn(),
+  findActiveWithPublishedCounts: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  findUsage: vi.fn(),
+  softDelete: vi.fn(),
 }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
@@ -49,7 +49,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findById.mockResolvedValue(category)
   repository.findBySlug.mockResolvedValue(null)
   repository.create.mockResolvedValue(category)

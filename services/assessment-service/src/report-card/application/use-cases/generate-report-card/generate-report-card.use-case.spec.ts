@@ -48,17 +48,17 @@ describe('GenerateReportCardUseCase', () => {
   let useCase: GenerateReportCardUseCase
 
   const mockRepo = {
-    upsert: jest.fn(),
-    findByEnrollmentId: jest.fn(),
-    calculateAndApplyClassroomRanks: jest.fn(),
+    upsert: vi.fn(),
+    findByEnrollmentId: vi.fn(),
+    calculateAndApplyClassroomRanks: vi.fn(),
   }
-  const mockScoreRepository = { findAllForReportCard: jest.fn() }
-  const mockEnrollmentRepository = { findSummary: jest.fn() }
+  const mockScoreRepository = { findAllForReportCard: vi.fn() }
+  const mockEnrollmentRepository = { findSummary: vi.fn() }
   const mockAcademicLookup = {
-    findSetting: jest
+    findSetting: vi
       .fn()
       .mockResolvedValue({ defaultPassingScore: 75, weeklyHolidays: [] }),
-    findPassingScores: jest.fn(),
+    findPassingScores: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -73,7 +73,7 @@ describe('GenerateReportCardUseCase', () => {
     }).compile()
 
     useCase = module.get<GenerateReportCardUseCase>(GenerateReportCardUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     mockEnrollmentRepository.findSummary.mockResolvedValue({ id: 'enr-1' })
     mockRepo.findByEnrollmentId.mockResolvedValue(null)

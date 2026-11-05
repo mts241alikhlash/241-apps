@@ -11,13 +11,13 @@ describe('CreateStudentUseCase', () => {
   let useCase: CreateStudentUseCase
 
   const mockStudentRepository = {
-    findByNis: jest.fn(),
-    findByNisn: jest.fn(),
-    create: jest.fn(),
+    findByNis: vi.fn(),
+    findByNisn: vi.fn(),
+    create: vi.fn(),
   }
 
   const mockEnsureStudentEnrollment = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -33,7 +33,7 @@ describe('CreateStudentUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateStudentUseCase>(CreateStudentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

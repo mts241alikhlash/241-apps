@@ -13,13 +13,13 @@ describe('GetMyReportCardDetailUseCase', () => {
     owner?: string
     isPublished?: boolean
   }) {
-    const detail = jest.fn().mockResolvedValue({
+    const detail = vi.fn().mockResolvedValue({
       id: CARD_ID,
       isPublished: options.isPublished ?? true,
       attendance: { SICK: 1, EXCUSED: 0, ABSENT: 2 },
     })
 
-    const findOwnership = jest
+    const findOwnership = vi
       .fn()
       .mockResolvedValue(
         options.owner
@@ -31,7 +31,7 @@ describe('GetMyReportCardDetailUseCase', () => {
       { execute: detail } as unknown as GetReportCardDetailUseCase,
       { findOwnership } as unknown as IReportCardRepository,
       {
-        findStudentIdByUserId: jest.fn().mockResolvedValue(options.studentId),
+        findStudentIdByUserId: vi.fn().mockResolvedValue(options.studentId),
       },
     )
 

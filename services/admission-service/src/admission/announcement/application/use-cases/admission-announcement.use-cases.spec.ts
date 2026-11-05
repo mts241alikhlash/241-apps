@@ -10,14 +10,14 @@ import { DeleteAdmissionAnnouncementUseCase } from './delete-admission-announcem
 
 describe('Admission Announcement use-cases', () => {
   const mockRepository = {
-    findAll: jest.fn(),
-    findActiveById: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    publish: jest.fn(),
-    softDelete: jest.fn(),
+    findAll: vi.fn(),
+    findActiveById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    publish: vi.fn(),
+    softDelete: vi.fn(),
   }
-  const notifications = { notifyScope: jest.fn() }
+  const notifications = { notifyScope: vi.fn() }
 
   let getAll: GetAdmissionAnnouncementsUseCase
   let create: CreateAdmissionAnnouncementUseCase
@@ -43,7 +43,7 @@ describe('Admission Announcement use-cases', () => {
     update = module.get(UpdateAdmissionAnnouncementUseCase)
     publish = module.get(PublishAdmissionAnnouncementUseCase)
     remove = module.get(DeleteAdmissionAnnouncementUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('GetAdmissionAnnouncementsUseCase', () => {

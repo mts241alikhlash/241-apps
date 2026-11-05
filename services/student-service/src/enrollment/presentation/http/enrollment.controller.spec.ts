@@ -32,15 +32,15 @@ const enrollmentResponse = {
 describe('EnrollmentController', () => {
   let controller: EnrollmentController
 
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockBulkCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockTransfer = { execute: jest.fn() }
-  const mockBulkTransfer = { execute: jest.fn() }
-  const mockDrop = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockBulkCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockTransfer = { execute: vi.fn() }
+  const mockBulkTransfer = { execute: vi.fn() }
+  const mockDrop = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -62,7 +62,7 @@ describe('EnrollmentController', () => {
     }).compile()
 
     controller = module.get<EnrollmentController>(EnrollmentController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

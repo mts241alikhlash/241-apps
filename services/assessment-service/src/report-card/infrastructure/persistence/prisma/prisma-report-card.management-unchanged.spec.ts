@@ -5,25 +5,23 @@ import type { IEnrollmentLookupPort } from '../../../../platform/enrollment-look
 
 describe('report card management read is unchanged', () => {
   function repositoryWithSpy() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(0)
-    const aggregate = jest
-      .fn()
-      .mockResolvedValue({ _avg: { totalAverage: 81 } })
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(0)
+    const aggregate = vi.fn().mockResolvedValue({ _avg: { totalAverage: 81 } })
 
     const prisma = {
       reportCard: { findMany, count, aggregate },
     } as unknown as PrismaService
-    const findActiveSemester = jest.fn().mockResolvedValue({ id: 'sem-active' })
+    const findActiveSemester = vi.fn().mockResolvedValue({ id: 'sem-active' })
     const academicLookup = {
       findActiveSemester,
-      listClassrooms: jest.fn().mockResolvedValue([]),
-      listSemesters: jest.fn().mockResolvedValue([]),
+      listClassrooms: vi.fn().mockResolvedValue([]),
+      listSemesters: vi.fn().mockResolvedValue([]),
     } as unknown as IAcademicLookupPort
-    const search = jest.fn().mockResolvedValue([{ id: 'enr-1' }])
+    const search = vi.fn().mockResolvedValue([{ id: 'enr-1' }])
     const enrollmentLookup = {
       search,
-      listByIds: jest.fn().mockResolvedValue([]),
+      listByIds: vi.fn().mockResolvedValue([]),
     } as unknown as IEnrollmentLookupPort
 
     return {

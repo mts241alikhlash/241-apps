@@ -26,16 +26,16 @@ describe('ProfileAddressService', () => {
   }
 
   const repository = {
-    findProfileIdByUserId: jest.fn(),
-    findAllByProfileId: jest.fn(),
-    findByIdForProfile: jest.fn(),
-    findByUserIds: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
-    clearPrimary: jest.fn(),
+    findProfileIdByUserId: vi.fn(),
+    findAllByProfileId: vi.fn(),
+    findByIdForProfile: vi.fn(),
+    findByUserIds: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
+    clearPrimary: vi.fn(),
   }
-  const regions = { findByCodes: jest.fn() }
+  const regions = { findByCodes: vi.fn() }
 
   let service: ProfileAddressService
 
@@ -49,7 +49,7 @@ describe('ProfileAddressService', () => {
     }).compile()
 
     service = moduleRef.get(ProfileAddressService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findProfileIdByUserId.mockResolvedValue('profile-1')
   })
 

@@ -15,21 +15,21 @@ import { VerifyApplicationWhenReadyUseCase } from '../../../verification/index.j
 
 describe('Admission applicant use-cases', () => {
   const repo = {
-    findOpenWave: jest.fn(),
-    findActiveWave: jest.fn(),
-    isWaveFull: jest.fn(),
-    isIdentifierTaken: jest.fn(),
-    registerApplicant: jest.fn(),
-    findMyApplication: jest.fn(),
-    findMyDetail: jest.fn(),
-    findDetailById: jest.fn(),
-    findRequiredActiveDocumentTypes: jest.fn(),
-    updateMyApplication: jest.fn(),
-    submitApplication: jest.fn(),
+    findOpenWave: vi.fn(),
+    findActiveWave: vi.fn(),
+    isWaveFull: vi.fn(),
+    isIdentifierTaken: vi.fn(),
+    registerApplicant: vi.fn(),
+    findMyApplication: vi.fn(),
+    findMyDetail: vi.fn(),
+    findDetailById: vi.fn(),
+    findRequiredActiveDocumentTypes: vi.fn(),
+    updateMyApplication: vi.fn(),
+    submitApplication: vi.fn(),
   }
-  const notifications = { notify: jest.fn() }
+  const notifications = { notify: vi.fn() }
   const referenceLookup = {
-    optionsByIds: jest
+    optionsByIds: vi
       .fn()
       .mockResolvedValue([{ id: 'ls1', name: 'Masih hidup', isActive: true }]),
   }
@@ -50,7 +50,7 @@ describe('Admission applicant use-cases', () => {
         { provide: AdmissionNotificationService, useValue: notifications },
         {
           provide: VerifyApplicationWhenReadyUseCase,
-          useValue: { execute: jest.fn().mockResolvedValue(false) },
+          useValue: { execute: vi.fn().mockResolvedValue(false) },
         },
       ],
     }).compile()
@@ -58,7 +58,7 @@ describe('Admission applicant use-cases', () => {
     register = module.get(RegisterApplicantUseCase)
     updateMine = module.get(UpdateMyApplicationUseCase)
     submit = module.get(SubmitApplicationUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const registerDto = {
@@ -260,7 +260,7 @@ describe('Admission applicant use-cases', () => {
     }
 
     beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('2026-01-15T10:00:00+07:00') })
+      vi.useFakeTimers({ now: new Date('2026-01-15T10:00:00+07:00') })
       repo.findRequiredActiveDocumentTypes.mockResolvedValue([])
       repo.submitApplication.mockResolvedValue({
         ...complete,
@@ -268,10 +268,10 @@ describe('Admission applicant use-cases', () => {
       })
     })
 
-    afterEach(() => jest.useRealTimers())
+    afterEach(() => vi.useRealTimers())
 
     it('accepts a submission on the last day of the wave', async () => {
-      jest.setSystemTime(new Date('2026-02-01T15:00:00+07:00'))
+      vi.setSystemTime(new Date('2026-02-01T15:00:00+07:00'))
       repo.findMyDetail.mockResolvedValue(complete)
 
       await submit.execute('u1')
@@ -280,7 +280,7 @@ describe('Admission applicant use-cases', () => {
     })
 
     it('refuses a submission the day after the wave ends', async () => {
-      jest.setSystemTime(new Date('2026-02-02T08:00:00+07:00'))
+      vi.setSystemTime(new Date('2026-02-02T08:00:00+07:00'))
       repo.findMyDetail.mockResolvedValue(complete)
 
       await expect(submit.execute('u1')).rejects.toThrow(ConflictException)

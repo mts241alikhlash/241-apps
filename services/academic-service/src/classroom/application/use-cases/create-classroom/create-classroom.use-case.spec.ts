@@ -8,8 +8,8 @@ describe('CreateClassroomUseCase', () => {
   let useCase: CreateClassroomUseCase
 
   const mockRepository = {
-    findDuplicate: jest.fn(),
-    create: jest.fn(),
+    findDuplicate: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('CreateClassroomUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateClassroomUseCase>(CreateClassroomUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

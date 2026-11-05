@@ -4,8 +4,8 @@ import type { IAccountProvisioningPort } from '../../../../../platform/user/inde
 import type { IReferenceLookupPort } from '../../../../../platform/reference-lookup/reference-lookup.port.js'
 
 describe('PrismaAdmissionApplicationRepository stats', () => {
-  const groupBy = jest.fn().mockResolvedValue([])
-  const findMany = jest.fn().mockResolvedValue([])
+  const groupBy = vi.fn().mockResolvedValue([])
+  const findMany = vi.fn().mockResolvedValue([])
   const repository = new PrismaAdmissionApplicationRepository(
     {
       admissionApplication: { groupBy },
@@ -15,7 +15,7 @@ describe('PrismaAdmissionApplicationRepository stats', () => {
     {} as IReferenceLookupPort,
   )
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('counts only applications whose wave belongs to the academic year', async () => {
     await repository.getStatusCounts({ academicYearId: 'year-1' })

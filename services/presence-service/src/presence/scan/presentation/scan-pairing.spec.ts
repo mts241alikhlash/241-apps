@@ -14,7 +14,7 @@ function controllerIn(nodeEnv: string) {
 }
 
 function response() {
-  return { cookie: jest.fn(), clearCookie: jest.fn() }
+  return { cookie: vi.fn(), clearCookie: vi.fn() }
 }
 
 describe('kiosk pairing', () => {

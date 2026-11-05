@@ -6,11 +6,11 @@ import { MarkNotificationReadUseCase } from './mark-notification-read/mark-notif
 
 describe('Admission notification use-cases', () => {
   const repo = {
-    findApplicationIdByUser: jest.fn(),
-    findNotifications: jest.fn(),
-    findMyNotification: jest.fn(),
-    markNotificationRead: jest.fn(),
-    markAllNotificationsRead: jest.fn(),
+    findApplicationIdByUser: vi.fn(),
+    findNotifications: vi.fn(),
+    findMyNotification: vi.fn(),
+    markNotificationRead: vi.fn(),
+    markAllNotificationsRead: vi.fn(),
   }
 
   let getMine: GetMyNotificationsUseCase
@@ -27,7 +27,7 @@ describe('Admission notification use-cases', () => {
 
     getMine = module.get(GetMyNotificationsUseCase)
     markRead = module.get(MarkNotificationReadUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('throws NotFound when the applicant has no application', async () => {

@@ -205,7 +205,7 @@ describe('parseLandingSection', () => {
   it('names the failing field in the message', () => {
     try {
       parseLandingSection('hero', { ...hero, registerLabel: '' })
-      fail('should have thrown')
+      expect.unreachable('should have thrown')
     } catch (error) {
       expect((error as BadRequestException).message).toContain('registerLabel')
     }

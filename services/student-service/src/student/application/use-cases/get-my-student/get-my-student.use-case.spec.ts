@@ -9,10 +9,10 @@ describe('GetMyStudentUseCase', () => {
     record?: unknown
     profiles?: Partial<ProfileSummary>[]
   }) {
-    const findByUserId = jest.fn().mockResolvedValue(options.own ?? null)
-    const findById = jest.fn().mockResolvedValue(options.record ?? null)
+    const findByUserId = vi.fn().mockResolvedValue(options.own ?? null)
+    const findById = vi.fn().mockResolvedValue(options.record ?? null)
 
-    const findByUserIds = jest.fn().mockResolvedValue(options.profiles ?? [])
+    const findByUserIds = vi.fn().mockResolvedValue(options.profiles ?? [])
 
     const useCase = new GetMyStudentUseCase(
       { findByUserId, findById } as unknown as IStudentRepository,

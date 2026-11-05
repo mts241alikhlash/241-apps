@@ -7,8 +7,8 @@ describe('DeleteSubjectUseCase', () => {
   let useCase: DeleteSubjectUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    remove: jest.fn(),
+    findById: vi.fn(),
+    remove: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('DeleteSubjectUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteSubjectUseCase>(DeleteSubjectUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

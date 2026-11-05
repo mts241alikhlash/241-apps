@@ -18,17 +18,17 @@ describe('GetMyClassroomUseCase', () => {
   }
 
   function makeUseCase(options: { semester: SemesterContext | null }) {
-    const findSemesterContext = jest.fn().mockResolvedValue(options.semester)
+    const findSemesterContext = vi.fn().mockResolvedValue(options.semester)
     const useCase = new GetMyClassroomUseCase(
       {
-        findActiveEnrollment: jest.fn().mockResolvedValue({
+        findActiveEnrollment: vi.fn().mockResolvedValue({
           classroomId: 'classroom-1',
           semesterId: 'semester-1',
         }),
-        findAll: jest.fn().mockResolvedValue({ data: [] }),
+        findAll: vi.fn().mockResolvedValue({ data: [] }),
       } as unknown as IEnrollmentRepository,
       {
-        findClassroomContext: jest.fn().mockResolvedValue({
+        findClassroomContext: vi.fn().mockResolvedValue({
           classroom: { id: 'classroom-1' },
           structure: null,
           supervisor: null,
@@ -37,7 +37,7 @@ describe('GetMyClassroomUseCase', () => {
         findSemesterContext,
       } as unknown as IAcademicLookupPort,
       {
-        findStudentIdByUserId: jest.fn().mockResolvedValue('student-1'),
+        findStudentIdByUserId: vi.fn().mockResolvedValue('student-1'),
       } as unknown as IStudentIdentityReadPort,
     )
     return { useCase, findSemesterContext }

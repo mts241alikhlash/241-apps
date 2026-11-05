@@ -16,10 +16,10 @@ describe('ServerClockService', () => {
     }).compile()
 
     service = module.get(ServerClockService)
-    jest.spyOn(service, 'now').mockReturnValue(NOW)
+    vi.spyOn(service, 'now').mockReturnValue(NOW)
   })
 
-  afterEach(() => jest.restoreAllMocks())
+  afterEach(() => vi.restoreAllMocks())
 
   describe('issueAnchor', () => {
     it('returns the server time and the offline window the device must respect', () => {

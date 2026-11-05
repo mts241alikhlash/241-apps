@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { BadRequestException, ConflictException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { IAcademicYearRepository } from '../../../domain/repositories/academic-year.repository.js'
@@ -7,10 +8,10 @@ import { CreateAcademicYearUseCase } from './create-academic-year.use-case.js'
 describe('CreateAcademicYearUseCase', () => {
   let useCase: CreateAcademicYearUseCase
 
-  const mockRepository: Record<string, jest.Mock> = {
-    findByName: jest.fn(),
-    deactivateAll: jest.fn(),
-    create: jest.fn(),
+  const mockRepository: Record<string, Mock> = {
+    findByName: vi.fn(),
+    deactivateAll: vi.fn(),
+    create: vi.fn(),
   }
 
   const mockAcademicYear = {
@@ -29,7 +30,7 @@ describe('CreateAcademicYearUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateAcademicYearUseCase>(CreateAcademicYearUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

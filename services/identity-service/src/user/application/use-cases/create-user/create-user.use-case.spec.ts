@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ConflictException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { CreateUserInput } from './create-user.input.js'
@@ -5,17 +6,17 @@ import { IUserRepository } from '../../../domain/repositories/user.repository.js
 import { CreateUserUseCase } from './create-user.use-case.js'
 import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
-jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
-  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
-  hashPassword: jest.fn(),
+vi.mock('@mts241alikhlash/nest-core/helpers', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  hashPassword: vi.fn(),
 }))
 
 describe('CreateUserUseCase', () => {
   let useCase: CreateUserUseCase
 
   const mockRepo = {
-    existsByIdentifier: jest.fn(),
-    create: jest.fn(),
+    existsByIdentifier: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -27,7 +28,7 @@ describe('CreateUserUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateUserUseCase>(CreateUserUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
@@ -46,7 +47,7 @@ describe('CreateUserUseCase', () => {
         identifier: 'newuser',
       }
       mockRepo.existsByIdentifier.mockResolvedValue(false)
-      ;(hashPassword as jest.Mock).mockResolvedValue('hashed-pass')
+      ;(hashPassword as Mock).mockResolvedValue('hashed-pass')
       mockRepo.create.mockResolvedValue(created)
 
       const result = await useCase.execute(input)

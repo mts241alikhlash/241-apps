@@ -28,10 +28,10 @@ import { ConditionController } from './condition.controller.js'
 
 describe('ConditionController', () => {
   function controllerWithSpies() {
-    const getConditionsUseCase = { execute: jest.fn() }
-    const createConditionUseCase = { execute: jest.fn() }
-    const updateConditionUseCase = { execute: jest.fn() }
-    const deleteConditionUseCase = { execute: jest.fn() }
+    const getConditionsUseCase = { execute: vi.fn() }
+    const createConditionUseCase = { execute: vi.fn() }
+    const updateConditionUseCase = { execute: vi.fn() }
+    const deleteConditionUseCase = { execute: vi.fn() }
 
     return {
       controller: new ConditionController(

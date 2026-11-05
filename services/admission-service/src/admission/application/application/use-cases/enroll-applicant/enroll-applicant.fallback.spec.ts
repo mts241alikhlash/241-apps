@@ -20,16 +20,14 @@ const application = (overrides: Record<string, unknown> = {}) => ({
 
 function setup(found = application()) {
   const repository = {
-    findActiveWithParentsAndUser: jest.fn().mockResolvedValue(found),
-    setNis: jest.fn().mockResolvedValue(undefined),
-    setEnrolling: jest.fn().mockResolvedValue(undefined),
-    markEnrolled: jest
-      .fn()
-      .mockResolvedValue({ id: 'app1', status: 'ENROLLED' }),
+    findActiveWithParentsAndUser: vi.fn().mockResolvedValue(found),
+    setNis: vi.fn().mockResolvedValue(undefined),
+    setEnrolling: vi.fn().mockResolvedValue(undefined),
+    markEnrolled: vi.fn().mockResolvedValue({ id: 'app1', status: 'ENROLLED' }),
   }
-  const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
+  const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
   const enrollment = {
-    enroll: jest.fn().mockResolvedValue({
+    enroll: vi.fn().mockResolvedValue({
       studentId: 's1',
       parentsLinked: 0,
       enrollmentCreated: false,

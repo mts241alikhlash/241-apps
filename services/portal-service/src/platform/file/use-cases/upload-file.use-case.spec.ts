@@ -5,7 +5,7 @@ import { UploadFileUseCase } from './upload-file.use-case.js'
 
 describe('UploadFileUseCase', () => {
   it('refuses anything over 5 MB before it reaches storage', async () => {
-    const storage = { uploadFile: jest.fn() }
+    const storage = { uploadFile: vi.fn() }
     const useCase = new UploadFileUseCase(
       {} as never,
       {} as never,

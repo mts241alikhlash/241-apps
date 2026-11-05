@@ -163,7 +163,7 @@ describe('CleanupExpiredSnapshotsUseCase', () => {
       )
     }
     const { storage } = fakeStorage(keys)
-    const findExpired = jest.spyOn(snapshots, 'findExpired')
+    const findExpired = vi.spyOn(snapshots, 'findExpired')
 
     const result = await new CleanupExpiredSnapshotsUseCase(
       snapshots,
@@ -197,7 +197,7 @@ describe('CleanupExpiredSnapshotsUseCase', () => {
       }),
     )
     const create = snapshots.create.bind(snapshots)
-    jest.spyOn(snapshots, 'create').mockImplementation((input) => {
+    vi.spyOn(snapshots, 'create').mockImplementation((input) => {
       if (input.id === bad.id) {
         return Promise.reject(new Error('storage_key taken'))
       }

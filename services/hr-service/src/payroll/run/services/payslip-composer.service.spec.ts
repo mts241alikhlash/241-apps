@@ -50,8 +50,8 @@ function summary(userId: string, overrides: Record<string, number> = {}) {
 
 describe('PayslipComposerService', () => {
   let composer: PayslipComposerService
-  const resolver = { resolve: jest.fn(), unconfigured: jest.fn() }
-  const presence = { summarizeMonth: jest.fn(), findByUsersAndDate: jest.fn() }
+  const resolver = { resolve: vi.fn(), unconfigured: vi.fn() }
+  const presence = { summarizeMonth: vi.fn(), findByUsersAndDate: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -65,7 +65,7 @@ describe('PayslipComposerService', () => {
     }).compile()
 
     composer = module.get(PayslipComposerService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     resolver.unconfigured.mockReturnValue([])
   })
 

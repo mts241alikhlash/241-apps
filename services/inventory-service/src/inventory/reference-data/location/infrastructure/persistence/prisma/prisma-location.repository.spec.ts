@@ -15,11 +15,11 @@ describe('PrismaLocationRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([prismaLocation])
-    const findUnique = jest.fn().mockResolvedValue(prismaLocation)
-    const create = jest.fn().mockResolvedValue(prismaLocation)
-    const update = jest.fn().mockResolvedValue(prismaLocation)
-    const deleteLocation = jest.fn().mockResolvedValue(prismaLocation)
+    const findMany = vi.fn().mockResolvedValue([prismaLocation])
+    const findUnique = vi.fn().mockResolvedValue(prismaLocation)
+    const create = vi.fn().mockResolvedValue(prismaLocation)
+    const update = vi.fn().mockResolvedValue(prismaLocation)
+    const deleteLocation = vi.fn().mockResolvedValue(prismaLocation)
     const prisma = {
       inventoryLocation: {
         findMany,

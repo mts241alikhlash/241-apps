@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { NotFoundException } from '@nestjs/common'
 import { ILocationRepository } from '../../domain/repositories/location.repository.js'
 import { CreateLocationUseCase } from './create-location/create-location.use-case.js'
@@ -19,12 +20,12 @@ describe('location use cases', () => {
 
   function makeRepository() {
     return {
-      findMany: jest.fn().mockResolvedValue([location]),
-      findById: jest.fn().mockResolvedValue(location),
-      create: jest.fn().mockResolvedValue(location),
-      update: jest.fn().mockResolvedValue(location),
-      delete: jest.fn().mockResolvedValue(location),
-    } as unknown as jest.Mocked<ILocationRepository>
+      findMany: vi.fn().mockResolvedValue([location]),
+      findById: vi.fn().mockResolvedValue(location),
+      create: vi.fn().mockResolvedValue(location),
+      update: vi.fn().mockResolvedValue(location),
+      delete: vi.fn().mockResolvedValue(location),
+    } as unknown as Mocked<ILocationRepository>
   }
 
   it('maps create input and returns created location', async () => {

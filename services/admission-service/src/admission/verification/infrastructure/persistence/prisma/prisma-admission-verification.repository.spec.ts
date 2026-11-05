@@ -1,12 +1,13 @@
+import type { Mock } from 'vitest'
 import { PrismaAdmissionVerificationRepository } from './prisma-admission-verification.repository.js'
 
-function locking(updateMany: jest.Mock) {
+function locking(updateMany: Mock) {
   const tx = {
-    $queryRaw: jest.fn().mockResolvedValue([]),
+    $queryRaw: vi.fn().mockResolvedValue([]),
     admissionApplication: { updateMany },
   }
   const prisma = {
-    $transaction: jest.fn((run: (client: unknown) => unknown) => run(tx)),
+    $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
   }
   return {
     repository: new PrismaAdmissionVerificationRepository(prisma as never),
@@ -16,7 +17,7 @@ function locking(updateMany: jest.Mock) {
 
 describe('PrismaAdmissionVerificationRepository', () => {
   it('lists the active required document type ids', async () => {
-    const findMany = jest.fn().mockResolvedValue([{ id: 'kk' }, { id: 'akta' }])
+    const findMany = vi.fn().mockResolvedValue([{ id: 'kk' }, { id: 'akta' }])
     const repository = new PrismaAdmissionVerificationRepository({
       admissionDocumentType: { findMany },
     } as never)
@@ -32,7 +33,7 @@ describe('PrismaAdmissionVerificationRepository', () => {
   })
 
   it('reads the status, documents and payment status of a live application', async () => {
-    const findFirst = jest.fn().mockResolvedValue({
+    const findFirst = vi.fn().mockResolvedValue({
       status: 'SUBMITTED',
       documents: [{ documentTypeId: 'kk', status: 'APPROVED' }],
       payment: { status: 'VERIFIED' },
@@ -57,7 +58,7 @@ describe('PrismaAdmissionVerificationRepository', () => {
   })
 
   it('reports a missing payment as null and a missing application as null', async () => {
-    const findFirst = jest
+    const findFirst = vi
       .fn()
       .mockResolvedValueOnce({
         status: 'SUBMITTED',
@@ -76,7 +77,7 @@ describe('PrismaAdmissionVerificationRepository', () => {
   })
 
   it('verifies only while every condition still holds, in one statement', async () => {
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 })
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
     const { repository, tx } = locking(updateMany)
 
     await expect(
@@ -107,7 +108,7 @@ describe('PrismaAdmissionVerificationRepository', () => {
   })
 
   it('answers false when another request got there first', async () => {
-    const { repository } = locking(jest.fn().mockResolvedValue({ count: 0 }))
+    const { repository } = locking(vi.fn().mockResolvedValue({ count: 0 }))
 
     await expect(repository.markVerified('app1', null, [])).resolves.toBe(false)
   })

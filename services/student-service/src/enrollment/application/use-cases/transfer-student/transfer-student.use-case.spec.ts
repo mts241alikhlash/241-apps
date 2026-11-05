@@ -9,11 +9,11 @@ describe('TransferStudentUseCase', () => {
   let useCase: TransferStudentUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
   }
 
-  const mockCapacity = { assertRoomFor: jest.fn() }
+  const mockCapacity = { assertRoomFor: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +25,7 @@ describe('TransferStudentUseCase', () => {
     }).compile()
 
     useCase = module.get<TransferStudentUseCase>(TransferStudentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockCapacity.assertRoomFor.mockResolvedValue(undefined)
   })
 

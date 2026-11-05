@@ -30,13 +30,13 @@ describe('Payroll run approval', () => {
   let recalculate: RecalculatePayrollRunUseCase
 
   const runs = {
-    findRunById: jest.fn(),
-    transition: jest.fn(),
-    snapshotNets: jest.fn(),
-    replacePayslips: jest.fn(),
+    findRunById: vi.fn(),
+    transition: vi.fn(),
+    snapshotNets: vi.fn(),
+    replacePayslips: vi.fn(),
   }
-  const roster = { list: jest.fn(), name: jest.fn() }
-  const composer = { compose: jest.fn() }
+  const roster = { list: vi.fn(), name: vi.fn() }
+  const composer = { compose: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +53,7 @@ describe('Payroll run approval', () => {
     approve = module.get(ApprovePayrollRunUseCase)
     submit = module.get(SubmitPayrollRunUseCase)
     recalculate = module.get(RecalculatePayrollRunUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     runs.transition.mockResolvedValue({ id: 'run-1' })
   })
 

@@ -2,12 +2,12 @@ import { ISubjectRepository } from '../../domain/repositories/subject.repository
 import { SubjectInternalController } from './subject-internal.controller.js'
 
 describe('SubjectInternalController', () => {
-  const findManyByIds = jest.fn()
+  const findManyByIds = vi.fn()
   const controller = new SubjectInternalController({
     findManyByIds,
   } as unknown as ISubjectRepository)
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('answers with id, name and code only', async () => {
     findManyByIds.mockResolvedValue([

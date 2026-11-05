@@ -12,12 +12,12 @@ describe('GradeAssignedStudentScoresUseCase', () => {
     teaches?: boolean
     supervises?: boolean | boolean[]
   }) {
-    const execute = jest.fn().mockResolvedValue({ saved: 1 })
+    const execute = vi.fn().mockResolvedValue({ saved: 1 })
 
     const supervisesQueue = Array.isArray(options.supervises)
       ? [...options.supervises]
       : null
-    const supervisesEnrollment = jest.fn().mockImplementation(() => {
+    const supervisesEnrollment = vi.fn().mockImplementation(() => {
       if (supervisesQueue) return Promise.resolve(supervisesQueue.shift())
       return Promise.resolve(options.supervises ?? false)
     })
@@ -25,15 +25,15 @@ describe('GradeAssignedStudentScoresUseCase', () => {
     const useCase = new GradeAssignedStudentScoresUseCase(
       { execute } as unknown as BulkUpsertStudentScoresUseCase,
       {
-        findEmployeeIdByUserId: jest
+        findEmployeeIdByUserId: vi
           .fn()
           .mockResolvedValue(
             options.employeeId === undefined ? EMPLOYEE : options.employeeId,
           ),
-        employeeExists: jest.fn().mockResolvedValue(true),
+        employeeExists: vi.fn().mockResolvedValue(true),
       },
       {
-        teachesAssessmentItem: jest
+        teachesAssessmentItem: vi
           .fn()
           .mockResolvedValue(options.teaches ?? false),
         supervisesEnrollment,

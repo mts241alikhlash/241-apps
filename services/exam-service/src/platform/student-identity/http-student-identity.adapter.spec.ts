@@ -3,10 +3,10 @@ import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 import { HttpStudentIdentityAdapter } from './http-student-identity.adapter.js'
 
 function build(answer: unknown) {
-  const getData = jest.fn((_key: string, _path: string) =>
+  const getData = vi.fn((_key: string, _path: string) =>
     Promise.resolve(answer),
   )
-  const malformed = jest.fn((): never => {
+  const malformed = vi.fn((): never => {
     throw new ServiceUnavailableException('malformed')
   })
   const client = { getData, malformed } as unknown as ServiceClient

@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { PrismaReportCardRepository } from './prisma-report-card.repository.js'
 import type { PrismaService } from '../../../../core/database/prisma.service.js'
 import type { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
@@ -5,9 +6,9 @@ import type { IEnrollmentLookupPort } from '../../../../platform/enrollment-look
 
 describe('report card list summary', () => {
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValueOnce(32).mockResolvedValueOnce(12)
-    const aggregate = jest
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValueOnce(32).mockResolvedValueOnce(12)
+    const aggregate = vi
       .fn()
       .mockResolvedValue({ _avg: { totalAverage: 81.5 } })
 
@@ -15,13 +16,13 @@ describe('report card list summary', () => {
       reportCard: { findMany, count, aggregate },
     } as unknown as PrismaService
     const academicLookup = {
-      findActiveSemester: jest.fn().mockResolvedValue({ id: 'sem-1' }),
-      listClassrooms: jest.fn().mockResolvedValue([]),
-      listSemesters: jest.fn().mockResolvedValue([]),
+      findActiveSemester: vi.fn().mockResolvedValue({ id: 'sem-1' }),
+      listClassrooms: vi.fn().mockResolvedValue([]),
+      listSemesters: vi.fn().mockResolvedValue([]),
     } as unknown as IAcademicLookupPort
     const enrollmentLookup = {
-      search: jest.fn().mockResolvedValue([{ id: 'enr-1' }, { id: 'enr-2' }]),
-      listByIds: jest.fn().mockResolvedValue([]),
+      search: vi.fn().mockResolvedValue([{ id: 'enr-1' }, { id: 'enr-2' }]),
+      listByIds: vi.fn().mockResolvedValue([]),
     } as unknown as IEnrollmentLookupPort
 
     return {
@@ -79,7 +80,7 @@ describe('report card list summary', () => {
     const { repository } = repositoryWithSpies()
     const prisma = (
       repository as unknown as {
-        prisma: { reportCard: { aggregate: jest.Mock } }
+        prisma: { reportCard: { aggregate: Mock } }
       }
     ).prisma
     prisma.reportCard.aggregate.mockResolvedValue({

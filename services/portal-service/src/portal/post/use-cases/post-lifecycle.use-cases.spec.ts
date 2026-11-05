@@ -51,18 +51,18 @@ function row(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const repository = {
-  findById: jest.fn(),
-  unpublish: jest.fn(),
-  archive: jest.fn(),
-  pin: jest.fn(),
-  softDelete: jest.fn(),
-  restore: jest.fn(),
+  findById: vi.fn(),
+  unpublish: vi.fn(),
+  archive: vi.fn(),
+  pin: vi.fn(),
+  softDelete: vi.fn(),
+  restore: vi.fn(),
 }
 
-const audit = { record: jest.fn() }
+const audit = { record: vi.fn() }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
   const module: TestingModule = await Test.createTestingModule({
@@ -77,7 +77,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findById.mockResolvedValue(row())
   audit.record.mockResolvedValue(undefined)
 })

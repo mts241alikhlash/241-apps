@@ -4,13 +4,13 @@ import { TokenManagerService } from './token-manager.service.js'
 
 describe('CentralSessionService', () => {
   const repository = {
-    createSession: jest.fn(),
-    findSessionByTokenHash: jest.fn(),
+    createSession: vi.fn(),
+    findSessionByTokenHash: vi.fn(),
   }
   const tokens = {
-    hashToken: jest.fn((value: string) => `hash:${value}`),
-    getRefreshExpirationMs: jest.fn().mockReturnValue(7 * 86400000),
-    getAbsoluteSessionMs: jest.fn().mockReturnValue(30 * 86400000),
+    hashToken: vi.fn((value: string) => `hash:${value}`),
+    getRefreshExpirationMs: vi.fn().mockReturnValue(7 * 86400000),
+    getAbsoluteSessionMs: vi.fn().mockReturnValue(30 * 86400000),
   }
   const service = new CentralSessionService(
     repository as unknown as IAuthRepository,
@@ -25,7 +25,7 @@ describe('CentralSessionService', () => {
     user: { id: 'u1', identifier: 'guru', isActive: true, deletedAt: null },
   }
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('stores only the hash of an opaque token and caps the session at 30 days', async () => {
     const { token, maxAgeMs } = await service.open('u1')

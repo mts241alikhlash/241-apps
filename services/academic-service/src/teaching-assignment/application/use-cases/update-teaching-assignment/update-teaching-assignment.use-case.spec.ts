@@ -10,11 +10,11 @@ import { ITeachingAssignmentRepository } from '../../../domain/repositories/teac
 describe('UpdateTeachingAssignmentUseCase', () => {
   let useCase: UpdateTeachingAssignmentUseCase
   const mockRepo = {
-    findById: jest.fn(),
-    findClassroomById: jest.fn(),
-    findSemesterById: jest.fn(),
-    findDuplicate: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findClassroomById: vi.fn(),
+    findSemesterById: vi.fn(),
+    findDuplicate: vi.fn(),
+    update: vi.fn(),
   }
 
   const existing = {
@@ -36,7 +36,7 @@ describe('UpdateTeachingAssignmentUseCase', () => {
     useCase = module.get<UpdateTeachingAssignmentUseCase>(
       UpdateTeachingAssignmentUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepo.findById.mockResolvedValue(existing)
   })
 

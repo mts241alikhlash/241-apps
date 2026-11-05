@@ -28,14 +28,14 @@ function entry(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetSitemapUseCase', () => {
   let useCase: GetSitemapUseCase
-  const repository = { findAllVisibleForSitemap: jest.fn() }
-  const agendaRepository = { findAllVisible: jest.fn() }
-  const galleryRepository = { findAllVisibleAlbums: jest.fn() }
-  const pageRepository = { findAllVisible: jest.fn() }
+  const repository = { findAllVisibleForSitemap: vi.fn() }
+  const agendaRepository = { findAllVisible: vi.fn() }
+  const galleryRepository = { findAllVisibleAlbums: vi.fn() }
+  const pageRepository = { findAllVisible: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -50,7 +50,7 @@ describe('GetSitemapUseCase', () => {
     }).compile()
 
     useCase = module.get(GetSitemapUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAllVisibleForSitemap.mockResolvedValue([entry()])
     agendaRepository.findAllVisible.mockResolvedValue([])
     galleryRepository.findAllVisibleAlbums.mockResolvedValue([])

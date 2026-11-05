@@ -7,12 +7,12 @@ import { SchoolUnitAddressUseCase } from './school-unit-address.use-case.js'
 describe('SchoolUnitAddressUseCase coordinates', () => {
   let useCase: SchoolUnitAddressUseCase
 
-  const schoolUnits = { findFirst: jest.fn() }
+  const schoolUnits = { findFirst: vi.fn() }
   const addresses = {
-    findBySchoolUnitId: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
+    findBySchoolUnitId: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   const body = {
@@ -36,7 +36,7 @@ describe('SchoolUnitAddressUseCase coordinates', () => {
     }).compile()
 
     useCase = module.get(SchoolUnitAddressUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     schoolUnits.findFirst.mockResolvedValue({ id: 'unit-1' })
     addresses.create.mockImplementation((_id: string, input: unknown) => input)
     addresses.update.mockImplementation((_id: string, input: unknown) => input)

@@ -8,9 +8,9 @@ describe('UpdateTimeSlotUseCase', () => {
   let useCase: UpdateTimeSlotUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findByOrder: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByOrder: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('UpdateTimeSlotUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateTimeSlotUseCase>(UpdateTimeSlotUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

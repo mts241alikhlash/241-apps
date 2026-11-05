@@ -12,11 +12,11 @@ import { CurriculumController } from './curriculum.controller.js'
 describe('CurriculumController', () => {
   let controller: CurriculumController
 
-  const mockGetCurriculaService = { execute: jest.fn() }
-  const mockGetCurriculaByIdService = { execute: jest.fn() }
-  const mockCreateCurriculaService = { execute: jest.fn() }
-  const mockUpdateCurriculaService = { execute: jest.fn() }
-  const mockDeleteCurriculaService = { execute: jest.fn() }
+  const mockGetCurriculaService = { execute: vi.fn() }
+  const mockGetCurriculaByIdService = { execute: vi.fn() }
+  const mockCreateCurriculaService = { execute: vi.fn() }
+  const mockUpdateCurriculaService = { execute: vi.fn() }
+  const mockDeleteCurriculaService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,7 +43,7 @@ describe('CurriculumController', () => {
     }).compile()
 
     controller = module.get<CurriculumController>(CurriculumController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

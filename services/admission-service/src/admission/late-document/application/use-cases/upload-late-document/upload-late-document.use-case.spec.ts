@@ -31,12 +31,12 @@ function pair(overrides: Partial<LateDocumentPair> = {}): LateDocumentPair {
 }
 
 function build(found: LateDocumentPair | null) {
-  const repo = { findPair: jest.fn().mockResolvedValue(found) }
+  const repo = { findPair: vi.fn().mockResolvedValue(found) }
   const documents = {
-    saveDocument: jest.fn().mockResolvedValue({ id: 'd1', status: 'PENDING' }),
+    saveDocument: vi.fn().mockResolvedValue({ id: 'd1', status: 'PENDING' }),
   }
   const storage = {
-    save: jest.fn().mockResolvedValue({
+    save: vi.fn().mockResolvedValue({
       filename: 'x.png',
       storageKey: 'documents/IJAZAH/x.png',
     }),

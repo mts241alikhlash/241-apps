@@ -6,8 +6,8 @@ import { ITeachingAssignmentRepository } from '../../../domain/repositories/teac
 describe('DeleteTeachingAssignmentUseCase', () => {
   let useCase: DeleteTeachingAssignmentUseCase
   const mockRepo = {
-    findById: jest.fn(),
-    softDelete: jest.fn(),
+    findById: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('DeleteTeachingAssignmentUseCase', () => {
     useCase = module.get<DeleteTeachingAssignmentUseCase>(
       DeleteTeachingAssignmentUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should soft-delete a teaching assignment', async () => {

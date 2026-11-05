@@ -4,16 +4,16 @@ import { CredentialsService } from '../../services/credentials.service.js'
 import { SsoLoginUseCase } from './sso-login.use-case.js'
 
 describe('SsoLoginUseCase', () => {
-  const credentials = { verify: jest.fn() }
+  const credentials = { verify: vi.fn() }
   const sessions = {
-    open: jest.fn().mockResolvedValue({ token: 't', maxAgeMs: 1 }),
+    open: vi.fn().mockResolvedValue({ token: 't', maxAgeMs: 1 }),
   }
   const useCase = new SsoLoginUseCase(
     credentials as unknown as CredentialsService,
     sessions as unknown as CentralSessionService,
   )
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('opens a central session for staff', async () => {
     credentials.verify.mockResolvedValue({

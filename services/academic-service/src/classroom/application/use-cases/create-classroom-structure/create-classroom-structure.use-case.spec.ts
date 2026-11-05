@@ -7,12 +7,12 @@ describe('CreateClassroomStructureUseCase', () => {
   let useCase: CreateClassroomStructureUseCase
 
   const mockRepo = {
-    findClassroomById: jest.fn(),
-    findSemesterById: jest.fn(),
-    findStructure: jest.fn(),
-    findActiveEnrollment: jest.fn(),
-    findByStudentAndSemester: jest.fn(),
-    create: jest.fn(),
+    findClassroomById: vi.fn(),
+    findSemesterById: vi.fn(),
+    findStructure: vi.fn(),
+    findActiveEnrollment: vi.fn(),
+    findByStudentAndSemester: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('CreateClassroomStructureUseCase', () => {
     useCase = module.get<CreateClassroomStructureUseCase>(
       CreateClassroomStructureUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

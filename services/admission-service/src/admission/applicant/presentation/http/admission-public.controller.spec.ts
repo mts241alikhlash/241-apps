@@ -4,7 +4,7 @@ import { AdmissionPublicController } from './admission-public.controller.js'
 describe('AdmissionPublicController', () => {
   it('serves the grade list without a token', async () => {
     const getActiveGrades = {
-      execute: jest
+      execute: vi
         .fn()
         .mockResolvedValue([{ id: 'g7', level: 7, name: 'Kelas 7' }]),
     }
@@ -26,7 +26,7 @@ describe('AdmissionPublicController', () => {
   })
 
   it('forwards the admission type and the target grade to registration', async () => {
-    const execute = jest.fn().mockResolvedValue({
+    const execute = vi.fn().mockResolvedValue({
       id: 'a1',
       registrationNumber: 'G1-0001',
       identifier: 'a@b.c',

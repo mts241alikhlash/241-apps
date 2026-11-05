@@ -5,9 +5,9 @@ import type { IEnrollmentLookupPort } from '../../../../platform/enrollment-look
 
 describe('report card list scoping', () => {
   function repositoryWithSpy(enrollmentIds = ['enr-1']) {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(0)
-    const aggregate = jest
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(0)
+    const aggregate = vi
       .fn()
       .mockResolvedValue({ _avg: { totalAverage: null } })
 
@@ -15,12 +15,12 @@ describe('report card list scoping', () => {
       reportCard: { findMany, count, aggregate },
     } as unknown as PrismaService
 
-    const search = jest
+    const search = vi
       .fn()
       .mockResolvedValue(enrollmentIds.map((id) => ({ id })))
     const enrollmentLookup = { search } as unknown as IEnrollmentLookupPort
 
-    const findActiveSemester = jest
+    const findActiveSemester = vi
       .fn()
       .mockResolvedValue({ id: 'sem-active', academicYearId: 'ay-1' })
     const academicLookup = {

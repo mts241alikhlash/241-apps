@@ -18,7 +18,7 @@ function assignment(userId: string, code: string, amount: string) {
 
 describe('SalaryResolverService', () => {
   let service: SalaryResolverService
-  const assignments = { findEffectiveOn: jest.fn() }
+  const assignments = { findEffectiveOn: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,7 +29,7 @@ describe('SalaryResolverService', () => {
     }).compile()
 
     service = module.get(SalaryResolverService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     assignments.findEffectiveOn.mockResolvedValue([
       assignment('user-1', 'GAJI_POKOK', '3500000.00'),
       assignment('user-1', 'TUNJ_JABATAN', '500000.00'),

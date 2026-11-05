@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ConflictException, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { UserGender } from '@mts241alikhlash/nest-core/domain'
@@ -5,8 +6,8 @@ import { HttpAccountProvisioningAdapter } from './http-account-provisioning.adap
 
 describe('HttpAccountProvisioningAdapter', () => {
   let adapter: HttpAccountProvisioningAdapter
-  let config: { get: jest.Mock }
-  let fetchMock: jest.Mock
+  let config: { get: Mock }
+  let fetchMock: Mock
 
   const input = {
     identifier: 'guru001',
@@ -23,13 +24,13 @@ describe('HttpAccountProvisioningAdapter', () => {
 
   beforeEach(() => {
     config = {
-      get: jest.fn((key: string) =>
+      get: vi.fn((key: string) =>
         key === 'IDENTITY_SERVICE_URL'
           ? 'https://identity.internal'
           : 'the-shared-secret',
       ),
     }
-    fetchMock = jest.fn()
+    fetchMock = vi.fn()
     global.fetch = fetchMock as typeof fetch
     adapter = new HttpAccountProvisioningAdapter(
       config as unknown as ConfigService,

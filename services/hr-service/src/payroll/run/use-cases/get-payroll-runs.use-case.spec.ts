@@ -9,7 +9,7 @@ import {
 describe('Payroll run reads', () => {
   let list: GetPayrollRunsUseCase
   let byId: GetPayrollRunByIdUseCase
-  const runs = { findAll: jest.fn(), findById: jest.fn() }
+  const runs = { findAll: vi.fn(), findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,7 +22,7 @@ describe('Payroll run reads', () => {
 
     list = module.get(GetPayrollRunsUseCase)
     byId = module.get(GetPayrollRunByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('passes the year and status filter through', async () => {

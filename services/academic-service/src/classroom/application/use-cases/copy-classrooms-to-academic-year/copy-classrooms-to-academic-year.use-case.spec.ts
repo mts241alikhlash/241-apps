@@ -7,8 +7,8 @@ import { CopyClassroomsToAcademicYearUseCase } from './copy-classrooms-to-academ
 describe('CopyClassroomsToAcademicYearUseCase', () => {
   let useCase: CopyClassroomsToAcademicYearUseCase
 
-  const classrooms = { copyToAcademicYear: jest.fn() }
-  const academicYears = { findById: jest.fn() }
+  const classrooms = { copyToAcademicYear: vi.fn() }
+  const academicYears = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,7 +20,7 @@ describe('CopyClassroomsToAcademicYearUseCase', () => {
     }).compile()
 
     useCase = module.get(CopyClassroomsToAcademicYearUseCase)
-    jest.resetAllMocks()
+    vi.resetAllMocks()
 
     academicYears.findById.mockImplementation((id: string) =>
       Promise.resolve({

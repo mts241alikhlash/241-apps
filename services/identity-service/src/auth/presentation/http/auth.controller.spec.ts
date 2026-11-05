@@ -18,25 +18,25 @@ import { AuthController } from './auth.controller.js'
 describe('AuthController', () => {
   let controller: AuthController
 
-  const mockIntrospectTokenService = { execute: jest.fn() }
-  const mockLoginService = { execute: jest.fn() }
-  const mockOAuthLoginService = { execute: jest.fn() }
-  const mockSsoGoogleLoginService = { execute: jest.fn() }
-  const mockRefreshTokenService = { execute: jest.fn() }
-  const mockLogoutService = { execute: jest.fn() }
-  const mockGetProfileService = { execute: jest.fn() }
-  const mockChangePasswordService = { execute: jest.fn() }
-  const mockRequestPasswordResetService = { execute: jest.fn() }
-  const mockResetPasswordService = { execute: jest.fn() }
+  const mockIntrospectTokenService = { execute: vi.fn() }
+  const mockLoginService = { execute: vi.fn() }
+  const mockOAuthLoginService = { execute: vi.fn() }
+  const mockSsoGoogleLoginService = { execute: vi.fn() }
+  const mockRefreshTokenService = { execute: vi.fn() }
+  const mockLogoutService = { execute: vi.fn() }
+  const mockGetProfileService = { execute: vi.fn() }
+  const mockChangePasswordService = { execute: vi.fn() }
+  const mockRequestPasswordResetService = { execute: vi.fn() }
+  const mockResetPasswordService = { execute: vi.fn() }
   const mockConfigService = {
-    get: jest.fn((key: string) => {
+    get: vi.fn((key: string) => {
       if (key === 'NODE_ENV') return 'test'
       if (key === 'GOOGLE_OAUTH_REDIRECT_ALLOWLIST') {
         return 'http://localhost:5173,http://localhost:5175'
       }
       return undefined
     }),
-    getOrThrow: jest.fn((key: string) => {
+    getOrThrow: vi.fn((key: string) => {
       if (key === 'GOOGLE_OAUTH_SUCCESS_REDIRECT_URL') {
         return 'http://localhost:5173/oauth/callback'
       }
@@ -56,9 +56,9 @@ describe('AuthController', () => {
   })
 
   const createMockResponse = (): Partial<Response> => ({
-    cookie: jest.fn(),
-    clearCookie: jest.fn(),
-    redirect: jest.fn(),
+    cookie: vi.fn(),
+    clearCookie: vi.fn(),
+    redirect: vi.fn(),
   })
 
   beforeEach(async () => {
@@ -89,7 +89,7 @@ describe('AuthController', () => {
     }).compile()
 
     controller = module.get<AuthController>(AuthController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -10,11 +10,11 @@ const profile = { id: 'p-1' }
 
 function build(replacedKey: string | null = null) {
   const repository = {
-    setAvatar: jest.fn().mockResolvedValue({ profile, replacedKey }),
+    setAvatar: vi.fn().mockResolvedValue({ profile, replacedKey }),
   }
   const storage = {
-    uploadFile: jest.fn().mockResolvedValue('key'),
-    deleteFile: jest.fn().mockResolvedValue(undefined),
+    uploadFile: vi.fn().mockResolvedValue('key'),
+    deleteFile: vi.fn().mockResolvedValue(undefined),
   }
   const useCase = new SetProfileAvatarUseCase(
     repository as never,

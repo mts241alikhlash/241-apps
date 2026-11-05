@@ -41,14 +41,14 @@ const scoreResponse = {
 
 describe('StudentScoreController', () => {
   let controller: StudentScoreController
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockRoster = { execute: jest.fn() }
-  const mockBulkUpsert = { execute: jest.fn() }
-  const mockGradeAssigned = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockRoster = { execute: vi.fn() }
+  const mockBulkUpsert = { execute: vi.fn() }
+  const mockGradeAssigned = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,7 +57,7 @@ describe('StudentScoreController', () => {
         { provide: GetStudentScoresUseCase, useValue: mockGetAll },
         {
           provide: GetMyStudentScoresUseCase,
-          useValue: { execute: jest.fn() },
+          useValue: { execute: vi.fn() },
         },
         { provide: GetStudentScoreByIdUseCase, useValue: mockGetById },
         { provide: CreateStudentScoreUseCase, useValue: mockCreate },
@@ -72,7 +72,7 @@ describe('StudentScoreController', () => {
       ],
     }).compile()
     controller = module.get<StudentScoreController>(StudentScoreController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { RequestPasswordResetUseCase } from './request-password-reset.use-case.js'
 
 const CONFIG: Record<string, string> = {
@@ -14,7 +15,7 @@ function build(
   profileEmail: string | null = 'guru@example.com',
 ) {
   const authRepository = {
-    findUserByIdentifier: jest.fn().mockResolvedValue({
+    findUserByIdentifier: vi.fn().mockResolvedValue({
       id: 'user-1',
       identifier,
       isActive: true,
@@ -22,14 +23,14 @@ function build(
       userRoles: roles.map((code) => ({ role: { code } })),
       profile: profileEmail === null ? null : { email: profileEmail },
     }),
-    createPasswordResetToken: jest.fn().mockResolvedValue(undefined),
+    createPasswordResetToken: vi.fn().mockResolvedValue(undefined),
   }
-  const emailService = { sendEmail: jest.fn().mockResolvedValue(emailSent) }
+  const emailService = { sendEmail: vi.fn().mockResolvedValue(emailSent) }
   const configService = {
-    get: jest.fn((key: string, fallback?: string) =>
+    get: vi.fn((key: string, fallback?: string) =>
       key === 'NODE_ENV' ? nodeEnv : fallback,
     ),
-    getOrThrow: jest.fn((key: string) => CONFIG[key]),
+    getOrThrow: vi.fn((key: string) => CONFIG[key]),
   }
   const useCase = new RequestPasswordResetUseCase(
     authRepository as never,
@@ -39,7 +40,7 @@ function build(
   return { useCase, emailService, authRepository }
 }
 
-function sentHtml(emailService: { sendEmail: jest.Mock }): string {
+function sentHtml(emailService: { sendEmail: Mock }): string {
   return (emailService.sendEmail.mock.calls[0] as string[])[2]
 }
 

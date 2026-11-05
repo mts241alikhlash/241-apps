@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import JSZip from 'jszip'
 import { assertSafeArchive, normalizeArchive } from './archive-guard.js'
 
-jest.setTimeout(60_000)
+vi.setConfig({ testTimeout: 60_000 })
 
 async function zipOf(entries: Record<string, Buffer>): Promise<Buffer> {
   const zip = new JSZip()

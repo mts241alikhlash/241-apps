@@ -6,7 +6,7 @@ import { DeleteReportCardUseCase } from './delete-report-card.use-case.js'
 describe('DeleteReportCardUseCase', () => {
   let useCase: DeleteReportCardUseCase
 
-  const mockRepo = { findById: jest.fn(), softDelete: jest.fn() }
+  const mockRepo = { findById: vi.fn(), softDelete: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('DeleteReportCardUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteReportCardUseCase>(DeleteReportCardUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

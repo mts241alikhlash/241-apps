@@ -6,7 +6,7 @@ describe('AuthCleanupService', () => {
   let service: AuthCleanupService
 
   const mockAuthRepository = {
-    deleteExpiredSessions: jest.fn(),
+    deleteExpiredSessions: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('AuthCleanupService', () => {
     }).compile()
 
     service = module.get<AuthCleanupService>(AuthCleanupService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

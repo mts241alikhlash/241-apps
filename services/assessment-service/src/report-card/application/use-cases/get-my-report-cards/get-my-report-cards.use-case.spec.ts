@@ -4,7 +4,7 @@ import type { IStudentIdentityReadPort } from '../../../../platform/student-iden
 
 describe('GetMyReportCardsUseCase', () => {
   function build(studentId: string | null) {
-    const execute = jest.fn().mockResolvedValue({
+    const execute = vi.fn().mockResolvedValue({
       data: [],
       total: 0,
       page: 1,
@@ -12,7 +12,7 @@ describe('GetMyReportCardsUseCase', () => {
     })
     const getReportCards = { execute } as unknown as GetReportCardsUseCase
     const studentIdentity = {
-      findStudentIdByUserId: jest.fn().mockResolvedValue(studentId),
+      findStudentIdByUserId: vi.fn().mockResolvedValue(studentId),
     } as unknown as IStudentIdentityReadPort
 
     return {

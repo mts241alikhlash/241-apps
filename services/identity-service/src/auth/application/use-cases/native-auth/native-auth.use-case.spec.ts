@@ -15,24 +15,24 @@ const user = (roles: string[]) => ({
 
 describe('native auth', () => {
   const tokens = {
-    generateTokenPair: jest.fn(),
-    hashToken: jest.fn().mockReturnValue('hash'),
-    getRefreshExpirationMs: jest.fn().mockReturnValue(604_800_000),
-    getAbsoluteSessionMs: jest.fn().mockReturnValue(30 * 86_400_000),
-    getAccessExpirationSeconds: jest.fn().mockReturnValue(900),
-    verifyRefreshToken: jest.fn(),
+    generateTokenPair: vi.fn(),
+    hashToken: vi.fn().mockReturnValue('hash'),
+    getRefreshExpirationMs: vi.fn().mockReturnValue(604_800_000),
+    getAbsoluteSessionMs: vi.fn().mockReturnValue(30 * 86_400_000),
+    getAccessExpirationSeconds: vi.fn().mockReturnValue(900),
+    verifyRefreshToken: vi.fn(),
   }
   const repo = {
-    findUserByIdentifier: jest.fn(),
-    findUserById: jest.fn(),
-    findGrants: jest.fn(),
-    createSession: jest.fn(),
-    findSessionWithUser: jest.fn(),
+    findUserByIdentifier: vi.fn(),
+    findUserById: vi.fn(),
+    findGrants: vi.fn(),
+    createSession: vi.fn(),
+    findSessionWithUser: vi.fn(),
   }
-  const passwords = { validatePassword: jest.fn() }
+  const passwords = { validatePassword: vi.fn() }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     tokens.hashToken.mockReturnValue('hash')
     tokens.getRefreshExpirationMs.mockReturnValue(604_800_000)
     tokens.getAbsoluteSessionMs.mockReturnValue(30 * 86_400_000)
@@ -129,7 +129,7 @@ describe('native auth', () => {
   })
 
   describe('refresh', () => {
-    const refreshUseCase = { execute: jest.fn() }
+    const refreshUseCase = { execute: vi.fn() }
     const refresh = () =>
       new NativeRefreshUseCase(
         tokens as never,
@@ -216,7 +216,7 @@ describe('native auth', () => {
   })
 
   describe('logout', () => {
-    const logoutUseCase = { execute: jest.fn() }
+    const logoutUseCase = { execute: vi.fn() }
     const logout = () =>
       new NativeLogoutUseCase(tokens as never, logoutUseCase as never)
 

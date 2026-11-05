@@ -1,26 +1,26 @@
 import { BadRequestException } from '@nestjs/common'
 import { RegisterApplicantUseCase } from './register-applicant.use-case.js'
 
-jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
-  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
-  hashPassword: jest.fn().mockResolvedValue('hash'),
+vi.mock('@mts241alikhlash/nest-core/helpers', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  hashPassword: vi.fn().mockResolvedValue('hash'),
 }))
 
 function setup(
   grades: { id: string; level: number; name: string | null }[] = [],
 ) {
   const repository = {
-    findActiveWave: jest
+    findActiveWave: vi
       .fn()
       .mockResolvedValue({ id: 'w1', code: 'G1', registrationFee: 100000 }),
-    findOpenWave: jest.fn(),
-    isWaveFull: jest.fn().mockResolvedValue(false),
-    isIdentifierTaken: jest.fn().mockResolvedValue(false),
-    registerApplicant: jest
+    findOpenWave: vi.fn(),
+    isWaveFull: vi.fn().mockResolvedValue(false),
+    isIdentifierTaken: vi.fn().mockResolvedValue(false),
+    registerApplicant: vi
       .fn()
       .mockResolvedValue({ id: 'app1', registrationNumber: 'G1-0001' }),
   }
-  const lookup = { activeGrades: jest.fn().mockResolvedValue(grades) }
+  const lookup = { activeGrades: vi.fn().mockResolvedValue(grades) }
   return {
     repository,
     lookup,

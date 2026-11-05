@@ -8,9 +8,9 @@ import { DeleteFileUseCase } from './delete-file.use-case.js'
 const FILE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const file = { id: FILE_ID, storageKey: 'portal/files/foto.webp' }
 
-const repository = { findById: jest.fn(), softDelete: jest.fn() }
-const storage = { deleteFile: jest.fn() }
-const usageChecker = { findReferences: jest.fn() }
+const repository = { findById: vi.fn(), softDelete: vi.fn() }
+const storage = { deleteFile: vi.fn() }
+const usageChecker = { findReferences: vi.fn() }
 
 async function build(withChecker: boolean): Promise<DeleteFileUseCase> {
   const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +27,7 @@ async function build(withChecker: boolean): Promise<DeleteFileUseCase> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findById.mockResolvedValue(file)
   repository.softDelete.mockResolvedValue(file)
   storage.deleteFile.mockResolvedValue(undefined)

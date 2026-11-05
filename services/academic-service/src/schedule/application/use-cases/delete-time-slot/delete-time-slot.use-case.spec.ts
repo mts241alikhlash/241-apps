@@ -7,9 +7,9 @@ describe('DeleteTimeSlotUseCase', () => {
   let useCase: DeleteTimeSlotUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    countSchedulesUsing: jest.fn(),
-    remove: jest.fn(),
+    findById: vi.fn(),
+    countSchedulesUsing: vi.fn(),
+    remove: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('DeleteTimeSlotUseCase', () => {
     }).compile()
 
     useCase = module.get<DeleteTimeSlotUseCase>(DeleteTimeSlotUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

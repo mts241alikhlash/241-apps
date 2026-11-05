@@ -7,8 +7,8 @@ describe('UpdateStudentGraduationUseCase', () => {
   let useCase: UpdateStudentGraduationUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('UpdateStudentGraduationUseCase', () => {
     useCase = module.get<UpdateStudentGraduationUseCase>(
       UpdateStudentGraduationUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should update graduation successfully', async () => {

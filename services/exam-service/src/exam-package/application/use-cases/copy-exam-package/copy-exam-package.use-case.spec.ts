@@ -67,7 +67,7 @@ describe('CopyExamPackageUseCase', () => {
   it('leaves no empty draft behind when the copy cannot be built', async () => {
     const { copier, pkg, packages, questions } = await setup('APPROVED')
     const before = packages.packages.size
-    jest.spyOn(questions, 'findPinned').mockResolvedValue([])
+    vi.spyOn(questions, 'findPinned').mockResolvedValue([])
 
     await expect(copier().execute(TEACHER, pkg.id)).rejects.toThrow()
 

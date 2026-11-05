@@ -11,7 +11,7 @@ describe('GetWorkflowByIdUseCase', () => {
       isActive: true,
       steps: [],
     }
-    const findWorkflowById = jest.fn().mockResolvedValue(workflow)
+    const findWorkflowById = vi.fn().mockResolvedValue(workflow)
     const repository = { findWorkflowById } as unknown as IApprovalRepository
     const useCase = new GetWorkflowByIdUseCase(repository)
 
@@ -20,7 +20,7 @@ describe('GetWorkflowByIdUseCase', () => {
   })
 
   it('throws when the workflow does not exist', async () => {
-    const findWorkflowById = jest.fn().mockResolvedValue(null)
+    const findWorkflowById = vi.fn().mockResolvedValue(null)
     const repository = { findWorkflowById } as unknown as IApprovalRepository
     const useCase = new GetWorkflowByIdUseCase(repository)
 
@@ -32,7 +32,7 @@ describe('GetWorkflowByIdUseCase', () => {
 
   it('propagates repository read errors', async () => {
     const error = new Error('database unavailable')
-    const findWorkflowById = jest.fn().mockRejectedValue(error)
+    const findWorkflowById = vi.fn().mockRejectedValue(error)
     const repository = { findWorkflowById } as unknown as IApprovalRepository
     const useCase = new GetWorkflowByIdUseCase(repository)
 

@@ -6,14 +6,14 @@ import type { IEnrollmentRepository } from '../../domain/repositories/enrollment
 describe('ClassroomCapacityService', () => {
   function serviceWith(capacity: number | null, activeCount: number) {
     const academicLookup = {
-      findClassroomDetail: jest
+      findClassroomDetail: vi
         .fn()
         .mockResolvedValue(
           capacity === null ? null : { id: 'cls-1', capacity },
         ),
     } as unknown as IAcademicLookupPort
 
-    const countActiveByClassroomAndSemester = jest
+    const countActiveByClassroomAndSemester = vi
       .fn()
       .mockResolvedValue(activeCount)
     const enrollmentRepository = {

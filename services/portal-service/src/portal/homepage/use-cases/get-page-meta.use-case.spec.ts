@@ -10,7 +10,7 @@ import { PortalCacheService } from '../../shared/services/portal-cache.service.j
 
 const COVER_ID = '22222222-2222-4222-8222-222222222222'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const post = {
   id: 'post-1',
@@ -34,10 +34,10 @@ const post = {
 
 describe('GetPageMetaUseCase', () => {
   let useCase: GetPageMetaUseCase
-  const bySlug = { executeOrThrow: jest.fn() }
-  const byPageSlug = { execute: jest.fn() }
-  const agendaRepository = { findPublicBySlug: jest.fn() }
-  const galleryRepository = { findPublicAlbumBySlug: jest.fn() }
+  const bySlug = { executeOrThrow: vi.fn() }
+  const byPageSlug = { execute: vi.fn() }
+  const agendaRepository = { findPublicBySlug: vi.fn() }
+  const galleryRepository = { findPublicAlbumBySlug: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -56,7 +56,7 @@ describe('GetPageMetaUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPageMetaUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     bySlug.executeOrThrow.mockResolvedValue(post)
     byPageSlug.execute.mockResolvedValue(null)
     agendaRepository.findPublicBySlug.mockResolvedValue(null)

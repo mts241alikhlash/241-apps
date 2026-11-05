@@ -4,9 +4,9 @@ import { IAssetUnitRepository } from '../../../domain/repositories/asset-unit.re
 
 describe('DeleteUnitUseCase', () => {
   it('checks existence and soft-deletes the unit', async () => {
-    const softDelete = jest.fn().mockResolvedValue({ id: 'unit-1' })
+    const softDelete = vi.fn().mockResolvedValue({ id: 'unit-1' })
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'unit-1' }),
+      findById: vi.fn().mockResolvedValue({ id: 'unit-1' }),
       softDelete,
     } as unknown as IAssetUnitRepository
     const useCase = new DeleteUnitUseCase(repository)
@@ -17,9 +17,9 @@ describe('DeleteUnitUseCase', () => {
   })
 
   it('rejects missing units without soft-deleting', async () => {
-    const softDelete = jest.fn()
+    const softDelete = vi.fn()
     const repository = {
-      findById: jest.fn().mockResolvedValue(null),
+      findById: vi.fn().mockResolvedValue(null),
       softDelete,
     } as unknown as IAssetUnitRepository
     const useCase = new DeleteUnitUseCase(repository)
@@ -33,8 +33,8 @@ describe('DeleteUnitUseCase', () => {
   it('propagates soft-delete errors', async () => {
     const error = new Error('database unavailable')
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'unit-1' }),
-      softDelete: jest.fn().mockRejectedValue(error),
+      findById: vi.fn().mockResolvedValue({ id: 'unit-1' }),
+      softDelete: vi.fn().mockRejectedValue(error),
     } as unknown as IAssetUnitRepository
     const useCase = new DeleteUnitUseCase(repository)
 

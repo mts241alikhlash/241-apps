@@ -2,7 +2,7 @@ import { GradeInternalController } from './grade-internal.controller.js'
 
 describe('GradeInternalController.active', () => {
   it('lists the active grades with their ids, lowest level first', async () => {
-    const findAll = jest.fn().mockResolvedValue({
+    const findAll = vi.fn().mockResolvedValue({
       data: [
         { id: 'g9', level: 9, name: 'Kelas 9' },
         { id: 'g7', level: 7, name: 'Kelas 7' },

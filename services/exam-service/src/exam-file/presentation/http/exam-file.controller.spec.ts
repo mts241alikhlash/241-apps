@@ -31,7 +31,7 @@ describe('ExamFileController', () => {
       size: png.length,
       originalname: 'a.png',
     } as Express.Multer.File)
-    const set = jest.fn()
+    const set = vi.fn()
 
     const streamed = await controller.download(stored.id, {
       set,

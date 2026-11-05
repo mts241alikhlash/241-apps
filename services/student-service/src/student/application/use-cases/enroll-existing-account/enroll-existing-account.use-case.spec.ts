@@ -6,14 +6,14 @@ import { EnrollExistingAccountUseCase } from './enroll-existing-account.use-case
 
 describe('EnrollExistingAccountUseCase', () => {
   const students = {
-    findByUserId: jest.fn(),
-    findByNis: jest.fn(),
-    findByNisn: jest.fn(),
-    enrollExistingAccount: jest.fn(),
+    findByUserId: vi.fn(),
+    findByNis: vi.fn(),
+    findByNisn: vi.fn(),
+    enrollExistingAccount: vi.fn(),
   }
   const accountProvisioning = {
-    updateProfile: jest.fn(),
-    assignRole: jest.fn(),
+    updateProfile: vi.fn(),
+    assignRole: vi.fn(),
   }
 
   let useCase: EnrollExistingAccountUseCase
@@ -42,7 +42,7 @@ describe('EnrollExistingAccountUseCase', () => {
     }).compile()
 
     useCase = module.get(EnrollExistingAccountUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns the existing student on a repeat, without consulting NIS', async () => {

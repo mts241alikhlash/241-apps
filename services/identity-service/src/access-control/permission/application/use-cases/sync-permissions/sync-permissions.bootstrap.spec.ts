@@ -6,7 +6,7 @@ import type { IPermissionRepository } from '../../../domain/repositories/permiss
 
 describe('permission catalog sync on bootstrap', () => {
   function useCaseWithSpy() {
-    const upsertPermission = jest.fn().mockResolvedValue(undefined)
+    const upsertPermission = vi.fn().mockResolvedValue(undefined)
     const repository = { upsertPermission } as unknown as IPermissionRepository
     return {
       useCase: new SyncPermissionsUseCase(repository),
@@ -38,7 +38,7 @@ describe('permission catalog sync on bootstrap', () => {
   it('runs when the application boots', async () => {
     const { useCase, upsertPermission } = useCaseWithSpy()
     const ensureStructuralRoles = {
-      execute: jest.fn().mockResolvedValue(undefined),
+      execute: vi.fn().mockResolvedValue(undefined),
     }
     const module = new PermissionModule(
       useCase,

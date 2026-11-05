@@ -42,18 +42,18 @@ describe('academic self-service (e2e)', () => {
   let server: Server
 
   const prismaMock = {
-    student: { findFirst: jest.fn() },
+    student: { findFirst: vi.fn() },
     semester: {
-      findFirst: jest.fn().mockResolvedValue({ id: 'sem-active' }),
+      findFirst: vi.fn().mockResolvedValue({ id: 'sem-active' }),
     },
     reportCard: {
-      findMany: jest.fn().mockResolvedValue([]),
-      count: jest.fn().mockResolvedValue(0),
-      findFirst: jest.fn().mockResolvedValue(null),
-      aggregate: jest.fn().mockResolvedValue({ _avg: {} }),
+      findMany: vi.fn().mockResolvedValue([]),
+      count: vi.fn().mockResolvedValue(0),
+      findFirst: vi.fn().mockResolvedValue(null),
+      aggregate: vi.fn().mockResolvedValue({ _avg: {} }),
     },
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
   }
 
   function whereOfListQuery(): PrismaWhere {
@@ -103,7 +103,7 @@ describe('academic self-service (e2e)', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     prismaMock.student.findFirst.mockResolvedValue({ id: CALLER_STUDENT_ID })
     prismaMock.semester.findFirst.mockResolvedValue({ id: 'sem-active' })
     prismaMock.reportCard.findMany.mockResolvedValue([])

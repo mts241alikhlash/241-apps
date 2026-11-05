@@ -48,11 +48,11 @@ describe('SSO (e2e)', () => {
 
   const mockPrismaService = {
     user: {
-      findFirst: jest.fn(),
-      findUnique: jest.fn(),
+      findFirst: vi.fn(),
+      findUnique: vi.fn(),
     },
     userRole: {
-      findMany: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([
         {
           role: {
             code: 'STAFF',
@@ -62,17 +62,17 @@ describe('SSO (e2e)', () => {
       ]),
     },
     authSession: {
-      create: jest.fn(({ data }: { data: Record<string, unknown> }) => {
+      create: vi.fn(({ data }: { data: Record<string, unknown> }) => {
         sessions.set(data.id as string, { ...data, revokedAt: null })
         return Promise.resolve(data)
       }),
-      findFirst: jest.fn(({ where }: { where: { tokenHash: string } }) => {
+      findFirst: vi.fn(({ where }: { where: { tokenHash: string } }) => {
         const row = [...sessions.values()].find(
           (session) => session.tokenHash === where.tokenHash,
         )
         return Promise.resolve(row ? { ...row, user, parent: null } : null)
       }),
-      findUnique: jest.fn(({ where }: { where: { id: string } }) => {
+      findUnique: vi.fn(({ where }: { where: { id: string } }) => {
         const row = sessions.get(where.id)
         if (!row) return Promise.resolve(null)
         const parent = row.parentSessionId
@@ -80,12 +80,12 @@ describe('SSO (e2e)', () => {
           : null
         return Promise.resolve({ ...row, user, parent })
       }),
-      update: jest.fn(),
-      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
-      deleteMany: jest.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      deleteMany: vi.fn(),
     },
     ssoAuthorizationCode: {
-      create: jest.fn(({ data }: { data: Record<string, unknown> }) => {
+      create: vi.fn(({ data }: { data: Record<string, unknown> }) => {
         const row = {
           ...data,
           id: `code-${codes.size}`,
@@ -95,10 +95,10 @@ describe('SSO (e2e)', () => {
         codes.set(data.codeHash as string, row)
         return Promise.resolve(row)
       }),
-      findUnique: jest.fn(({ where }: { where: { codeHash: string } }) =>
+      findUnique: vi.fn(({ where }: { where: { codeHash: string } }) =>
         Promise.resolve(codes.get(where.codeHash) ?? null),
       ),
-      updateMany: jest.fn(
+      updateMany: vi.fn(
         ({
           where,
           data,
@@ -113,8 +113,8 @@ describe('SSO (e2e)', () => {
         },
       ),
     },
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
   }
 
   beforeAll(async () => {

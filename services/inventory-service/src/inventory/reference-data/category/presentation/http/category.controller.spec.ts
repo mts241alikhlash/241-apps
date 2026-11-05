@@ -19,10 +19,10 @@ import { CategoryController } from './category.controller.js'
 
 describe('CategoryController', () => {
   function controllerWithSpies() {
-    const getCategoriesUseCase = { execute: jest.fn() }
-    const createCategoryUseCase = { execute: jest.fn() }
-    const updateCategoryUseCase = { execute: jest.fn() }
-    const deleteCategoryUseCase = { execute: jest.fn() }
+    const getCategoriesUseCase = { execute: vi.fn() }
+    const createCategoryUseCase = { execute: vi.fn() }
+    const updateCategoryUseCase = { execute: vi.fn() }
+    const deleteCategoryUseCase = { execute: vi.fn() }
 
     return {
       controller: new CategoryController(

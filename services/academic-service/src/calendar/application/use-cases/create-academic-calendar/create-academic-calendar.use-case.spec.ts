@@ -11,18 +11,18 @@ describe('CreateAcademicCalendarUseCase', () => {
   let useCase: CreateAcademicCalendarUseCase
 
   const mockRepo = {
-    create: jest.fn(),
+    create: vi.fn(),
   }
 
   const mockAcademicYearRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   const mockSemesterRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
-  const mockAssertClassroomsExist = { execute: jest.fn() }
+  const mockAssertClassroomsExist = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,7 +44,7 @@ describe('CreateAcademicCalendarUseCase', () => {
     useCase = module.get<CreateAcademicCalendarUseCase>(
       CreateAcademicCalendarUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

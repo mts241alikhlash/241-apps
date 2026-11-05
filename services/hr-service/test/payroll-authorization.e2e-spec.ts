@@ -122,18 +122,18 @@ describe('payroll authorization (ADR-0008)', () => {
   }
 
   const prismaMock = {
-    salaryComponent: { findMany: jest.fn().mockResolvedValue([]) },
-    salaryAssignment: { findMany: jest.fn().mockResolvedValue([]) },
+    salaryComponent: { findMany: vi.fn().mockResolvedValue([]) },
+    salaryAssignment: { findMany: vi.fn().mockResolvedValue([]) },
     payrollRun: {
-      findMany: jest.fn().mockResolvedValue([]),
-      findFirst: jest.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn(),
     },
     payslip: {
-      findMany: jest.fn().mockResolvedValue([]),
-      findFirst: jest.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      findFirst: vi.fn(),
     },
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
   }
 
   beforeAll(async () => {

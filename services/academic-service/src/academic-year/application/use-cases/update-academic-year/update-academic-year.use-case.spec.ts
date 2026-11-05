@@ -12,9 +12,9 @@ describe('UpdateAcademicYearUseCase', () => {
   let useCase: UpdateAcademicYearUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByName: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('UpdateAcademicYearUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateAcademicYearUseCase>(UpdateAcademicYearUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

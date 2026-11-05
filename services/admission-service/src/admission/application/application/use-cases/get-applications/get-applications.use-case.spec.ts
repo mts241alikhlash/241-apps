@@ -7,13 +7,13 @@ import { GetAdmissionStatsUseCase } from '../get-admission-stats/get-admission-s
 
 describe('Admission application read use-cases', () => {
   const mockRepository = {
-    findAll: jest.fn(),
-    findAdminDetailById: jest.fn(),
-    countByNik: jest.fn(),
-    findDocumentTypesForReview: jest.fn(),
-    getStatusCounts: jest.fn(),
-    getWavesWithAcceptedCount: jest.fn(),
-    isWaveFull: jest.fn(),
+    findAll: vi.fn(),
+    findAdminDetailById: vi.fn(),
+    countByNik: vi.fn(),
+    findDocumentTypesForReview: vi.fn(),
+    getStatusCounts: vi.fn(),
+    getWavesWithAcceptedCount: vi.fn(),
+    isWaveFull: vi.fn(),
   }
 
   let getApplications: GetApplicationsUseCase
@@ -33,7 +33,7 @@ describe('Admission application read use-cases', () => {
     getApplications = module.get(GetApplicationsUseCase)
     getById = module.get(GetApplicationByIdUseCase)
     getStats = module.get(GetAdmissionStatsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('GetApplicationsUseCase', () => {

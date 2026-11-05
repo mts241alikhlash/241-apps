@@ -15,8 +15,8 @@ describe('UpdateUnitUseCase', () => {
 
   it('checks existence, maps update fields, and returns updated unit', async () => {
     const result = { id: 'unit-1', barcode: 'barcode-2' }
-    const findById = jest.fn().mockResolvedValue({ id: 'unit-1' })
-    const update = jest.fn().mockResolvedValue(result)
+    const findById = vi.fn().mockResolvedValue({ id: 'unit-1' })
+    const update = vi.fn().mockResolvedValue(result)
     const repository = { findById, update } as unknown as IAssetUnitRepository
     const useCase = new UpdateUnitUseCase(repository)
 
@@ -27,9 +27,9 @@ describe('UpdateUnitUseCase', () => {
   })
 
   it('maps omitted optional values to undefined', async () => {
-    const update = jest.fn().mockResolvedValue({ id: 'unit-1' })
+    const update = vi.fn().mockResolvedValue({ id: 'unit-1' })
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'unit-1' }),
+      findById: vi.fn().mockResolvedValue({ id: 'unit-1' }),
       update,
     } as unknown as IAssetUnitRepository
     const useCase = new UpdateUnitUseCase(repository)
@@ -49,9 +49,9 @@ describe('UpdateUnitUseCase', () => {
   })
 
   it('rejects missing units before updating', async () => {
-    const update = jest.fn()
+    const update = vi.fn()
     const repository = {
-      findById: jest.fn().mockResolvedValue(null),
+      findById: vi.fn().mockResolvedValue(null),
       update,
     } as unknown as IAssetUnitRepository
     const useCase = new UpdateUnitUseCase(repository)
@@ -65,8 +65,8 @@ describe('UpdateUnitUseCase', () => {
   it('propagates update conflicts without translating them', async () => {
     const conflict = new ConflictException('barcode already exists')
     const repository = {
-      findById: jest.fn().mockResolvedValue({ id: 'unit-1' }),
-      update: jest.fn().mockRejectedValue(conflict),
+      findById: vi.fn().mockResolvedValue({ id: 'unit-1' }),
+      update: vi.fn().mockRejectedValue(conflict),
     } as unknown as IAssetUnitRepository
     const useCase = new UpdateUnitUseCase(repository)
 

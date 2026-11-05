@@ -33,7 +33,7 @@ const teacherAssignments = (
     employeeExists: () => Promise.resolve(true),
   },
   academic: {
-    listTeachingAssignmentsByEmployee: jest.fn(() =>
+    listTeachingAssignmentsByEmployee: vi.fn(() =>
       Promise.resolve(pairs.map((pair) => ({ ...pair, id: 'x' }))),
     ),
     findActiveSemester: () =>

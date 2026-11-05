@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ForbiddenException } from '@nestjs/common'
 import { EnsureStructuralRolesUseCase } from './ensure-structural-roles.use-case.js'
 import { DeleteRoleUseCase } from '../delete-role/delete-role.use-case.js'
@@ -11,10 +12,10 @@ describe('structural roles', () => {
   function repositoryWith(
     existing: Record<string, { id: string; isSystem: boolean }>,
   ) {
-    const createStructural = jest.fn().mockResolvedValue({ id: 'new' })
-    const markSystem = jest.fn().mockResolvedValue({ id: 'x' })
-    const ensureStructuralPermissions = jest.fn().mockResolvedValue(0)
-    const findByCode = jest
+    const createStructural = vi.fn().mockResolvedValue({ id: 'new' })
+    const markSystem = vi.fn().mockResolvedValue({ id: 'x' })
+    const ensureStructuralPermissions = vi.fn().mockResolvedValue(0)
+    const findByCode = vi
       .fn()
       .mockImplementation((code: string) =>
         Promise.resolve(existing[code] ? { code, ...existing[code] } : null),
@@ -83,12 +84,12 @@ describe('structural roles', () => {
   describe('deletion', () => {
     function deleteUseCaseFor(role: { code: string; isSystem: boolean }) {
       const repository = {
-        findById: jest.fn().mockResolvedValue({ id: 'r1', ...role }),
-        delete: jest.fn(),
+        findById: vi.fn().mockResolvedValue({ id: 'r1', ...role }),
+        delete: vi.fn(),
       } as unknown as IRoleRepository
       return {
         useCase: new DeleteRoleUseCase(repository),
-        remove: (repository as unknown as { delete: jest.Mock }).delete,
+        remove: (repository as unknown as { delete: Mock }).delete,
       }
     }
 

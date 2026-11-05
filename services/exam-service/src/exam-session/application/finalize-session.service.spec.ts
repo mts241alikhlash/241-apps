@@ -178,7 +178,7 @@ describe('FinalizeSessionService', () => {
   it('two finalizations at once score once', async () => {
     const [mc] = await start([choiceSpec('B')])
     answer(mc, { key: 'B' })
-    const closeSpy = jest.spyOn(sessions, 'close')
+    const closeSpy = vi.spyOn(sessions, 'close')
 
     const [a, b] = await Promise.all([
       service.finalize('a', 'SUBMITTED', NOW),

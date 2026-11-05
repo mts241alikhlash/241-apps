@@ -10,15 +10,15 @@ describe('UpdateAcademicCalendarUseCase', () => {
   let useCase: UpdateAcademicCalendarUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
   }
 
   const mockSemesterRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
-  const mockAssertClassroomsExist = { execute: jest.fn() }
+  const mockAssertClassroomsExist = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('UpdateAcademicCalendarUseCase', () => {
     useCase = module.get<UpdateAcademicCalendarUseCase>(
       UpdateAcademicCalendarUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

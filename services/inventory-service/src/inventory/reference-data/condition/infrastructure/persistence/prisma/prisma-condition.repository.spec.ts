@@ -11,11 +11,11 @@ describe('PrismaConditionRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const findUnique = jest.fn().mockResolvedValue(prismaCondition)
-    const create = jest.fn().mockResolvedValue(prismaCondition)
-    const update = jest.fn().mockResolvedValue(prismaCondition)
-    const deleteCondition = jest.fn().mockResolvedValue(prismaCondition)
+    const findMany = vi.fn().mockResolvedValue([])
+    const findUnique = vi.fn().mockResolvedValue(prismaCondition)
+    const create = vi.fn().mockResolvedValue(prismaCondition)
+    const update = vi.fn().mockResolvedValue(prismaCondition)
+    const deleteCondition = vi.fn().mockResolvedValue(prismaCondition)
     const prisma = {
       inventoryCondition: {
         findMany,

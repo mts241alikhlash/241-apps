@@ -28,11 +28,11 @@ function dto(overrides: Record<string, unknown> = {}) {
 describe('RecordStudentExcusedAbsenceUseCase', () => {
   let useCase: RecordStudentExcusedAbsenceUseCase
   const leave = {
-    findTypeById: jest.fn(),
-    submit: jest.fn(),
-    approve: jest.fn(),
+    findTypeById: vi.fn(),
+    submit: vi.fn(),
+    approve: vi.fn(),
   }
-  const expander = { expand: jest.fn() }
+  const expander = { expand: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,7 +44,7 @@ describe('RecordStudentExcusedAbsenceUseCase', () => {
     }).compile()
 
     useCase = module.get(RecordStudentExcusedAbsenceUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     leave.findTypeById.mockResolvedValue(SAKIT_SISWA)
     leave.submit.mockResolvedValue({ id: 'req-1' })
     leave.approve.mockResolvedValue({ id: 'req-1', status: 'APPROVED' })

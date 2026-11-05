@@ -5,7 +5,7 @@ import { ITeachingAssignmentRepository } from '../../../domain/repositories/teac
 describe('GetTeachingAssignmentsUseCase', () => {
   let useCase: GetTeachingAssignmentsUseCase
   const mockRepo = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetTeachingAssignmentsUseCase', () => {
     useCase = module.get<GetTeachingAssignmentsUseCase>(
       GetTeachingAssignmentsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should delegate to repository', async () => {

@@ -6,7 +6,7 @@ const USER = '11111111-1111-4111-8111-111111111111'
 function makePrisma() {
   const tx = {
     admissionLandingSection: {
-      findMany: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([
         {
           key: 'closing',
           draft: { a: 1 },
@@ -18,23 +18,23 @@ function makePrisma() {
           draftUpdatedAt: new Date('2026-10-09T02:00:00Z'),
         },
       ]),
-      updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
   }
   return {
     tx,
     admissionLandingSection: {
-      findMany: jest.fn().mockResolvedValue([]),
-      upsert: jest.fn().mockResolvedValue({}),
-      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+      findMany: vi.fn().mockResolvedValue([]),
+      upsert: vi.fn().mockResolvedValue({}),
+      updateMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
     admissionLandingImage: {
-      findUnique: jest.fn().mockResolvedValue(null),
-      findMany: jest.fn().mockResolvedValue([]),
-      create: jest.fn().mockResolvedValue({ id: 'i1' }),
-      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+      findUnique: vi.fn().mockResolvedValue(null),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn().mockResolvedValue({ id: 'i1' }),
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
     },
-    $transaction: jest.fn((fn: (tx: unknown) => unknown) => fn(tx)),
+    $transaction: vi.fn((fn: (tx: unknown) => unknown) => fn(tx)),
   }
 }
 

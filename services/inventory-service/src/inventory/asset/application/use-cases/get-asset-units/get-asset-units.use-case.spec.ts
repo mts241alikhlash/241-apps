@@ -4,7 +4,7 @@ import { IAssetUnitRepository } from '../../../domain/repositories/asset-unit.re
 describe('GetAssetUnitsUseCase', () => {
   it('forwards pagination, lendability, and search to the unit repository', async () => {
     const result = { data: [{ id: 'unit-1' }], total: 1, page: 1, limit: 10 }
-    const findAll = jest.fn().mockResolvedValue(result)
+    const findAll = vi.fn().mockResolvedValue(result)
     const repository = { findAll } as unknown as IAssetUnitRepository
     const useCase = new GetAssetUnitsUseCase(repository)
     const query = { page: 1, limit: 10, lendable: true, search: 'laptop' }
@@ -19,7 +19,7 @@ describe('GetAssetUnitsUseCase', () => {
   })
 
   it('forwards empty queries with explicit undefined fields', async () => {
-    const findAll = jest.fn().mockResolvedValue({ data: [] })
+    const findAll = vi.fn().mockResolvedValue({ data: [] })
     const repository = { findAll } as unknown as IAssetUnitRepository
     const useCase = new GetAssetUnitsUseCase(repository)
 
@@ -34,7 +34,7 @@ describe('GetAssetUnitsUseCase', () => {
   })
 
   it('forwards an explicit false lendable filter and search', async () => {
-    const findAll = jest.fn().mockResolvedValue({ data: [] })
+    const findAll = vi.fn().mockResolvedValue({ data: [] })
     const repository = { findAll } as unknown as IAssetUnitRepository
     const useCase = new GetAssetUnitsUseCase(repository)
 
@@ -51,7 +51,7 @@ describe('GetAssetUnitsUseCase', () => {
   it('propagates repository read errors', async () => {
     const error = new Error('database unavailable')
     const repository = {
-      findAll: jest.fn().mockRejectedValue(error),
+      findAll: vi.fn().mockRejectedValue(error),
     } as unknown as IAssetUnitRepository
     const useCase = new GetAssetUnitsUseCase(repository)
 

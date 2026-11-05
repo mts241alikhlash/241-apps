@@ -8,10 +8,10 @@ describe('UpdateStudentUseCase', () => {
   let useCase: UpdateStudentUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findByNis: jest.fn(),
-    findByNisn: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByNis: vi.fn(),
+    findByNisn: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -23,7 +23,7 @@ describe('UpdateStudentUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateStudentUseCase>(UpdateStudentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

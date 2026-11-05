@@ -60,12 +60,12 @@ describe('AssetController', () => {
   }
 
   function controllerWithSpies() {
-    const getAssetsUseCase = { execute: jest.fn() }
-    const getAssetByIdUseCase = { execute: jest.fn() }
-    const createAssetUseCase = { execute: jest.fn() }
-    const updateAssetUseCase = { execute: jest.fn() }
-    const deleteAssetUseCase = { execute: jest.fn() }
-    const addUnitsUseCase = { execute: jest.fn() }
+    const getAssetsUseCase = { execute: vi.fn() }
+    const getAssetByIdUseCase = { execute: vi.fn() }
+    const createAssetUseCase = { execute: vi.fn() }
+    const updateAssetUseCase = { execute: vi.fn() }
+    const deleteAssetUseCase = { execute: vi.fn() }
+    const addUnitsUseCase = { execute: vi.fn() }
     return {
       controller: new AssetController(
         getAssetsUseCase as never,

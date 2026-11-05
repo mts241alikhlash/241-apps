@@ -8,7 +8,7 @@ import { ProfilesController } from './profiles.controller.js'
 describe('ProfilesController', () => {
   let controller: ProfilesController
 
-  const mockGetProfilesByIdsUseCase = { execute: jest.fn() }
+  const mockGetProfilesByIdsUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,12 +18,12 @@ describe('ProfilesController', () => {
           provide: GetProfilesByIdsUseCase,
           useValue: mockGetProfilesByIdsUseCase,
         },
-        { provide: ConfigService, useValue: { get: jest.fn() } },
+        { provide: ConfigService, useValue: { get: vi.fn() } },
       ],
     }).compile()
 
     controller = module.get<ProfilesController>(ProfilesController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

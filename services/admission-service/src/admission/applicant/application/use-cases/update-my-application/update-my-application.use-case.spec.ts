@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { BadRequestException } from '@nestjs/common'
 import type { OptionRef } from '../../../../../platform/reference-lookup/option-lists.js'
 import type { IReferenceLookupPort } from '../../../../../platform/reference-lookup/reference-lookup.port.js'
@@ -59,9 +60,9 @@ const NO_ADDRESS = {
 describe('UpdateMyApplicationUseCase options and addresses', () => {
   let options: Map<string, OptionRef>
   let application: Record<string, unknown>
-  let updateMyApplication: jest.Mock
-  let countApplicationFiles: jest.Mock
-  let optionsByIds: jest.Mock
+  let updateMyApplication: Mock
+  let countApplicationFiles: Mock
+  let optionsByIds: Mock
   let useCase: UpdateMyApplicationUseCase
 
   beforeEach(() => {
@@ -76,19 +77,19 @@ describe('UpdateMyApplicationUseCase options and addresses', () => {
       ['income-1', { id: 'income-1', name: '< 500rb', isActive: true }],
     ])
     application = { id: 'app1', status: 'DRAFT', parents: [] }
-    updateMyApplication = jest.fn().mockResolvedValue({ id: 'app1' })
-    countApplicationFiles = jest
+    updateMyApplication = vi.fn().mockResolvedValue({ id: 'app1' })
+    countApplicationFiles = vi
       .fn()
       .mockImplementation((_id: string, fileIds: string[]) =>
         Promise.resolve(fileIds.length),
       )
     const repository = {
-      findMyDetail: jest.fn().mockImplementation(() => application),
-      findDetailById: jest.fn().mockImplementation(() => application),
+      findMyDetail: vi.fn().mockImplementation(() => application),
+      findDetailById: vi.fn().mockImplementation(() => application),
       updateMyApplication,
       countApplicationFiles,
     } as unknown as IAdmissionApplicantRepository
-    optionsByIds = jest
+    optionsByIds = vi
       .fn()
       .mockImplementation((_key: string, ids: string[]) =>
         Promise.resolve(
@@ -97,7 +98,7 @@ describe('UpdateMyApplicationUseCase options and addresses', () => {
       )
     const lookup = { optionsByIds } as unknown as IReferenceLookupPort
     const regions = {
-      byCodes: jest
+      byCodes: vi
         .fn()
         .mockImplementation((codes: string[]) =>
           Promise.resolve(REGIONS.filter((r) => codes.includes(r.code))),

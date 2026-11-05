@@ -8,11 +8,11 @@ import {
 
 describe('salary assignment writes', () => {
   const assignments = {
-    create: jest.fn(),
-    findById: jest.fn(),
-    softDelete: jest.fn(),
+    create: vi.fn(),
+    findById: vi.fn(),
+    softDelete: vi.fn(),
   }
-  const components = { findById: jest.fn() }
+  const components = { findById: vi.fn() }
   const create = new CreateSalaryAssignmentUseCase(
     assignments as unknown as ISalaryAssignmentRepository,
     components as unknown as ISalaryComponentRepository,
@@ -27,7 +27,7 @@ describe('salary assignment writes', () => {
   }
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     components.findById.mockResolvedValue({
       id: 'c-1',
       name: 'Gaji',

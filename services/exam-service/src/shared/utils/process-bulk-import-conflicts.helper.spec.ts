@@ -6,9 +6,9 @@ describe('processBulkImportConflicts', () => {
 
   beforeEach(() => {
     logger = {
-      warn: jest.fn(),
-      log: jest.fn(),
-      error: jest.fn(),
+      warn: vi.fn(),
+      log: vi.fn(),
+      error: vi.fn(),
     } as unknown as Logger
   })
 
@@ -17,7 +17,7 @@ describe('processBulkImportConflicts', () => {
       { action: 'update' as const, existingId: 'id-1' },
       { action: 'update' as const, existingId: 'id-2' },
     ]
-    const process = jest.fn().mockResolvedValue(undefined)
+    const process = vi.fn().mockResolvedValue(undefined)
 
     const result = await processBulkImportConflicts(
       items,
@@ -39,7 +39,7 @@ describe('processBulkImportConflicts', () => {
       { action: 'skip' as const, existingId: 'id-1' },
       { action: 'update' as const, existingId: 'id-2' },
     ]
-    const process = jest.fn().mockResolvedValue(undefined)
+    const process = vi.fn().mockResolvedValue(undefined)
 
     const result = await processBulkImportConflicts(
       items,
@@ -57,7 +57,7 @@ describe('processBulkImportConflicts', () => {
 
   it('records failed items and logs a warning', async () => {
     const items = [{ action: 'update' as const, existingId: 'id-1' }]
-    const process = jest.fn().mockRejectedValue(new Error('boom'))
+    const process = vi.fn().mockRejectedValue(new Error('boom'))
 
     const result = await processBulkImportConflicts(
       items,
@@ -79,7 +79,7 @@ describe('processBulkImportConflicts', () => {
 
   it('uses NEW_ROW when existingId is undefined on failure', async () => {
     const items = [{ action: 'update' as const }]
-    const process = jest.fn().mockRejectedValue(new Error('fail'))
+    const process = vi.fn().mockRejectedValue(new Error('fail'))
 
     const result = await processBulkImportConflicts(
       items,
@@ -94,7 +94,7 @@ describe('processBulkImportConflicts', () => {
 
   it('handles non-Error objects thrown', async () => {
     const items = [{ action: 'update' as const, existingId: 'id-1' }]
-    const process = jest.fn().mockRejectedValue('raw string error')
+    const process = vi.fn().mockRejectedValue('raw string error')
 
     const result = await processBulkImportConflicts(
       items,
@@ -112,7 +112,7 @@ describe('processBulkImportConflicts', () => {
       [],
       'thing',
       logger,
-      jest.fn(),
+      vi.fn(),
     )
 
     expect(result).toEqual({

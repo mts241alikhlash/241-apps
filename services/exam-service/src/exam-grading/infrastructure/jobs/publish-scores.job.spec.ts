@@ -4,7 +4,7 @@ import { PublishScoresJob } from './publish-scores.job.js'
 describe('PublishScoresJob', () => {
   it('does not start a second run while one is still going', async () => {
     let finish: () => void = () => undefined
-    const execute = jest.fn(
+    const execute = vi.fn(
       () => new Promise<number>((resolve) => (finish = () => resolve(0))),
     )
     const job = new PublishScoresJob({
@@ -24,8 +24,8 @@ describe('PublishScoresJob', () => {
   })
 
   it('runs again after a failure', async () => {
-    const execute = jest
-      .fn<Promise<number>, []>()
+    const execute = vi
+      .fn<() => Promise<number>>()
       .mockRejectedValueOnce(new Error('boom'))
       .mockResolvedValue(0)
     const job = new PublishScoresJob({

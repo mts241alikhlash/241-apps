@@ -6,8 +6,8 @@ import { GetClockAnchorUseCase, GetScansUseCase } from './get-scans.use-case.js'
 describe('GetScansUseCase', () => {
   let list: GetScansUseCase
   let anchor: GetClockAnchorUseCase
-  const scans = { findAll: jest.fn() }
-  const clock = { issueAnchor: jest.fn() }
+  const scans = { findAll: vi.fn() }
+  const clock = { issueAnchor: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,7 +21,7 @@ describe('GetScansUseCase', () => {
 
     list = module.get(GetScansUseCase)
     anchor = module.get(GetClockAnchorUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     scans.findAll.mockResolvedValue({
       data: [{ id: 'scan-1', outcome: 'REJECTED_UNKNOWN' }],
       total: 1,

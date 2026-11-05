@@ -12,11 +12,11 @@ describe('PrismaFundingSourceRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([prismaFundingSource])
-    const findUnique = jest.fn().mockResolvedValue(prismaFundingSource)
-    const create = jest.fn().mockResolvedValue(prismaFundingSource)
-    const update = jest.fn().mockResolvedValue(prismaFundingSource)
-    const deleteFundingSource = jest.fn().mockResolvedValue(prismaFundingSource)
+    const findMany = vi.fn().mockResolvedValue([prismaFundingSource])
+    const findUnique = vi.fn().mockResolvedValue(prismaFundingSource)
+    const create = vi.fn().mockResolvedValue(prismaFundingSource)
+    const update = vi.fn().mockResolvedValue(prismaFundingSource)
+    const deleteFundingSource = vi.fn().mockResolvedValue(prismaFundingSource)
     const prisma = {
       inventoryFundingSource: {
         findMany,

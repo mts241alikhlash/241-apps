@@ -59,10 +59,10 @@ describe('LoanController', () => {
   }
 
   function controllerWithSpies() {
-    const getLoansUseCase = { execute: jest.fn() }
-    const getLoanByIdUseCase = { execute: jest.fn() }
-    const createLoanUseCase = { execute: jest.fn() }
-    const returnLoanUseCase = { execute: jest.fn() }
+    const getLoansUseCase = { execute: vi.fn() }
+    const getLoanByIdUseCase = { execute: vi.fn() }
+    const createLoanUseCase = { execute: vi.fn() }
+    const returnLoanUseCase = { execute: vi.fn() }
     return {
       controller: new LoanController(
         getLoansUseCase as never,

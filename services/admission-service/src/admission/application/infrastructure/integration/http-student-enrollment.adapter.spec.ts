@@ -5,7 +5,7 @@ import type { EnrollStudentInput } from './student-enrollment.port.js'
 describe('HttpStudentEnrollmentAdapter', () => {
   it('forwards applicationId without changing the response contract', async () => {
     const config = {
-      get: jest.fn().mockReturnValue('http://student-service/'),
+      get: vi.fn().mockReturnValue('http://student-service/'),
     } as unknown as ConfigService
     const responseBody = {
       data: {
@@ -15,9 +15,9 @@ describe('HttpStudentEnrollmentAdapter', () => {
         alreadyEnrolled: false,
       },
     }
-    const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue(responseBody),
+      json: vi.fn().mockResolvedValue(responseBody),
     } as unknown as Response)
 
     const input: EnrollStudentInput = {

@@ -51,26 +51,26 @@ function completeApplication(overrides: Record<string, unknown> = {}) {
 
 function setup(application = completeApplication()) {
   const applicants = {
-    findMyDetail: jest.fn().mockResolvedValue(application),
-    findRequiredActiveDocumentTypes: jest
+    findMyDetail: vi.fn().mockResolvedValue(application),
+    findRequiredActiveDocumentTypes: vi
       .fn()
       .mockResolvedValue([{ id: 'kk', name: 'Kartu Keluarga' }]),
-    submitApplication: jest
+    submitApplication: vi
       .fn()
       .mockResolvedValue({ ...application, status: 'SUBMITTED' }),
-    findDetailById: jest.fn().mockResolvedValue({
+    findDetailById: vi.fn().mockResolvedValue({
       ...application,
       status: 'VERIFIED',
       verifiedAt: new Date('2026-10-08T00:00:00Z'),
     }),
   }
-  const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
+  const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
   const referenceLookup = {
-    optionsByIds: jest
+    optionsByIds: vi
       .fn()
       .mockResolvedValue([{ id: 'alive', name: 'Masih hidup' }]),
   }
-  const verification = { execute: jest.fn().mockResolvedValue(true) }
+  const verification = { execute: vi.fn().mockResolvedValue(true) }
   const useCase = new SubmitApplicationUseCase(
     applicants as never,
     notifications as never,

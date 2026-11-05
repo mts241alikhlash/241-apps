@@ -8,6 +8,7 @@
     "**/*spec.ts",
     "**/*.fake.ts",
     "prisma",
-    "packages"
+    "packages",
+    "vitest.config.ts"
   ]
 }

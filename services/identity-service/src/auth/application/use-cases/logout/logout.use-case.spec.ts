@@ -6,8 +6,8 @@ describe('LogoutUseCase', () => {
   let useCase: LogoutUseCase
 
   const mockAuthRepository = {
-    findSessionWithUser: jest.fn(),
-    revokeSessionFamily: jest.fn(),
+    findSessionWithUser: vi.fn(),
+    revokeSessionFamily: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('LogoutUseCase', () => {
     }).compile()
 
     useCase = module.get<LogoutUseCase>(LogoutUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

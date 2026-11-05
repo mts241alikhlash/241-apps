@@ -21,22 +21,22 @@ const type: AdmissionDocumentTypeEntity = {
   documentCount: 0,
 }
 
-const verifier = { execute: jest.fn().mockResolvedValue(true) }
+const verifier = { execute: vi.fn().mockResolvedValue(true) }
 
 beforeEach(() => verifier.execute.mockClear())
 
 function repository(found: AdmissionDocumentTypeEntity | null = type) {
   return {
-    findAll: jest.fn().mockResolvedValue([type]),
-    findById: jest.fn().mockResolvedValue(found),
-    nameTaken: jest.fn().mockResolvedValue(false),
-    findAllCodes: jest.fn().mockResolvedValue(['FAMILY_CARD', 'PHOTO']),
-    maxSortOrder: jest.fn().mockResolvedValue(7),
-    create: jest.fn().mockResolvedValue(type),
-    update: jest.fn().mockResolvedValue(type),
-    reorder: jest.fn().mockResolvedValue(undefined),
-    delete: jest.fn().mockResolvedValue(undefined),
-    findSubmittedApplicationIds: jest.fn().mockResolvedValue(['a1', 'a2']),
+    findAll: vi.fn().mockResolvedValue([type]),
+    findById: vi.fn().mockResolvedValue(found),
+    nameTaken: vi.fn().mockResolvedValue(false),
+    findAllCodes: vi.fn().mockResolvedValue(['FAMILY_CARD', 'PHOTO']),
+    maxSortOrder: vi.fn().mockResolvedValue(7),
+    create: vi.fn().mockResolvedValue(type),
+    update: vi.fn().mockResolvedValue(type),
+    reorder: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn().mockResolvedValue(undefined),
+    findSubmittedApplicationIds: vi.fn().mockResolvedValue(['a1', 'a2']),
   }
 }
 

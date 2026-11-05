@@ -60,10 +60,10 @@ describe('WorkflowController', () => {
   }
 
   function controllerWithSpies() {
-    const getWorkflowsUseCase = { execute: jest.fn() }
-    const getWorkflowByIdUseCase = { execute: jest.fn() }
-    const createWorkflowUseCase = { execute: jest.fn() }
-    const getRoleUsageUseCase = { execute: jest.fn() }
+    const getWorkflowsUseCase = { execute: vi.fn() }
+    const getWorkflowByIdUseCase = { execute: vi.fn() }
+    const createWorkflowUseCase = { execute: vi.fn() }
+    const getRoleUsageUseCase = { execute: vi.fn() }
     return {
       controller: new WorkflowController(
         getWorkflowsUseCase as never,

@@ -2,8 +2,8 @@ import { GetActiveWavesUseCase } from './get-active-waves.use-case.js'
 
 describe('GetActiveWavesUseCase', () => {
   const applicantRepo = {
-    findActiveWaves: jest.fn(),
-    findActiveDocumentTypes: jest.fn(),
+    findActiveWaves: vi.fn(),
+    findActiveDocumentTypes: vi.fn(),
   }
   const getActiveWaves = new GetActiveWavesUseCase(applicantRepo as never)
 

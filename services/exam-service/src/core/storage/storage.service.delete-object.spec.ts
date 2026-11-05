@@ -1,7 +1,8 @@
+import type { Mock } from 'vitest'
 import { InternalServerErrorException } from '@nestjs/common'
 import { StorageService } from './storage.service.js'
 
-function storageWith(send: jest.Mock) {
+function storageWith(send: Mock) {
   const settings: Record<string, unknown> = {
     S3_BUCKET: 'bucket',
     S3_SIGNED_URL_EXPIRY_SECONDS: 60,
@@ -11,15 +12,15 @@ function storageWith(send: jest.Mock) {
     S3_SECRET_ACCESS_KEY: 'secret',
   }
   const storage = new StorageService({
-    get: jest.fn((name: string) => settings[name]),
+    get: vi.fn((name: string) => settings[name]),
   } as never)
-  ;(storage as unknown as { client: { send: jest.Mock } }).client = { send }
+  ;(storage as unknown as { client: { send: Mock } }).client = { send }
   return storage
 }
 
 describe('StorageService.deleteObject', () => {
   it('deletes the key from the bucket', async () => {
-    const send = jest.fn().mockResolvedValue({})
+    const send = vi.fn().mockResolvedValue({})
 
     await storageWith(send).deleteObject('exam-proctor/s1/latest.jpg')
 
@@ -30,7 +31,7 @@ describe('StorageService.deleteObject', () => {
   })
 
   it('answers 500 when the store refuses the delete', async () => {
-    const send = jest.fn().mockRejectedValue(new Error('connection reset'))
+    const send = vi.fn().mockRejectedValue(new Error('connection reset'))
 
     await expect(storageWith(send).deleteObject('k')).rejects.toBeInstanceOf(
       InternalServerErrorException,

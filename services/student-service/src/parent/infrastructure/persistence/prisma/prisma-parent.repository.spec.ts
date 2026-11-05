@@ -11,13 +11,13 @@ describe('PrismaParentRepository.findAll', () => {
     }
     const prisma = {
       parent: {
-        findMany: jest.fn().mockResolvedValue([row]),
-        count: jest.fn().mockResolvedValue(1),
+        findMany: vi.fn().mockResolvedValue([row]),
+        count: vi.fn().mockResolvedValue(1),
       },
     }
     const academicLookup = {
-      listOccupationsByIds: jest.fn().mockResolvedValue([]),
-      listEducationsByIds: jest.fn().mockResolvedValue([]),
+      listOccupationsByIds: vi.fn().mockResolvedValue([]),
+      listEducationsByIds: vi.fn().mockResolvedValue([]),
     }
     const repository = new PrismaParentRepository(
       prisma as never,

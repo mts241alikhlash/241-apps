@@ -5,13 +5,13 @@ import { UserGender } from '@mts241alikhlash/nest-core/domain'
 import { PrismaEmployeeRepository } from './prisma-employee.repository.js'
 
 describe('PrismaEmployeeRepository.create', () => {
-  const write = jest.fn()
+  const write = vi.fn()
   const tx = { employee: { create: write } }
   const prisma = {
-    $transaction: jest.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
+    $transaction: vi.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
   }
-  const provisioning = { provision: jest.fn(), deprovision: jest.fn() }
-  const profiles = { findByUserIds: jest.fn() }
+  const provisioning = { provision: vi.fn(), deprovision: vi.fn() }
+  const profiles = { findByUserIds: vi.fn() }
   const repository = new PrismaEmployeeRepository(
     prisma as unknown as PrismaService,
     provisioning as unknown as IAccountProvisioningPort,
@@ -28,7 +28,7 @@ describe('PrismaEmployeeRepository.create', () => {
   }
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     prisma.$transaction.mockImplementation(
       (fn: (client: typeof tx) => unknown) => fn(tx),
     )

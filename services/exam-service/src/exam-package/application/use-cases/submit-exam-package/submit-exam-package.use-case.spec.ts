@@ -57,7 +57,7 @@ describe('SubmitExamPackageUseCase', () => {
 
   it('loses a race against another change with a conflict', async () => {
     const world = await reviewWorld()
-    jest.spyOn(world.packages, 'transition').mockResolvedValue(false)
+    vi.spyOn(world.packages, 'transition').mockResolvedValue(false)
     const useCase = new SubmitExamPackageUseCase(world.packages, world.scope)
 
     await expect(useCase.execute(AUTHOR, world.pkg.id)).rejects.toThrow(

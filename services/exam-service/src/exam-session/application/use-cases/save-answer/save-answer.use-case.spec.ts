@@ -137,7 +137,7 @@ describe('SaveAnswerUseCase', () => {
   })
 
   it('refuses when the session closed between the check and the write', async () => {
-    jest.spyOn(sessions, 'upsertAnswer').mockResolvedValueOnce(null)
+    vi.spyOn(sessions, 'upsertAnswer').mockResolvedValueOnce(null)
 
     await expect(save()).rejects.toThrow('Waktu pengiriman jawaban sudah habis')
   })

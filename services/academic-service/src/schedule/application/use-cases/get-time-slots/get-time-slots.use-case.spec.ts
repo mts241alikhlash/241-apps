@@ -6,7 +6,7 @@ describe('GetTimeSlotsUseCase', () => {
   let useCase: GetTimeSlotsUseCase
 
   const mockRepo = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('GetTimeSlotsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetTimeSlotsUseCase>(GetTimeSlotsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

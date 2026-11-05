@@ -10,12 +10,12 @@ import { ClassroomController } from './classroom.controller.js'
 describe('ClassroomController', () => {
   let controller: ClassroomController
 
-  const mockGetClassesUC = { execute: jest.fn() }
-  const mockGetClassroomByIdUC = { execute: jest.fn() }
-  const mockCopyClassroomsUC = { execute: jest.fn() }
-  const mockCreateClassroomUC = { execute: jest.fn() }
-  const mockUpdateClassroomUC = { execute: jest.fn() }
-  const mockDeleteClassroomUC = { execute: jest.fn() }
+  const mockGetClassesUC = { execute: vi.fn() }
+  const mockGetClassroomByIdUC = { execute: vi.fn() }
+  const mockCopyClassroomsUC = { execute: vi.fn() }
+  const mockCreateClassroomUC = { execute: vi.fn() }
+  const mockUpdateClassroomUC = { execute: vi.fn() }
+  const mockDeleteClassroomUC = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +34,7 @@ describe('ClassroomController', () => {
     }).compile()
 
     controller = module.get<ClassroomController>(ClassroomController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

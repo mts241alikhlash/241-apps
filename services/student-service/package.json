@@ -28,11 +28,9 @@
     "typecheck": "tsc --noEmit",
     "check": "pnpm run lint",
     "validate": "pnpm run lint && pnpm run typecheck && pnpm run lint:strict && pnpm test && pnpm run build",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:ci": "jest --runInBand --coverage --passWithNoTests",
-    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "vitest run --config vitest.e2e.config.mts",
     "openapi:emit": "nest build && node dist/src/openapi/emit-openapi.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -79,54 +77,28 @@
     "@mts241alikhlash/academic-api": "workspace:*",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
+    "@mts241alikhlash/vitest-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
-    "@types/jest": "^30.0.0",
     "@types/multer": "^2.1.0",
     "@types/node": "^24.10.0",
     "@types/passport-jwt": "^4.0.1",
     "@types/sanitize-html": "^2.16.1",
     "@types/supertest": "^7.2.1",
-    "cross-env": "^10.1.0",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
-    "jest": "^30.4.2",
     "prettier": "^3.9.10",
     "source-map-support": "^0.5.21",
     "supertest": "^7.2.2",
-    "ts-jest": "^29.4.12",
     "ts-loader": "^9.6.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.72.1"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "transformIgnorePatterns": [
-      "/\\.pnpm/"
-    ],
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s",
-      "!generated/**"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
   }
 }

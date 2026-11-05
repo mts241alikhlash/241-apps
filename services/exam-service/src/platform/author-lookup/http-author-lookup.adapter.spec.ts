@@ -7,7 +7,7 @@ function build(options: {
   profiles?: unknown
   failHr?: boolean
 }) {
-  const postData = jest.fn((key: string, _path: string, _body: unknown) => {
+  const postData = vi.fn((key: string, _path: string, _body: unknown) => {
     if (key === 'HR_SERVICE_URL') {
       return options.failHr
         ? Promise.reject(new ServiceUnavailableException('hr down'))
@@ -15,7 +15,7 @@ function build(options: {
     }
     return Promise.resolve(options.profiles)
   })
-  const malformed = jest.fn((): never => {
+  const malformed = vi.fn((): never => {
     throw new ServiceUnavailableException('malformed')
   })
   const client = { postData, malformed } as unknown as ServiceClient

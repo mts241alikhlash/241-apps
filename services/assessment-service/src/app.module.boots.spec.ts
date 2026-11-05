@@ -10,8 +10,8 @@ process.env.PRESENCE_SERVICE_URL ??= 'http://localhost:3400'
 import { Test } from '@nestjs/testing'
 import { AppModule } from './app.module.js'
 
-jest.mock('./report-card/application/services/pdf.service.js', () => ({
-  PdfService: jest.fn(),
+vi.mock('./report-card/application/services/pdf.service.js', () => ({
+  PdfService: vi.fn(),
 }))
 
 describe('AppModule', () => {

@@ -10,10 +10,10 @@ export default nest({ tsconfigRootDir: import.meta.dirname })
 
 `eslint.typecheck.config.mjs` passes `typecheck: true` and is what `lint:strict` runs.
 
-| Preset | Used by |
-| --- | --- |
-| `vue` | web apps, `packages/platform`, `packages/reference-data` |
-| `nest` | services, `packages/nest-core` |
+| Preset | Used by                                                  |
+| ------ | -------------------------------------------------------- |
+| `vue`  | web apps, `packages/platform`, `packages/reference-data` |
+| `nest` | services, `packages/nest-core`                           |
 
 Options: `tsconfigRootDir` (required), `typecheck`, `ignores`, `overrides` (extra flat config objects, placed before
 `eslint-config-prettier`).

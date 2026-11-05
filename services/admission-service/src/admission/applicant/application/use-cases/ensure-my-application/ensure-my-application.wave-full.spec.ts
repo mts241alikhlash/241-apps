@@ -2,18 +2,18 @@ import { EnsureMyApplicationUseCase } from './ensure-my-application.use-case.js'
 
 describe('EnsureMyApplicationUseCase waveIsFull', () => {
   const repo = {
-    findMyDetail: jest.fn(),
-    findActiveDocumentTypes: jest.fn().mockResolvedValue([]),
-    findActiveWave: jest.fn(),
-    ensureApplication: jest.fn(),
-    isWaveFull: jest.fn(),
+    findMyDetail: vi.fn(),
+    findActiveDocumentTypes: vi.fn().mockResolvedValue([]),
+    findActiveWave: vi.fn(),
+    ensureApplication: vi.fn(),
+    isWaveFull: vi.fn(),
   }
   const ensure = new EnsureMyApplicationUseCase(
     repo as never,
-    { firstSemesterOf: jest.fn().mockResolvedValue(null) } as never,
+    { firstSemesterOf: vi.fn().mockResolvedValue(null) } as never,
   )
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('flags an existing unverified application whose wave is full', async () => {
     repo.findMyDetail.mockResolvedValue({

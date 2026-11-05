@@ -15,14 +15,14 @@ import { GraduationController } from './graduation.controller.js'
 describe('GraduationController', () => {
   let controller: GraduationController
 
-  const mockGetAll = { execute: jest.fn() }
-  const mockGetById = { execute: jest.fn() }
-  const mockCreate = { execute: jest.fn() }
-  const mockUpdate = { execute: jest.fn() }
-  const mockDelete = { execute: jest.fn() }
-  const mockCandidates = { execute: jest.fn() }
-  const mockBulk = { execute: jest.fn() }
-  const mockHolds = { execute: jest.fn() }
+  const mockGetAll = { execute: vi.fn() }
+  const mockGetById = { execute: vi.fn() }
+  const mockCreate = { execute: vi.fn() }
+  const mockUpdate = { execute: vi.fn() }
+  const mockDelete = { execute: vi.fn() }
+  const mockCandidates = { execute: vi.fn() }
+  const mockBulk = { execute: vi.fn() }
+  const mockHolds = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +40,7 @@ describe('GraduationController', () => {
     }).compile()
 
     controller = module.get<GraduationController>(GraduationController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -66,15 +66,15 @@ function postRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetHomepageUseCase', () => {
   let useCase: GetHomepageUseCase
 
-  const mockSections = { findAllEnabled: jest.fn() }
-  const mockPosts = { findLatestPublic: jest.fn() }
-  const mockAgenda = { findUpcoming: jest.fn() }
-  const mockGallery = { findLatestPublicAlbums: jest.fn() }
+  const mockSections = { findAllEnabled: vi.fn() }
+  const mockPosts = { findLatestPublic: vi.fn() }
+  const mockAgenda = { findUpcoming: vi.fn() }
+  const mockGallery = { findLatestPublicAlbums: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -89,7 +89,7 @@ describe('GetHomepageUseCase', () => {
     }).compile()
 
     useCase = module.get(GetHomepageUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockPosts.findLatestPublic.mockResolvedValue([postRow()])
     mockAgenda.findUpcoming.mockResolvedValue([])
     mockGallery.findLatestPublicAlbums.mockResolvedValue([])
@@ -253,7 +253,7 @@ describe('GetHomepageUseCase', () => {
 
 describe('UpdateHomepageSectionUseCase', () => {
   let useCase: UpdateHomepageSectionUseCase
-  const mockSections = { findByKey: jest.fn(), update: jest.fn() }
+  const mockSections = { findByKey: vi.fn(), update: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -265,7 +265,7 @@ describe('UpdateHomepageSectionUseCase', () => {
     }).compile()
 
     useCase = module.get(UpdateHomepageSectionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockSections.findByKey.mockResolvedValue({
       id: 'sec-1',
       key: 'berita',

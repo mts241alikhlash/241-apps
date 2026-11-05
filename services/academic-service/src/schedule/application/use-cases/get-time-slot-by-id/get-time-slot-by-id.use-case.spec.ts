@@ -7,7 +7,7 @@ describe('GetTimeSlotByIdUseCase', () => {
   let useCase: GetTimeSlotByIdUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetTimeSlotByIdUseCase', () => {
     }).compile()
 
     useCase = module.get<GetTimeSlotByIdUseCase>(GetTimeSlotByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

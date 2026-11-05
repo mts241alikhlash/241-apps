@@ -42,11 +42,11 @@ function row(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetPublicPostsUseCase', () => {
   let useCase: GetPublicPostsUseCase
-  const mockRepository = { findPublic: jest.fn() }
+  const mockRepository = { findPublic: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +58,7 @@ describe('GetPublicPostsUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPublicPostsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findPublic.mockResolvedValue({
       data: [row()],
       total: 1,
@@ -145,8 +145,8 @@ describe('GetPublicPostsUseCase', () => {
 describe('GetPublicPostBySlugUseCase', () => {
   let useCase: GetPublicPostBySlugUseCase
   const mockRepository = {
-    findPublicBySlug: jest.fn(),
-    findByHistoricalSlug: jest.fn(),
+    findPublicBySlug: vi.fn(),
+    findByHistoricalSlug: vi.fn(),
   }
 
   async function detail(slug: string) {
@@ -166,7 +166,7 @@ describe('GetPublicPostBySlugUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPublicPostBySlugUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findByHistoricalSlug.mockResolvedValue(null)
   })
 

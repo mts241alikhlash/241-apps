@@ -3,7 +3,7 @@ import { IAuthRepository } from '../../../domain/repositories/auth.repository.js
 import { ListSsoAppsUseCase } from './list-sso-apps.use-case.js'
 
 describe('ListSsoAppsUseCase', () => {
-  const repository = { findGrants: jest.fn() }
+  const repository = { findGrants: vi.fn() }
   const useCase = new ListSsoAppsUseCase(
     repository as unknown as IAuthRepository,
     new ConfigService({

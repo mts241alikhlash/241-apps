@@ -44,23 +44,23 @@ function repoRow(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('CreatePostUseCase', () => {
   let useCase: CreatePostUseCase
 
   const mockSyncMediaUsage = {
-    execute: jest.fn().mockResolvedValue(undefined),
+    execute: vi.fn().mockResolvedValue(undefined),
   }
 
   const mockTagRepository = {
-    resolveOrCreate: jest.fn().mockResolvedValue([]),
-    setPostTags: jest.fn().mockResolvedValue(undefined),
+    resolveOrCreate: vi.fn().mockResolvedValue([]),
+    setPostTags: vi.fn().mockResolvedValue(undefined),
   }
 
   const mockRepository = {
-    create: jest.fn(),
-    findTakenSlugs: jest.fn(),
+    create: vi.fn(),
+    findTakenSlugs: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -76,7 +76,7 @@ describe('CreatePostUseCase', () => {
     }).compile()
 
     useCase = module.get(CreatePostUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findTakenSlugs.mockResolvedValue([])
     mockRepository.create.mockResolvedValue(repoRow())
   })

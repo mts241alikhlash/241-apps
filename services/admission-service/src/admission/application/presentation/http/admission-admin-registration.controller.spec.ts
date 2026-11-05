@@ -2,7 +2,7 @@ import { AdmissionAdminRegistrationController } from './admission-admin-registra
 
 describe('AdmissionAdminRegistrationController.register', () => {
   it('forwards the admission type and the target grade', async () => {
-    const execute = jest.fn().mockResolvedValue({
+    const execute = vi.fn().mockResolvedValue({
       id: 'a1',
       registrationNumber: 'G1-0001',
       identifier: 'a@b.c',

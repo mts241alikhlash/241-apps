@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -60,7 +61,7 @@ function context(overrides: Record<string, unknown> = {}) {
 
 describe('GetDocumentReviewQueueUseCase', () => {
   it('defaults to Menunggu, summarizes the required documents and pages the meta', async () => {
-    const findQueue = jest.fn().mockResolvedValue({
+    const findQueue = vi.fn().mockResolvedValue({
       records: [
         {
           applicationId: 'app1',
@@ -120,7 +121,7 @@ describe('GetDocumentReviewQueueUseCase revision note', () => {
   }
 
   it('shows the note the staff sent with the revision request', async () => {
-    const findQueue = jest.fn().mockResolvedValue({
+    const findQueue = vi.fn().mockResolvedValue({
       records: [{ ...record, revisionNote: 'Foto KK buram' }],
       total: 1,
       counts: { waiting: 0, revision: 1, done: 0 },
@@ -135,7 +136,7 @@ describe('GetDocumentReviewQueueUseCase revision note', () => {
   })
 
   it('answers null when the repository sends no note', async () => {
-    const findQueue = jest.fn().mockResolvedValue({
+    const findQueue = vi.fn().mockResolvedValue({
       records: [record],
       total: 1,
       counts: { waiting: 0, revision: 1, done: 0 },
@@ -152,7 +153,7 @@ describe('GetDocumentReviewQueueUseCase revision note', () => {
 
 describe('GetDocumentReviewUseCase', () => {
   it('returns the review page of a submitted application as editable', async () => {
-    const repository = { findContext: jest.fn().mockResolvedValue(context()) }
+    const repository = { findContext: vi.fn().mockResolvedValue(context()) }
 
     const result = await new GetDocumentReviewUseCase(
       repository as never,
@@ -165,7 +166,7 @@ describe('GetDocumentReviewUseCase', () => {
     'is read-only once the application is %s',
     async (status) => {
       const repository = {
-        findContext: jest.fn().mockResolvedValue(context({ status })),
+        findContext: vi.fn().mockResolvedValue(context({ status })),
       }
 
       const result = await new GetDocumentReviewUseCase(
@@ -180,7 +181,7 @@ describe('GetDocumentReviewUseCase', () => {
     ['unknown', null],
     ['a draft', context({ status: 'DRAFT' })],
   ])('answers 404 for %s', async (_name, found) => {
-    const repository = { findContext: jest.fn().mockResolvedValue(found) }
+    const repository = { findContext: vi.fn().mockResolvedValue(found) }
 
     await expect(
       new GetDocumentReviewUseCase(repository as never).execute('app1'),
@@ -196,7 +197,7 @@ describe('SaveDocumentDecisionUseCase', () => {
   }
 
   it('requires a reason to reject', async () => {
-    const repository = { saveDecision: jest.fn() }
+    const repository = { saveDecision: vi.fn() }
     const useCase = new SaveDocumentDecisionUseCase(repository as never)
 
     await expect(
@@ -209,7 +210,7 @@ describe('SaveDocumentDecisionUseCase', () => {
 
   it('refuses a late document with 409', async () => {
     const repository = {
-      saveDecision: jest.fn().mockResolvedValue({ outcome: 'LATER_TYPE' }),
+      saveDecision: vi.fn().mockResolvedValue({ outcome: 'LATER_TYPE' }),
     }
     const useCase = new SaveDocumentDecisionUseCase(repository as never)
 
@@ -225,7 +226,7 @@ describe('SaveDocumentDecisionUseCase', () => {
   it('saves a rejection with its trimmed reason', async () => {
     const saved = document('kk', 'REJECTED', 'Buram')
     const repository = {
-      saveDecision: jest
+      saveDecision: vi
         .fn()
         .mockResolvedValue({ outcome: 'SAVED', document: saved }),
     }
@@ -244,7 +245,7 @@ describe('SaveDocumentDecisionUseCase', () => {
 
   it('clears the old reason when a document is approved after a rejection', async () => {
     const repository = {
-      saveDecision: jest.fn().mockResolvedValue({
+      saveDecision: vi.fn().mockResolvedValue({
         outcome: 'SAVED',
         document: document('kk', 'APPROVED'),
       }),
@@ -265,10 +266,10 @@ describe('SaveDocumentDecisionUseCase', () => {
 
   it('answers 404 for an unknown document and 409 once the application left review', async () => {
     const notFound = new SaveDocumentDecisionUseCase({
-      saveDecision: jest.fn().mockResolvedValue({ outcome: 'NOT_FOUND' }),
+      saveDecision: vi.fn().mockResolvedValue({ outcome: 'NOT_FOUND' }),
     } as never)
     const closed = new SaveDocumentDecisionUseCase({
-      saveDecision: jest.fn().mockResolvedValue({ outcome: 'NOT_SUBMITTED' }),
+      saveDecision: vi.fn().mockResolvedValue({ outcome: 'NOT_SUBMITTED' }),
     } as never)
 
     await expect(
@@ -285,15 +286,15 @@ describe('SaveDocumentDecisionUseCase', () => {
 })
 
 describe('SendDocumentReviewUseCase', () => {
-  function setup(found: unknown, overrides: Record<string, jest.Mock> = {}) {
+  function setup(found: unknown, overrides: Record<string, Mock> = {}) {
     const repository = {
-      findContext: jest.fn().mockResolvedValue(found),
-      markRevisionNeeded: jest.fn().mockResolvedValue(true),
-      recordApproval: jest.fn().mockResolvedValue(true),
+      findContext: vi.fn().mockResolvedValue(found),
+      markRevisionNeeded: vi.fn().mockResolvedValue(true),
+      recordApproval: vi.fn().mockResolvedValue(true),
       ...overrides,
     }
-    const notifications = { notify: jest.fn().mockResolvedValue(undefined) }
-    const verifyWhenReady = { execute: jest.fn().mockResolvedValue(true) }
+    const notifications = { notify: vi.fn().mockResolvedValue(undefined) }
+    const verifyWhenReady = { execute: vi.fn().mockResolvedValue(true) }
     const useCase = new SendDocumentReviewUseCase(
       repository as never,
       notifications as never,
@@ -323,7 +324,7 @@ describe('SendDocumentReviewUseCase', () => {
 
   it('answers 409 and verifies nothing when the approval was already sent or the documents changed', async () => {
     const { useCase, verifyWhenReady } = setup(context(), {
-      recordApproval: jest.fn().mockResolvedValue(false),
+      recordApproval: vi.fn().mockResolvedValue(false),
     })
 
     await expect(useCase.execute(send)).rejects.toBeInstanceOf(
@@ -467,7 +468,7 @@ describe('SendDocumentReviewUseCase', () => {
       ],
     })
     const { useCase, notifications } = setup(found, {
-      markRevisionNeeded: jest.fn().mockResolvedValue(false),
+      markRevisionNeeded: vi.fn().mockResolvedValue(false),
     })
 
     await expect(useCase.execute(send)).rejects.toBeInstanceOf(

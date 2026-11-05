@@ -7,7 +7,7 @@ describe('GetStudentGraduationByIdUseCase', () => {
   let useCase: GetStudentGraduationByIdUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('GetStudentGraduationByIdUseCase', () => {
     useCase = module.get<GetStudentGraduationByIdUseCase>(
       GetStudentGraduationByIdUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should return graduation when found', async () => {

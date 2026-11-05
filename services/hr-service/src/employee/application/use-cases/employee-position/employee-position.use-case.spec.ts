@@ -16,17 +16,17 @@ describe('EmployeePositionUseCase', () => {
   let useCase: EmployeePositionUseCase
 
   const mockEmployeeRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   const mockPositionRepository = {
-    findByEmployeeId: jest.fn(),
-    findPositionById: jest.fn(),
-    findByEmployeeAndPosition: jest.fn(),
-    create: jest.fn(),
-    findById: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
+    findByEmployeeId: vi.fn(),
+    findPositionById: vi.fn(),
+    findByEmployeeAndPosition: vi.fn(),
+    create: vi.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -42,7 +42,7 @@ describe('EmployeePositionUseCase', () => {
     }).compile()
 
     useCase = module.get<EmployeePositionUseCase>(EmployeePositionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const employeeId = 'emp-1'

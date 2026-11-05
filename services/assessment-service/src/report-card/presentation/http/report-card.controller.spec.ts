@@ -16,24 +16,24 @@ import { ExportReportCardPdfUseCase } from '../../application/use-cases/export-r
 import { ReportCardController } from './report-card.controller.js'
 import { Response } from 'express'
 
-jest.mock('../../application/services/pdf.service.js', () => ({
+vi.mock('../../application/services/pdf.service.js', () => ({
   PdfService: class {},
 }))
 
 describe('ReportCardController', () => {
   let controller: ReportCardController
 
-  const mockGetReportCards = { execute: jest.fn() }
-  const mockGetMyReportCards = { execute: jest.fn() }
-  const mockGetReportCardById = { execute: jest.fn() }
-  const mockGetReportCardDetail = { execute: jest.fn() }
-  const mockGetMyReportCardDetail = { execute: jest.fn() }
-  const mockGenerateReportCard = { execute: jest.fn() }
-  const mockBulkGenerateReportCards = { execute: jest.fn() }
-  const mockUpdateReportCard = { execute: jest.fn() }
-  const mockPublishReportCard = { execute: jest.fn() }
-  const mockDeleteReportCard = { execute: jest.fn() }
-  const mockExportReportCardPdf = { execute: jest.fn() }
+  const mockGetReportCards = { execute: vi.fn() }
+  const mockGetMyReportCards = { execute: vi.fn() }
+  const mockGetReportCardById = { execute: vi.fn() }
+  const mockGetReportCardDetail = { execute: vi.fn() }
+  const mockGetMyReportCardDetail = { execute: vi.fn() }
+  const mockGenerateReportCard = { execute: vi.fn() }
+  const mockBulkGenerateReportCards = { execute: vi.fn() }
+  const mockUpdateReportCard = { execute: vi.fn() }
+  const mockPublishReportCard = { execute: vi.fn() }
+  const mockDeleteReportCard = { execute: vi.fn() }
+  const mockExportReportCardPdf = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -69,7 +69,7 @@ describe('ReportCardController', () => {
     }).compile()
 
     controller = module.get<ReportCardController>(ReportCardController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
@@ -135,8 +135,8 @@ describe('ReportCardController', () => {
       mockExportReportCardPdf.execute.mockResolvedValue(mockBuffer)
 
       const mockRes = {
-        set: jest.fn(),
-        end: jest.fn(),
+        set: vi.fn(),
+        end: vi.fn(),
       } as unknown as Response
 
       await controller.exportPdf('rap-1', mockRes)

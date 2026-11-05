@@ -84,17 +84,17 @@ describe('EmployeeController & EmployeeImportExportController', () => {
   let controller: EmployeeController
   let importExportController: EmployeeImportExportController
 
-  const mockGetEmployeesUseCase = { execute: jest.fn() }
-  const mockGetEmployeeByIdUseCase = { execute: jest.fn() }
-  const mockGetMyEmployeeUseCase = { execute: jest.fn() }
-  const mockCreateEmployeeUseCase = { execute: jest.fn() }
-  const mockUpdateEmployeeUseCase = { execute: jest.fn() }
-  const mockDeleteEmployeeUseCase = { execute: jest.fn() }
-  const mockToggleEmployeeActiveUseCase = { execute: jest.fn() }
-  const mockUpdateProfileUseCase = { execute: jest.fn() }
-  const mockBulkImportEmployeesUseCase = { execute: jest.fn() }
-  const mockResolveBulkImportConflictsUseCase = { execute: jest.fn() }
-  const mockExportEmployeesUseCase = { execute: jest.fn() }
+  const mockGetEmployeesUseCase = { execute: vi.fn() }
+  const mockGetEmployeeByIdUseCase = { execute: vi.fn() }
+  const mockGetMyEmployeeUseCase = { execute: vi.fn() }
+  const mockCreateEmployeeUseCase = { execute: vi.fn() }
+  const mockUpdateEmployeeUseCase = { execute: vi.fn() }
+  const mockDeleteEmployeeUseCase = { execute: vi.fn() }
+  const mockToggleEmployeeActiveUseCase = { execute: vi.fn() }
+  const mockUpdateProfileUseCase = { execute: vi.fn() }
+  const mockBulkImportEmployeesUseCase = { execute: vi.fn() }
+  const mockResolveBulkImportConflictsUseCase = { execute: vi.fn() }
+  const mockExportEmployeesUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -136,7 +136,7 @@ describe('EmployeeController & EmployeeImportExportController', () => {
     importExportController = module.get<EmployeeImportExportController>(
       EmployeeImportExportController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('findAll', () => {

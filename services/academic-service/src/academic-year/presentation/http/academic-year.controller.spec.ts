@@ -14,13 +14,13 @@ import { AcademicYearController } from './academic-year.controller.js'
 describe('AcademicYearController', () => {
   let controller: AcademicYearController
 
-  const mockGetAcademicYearsService = { execute: jest.fn() }
-  const mockGetAcademicYearByIdService = { execute: jest.fn() }
-  const mockCreateAcademicYearService = { execute: jest.fn() }
-  const mockUpdateAcademicYearService = { execute: jest.fn() }
-  const mockDeleteAcademicYearService = { execute: jest.fn() }
-  const mockActivateAcademicYearService = { execute: jest.fn() }
-  const mockDeactivateAcademicYearService = { execute: jest.fn() }
+  const mockGetAcademicYearsService = { execute: vi.fn() }
+  const mockGetAcademicYearByIdService = { execute: vi.fn() }
+  const mockCreateAcademicYearService = { execute: vi.fn() }
+  const mockUpdateAcademicYearService = { execute: vi.fn() }
+  const mockDeleteAcademicYearService = { execute: vi.fn() }
+  const mockActivateAcademicYearService = { execute: vi.fn() }
+  const mockDeactivateAcademicYearService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +58,7 @@ describe('AcademicYearController', () => {
     }).compile()
 
     controller = module.get<AcademicYearController>(AcademicYearController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

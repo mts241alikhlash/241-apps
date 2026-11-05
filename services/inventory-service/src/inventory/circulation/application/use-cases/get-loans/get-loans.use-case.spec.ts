@@ -7,7 +7,7 @@ describe('GetLoansUseCase', () => {
       data: [{ id: 'loan-1' }],
       meta: { page: 2, limit: 20, total: 1, totalPages: 1 },
     }
-    const findAllLoans = jest.fn().mockResolvedValue(result)
+    const findAllLoans = vi.fn().mockResolvedValue(result)
     const repository = { findAllLoans } as unknown as ILoanRepository
     const useCase = new GetLoansUseCase(repository)
     const query = {
@@ -23,7 +23,7 @@ describe('GetLoansUseCase', () => {
   })
 
   it('forwards an empty query with explicit undefined fields', async () => {
-    const findAllLoans = jest.fn().mockResolvedValue({ data: [] })
+    const findAllLoans = vi.fn().mockResolvedValue({ data: [] })
     const repository = { findAllLoans } as unknown as ILoanRepository
     const useCase = new GetLoansUseCase(repository)
 

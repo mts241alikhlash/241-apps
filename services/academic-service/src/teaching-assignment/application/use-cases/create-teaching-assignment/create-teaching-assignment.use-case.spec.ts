@@ -7,12 +7,12 @@ import { SKIP_ALREADY_ASSIGNED } from '../../../domain/entities/bulk-assignment.
 describe('CreateTeachingAssignmentUseCase', () => {
   let useCase: CreateTeachingAssignmentUseCase
   const mockRepo = {
-    findClassroomById: jest.fn(),
-    findSemesterById: jest.fn(),
-    findDuplicate: jest.fn(),
-    findSoftDeleted: jest.fn(),
-    restore: jest.fn(),
-    create: jest.fn(),
+    findClassroomById: vi.fn(),
+    findSemesterById: vi.fn(),
+    findDuplicate: vi.fn(),
+    findSoftDeleted: vi.fn(),
+    restore: vi.fn(),
+    create: vi.fn(),
   }
 
   const dto = {
@@ -40,7 +40,7 @@ describe('CreateTeachingAssignmentUseCase', () => {
     useCase = module.get<CreateTeachingAssignmentUseCase>(
       CreateTeachingAssignmentUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepo.findClassroomById.mockImplementation((id: string) =>
       Promise.resolve({ id, academicYearId: 'ay-1' }),
     )

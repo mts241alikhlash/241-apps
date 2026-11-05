@@ -26,7 +26,7 @@ function card(overrides: Record<string, unknown> = {}) {
 describe('GetCredentialsUseCase', () => {
   let list: GetCredentialsUseCase
   let byId: GetCredentialByIdUseCase
-  const repository = { findAll: jest.fn(), findById: jest.fn() }
+  const repository = { findAll: vi.fn(), findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +39,7 @@ describe('GetCredentialsUseCase', () => {
 
     list = module.get(GetCredentialsUseCase)
     byId = module.get(GetCredentialByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAll.mockResolvedValue({
       data: [card()],
       total: 25,

@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { ConflictException } from '@nestjs/common'
 import { Prisma } from '../../generated/prisma/client.js'
 import { SimpleListRepository } from './simple-list.repository.js'
@@ -5,13 +6,13 @@ import type { SimpleListDelegate } from './simple-list.types.js'
 
 function delegate(overrides: Partial<SimpleListDelegate> = {}) {
   return {
-    findMany: jest.fn().mockResolvedValue([]),
-    count: jest.fn().mockResolvedValue(0),
-    findFirst: jest.fn().mockResolvedValue(null),
-    create: jest.fn(),
-    update: jest.fn(),
+    findMany: vi.fn().mockResolvedValue([]),
+    count: vi.fn().mockResolvedValue(0),
+    findFirst: vi.fn().mockResolvedValue(null),
+    create: vi.fn(),
+    update: vi.fn(),
     ...overrides,
-  } as jest.Mocked<SimpleListDelegate>
+  } as Mocked<SimpleListDelegate>
 }
 
 const uniqueViolation = new Prisma.PrismaClientKnownRequestError(
@@ -44,7 +45,7 @@ describe('SimpleListRepository', () => {
   })
 
   it('turns a unique violation on create into 409', async () => {
-    const d = delegate({ create: jest.fn().mockRejectedValue(uniqueViolation) })
+    const d = delegate({ create: vi.fn().mockRejectedValue(uniqueViolation) })
     const repository = new SimpleListRepository(d, 'Transportation')
 
     await expect(repository.create({ name: 'Ojek' })).rejects.toThrow(
@@ -53,7 +54,7 @@ describe('SimpleListRepository', () => {
   })
 
   it('turns a unique violation on update into 409', async () => {
-    const d = delegate({ update: jest.fn().mockRejectedValue(uniqueViolation) })
+    const d = delegate({ update: vi.fn().mockRejectedValue(uniqueViolation) })
     const repository = new SimpleListRepository(d, 'Transportation')
 
     await expect(repository.update('id-1', { name: 'Ojek' })).rejects.toThrow(

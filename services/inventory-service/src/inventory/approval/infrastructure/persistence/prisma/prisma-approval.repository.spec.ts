@@ -84,7 +84,7 @@ describe('PrismaApprovalRepository', () => {
   }
 
   it('maps workflow and step fields explicitly', async () => {
-    const findMany = jest.fn().mockResolvedValue([workflowRow])
+    const findMany = vi.fn().mockResolvedValue([workflowRow])
     const prisma = {
       approvalWorkflow: { findMany },
     } as unknown as PrismaService
@@ -117,7 +117,7 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('maps instance and log relations explicitly', async () => {
-    const findUnique = jest.fn().mockResolvedValue(instanceRow)
+    const findUnique = vi.fn().mockResolvedValue(instanceRow)
     const prisma = {
       approvalInstance: { findUnique },
     } as unknown as PrismaService
@@ -174,11 +174,11 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('maps workflow creation and instance/log writes explicitly', async () => {
-    const createdWorkflow = jest.fn().mockResolvedValue(workflowRow)
-    const updateMany = jest.fn().mockResolvedValue({ count: 1 })
-    const createLog = jest.fn().mockResolvedValue(instanceRow.logs[0])
-    const updateInstance = jest.fn().mockResolvedValue(instanceRow)
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const createdWorkflow = vi.fn().mockResolvedValue(workflowRow)
+    const updateMany = vi.fn().mockResolvedValue({ count: 1 })
+    const createLog = vi.fn().mockResolvedValue(instanceRow.logs[0])
+    const updateInstance = vi.fn().mockResolvedValue(instanceRow)
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({
         approvalWorkflow: { updateMany, create: createdWorkflow },
       }),
@@ -241,7 +241,7 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('maps pending instances and filters by the active step role', async () => {
-    const stepPairs = jest
+    const stepPairs = vi
       .fn()
       .mockResolvedValue([{ workflowId: 'workflow-1', stepSequence: 1 }])
     const candidates = [
@@ -249,7 +249,7 @@ describe('PrismaApprovalRepository', () => {
       { ...instanceRow, id: 'instance-2', currentStepSequence: 2 },
       { ...instanceRow, id: 'instance-3', statusId: 'status-approved' },
     ]
-    const findMany = jest
+    const findMany = vi
       .fn()
       .mockImplementation(({ where }) =>
         candidates.filter(
@@ -288,10 +288,10 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('does not filter active roles again after Prisma returns instances', async () => {
-    const findStepPairs = jest
+    const findStepPairs = vi
       .fn()
       .mockResolvedValue([{ workflowId: 'workflow-1', stepSequence: 1 }])
-    const findMany = jest.fn().mockResolvedValue([
+    const findMany = vi.fn().mockResolvedValue([
       {
         ...instanceRow,
         workflow: {
@@ -314,8 +314,8 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('returns no pending instances without querying steps for empty roles', async () => {
-    const findStepPairs = jest.fn()
-    const findMany = jest.fn()
+    const findStepPairs = vi.fn()
+    const findMany = vi.fn()
     const prisma = {
       approvalStep: { findMany: findStepPairs },
       approvalInstance: { findMany },
@@ -329,8 +329,8 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('does not read instances when no role has an exact workflow step', async () => {
-    const findStepPairs = jest.fn().mockResolvedValue([])
-    const findMany = jest.fn()
+    const findStepPairs = vi.fn().mockResolvedValue([])
+    const findMany = vi.fn()
     const prisma = {
       approvalStep: { findMany: findStepPairs },
       approvalInstance: { findMany },
@@ -351,8 +351,8 @@ describe('PrismaApprovalRepository', () => {
 
   it('propagates repository and transaction errors', async () => {
     const error = new Error('database unavailable')
-    const findMany = jest.fn().mockRejectedValue(error)
-    const transaction = jest.fn().mockRejectedValue(error)
+    const findMany = vi.fn().mockRejectedValue(error)
+    const transaction = vi.fn().mockRejectedValue(error)
     const prisma = {
       approvalWorkflow: { findMany },
       $transaction: transaction,
@@ -381,9 +381,9 @@ describe('PrismaApprovalRepository', () => {
       consequenceError: null,
       consequenceUpdatedAt: dates.logCreated,
     }
-    const create = jest.fn().mockResolvedValue(log)
-    const update = jest.fn().mockResolvedValue(instanceRow)
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const create = vi.fn().mockResolvedValue(log)
+    const update = vi.fn().mockResolvedValue(instanceRow)
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({
         approvalLog: { create },
         approvalInstance: { update },
@@ -429,16 +429,16 @@ describe('PrismaApprovalRepository', () => {
       consequenceError: null,
       consequenceUpdatedAt: dates.logCreated,
     }
-    const create = jest.fn().mockResolvedValue(pendingLog)
-    const update = jest.fn().mockResolvedValue(instanceRow)
-    const updateManyAndReturn = jest.fn().mockResolvedValue([
+    const create = vi.fn().mockResolvedValue(pendingLog)
+    const update = vi.fn().mockResolvedValue(instanceRow)
+    const updateManyAndReturn = vi.fn().mockResolvedValue([
       {
         ...pendingLog,
         consequenceStatus: 'COMPLETED',
         consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
       },
     ])
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({
         approvalLog: { create, updateManyAndReturn },
         approvalInstance: { update },
@@ -496,14 +496,14 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('returns stored state without ownership when conditional transition loses the race', async () => {
-    const updateManyAndReturn = jest.fn().mockResolvedValue([])
-    const findUnique = jest.fn().mockResolvedValue({
+    const updateManyAndReturn = vi.fn().mockResolvedValue([])
+    const findUnique = vi.fn().mockResolvedValue({
       ...instanceRow.logs[0],
       consequenceType: 'FINAL_APPROVAL',
       consequenceStatus: 'FAILED',
       consequenceError: 'Safe failure',
     })
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ approvalLog: { updateManyAndReturn, findUnique } }),
     )
     const prisma = {
@@ -527,8 +527,8 @@ describe('PrismaApprovalRepository', () => {
 
   it('propagates conditional transition write and read errors', async () => {
     const writeError = new Error('approval write failed')
-    const write = jest.fn().mockRejectedValue(writeError)
-    const writeTransaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const write = vi.fn().mockRejectedValue(writeError)
+    const writeTransaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ approvalLog: { updateManyAndReturn: write } }),
     )
     const writePrisma = {
@@ -545,9 +545,9 @@ describe('PrismaApprovalRepository', () => {
     ).rejects.toBe(writeError)
 
     const readError = new Error('approval read failed')
-    const updateManyAndReturn = jest.fn().mockResolvedValue([])
-    const findUnique = jest.fn().mockRejectedValue(readError)
-    const readTransaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const updateManyAndReturn = vi.fn().mockResolvedValue([])
+    const findUnique = vi.fn().mockRejectedValue(readError)
+    const readTransaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ approvalLog: { updateManyAndReturn, findUnique } }),
     )
     const readPrisma = {
@@ -565,11 +565,9 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('does not read after an owned conditional transition', async () => {
-    const updateManyAndReturn = jest
-      .fn()
-      .mockResolvedValue([instanceRow.logs[0]])
-    const findUnique = jest.fn()
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const updateManyAndReturn = vi.fn().mockResolvedValue([instanceRow.logs[0]])
+    const findUnique = vi.fn()
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ approvalLog: { updateManyAndReturn, findUnique } }),
     )
     const prisma = {
@@ -589,14 +587,14 @@ describe('PrismaApprovalRepository', () => {
   })
 
   it('does not mutate a completed consequence', async () => {
-    const findUnique = jest.fn().mockResolvedValue({
+    const findUnique = vi.fn().mockResolvedValue({
       ...instanceRow.logs[0],
       consequenceType: 'FINAL_APPROVAL',
       consequenceStatus: 'COMPLETED',
       consequenceError: null,
     })
-    const updateManyAndReturn = jest.fn()
-    const transaction = jest.fn((callback: (tx: unknown) => unknown) =>
+    const updateManyAndReturn = vi.fn()
+    const transaction = vi.fn((callback: (tx: unknown) => unknown) =>
       callback({ approvalLog: { updateManyAndReturn, findUnique } }),
     )
     const prisma = { $transaction: transaction } as unknown as PrismaService

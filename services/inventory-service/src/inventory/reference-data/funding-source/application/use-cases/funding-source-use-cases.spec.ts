@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { NotFoundException } from '@nestjs/common'
 import { IFundingSourceRepository } from '../../domain/repositories/funding-source.repository.js'
 import { CreateFundingSourceUseCase } from './create-funding-source/create-funding-source.use-case.js'
@@ -15,12 +16,12 @@ describe('funding-source use cases', () => {
 
   function makeRepository() {
     return {
-      findMany: jest.fn().mockResolvedValue([fundingSource]),
-      findById: jest.fn().mockResolvedValue(fundingSource),
-      create: jest.fn().mockResolvedValue(fundingSource),
-      update: jest.fn().mockResolvedValue(fundingSource),
-      delete: jest.fn().mockResolvedValue(fundingSource),
-    } as unknown as jest.Mocked<IFundingSourceRepository>
+      findMany: vi.fn().mockResolvedValue([fundingSource]),
+      findById: vi.fn().mockResolvedValue(fundingSource),
+      create: vi.fn().mockResolvedValue(fundingSource),
+      update: vi.fn().mockResolvedValue(fundingSource),
+      delete: vi.fn().mockResolvedValue(fundingSource),
+    } as unknown as Mocked<IFundingSourceRepository>
   }
 
   it('maps create input and returns created funding source', async () => {

@@ -11,20 +11,20 @@ describe('LoginUseCase', () => {
   let useCase: LoginUseCase
 
   const mockPasswordManagerService = {
-    validatePassword: jest.fn(),
+    validatePassword: vi.fn(),
   }
 
   const mockTokenManagerService = {
-    generateTokenPair: jest.fn(),
-    hashToken: jest.fn(),
-    getRefreshExpirationMs: jest.fn(),
-    getAbsoluteSessionMs: jest.fn().mockReturnValue(30 * 86400000),
+    generateTokenPair: vi.fn(),
+    hashToken: vi.fn(),
+    getRefreshExpirationMs: vi.fn(),
+    getAbsoluteSessionMs: vi.fn().mockReturnValue(30 * 86400000),
   }
 
   const mockAuthRepository = {
-    findGrants: jest.fn().mockResolvedValue({ roles: [], permissions: [] }),
-    findUserByIdentifier: jest.fn(),
-    createSession: jest.fn(),
+    findGrants: vi.fn().mockResolvedValue({ roles: [], permissions: [] }),
+    findUserByIdentifier: vi.fn(),
+    createSession: vi.fn(),
   }
 
   const mockUser = {
@@ -54,7 +54,7 @@ describe('LoginUseCase', () => {
 
     useCase = module.get<LoginUseCase>(LoginUseCase)
 
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

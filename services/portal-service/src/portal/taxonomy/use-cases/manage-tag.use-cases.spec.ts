@@ -15,15 +15,15 @@ import {
 const tag = { id: 'tag-1', name: 'olimpiade', slug: 'olimpiade' }
 
 const repository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findBySlug: jest.fn(),
-  create: jest.fn(),
-  rename: jest.fn(),
-  delete: jest.fn(),
-  resolveOrCreate: jest.fn(),
-  setPostTags: jest.fn(),
-  findByPostId: jest.fn(),
+  findAll: vi.fn(),
+  findById: vi.fn(),
+  findBySlug: vi.fn(),
+  create: vi.fn(),
+  rename: vi.fn(),
+  delete: vi.fn(),
+  resolveOrCreate: vi.fn(),
+  setPostTags: vi.fn(),
+  findByPostId: vi.fn(),
 }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
@@ -34,7 +34,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findAll.mockResolvedValue([tag])
   repository.findById.mockResolvedValue(tag)
   repository.findBySlug.mockResolvedValue(null)

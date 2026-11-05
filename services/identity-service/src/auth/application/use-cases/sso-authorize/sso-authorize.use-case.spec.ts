@@ -7,11 +7,11 @@ import { SsoAuthorizeUseCase } from './sso-authorize.use-case.js'
 
 describe('SsoAuthorizeUseCase', () => {
   const repository = {
-    findGrants: jest.fn(),
-    createAuthorizationCode: jest.fn(),
+    findGrants: vi.fn(),
+    createAuthorizationCode: vi.fn(),
   }
-  const sessions = { find: jest.fn() }
-  const tokens = { hashToken: jest.fn((value: string) => `hash:${value}`) }
+  const sessions = { find: vi.fn() }
+  const tokens = { hashToken: vi.fn((value: string) => `hash:${value}`) }
   const config = new ConfigService({
     SSO_ACCOUNTS_ORIGIN: 'https://accounts.test',
     SSO_APPS:
@@ -31,7 +31,7 @@ describe('SsoAuthorizeUseCase', () => {
   }
   const path = '/sso/authorize?app=hr'
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks())
 
   it('refuses an unknown app without redirecting', async () => {
     await expect(

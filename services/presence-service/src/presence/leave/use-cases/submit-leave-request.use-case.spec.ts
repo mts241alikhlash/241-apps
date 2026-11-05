@@ -28,8 +28,8 @@ function dto(overrides: Record<string, unknown> = {}) {
 
 describe('SubmitLeaveRequestUseCase', () => {
   let useCase: SubmitLeaveRequestUseCase
-  const leave = { findTypeById: jest.fn(), submit: jest.fn() }
-  const expander = { expand: jest.fn() }
+  const leave = { findTypeById: vi.fn(), submit: vi.fn() }
+  const expander = { expand: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,7 +41,7 @@ describe('SubmitLeaveRequestUseCase', () => {
     }).compile()
 
     useCase = module.get(SubmitLeaveRequestUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     leave.findTypeById.mockResolvedValue(IZIN)
     leave.submit.mockImplementation((input: unknown) => input)
     expander.expand.mockResolvedValue([

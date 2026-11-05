@@ -10,7 +10,7 @@ const row = {
 describe('GetPaymentQueueUseCase', () => {
   it('pages the queue and reports the tab counts', async () => {
     const queue = {
-      findQueue: jest.fn().mockResolvedValue({
+      findQueue: vi.fn().mockResolvedValue({
         rows: [row],
         total: 45,
         counts: { pending: 45, verified: 3, rejected: 1 },
@@ -44,7 +44,7 @@ describe('GetPaymentQueueUseCase', () => {
 
   it('defaults to the pending tab and the first page', async () => {
     const queue = {
-      findQueue: jest.fn().mockResolvedValue({
+      findQueue: vi.fn().mockResolvedValue({
         rows: [],
         total: 0,
         counts: { pending: 0, verified: 0, rejected: 0 },
@@ -62,7 +62,7 @@ describe('GetPaymentQueueUseCase', () => {
 describe('GetEligibleApplicationsUseCase', () => {
   it('serializes the amount and limits the list to twenty', async () => {
     const queue = {
-      findEligibleApplications: jest
+      findEligibleApplications: vi
         .fn()
         .mockResolvedValue([{ applicationId: 'app1', amount: 150000 }]),
     }

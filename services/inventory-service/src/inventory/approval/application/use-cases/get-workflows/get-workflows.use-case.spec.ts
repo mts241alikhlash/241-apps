@@ -11,7 +11,7 @@ describe('GetWorkflowsUseCase', () => {
         isActive: true,
       },
     ]
-    const findAllWorkflows = jest.fn().mockResolvedValue(workflows)
+    const findAllWorkflows = vi.fn().mockResolvedValue(workflows)
     const repository = { findAllWorkflows } as unknown as IApprovalRepository
     const useCase = new GetWorkflowsUseCase(repository)
 
@@ -22,7 +22,7 @@ describe('GetWorkflowsUseCase', () => {
 
   it('propagates repository read errors', async () => {
     const error = new Error('database unavailable')
-    const findAllWorkflows = jest.fn().mockRejectedValue(error)
+    const findAllWorkflows = vi.fn().mockRejectedValue(error)
     const repository = { findAllWorkflows } as unknown as IApprovalRepository
     const useCase = new GetWorkflowsUseCase(repository)
 

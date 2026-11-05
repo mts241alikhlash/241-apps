@@ -12,7 +12,7 @@ describe('HttpStudentEnrollmentAdapter.updateNis', () => {
   })
 
   it('patches the student with the caller token', async () => {
-    const fetchMock = jest
+    const fetchMock = vi
       .fn()
       .mockResolvedValue({ ok: true, json: () => Promise.resolve({}) })
     global.fetch = fetchMock as never
@@ -30,7 +30,7 @@ describe('HttpStudentEnrollmentAdapter.updateNis', () => {
   })
 
   it('surfaces the refusal with its status and message', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 409,
       json: () => Promise.resolve({ message: 'Duplicate NIS or NISN' }),
@@ -46,7 +46,7 @@ describe('HttpStudentEnrollmentAdapter.updateNis', () => {
   })
 
   it('answers a clear error when student-service is unreachable or not configured', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('refused')) as never
+    global.fetch = vi.fn().mockRejectedValue(new Error('refused')) as never
     await expect(adapter().updateNis('s1', '1', 'tok')).rejects.toBeInstanceOf(
       InternalServerErrorException,
     )

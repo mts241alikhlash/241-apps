@@ -20,10 +20,10 @@ describe('device read and lifecycle use cases', () => {
   let update: UpdateDeviceUseCase
   let remove: DeleteDeviceUseCase
   const repository = {
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -39,7 +39,7 @@ describe('device read and lifecycle use cases', () => {
     list = module.get(GetDevicesUseCase)
     update = module.get(UpdateDeviceUseCase)
     remove = module.get(DeleteDeviceUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAll.mockResolvedValue({
       data: [DEVICE],
       total: 1,

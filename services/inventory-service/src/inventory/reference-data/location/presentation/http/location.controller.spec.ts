@@ -82,10 +82,10 @@ describe('LocationController', () => {
   }
 
   function controllerWithSpies() {
-    const getLocationsUseCase = { execute: jest.fn() }
-    const createLocationUseCase = { execute: jest.fn() }
-    const updateLocationUseCase = { execute: jest.fn() }
-    const deleteLocationUseCase = { execute: jest.fn() }
+    const getLocationsUseCase = { execute: vi.fn() }
+    const createLocationUseCase = { execute: vi.fn() }
+    const updateLocationUseCase = { execute: vi.fn() }
+    const deleteLocationUseCase = { execute: vi.fn() }
     return {
       controller: new LocationController(
         getLocationsUseCase as never,

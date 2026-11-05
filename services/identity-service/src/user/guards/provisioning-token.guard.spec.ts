@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   ExecutionContext,
   NotFoundException,
@@ -7,7 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { ProvisioningTokenGuard } from './provisioning-token.guard.js'
 
 describe('ProvisioningTokenGuard', () => {
-  const config = { get: jest.fn() } as unknown as ConfigService
+  const config = { get: vi.fn() } as unknown as ConfigService
   const guard = new ProvisioningTokenGuard(config)
 
   function contextWithHeader(value: string | undefined): ExecutionContext {
@@ -19,8 +20,8 @@ describe('ProvisioningTokenGuard', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(config.get as jest.Mock).mockReturnValue('the-shared-secret')
+    vi.clearAllMocks()
+    ;(config.get as Mock).mockReturnValue('the-shared-secret')
   })
 
   it('admits a request whose header matches the configured token', () => {
@@ -40,7 +41,7 @@ describe('ProvisioningTokenGuard', () => {
   })
 
   it('rejects every request when no token is configured', () => {
-    ;(config.get as jest.Mock).mockReturnValue(undefined)
+    ;(config.get as Mock).mockReturnValue(undefined)
 
     expect(() => guard.canActivate(contextWithHeader('anything'))).toThrow(
       UnauthorizedException,

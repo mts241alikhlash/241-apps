@@ -1,13 +1,14 @@
+import type { Mocked } from 'vitest'
 import { resolveUserRefs } from './resolve-user-refs.helper.js'
 import { IProfileLookupPort } from '../../platform/profile-lookup/profile-lookup.port.js'
 
 describe('resolveUserRefs', () => {
-  const mockProfileLookupPort: jest.Mocked<IProfileLookupPort> = {
-    findByUserIds: jest.fn(),
+  const mockProfileLookupPort: Mocked<IProfileLookupPort> = {
+    findByUserIds: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns an empty map without calling the port when given no ids', async () => {

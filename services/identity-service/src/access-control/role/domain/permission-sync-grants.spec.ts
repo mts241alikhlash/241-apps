@@ -22,10 +22,10 @@ function fakePrisma(existingCodes: string[], roleCodes: string[]) {
 
   const prisma = {
     permission: {
-      findMany: jest.fn(() =>
+      findMany: vi.fn(() =>
         Promise.resolve([...permissions].map(([code, id]) => ({ code, id }))),
       ),
-      upsert: jest.fn(({ where }: { where: { code: string } }) => {
+      upsert: vi.fn(({ where }: { where: { code: string } }) => {
         if (!permissions.has(where.code)) {
           permissions.set(where.code, `p${permissions.size}`)
         }
@@ -33,28 +33,28 @@ function fakePrisma(existingCodes: string[], roleCodes: string[]) {
       }),
     },
     role: {
-      upsert: jest.fn(({ where }: { where: { code: string } }) => {
+      upsert: vi.fn(({ where }: { where: { code: string } }) => {
         if (!roles.has(where.code)) roles.set(where.code, `r${roles.size}`)
         return Promise.resolve({ id: roles.get(where.code) })
       }),
-      findUnique: jest.fn(({ where }: { where: { code: string } }) =>
+      findUnique: vi.fn(({ where }: { where: { code: string } }) =>
         Promise.resolve(
           roles.has(where.code)
             ? { id: roles.get(where.code), _count: { rolePermissions: 1 } }
             : null,
         ),
       ),
-      findMany: jest.fn(({ where }: { where: { code: { in: string[] } } }) =>
+      findMany: vi.fn(({ where }: { where: { code: { in: string[] } } }) =>
         Promise.resolve(
           where.code.in
             .filter((code) => roles.has(code))
             .map((code) => ({ id: roles.get(code), code })),
         ),
       ),
-      create: jest.fn(),
+      create: vi.fn(),
     },
     rolePermission: {
-      createMany: jest.fn(
+      createMany: vi.fn(
         ({ data }: { data: { roleId: string; permissionId: string }[] }) => {
           grants.push(...data)
           return Promise.resolve({ count: data.length })

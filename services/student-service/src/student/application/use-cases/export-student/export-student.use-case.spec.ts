@@ -36,9 +36,9 @@ describe('ExportStudentsUseCase', () => {
   let useCase: ExportStudentsUseCase
 
   const mockRepo = {
-    findAllForExport: jest.fn(),
-    getActiveGradeLevels: jest.fn().mockResolvedValue([7, 8, 9]),
-    getActiveClassroomCodes: jest
+    findAllForExport: vi.fn(),
+    getActiveGradeLevels: vi.fn().mockResolvedValue([7, 8, 9]),
+    getActiveClassroomCodes: vi
       .fn()
       .mockResolvedValue(['VII-A', 'VII-B', 'VIII-A']),
   }
@@ -52,7 +52,7 @@ describe('ExportStudentsUseCase', () => {
     }).compile()
 
     useCase = module.get<ExportStudentsUseCase>(ExportStudentsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

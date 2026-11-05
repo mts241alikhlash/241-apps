@@ -7,7 +7,7 @@ describe('GetClassroomsUseCase', () => {
   let useCase: GetClassroomsUseCase
 
   const mockRepository = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetClassroomsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetClassroomsUseCase>(GetClassroomsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

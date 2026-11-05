@@ -6,7 +6,7 @@ import { BulkDeleteAcademicCalendarsUseCase } from './bulk-delete-academic-calen
 describe('BulkDeleteAcademicCalendarsUseCase', () => {
   let useCase: BulkDeleteAcademicCalendarsUseCase
 
-  const mockRepo = { softDeleteMany: jest.fn() }
+  const mockRepo = { softDeleteMany: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('BulkDeleteAcademicCalendarsUseCase', () => {
     useCase = module.get<BulkDeleteAcademicCalendarsUseCase>(
       BulkDeleteAcademicCalendarsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('soft-deletes every id it was given', async () => {

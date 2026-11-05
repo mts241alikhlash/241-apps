@@ -37,18 +37,18 @@ function build(
   options: { timeline?: unknown; yearId?: string | null } = {},
 ) {
   const repo = {
-    resolvePpdbYearId: jest
+    resolvePpdbYearId: vi
       .fn()
       .mockResolvedValue(options.yearId === undefined ? 'y1' : options.yearId),
-    findTrackedPairs: jest.fn().mockResolvedValue(pairs),
+    findTrackedPairs: vi.fn().mockResolvedValue(pairs),
   }
   const lookup = {
-    firstSemesterOf: jest
+    firstSemesterOf: vi
       .fn()
       .mockResolvedValue(
         options.timeline === undefined ? timeline : options.timeline,
       ),
-    listAcademicYears: jest
+    listAcademicYears: vi
       .fn()
       .mockResolvedValue([{ id: 'y1', name: '2027/2028' }]),
   }

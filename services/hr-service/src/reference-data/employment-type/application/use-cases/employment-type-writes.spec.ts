@@ -6,12 +6,12 @@ import { DeleteEmploymentTypeUseCase } from './delete-employment-type/delete-emp
 
 describe('employment type writes', () => {
   const repository = {
-    findByCode: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-    countEmployeesWithEmploymentType: jest.fn(),
+    findByCode: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn(),
+    countEmployeesWithEmploymentType: vi.fn(),
   }
   const port = repository as unknown as IEmploymentTypeRepository
   const create = new CreateEmploymentTypeUseCase(port)
@@ -19,7 +19,7 @@ describe('employment type writes', () => {
   const remove = new DeleteEmploymentTypeUseCase(port)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     repository.findByCode.mockResolvedValue(null)
     repository.findById.mockResolvedValue({ id: 'et-1' })
     repository.create.mockResolvedValue({ id: 'et-1', code: 'PNS' })

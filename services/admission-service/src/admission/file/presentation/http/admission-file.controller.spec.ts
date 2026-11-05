@@ -13,8 +13,8 @@ const file = {
 
 function setup() {
   const stream = Readable.from(['x'])
-  const getFile = { execute: jest.fn().mockResolvedValue({ file, stream }) }
-  const res = { set: jest.fn() }
+  const getFile = { execute: vi.fn().mockResolvedValue({ file, stream }) }
+  const res = { set: vi.fn() }
   const controller = new AdmissionFileController(getFile as never)
   return { controller, getFile, res, stream }
 }

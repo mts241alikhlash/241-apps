@@ -9,11 +9,11 @@ const IN_BODY = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
 const SECOND_IN_BODY = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
 const ATTACHMENT = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('SyncMediaUsageUseCase', () => {
   let useCase: SyncMediaUsageUseCase
-  const repository = { replaceForOwner: jest.fn() }
+  const repository = { replaceForOwner: vi.fn() }
 
   function written(): { fileId: string; kind: string }[] {
     const [, , usages] = repository.replaceForOwner.mock.calls[0] as [
@@ -34,7 +34,7 @@ describe('SyncMediaUsageUseCase', () => {
     }).compile()
 
     useCase = module.get(SyncMediaUsageUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.replaceForOwner.mockResolvedValue(undefined)
   })
 

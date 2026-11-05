@@ -28,12 +28,12 @@ const userResponse = {
 describe('UserController', () => {
   let controller: UserController
 
-  const mockGetUsersUseCase = { execute: jest.fn() }
-  const mockGetUserByIdUseCase = { execute: jest.fn() }
-  const mockGetUserSummaryUseCase = { execute: jest.fn() }
-  const mockCreateUserUseCase = { execute: jest.fn() }
-  const mockUpdateUserUseCase = { execute: jest.fn() }
-  const mockDeleteUserUseCase = { execute: jest.fn() }
+  const mockGetUsersUseCase = { execute: vi.fn() }
+  const mockGetUserByIdUseCase = { execute: vi.fn() }
+  const mockGetUserSummaryUseCase = { execute: vi.fn() }
+  const mockCreateUserUseCase = { execute: vi.fn() }
+  const mockUpdateUserUseCase = { execute: vi.fn() }
+  const mockDeleteUserUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -52,7 +52,7 @@ describe('UserController', () => {
     }).compile()
 
     controller = module.get<UserController>(UserController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

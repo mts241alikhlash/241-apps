@@ -5,7 +5,7 @@ const later = { id: 'ijazah', requirement: 'LATER', lateDueMonths: 2 }
 
 function lookup(result: unknown) {
   return {
-    firstSemesterOf: jest
+    firstSemesterOf: vi
       .fn()
       .mockImplementation(() =>
         result instanceof Error

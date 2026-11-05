@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { IClassroomSupervisorRepository } from '../../../domain/repositories/classroom-supervisor.repository.js'
@@ -7,13 +8,12 @@ import { CreateClassroomSupervisorUseCase } from './create-classroom-supervisor.
 describe('CreateClassroomSupervisorUseCase', () => {
   let useCase: CreateClassroomSupervisorUseCase
 
-  const mockRepo: Partial<
-    Record<keyof IClassroomSupervisorRepository, jest.Mock>
-  > = {
-    findEmployeeById: jest.fn(),
-    findAssignment: jest.fn(),
-    create: jest.fn(),
-  }
+  const mockRepo: Partial<Record<keyof IClassroomSupervisorRepository, Mock>> =
+    {
+      findEmployeeById: vi.fn(),
+      findAssignment: vi.fn(),
+      create: vi.fn(),
+    }
 
   const mockEmployee = { id: 'employee-uuid-1' }
 
@@ -34,7 +34,7 @@ describe('CreateClassroomSupervisorUseCase', () => {
     useCase = module.get<CreateClassroomSupervisorUseCase>(
       CreateClassroomSupervisorUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

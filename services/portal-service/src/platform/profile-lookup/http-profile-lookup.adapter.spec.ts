@@ -3,14 +3,11 @@ import { ServiceUnavailableException } from '@nestjs/common'
 import { HttpProfileLookupAdapter } from './http-profile-lookup.adapter.js'
 
 describe('Profile lookup boundary', () => {
-  const fetchMock = jest.fn<
-    ReturnType<typeof fetch>,
-    Parameters<typeof fetch>
-  >()
+  const fetchMock = vi.fn<typeof fetch>()
   let adapter: HttpProfileLookupAdapter
   beforeEach(() => {
     fetchMock.mockReset()
-    jest.spyOn(globalThis, 'fetch').mockImplementation(fetchMock)
+    vi.spyOn(globalThis, 'fetch').mockImplementation(fetchMock)
     adapter = new HttpProfileLookupAdapter(
       new ConfigService({
         IDENTITY_SERVICE_URL: 'https://identity.internal',
@@ -19,7 +16,7 @@ describe('Profile lookup boundary', () => {
       }),
     )
   })
-  afterEach(() => jest.restoreAllMocks())
+  afterEach(() => vi.restoreAllMocks())
 
   function reply(data: object) {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ data })))

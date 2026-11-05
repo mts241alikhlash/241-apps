@@ -499,7 +499,7 @@ describe('audit transaction guarantee', () => {
       f.rooms,
       f.packages,
     )
-    jest.spyOn(failing, 'recoverOne').mockResolvedValue(null)
+    vi.spyOn(failing, 'recoverOne').mockResolvedValue(null)
     const recovery = new SessionRecoveryService(f.sessions, failing, f.access)
 
     await expect(

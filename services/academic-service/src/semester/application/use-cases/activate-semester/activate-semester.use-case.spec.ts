@@ -8,11 +8,11 @@ describe('ActivateSemesterUseCase', () => {
   let useCase: ActivateSemesterUseCase
 
   const mockSemesterRepository = {
-    findById: jest.fn(),
-    activateById: jest.fn(),
+    findById: vi.fn(),
+    activateById: vi.fn(),
   }
   const mockAcademicYearRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   const inactiveSemester = {
@@ -34,7 +34,7 @@ describe('ActivateSemesterUseCase', () => {
     }).compile()
 
     useCase = module.get<ActivateSemesterUseCase>(ActivateSemesterUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

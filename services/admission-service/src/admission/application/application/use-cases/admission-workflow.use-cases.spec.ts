@@ -15,22 +15,22 @@ import { VerifyApplicationUseCase } from './verify-application/verify-applicatio
 
 describe('Admission workflow use-cases', () => {
   const repo = {
-    findActiveById: jest.fn(),
-    findActiveWithWave: jest.fn(),
-    findActiveWithDocsAndPayment: jest.fn(),
-    findActiveWithParentsAndUser: jest.fn(),
-    countAcceptedInWave: jest.fn(),
-    findRequiredActiveDocumentTypes: jest.fn(),
-    setRevisionNeeded: jest.fn(),
-    setVerified: jest.fn(),
-    setAccepted: jest.fn(),
-    setRejected: jest.fn(),
-    setNis: jest.fn(),
-    setEnrolling: jest.fn(),
-    markEnrolled: jest.fn(),
+    findActiveById: vi.fn(),
+    findActiveWithWave: vi.fn(),
+    findActiveWithDocsAndPayment: vi.fn(),
+    findActiveWithParentsAndUser: vi.fn(),
+    countAcceptedInWave: vi.fn(),
+    findRequiredActiveDocumentTypes: vi.fn(),
+    setRevisionNeeded: vi.fn(),
+    setVerified: vi.fn(),
+    setAccepted: vi.fn(),
+    setRejected: vi.fn(),
+    setNis: vi.fn(),
+    setEnrolling: vi.fn(),
+    markEnrolled: vi.fn(),
   }
-  const notifications = { notify: jest.fn() }
-  const enrollment = { enroll: jest.fn(), updateNis: jest.fn() }
+  const notifications = { notify: vi.fn() }
+  const enrollment = { enroll: vi.fn(), updateNis: vi.fn() }
 
   let accept: AcceptApplicationUseCase
   let reject: RejectApplicationUseCase
@@ -57,7 +57,7 @@ describe('Admission workflow use-cases', () => {
     verifyApp = module.get(VerifyApplicationUseCase)
     enroll = module.get(EnrollApplicantUseCase)
     requestRevision = module.get(RequestRevisionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('AcceptApplicationUseCase', () => {

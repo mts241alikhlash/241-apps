@@ -59,7 +59,7 @@ function build() {
 describe('QuestionImportController', () => {
   it('serves the template as an attachment and imports it back', async () => {
     const { controller, template } = build()
-    const set = jest.fn()
+    const set = vi.fn()
 
     const streamed = await controller.template({ format: 'xlsx' }, {
       set,

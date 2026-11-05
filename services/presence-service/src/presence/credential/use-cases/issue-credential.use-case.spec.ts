@@ -10,10 +10,10 @@ const ISSUER_ID = '22222222-2222-4222-8222-222222222222'
 describe('IssueCredentialUseCase', () => {
   let useCase: IssueCredentialUseCase
   const repository = {
-    findActiveByUserId: jest.fn(),
-    create: jest.fn(),
+    findActiveByUserId: vi.fn(),
+    create: vi.fn(),
   }
-  const codes = { generate: jest.fn() }
+  const codes = { generate: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,7 +25,7 @@ describe('IssueCredentialUseCase', () => {
     }).compile()
 
     useCase = module.get(IssueCredentialUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findActiveByUserId.mockResolvedValue(null)
     repository.create.mockImplementation((input: unknown) => input)
     codes.generate.mockReturnValue('generated-code')

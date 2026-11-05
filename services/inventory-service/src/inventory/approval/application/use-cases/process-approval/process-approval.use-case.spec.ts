@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ForbiddenException,
@@ -53,49 +54,47 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError,
       consequenceUpdatedAt,
     })
-    const processApprovalTransaction = jest
-      .fn()
-      .mockImplementation((params) => {
-        const consequenceType = params.hasNextStep
-          ? 'NONE'
-          : params.action === 'REJECT'
-            ? 'REJECTION'
-            : 'FINAL_APPROVAL'
-        lastConsequenceType = consequenceType
-        const consequenceStatus =
-          consequenceType === 'NONE' ? 'NOT_REQUIRED' : 'PENDING'
-        return {
-          success: true,
-          action:
-            params.action === 'REJECT'
-              ? 'REJECT'
-              : params.hasNextStep
-                ? 'APPROVE_STEP'
-                : 'APPROVE_FINAL',
-          ...(params.nextStepSequence !== undefined && {
-            nextStepSequence: params.nextStepSequence,
-          }),
-          log:
-            params.existingLogId && options.existingLog
-              ? {
-                  ...options.existingLog,
-                  consequenceStatus: 'PENDING',
-                  consequenceError: null,
-                }
-              : makeLog(
-                  'log-1',
-                  consequenceType,
-                  consequenceStatus,
-                  params.note ?? null,
-                ),
-          consequence: {
-            type: consequenceType,
-            status: consequenceStatus,
-          },
-          retryable: false,
-        }
-      })
-    const transitionLogConsequence = jest
+    const processApprovalTransaction = vi.fn().mockImplementation((params) => {
+      const consequenceType = params.hasNextStep
+        ? 'NONE'
+        : params.action === 'REJECT'
+          ? 'REJECTION'
+          : 'FINAL_APPROVAL'
+      lastConsequenceType = consequenceType
+      const consequenceStatus =
+        consequenceType === 'NONE' ? 'NOT_REQUIRED' : 'PENDING'
+      return {
+        success: true,
+        action:
+          params.action === 'REJECT'
+            ? 'REJECT'
+            : params.hasNextStep
+              ? 'APPROVE_STEP'
+              : 'APPROVE_FINAL',
+        ...(params.nextStepSequence !== undefined && {
+          nextStepSequence: params.nextStepSequence,
+        }),
+        log:
+          params.existingLogId && options.existingLog
+            ? {
+                ...options.existingLog,
+                consequenceStatus: 'PENDING',
+                consequenceError: null,
+              }
+            : makeLog(
+                'log-1',
+                consequenceType,
+                consequenceStatus,
+                params.note ?? null,
+              ),
+        consequence: {
+          type: consequenceType,
+          status: consequenceStatus,
+        },
+        retryable: false,
+      }
+    })
+    const transitionLogConsequence = vi
       .fn()
       .mockImplementation(
         (
@@ -115,7 +114,7 @@ describe('ProcessApprovalUseCase', () => {
       )
 
     const repository = {
-      findInstanceById: jest.fn().mockResolvedValue({
+      findInstanceById: vi.fn().mockResolvedValue({
         id: 'inst-1',
         referenceId: 'loan-1',
         statusId: options.statusId ?? PENDING_STATUS.id,
@@ -130,7 +129,7 @@ describe('ProcessApprovalUseCase', () => {
     } as unknown as IApprovalRepository
 
     const statusLookup = {
-      findBySystemKey: jest.fn().mockImplementation((key: string) => {
+      findBySystemKey: vi.fn().mockImplementation((key: string) => {
         const statuses: Record<string, { id: string }> = {
           LOAN_PENDING: PENDING_STATUS,
           LOAN_REJECTED: { id: 'st-rejected' },
@@ -142,19 +141,19 @@ describe('ProcessApprovalUseCase', () => {
       }),
     }
     const loanCapability = {
-      findDetailsByIds: jest.fn(),
-      updateStatus: jest
+      findDetailsByIds: vi.fn(),
+      updateStatus: vi
         .fn()
         .mockResolvedValue({ id: REFERENCE_ID, loanNumber: 'LN-1' }),
     }
-    const loanItemCapability = { findByLoanId: jest.fn().mockResolvedValue([]) }
+    const loanItemCapability = { findByLoanId: vi.fn().mockResolvedValue([]) }
     const unitMutation = {
-      updateStatuses: jest.fn().mockResolvedValue(undefined),
-      updateCondition: jest.fn().mockResolvedValue(undefined),
+      updateStatuses: vi.fn().mockResolvedValue(undefined),
+      updateCondition: vi.fn().mockResolvedValue(undefined),
     }
-    const history = { record: jest.fn() }
+    const history = { record: vi.fn() }
     const transactionType = {
-      findTransactionTypeByCode: jest
+      findTransactionTypeByCode: vi
         .fn()
         .mockResolvedValue({ id: 'transaction-1' }),
     }
@@ -243,16 +242,16 @@ describe('ProcessApprovalUseCase', () => {
 
   describe('preconditions', () => {
     it('throws when the approval instance does not exist', async () => {
-      const findInstanceById = jest.fn().mockResolvedValue(null)
-      const findStatusBySystemKey = jest.fn()
+      const findInstanceById = vi.fn().mockResolvedValue(null)
+      const findStatusBySystemKey = vi.fn()
       const repository = {
         findInstanceById,
-        processApprovalTransaction: jest.fn(),
+        processApprovalTransaction: vi.fn(),
       } as unknown as IApprovalRepository
       const useCase = new ProcessApprovalUseCase(
         repository,
         { findBySystemKey: findStatusBySystemKey },
-        { findDetailsByIds: jest.fn() } as never,
+        { findDetailsByIds: vi.fn() } as never,
         {} as never,
         {} as never,
         {} as never,
@@ -269,15 +268,15 @@ describe('ProcessApprovalUseCase', () => {
     })
 
     it('throws when the pending status cannot be found', async () => {
-      const findStatusBySystemKey = jest.fn().mockResolvedValue(null)
-      const findInstanceById = jest.fn().mockResolvedValue({
+      const findStatusBySystemKey = vi.fn().mockResolvedValue(null)
+      const findInstanceById = vi.fn().mockResolvedValue({
         id: 'inst-1',
         referenceId: 'loan-1',
         statusId: PENDING_STATUS.id,
         currentStepSequence: 1,
         workflow: { steps: TWO_STEP_OPTIONAL },
       })
-      const processApprovalTransaction = jest.fn()
+      const processApprovalTransaction = vi.fn()
       const repository = {
         findInstanceById,
         processApprovalTransaction,
@@ -302,15 +301,15 @@ describe('ProcessApprovalUseCase', () => {
     })
 
     it('throws when the instance status is no longer pending', async () => {
-      const findInstanceById = jest.fn().mockResolvedValue({
+      const findInstanceById = vi.fn().mockResolvedValue({
         id: 'inst-1',
         referenceId: 'loan-1',
         statusId: 'st-approved',
         currentStepSequence: 1,
         workflow: { steps: TWO_STEP_OPTIONAL },
       })
-      const findStatusBySystemKey = jest.fn().mockResolvedValue(PENDING_STATUS)
-      const processApprovalTransaction = jest.fn()
+      const findStatusBySystemKey = vi.fn().mockResolvedValue(PENDING_STATUS)
+      const processApprovalTransaction = vi.fn()
       const repository = {
         findInstanceById,
         processApprovalTransaction,
@@ -616,7 +615,7 @@ describe('ProcessApprovalUseCase', () => {
   it('awaits circulation and asset consequences after local approval persistence', async () => {
     const order: string[] = []
     const repository = {
-      findInstanceById: jest.fn().mockResolvedValue({
+      findInstanceById: vi.fn().mockResolvedValue({
         id: INSTANCE_ID,
         referenceId: REFERENCE_ID,
         statusId: PENDING_STATUS.id,
@@ -627,7 +626,7 @@ describe('ProcessApprovalUseCase', () => {
           ],
         },
       }),
-      processApprovalTransaction: jest.fn().mockImplementation(() => {
+      processApprovalTransaction: vi.fn().mockImplementation(() => {
         order.push('approval')
         return {
           success: true,
@@ -649,7 +648,7 @@ describe('ProcessApprovalUseCase', () => {
           retryable: false,
         }
       }),
-      transitionLogConsequence: jest
+      transitionLogConsequence: vi
         .fn()
         .mockImplementation(
           (logId: string, _expected: string, status: string) => ({
@@ -671,7 +670,7 @@ describe('ProcessApprovalUseCase', () => {
         ),
     }
     const statusLookup = {
-      findBySystemKey: jest.fn().mockImplementation((key: string) => {
+      findBySystemKey: vi.fn().mockImplementation((key: string) => {
         if (key === 'LOAN_PENDING') return PENDING_STATUS
         if (key === 'LOAN_REJECTED') return { id: 'status-rejected' }
         if (key === 'AVAILABLE') return { id: 'status-available' }
@@ -679,30 +678,30 @@ describe('ProcessApprovalUseCase', () => {
       }),
     }
     const loan = {
-      updateStatus: jest.fn().mockImplementation(() => {
+      updateStatus: vi.fn().mockImplementation(() => {
         order.push('loan')
         return { id: REFERENCE_ID, loanNumber: 'LN-1' }
       }),
     }
     const loanItems = {
-      findByLoanId: jest.fn().mockImplementation(() => {
+      findByLoanId: vi.fn().mockImplementation(() => {
         order.push('loan-items')
         return [{ unitId: 'unit-1' }]
       }),
     }
     const unitMutation = {
-      updateStatuses: jest.fn().mockImplementation(() => {
+      updateStatuses: vi.fn().mockImplementation(() => {
         order.push('units')
       }),
-      updateCondition: jest.fn(),
+      updateCondition: vi.fn(),
     }
     const history = {
-      record: jest.fn().mockImplementation(() => {
+      record: vi.fn().mockImplementation(() => {
         order.push('history')
       }),
     }
     const transactionType = {
-      findTransactionTypeByCode: jest
+      findTransactionTypeByCode: vi
         .fn()
         .mockResolvedValue({ id: 'transaction-cancel' }),
     }
@@ -1032,7 +1031,7 @@ describe('ProcessApprovalUseCase', () => {
       log: pendingLog,
       transitioned: false,
     })
-    const findInstanceById = repository.findInstanceById as jest.Mock
+    const findInstanceById = repository.findInstanceById as Mock
     findInstanceById.mockReset()
     findInstanceById
       .mockResolvedValueOnce({
@@ -1091,7 +1090,7 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: null,
       consequenceUpdatedAt: new Date('2026-09-14T00:04:30.000Z'),
     }
-    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now.getTime())
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now.getTime())
 
     try {
       const {
@@ -1143,7 +1142,7 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: null,
       consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
     }
-    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now.getTime())
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(now.getTime())
 
     try {
       const { useCase, transitionLogConsequence, loanCapability, roleCodes } =
@@ -1225,7 +1224,7 @@ describe('ProcessApprovalUseCase', () => {
         existingLog: pendingLog,
         roleCodes: ['ADMIN'],
       })
-    const findInstanceById = repository.findInstanceById as jest.Mock
+    const findInstanceById = repository.findInstanceById as Mock
     findInstanceById.mockReset()
     findInstanceById
       .mockResolvedValueOnce({
@@ -1298,18 +1297,18 @@ describe('ProcessApprovalUseCase', () => {
       statusId: PENDING_STATUS.id,
       logs: [],
     }
-    const findInstanceById = jest
+    const findInstanceById = vi
       .fn()
       .mockResolvedValueOnce(initialInstance)
       .mockResolvedValueOnce(reloadedInstance)
-    const processApprovalTransaction = jest.fn().mockRejectedValue(
+    const processApprovalTransaction = vi.fn().mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
         code: 'P2002',
         clientVersion: '7.10.0',
         meta: { target: ['instance_id', 'step_sequence'] },
       }),
     )
-    const transitionLogConsequence = jest
+    const transitionLogConsequence = vi
       .fn()
       .mockResolvedValueOnce({ log: pendingLog, transitioned: true })
       .mockResolvedValueOnce({
@@ -1322,7 +1321,7 @@ describe('ProcessApprovalUseCase', () => {
       transitionLogConsequence,
     } as unknown as IApprovalRepository
     const statusLookup = {
-      findBySystemKey: jest.fn().mockImplementation((key: string) => {
+      findBySystemKey: vi.fn().mockImplementation((key: string) => {
         if (key === 'LOAN_PENDING') return PENDING_STATUS
         if (key === 'LOAN_APPROVED') return { id: 'st-approved' }
         if (key === 'LOANED') return { id: 'st-loaned' }
@@ -1330,19 +1329,19 @@ describe('ProcessApprovalUseCase', () => {
       }),
     }
     const loanCapability = {
-      findDetailsByIds: jest.fn(),
-      updateStatus: jest
+      findDetailsByIds: vi.fn(),
+      updateStatus: vi
         .fn()
         .mockResolvedValue({ id: REFERENCE_ID, loanNumber: 'LN-1' }),
     }
-    const loanItemCapability = { findByLoanId: jest.fn().mockResolvedValue([]) }
+    const loanItemCapability = { findByLoanId: vi.fn().mockResolvedValue([]) }
     const unitMutation = {
-      updateStatuses: jest.fn(),
-      updateCondition: jest.fn(),
+      updateStatuses: vi.fn(),
+      updateCondition: vi.fn(),
     }
-    const history = { record: jest.fn() }
+    const history = { record: vi.fn() }
     const transactionType = {
-      findTransactionTypeByCode: jest
+      findTransactionTypeByCode: vi
         .fn()
         .mockResolvedValue({ id: 'transaction-loan-out' }),
     }
@@ -1403,7 +1402,7 @@ describe('ProcessApprovalUseCase', () => {
       ],
       roleCodes: ['ADMIN'],
     })
-    const findInstanceById = repository.findInstanceById as jest.Mock
+    const findInstanceById = repository.findInstanceById as Mock
     const instance = {
       id: INSTANCE_ID,
       referenceId: REFERENCE_ID,
@@ -1484,11 +1483,11 @@ describe('ProcessApprovalUseCase', () => {
       },
       logs: [existingRejectLog],
     }
-    const findInstanceById = jest
+    const findInstanceById = vi
       .fn()
       .mockResolvedValueOnce({ ...instance, logs: [] })
       .mockResolvedValueOnce(instance)
-    const processApprovalTransaction = jest.fn().mockRejectedValue(
+    const processApprovalTransaction = vi.fn().mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
         code: 'P2002',
         clientVersion: '7.10.0',
@@ -1498,12 +1497,12 @@ describe('ProcessApprovalUseCase', () => {
     const repository = {
       findInstanceById,
       processApprovalTransaction,
-      transitionLogConsequence: jest.fn(),
+      transitionLogConsequence: vi.fn(),
     } as unknown as IApprovalRepository
     const useCase = new ProcessApprovalUseCase(
       repository,
       {
-        findBySystemKey: jest.fn().mockImplementation((key: string) => {
+        findBySystemKey: vi.fn().mockImplementation((key: string) => {
           if (key === 'LOAN_PENDING') return PENDING_STATUS
           if (key === 'LOAN_APPROVED') return { id: 'st-approved' }
           if (key === 'LOANED') return { id: 'st-loaned' }
@@ -1515,7 +1514,7 @@ describe('ProcessApprovalUseCase', () => {
       {} as never,
       {} as never,
       {
-        findTransactionTypeByCode: jest
+        findTransactionTypeByCode: vi
           .fn()
           .mockResolvedValue({ id: 'transaction-loan-out' }),
       },
@@ -1605,7 +1604,7 @@ describe('ProcessApprovalUseCase', () => {
       .mockResolvedValueOnce({ id: REFERENCE_ID, loanNumber: 'LN-1' })
     const transitionLogConsequence = (
       useCase as unknown as { approvalRepository: IApprovalRepository }
-    ).approvalRepository.transitionLogConsequence as jest.Mock
+    ).approvalRepository.transitionLogConsequence as Mock
     transitionLogConsequence
       .mockResolvedValueOnce({
         log: { ...failedLog, consequenceStatus: 'PENDING' as const },
@@ -1911,7 +1910,7 @@ describe('ProcessApprovalUseCase', () => {
       consequenceError: null,
       consequenceUpdatedAt: new Date('2026-09-14T00:04:00.000Z'),
     }
-    const findInstanceById = jest
+    const findInstanceById = vi
       .fn()
       .mockResolvedValueOnce({
         id: INSTANCE_ID,
@@ -1936,14 +1935,14 @@ describe('ProcessApprovalUseCase', () => {
         },
         logs: [{ ...pendingLog, consequenceStatus: 'PENDING' as const }],
       })
-    const processApprovalTransaction = jest.fn().mockResolvedValue({
+    const processApprovalTransaction = vi.fn().mockResolvedValue({
       success: true,
       action: 'APPROVE_FINAL',
       log: pendingLog,
       consequence: { type: 'FINAL_APPROVAL', status: 'PENDING' },
       retryable: false,
     })
-    const transitionLogConsequence = jest
+    const transitionLogConsequence = vi
       .fn()
       .mockResolvedValueOnce({ log: null, transitioned: false })
     const repository = {
@@ -1952,7 +1951,7 @@ describe('ProcessApprovalUseCase', () => {
       transitionLogConsequence,
     } as unknown as IApprovalRepository
     const statusLookup = {
-      findBySystemKey: jest.fn().mockImplementation((key: string) => {
+      findBySystemKey: vi.fn().mockImplementation((key: string) => {
         if (key === 'LOAN_PENDING') return PENDING_STATUS
         if (key === 'LOAN_APPROVED') return { id: 'st-approved' }
         if (key === 'LOANED') return { id: 'st-loaned' }
@@ -1960,19 +1959,19 @@ describe('ProcessApprovalUseCase', () => {
       }),
     }
     const loanCapability = {
-      findDetailsByIds: jest.fn(),
-      updateStatus: jest
+      findDetailsByIds: vi.fn(),
+      updateStatus: vi
         .fn()
         .mockResolvedValue({ id: REFERENCE_ID, loanNumber: 'LN-1' }),
     }
-    const loanItemCapability = { findByLoanId: jest.fn().mockResolvedValue([]) }
+    const loanItemCapability = { findByLoanId: vi.fn().mockResolvedValue([]) }
     const unitMutation = {
-      updateStatuses: jest.fn(),
-      updateCondition: jest.fn(),
+      updateStatuses: vi.fn(),
+      updateCondition: vi.fn(),
     }
-    const history = { record: jest.fn() }
+    const history = { record: vi.fn() }
     const transactionType = {
-      findTransactionTypeByCode: jest
+      findTransactionTypeByCode: vi
         .fn()
         .mockResolvedValue({ id: 'transaction-loan-out' }),
     }

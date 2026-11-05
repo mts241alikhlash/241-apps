@@ -4,22 +4,22 @@ import type { IEnrollmentLookupPort } from '../../../../platform/enrollment-look
 
 describe('academic year activation', () => {
   const semester = {
-    findFirst: jest.fn(),
-    updateMany: jest.fn(),
-    update: jest.fn(),
+    findFirst: vi.fn(),
+    updateMany: vi.fn(),
+    update: vi.fn(),
   }
   const academicYear = {
-    updateMany: jest.fn(),
-    update: jest.fn(),
+    updateMany: vi.fn(),
+    update: vi.fn(),
   }
 
   const tx = { semester, academicYear }
   const prisma = {
-    $transaction: jest.fn((cb: (client: typeof tx) => unknown) => cb(tx)),
+    $transaction: vi.fn((cb: (client: typeof tx) => unknown) => cb(tx)),
   }
 
   const enrollmentLookup = {
-    countBySemesters: jest.fn().mockResolvedValue(new Map()),
+    countBySemesters: vi.fn().mockResolvedValue(new Map()),
   } as unknown as IEnrollmentLookupPort
 
   const repository = new PrismaAcademicYearRepository(
@@ -28,7 +28,7 @@ describe('academic year activation', () => {
   )
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     academicYear.update.mockResolvedValue({ id: 'ay-new', isActive: true })
   })
 

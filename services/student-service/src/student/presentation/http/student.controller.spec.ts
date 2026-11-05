@@ -34,17 +34,17 @@ describe('StudentController & StudentImportExportController', () => {
   let controller: StudentController
   let importExportController: StudentImportExportController
 
-  const mockGetStudentsService = { execute: jest.fn() }
-  const mockGetStudentByIdService = { execute: jest.fn() }
-  const mockGetMyStudentService = { execute: jest.fn() }
-  const mockGetMyClassroomService = { execute: jest.fn() }
-  const mockCreateStudentService = { execute: jest.fn() }
-  const mockUpdateStudentService = { execute: jest.fn() }
-  const mockDeleteStudentService = { execute: jest.fn() }
-  const mockToggleStudentActiveService = { execute: jest.fn() }
-  const mockBulkImportStudentsService = { execute: jest.fn() }
-  const mockResolveBulkImportConflictsService = { execute: jest.fn() }
-  const mockExportStudentsService = { execute: jest.fn() }
+  const mockGetStudentsService = { execute: vi.fn() }
+  const mockGetStudentByIdService = { execute: vi.fn() }
+  const mockGetMyStudentService = { execute: vi.fn() }
+  const mockGetMyClassroomService = { execute: vi.fn() }
+  const mockCreateStudentService = { execute: vi.fn() }
+  const mockUpdateStudentService = { execute: vi.fn() }
+  const mockDeleteStudentService = { execute: vi.fn() }
+  const mockToggleStudentActiveService = { execute: vi.fn() }
+  const mockBulkImportStudentsService = { execute: vi.fn() }
+  const mockResolveBulkImportConflictsService = { execute: vi.fn() }
+  const mockExportStudentsService = { execute: vi.fn() }
 
   const mockUser: AuthenticatedUser = {
     id: 'usr-1',
@@ -65,7 +65,7 @@ describe('StudentController & StudentImportExportController', () => {
         { provide: CreateStudentUseCase, useValue: mockCreateStudentService },
         {
           provide: CreateStudentWithRelationsUseCase,
-          useValue: { execute: jest.fn() },
+          useValue: { execute: vi.fn() },
         },
         { provide: UpdateStudentUseCase, useValue: mockUpdateStudentService },
         { provide: DeleteStudentUseCase, useValue: mockDeleteStudentService },
@@ -75,7 +75,7 @@ describe('StudentController & StudentImportExportController', () => {
         },
         {
           provide: EnrollExistingAccountUseCase,
-          useValue: { execute: jest.fn() },
+          useValue: { execute: vi.fn() },
         },
         {
           provide: BulkImportStudentsUseCase,
@@ -96,7 +96,7 @@ describe('StudentController & StudentImportExportController', () => {
     importExportController = module.get<StudentImportExportController>(
       StudentImportExportController,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -26,7 +26,7 @@ function contextWith(authorization?: string, cookies?: Record<string, string>) {
 describe('DeviceGuard', () => {
   let guard: DeviceGuard
   let tokens: DeviceTokenService
-  const repository = { findByTokenHash: jest.fn() }
+  const repository = { findByTokenHash: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +39,7 @@ describe('DeviceGuard', () => {
 
     guard = module.get(DeviceGuard)
     tokens = module.get(DeviceTokenService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findByTokenHash.mockResolvedValue(DEVICE)
   })
 

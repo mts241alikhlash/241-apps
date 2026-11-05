@@ -9,13 +9,13 @@ describe('UpdateCurriculaUseCase', () => {
   let useCase: UpdateCurriculaUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findByNameAndAcademicYear: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByNameAndAcademicYear: vi.fn(),
+    update: vi.fn(),
   }
 
   const mockAcademicYearsRepository = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   const mockExisting = {
@@ -38,7 +38,7 @@ describe('UpdateCurriculaUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateCurriculaUseCase>(UpdateCurriculaUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -8,8 +8,8 @@ describe('CreateTimeSlotUseCase', () => {
   let useCase: CreateTimeSlotUseCase
 
   const mockRepo = {
-    findByOrder: jest.fn(),
-    create: jest.fn(),
+    findByOrder: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('CreateTimeSlotUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateTimeSlotUseCase>(CreateTimeSlotUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

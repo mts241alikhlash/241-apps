@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { InventoryStatusKey } from '@mts241alikhlash/nest-core/domain'
 import { IStatusRepository } from '../../domain/repositories/status.repository.js'
@@ -18,12 +19,12 @@ describe('status use cases', () => {
 
   function makeRepository() {
     return {
-      findMany: jest.fn().mockResolvedValue([status]),
-      findById: jest.fn().mockResolvedValue(status),
-      create: jest.fn().mockResolvedValue(status),
-      update: jest.fn().mockResolvedValue(status),
-      delete: jest.fn().mockResolvedValue(status),
-    } as unknown as jest.Mocked<IStatusRepository>
+      findMany: vi.fn().mockResolvedValue([status]),
+      findById: vi.fn().mockResolvedValue(status),
+      create: vi.fn().mockResolvedValue(status),
+      update: vi.fn().mockResolvedValue(status),
+      delete: vi.fn().mockResolvedValue(status),
+    } as unknown as Mocked<IStatusRepository>
   }
 
   it('maps create input and preserves defaults', async () => {

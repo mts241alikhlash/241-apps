@@ -52,7 +52,7 @@ describe('HistoryController', () => {
   }
 
   it('forwards history query and preserves response', async () => {
-    const getHistoriesUseCase = { execute: jest.fn() }
+    const getHistoriesUseCase = { execute: vi.fn() }
     const controller = new HistoryController(getHistoriesUseCase as never)
     const query = {
       page: 3,

@@ -3,14 +3,14 @@ import { moveUnitsAndRecord } from './inventory-unit-movement.steps.js'
 
 describe('moveUnitsAndRecord', () => {
   function operationsSpy() {
-    const updateMany = jest.fn().mockResolvedValue({ count: 0 })
-    const update = jest.fn().mockResolvedValue({})
-    const create = jest.fn().mockResolvedValue({})
+    const updateMany = vi.fn().mockResolvedValue({ count: 0 })
+    const update = vi.fn().mockResolvedValue({})
+    const create = vi.fn().mockResolvedValue({})
 
     const operations = {
-      updateStatuses: jest.fn().mockResolvedValue(undefined),
-      updateCondition: jest.fn().mockResolvedValue(undefined),
-      record: jest.fn().mockResolvedValue(undefined),
+      updateStatuses: vi.fn().mockResolvedValue(undefined),
+      updateCondition: vi.fn().mockResolvedValue(undefined),
+      record: vi.fn().mockResolvedValue(undefined),
     }
 
     return { operations, updateMany, update, create }

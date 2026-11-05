@@ -43,26 +43,26 @@ function entry(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const repository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findPublic: jest.fn(),
-  findPublicBySlug: jest.fn(),
-  findUpcoming: jest.fn(),
-  findTakenSlugs: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  publish: jest.fn(),
-  unpublish: jest.fn(),
-  archive: jest.fn(),
-  softDelete: jest.fn(),
-  restore: jest.fn(),
-  findAllVisible: jest.fn(),
+  findAll: vi.fn(),
+  findById: vi.fn(),
+  findPublic: vi.fn(),
+  findPublicBySlug: vi.fn(),
+  findUpcoming: vi.fn(),
+  findTakenSlugs: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  publish: vi.fn(),
+  unpublish: vi.fn(),
+  archive: vi.fn(),
+  softDelete: vi.fn(),
+  restore: vi.fn(),
+  findAllVisible: vi.fn(),
 }
 
-const syncMediaUsage = { execute: jest.fn() }
+const syncMediaUsage = { execute: vi.fn() }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
   const module: TestingModule = await Test.createTestingModule({
@@ -78,7 +78,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findById.mockResolvedValue(entry())
   repository.findTakenSlugs.mockResolvedValue([])
   repository.create.mockImplementation((data: Record<string, unknown>) =>

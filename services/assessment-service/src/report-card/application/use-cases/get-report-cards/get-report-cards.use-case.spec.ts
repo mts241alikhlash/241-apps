@@ -6,7 +6,7 @@ import type { GetReportCardsInput } from './get-report-cards.input.js'
 describe('GetReportCardsUseCase', () => {
   let useCase: GetReportCardsUseCase
 
-  const mockRepo = { findAll: jest.fn() }
+  const mockRepo = { findAll: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('GetReportCardsUseCase', () => {
     }).compile()
 
     useCase = module.get<GetReportCardsUseCase>(GetReportCardsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

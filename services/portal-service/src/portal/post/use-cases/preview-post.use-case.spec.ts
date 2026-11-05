@@ -43,7 +43,7 @@ function row(overrides: Record<string, unknown> = {}) {
 
 describe('PreviewPostUseCase', () => {
   let useCase: PreviewPostUseCase
-  const repository = { findById: jest.fn() }
+  const repository = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,7 +54,7 @@ describe('PreviewPostUseCase', () => {
     }).compile()
 
     useCase = module.get(PreviewPostUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findById.mockResolvedValue(row())
   })
 

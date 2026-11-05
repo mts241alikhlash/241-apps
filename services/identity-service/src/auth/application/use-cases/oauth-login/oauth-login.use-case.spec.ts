@@ -10,24 +10,24 @@ describe('OAuthLoginUseCase', () => {
   let useCase: OAuthLoginUseCase
 
   const mockTokenManagerService = {
-    generateTokenPair: jest.fn(),
-    hashToken: jest.fn(),
-    getRefreshExpirationMs: jest.fn(),
-    getAbsoluteSessionMs: jest.fn().mockReturnValue(30 * 86400000),
+    generateTokenPair: vi.fn(),
+    hashToken: vi.fn(),
+    getRefreshExpirationMs: vi.fn(),
+    getAbsoluteSessionMs: vi.fn().mockReturnValue(30 * 86400000),
   }
 
   const mockAuthRepository = {
-    findOAuthAccount: jest.fn(),
-    findUserById: jest.fn(),
-    findUserByEmail: jest.fn(),
-    linkOAuthAccount: jest.fn(),
-    createUserFromOAuth: jest.fn(),
-    findGrants: jest.fn(),
-    createSession: jest.fn(),
+    findOAuthAccount: vi.fn(),
+    findUserById: vi.fn(),
+    findUserByEmail: vi.fn(),
+    linkOAuthAccount: vi.fn(),
+    createUserFromOAuth: vi.fn(),
+    findGrants: vi.fn(),
+    createSession: vi.fn(),
   }
 
   const mockConfigService = {
-    get: jest.fn(),
+    get: vi.fn(),
   }
 
   const mockUser = {
@@ -78,7 +78,7 @@ describe('OAuthLoginUseCase', () => {
 
     useCase = module.get<OAuthLoginUseCase>(OAuthLoginUseCase)
 
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockConfigService.get.mockReturnValue(undefined)
   })
 

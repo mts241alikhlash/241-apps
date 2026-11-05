@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { IAssetUnitMutationPort } from '../../../../asset/index.js'
 import { IStatusLookupPort } from '../../../../reference-data/status/index.js'
@@ -26,17 +27,17 @@ describe('ReturnLoanUseCase', () => {
     ],
   }
 
-  function make(overrides: Record<string, jest.Mock> = {}) {
+  function make(overrides: Record<string, Mock> = {}) {
     const repository = {
-      findLoanById: overrides.findLoanById ?? jest.fn().mockResolvedValue(loan),
+      findLoanById: overrides.findLoanById ?? vi.fn().mockResolvedValue(loan),
       processReturnLoanTransaction:
         overrides.processReturnLoanTransaction ??
-        jest.fn().mockResolvedValue({ id: 'loan-1' }),
+        vi.fn().mockResolvedValue({ id: 'loan-1' }),
     } as unknown as ILoanRepository
     const status = {
       findBySystemKey:
         overrides.findBySystemKey ??
-        jest.fn((key: string) =>
+        vi.fn((key: string) =>
           Promise.resolve(
             key === 'LOAN_RETURNED'
               ? { id: 'status-returned' }
@@ -47,14 +48,14 @@ describe('ReturnLoanUseCase', () => {
     const transactionType = {
       findTransactionTypeByCode:
         overrides.findTransactionTypeByCode ??
-        jest.fn().mockResolvedValue({ id: 'tx-loan-in' }),
+        vi.fn().mockResolvedValue({ id: 'tx-loan-in' }),
     } as unknown as ITransactionTypeRepository
     const mutation = {
-      updateStatuses: jest.fn().mockResolvedValue(undefined),
-      updateCondition: jest.fn().mockResolvedValue(undefined),
+      updateStatuses: vi.fn().mockResolvedValue(undefined),
+      updateCondition: vi.fn().mockResolvedValue(undefined),
     } as unknown as IAssetUnitMutationPort
     const history = {
-      record: jest.fn().mockResolvedValue(undefined),
+      record: vi.fn().mockResolvedValue(undefined),
     } as unknown as IHistoryCapabilityPort
     return {
       useCase: new ReturnLoanUseCase(
@@ -73,9 +74,9 @@ describe('ReturnLoanUseCase', () => {
   }
 
   it('preserves not-found and reference-data errors', async () => {
-    const findStatusBySystemKey = jest.fn()
+    const findStatusBySystemKey = vi.fn()
     const { useCase } = make({
-      findLoanById: jest.fn().mockResolvedValue(null),
+      findLoanById: vi.fn().mockResolvedValue(null),
       findBySystemKey: findStatusBySystemKey,
     })
     await expect(
@@ -85,8 +86,8 @@ describe('ReturnLoanUseCase', () => {
 
     await expect(
       make({
-        findBySystemKey: jest.fn().mockResolvedValue(null),
-        findTransactionTypeByCode: jest.fn().mockResolvedValue(null),
+        findBySystemKey: vi.fn().mockResolvedValue(null),
+        findTransactionTypeByCode: vi.fn().mockResolvedValue(null),
       }).useCase.execute('loan-1', input, 'user-1'),
     ).rejects.toEqual(
       new InventoryReferenceDataMissingException([
@@ -100,19 +101,19 @@ describe('ReturnLoanUseCase', () => {
   it('awaits loan, asset, condition, and history calls in order', async () => {
     const events: string[] = []
     const { useCase, repository, mutation, history } = make()
-    ;(repository.processReturnLoanTransaction as jest.Mock).mockImplementation(
+    ;(repository.processReturnLoanTransaction as Mock).mockImplementation(
       () => {
         events.push('loan')
         return { id: 'loan-1' }
       },
     )
-    ;(mutation.updateStatuses as jest.Mock).mockImplementation(() => {
+    ;(mutation.updateStatuses as Mock).mockImplementation(() => {
       events.push('status')
     })
-    ;(mutation.updateCondition as jest.Mock).mockImplementation(() => {
+    ;(mutation.updateCondition as Mock).mockImplementation(() => {
       events.push('condition')
     })
-    ;(history.record as jest.Mock).mockImplementation(() => {
+    ;(history.record as Mock).mockImplementation(() => {
       events.push('history')
     })
 
@@ -135,7 +136,7 @@ describe('ReturnLoanUseCase', () => {
   it('preserves already-returned and foreign-unit errors', async () => {
     await expect(
       make({
-        findLoanById: jest.fn().mockResolvedValue({
+        findLoanById: vi.fn().mockResolvedValue({
           ...loan,
           actualReturnDate: new Date('2026-09-14T00:00:00.000Z'),
         }),

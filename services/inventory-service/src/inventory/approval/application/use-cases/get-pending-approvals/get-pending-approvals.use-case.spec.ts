@@ -3,7 +3,7 @@ import { GetPendingApprovalsUseCase } from './get-pending-approvals.use-case.js'
 
 describe('GetPendingApprovalsUseCase', () => {
   const statusLookup = {
-    findBySystemKey: jest.fn().mockResolvedValue({ id: 'pending' }),
+    findBySystemKey: vi.fn().mockResolvedValue({ id: 'pending' }),
   }
   it('loads unique loan details once and preserves instance order', async () => {
     const loanInstance = {
@@ -42,8 +42,8 @@ describe('GetPendingApprovalsUseCase', () => {
       ],
     }
     const roleCodes = ['ADMIN', 'PRINCIPAL']
-    const findPendingInstancesForRoles = jest.fn().mockResolvedValue(instances)
-    const findLoanDetailsForInstances = jest.fn().mockResolvedValue([details])
+    const findPendingInstancesForRoles = vi.fn().mockResolvedValue(instances)
+    const findLoanDetailsForInstances = vi.fn().mockResolvedValue([details])
     const repository = {
       findPendingInstancesForRoles,
     }
@@ -77,8 +77,8 @@ describe('GetPendingApprovalsUseCase', () => {
       currentStepSequence: 1,
       workflow: { targetEntity: 'InventoryLoan' },
     }
-    const findPendingInstancesForRoles = jest.fn().mockResolvedValue([instance])
-    const findLoanDetailsForInstances = jest.fn()
+    const findPendingInstancesForRoles = vi.fn().mockResolvedValue([instance])
+    const findLoanDetailsForInstances = vi.fn()
     const repository = {
       findPendingInstancesForRoles,
     } as unknown as IApprovalRepository
@@ -93,8 +93,8 @@ describe('GetPendingApprovalsUseCase', () => {
   })
 
   it('does not call the capability when there are no loan instances', async () => {
-    const findPendingInstancesForRoles = jest.fn().mockResolvedValue([])
-    const findLoanDetailsForInstances = jest.fn()
+    const findPendingInstancesForRoles = vi.fn().mockResolvedValue([])
+    const findLoanDetailsForInstances = vi.fn()
     const repository = { findPendingInstancesForRoles }
     const useCase = new GetPendingApprovalsUseCase(
       repository as unknown as IApprovalRepository,
@@ -114,8 +114,8 @@ describe('GetPendingApprovalsUseCase', () => {
       currentStepSequence: 1,
       workflow: { targetEntity: 'InventoryLoan' },
     }
-    const findPendingInstancesForRoles = jest.fn().mockResolvedValue([instance])
-    const findLoanDetailsForInstances = jest.fn().mockResolvedValue([])
+    const findPendingInstancesForRoles = vi.fn().mockResolvedValue([instance])
+    const findLoanDetailsForInstances = vi.fn().mockResolvedValue([])
     const repository = {
       findPendingInstancesForRoles,
     } as unknown as IApprovalRepository
@@ -131,12 +131,12 @@ describe('GetPendingApprovalsUseCase', () => {
 
   it('propagates pending-instance repository errors', async () => {
     const error = new Error('database unavailable')
-    const findPendingInstancesForRoles = jest.fn().mockRejectedValue(error)
+    const findPendingInstancesForRoles = vi.fn().mockRejectedValue(error)
     const repository = {
       findPendingInstancesForRoles,
     } as unknown as IApprovalRepository
     const useCase = new GetPendingApprovalsUseCase(repository, statusLookup, {
-      findDetailsByIds: jest.fn(),
+      findDetailsByIds: vi.fn(),
     } as never)
 
     await expect(useCase.execute(['ADMIN'])).rejects.toBe(error)
@@ -144,7 +144,7 @@ describe('GetPendingApprovalsUseCase', () => {
 
   it('propagates loan-detail repository errors', async () => {
     const error = new Error('loan service unavailable')
-    const findPendingInstancesForRoles = jest.fn().mockResolvedValue([
+    const findPendingInstancesForRoles = vi.fn().mockResolvedValue([
       {
         id: 'instance-1',
         workflowId: 'workflow-1',
@@ -153,7 +153,7 @@ describe('GetPendingApprovalsUseCase', () => {
         workflow: { targetEntity: 'InventoryLoan' },
       },
     ])
-    const findLoanDetailsForInstances = jest.fn().mockRejectedValue(error)
+    const findLoanDetailsForInstances = vi.fn().mockRejectedValue(error)
     const repository = {
       findPendingInstancesForRoles,
     } as unknown as IApprovalRepository

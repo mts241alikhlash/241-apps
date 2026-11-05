@@ -26,8 +26,8 @@ describe('ExportEmployeesUseCase', () => {
   let useCase: ExportEmployeesUseCase
 
   const mockRepo = {
-    findAllForExport: jest.fn(),
-    getActiveEmploymentTypeCodes: jest
+    findAllForExport: vi.fn(),
+    getActiveEmploymentTypeCodes: vi
       .fn()
       .mockResolvedValue(['PNS', 'PPPK', 'NON_ASN']),
   }
@@ -41,7 +41,7 @@ describe('ExportEmployeesUseCase', () => {
     }).compile()
 
     useCase = module.get<ExportEmployeesUseCase>(ExportEmployeesUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

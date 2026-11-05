@@ -7,9 +7,9 @@ describe('CreateGradeUseCase', () => {
   let useCase: CreateGradeUseCase
 
   const mockRepository = {
-    findByLevel: jest.fn(),
-    findByName: jest.fn(),
-    create: jest.fn(),
+    findByLevel: vi.fn(),
+    findByName: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('CreateGradeUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateGradeUseCase>(CreateGradeUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

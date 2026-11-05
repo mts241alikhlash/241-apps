@@ -6,7 +6,7 @@ import { GetSemesterByIdUseCase } from './get-semester-by-id.use-case.js'
 describe('GetSemesterByIdUseCase', () => {
   let useCase: GetSemesterByIdUseCase
 
-  const mockRepository = { findById: jest.fn() }
+  const mockRepository = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('GetSemesterByIdUseCase', () => {
     }).compile()
 
     useCase = module.get<GetSemesterByIdUseCase>(GetSemesterByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

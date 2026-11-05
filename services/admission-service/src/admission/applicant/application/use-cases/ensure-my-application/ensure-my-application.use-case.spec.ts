@@ -6,11 +6,11 @@ import { EnsureMyApplicationUseCase } from './ensure-my-application.use-case.js'
 
 describe('EnsureMyApplicationUseCase', () => {
   const repo = {
-    findMyDetail: jest.fn(),
-    isWaveFull: jest.fn(),
-    findActiveWave: jest.fn(),
-    ensureApplication: jest.fn(),
-    findActiveDocumentTypes: jest.fn(),
+    findMyDetail: vi.fn(),
+    isWaveFull: vi.fn(),
+    findActiveWave: vi.fn(),
+    ensureApplication: vi.fn(),
+    findActiveDocumentTypes: vi.fn(),
   }
 
   let ensure: EnsureMyApplicationUseCase
@@ -22,13 +22,13 @@ describe('EnsureMyApplicationUseCase', () => {
         { provide: IAdmissionApplicantRepository, useValue: repo },
         {
           provide: IReferenceLookupPort,
-          useValue: { firstSemesterOf: jest.fn().mockResolvedValue(null) },
+          useValue: { firstSemesterOf: vi.fn().mockResolvedValue(null) },
         },
       ],
     }).compile()
 
     ensure = module.get(EnsureMyApplicationUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repo.findActiveDocumentTypes.mockResolvedValue([])
   })
 

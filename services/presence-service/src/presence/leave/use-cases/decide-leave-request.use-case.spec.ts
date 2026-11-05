@@ -40,14 +40,14 @@ describe('leave decisions', () => {
   let reject: RejectLeaveRequestUseCase
   let withdraw: WithdrawLeaveRequestUseCase
   const leave = {
-    findRequestById: jest.fn(),
-    findTypeById: jest.fn(),
-    countUsedDays: jest.fn(),
-    approve: jest.fn(),
-    reject: jest.fn(),
-    withdraw: jest.fn(),
+    findRequestById: vi.fn(),
+    findTypeById: vi.fn(),
+    countUsedDays: vi.fn(),
+    approve: vi.fn(),
+    reject: vi.fn(),
+    withdraw: vi.fn(),
   }
-  const credentials = { findActiveByUserId: jest.fn() }
+  const credentials = { findActiveByUserId: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -63,7 +63,7 @@ describe('leave decisions', () => {
     approve = module.get(ApproveLeaveRequestUseCase)
     reject = module.get(RejectLeaveRequestUseCase)
     withdraw = module.get(WithdrawLeaveRequestUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     leave.findRequestById.mockResolvedValue(request())
     leave.findTypeById.mockResolvedValue(CUTI)
     leave.countUsedDays.mockResolvedValue(0)

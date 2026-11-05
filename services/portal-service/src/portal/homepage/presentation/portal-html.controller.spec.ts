@@ -23,7 +23,7 @@ const SHELL = `<!doctype html>
   <body><div id="app"></div></body>
 </html>`
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const ARTICLE_META = {
   title: 'Juara 1 Olimpiade',
@@ -38,8 +38,8 @@ const ARTICLE_META = {
 describe('PortalHtmlController', () => {
   let controller: PortalHtmlController
   let distPath: string
-  const getPageMeta = { execute: jest.fn() }
-  const getSitemap = { execute: jest.fn().mockResolvedValue([]) }
+  const getPageMeta = { execute: vi.fn() }
+  const getSitemap = { execute: vi.fn().mockResolvedValue([]) }
 
   function responseSpy() {
     const sent = {
@@ -93,7 +93,7 @@ describe('PortalHtmlController', () => {
     }).compile()
 
     controller = module.get(PortalHtmlController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     getPageMeta.execute.mockResolvedValue(ARTICLE_META)
   })
 

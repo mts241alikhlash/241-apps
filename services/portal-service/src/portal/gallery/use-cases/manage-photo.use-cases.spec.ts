@@ -14,7 +14,7 @@ import { PortalCacheService } from '../../shared/services/portal-cache.service.j
 const AUTHOR_ID = '11111111-1111-4111-8111-111111111111'
 const FILE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const album = {
   id: 'album-1',
@@ -34,16 +34,16 @@ const album = {
 }
 
 const repository = {
-  findAlbumById: jest.fn(),
-  updatePhoto: jest.fn(),
-  findPhotoIds: jest.fn(),
-  findPhotoFileIds: jest.fn(),
-  addPhoto: jest.fn(),
-  removePhoto: jest.fn(),
-  reorderPhotos: jest.fn(),
+  findAlbumById: vi.fn(),
+  updatePhoto: vi.fn(),
+  findPhotoIds: vi.fn(),
+  findPhotoFileIds: vi.fn(),
+  addPhoto: vi.fn(),
+  removePhoto: vi.fn(),
+  reorderPhotos: vi.fn(),
 }
 
-const syncMediaUsage = { execute: jest.fn() }
+const syncMediaUsage = { execute: vi.fn() }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
   const module: TestingModule = await Test.createTestingModule({
@@ -58,7 +58,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findAlbumById.mockResolvedValue(album)
   repository.findPhotoIds.mockResolvedValue(['photo-1', 'photo-2'])
   repository.findPhotoFileIds.mockResolvedValue([FILE_ID])

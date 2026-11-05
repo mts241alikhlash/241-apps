@@ -7,12 +7,12 @@ import { DecideLateDocumentUseCase } from './decide-late-document.use-case.js'
 
 function build(document: unknown) {
   const documents = {
-    findDocument: jest.fn().mockResolvedValue(document),
-    updateDocumentStatus: jest
+    findDocument: vi.fn().mockResolvedValue(document),
+    updateDocumentStatus: vi
       .fn()
       .mockResolvedValue({ id: 'd1', status: 'APPROVED' }),
   }
-  const notifications = { notify: jest.fn() }
+  const notifications = { notify: vi.fn() }
   return {
     documents,
     notifications,

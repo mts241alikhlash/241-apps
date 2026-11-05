@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { UpdateUserInput } from './update-user.input.js'
@@ -5,18 +6,18 @@ import { IUserRepository } from '../../../domain/repositories/user.repository.js
 import { UpdateUserUseCase } from './update-user.use-case.js'
 import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
-jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
-  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
-  hashPassword: jest.fn(),
+vi.mock('@mts241alikhlash/nest-core/helpers', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  hashPassword: vi.fn(),
 }))
 
 describe('UpdateUserUseCase', () => {
   let useCase: UpdateUserUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findByIdentifier: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByIdentifier: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -28,7 +29,7 @@ describe('UpdateUserUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateUserUseCase>(UpdateUserUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
@@ -71,7 +72,7 @@ describe('UpdateUserUseCase', () => {
     it('should hash password when provided', async () => {
       const input: UpdateUserInput = { password: 'newpass' }
       mockRepo.findById.mockResolvedValue(mockUser)
-      ;(hashPassword as jest.Mock).mockResolvedValue('hashed')
+      ;(hashPassword as Mock).mockResolvedValue('hashed')
       mockRepo.update.mockResolvedValue({ id })
 
       await useCase.execute(id, input)

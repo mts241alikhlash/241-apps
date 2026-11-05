@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -12,15 +13,15 @@ import { UpdateSemesterUseCase } from './update-semester.use-case.js'
 describe('UpdateSemesterUseCase', () => {
   let useCase: UpdateSemesterUseCase
 
-  const mockSemesterRepository: Record<string, jest.Mock> = {
-    findById: jest.fn(),
-    findFirstDependent: jest.fn(),
-    findTypeById: jest.fn(),
-    findByAcademicYearAndType: jest.fn(),
-    update: jest.fn(),
+  const mockSemesterRepository: Record<string, Mock> = {
+    findById: vi.fn(),
+    findFirstDependent: vi.fn(),
+    findTypeById: vi.fn(),
+    findByAcademicYearAndType: vi.fn(),
+    update: vi.fn(),
   }
-  const mockAcademicYearRepository: Record<string, jest.Mock> = {
-    findById: jest.fn(),
+  const mockAcademicYearRepository: Record<string, Mock> = {
+    findById: vi.fn(),
   }
 
   const currentSemester = {
@@ -45,7 +46,7 @@ describe('UpdateSemesterUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateSemesterUseCase>(UpdateSemesterUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockSemesterRepository.findFirstDependent.mockResolvedValue(null)
   })
 

@@ -8,8 +8,8 @@ describe('CreatePositionUseCase', () => {
   let useCase: CreatePositionUseCase
 
   const mockRepo = {
-    findByName: jest.fn(),
-    create: jest.fn(),
+    findByName: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('CreatePositionUseCase', () => {
     }).compile()
 
     useCase = module.get<CreatePositionUseCase>(CreatePositionUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

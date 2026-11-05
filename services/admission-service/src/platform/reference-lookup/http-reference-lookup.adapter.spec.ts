@@ -3,9 +3,9 @@ import type { ServiceClient } from '@mts241alikhlash/nest-core/service-client'
 
 function build(data: unknown) {
   const client = {
-    getData: jest.fn().mockResolvedValue(data),
-    postData: jest.fn().mockResolvedValue(data),
-    malformed: jest.fn().mockImplementation(() => {
+    getData: vi.fn().mockResolvedValue(data),
+    postData: vi.fn().mockResolvedValue(data),
+    malformed: vi.fn().mockImplementation(() => {
       throw new Error('malformed')
     }),
   }

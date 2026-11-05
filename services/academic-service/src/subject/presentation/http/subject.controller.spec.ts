@@ -12,11 +12,11 @@ import { SubjectController } from './subject.controller.js'
 describe('SubjectController', () => {
   let controller: SubjectController
 
-  const mockGetSubjectsService = { execute: jest.fn() }
-  const mockGetSubjectByIdService = { execute: jest.fn() }
-  const mockCreateSubjectService = { execute: jest.fn() }
-  const mockUpdateSubjectService = { execute: jest.fn() }
-  const mockDeleteSubjectService = { execute: jest.fn() }
+  const mockGetSubjectsService = { execute: vi.fn() }
+  const mockGetSubjectByIdService = { execute: vi.fn() }
+  const mockCreateSubjectService = { execute: vi.fn() }
+  const mockUpdateSubjectService = { execute: vi.fn() }
+  const mockDeleteSubjectService = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +31,7 @@ describe('SubjectController', () => {
     }).compile()
 
     controller = module.get<SubjectController>(SubjectController)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

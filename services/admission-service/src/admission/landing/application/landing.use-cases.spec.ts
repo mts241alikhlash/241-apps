@@ -120,9 +120,9 @@ class FakeRepository {
 
 function storage() {
   return {
-    put: jest.fn().mockResolvedValue(undefined),
-    read: jest.fn().mockResolvedValue({ stream: Readable.from(['x']) }),
-    remove: jest.fn().mockResolvedValue(undefined),
+    put: vi.fn().mockResolvedValue(undefined),
+    read: vi.fn().mockResolvedValue({ stream: Readable.from(['x']) }),
+    remove: vi.fn().mockResolvedValue(undefined),
   }
 }
 
@@ -249,7 +249,7 @@ describe('UploadLandingImageUseCase', () => {
   }
 
   function build(
-    processor = { process: jest.fn().mockResolvedValue(processed) },
+    processor = { process: vi.fn().mockResolvedValue(processed) },
   ) {
     const repo = new FakeRepository()
     const store = storage()
@@ -300,7 +300,7 @@ describe('UploadLandingImageUseCase', () => {
 
   it('stores nothing when processing fails', async () => {
     const { store, useCase } = build({
-      process: jest.fn().mockRejectedValue(new BadRequestException('x')),
+      process: vi.fn().mockRejectedValue(new BadRequestException('x')),
     })
     await expect(
       useCase.execute({
@@ -314,7 +314,7 @@ describe('UploadLandingImageUseCase', () => {
 
   it('removes the stored object when the row cannot be written', async () => {
     const { repo, store, useCase } = build()
-    repo.createImage = jest.fn().mockRejectedValue(new Error('db down'))
+    repo.createImage = vi.fn().mockRejectedValue(new Error('db down'))
     await expect(
       useCase.execute({
         file: { buffer: png },
@@ -458,7 +458,7 @@ describe('LandingImageGarbageCollector', () => {
 
   it('does nothing when nothing is unused', async () => {
     const { repo, store, gc } = setup()
-    const spy = jest.spyOn(repo, 'deleteImages')
+    const spy = vi.spyOn(repo, 'deleteImages')
     await gc.run()
     expect(spy).not.toHaveBeenCalled()
     expect(store.remove).not.toHaveBeenCalled()

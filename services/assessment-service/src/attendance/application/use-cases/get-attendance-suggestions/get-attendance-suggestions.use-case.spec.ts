@@ -27,8 +27,8 @@ const INPUT = {
 
 describe('GetAttendanceSuggestionsUseCase', () => {
   let useCase: GetAttendanceSuggestionsUseCase
-  const enrollments = { listByClassroom: jest.fn() }
-  const presence = { findByUsersAndDate: jest.fn(), summarizeMonth: jest.fn() }
+  const enrollments = { listByClassroom: vi.fn() }
+  const presence = { findByUsersAndDate: vi.fn(), summarizeMonth: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +40,7 @@ describe('GetAttendanceSuggestionsUseCase', () => {
     }).compile()
 
     useCase = module.get(GetAttendanceSuggestionsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     enrollments.listByClassroom.mockResolvedValue([
       enrollment('enr-1', 'user-1'),
       enrollment('enr-2', 'user-2'),

@@ -4,7 +4,7 @@ import { IApprovalRepository } from '../../../domain/repositories/approval.repos
 
 describe('CreateWorkflowUseCase', () => {
   function makeUseCase() {
-    const createWorkflow = jest.fn().mockResolvedValue({ id: 'wf-1' })
+    const createWorkflow = vi.fn().mockResolvedValue({ id: 'wf-1' })
     const repository = { createWorkflow } as unknown as IApprovalRepository
     return { useCase: new CreateWorkflowUseCase(repository), createWorkflow }
   }

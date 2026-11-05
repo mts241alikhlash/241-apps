@@ -8,9 +8,9 @@ describe('RolloverSemesterUseCase', () => {
   let useCase: RolloverSemesterUseCase
 
   const mockRolloverRepository = {
-    findSemesterWithAcademicYear: jest.fn(),
-    fetchSourceData: jest.fn(),
-    executeRollover: jest.fn(),
+    findSemesterWithAcademicYear: vi.fn(),
+    fetchSourceData: vi.fn(),
+    executeRollover: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('RolloverSemesterUseCase', () => {
     }).compile()
 
     useCase = module.get<RolloverSemesterUseCase>(RolloverSemesterUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

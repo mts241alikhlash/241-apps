@@ -6,7 +6,7 @@ import {
 
 describe('wave capacity queries', () => {
   it('counts only verified, non-rejected, live applications per wave', async () => {
-    const groupBy = jest
+    const groupBy = vi
       .fn()
       .mockResolvedValue([{ waveId: 'w1', _count: { _all: 3 } }])
     const counts = await countFilledByWave(
@@ -29,7 +29,7 @@ describe('wave capacity queries', () => {
   })
 
   it('does not query without waves and defaults missing counts to zero', async () => {
-    const groupBy = jest
+    const groupBy = vi
       .fn()
       .mockResolvedValue([{ waveId: 'w1', _count: { _all: 2 } }])
     const db = { admissionApplication: { groupBy } } as never

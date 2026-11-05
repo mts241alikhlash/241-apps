@@ -21,7 +21,7 @@ const payload: ExamScorePayload = {
 }
 
 const build = (status: number | Error) => {
-  const postStatus = jest.fn(() =>
+  const postStatus = vi.fn(() =>
     status instanceof Error ? Promise.reject(status) : Promise.resolve(status),
   )
   return {

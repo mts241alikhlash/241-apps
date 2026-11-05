@@ -3,8 +3,8 @@ import { findSchedulePage } from './prisma-schedule.queries.js'
 
 describe('schedule page scoping', () => {
   function prismaWithSpy() {
-    const findMany = jest.fn().mockResolvedValue([])
-    const count = jest.fn().mockResolvedValue(0)
+    const findMany = vi.fn().mockResolvedValue([])
+    const count = vi.fn().mockResolvedValue(0)
     return {
       prisma: { schedule: { findMany, count } } as unknown as PrismaClient,
       findMany,

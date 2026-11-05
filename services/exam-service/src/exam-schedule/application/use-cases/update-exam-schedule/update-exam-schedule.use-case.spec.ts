@@ -197,7 +197,7 @@ describe('Update and cancel exam schedule', () => {
 
   describe('when a session appears between the check and the write', () => {
     const appearDuring = (method: 'cancel' | 'updateWindow') =>
-      jest.spyOn(schedules, method).mockImplementationOnce(() => {
+      vi.spyOn(schedules, method).mockImplementationOnce(() => {
         guard.withSessions.add(scheduleId)
         return Promise.resolve(method === 'cancel' ? false : null) as never
       })

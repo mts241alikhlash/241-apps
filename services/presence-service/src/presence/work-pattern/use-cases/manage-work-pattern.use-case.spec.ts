@@ -39,13 +39,13 @@ describe('work pattern management', () => {
   let remove: DeleteWorkPatternUseCase
   let replaceDays: ReplaceWorkPatternDaysUseCase
   const repository = {
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
-    replaceDays: jest.fn(),
-    countAssignments: jest.fn(),
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
+    replaceDays: vi.fn(),
+    countAssignments: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -63,7 +63,7 @@ describe('work pattern management', () => {
     update = module.get(UpdateWorkPatternUseCase)
     remove = module.get(DeleteWorkPatternUseCase)
     replaceDays = module.get(ReplaceWorkPatternDaysUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAll.mockResolvedValue([STANDARD, PIKET])
     repository.findById.mockResolvedValue(PIKET)
     repository.countAssignments.mockResolvedValue(0)

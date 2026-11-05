@@ -7,9 +7,9 @@ describe('PromotionSemesterResolver', () => {
   let resolver: PromotionSemesterResolver
 
   const repository = {
-    findEdgeSemesterOfAcademicYear: jest.fn(),
-    findLatestEnrolledSemesterOfAcademicYear: jest.fn(),
-    findAcademicYearName: jest.fn(),
+    findEdgeSemesterOfAcademicYear: vi.fn(),
+    findLatestEnrolledSemesterOfAcademicYear: vi.fn(),
+    findAcademicYearName: vi.fn(),
   }
 
   const semester = (id: string, academicYearId: string) => ({
@@ -27,7 +27,7 @@ describe('PromotionSemesterResolver', () => {
     }).compile()
 
     resolver = module.get(PromotionSemesterResolver)
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     repository.findAcademicYearName.mockResolvedValue(null)
   })
 

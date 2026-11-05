@@ -41,14 +41,14 @@ describe('BulkImportEmployeesUseCase', () => {
   let useCase: BulkImportEmployeesUseCase
 
   const mockRepo = {
-    findUserByIdentifier: jest.fn(),
-    findProfileByNik: jest.fn(),
-    findByUserId: jest.fn(),
-    findByNip: jest.fn(),
-    findByNuptk: jest.fn(),
-    resolveEmploymentTypeId: jest.fn().mockResolvedValue('employment-type-id'),
-    create: jest.fn(),
-    update: jest.fn(),
+    findUserByIdentifier: vi.fn(),
+    findProfileByNik: vi.fn(),
+    findByUserId: vi.fn(),
+    findByNip: vi.fn(),
+    findByNuptk: vi.fn(),
+    resolveEmploymentTypeId: vi.fn().mockResolvedValue('employment-type-id'),
+    create: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -61,7 +61,7 @@ describe('BulkImportEmployeesUseCase', () => {
     }).compile()
 
     useCase = module.get<BulkImportEmployeesUseCase>(BulkImportEmployeesUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepo.resolveEmploymentTypeId.mockResolvedValue('employment-type-id')
   })
 

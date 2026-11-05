@@ -8,9 +8,9 @@ describe('UpdateClassroomUseCase', () => {
   let useCase: UpdateClassroomUseCase
 
   const mockRepository = {
-    findById: jest.fn(),
-    findDuplicate: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findDuplicate: vi.fn(),
+    update: vi.fn(),
   }
 
   const existingClassroom = {
@@ -32,7 +32,7 @@ describe('UpdateClassroomUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateClassroomUseCase>(UpdateClassroomUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

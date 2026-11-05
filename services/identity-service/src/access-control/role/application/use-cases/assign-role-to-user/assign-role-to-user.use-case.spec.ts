@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import { AssignRoleToUserUseCase } from './assign-role-to-user.use-case.js'
@@ -6,19 +7,19 @@ import { IUserRepository } from '../../../../../user/index.js'
 
 describe('AssignRoleToUserUseCase', () => {
   let useCase: AssignRoleToUserUseCase
-  let rolesRepo: jest.Mocked<IRoleRepository>
-  let usersRepo: jest.Mocked<IUserRepository>
+  let rolesRepo: Mocked<IRoleRepository>
+  let usersRepo: Mocked<IUserRepository>
 
   beforeEach(async () => {
     const mockRolesRepository = {
-      findById: jest.fn(),
-      findUserRoles: jest.fn(),
-      findUserRole: jest.fn(),
-      assignRoleToUser: jest.fn(),
+      findById: vi.fn(),
+      findUserRoles: vi.fn(),
+      findUserRole: vi.fn(),
+      assignRoleToUser: vi.fn(),
     }
 
     const mockUsersRepository = {
-      findById: jest.fn(),
+      findById: vi.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({

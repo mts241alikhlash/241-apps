@@ -13,12 +13,12 @@ import { DeleteAdmissionWaveUseCase } from './delete-admission-wave/delete-admis
 
 describe('Admission Wave use-cases', () => {
   const mockRepository = {
-    findAll: jest.fn(),
-    findById: jest.fn(),
-    findByCode: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    softDelete: jest.fn(),
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    findByCode: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
   }
 
   let getWaves: GetAdmissionWavesUseCase
@@ -44,7 +44,7 @@ describe('Admission Wave use-cases', () => {
     create = module.get(CreateAdmissionWaveUseCase)
     update = module.get(UpdateAdmissionWaveUseCase)
     remove = module.get(DeleteAdmissionWaveUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const createDto = {

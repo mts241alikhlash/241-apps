@@ -13,15 +13,15 @@ import { VerifyDocumentUseCase } from './verify-document/verify-document.use-cas
 
 describe('Document workflow use-cases', () => {
   const repo = {
-    findDocument: jest.fn(),
-    updateDocumentStatus: jest.fn(),
-    findApplicationForUpload: jest.fn(),
-    findByApplicationId: jest.fn(),
-    findDocumentTypeByCode: jest.fn(),
-    saveDocument: jest.fn(),
+    findDocument: vi.fn(),
+    updateDocumentStatus: vi.fn(),
+    findApplicationForUpload: vi.fn(),
+    findByApplicationId: vi.fn(),
+    findDocumentTypeByCode: vi.fn(),
+    saveDocument: vi.fn(),
   }
-  const storage = { save: jest.fn() }
-  const notifications = { notify: jest.fn() }
+  const storage = { save: vi.fn() }
+  const notifications = { notify: vi.fn() }
 
   let verifyDocument: VerifyDocumentUseCase
   let uploadDocument: UploadAdmissionDocumentUseCase
@@ -42,7 +42,7 @@ describe('Document workflow use-cases', () => {
 
     verifyDocument = module.get(VerifyDocumentUseCase)
     uploadDocument = module.get(UploadAdmissionDocumentUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('approves a document and tells the applicant which one', async () => {

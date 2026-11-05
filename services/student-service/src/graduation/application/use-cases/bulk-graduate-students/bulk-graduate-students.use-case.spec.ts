@@ -7,8 +7,8 @@ describe('BulkGraduateStudentsUseCase', () => {
   let useCase: BulkGraduateStudentsUseCase
 
   const mockRepo = {
-    executeBulk: jest.fn(),
-    findActiveAcademicYearId: jest.fn(),
+    executeBulk: vi.fn(),
+    findActiveAcademicYearId: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('BulkGraduateStudentsUseCase', () => {
     }).compile()
 
     useCase = module.get(BulkGraduateStudentsUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepo.findActiveAcademicYearId.mockResolvedValue('ay-1')
   })
 

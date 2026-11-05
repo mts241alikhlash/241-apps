@@ -8,8 +8,8 @@ describe('CreateSubjectUseCase', () => {
   let useCase: CreateSubjectUseCase
 
   const mockRepo = {
-    findByName: jest.fn(),
-    create: jest.fn(),
+    findByName: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('CreateSubjectUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateSubjectUseCase>(CreateSubjectUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

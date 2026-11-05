@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { Test, TestingModule } from '@nestjs/testing'
 import { IPromotionRepository } from '../../../domain/repositories/promotion.repository.js'
 import { PromotionSemesterResolver } from '../../services/promotion-semester-resolver.service.js'
@@ -7,12 +8,12 @@ import { GeneratePromotionRecommendationUseCase } from './generate-promotion-rec
 describe('GeneratePromotionRecommendationUseCase', () => {
   let useCase: GeneratePromotionRecommendationUseCase
 
-  const mockRepository: Record<string, jest.Mock> = {
-    findLatestEnrolledSemesterOfAcademicYear: jest.fn(),
-    findEdgeSemesterOfAcademicYear: jest.fn(),
-    findAcademicYearName: jest.fn(),
-    findActiveEnrollmentsWithDetails: jest.fn(),
-    findClassesByAcademicYear: jest.fn(),
+  const mockRepository: Record<string, Mock> = {
+    findLatestEnrolledSemesterOfAcademicYear: vi.fn(),
+    findEdgeSemesterOfAcademicYear: vi.fn(),
+    findAcademicYearName: vi.fn(),
+    findActiveEnrollmentsWithDetails: vi.fn(),
+    findClassesByAcademicYear: vi.fn(),
   }
 
   const sourceSemester = { id: 'sem-src', academicYearId: 'ay-1' }
@@ -29,7 +30,7 @@ describe('GeneratePromotionRecommendationUseCase', () => {
     useCase = module.get<GeneratePromotionRecommendationUseCase>(
       GeneratePromotionRecommendationUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepository.findLatestEnrolledSemesterOfAcademicYear.mockResolvedValue(
       sourceSemester,
     )

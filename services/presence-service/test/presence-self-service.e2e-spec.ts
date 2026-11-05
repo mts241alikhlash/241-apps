@@ -35,13 +35,13 @@ describe('presence self-service (FR-061)', () => {
     }
   }
 
-  const dailyPresence = { findMany: jest.fn().mockResolvedValue([]) }
+  const dailyPresence = { findMany: vi.fn().mockResolvedValue([]) }
 
   const prismaMock = {
     dailyPresence,
-    presenceCredential: { findMany: jest.fn().mockResolvedValue([]) },
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    presenceCredential: { findMany: vi.fn().mockResolvedValue([]) },
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
   }
 
   beforeAll(async () => {
@@ -82,7 +82,7 @@ describe('presence self-service (FR-061)', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     granted = READ_OWN
     dailyPresence.findMany.mockResolvedValue([])
   })

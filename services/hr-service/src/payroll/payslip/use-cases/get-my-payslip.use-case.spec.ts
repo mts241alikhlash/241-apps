@@ -23,8 +23,8 @@ function payslip() {
 
 describe('GetMyPayslipUseCase', () => {
   let useCase: GetMyPayslipUseCase
-  const payslips = { findOwn: jest.fn() }
-  const audit = { record: jest.fn() }
+  const payslips = { findOwn: vi.fn() }
+  const audit = { record: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('GetMyPayslipUseCase', () => {
     }).compile()
 
     useCase = module.get(GetMyPayslipUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     audit.record.mockResolvedValue(undefined)
   })
 

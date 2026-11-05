@@ -12,12 +12,12 @@ import {
 
 describe('salary component writes', () => {
   const repository = {
-    findById: jest.fn(),
-    findByCode: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    countAssignments: jest.fn(),
-    softDelete: jest.fn(),
+    findById: vi.fn(),
+    findByCode: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    countAssignments: vi.fn(),
+    softDelete: vi.fn(),
   }
   const port = repository as unknown as ISalaryComponentRepository
   const create = new CreateSalaryComponentUseCase(port)
@@ -25,7 +25,7 @@ describe('salary component writes', () => {
   const remove = new DeleteSalaryComponentUseCase(port)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     repository.findByCode.mockResolvedValue(null)
     repository.findById.mockResolvedValue({
       id: 'c-1',

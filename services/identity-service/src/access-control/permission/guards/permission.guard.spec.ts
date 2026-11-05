@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ForbiddenException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { ExecutionContext } from '@nestjs/common'
@@ -5,10 +6,10 @@ import { PermissionGuard } from './permission.guard.js'
 
 describe('PermissionGuard', () => {
   const repo = {
-    findUserRoles: jest.fn(),
-    findUserPermissions: jest.fn(),
+    findUserRoles: vi.fn(),
+    findUserPermissions: vi.fn(),
   }
-  const reflector = { getAllAndOverride: jest.fn() } as unknown as Reflector
+  const reflector = { getAllAndOverride: vi.fn() } as unknown as Reflector
 
   const guard = new PermissionGuard(reflector, repo as never)
 
@@ -21,10 +22,8 @@ describe('PermissionGuard', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(reflector.getAllAndOverride as jest.Mock).mockReturnValue([
-      'students.read',
-    ])
+    vi.clearAllMocks()
+    ;(reflector.getAllAndOverride as Mock).mockReturnValue(['students.read'])
   })
 
   describe('when the token carries grants', () => {
@@ -85,7 +84,7 @@ describe('PermissionGuard', () => {
   })
 
   it('lets an unguarded route through untouched', async () => {
-    ;(reflector.getAllAndOverride as jest.Mock).mockReturnValue(undefined)
+    ;(reflector.getAllAndOverride as Mock).mockReturnValue(undefined)
 
     await expect(guard.canActivate(contextFor(undefined))).resolves.toBe(true)
     expect(repo.findUserRoles).not.toHaveBeenCalled()

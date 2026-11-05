@@ -5,11 +5,11 @@ import { visiblePostWhere } from '../infrastructure/persistence/post.where.js'
 import { PostStatusSyncService } from './post-status-sync.service.js'
 import { PortalCacheService } from '../../shared/services/portal-cache.service.js'
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('PostStatusSyncService', () => {
   let service: PostStatusSyncService
-  const repository = { normalizeDueScheduled: jest.fn() }
+  const repository = { normalizeDueScheduled: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,7 +21,7 @@ describe('PostStatusSyncService', () => {
     }).compile()
 
     service = module.get(PostStatusSyncService)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.normalizeDueScheduled.mockResolvedValue(0)
   })
 

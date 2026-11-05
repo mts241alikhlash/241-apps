@@ -5,13 +5,13 @@ const approved = (documentTypeId: string) => ({
 })
 
 function queueRepository(counts = [3, 2, 7]) {
-  const findMany = jest.fn().mockResolvedValue([])
-  const count = jest.fn()
+  const findMany = vi.fn().mockResolvedValue([])
+  const count = vi.fn()
   counts.forEach((value) => count.mockResolvedValueOnce(value))
   count.mockResolvedValue(0)
   const prisma = {
     admissionDocumentType: {
-      findMany: jest.fn().mockResolvedValue([{ id: 'kk' }, { id: 'akta' }]),
+      findMany: vi.fn().mockResolvedValue([{ id: 'kk' }, { id: 'akta' }]),
     },
     admissionApplication: { findMany, count },
   }
@@ -180,7 +180,7 @@ describe('PrismaAdmissionDocumentReviewRepository.findQueue', () => {
 
 describe('PrismaAdmissionDocumentReviewRepository.findContext', () => {
   it('returns every active document type with the applicant’s document or null', async () => {
-    const findFirst = jest.fn().mockResolvedValue({
+    const findFirst = vi.fn().mockResolvedValue({
       id: 'app1',
       registrationNumber: 'PPDB-001',
       fullName: 'Ahmad',
@@ -205,7 +205,7 @@ describe('PrismaAdmissionDocumentReviewRepository.findContext', () => {
         },
       ],
     })
-    const findTypes = jest.fn().mockResolvedValue([
+    const findTypes = vi.fn().mockResolvedValue([
       { id: 'kk', code: 'KK', name: 'Kartu Keluarga', requirement: 'REQUIRED' },
       {
         id: 'surat',
@@ -255,8 +255,8 @@ describe('PrismaAdmissionDocumentReviewRepository.findContext', () => {
 
   it('answers null for an unknown or deleted application', async () => {
     const repository = new PrismaAdmissionDocumentReviewRepository({
-      admissionApplication: { findFirst: jest.fn().mockResolvedValue(null) },
-      admissionDocumentType: { findMany: jest.fn().mockResolvedValue([]) },
+      admissionApplication: { findFirst: vi.fn().mockResolvedValue(null) },
+      admissionDocumentType: { findMany: vi.fn().mockResolvedValue([]) },
     } as never)
 
     await expect(repository.findContext('missing')).resolves.toBeNull()
@@ -266,16 +266,16 @@ describe('PrismaAdmissionDocumentReviewRepository.findContext', () => {
 describe('PrismaAdmissionDocumentReviewRepository writes', () => {
   function transactional(overrides: Record<string, unknown> = {}) {
     const tx = {
-      $queryRaw: jest.fn().mockResolvedValue([]),
+      $queryRaw: vi.fn().mockResolvedValue([]),
       admissionApplication: {
-        findFirst: jest.fn().mockResolvedValue({ status: 'SUBMITTED' }),
+        findFirst: vi.fn().mockResolvedValue({ status: 'SUBMITTED' }),
       },
       admissionDocument: {
-        findFirst: jest.fn().mockResolvedValue({
+        findFirst: vi.fn().mockResolvedValue({
           id: 'd1',
           documentType: { requirement: 'REQUIRED' },
         }),
-        update: jest.fn().mockResolvedValue({
+        update: vi.fn().mockResolvedValue({
           id: 'd1',
           documentTypeId: 'kk',
           status: 'REJECTED',
@@ -292,7 +292,7 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
       ...overrides,
     }
     const prisma = {
-      $transaction: jest.fn((run: (client: unknown) => unknown) => run(tx)),
+      $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
     }
     return {
       repository: new PrismaAdmissionDocumentReviewRepository(prisma as never),
@@ -333,11 +333,11 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
   it('answers LATER_TYPE and writes nothing for a late document', async () => {
     const { repository, tx } = transactional({
       admissionDocument: {
-        findFirst: jest.fn().mockResolvedValue({
+        findFirst: vi.fn().mockResolvedValue({
           id: 'd1',
           documentType: { requirement: 'LATER' },
         }),
-        update: jest.fn(),
+        update: vi.fn(),
       },
     })
 
@@ -350,7 +350,7 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
   it('writes nothing once the application is no longer submitted', async () => {
     const { repository, tx } = transactional({
       admissionApplication: {
-        findFirst: jest.fn().mockResolvedValue({ status: 'REVISION_NEEDED' }),
+        findFirst: vi.fn().mockResolvedValue({ status: 'REVISION_NEEDED' }),
       },
     })
 
@@ -362,12 +362,12 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
 
   it('answers not found for an unknown application or a document of another applicant', async () => {
     const missingApplication = transactional({
-      admissionApplication: { findFirst: jest.fn().mockResolvedValue(null) },
+      admissionApplication: { findFirst: vi.fn().mockResolvedValue(null) },
     })
     const missingDocument = transactional({
       admissionDocument: {
-        findFirst: jest.fn().mockResolvedValue(null),
-        update: jest.fn(),
+        findFirst: vi.fn().mockResolvedValue(null),
+        update: vi.fn(),
       },
     })
 
@@ -381,7 +381,7 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
   })
 
   it('returns the application for revision only while it is still submitted', async () => {
-    const updateMany = jest.fn().mockResolvedValueOnce({ count: 1 })
+    const updateMany = vi.fn().mockResolvedValueOnce({ count: 1 })
     updateMany.mockResolvedValueOnce({ count: 0 })
     const repository = new PrismaAdmissionDocumentReviewRepository({
       admissionApplication: { updateMany },
@@ -402,9 +402,9 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
   describe('recordApproval', () => {
     function approving(overrides: Record<string, unknown> = {}) {
       const tx = {
-        $queryRaw: jest.fn().mockResolvedValue([]),
+        $queryRaw: vi.fn().mockResolvedValue([]),
         admissionApplication: {
-          findFirst: jest.fn().mockResolvedValue({
+          findFirst: vi.fn().mockResolvedValue({
             status: 'SUBMITTED',
             submittedAt: new Date('2026-10-01T00:00:00Z'),
             documents: [
@@ -414,16 +414,16 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
           }),
         },
         admissionDocumentType: {
-          findMany: jest.fn().mockResolvedValue([{ id: 'kk' }]),
+          findMany: vi.fn().mockResolvedValue([{ id: 'kk' }]),
         },
         admissionNotification: {
-          findFirst: jest.fn().mockResolvedValue(null),
-          create: jest.fn().mockResolvedValue({}),
+          findFirst: vi.fn().mockResolvedValue(null),
+          create: vi.fn().mockResolvedValue({}),
         },
         ...overrides,
       }
       const prisma = {
-        $transaction: jest.fn((run: (client: unknown) => unknown) => run(tx)),
+        $transaction: vi.fn((run: (client: unknown) => unknown) => run(tx)),
       }
       return {
         repository: new PrismaAdmissionDocumentReviewRepository(
@@ -447,7 +447,7 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
     it('ignores a rejected late document', async () => {
       const { repository, tx } = approving({
         admissionApplication: {
-          findFirst: jest.fn().mockResolvedValue({
+          findFirst: vi.fn().mockResolvedValue({
             status: 'SUBMITTED',
             submittedAt: new Date('2026-10-01T00:00:00Z'),
             documents: [
@@ -488,8 +488,8 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
     it('records nothing when the notice already exists for this submission', async () => {
       const { repository, tx } = approving({
         admissionNotification: {
-          findFirst: jest.fn().mockResolvedValue({ id: 'n1' }),
-          create: jest.fn(),
+          findFirst: vi.fn().mockResolvedValue({ id: 'n1' }),
+          create: vi.fn(),
         },
       })
 
@@ -519,7 +519,7 @@ describe('PrismaAdmissionDocumentReviewRepository writes', () => {
     ])('records nothing when %s', async (_name, application) => {
       const { repository, tx } = approving({
         admissionApplication: {
-          findFirst: jest
+          findFirst: vi
             .fn()
             .mockResolvedValue({ submittedAt: null, ...application }),
         },

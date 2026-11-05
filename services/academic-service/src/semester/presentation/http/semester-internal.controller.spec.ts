@@ -4,7 +4,7 @@ import { ISemesterRepository } from '../../domain/repositories/semester.reposito
 import { SemesterInternalController } from './semester-internal.controller.js'
 
 describe('SemesterInternalController dates', () => {
-  const findAll = jest.fn()
+  const findAll = vi.fn()
   let controller: SemesterInternalController
 
   beforeEach(async () => {

@@ -25,16 +25,16 @@ function item(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 const repository = {
-  findAll: jest.fn(),
-  findById: jest.fn(),
-  findPublic: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  reorder: jest.fn(),
-  delete: jest.fn(),
+  findAll: vi.fn(),
+  findById: vi.fn(),
+  findPublic: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  reorder: vi.fn(),
+  delete: vi.fn(),
 }
 
 async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
@@ -49,7 +49,7 @@ async function build<T>(useCase: new (...args: never[]) => T): Promise<T> {
 }
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   repository.findAll.mockResolvedValue([item()])
   repository.findById.mockResolvedValue(item())
   repository.create.mockImplementation((data: Record<string, unknown>) =>

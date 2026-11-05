@@ -3,13 +3,13 @@ import { PrismaAdmissionApplicantReader } from './prisma-admission-applicant.rea
 function makeReader(filled: Record<string, number>) {
   const prisma = {
     admissionWave: {
-      findMany: jest.fn().mockResolvedValue([
+      findMany: vi.fn().mockResolvedValue([
         { id: 'w1', quota: 2, startDate: new Date('2027-01-01') },
         { id: 'w2', quota: 2, startDate: new Date('2027-02-01') },
       ]),
     },
     admissionApplication: {
-      groupBy: jest.fn().mockResolvedValue(
+      groupBy: vi.fn().mockResolvedValue(
         Object.entries(filled).map(([waveId, n]) => ({
           waveId,
           _count: { _all: n },
@@ -38,7 +38,7 @@ describe('PrismaAdmissionApplicantReader.findActiveWave', () => {
 
 describe('PrismaAdmissionApplicantReader.findRequiredActiveDocumentTypes', () => {
   it('asks only for active REQUIRED types', async () => {
-    const findMany = jest.fn().mockResolvedValue([])
+    const findMany = vi.fn().mockResolvedValue([])
     const reader = new PrismaAdmissionApplicantReader(
       { admissionDocumentType: { findMany } } as never,
       {} as never,

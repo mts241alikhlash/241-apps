@@ -36,11 +36,11 @@ function entry(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('GetPublicAgendaUseCase', () => {
   let useCase: GetPublicAgendaUseCase
-  const repository = { findPublic: jest.fn() }
+  const repository = { findPublic: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -52,7 +52,7 @@ describe('GetPublicAgendaUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPublicAgendaUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findPublic.mockResolvedValue({
       data: [entry()],
       total: 1,
@@ -137,7 +137,7 @@ describe('the upcoming/past predicate', () => {
 
 describe('GetPublicAgendaBySlugUseCase', () => {
   let useCase: GetPublicAgendaBySlugUseCase
-  const repository = { findPublicBySlug: jest.fn() }
+  const repository = { findPublicBySlug: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -149,7 +149,7 @@ describe('GetPublicAgendaBySlugUseCase', () => {
     }).compile()
 
     useCase = module.get(GetPublicAgendaBySlugUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('returns an entry that has already happened', async () => {

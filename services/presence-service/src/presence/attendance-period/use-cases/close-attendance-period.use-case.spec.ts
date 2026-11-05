@@ -14,13 +14,13 @@ function incomplete(userId: string) {
 describe('CloseAttendancePeriodUseCase', () => {
   let useCase: CloseAttendancePeriodUseCase
   const periods = {
-    findByPeriod: jest.fn(),
-    close: jest.fn(),
-    isClosed: jest.fn(),
-    findAll: jest.fn(),
+    findByPeriod: vi.fn(),
+    close: vi.fn(),
+    isClosed: vi.fn(),
+    findAll: vi.fn(),
   }
-  const prisma = { dailyPresence: { findMany: jest.fn() } }
-  const profileLookupPort = { findByUserIds: jest.fn() }
+  const prisma = { dailyPresence: { findMany: vi.fn() } }
+  const profileLookupPort = { findByUserIds: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,7 +33,7 @@ describe('CloseAttendancePeriodUseCase', () => {
     }).compile()
 
     useCase = module.get(CloseAttendancePeriodUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     periods.findByPeriod.mockResolvedValue(null)
     prisma.dailyPresence.findMany.mockResolvedValue([])
     profileLookupPort.findByUserIds.mockResolvedValue([])

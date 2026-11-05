@@ -18,15 +18,15 @@ describe('PrismaUserRepository.provisionAccount', () => {
 
   function makeTx(role: { id: string } | null) {
     return {
-      user: { create: jest.fn().mockResolvedValue({ id: 'u-1' }) },
-      role: { findUnique: jest.fn().mockResolvedValue(role) },
-      userRole: { create: jest.fn().mockResolvedValue({}) },
+      user: { create: vi.fn().mockResolvedValue({ id: 'u-1' }) },
+      role: { findUnique: vi.fn().mockResolvedValue(role) },
+      userRole: { create: vi.fn().mockResolvedValue({}) },
     }
   }
 
   function repositoryWith(tx: ReturnType<typeof makeTx>) {
     const prisma = {
-      $transaction: jest.fn((fn: (tx: unknown) => unknown) => fn(tx)),
+      $transaction: vi.fn((fn: (tx: unknown) => unknown) => fn(tx)),
     }
     return new PrismaUserRepository(prisma as never)
   }

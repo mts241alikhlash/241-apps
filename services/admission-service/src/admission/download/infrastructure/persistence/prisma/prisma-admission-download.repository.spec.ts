@@ -16,15 +16,15 @@ const row = {
 function makePrisma() {
   return {
     admissionDownload: {
-      findMany: jest.fn().mockResolvedValue([row]),
-      findUnique: jest.fn().mockResolvedValue(row),
-      findFirst: jest.fn().mockResolvedValue(null),
-      aggregate: jest.fn().mockResolvedValue({ _max: { sortOrder: null } }),
-      create: jest.fn().mockResolvedValue(row),
-      update: jest.fn().mockResolvedValue(row),
-      delete: jest.fn().mockResolvedValue(row),
+      findMany: vi.fn().mockResolvedValue([row]),
+      findUnique: vi.fn().mockResolvedValue(row),
+      findFirst: vi.fn().mockResolvedValue(null),
+      aggregate: vi.fn().mockResolvedValue({ _max: { sortOrder: null } }),
+      create: vi.fn().mockResolvedValue(row),
+      update: vi.fn().mockResolvedValue(row),
+      delete: vi.fn().mockResolvedValue(row),
     },
-    $transaction: jest.fn((ops: unknown[]) => Promise.all(ops)),
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   }
 }
 

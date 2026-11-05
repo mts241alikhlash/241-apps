@@ -26,23 +26,23 @@ describe('ResolveBulkImportConflictsUseCase (employee)', () => {
   let useCase: ResolveBulkImportConflictsUseCase
 
   const mockRepo = {
-    resolveEmploymentTypeId: jest.fn().mockResolvedValue('employment-type-id'),
-    findByNip: jest.fn(),
-    findByNuptk: jest.fn(),
-    findProfileByNik: jest.fn(),
-    findByUserId: jest.fn(),
+    resolveEmploymentTypeId: vi.fn().mockResolvedValue('employment-type-id'),
+    findByNip: vi.fn(),
+    findByNuptk: vi.fn(),
+    findProfileByNik: vi.fn(),
+    findByUserId: vi.fn(),
   }
 
   const mockUpdateEmployee = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockUpdateEmployeeProfile = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   const mockCreateEmployee = {
-    execute: jest.fn(),
+    execute: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -62,7 +62,7 @@ describe('ResolveBulkImportConflictsUseCase (employee)', () => {
     useCase = module.get<ResolveBulkImportConflictsUseCase>(
       ResolveBulkImportConflictsUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockRepo.resolveEmploymentTypeId.mockResolvedValue('employment-type-id')
   })
 

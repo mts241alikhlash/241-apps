@@ -49,13 +49,13 @@ function publishable(overrides: Record<string, unknown> = {}) {
   }
 }
 
-const cacheMock = { invalidate: jest.fn(), get: jest.fn(), set: jest.fn() }
+const cacheMock = { invalidate: vi.fn(), get: vi.fn(), set: vi.fn() }
 
 describe('PublishPostUseCase', () => {
   let useCase: PublishPostUseCase
 
-  const mockRepository = { findById: jest.fn(), publish: jest.fn() }
-  const mockAudit = { record: jest.fn() }
+  const mockRepository = { findById: vi.fn(), publish: vi.fn() }
+  const mockAudit = { record: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -68,7 +68,7 @@ describe('PublishPostUseCase', () => {
     }).compile()
 
     useCase = module.get(PublishPostUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockAudit.record.mockResolvedValue(undefined)
     mockRepository.findById.mockResolvedValue(publishable())
     mockRepository.publish.mockImplementation((_id, _v, data) =>

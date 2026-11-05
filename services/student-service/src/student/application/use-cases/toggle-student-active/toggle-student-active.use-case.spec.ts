@@ -7,8 +7,8 @@ describe('ToggleStudentActiveUseCase', () => {
   let useCase: ToggleStudentActiveUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    toggleUserActive: jest.fn(),
+    findById: vi.fn(),
+    toggleUserActive: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -20,7 +20,7 @@ describe('ToggleStudentActiveUseCase', () => {
     }).compile()
 
     useCase = module.get<ToggleStudentActiveUseCase>(ToggleStudentActiveUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

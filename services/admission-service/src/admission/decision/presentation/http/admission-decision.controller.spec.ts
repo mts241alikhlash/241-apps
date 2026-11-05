@@ -2,7 +2,7 @@ import { AdmissionDecisionController } from './admission-decision.controller.js'
 
 describe('AdmissionDecisionController.acceptMany', () => {
   function setup() {
-    const acceptMany = { execute: jest.fn().mockResolvedValue({ results: [] }) }
+    const acceptMany = { execute: vi.fn().mockResolvedValue({ results: [] }) }
     const controller = new AdmissionDecisionController(
       {} as never,
       {} as never,

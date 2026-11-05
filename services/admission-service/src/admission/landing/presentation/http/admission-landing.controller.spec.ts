@@ -34,7 +34,7 @@ describe('AdmissionLandingController permissions', () => {
   })
 
   it('returns the overview with an ISO publish time', async () => {
-    const getLanding = { draft: jest.fn().mockResolvedValue(overview) }
+    const getLanding = { draft: vi.fn().mockResolvedValue(overview) }
     const controller = new AdmissionLandingController(
       getLanding as never,
       {} as never,
@@ -52,7 +52,7 @@ describe('AdmissionLandingController permissions', () => {
   })
 
   it('saves a section for the signed-in user', async () => {
-    const save = { execute: jest.fn().mockResolvedValue(overview) }
+    const save = { execute: vi.fn().mockResolvedValue(overview) }
     const controller = new AdmissionLandingController(
       {} as never,
       save as never,
@@ -70,7 +70,7 @@ describe('AdmissionLandingController permissions', () => {
 
   it('uploads an image and returns only its public fields', async () => {
     const upload = {
-      execute: jest.fn().mockResolvedValue({
+      execute: vi.fn().mockResolvedValue({
         id: 'i1',
         width: 1080,
         height: 1920,
@@ -120,7 +120,7 @@ describe('AdmissionLandingPublicController', () => {
 
   it('returns the published sections with null for the unpublished ones', async () => {
     const getLanding = {
-      published: jest.fn().mockResolvedValue({
+      published: vi.fn().mockResolvedValue({
         hero: null,
         life: null,
         info: null,
@@ -144,11 +144,11 @@ describe('AdmissionLandingPublicController', () => {
   it('streams an image as long-cached WebP', async () => {
     const stream = Readable.from(['x'])
     const getImage = {
-      execute: jest
+      execute: vi
         .fn()
         .mockResolvedValue({ image: { id: 'i1', sizeBytes: 9 }, stream }),
     }
-    const res = { set: jest.fn() }
+    const res = { set: vi.fn() }
     const controller = new AdmissionLandingPublicController(
       {} as never,
       getImage as never,

@@ -57,8 +57,8 @@ describe('ApprovalController', () => {
   }
 
   function controllerWithSpies() {
-    const getPendingApprovalsUseCase = { execute: jest.fn() }
-    const processApprovalUseCase = { execute: jest.fn() }
+    const getPendingApprovalsUseCase = { execute: vi.fn() }
+    const processApprovalUseCase = { execute: vi.fn() }
     return {
       controller: new ApprovalController(
         getPendingApprovalsUseCase as never,

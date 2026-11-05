@@ -13,10 +13,10 @@ describe('TokenManagerService', () => {
     JWT_REFRESH_EXPIRATION: '7d',
   }
   const mockConfigService = {
-    get: jest.fn(
+    get: vi.fn(
       (key: string, defaultVal?: string) => testConfig[key] ?? defaultVal,
     ),
-    getOrThrow: jest.fn((key: string) => {
+    getOrThrow: vi.fn((key: string) => {
       const value = testConfig[key]
       if (value === undefined) {
         throw new Error(`Missing config: ${key}`)
@@ -26,8 +26,8 @@ describe('TokenManagerService', () => {
   }
 
   const mockJwtService = {
-    signAsync: jest.fn(),
-    verifyAsync: jest.fn(),
+    signAsync: vi.fn(),
+    verifyAsync: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -41,7 +41,7 @@ describe('TokenManagerService', () => {
 
     service = module.get<TokenManagerService>(TokenManagerService)
 
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { NotFoundException } from '@nestjs/common'
 import { IConditionRepository } from '../../domain/repositories/condition.repository.js'
 import { CreateConditionUseCase } from './create-condition/create-condition.use-case.js'
@@ -16,12 +17,12 @@ describe('condition use cases', () => {
 
   function makeRepository() {
     return {
-      findMany: jest.fn().mockResolvedValue([condition]),
-      findById: jest.fn().mockResolvedValue(condition),
-      create: jest.fn().mockResolvedValue(condition),
-      update: jest.fn().mockResolvedValue(condition),
-      delete: jest.fn().mockResolvedValue(condition),
-    } as unknown as jest.Mocked<IConditionRepository>
+      findMany: vi.fn().mockResolvedValue([condition]),
+      findById: vi.fn().mockResolvedValue(condition),
+      create: vi.fn().mockResolvedValue(condition),
+      update: vi.fn().mockResolvedValue(condition),
+      delete: vi.fn().mockResolvedValue(condition),
+    } as unknown as Mocked<IConditionRepository>
   }
 
   it('defaults isUsable when creating a condition', async () => {

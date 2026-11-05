@@ -6,7 +6,7 @@ import { GetAcademicCalendarByIdUseCase } from './get-academic-calendar-by-id.us
 describe('GetAcademicCalendarByIdUseCase', () => {
   let useCase: GetAcademicCalendarByIdUseCase
 
-  const mockRepo = { findById: jest.fn() }
+  const mockRepo = { findById: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('GetAcademicCalendarByIdUseCase', () => {
     useCase = module.get<GetAcademicCalendarByIdUseCase>(
       GetAcademicCalendarByIdUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

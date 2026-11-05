@@ -3,7 +3,7 @@ import type { PrismaService } from '../../../core/database/prisma.service.js'
 
 describe('IEmployeeIdentityReadPort', () => {
   function employeePortWith(row: { id: string } | null) {
-    const findFirst = jest.fn().mockResolvedValue(row)
+    const findFirst = vi.fn().mockResolvedValue(row)
     const prisma = { employee: { findFirst } } as unknown as PrismaService
     return { port: new PrismaEmployeeIdentityReadPort(prisma), findFirst }
   }
@@ -39,7 +39,7 @@ describe('IEmployeeIdentityReadPort', () => {
 
   describe('roster', () => {
     function rosterPortWith(rows: { userId: string }[]) {
-      const findMany = jest.fn().mockResolvedValue(rows)
+      const findMany = vi.fn().mockResolvedValue(rows)
       const prisma = { employee: { findMany } } as unknown as PrismaService
       return { port: new PrismaEmployeeIdentityReadPort(prisma), findMany }
     }

@@ -23,7 +23,7 @@ const OTHER = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 
 describe('GetSessionFileUseCase', () => {
   const fileResult = { file: { id: USED }, stream: Readable.from([]) }
-  const execute = jest.fn(() => Promise.resolve(fileResult))
+  const execute = vi.fn(() => Promise.resolve(fileResult))
   const getFile = { execute } as unknown as GetExamFileUseCase
 
   async function setup(guideImage = false) {

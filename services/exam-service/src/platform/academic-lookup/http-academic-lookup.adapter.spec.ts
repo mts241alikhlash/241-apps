@@ -29,11 +29,11 @@ function build(responses: Record<string, unknown>) {
     )
     return Promise.resolve(hit ? hit[1] : undefined)
   }
-  const getData = jest.fn((_key: string, path: string) => answer(path))
-  const postData = jest.fn((_key: string, path: string, _body: unknown) =>
+  const getData = vi.fn((_key: string, path: string) => answer(path))
+  const postData = vi.fn((_key: string, path: string, _body: unknown) =>
     answer(path),
   )
-  const malformed = jest.fn((): never => {
+  const malformed = vi.fn((): never => {
     throw new ServiceUnavailableException('malformed')
   })
   const client = {
@@ -219,13 +219,13 @@ describe('HttpAcademicLookupAdapter.activeSemester', () => {
 
 describe('HttpAcademicLookupAdapter.teachingAssignmentsOf', () => {
   it('reads what an employee teaches in the given semester', async () => {
-    const getData = jest.fn((_key: string, _path: string) =>
+    const getData = vi.fn((_key: string, _path: string) =>
       Promise.resolve([
         assignment('a1', 'room-7a', 'math', 'grade-7'),
         assignment('a2', 'room-7b', 'math', 'grade-7'),
       ]),
     )
-    const malformed = jest.fn((): never => {
+    const malformed = vi.fn((): never => {
       throw new ServiceUnavailableException('malformed')
     })
     const adapter = new HttpAcademicLookupAdapter({
@@ -246,10 +246,10 @@ describe('HttpAcademicLookupAdapter.teachingAssignmentsOf', () => {
   })
 
   it('fails closed on a malformed answer', async () => {
-    const getData = jest.fn((_key: string, _path: string) =>
+    const getData = vi.fn((_key: string, _path: string) =>
       Promise.resolve({ nope: 1 }),
     )
-    const malformed = jest.fn((): never => {
+    const malformed = vi.fn((): never => {
       throw new ServiceUnavailableException('malformed')
     })
     const adapter = new HttpAcademicLookupAdapter({

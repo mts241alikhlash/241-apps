@@ -139,7 +139,7 @@ describe('SimpleListService', () => {
   })
 
   it('refuses to delete a row still in use', async () => {
-    const usage = { count: jest.fn().mockResolvedValue(3) }
+    const usage = { count: vi.fn().mockResolvedValue(3) }
     const { service, repository } = build(usage)
     const row = await service.create({ name: 'Petani' })
 

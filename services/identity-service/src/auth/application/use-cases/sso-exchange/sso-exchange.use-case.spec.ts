@@ -14,21 +14,21 @@ describe('pkceChallenge', () => {
 
 describe('SsoExchangeUseCase', () => {
   const repository = {
-    findAuthorizationCode: jest.fn(),
-    claimAuthorizationCode: jest.fn(),
-    revokeSessionFamily: jest.fn(),
-    findSessionWithUser: jest.fn(),
-    findGrants: jest
+    findAuthorizationCode: vi.fn(),
+    claimAuthorizationCode: vi.fn(),
+    revokeSessionFamily: vi.fn(),
+    findSessionWithUser: vi.fn(),
+    findGrants: vi
       .fn()
       .mockResolvedValue({ roles: ['STAFF'], permissions: [] }),
-    createSession: jest.fn(),
+    createSession: vi.fn(),
   }
   const tokens = {
-    hashToken: jest.fn((value: string) => `hash:${value}`),
-    generateTokenPair: jest
+    hashToken: vi.fn((value: string) => `hash:${value}`),
+    generateTokenPair: vi
       .fn()
       .mockResolvedValue({ accessToken: 'access', refreshToken: 'refresh' }),
-    getRefreshExpirationMs: jest.fn().mockReturnValue(7 * 86400000),
+    getRefreshExpirationMs: vi.fn().mockReturnValue(7 * 86400000),
   }
   const useCase = new SsoExchangeUseCase(
     repository as unknown as IAuthRepository,
@@ -62,7 +62,7 @@ describe('SsoExchangeUseCase', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     repository.findAuthorizationCode.mockResolvedValue(code)
     repository.findSessionWithUser.mockResolvedValue(parent)
     repository.claimAuthorizationCode.mockResolvedValue(true)

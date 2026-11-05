@@ -3,20 +3,20 @@ import { createDraftApplication } from './prisma-admission-applicant.draft.js'
 function makeTx(quota: number, filled: number) {
   return {
     admissionWave: {
-      update: jest
+      update: vi
         .fn()
         .mockResolvedValue({ id: 'w1', quota, lastRegistrationSeq: 7 }),
     },
     admissionApplication: {
-      groupBy: jest
+      groupBy: vi
         .fn()
         .mockResolvedValue(
           filled ? [{ waveId: 'w1', _count: { _all: filled } }] : [],
         ),
-      create: jest.fn().mockResolvedValue({ id: 'app1' }),
+      create: vi.fn().mockResolvedValue({ id: 'app1' }),
     },
-    admissionPayment: { create: jest.fn() },
-    admissionNotification: { create: jest.fn() },
+    admissionPayment: { create: vi.fn() },
+    admissionNotification: { create: vi.fn() },
   }
 }
 

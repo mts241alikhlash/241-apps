@@ -7,7 +7,7 @@ describe('GetPositionByIdUseCase', () => {
   let useCase: GetPositionByIdUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
+    findById: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -19,7 +19,7 @@ describe('GetPositionByIdUseCase', () => {
     }).compile()
 
     useCase = module.get<GetPositionByIdUseCase>(GetPositionByIdUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('execute', () => {

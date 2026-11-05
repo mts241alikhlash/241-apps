@@ -8,19 +8,19 @@ describe('RefreshTokenUseCase', () => {
   let useCase: RefreshTokenUseCase
 
   const mockTokenManagerService = {
-    verifyRefreshToken: jest.fn(),
-    hashToken: jest.fn(),
-    constantTimeEqual: jest.fn(),
-    generateTokenPair: jest.fn(),
-    getRefreshExpirationMs: jest.fn(),
+    verifyRefreshToken: vi.fn(),
+    hashToken: vi.fn(),
+    constantTimeEqual: vi.fn(),
+    generateTokenPair: vi.fn(),
+    getRefreshExpirationMs: vi.fn(),
   }
 
   const mockAuthRepository = {
-    findGrants: jest.fn().mockResolvedValue({ roles: [], permissions: [] }),
-    findSessionWithUser: jest.fn(),
-    revokeSession: jest.fn(),
-    updateSessionToken: jest.fn(),
-    slideSession: jest.fn(),
+    findGrants: vi.fn().mockResolvedValue({ roles: [], permissions: [] }),
+    findSessionWithUser: vi.fn(),
+    revokeSession: vi.fn(),
+    updateSessionToken: vi.fn(),
+    slideSession: vi.fn(),
   }
 
   const mockSession = {
@@ -58,7 +58,7 @@ describe('RefreshTokenUseCase', () => {
 
     useCase = module.get<RefreshTokenUseCase>(RefreshTokenUseCase)
 
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

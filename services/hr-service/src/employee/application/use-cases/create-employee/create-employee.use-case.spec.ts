@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import { ConflictException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { UserGender } from '@mts241alikhlash/nest-core/domain'
@@ -6,20 +7,20 @@ import { IEmployeeRepository } from '../../../domain/repositories/employee.repos
 import { CreateEmployeeUseCase } from './create-employee.use-case.js'
 import { hashPassword } from '@mts241alikhlash/nest-core/helpers'
 
-jest.mock('@mts241alikhlash/nest-core/helpers', () => ({
-  ...jest.requireActual('@mts241alikhlash/nest-core/helpers'),
-  hashPassword: jest.fn(),
+vi.mock('@mts241alikhlash/nest-core/helpers', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  hashPassword: vi.fn(),
 }))
 
 describe('CreateEmployeeUseCase', () => {
   let useCase: CreateEmployeeUseCase
 
   const mockRepository = {
-    findUserByIdentifier: jest.fn(),
-    findProfileByNik: jest.fn(),
-    findByNip: jest.fn(),
-    findByNuptk: jest.fn(),
-    create: jest.fn(),
+    findUserByIdentifier: vi.fn(),
+    findProfileByNik: vi.fn(),
+    findByNip: vi.fn(),
+    findByNuptk: vi.fn(),
+    create: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -31,8 +32,8 @@ describe('CreateEmployeeUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateEmployeeUseCase>(CreateEmployeeUseCase)
-    jest.clearAllMocks()
-    ;(hashPassword as jest.Mock).mockResolvedValue('hashed-password')
+    vi.clearAllMocks()
+    ;(hashPassword as Mock).mockResolvedValue('hashed-password')
   })
 
   describe('execute', () => {
@@ -105,7 +106,7 @@ describe('CreateEmployeeUseCase', () => {
         expect(mockRepository.findUserByIdentifier).toHaveBeenCalledWith(
           expected,
         )
-        const hashed = (hashPassword as jest.Mock).mock.calls[0][0] as string
+        const hashed = (hashPassword as Mock).mock.calls[0][0] as string
         expect(hashed).not.toBe(expected)
         expect(hashed.length).toBeGreaterThanOrEqual(24)
         expect(mockRepository.create).toHaveBeenCalledWith(

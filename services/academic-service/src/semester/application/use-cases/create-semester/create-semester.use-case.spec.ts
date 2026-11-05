@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -12,14 +13,14 @@ import { CreateSemesterUseCase } from './create-semester.use-case.js'
 describe('CreateSemesterUseCase', () => {
   let useCase: CreateSemesterUseCase
 
-  const mockSemesterRepository: Record<string, jest.Mock> = {
-    findTypeById: jest.fn(),
-    findByAcademicYearAndType: jest.fn(),
-    deactivateAll: jest.fn(),
-    create: jest.fn(),
+  const mockSemesterRepository: Record<string, Mock> = {
+    findTypeById: vi.fn(),
+    findByAcademicYearAndType: vi.fn(),
+    deactivateAll: vi.fn(),
+    create: vi.fn(),
   }
-  const mockAcademicYearRepository: Record<string, jest.Mock> = {
-    findById: jest.fn(),
+  const mockAcademicYearRepository: Record<string, Mock> = {
+    findById: vi.fn(),
   }
 
   const academicYear = { id: 'ay-1', name: '2025/2026' }
@@ -44,7 +45,7 @@ describe('CreateSemesterUseCase', () => {
     }).compile()
 
     useCase = module.get<CreateSemesterUseCase>(CreateSemesterUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

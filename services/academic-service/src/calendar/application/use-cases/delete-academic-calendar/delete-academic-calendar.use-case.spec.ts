@@ -6,7 +6,7 @@ import { DeleteAcademicCalendarUseCase } from './delete-academic-calendar.use-ca
 describe('DeleteAcademicCalendarUseCase', () => {
   let useCase: DeleteAcademicCalendarUseCase
 
-  const mockRepo = { findById: jest.fn(), remove: jest.fn() }
+  const mockRepo = { findById: vi.fn(), remove: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +19,7 @@ describe('DeleteAcademicCalendarUseCase', () => {
     useCase = module.get<DeleteAcademicCalendarUseCase>(
       DeleteAcademicCalendarUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

@@ -7,7 +7,7 @@ describe('GetStudentParentsListUseCase', () => {
   let useCase: GetStudentParentsListUseCase
 
   const mockStudentParentsRepository = {
-    findAll: jest.fn(),
+    findAll: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe('GetStudentParentsListUseCase', () => {
     useCase = module.get<GetStudentParentsListUseCase>(
       GetStudentParentsListUseCase,
     )
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

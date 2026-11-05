@@ -6,7 +6,7 @@ import { GetUsersUseCase } from './get-users.use-case.js'
 describe('GetUsersUseCase', () => {
   let useCase: GetUsersUseCase
 
-  const mockRepo = { findAll: jest.fn() }
+  const mockRepo = { findAll: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,7 +17,7 @@ describe('GetUsersUseCase', () => {
     }).compile()
 
     useCase = module.get<GetUsersUseCase>(GetUsersUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {

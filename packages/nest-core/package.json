@@ -140,6 +140,7 @@
     "@eslint/js": "^10.0.1",
     "@mts241alikhlash/eslint-config": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
+    "@mts241alikhlash/vitest-config": "workspace:*",
     "@nestjs/cache-manager": "^12.0.0",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/common": "^12.0.1",
@@ -154,7 +155,6 @@
     "@nestjs/testing": "^12.0.1",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "7.10.0",
-    "@swc/core": "^1.16.21",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.0",
@@ -179,7 +179,6 @@
     "supertest": "^7.2.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.72.1",
-    "unplugin-swc": "^2.0.0",
     "vitest": "^5.1.0",
     "zod": "^4.4.3"
   },

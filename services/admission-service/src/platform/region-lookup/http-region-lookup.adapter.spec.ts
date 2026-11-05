@@ -3,8 +3,8 @@ import { HttpRegionLookupAdapter } from './http-region-lookup.adapter.js'
 
 function build(data: unknown) {
   const client = {
-    postData: jest.fn().mockResolvedValue(data),
-    malformed: jest.fn().mockImplementation(() => {
+    postData: vi.fn().mockResolvedValue(data),
+    malformed: vi.fn().mockImplementation(() => {
       throw new Error('malformed')
     }),
   }

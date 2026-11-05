@@ -51,7 +51,7 @@ describe('GradingScopeService', () => {
 
   it('asks the academic service once per semester', async () => {
     const academic = new FakeAcademicLookup({ assignments: [] })
-    const spy = jest.spyOn(academic, 'teachingAssignmentsOf')
+    const spy = vi.spyOn(academic, 'teachingAssignmentsOf')
     const scope = await new GradingScopeService(
       employees('e1'),
       academic,
@@ -65,7 +65,7 @@ describe('GradingScopeService', () => {
 
   it('lets manage-all through without asking anyone', async () => {
     const academic = new FakeAcademicLookup()
-    const spy = jest.spyOn(academic, 'teachingAssignmentsOf')
+    const spy = vi.spyOn(academic, 'teachingAssignmentsOf')
     const scope = await new GradingScopeService(
       employees(null),
       academic,

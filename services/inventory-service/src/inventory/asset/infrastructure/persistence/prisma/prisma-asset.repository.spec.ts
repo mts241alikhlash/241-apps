@@ -41,22 +41,18 @@ describe('PrismaAssetRepository', () => {
   }
 
   function repositoryWithSpies() {
-    const findMany = jest.fn().mockResolvedValue([asset])
-    const count = jest.fn().mockResolvedValue(1)
-    const findFirst = jest.fn().mockResolvedValue(asset)
-    const categoryFindById = jest.fn().mockResolvedValue(asset.category)
-    const fundingSourceFindById = jest
-      .fn()
-      .mockResolvedValue(asset.fundingSource)
-    const conditionFindById = jest
+    const findMany = vi.fn().mockResolvedValue([asset])
+    const count = vi.fn().mockResolvedValue(1)
+    const findFirst = vi.fn().mockResolvedValue(asset)
+    const categoryFindById = vi.fn().mockResolvedValue(asset.category)
+    const fundingSourceFindById = vi.fn().mockResolvedValue(asset.fundingSource)
+    const conditionFindById = vi
       .fn()
       .mockResolvedValue(asset.units[0].condition)
-    const statusFindById = jest.fn().mockResolvedValue(asset.units[0].status)
-    const locationFindById = jest
-      .fn()
-      .mockResolvedValue(asset.units[0].location)
-    const create = jest.fn().mockResolvedValue(asset)
-    const update = jest.fn().mockResolvedValue(asset)
+    const statusFindById = vi.fn().mockResolvedValue(asset.units[0].status)
+    const locationFindById = vi.fn().mockResolvedValue(asset.units[0].location)
+    const create = vi.fn().mockResolvedValue(asset)
+    const update = vi.fn().mockResolvedValue(asset)
     const prisma = {
       inventoryAsset: {
         findMany,
@@ -74,7 +70,7 @@ describe('PrismaAssetRepository', () => {
         { findById: categoryFindById },
         { findById: fundingSourceFindById },
         { findById: conditionFindById },
-        { findById: statusFindById, findIdsAllowingTransactions: jest.fn() },
+        { findById: statusFindById, findIdsAllowingTransactions: vi.fn() },
         { findById: locationFindById },
       ),
       findMany,

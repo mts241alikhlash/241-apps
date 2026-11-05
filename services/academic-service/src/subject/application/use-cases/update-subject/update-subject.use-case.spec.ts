@@ -8,9 +8,9 @@ describe('UpdateSubjectUseCase', () => {
   let useCase: UpdateSubjectUseCase
 
   const mockRepo = {
-    findById: jest.fn(),
-    findByName: jest.fn(),
-    update: jest.fn(),
+    findById: vi.fn(),
+    findByName: vi.fn(),
+    update: vi.fn(),
   }
 
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('UpdateSubjectUseCase', () => {
     }).compile()
 
     useCase = module.get<UpdateSubjectUseCase>(UpdateSubjectUseCase)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should be defined', () => {
