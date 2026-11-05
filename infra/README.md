@@ -24,4 +24,5 @@ Deployment definitions: the one Compose stack (project `241-apps`), the nginx ga
 
 ## Open work
 
+- `infra/.github/` still holds the workflows of the old infra repository; GitHub reads only the root `.github/`, so the CI, release and cutover plan moves and rewrites them there.
 - First-time provisioning, the release flow and the cutover are described in the CI, release and cutover plan, not here yet.
