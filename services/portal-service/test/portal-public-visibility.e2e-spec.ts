@@ -1,14 +1,27 @@
+import { execFileSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
+
+const E2E_DATABASE_URL =
+  process.env.E2E_DATABASE_URL ??
+  'postgresql://mts241:mts241@localhost:5433/portal_e2e?sslmode=disable'
+process.env.DATABASE_URL = E2E_DATABASE_URL
+process.env.DIRECT_URL = E2E_DATABASE_URL
+process.env.JWT_SECRET ??= 'test-jwt-secret-for-e2e-testing-minimum-32-chars'
+process.env.S3_ENDPOINT ??= 'http://localhost:9000'
+process.env.S3_BUCKET ??= 'e2e'
+process.env.S3_ACCESS_KEY_ID ??= 'e2e'
+process.env.S3_SECRET_ACCESS_KEY ??= 'e2e'
+process.env.IDENTITY_SERVICE_URL ??= 'http://localhost:3000'
+process.env.PROVISIONING_SERVICE_TOKEN ??= 'e2e-test-provisioning-token'
+
 import { INestApplication, ValidationPipe } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { Test, TestingModule } from '@nestjs/testing'
 import type { Server } from 'node:http'
 import request from 'supertest'
-import { AppCacheModule } from '@mts241alikhlash/nest-core/cache'
-import { PrismaModule } from '../src/core/database/prisma.module.js'
+import { IProfileLookupPort } from '../src/platform/profile-lookup/profile-lookup.port.js'
 import { PrismaService } from '../src/core/database/prisma.service.js'
-import { ResponseInterceptor } from '@mts241alikhlash/nest-core/interceptors'
-import { StorageModule } from '../src/core/storage/storage.module.js'
-import { PortalModule } from '../src/portal/portal.module.js'
+import { AppModule } from '../src/app.module.js'
 import { PortalCacheService } from '../src/portal/shared/services/portal-cache.service.js'
 
 const SLUG_PREFIX = 'e2e-visibility-'
@@ -59,15 +72,23 @@ describe('portal public visibility (SC-004)', () => {
   const POST_TYPES = ['BERITA', 'ARTIKEL', 'PENGUMUMAN'] as const
 
   beforeAll(async () => {
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
-        PrismaModule,
-        StorageModule,
-        AppCacheModule,
-        PortalModule,
-      ],
+    execFileSync('pnpm', ['exec', 'prisma', 'migrate', 'deploy'], {
+      stdio: 'ignore',
     })
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue(
+        new PrismaService(
+          new ConfigService({
+            DATABASE_URL: E2E_DATABASE_URL,
+          }),
+        ),
+      )
+      .overrideProvider(IProfileLookupPort)
+      .useValue({ findByUserIds: () => Promise.resolve([]) })
       .overrideProvider(PortalCacheService)
       .useValue({
         get: () => Promise.resolve(undefined),
@@ -78,17 +99,19 @@ describe('portal public visibility (SC-004)', () => {
 
     app = moduleRef.createNestApplication()
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
-    app.useGlobalInterceptors(new ResponseInterceptor())
     await app.init()
 
     prisma = app.get(PrismaService)
     server = app.getHttpServer() as Server
 
-    const [author] = await prisma.$queryRaw<{ id: string }[]>`
-      SELECT id FROM users WHERE deleted_at IS NULL LIMIT 1
-    `
-    if (!author) throw new Error('e2e needs at least one user to author with')
-    authorId = author.id
+    const [{ name }] = await prisma.$queryRaw<
+      { name: string }[]
+    >`SELECT current_database() AS name`
+    if (!name.endsWith('_e2e')) {
+      throw new Error(`e2e must run on a *_e2e database, got ${name}`)
+    }
+
+    authorId = randomUUID()
 
     const category = await prisma.postCategory.findFirst({
       where: { deletedAt: null },
