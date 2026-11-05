@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config'
 import 'reflect-metadata'
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '../core/database/prisma.service.js'
@@ -49,7 +50,15 @@ import { InventoryModule } from './inventory.module.js'
 describe('InventoryModule', () => {
   async function moduleRef() {
     return Test.createTestingModule({
-      imports: [PrismaModule, InventoryModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          ignoreEnvFile: true,
+          load: [() => ({ SCHOOL_TIME_ZONE: 'Asia/Jakarta' })],
+        }),
+        PrismaModule,
+        InventoryModule,
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue({})

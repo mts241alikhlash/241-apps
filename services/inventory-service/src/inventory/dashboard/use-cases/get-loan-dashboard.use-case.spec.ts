@@ -1,12 +1,18 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import { IInventoryDashboardRepository } from '../domain/inventory-dashboard.repository.js'
 import { GetLoanDashboardUseCase } from './get-loan-dashboard.use-case.js'
+
+const schoolTime = new SchoolTimeService({
+  getOrThrow: () => 'Asia/Jakarta',
+} as unknown as ConfigService)
 
 function setup(active: number, overdue: number) {
   const repo = {
     countActiveLoans: vi.fn().mockResolvedValue(active),
     countLoansDueBefore: vi.fn().mockResolvedValue(overdue),
   } as unknown as IInventoryDashboardRepository
-  return { repo, useCase: new GetLoanDashboardUseCase(repo) }
+  return { repo, useCase: new GetLoanDashboardUseCase(repo, schoolTime) }
 }
 
 describe('GetLoanDashboardUseCase', () => {
@@ -21,6 +27,15 @@ describe('GetLoanDashboardUseCase', () => {
     expect(await useCase.execute()).toEqual({ active: 3, overdue: 1 })
     expect(repo.countLoansDueBefore).toHaveBeenCalledWith(
       new Date('2026-11-05T00:00:00Z'),
+    )
+  })
+
+  it('uses the local day: 17:00 UTC is already the next day in WIB', async () => {
+    vi.setSystemTime(new Date('2026-11-05T17:00:00Z'))
+    const { repo, useCase } = setup(1, 1)
+    await useCase.execute()
+    expect(repo.countLoansDueBefore).toHaveBeenCalledWith(
+      new Date('2026-11-06T00:00:00Z'),
     )
   })
 

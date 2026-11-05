@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { Module } from '@nestjs/common'
 import { IInventoryDashboardRepository } from './domain/inventory-dashboard.repository.js'
 import { PrismaInventoryDashboardRepository } from './infrastructure/prisma-inventory-dashboard.repository.js'
@@ -6,6 +7,7 @@ import { GetAssetDashboardUseCase } from './use-cases/get-asset-dashboard.use-ca
 import { GetLoanDashboardUseCase } from './use-cases/get-loan-dashboard.use-case.js'
 
 @Module({
+  imports: [SchoolTimeModule],
   controllers: [InventoryDashboardController],
   providers: [
     {

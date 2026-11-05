@@ -1,3 +1,4 @@
+import { schoolTimeZone } from '@mts241alikhlash/nest-core/time'
 import { z } from 'zod'
 
 const DURATION_PATTERN = /^\d+[smhd]$/
@@ -11,6 +12,7 @@ export const envSchema = z
       .default('development'),
     PORT: z.coerce.number().int().min(1).max(65535).default(3000),
     TRUST_PROXY: z.coerce.number().int().min(0).default(0),
+    SCHOOL_TIME_ZONE: schoolTimeZone,
 
     THROTTLE_TTL: z.coerce
       .number()
