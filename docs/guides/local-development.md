@@ -70,7 +70,7 @@ Run the whole deploy path (`deploy.sh`, `bootstrap.sh`, migrations, seeds, healt
 
 Result: both runs exit 0, the second creates nothing and changes no data, and `https://accounts.mts241alikhlash.sch.id:8443` signs in. Tear down with `docker compose ... down -v`, `rehearsal-caddy.sh down`, removing the links in `infra/compose/env/` and `infra/compose/.env`, `podman network rm 241-apps`, and `podman start 241-apps_postgres_1 241-apps_s3_1`.
 
-The knobs that exist only for the rehearsal: `DEPLOY_OVERRIDE`, `DEPLOY_PULL=never`, `BOOTSTRAP_PSQL`, `BOOTSTRAP_S3_*` (their VPS defaults are `compose/compose.override.yaml`, pull, native `psql` through `PGPASSFILE`, the S3 values in the env file), and a gateway `nginx.conf` mounted with the Podman DNS resolver and `Host $http_host` (the VPS image uses Docker's `127.0.0.11` and `Host $host`).
+The knobs that exist only for the rehearsal: `DEPLOY_OVERRIDE`, `DEPLOY_PULL=never`, `BOOTSTRAP_PSQL`, `BOOTSTRAP_S3_*` (their VPS defaults are `compose/compose.override.yaml`, pull, native `psql` through `PGPASSFILE`, the S3 values in the env file), and a gateway `nginx.conf` mounted with the Podman DNS resolver and `Host $http_host` (the VPS image uses the Docker embedded DNS resolver and `Host $host`).
 
 ## Notes
 
