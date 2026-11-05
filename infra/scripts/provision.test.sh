@@ -14,7 +14,8 @@ grep -q 'MinIO access key: prompt' <<< "$dry" || fail "the dry run does not show
 if grep -q '\bmc\b' <<< "$dry"; then fail "the dry run still mentions mc"; fi
 
 root="$work/root"
-mkdir -p "$root/infra/compose/env"
+mkdir -p "$root/infra/compose/env" "$root/infra/deployment"
+cp "$repo/infra/deployment/lock.json" "$root/infra/deployment/lock.json"
 for s in "${services[@]}"; do
   mkdir -p "$root/services/$s-service"
   cp "$repo/services/$s-service/.env.example" "$root/services/$s-service/.env.example"
@@ -55,6 +56,9 @@ grep -qx "S3_SECRET_ACCESS_KEY=$key_secret" "$portal" || fail "the key secret di
 grep -q "^SEED_ADMIN_PASSWORD=$admin_pw" "$root/infra/compose/env/identity-service.env" || fail "the admin password did not reach the identity env file"
 
 grep -qx "GOOGLE_CLIENT_SECRET=$google_secret" "$root/infra/compose/env/identity-service.env" || fail "the Google secret did not reach the identity env file"
+grep -q "^SSO_APPS=.*account=https://accounts.mts241alikhlash.sch.id/oauth/callback" "$root/infra/compose/env/identity-service.env" || fail "SSO_APPS does not carry the production host names"
+grep -qx "SSO_ACCOUNTS_ORIGIN=https://accounts.mts241alikhlash.sch.id" "$root/infra/compose/env/identity-service.env" || fail "SSO_ACCOUNTS_ORIGIN is not the production origin"
+grep -qx "S3_ACCESS_KEY_ID=$key_id" "$root/infra/compose/env/identity-service.env" || fail "identity did not get the S3 key (profile photos need it)"
 if grep -q "change-me" "$root/infra/compose/env/exam-service.env"; then fail "the exam env file still holds a placeholder"; fi
 
 for secret in "$key_id" "$key_secret" "$db_pw" "$admin_pw" "$google_secret"; do

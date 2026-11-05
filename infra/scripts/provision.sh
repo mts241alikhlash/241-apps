@@ -128,6 +128,7 @@ if $need_env; then
   export PROV_DB_HOST="$db_host" PROV_DB_USER="$db_role" PROV_DB_PASSWORD="$db_password"
   PROV_EXAM_ACCESS_SECRET="$(openssl rand -hex 32)"
   export PROV_JWT_SECRET PROV_TOKEN PROV_EXAM_ACCESS_SECRET PROV_ADMIN_PASSWORD="$admin_password"
+  export PROV_LOCK="$root/infra/deployment/lock.json"
   export PROV_GOOGLE_ID="$google_id" PROV_GOOGLE_SECRET="$google_secret"
   export PROV_S3_KEY="$s3_key" PROV_S3_SECRET="$s3_secret" PROV_S3_ENDPOINT="$minio_url" PROV_BUCKET="$bucket"
 fi
@@ -150,9 +151,9 @@ for service in "${services[@]}"; do
   [[ -n "$only_env" ]] || chown deploy:deploy "$target"
   echo "    wrote $target"
 done
-unset PROV_GOOGLE_ID PROV_GOOGLE_SECRET PROV_EXAM_ACCESS_SECRET PROV_DB_HOST PROV_DB_USER PROV_DB_PASSWORD PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD PROV_S3_KEY PROV_S3_SECRET PROV_S3_ENDPOINT PROV_BUCKET
+unset PROV_LOCK PROV_GOOGLE_ID PROV_GOOGLE_SECRET PROV_EXAM_ACCESS_SECRET PROV_DB_HOST PROV_DB_USER PROV_DB_PASSWORD PROV_JWT_SECRET PROV_TOKEN PROV_ADMIN_PASSWORD PROV_S3_KEY PROV_S3_SECRET PROV_S3_ENDPOINT PROV_BUCKET
 if ! $dry_run; then
-  grep -lE 'example\.com|change-me' "$root"/infra/compose/env/*.env 2> /dev/null | while read -r file; do
+  { grep -lE 'example\.com|change-me' "$root"/infra/compose/env/*.env 2> /dev/null || true; } | while read -r file; do
     echo "    still holds example values, edit it: $file"
   done
 fi

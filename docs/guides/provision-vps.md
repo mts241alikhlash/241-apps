@@ -48,7 +48,7 @@ Result: the output lists the user, the Docker network, the PostgreSQL role, the 
 sudo infra/scripts/provision.sh
 ```
 
-It prompts for the PostgreSQL password of the role `mts241`, the MinIO URL, the access key id and the secret key (from step 1), the PostgreSQL host the containers use, the first admin password (12 characters or more) and the deploy public key. Secrets are read without echo and written only to files with mode 600; none is ever passed as a command-line argument (PostgreSQL gets its SQL on stdin, MinIO prints the generated access key, the env files are written by `infra/scripts/provision-env.py` from environment variables).
+It prompts for the PostgreSQL password of the role `mts241`, the MinIO URL, the access key id and the secret key (from step 1), the PostgreSQL host the containers use, the first admin password (12 characters or more), the Google OAuth client id and secret (identity refuses to start with placeholder values), and the deploy public key. Secrets are read without echo and written only to files with mode 600; none is ever passed as a command-line argument (PostgreSQL gets its SQL on stdin, MinIO prints the generated access key, the env files are written by `infra/scripts/provision-env.py` from environment variables).
 
 ## 4. Check each result
 
@@ -63,7 +63,7 @@ It prompts for the PostgreSQL password of the role `mts241`, the MinIO URL, the 
 | env files       | `ls -l /srv/241-apps/infra/compose/env`                                                | ten `*-service.env` files, mode 600, owned by `deploy` |
 | forced command  | `sudo grep deploy-entry /home/deploy/.ssh/authorized_keys`                             | one line starting with `restrict,command=`             |
 
-The script also lists any env file that still holds example values (public host names, `FRONTEND_URL`, `SSO_APPS`, `SSO_ACCOUNTS_ORIGIN` and similar): edit those by hand before the first deploy.
+The env files get the production host names from `infra/deployment/lock.json` (`FRONTEND_URL`, `SSO_APPS`, `SSO_ACCOUNTS_ORIGIN`, `S3_PUBLIC_ENDPOINT`, OAuth redirects), random secrets, and the access key. The script lists any env file that still holds example values; edit those by hand before the first deploy.
 
 ## What provisioning does not do
 
