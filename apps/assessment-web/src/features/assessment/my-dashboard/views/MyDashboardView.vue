@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoleGuard } from '@mts241alikhlash/platform/auth'
-import { DashboardView } from '@mts241alikhlash/platform/dashboard'
 import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import {
@@ -58,9 +57,19 @@ onMounted(() => {
 
 <template>
   <div>
-    <template v-if="!needsPersonal">
-      <DashboardView />
-    </template>
+    <div
+      v-if="!needsPersonal"
+      class="space-y-6 p-4 sm:p-6"
+    >
+      <Card gap="none">
+        <CardHeader standard>
+          <CardTitle size="lg">Dashboard</CardTitle>
+        </CardHeader>
+        <CardContent variant="standard">
+          <p class="text-muted-foreground">Belum ada ringkasan.</p>
+        </CardContent>
+      </Card>
+    </div>
 
     <div
       v-else

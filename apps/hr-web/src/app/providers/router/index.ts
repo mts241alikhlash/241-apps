@@ -1,6 +1,6 @@
 import '@mts241alikhlash/web-shared/types/router'
 import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
-import { dashboardRoutes } from '@mts241alikhlash/platform/dashboard'
+import { dashboardRoutes } from '@/features/dashboard/routes'
 import { credentialRoutes } from '@/features/presence/credential'
 import { presenceDeviceRoutes } from '@/features/presence/device'
 import { employeeAttendanceRoutes } from '@/features/presence/employee-attendance'

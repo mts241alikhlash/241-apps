@@ -10,7 +10,6 @@
     "./blood-type": "./src/features/blood-type/index.ts",
     "./religion": "./src/features/religion/index.ts",
     "./school-unit-type": "./src/features/school-unit-type/index.ts",
-    "./dashboard": "./src/features/dashboard/index.ts",
     "./reference-data": "./src/features/reference-data/index.ts",
     "./layout": "./src/features/layout/index.ts"
   },

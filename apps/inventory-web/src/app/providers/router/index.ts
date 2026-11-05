@@ -6,7 +6,7 @@ import {
   authSessionService,
   useAuthStore,
 } from '@mts241alikhlash/platform/auth'
-import { dashboardRoutes } from '@mts241alikhlash/platform/dashboard'
+import { dashboardRoutes } from '@/features/dashboard/routes'
 import { inventoryRoutes } from '@/features/inventory/routes'
 
 const HOME = '/dashboard'
