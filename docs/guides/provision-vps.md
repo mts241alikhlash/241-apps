@@ -16,7 +16,7 @@ sudo infra/scripts/provision.sh --dry-run
 
 It prints every action and every prompt without changing anything or asking for secrets.
 
-Result: the output lists the user, the Docker network, the PostgreSQL role, the MinIO policy, the checkout, the override, ten env files and the authorized key.
+Result: the output lists the user, the Docker network, the PostgreSQL role, the MinIO access key, the checkout, the override, ten env files and the authorized key.
 
 ## 2. Run it
 
@@ -33,7 +33,7 @@ It prompts for the PostgreSQL password of the role `mts241`, the MinIO root cred
 | deploy user     | `id deploy`                                                                            | belongs to group `docker`                              |
 | network         | `docker network inspect 241-apps`                                                      | exists                                                 |
 | PostgreSQL role | `sudo -u postgres psql -Atc "select rolcreatedb from pg_roles where rolname='mts241'"` | `t`                                                    |
-| MinIO           | `mc admin policy list <alias>`                                                         | lists `241-apps-bucket`                                |
+| MinIO           | `mc admin accesskey list <alias>`                                                      | an access key whose policy only allows `241-apps`      |
 | checkout        | `git -C /srv/241-apps sparse-checkout list`                                            | `/infra/` and `/services/*/.env.example`               |
 | override        | `grep 8082 /srv/241-apps/infra/compose/compose.override.yaml`                          | the gateway port line                                  |
 | env files       | `ls -l /srv/241-apps/infra/compose/env`                                                | ten `*-service.env` files, mode 600, owned by `deploy` |
