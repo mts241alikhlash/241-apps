@@ -2,6 +2,7 @@ import {
   schoolDate,
   schoolDayRange,
   schoolTimeZone,
+  schoolWeekday,
   schoolYearMonth,
 } from './school-time.js'
 
@@ -57,5 +58,12 @@ describe('schoolTimeZone', () => {
   it('accepts an IANA zone and rejects an unknown one', () => {
     expect(schoolTimeZone.safeParse('Asia/Jakarta').success).toBe(true)
     expect(schoolTimeZone.safeParse('Mars/Base').success).toBe(false)
+  })
+})
+
+describe('schoolWeekday', () => {
+  it('tells Thursday 23:59 WIB from Friday 00:00 WIB', () => {
+    expect(schoolWeekday(new Date('2026-11-05T16:59:00Z'), ZONE)).toBe(4)
+    expect(schoolWeekday(new Date('2026-11-05T17:00:00Z'), ZONE)).toBe(5)
   })
 })

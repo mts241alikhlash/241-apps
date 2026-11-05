@@ -84,3 +84,7 @@ export function schoolMinutesOfDay(at: Date, timeZone: string): number {
   const { hour, minute } = localParts(at, timeZone)
   return hour * 60 + minute
 }
+
+export function schoolWeekday(at: Date, timeZone: string): number {
+  return schoolDate(at, timeZone).getUTCDay()
+}

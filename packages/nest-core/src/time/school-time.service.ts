@@ -4,6 +4,7 @@ import {
   schoolDate,
   schoolDayRange,
   schoolMinutesOfDay,
+  schoolWeekday,
   schoolYearMonth,
 } from './school-time.js'
 
@@ -25,6 +26,10 @@ export class SchoolTimeService {
 
   dayRange(date: Date): { from: Date; to: Date } {
     return schoolDayRange(date, this.timeZone)
+  }
+
+  weekday(at: Date = new Date()): number {
+    return schoolWeekday(at, this.timeZone)
   }
 
   minutesOfDay(at: Date): number {
