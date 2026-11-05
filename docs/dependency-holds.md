@@ -1,6 +1,6 @@
 # Dependency holds
 
-Record of dependencies kept below their latest version. Phase 2e moves these into catalogs and Dependabot `ignore`.
+Record of dependencies kept below their latest version. Shared versions live in the `catalog:` section of `pnpm-workspace.yaml`; a held dependency keeps its held range there (or explicit in the package when its range differs, such as `zod` 3 in the apps and 4 in the services). Dependabot `ignore` follows these rows.
 
 ## Waiting on upstream
 
