@@ -2402,6 +2402,86 @@
           "Inventory Approvals"
         ]
       }
+    },
+    "/inventory/dashboard/assets": {
+      "get": {
+        "operationId": "InventoryDashboardController_assets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssetDashboardResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Asset units by status and by condition",
+        "tags": [
+          "Inventory — Dashboard"
+        ]
+      }
+    },
+    "/inventory/dashboard/loans": {
+      "get": {
+        "operationId": "InventoryDashboardController_loans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LoanDashboardResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Active and overdue loans",
+        "tags": [
+          "Inventory — Dashboard"
+        ]
+      }
     }
   },
   "info": {
@@ -6153,6 +6233,61 @@
           "log",
           "consequence",
           "retryable"
+        ]
+      },
+      "InventoryNamedTotalResponseDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "total"
+        ]
+      },
+      "AssetDashboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "byStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryNamedTotalResponseDto"
+            }
+          },
+          "byCondition": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryNamedTotalResponseDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "byStatus",
+          "byCondition"
+        ]
+      },
+      "LoanDashboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "number"
+          },
+          "overdue": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "active",
+          "overdue"
         ]
       }
     }

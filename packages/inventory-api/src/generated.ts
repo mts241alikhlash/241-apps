@@ -216,6 +216,40 @@ export interface paths {
         patch: operations["ConditionController_updateCondition"];
         trace?: never;
     };
+    "/inventory/dashboard/assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Asset units by status and by condition */
+        get: operations["InventoryDashboardController_assets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/inventory/dashboard/loans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Active and overdue loans */
+        get: operations["InventoryDashboardController_loans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/inventory/funding-sources": {
         parameters: {
             query?: never;
@@ -530,6 +564,11 @@ export interface components {
             forwardToNextApprover?: boolean;
             /** @description Optional rejection or approval note */
             note?: string;
+        };
+        AssetDashboardResponseDto: {
+            byCondition: components["schemas"]["InventoryNamedTotalResponseDto"][];
+            byStatus: components["schemas"]["InventoryNamedTotalResponseDto"][];
+            total: number;
         };
         CreateAssetDto: {
             /** @description Custom asset number */
@@ -1374,6 +1413,10 @@ export interface components {
             /** @enum {string|null} */
             systemKey: "AVAILABLE" | "LOANED" | "LOAN_PENDING" | "LOAN_APPROVED" | "LOAN_REJECTED" | "LOAN_RETURNED" | null;
         };
+        InventoryNamedTotalResponseDto: {
+            name: string;
+            total: number;
+        };
         InventoryStatusResponseDto: {
             allowTransactions: boolean;
             code: string;
@@ -1383,6 +1426,10 @@ export interface components {
             name: string;
             /** @enum {string|null} */
             systemKey: "AVAILABLE" | "LOANED" | "LOAN_PENDING" | "LOAN_APPROVED" | "LOAN_REJECTED" | "LOAN_RETURNED" | null;
+        };
+        LoanDashboardResponseDto: {
+            active: number;
+            overdue: number;
         };
         PendingApprovalResponseDetailsDto: {
             /** Format: date-time */
@@ -2281,6 +2328,56 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["InventoryConditionResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    InventoryDashboardController_assets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AssetDashboardResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    InventoryDashboardController_loans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["LoanDashboardResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
