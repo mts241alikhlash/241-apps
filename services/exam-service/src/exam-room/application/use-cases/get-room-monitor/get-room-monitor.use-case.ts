@@ -1,3 +1,4 @@
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import {
   ForbiddenException,
   Injectable,
@@ -173,6 +174,7 @@ export class GetRoomMonitorUseCase {
     private readonly employees: IEmployeeIdentityReadPort,
     private readonly access: RoomAccessService,
     private readonly roomCodes: RoomAccessCodeService,
+    private readonly schoolTime: SchoolTimeService,
   ) {}
 
   async execute(
@@ -472,9 +474,10 @@ export class GetRoomMonitorUseCase {
         slot.endsAt,
       )
     }
-    const dayStart = new Date(now)
-    dayStart.setUTCHours(0, 0, 0, 0)
-    const dayEnd = new Date(dayStart.getTime() + 86_400_000)
+    const { from: dayStart, to } = this.schoolTime.dayRange(
+      this.schoolTime.today(now),
+    )
+    const dayEnd = new Date(to.getTime() + 1)
     return this.schedules.listSchedulesForEventWindow(eventId, dayStart, dayEnd)
   }
 

@@ -1,3 +1,4 @@
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
 import { forwardRef, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ExamPackageModule } from '../exam-package/exam-package.module.js'
@@ -29,6 +30,7 @@ import {
 
 @Module({
   imports: [
+    SchoolTimeModule,
     forwardRef(() => ExamPackageModule),
     forwardRef(() => ExamScheduleModule),
     forwardRef(() => ExamSessionModule),

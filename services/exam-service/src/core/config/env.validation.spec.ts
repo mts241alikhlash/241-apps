@@ -4,6 +4,7 @@ const base = {
   DATABASE_URL: 'postgresql://u:p@localhost:5432/db',
   NODE_ENV: 'production',
   JWT_SECRET: 'a-strong-random-jwt-secret-of-32-chars-or-more-0123',
+  SCHOOL_TIME_ZONE: 'Asia/Jakarta',
   FRONTEND_URL: 'https://app.example.sch.id',
   IDENTITY_SERVICE_URL: 'http://identity-service:3000',
   ACADEMIC_SERVICE_URL: 'http://academic-service:3200',

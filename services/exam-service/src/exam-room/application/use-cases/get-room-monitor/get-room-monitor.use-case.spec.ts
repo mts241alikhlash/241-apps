@@ -1,4 +1,6 @@
 import { ForbiddenException } from '@nestjs/common'
+import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
+import type { ConfigService } from '@nestjs/config'
 import {
   MANAGE_ALL,
   RoomAccessService,
@@ -45,9 +47,30 @@ function build() {
       fixture.employees,
       new RoomAccessService(fixture.rooms),
       new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
+      new SchoolTimeService({
+        getOrThrow: () => 'Asia/Jakarta',
+      } as unknown as ConfigService),
     ),
   }))
 }
+
+describe('GetRoomMonitorUseCase school day window', () => {
+  it('bounds the fallback window by the local day: 23:45 UTC is 06:45 WIB of the next day', async () => {
+    const { fixture, monitor } = await build()
+    const spy = vi.spyOn(fixture.schedules, 'listSchedulesForEventWindow')
+    await monitor
+      .execute(
+        COORDINATOR,
+        fixture.room.id,
+        { page: 1, limit: 25 },
+        new Date('2026-11-05T23:45:00Z'),
+      )
+      .catch(() => undefined)
+    const [, from, to] = spy.mock.calls[0]
+    expect(from.toISOString()).toBe('2026-11-05T17:00:00.000Z')
+    expect(to.toISOString()).toBe('2026-11-06T17:00:00.000Z')
+  })
+})
 
 describe('GetRoomMonitorUseCase', () => {
   it('returns the exact page slice while the summary covers the whole roster', async () => {
