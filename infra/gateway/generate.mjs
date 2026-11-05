@@ -644,7 +644,7 @@ function securityHeaders(ssl, pad) {
 function webProxyBlock(app, ssl) {
   const upstream = webUpstreamName(app.app)
   const forwardedProto = ssl ? 'https' : '$scheme'
-  return `    location /assets/ {
+  return `    location ^~ /_app/ {
         proxy_pass         http://${upstream};
         proxy_http_version 1.1;
         proxy_set_header   Host              $host;
@@ -653,7 +653,7 @@ function webProxyBlock(app, ssl) {
         proxy_pass_header  Set-Cookie;
         access_log off;
         expires 1y;
-        add_header Cache-Control "public, immutable" always;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
 ${securityHeaders(ssl, '        ')}
     }
 
@@ -664,7 +664,7 @@ ${securityHeaders(ssl, '        ')}
         proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto ${forwardedProto};
         proxy_pass_header  Set-Cookie;
-        add_header Cache-Control "no-store" always;
+        add_header Cache-Control "no-cache" always;
 ${securityHeaders(ssl, '        ')}
     }
 

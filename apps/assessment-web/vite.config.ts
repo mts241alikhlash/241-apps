@@ -83,5 +83,6 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     outDir: mode === 'development' ? 'dist-dev' : 'dist',
+    assetsDir: '_app',
   },
 }))

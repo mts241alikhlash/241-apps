@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -20,6 +21,98 @@ const rootDir = path.dirname(here)
 const model = await loadInputs({ rootDir })
 
 assert.equal(model.manifests.length, 9)
+
+function locationsOf(config, serverName) {
+  const block = config
+    .split(/^server \{$/m)
+    .find(
+      (part) =>
+        part.includes(`server_name ${serverName};`) &&
+        part.includes('location '),
+    )
+  assert.ok(block, `no server block for ${serverName}`)
+  return [
+    ...block.matchAll(
+      /^    location (=|\^~|~\*|~)? ?(\S+) \{([\s\S]*?)^    \}/gm,
+    ),
+  ].map((m) => ({
+    modifier: m[1] ?? '',
+    pattern: m[2],
+    body: m[3],
+  }))
+}
+
+function resolveLocation(locations, uri) {
+  const exact = locations.find((l) => l.modifier === '=' && l.pattern === uri)
+  if (exact) return exact
+  const prefixes = locations
+    .filter(
+      (l) =>
+        (l.modifier === '' || l.modifier === '^~') && uri.startsWith(l.pattern),
+    )
+    .sort((a, b) => b.pattern.length - a.pattern.length)
+  if (prefixes[0]?.modifier === '^~') return prefixes[0]
+  return prefixes[0]
+}
+
+for (const ssl of [false, true]) {
+  const config = renderConfig(model, { ssl })
+  for (const manifest of model.manifests) {
+    const host = model.lock.apps[manifest.app].sslHost
+    const locations = locationsOf(config, host)
+    assert.ok(
+      !locations.some((l) => l.pattern === '/assets/'),
+      `${manifest.app} still has location /assets/`,
+    )
+    const statics = locations.find(
+      (l) => l.modifier === '^~' && l.pattern === '/_app/',
+    )
+    assert.ok(statics, `${manifest.app} has no ^~ /_app/ location`)
+    assert.match(
+      statics.body,
+      /add_header Cache-Control "public, max-age=31536000, immutable" always;/,
+    )
+    const index = locations.find(
+      (l) => l.modifier === '=' && l.pattern === '/index.html',
+    )
+    assert.match(index.body, /add_header Cache-Control "no-cache" always;/)
+  }
+  const inventory = locationsOf(config, model.lock.apps.inventory.sslHost)
+  for (const uri of ['/assets', '/assets/create', '/assets/123/edit']) {
+    assert.equal(
+      resolveLocation(inventory, uri).pattern,
+      '/',
+      `${uri} must reach the SPA fallback`,
+    )
+  }
+  assert.equal(
+    resolveLocation(inventory, '/_app/index-abc.js').pattern,
+    '/_app/',
+  )
+}
+
+for (const app of EXPECTED_APPS) {
+  const nginx = readFileSync(
+    path.join(rootDir, '..', 'apps', `${app}-web`, 'nginx.conf'),
+    'utf8',
+  )
+  assert.match(
+    nginx,
+    /location \^~ \/_app\/ \{ try_files \$uri =404; add_header Cache-Control "public, max-age=31536000, immutable" always; \}/,
+    `${app} image serves /_app with immutable caching`,
+  )
+  assert.match(
+    nginx,
+    /location = \/index\.html \{ add_header Cache-Control "no-cache" always; \}/,
+    `${app} image serves index.html no-cache`,
+  )
+  assert.match(
+    nginx,
+    /location \/ \{ try_files \$uri \/index\.html; \}/,
+    `${app} image falls back to index.html without a directory redirect`,
+  )
+  assert.ok(!nginx.includes('/assets/'), `${app} image still has /assets/`)
+}
 const httpConfig = renderConfig(model, { ssl: false })
 assert.equal(httpConfig, renderConfig(model, { ssl: false }))
 assert.match(httpConfig, /default_type application\/json;/)
@@ -27,7 +120,7 @@ assert.match(httpConfig, /server_tokens off;/)
 assert.match(httpConfig, /^client_max_body_size 6m;$/m)
 for (const config of [httpConfig, renderConfig(model, { ssl: true })]) {
   for (const location of [
-    'location \\/assets\\/',
+    'location \\^~ \\/_app\\/',
     'location = \\/index\\.html',
   ]) {
     assert.match(

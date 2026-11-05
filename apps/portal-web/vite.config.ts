@@ -72,5 +72,6 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: mode === 'development' ? 'dist-dev' : 'dist',
+    assetsDir: '_app',
   },
 }))
