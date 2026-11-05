@@ -24,5 +24,8 @@
   },
   "devDependencies": {
     "vitest": "catalog:"
+  },
+  "scripts": {
+    "ci": "node -e 0"
   }
 }

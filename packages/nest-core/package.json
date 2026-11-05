@@ -110,7 +110,8 @@
     "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
     "lint:strict": "eslint -c eslint.typecheck.config.mjs \"src/**/*.ts\" --max-warnings=0",
     "check": "pnpm run lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "ci": "pnpm run typecheck && pnpm run lint && pnpm run lint:strict && pnpm run test && pnpm run build"
   },
   "peerDependencies": {
     "@nestjs/cache-manager": "^12.0.0",

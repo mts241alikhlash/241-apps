@@ -11,7 +11,8 @@
     }
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "ci": "pnpm run typecheck"
   },
   "dependencies": {
     "openapi-fetch": "catalog:"

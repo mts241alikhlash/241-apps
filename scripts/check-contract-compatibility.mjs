@@ -21,6 +21,23 @@ const CHANGESET_RE = /^\.changeset\/(?!README\.md$)[^/]+\.md$/
 
 const isObject = (value) =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
+export function requiredBump(version) {
+  return /^0\./.test(version) ? 'minor' : 'major'
+}
+
+export function bumpSatisfies(bump, version) {
+  return (BUMP_RANK[bump] ?? 0) >= BUMP_RANK[requiredBump(version)]
+}
+
+function packageVersion(name) {
+  const dir = name.startsWith('@')
+    ? `packages/${name.split('/')[1]}`
+    : `services/${name}`
+  return JSON.parse(
+    readFileSync(path.join(process.cwd(), dir, 'package.json'), 'utf8'),
+  ).version
+}
+
 const git = (args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
 
 function changedFiles(base) {
@@ -410,9 +427,10 @@ function run(base) {
     for (const packageName of breaking.length
       ? [`${name}-service`, `@mts241alikhlash/${name}-api`]
       : []) {
-      if (bumps.get(packageName) !== 'major')
+      const version = packageVersion(packageName)
+      if (!bumpSatisfies(bumps.get(packageName), version))
         errors.push(
-          `${file} is breaking (${breaking.join('; ')}); ${packageName} requires a major Changeset`,
+          `${file} is breaking (${breaking.join('; ')}); ${packageName} at ${version} requires a ${requiredBump(version)} Changeset`,
         )
     }
   }
@@ -482,7 +500,8 @@ function selfCheck() {
   console.log('contract compatibility self-check passed')
 }
 
-if (process.argv.includes('--self-check')) {
+if (!import.meta.main) {
+} else if (process.argv.includes('--self-check')) {
   selfCheck()
 } else {
   try {

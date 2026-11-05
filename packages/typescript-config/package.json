@@ -11,5 +11,8 @@
   },
   "dependencies": {
     "@vue/tsconfig": "catalog:"
+  },
+  "scripts": {
+    "ci": "node -e 0"
   }
 }

@@ -11,7 +11,8 @@
   "scripts": {
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "check": "pnpm run typecheck",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "ci": "pnpm run typecheck && pnpm run test"
   },
   "dependencies": {
     "@lucide/vue": "catalog:",

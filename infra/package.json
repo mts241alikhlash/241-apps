@@ -7,7 +7,8 @@
     "check": "node deployment/validate-lock.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "ci": "pnpm run check && node gateway/generate.self-check.mjs && bash scripts/deploy-entry.test.sh"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:"

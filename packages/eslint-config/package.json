@@ -23,5 +23,8 @@
   },
   "devDependencies": {
     "eslint": "catalog:"
+  },
+  "scripts": {
+    "ci": "node -e 0"
   }
 }

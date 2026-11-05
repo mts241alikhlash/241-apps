@@ -26,7 +26,8 @@
     "routes:emit": "node --experimental-strip-types scripts/emit-routing-manifest.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "ci": "pnpm run validate"
   },
   "dependencies": {
     "@fullcalendar/core": "catalog:",
