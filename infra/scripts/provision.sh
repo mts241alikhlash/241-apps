@@ -55,9 +55,11 @@ if ! id deploy > /dev/null 2>&1; then
   act useradd -m -s /bin/bash -G docker deploy
 fi
 
-step "docker network 241-apps"
-if ! docker network inspect 241-apps > /dev/null 2>&1; then
-  act docker network create 241-apps
+step "docker network 241-apps, PostgreSQL and the firewall"
+if $dry_run; then
+  bash "$here/provision-server.sh" --dry-run
+else
+  bash "$here/provision-server.sh"
 fi
 
 step "PostgreSQL role $db_role with CREATEDB"

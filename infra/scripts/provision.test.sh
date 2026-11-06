@@ -13,6 +13,7 @@ dry="$(bash "$here/provision.sh" --dry-run 2>&1)" || fail "the dry run failed wi
 grep -q 'MinIO access key: prompt' <<< "$dry" || fail "the dry run does not show the MinIO access key prompt"
 if grep -q '\bmc\b' <<< "$dry"; then fail "the dry run still mentions mc"; fi
 grep -q 'would write .*sites-available/241-apps for:' <<< "$dry" || fail "the dry run does not show the nginx site"
+grep -q 'would create the network 241-apps with subnet 172.30.0.0/16' <<< "$dry" || fail "the dry run does not show the server step"
 grep -q 'systemctl enable --now 241-apps-backup.timer' <<< "$dry" || fail "the dry run does not show the backup timer"
 grep -q '/var/backups/241-apps' <<< "$dry" || fail "the dry run does not show the backup directory"
 
