@@ -1,0 +1,79 @@
+name: Dependabot
+
+on: pull_request
+
+permissions: {}
+
+concurrency:
+  group: dependabot-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  changeset-and-merge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      PR_URL: ${{ github.event.pull_request.html_url }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Changed files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files" --jq '.[].filename' > "$RUNNER_TEMP/files.txt"
+      - id: app-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ vars.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          owner: mts241alikhlash
+          repositories: 241-apps
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Commit one patch changeset for the packages this update touches
+        if: steps.app-token.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          path=".changeset/dependabot-${PR_NUMBER}.md"
+          if gh api "repos/$GH_REPO/contents/$path?ref=$HEAD_REF" > /dev/null 2>&1; then
+            echo "$path already exists"
+            exit 0
+          fi
+          node .github/scripts/dependabot-changeset.mjs "$PR_NUMBER" < "$RUNNER_TEMP/files.txt" > "$RUNNER_TEMP/changeset.md"
+          if [ ! -s "$RUNNER_TEMP/changeset.md" ]; then
+            echo "no workspace package.json or Dockerfile changed"
+            exit 0
+          fi
+          gh api -X PUT "repos/$GH_REPO/contents/$path" \
+            -f message="chore: changeset for dependabot #$PR_NUMBER" \
+            -f content="$(base64 -w0 "$RUNNER_TEMP/changeset.md")" \
+            -f branch="$HEAD_REF"
+      - name: Enable auto-merge unless the update touches the lock or the Compose files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPENDENCIES: ${{ steps.metadata.outputs.dependency-names }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          echo "Dependabot: $DEPENDENCIES ($UPDATE_TYPE)" >> "$GITHUB_STEP_SUMMARY"
+          if grep -qE '^(infra/deployment/lock\.json|infra/compose/)' "$RUNNER_TEMP/files.txt"; then
+            echo "This update touches the lock or the Compose files: it waits for the owner." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          gh pr merge --auto --squash "$PR_URL"
