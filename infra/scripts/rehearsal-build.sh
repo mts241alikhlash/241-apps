@@ -4,7 +4,9 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repo="$(cd "$here/../.." && pwd)"
 tag="${REHEARSAL_TAG:-rehearsal}"
-only="${REHEARSAL_ONLY:-}"
+only=()
+[[ -n "${REHEARSAL_ONLY:-}" ]] && only+=("$REHEARSAL_ONLY")
+only+=("$@")
 cd "$repo"
 
 node infra/gateway/generate.mjs --check
@@ -21,7 +23,7 @@ targets+=(infra/gateway)
 for dir in "${targets[@]}"; do
   name="$(basename "$dir")"
   [[ "$dir" == infra/gateway ]] && name=gateway
-  if [[ -n "$only" && "$name" != "$only" ]]; then
+  if (( ${#only[@]} > 0 )) && [[ " ${only[*]} " != *" $name "* ]]; then
     continue
   fi
   echo "==> build $name"

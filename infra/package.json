@@ -8,7 +8,7 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish",
-    "ci": "pnpm run check && node gateway/generate.self-check.mjs && bash scripts/deploy-entry.test.sh && bash scripts/provision.test.sh && bash scripts/rehearsal-env.test.sh && bash scripts/deploy.test.sh"
+    "ci": "pnpm run check && node gateway/generate.self-check.mjs && bash scripts/deploy-entry.test.sh && bash scripts/provision.test.sh && bash scripts/rehearsal-env.test.sh && bash scripts/rehearsal-down.test.sh && bash scripts/rehearsal-build.test.sh && bash scripts/deploy.test.sh"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:"
