@@ -5,7 +5,7 @@ One time only: replace the polyrepo stack on the server with the stack of this r
 ## Preconditions
 
 - Every app and service image and the gateway image exist in GHCR and are pinned in `infra/deployment/lock.json` (the first `Update the lock` pull request is merged).
-- The server is provisioned ([provision-vps](provision-vps.md)) and the `vps` Environment has its secrets and a required reviewer.
+- The server is provisioned ([provision-vps](provision-vps.md)) and the `production` Environment has its secrets and a required reviewer.
 - This guide is read, and a `pg_dump` backup of every old database was taken today ([backup](backup.md)).
 
 Result: `git show main:infra/deployment/lock.json | grep -c REPLACE_BEFORE_DEPLOYMENT` prints `0`.
@@ -28,7 +28,7 @@ Result: `docker ps --filter publish=8082` lists nothing.
 
 ## 3. Approve the waiting deploy
 
-Approve the `Deploy` run that waits in the `vps` Environment. Expected log lines: `==> bootstrap` creating the databases and the bucket, `==> migrate <service>` for all ten, `==> seed permissions`, `==> seed admin`, `==> up`, a `==> health` line per service, and `==> deployed <sha>`. The workflow then tags `deploy-<date>-<sha7>`.
+Approve the `Deploy` run that waits in the `production` Environment. Expected log lines: `==> bootstrap` creating the databases and the bucket, `==> migrate <service>` for all ten, `==> seed permissions`, `==> seed admin`, `==> up`, a `==> health` line per service, and `==> deployed <sha>`. The workflow then tags `deploy-<date>-<sha7>`.
 
 Result: the workflow is green and the tag exists.
 

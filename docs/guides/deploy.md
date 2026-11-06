@@ -5,7 +5,7 @@ A deploy applies the pinned image digests in `infra/deployment/lock.json` to the
 ## Before you start
 
 - The change is merged to `main` and its images are released (apps, services and the gateway publish an image per release).
-- The server is provisioned ([provision-vps](provision-vps.md)) and the `vps` GitHub Environment has its secrets (`VPS_SSH_KEY`, `VPS_KNOWN_HOSTS`, `VPS_HOST`) and the owner as required reviewer. Server and key facts are in `AGENTS.local.md` and the owner's notes, not in this repository.
+- The server is provisioned ([provision-vps](provision-vps.md)) and the `production` GitHub Environment has its secrets (`DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_HOST`) and the owner as required reviewer. Server and key facts are in `AGENTS.local.md` and the owner's notes, not in this repository.
 - Read [rollback](rollback.md) first: there is no staging to rehearse on.
 
 ## 1. Update the lock
@@ -22,7 +22,7 @@ A pull request created with the default `GITHUB_TOKEN` does not start the `Valid
 
 Merge the pull request. A push to `main` that changes `compose/compose.yaml` or `deployment/lock.json` starts the `Deploy` workflow.
 
-Result: the run waits in the `vps` Environment for the owner's approval.
+Result: the run waits in the `production` Environment for the owner's approval.
 
 ## 3. Approve and watch
 

@@ -7,7 +7,7 @@
 - A server with Docker (with Compose), native PostgreSQL 16 and MinIO, plus `git`, `curl`, `openssl` and `python3` on the PATH of root.
 - A MinIO access key limited to the bucket `241-apps` (next section).
 - PostgreSQL accepts connections from the Docker network on the address you will give the script, and MinIO answers on the URL you will give it.
-- The public key of the deploy workflow's SSH key pair (the private key goes into the `vps` Environment, see [cutover](cutover.md)).
+- The public key of the deploy workflow's SSH key pair (the private key goes into the `production` Environment, see [cutover](cutover.md)).
 
 ## 1. Create the MinIO access key
 
