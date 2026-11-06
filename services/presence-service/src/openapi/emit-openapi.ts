@@ -1,5 +1,6 @@
 process.env.DATABASE_URL =
   process.env.DATABASE_URL || 'postgresql://mock:mock@localhost:5432/mock'
+process.env.SCHOOL_TIME_ZONE = process.env.SCHOOL_TIME_ZONE || 'Asia/Jakarta'
 process.env.JWT_SECRET =
   process.env.JWT_SECRET || 'super-secret-jwt-secret-min-16-chars'
 process.env.IDENTITY_SERVICE_URL =
