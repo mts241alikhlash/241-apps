@@ -19,7 +19,8 @@ for arg in "$@"; do
 done
 printf '%s\n' "$*" >> "$STUB_LOG"
 [[ "$db" == "${STUB_FAIL:-}" ]] && exit 1
-echo "dump of $db" > "$file"
+echo "dump of $db"
+[[ -z "$file" ]] || echo "dump of $db" > "$file"
 STUB
 chmod +x "$work/stubs/pg_dump"
 
@@ -40,6 +41,8 @@ for db in identity academic inventory presence portal admission hr student asses
   [[ -s "$today/$db.dump" ]] || fail "no dump for $db"
 done
 grep -q -- "--format=custom" "$work/pg_dump.log" || fail "pg_dump did not use the custom format"
+# the dump runs as postgres and the backup tree is root-only, so this shell must create the file
+grep -q -- "--file=" "$work/pg_dump.log" && fail "pg_dump was asked to write the file itself"
 
 [[ ! -d "$work/backups/2026-10-20" && ! -d "$work/backups/2026-10-23" ]] || fail "directories older than 14 days were kept"
 [[ -d "$work/backups/2026-10-24" && -d "$work/backups/2026-11-05" ]] || fail "directories inside 14 days were removed"
