@@ -58,3 +58,14 @@ test('a dependabot branch is exempt from the missing changeset', () => {
 test('files outside every package need none', () => {
   assert.deepEqual(run(['scripts/affected.mjs', '.github/workflows/a.yml']), [])
 })
+
+test('the Release pull request branch is exempt: it consumes the changesets', () => {
+  assert.deepEqual(
+    run(
+      ['services/hr-service/package.json', 'services/hr-service/CHANGELOG.md'],
+      [],
+      'changeset-release/main',
+    ),
+    [],
+  )
+})
