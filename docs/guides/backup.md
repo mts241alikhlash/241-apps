@@ -2,7 +2,13 @@
 
 What is backed up: each service's PostgreSQL database (`identity`, `academic`, `admission`, `assessment`, `exam`, `hr`, `inventory`, `portal`, `presence`, `student`) and the files in the S3 bucket `241-apps`. Everything else (images, code, lock) is rebuilt from the repository and the registry.
 
-How often, where the dumps go and for how long are server settings kept in `AGENTS.local.md`, not here. A backup that exists only on the machine it protects is not a backup: copy the dumps to another machine regularly.
+## The daily backup
+
+`provision.sh` installs `241-apps-backup.timer` (systemd). Every day at 02:00 WIB, `241-apps-backup.service` runs `/usr/local/sbin/241-apps-backup` (`infra/scripts/backup.sh`), which writes `pg_dump --format=custom` of each of the ten databases to `/var/backups/241-apps/<yyyy-mm-dd>/<database>.dump` (directory mode 700) and removes day directories older than 14 days. A database that fails to dump does not stop the others; the run then exits non-zero and the failure shows in `systemctl status 241-apps-backup.service`.
+
+Check it: `systemctl list-timers 241-apps-backup.timer` shows the next run, and after a run `ls /var/backups/241-apps/$(date +%F)` lists ten `.dump` files. To run it now: `systemctl start 241-apps-backup.service`.
+
+A backup that exists only on the machine it protects is not a backup: copy `/var/backups/241-apps/` to another machine regularly (for example `rsync -a root@<server>:/var/backups/241-apps/ <local folder>/`).
 
 ## Back up one database
 

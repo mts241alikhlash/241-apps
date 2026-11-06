@@ -1,0 +1,10 @@
+[Unit]
+Description=pg_dump of the 241 Apps databases
+After=postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/241-apps-backup
+Nice=10
+IOSchedulingClass=idle

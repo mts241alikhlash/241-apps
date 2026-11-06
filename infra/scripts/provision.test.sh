@@ -12,6 +12,8 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 dry="$(bash "$here/provision.sh" --dry-run 2>&1)" || fail "the dry run failed without mc on PATH"
 grep -q 'MinIO access key: prompt' <<< "$dry" || fail "the dry run does not show the MinIO access key prompt"
 if grep -q '\bmc\b' <<< "$dry"; then fail "the dry run still mentions mc"; fi
+grep -q 'systemctl enable --now 241-apps-backup.timer' <<< "$dry" || fail "the dry run does not show the backup timer"
+grep -q '/var/backups/241-apps' <<< "$dry" || fail "the dry run does not show the backup directory"
 
 root="$work/root"
 mkdir -p "$root/infra/compose/env" "$root/infra/deployment"

@@ -173,6 +173,14 @@ else
   chown deploy:deploy /home/deploy/.ssh/authorized_keys
   chmod 600 /home/deploy/.ssh/authorized_keys
 fi
+step "daily database backup (241-apps-backup.timer)"
+act install -m 755 "$root/infra/scripts/backup.sh" /usr/local/sbin/241-apps-backup
+act install -m 644 "$root/infra/systemd/241-apps-backup.service" /etc/systemd/system/241-apps-backup.service
+act install -m 644 "$root/infra/systemd/241-apps-backup.timer" /etc/systemd/system/241-apps-backup.timer
+act install -d -m 700 /var/backups/241-apps
+act systemctl daemon-reload
+act systemctl enable --now 241-apps-backup.timer
+
 fi
 
 step "done"
