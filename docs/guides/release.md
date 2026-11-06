@@ -4,7 +4,7 @@ Every app, service and library versions on its own. Versions are written by Chan
 
 ## 1. Add a changeset
 
-Any change to a package needs a changeset (`pnpm changeset`): choose the packages and the bump, and write one sentence for the changelog. The PR check `Validate` runs `.github/scripts/require-changeset.mjs` and fails a PR that changes a package without one. Documentation, specs and the lock file need none, and Dependabot branches are exempt.
+Any change to a package needs a changeset (`pnpm changeset`): choose the packages and the bump, and write one sentence for the changelog. The PR check `Validate` runs `.github/scripts/require-changeset.mjs` and fails a PR that changes a package without one. Documentation, specs and the lock file need none, and Dependabot branches and the Release pull request (`changeset-release/main`, which consumes the changesets) are exempt.
 
 Result: a `.changeset/<name>.md` listing your packages is part of the PR, and the `ci-ok` check is green.
 

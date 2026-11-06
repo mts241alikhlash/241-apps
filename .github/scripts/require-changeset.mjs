@@ -37,7 +37,9 @@ export function checkChangesets({ files, packages, changesets, branch }) {
       }
     }
   }
-  if (branch.startsWith('dependabot/')) return problems
+  if (branch.startsWith('dependabot/') || branch === 'changeset-release/main') {
+    return problems
+  }
   const touched = new Set()
   for (const file of files) {
     if (EXEMPT.some((re) => re.test(file))) continue
