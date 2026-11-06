@@ -173,6 +173,13 @@ else
   chown deploy:deploy /home/deploy/.ssh/authorized_keys
   chmod 600 /home/deploy/.ssh/authorized_keys
 fi
+step "host nginx site 241-apps"
+if $dry_run; then
+  PROV_LOCK="$root/infra/deployment/lock.json" bash "$here/provision-nginx.sh" --dry-run
+else
+  PROV_LOCK="$root/infra/deployment/lock.json" bash "$here/provision-nginx.sh"
+fi
+
 step "daily database backup (241-apps-backup.timer)"
 act install -m 755 "$root/infra/scripts/backup.sh" /usr/local/sbin/241-apps-backup
 act install -m 644 "$root/infra/systemd/241-apps-backup.service" /etc/systemd/system/241-apps-backup.service
