@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Unit-test fixture secret and the exam access-code alphabet, neither is a credential"
+paths = [
+  '''services/exam-service/src/core/config/env\.validation\.spec\.ts''',
+  '''services/exam-service/src/exam-schedule/domain/policies/derive-access-code\.policy\.ts''',
+]
