@@ -29,7 +29,7 @@ Result: the run waits in the `production` Environment for the owner's approval.
 Approve the run. The workflow connects with the forced command (`StrictHostKeyChecking=yes`), which accepts one 40-character commit sha and runs `infra/scripts/deploy.sh`:
 
 1. refuses to start with less than 5 GB free under Docker's root directory, or when `127.0.0.1:8082` is held by something other than the `241-apps` stack;
-2. runs `infra/scripts/bootstrap.sh`, which creates each missing database as `mts241` and the bucket `241-apps` (and nothing else);
+2. runs `infra/scripts/bootstrap.sh`, which creates each missing database as `mts241` and the bucket `241-apps` (and nothing else); it reaches PostgreSQL over the loopback of the deploy host (`BOOTSTRAP_DB_HOST` overrides that), because `DATABASE_URL` carries the address the containers use;
 3. pulls the pinned images;
 4. runs every service's migration job, one at a time, and stops at the first failure;
 5. runs `seed-permissions.ts` in identity, then `seed-admin-minimal.ts` when `SEED_ADMIN_PASSWORD` is in identity's env file (it creates the admin once and never resets an existing password unless `SEED_ADMIN_RESET=true` is set by hand);
