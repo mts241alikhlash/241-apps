@@ -48,6 +48,7 @@ cat > "$work/stubs/psql" <<STUB
 #!/usr/bin/env bash
 printf '%s\n' "\$@" >> "$work/argv.log"
 printf '%s\n' "\$PGPASSFILE" >> "$work/pgpass.paths"
+printf '%s\n' "\$PGHOST:\$PGPORT:\$PGUSER" >> "$work/conn.log"
 cat "\$PGPASSFILE" >> "$work/pgpass.seen"
 read -r -a cmd <<< "$psql_cmd"
 exec "\${cmd[@]}" -v ON_ERROR_STOP=1 "\$@"
@@ -74,5 +75,15 @@ done
 while read -r pgpass_path; do
   [[ ! -e "$pgpass_path" ]] || fail "the password file $pgpass_path was left behind"
 done < "$work/pgpass.paths"
+
+# the deploy host runs next to PostgreSQL: the container-facing host in DATABASE_URL is not reachable
+# from it (docker's MASQUERADE rewrites host traffic to the bridge address), so connect over the loopback
+[[ "$(head -1 "$work/conn.log")" == "127.0.0.1:5433:mts241" ]] || fail "bootstrap connected to $(head -1 "$work/conn.log"), not the loopback"
+grep -q '^127\.0\.0\.1:5433:' "$work/pgpass.seen" || fail "the password file does not match the connection host"
+
+: > "$work/conn.log"
+PATH="$work/stubs:$PATH" BOOTSTRAP_ENV_DIR="$work/env" BOOTSTRAP_DB_HOST=db.example.test BOOTSTRAP_DB_PREFIX="$prefix" \
+  BOOTSTRAP_BUCKET="$bucket" bash "$here/bootstrap.sh" > /dev/null || fail "the run with BOOTSTRAP_DB_HOST failed"
+[[ "$(head -1 "$work/conn.log")" == "db.example.test:5433:mts241" ]] || fail "BOOTSTRAP_DB_HOST was ignored: $(head -1 "$work/conn.log")"
 
 echo "bootstrap test passed ($total_before databases before)"

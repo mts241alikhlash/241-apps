@@ -20,12 +20,14 @@ if [[ -n "${BOOTSTRAP_PSQL:-}" ]]; then
 else
   pgpass="$(mktemp)"
   chmod 600 "$pgpass"
+  # deploy runs on the database host, and DATABASE_URL's host is the container-facing bridge address
+  # (docker's MASQUERADE rewrites host traffic to it): connect over the loopback, or BOOTSTRAP_DB_HOST
   connection="$(DB_URL="$(env_value identity-service.env DATABASE_URL)" PGPASS_FILE="$pgpass" python3 -c '
 import os
 from urllib.parse import unquote, urlsplit
 
 parts = urlsplit(os.environ["DB_URL"])
-host = parts.hostname or "localhost"
+host = os.environ.get("BOOTSTRAP_DB_HOST") or "127.0.0.1"
 port = parts.port or 5432
 user = unquote(parts.username or "")
 password = unquote(parts.password or "")
