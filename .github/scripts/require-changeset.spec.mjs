@@ -69,3 +69,25 @@ test('the Release pull request branch is exempt: it consumes the changesets', ()
     [],
   )
 })
+
+test('the lock pull request branch is exempt: it only pins digests', () => {
+  assert.deepEqual(
+    run(
+      [
+        'infra/package.json',
+        'infra/deployment/lock.json',
+        'infra/compose/compose.yaml',
+      ],
+      [],
+      'chore/update-lock',
+    ),
+    [],
+  )
+})
+
+test('another chore branch is not exempt', () => {
+  assert.equal(
+    run(['services/hr-service/src/a.ts'], [], 'chore/other').length,
+    1,
+  )
+})

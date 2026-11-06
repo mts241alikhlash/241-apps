@@ -37,7 +37,11 @@ export function checkChangesets({ files, packages, changesets, branch }) {
       }
     }
   }
-  if (branch.startsWith('dependabot/') || branch === 'changeset-release/main') {
+  if (
+    branch.startsWith('dependabot/') ||
+    branch === 'changeset-release/main' ||
+    branch === 'chore/update-lock'
+  ) {
     return problems
   }
   const touched = new Set()
