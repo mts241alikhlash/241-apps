@@ -43,6 +43,17 @@ Pull requests created with `GITHUB_TOKEN` do not trigger other workflows, so the
 
 Result: the "app-token" step succeeds in both workflows, and the Release pull request and the pull request `Update the lock` each show a green `ci-ok` check.
 
+## Dependabot pull requests
+
+Dependabot opens grouped update pull requests (`.github/dependabot.yml`), with no ignore rules: every update type is taken. The workflow `Dependabot` (`.github/workflows/dependabot-auto-merge.yml`) handles each of them:
+
+1. For every workspace package whose `package.json` or `Dockerfile` the update changes (`infra/gateway/Dockerfile` counts for `infra`), it commits one `patch` changeset `.changeset/dependabot-<pull request number>.md` to the Dependabot branch through the GitHub contents API, with the token of the `241-apps bot` App, so `Validate` runs again on the new head. It skips this when that file already exists. `require-changeset.mjs` still exempts `dependabot/` branches; the changeset is an addition, not a requirement.
+2. It enables auto-merge (`gh pr merge --auto --squash`). GitHub merges the pull request once `ci-ok` is green; `ci-ok` stays the only gate. An update that touches `infra/deployment/lock.json` or `infra/compose/` is not auto-merged and waits for the owner, because merging it starts a Deploy.
+
+Workflows started by Dependabot read secrets from the repository's **Dependabot secrets**, not from the Actions secrets. Add `BOT_APP_PRIVATE_KEY` there too (Settings, Secrets and variables, Dependabot); the variable `BOT_APP_ID` is shared. Without it the changeset step is skipped and the update still auto-merges.
+
+Result: a Dependabot pull request shows a `chore: changeset for dependabot #<n>` commit by the App and the label "Auto-merge enabled".
+
 ## Going to 1.0.0
 
 The guard refuses a `major` changeset below `1.0.0`, so the first stable release is a deliberate edit: in one PR set the package's `version` to `1.0.0` (and, for a service, `info.version` of its contract and the version of its `*-api` client, which `pnpm run version:check` keeps equal) and add a `patch` changeset describing the release. From then on breaking changes are `major`.
