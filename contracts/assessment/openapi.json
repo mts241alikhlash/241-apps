@@ -2849,7 +2849,7 @@
   "info": {
     "title": "Assessment Service API",
     "description": "Assessment Service",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "contact": {}
   },
   "tags": [],
