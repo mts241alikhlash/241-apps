@@ -43,8 +43,7 @@ jobs:
           version-script: node scripts/release-version.mjs
           pr-title: Release
           commit-message: Release
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          github-token: ${{ steps.app-token.outputs.token }}
 
   targets:
     needs: version
