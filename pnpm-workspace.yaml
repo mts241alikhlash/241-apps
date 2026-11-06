@@ -128,7 +128,7 @@ catalog:
   'vue-router': '^5.1.0'
   'vue-sonner': '^2.0.9'
   'vue-tsc': '^3.3.10'
-  'zod': '^3.25.76'
+  'zod': '^4.6.6'
 
 allowBuilds:
   'esbuild': true
