@@ -40,5 +40,7 @@ if (import.meta.main) {
     mkdirSync(path.dirname(target), { recursive: true })
     copyFileSync(source, target)
   }
+  run(['run', 'openapi:emit'])
+  run(['run', 'api:generate'])
   run(['install', '--lockfile-only'])
 }
