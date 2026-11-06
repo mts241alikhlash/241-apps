@@ -15,8 +15,9 @@ install -d -m 700 "$target"
 failed=0
 for db in "${databases[@]}"; do
   out="$target/$db.dump"
+  # pg_dump runs as postgres while the backup tree is root-only: this shell creates the file
   # shellcheck disable=SC2086
-  if $as_postgres pg_dump --format=custom --dbname="$db" --file="$out.partial"; then
+  if $as_postgres pg_dump --format=custom --dbname="$db" > "$out.partial"; then
     mv "$out.partial" "$out"
     echo "dumped $db"
   else
