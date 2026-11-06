@@ -2487,7 +2487,7 @@
   "info": {
     "title": "Inventory Service API",
     "description": "Inventory Service",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "contact": {}
   },
   "tags": [],
