@@ -1,5 +1,11 @@
 # infra
 
+## 0.1.2
+
+### Patch Changes
+
+- 6f4b325: Connect bootstrap.sh to PostgreSQL over the loopback of the deploy host, since DATABASE_URL carries the address the containers use.
+
 ## 0.1.1
 
 ### Patch Changes
