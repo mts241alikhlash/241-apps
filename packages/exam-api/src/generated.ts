@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+    "/exam-activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create one activity for a grade and its classes */
+        post: operations["ExamActivityController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-activities/{id}/policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change the enforcement policy of an activity */
+        patch: operations["ExamActivityController_policy"];
+        trace?: never;
+    };
+    "/exam-activities/{id}/token/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invalidate the previous access code of an activity */
+        post: operations["ExamActivityController_rotate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-events": {
         parameters: {
             query?: never;
@@ -1380,6 +1431,30 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        CreateActivityRequestDto: {
+            classroomIds: string[];
+            durationMinutes: number;
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            eventId?: string | null;
+            /** Format: uuid */
+            gradeId: string;
+            /** Format: uuid */
+            packageId: string;
+            /** @enum {string} */
+            presetName: "UJIAN_KETAT" | "ULANGAN_KELAS" | "TUGAS";
+            /** Format: uuid */
+            semesterId: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: uuid */
+            subjectId: string;
+            /** @enum {string} */
+            tokenMode: "ROTATING" | "STATIC";
+            /** @enum {string} */
+            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+        };
         CreateExamEventDto: {
             /** Format: date-time */
             endsAt: string;
@@ -1438,6 +1513,30 @@ export interface components {
             participants: components["schemas"]["MakeupParticipantDto"][];
             /** Format: date-time */
             startsAt: string;
+        };
+        ExamActivityDto: {
+            durationMinutes: number;
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            eventId: string | null;
+            /** Format: uuid */
+            gradeId: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            packageId: string;
+            policy: components["schemas"]["ExamPolicyDto"];
+            /** Format: uuid */
+            semesterId: string;
+            /** Format: date-time */
+            startsAt: string;
+            status: string;
+            /** Format: uuid */
+            subjectId: string;
+            tokenMode: string;
+            tokenRotation: number;
+            type: string;
         };
         ExamEventDto: {
             /** Format: date-time */
@@ -1553,6 +1652,16 @@ export interface components {
             title: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        ExamPolicyDto: {
+            focusThresholdMs: number;
+            gapRecordedMs: number;
+            gapTokenMs: number;
+            gapViolationFrom: number;
+            heartbeatIntervalMs: number;
+            snapshotIntervalMs: number;
+            tokenSlotSeconds: number;
+            violationLimit: number;
         };
         ExamRoomDto: {
             building: string | null;
@@ -2391,6 +2500,16 @@ export interface components {
             /** Format: uuid */
             sourcePackageId: string;
         };
+        UpdateActivityPolicyRequestDto: {
+            focusThresholdMs?: number;
+            gapRecordedMs?: number;
+            gapTokenMs?: number;
+            gapViolationFrom?: number;
+            heartbeatIntervalMs?: number;
+            snapshotIntervalMs?: number;
+            tokenSlotSeconds?: number;
+            violationLimit?: number;
+        };
         UpdateExamEventDto: {
             /** Format: date-time */
             endsAt?: string;
@@ -2452,6 +2571,93 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ExamActivityController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateActivityRequestDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_policy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityPolicyRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_rotate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamEventController_list: {
         parameters: {
             query?: {
