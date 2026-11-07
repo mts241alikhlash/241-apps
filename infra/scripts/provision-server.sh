@@ -28,7 +28,6 @@ step "docker network $network"
 if $dry_run; then
   echo "    would create the network $network with subnet $subnet, gateway $gateway and bridge name $bridge when it is missing or wrong"
 else
-  # the containers reach PostgreSQL and MinIO through this bridge, so the subnet must be free
   for name in $($docker_bin network ls --format '{{.Name}}'); do
     [[ "$name" == "$network" ]] && continue
     other="$($docker_bin network inspect "$name" --format '{{range .IPAM.Config}}{{.Subnet}} {{end}}' 2> /dev/null || true)"
