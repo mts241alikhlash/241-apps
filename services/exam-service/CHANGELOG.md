@@ -1,5 +1,12 @@
 # exam-service
 
+## 0.1.3
+
+### Patch Changes
+
+- 95c9a83: Give the exam time back when a phone call interrupts a sitting: the app reports the pause, the session deadline and finalize time shift by the paused minutes inside the existing 180 minute allowance, and the pause shows up in the session event history as CALL_SUSPENDED.
+- 7d8fbab: Report the device readiness of a sitting — whether Do Not Disturb is granted, whether screen pinning is active, and whether battery optimization is off for the app — and warn on the room monitor when one of them is missing.
+
 ## 0.1.2
 
 ### Patch Changes
