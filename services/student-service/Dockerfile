@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:24.22.1-alpine AS build
+FROM node:26.12.1-alpine AS build
 ENV PNPM_HOME=/pnpm
 ENV npm_config_store_dir=/pnpm/store
 ENV PATH=$PNPM_HOME:$PATH
@@ -12,7 +12,7 @@ RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter s
     && pnpm --filter student-service... run build
 RUN pnpm --filter student-service deploy --prod --legacy /out
 
-FROM node:24.22.1-alpine AS runner
+FROM node:26.12.1-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build --chown=node:node /out/ ./
