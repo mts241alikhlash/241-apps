@@ -251,7 +251,7 @@ services:
 
   exam-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:849c4f87ac0f3dd819f08d6ee76c480ebd3c1d574c1cc44830c269732374b81e
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:bdc0575b26cc0c3f1c50f79bdc83a925ccc6d5d12e304abf5e4c5fd5483c3243
     env_file:
       - path: env/exam-service.env
     expose:
@@ -328,7 +328,7 @@ services:
 
   exam-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:849c4f87ac0f3dd819f08d6ee76c480ebd3c1d574c1cc44830c269732374b81e
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:bdc0575b26cc0c3f1c50f79bdc83a925ccc6d5d12e304abf5e4c5fd5483c3243
     profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
