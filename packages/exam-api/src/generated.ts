@@ -1243,6 +1243,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/student-exams/{sessionId}/suspension": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give back the time a phone call took */
+        post: operations["SessionExamController_suspension"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/student-exams/{sessionId}/violations": {
         parameters: {
             query?: never;
@@ -2257,7 +2274,7 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             /** @enum {string} */
-            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED";
+            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
         };
         SessionEventItemDto: {
             /** @description Stable id of the event on the tablet */
@@ -2267,7 +2284,7 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             /** @enum {string} */
-            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED";
+            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
         };
         SessionHeartbeatDto: {
             absentSince: string | null;
@@ -2282,6 +2299,22 @@ export interface components {
             serverTime: string;
             /** Format: date-time */
             startedAt: string;
+        };
+        SessionSuspensionDto: {
+            /** Format: date-time */
+            deadline: string;
+            /** @description Minutes this report added to the session */
+            extraMinutes: number;
+            /** Format: date-time */
+            finalizeAt: string;
+            suspendedSeconds: number;
+        };
+        SessionSuspensionRequestDto: {
+            /** Format: uuid */
+            clientId: string;
+            /** @enum {string} */
+            reason: "CALL";
+            seconds: number;
         };
         SessionTimelineEntryDto: {
             action: string | null;
@@ -5135,6 +5168,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["SubmitSessionResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SessionExamController_suspension: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Send 'web' from a browser; the Android app omits it */
+                "X-Client-Platform"?: string;
+                /** @description The tablet the session was started on */
+                "X-Device-Id": string;
+            };
+            path: {
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionSuspensionRequestDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["SessionSuspensionDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

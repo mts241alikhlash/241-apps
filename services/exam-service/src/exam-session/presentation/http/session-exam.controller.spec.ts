@@ -15,6 +15,7 @@ const expected: Record<string, string[]> = {
   events: ['exam-sessions.take'],
   resume: ['exam-sessions.take'],
   heartbeatNow: ['exam-sessions.take'],
+  suspension: ['exam-sessions.take'],
   snapshot: ['exam-sessions.take'],
 }
 

@@ -38,6 +38,7 @@ import { AllowLateEntryUseCase } from './use-cases/allow-late-entry/allow-late-e
 import { ResumeExamSessionUseCase } from './use-cases/resume-exam-session/resume-exam-session.use-case.js'
 import { RecordSessionEventsUseCase } from './use-cases/record-session-events/record-session-events.use-case.js'
 import { SessionHeartbeatUseCase } from './use-cases/session-heartbeat/session-heartbeat.use-case.js'
+import { SuspendSessionUseCase } from './use-cases/suspend-session/suspend-session.use-case.js'
 import { SessionAccessService } from './session-access.service.js'
 import { StartExamSessionUseCase } from './use-cases/start-exam-session/start-exam-session.use-case.js'
 import { CreateExamScheduleUseCase } from '../../exam-schedule/application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
@@ -766,6 +767,99 @@ describe('session heartbeat', () => {
     )
 
     expect(beat.lockedByViolation).toBe(true)
+  })
+})
+
+describe('call suspension', () => {
+  const ACTOR = { id: STUDENT_USER.id, deviceId: 'device-1' }
+  const CLIENT_ID = '3f0d0e6a-6b1f-4b1a-9c5f-4d6e7f8a9b0c'
+
+  function build(f: Fixtures) {
+    const access = new SessionAccessService(
+      f.sessions,
+      new FakeSessionFinalizer(),
+    )
+    return new SuspendSessionUseCase(access, f.sessions, f.rooms)
+  }
+
+  const report = (seconds: number) => ({
+    reason: 'CALL' as const,
+    seconds,
+    clientId: CLIENT_ID,
+  })
+
+  it('gives the paused seconds back to the window and records the event', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id)
+
+    const result = await build(f).execute(ACTOR, session.id, report(120), NOW)
+
+    expect(result.deadline).toEqual(new Date('2026-11-02T03:32:00.000Z'))
+    expect(result.finalizeAt).toEqual(new Date('2026-11-02T03:42:00.000Z'))
+    expect(result.extraMinutes).toBe(2)
+    expect(result.suspendedSeconds).toBe(120)
+    const stored = await f.sessions.findById(session.id)
+    expect(stored?.extraMinutes).toBe(2)
+    expect(stored?.deadline).toEqual(new Date('2026-11-02T03:32:00.000Z'))
+    expect(await f.rooms.listSessionEvents(session.id)).toMatchObject([
+      {
+        clientId: CLIENT_ID,
+        type: 'CALL_SUSPENDED',
+        isViolation: false,
+        detail: 'Ujian dijeda karena panggilan (120 detik)',
+      },
+    ])
+  })
+
+  it('never gives the same report back twice', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id)
+    const useCase = build(f)
+
+    const first = await useCase.execute(ACTOR, session.id, report(120), NOW)
+    const replay = await useCase.execute(ACTOR, session.id, report(120), NOW)
+
+    expect(replay.deadline).toEqual(first.deadline)
+    expect(replay.finalizeAt).toEqual(first.finalizeAt)
+    expect(replay.extraMinutes).toBe(0)
+    expect((await f.sessions.findById(session.id))?.extraMinutes).toBe(2)
+    expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(1)
+  })
+
+  it('stops at the 180 minute allowance instead of refusing', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id, { extraMinutes: 179 })
+
+    const result = await build(f).execute(ACTOR, session.id, report(900), NOW)
+
+    expect(result.extraMinutes).toBe(1)
+    expect(result.deadline).toEqual(new Date('2026-11-02T03:31:00.000Z'))
+    expect(result.finalizeAt).toEqual(new Date('2026-11-02T03:41:00.000Z'))
+    expect((await f.sessions.findById(session.id))?.extraMinutes).toBe(180)
+  })
+
+  it('adds no time once the allowance is spent, and still records the call', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id, { extraMinutes: 180 })
+
+    const result = await build(f).execute(ACTOR, session.id, report(300), NOW)
+
+    expect(result.extraMinutes).toBe(0)
+    expect(result.deadline).toEqual(session.deadline)
+    expect((await f.sessions.findById(session.id))?.extraMinutes).toBe(180)
+    expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(1)
+  })
+
+  it('refuses a session that is not running', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id, {
+      status: 'SUBMITTED',
+      submittedAt: NOW,
+    })
+
+    await expect(
+      build(f).execute(ACTOR, session.id, report(120), NOW),
+    ).rejects.toThrow(ConflictException)
   })
 })
 

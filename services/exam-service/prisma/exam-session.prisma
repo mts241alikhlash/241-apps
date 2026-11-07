@@ -127,6 +127,7 @@ enum SessionEventType {
   SCREEN_SHARE_DETECTED
   LEFT_APP
   VIOLATION_LOCKED
+  CALL_SUSPENDED
 }
 
 model ExamSessionEvent {
