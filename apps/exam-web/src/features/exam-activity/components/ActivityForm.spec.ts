@@ -70,7 +70,7 @@ describe('ActivityForm', () => {
     })
   })
 
-  it('keeps the admin section hidden from teachers', async () => {
+  it('keeps the admin section hidden from teachers', () => {
     expect(open().text()).not.toContain('Lanjutan (admin)')
     const admin = mount(ActivityForm, { props: { ...props, isAdmin: true } })
     expect(admin.text()).toContain('Lanjutan (admin)')
