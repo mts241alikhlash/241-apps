@@ -1,3 +1,7 @@
+import {
+  DEFAULT_POLICIES,
+  type ExamPolicy,
+} from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { tryParsePolicy } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import { randomBytes } from 'node:crypto'
@@ -32,6 +36,7 @@ export interface StartedSession {
   sessionId: string
   deadline: Date
   serverTime: Date
+  policy: ExamPolicy
 }
 
 @Injectable()
@@ -278,6 +283,7 @@ export class StartExamSessionUseCase {
       sessionId: session.id,
       deadline: session.deadline,
       serverTime: now,
+      policy: session.policy ?? DEFAULT_POLICIES.UJIAN_KETAT,
     }
   }
 }

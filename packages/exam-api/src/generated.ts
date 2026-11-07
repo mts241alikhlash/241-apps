@@ -2446,6 +2446,7 @@ export interface components {
         StartedSessionDto: {
             /** @description End of the working time, epoch milliseconds */
             deadline: number;
+            policy: components["schemas"]["ExamPolicyDto"];
             /** @description Server clock, epoch milliseconds */
             serverTime: number;
             /** Format: uuid */

@@ -7269,12 +7269,16 @@
           "serverTime": {
             "type": "number",
             "description": "Server clock, epoch milliseconds"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
           }
         },
         "required": [
           "sessionId",
           "deadline",
-          "serverTime"
+          "serverTime",
+          "policy"
         ]
       },
       "PaperChoiceDto": {
