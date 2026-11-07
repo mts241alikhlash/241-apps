@@ -1,3 +1,4 @@
+import { codeScopeOf } from '../../../domain/policies/access-code-scope.policy.js'
 import {
   ConflictException,
   Injectable,
@@ -20,10 +21,15 @@ export class RotateAccessCodeUseCase {
     if (found === null) throw new NotFoundException('Jadwal tidak ditemukan')
     const rotated = await this.schedules.rotateToken(id)
     if (rotated === null) throw new ConflictException(CANCELLED_MESSAGE)
-    const derived = this.codes.codeFor(rotated.id, rotated.tokenRotation, now)
+    const codeScope = codeScopeOf(rotated, now)
+    const derived = this.codes.codeFor(
+      codeScope.scope,
+      codeScope.rotation,
+      codeScope.at,
+    )
     return {
       accessCode: derived.code,
-      rotation: rotated.tokenRotation,
+      rotation: codeScope.rotation,
       expiresAt: derived.expiresAt,
       slotIndex: derived.slotIndex,
     }

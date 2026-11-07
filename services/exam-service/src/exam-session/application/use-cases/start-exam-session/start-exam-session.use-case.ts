@@ -1,3 +1,4 @@
+import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import { randomBytes } from 'node:crypto'
 import {
   ConflictException,
@@ -99,12 +100,13 @@ export class StartExamSessionUseCase {
         HttpStatus.TOO_MANY_REQUESTS,
       )
     }
+    const codeScope = codeScopeOf(schedule, now)
     const correct = this.codes.matches(
-      schedule.id,
-      schedule.tokenRotation,
+      codeScope.scope,
+      codeScope.rotation,
       input.accessCode,
-      now,
-      true,
+      codeScope.at,
+      codeScope.allowPreviousSlotGrace,
     )
     if (correct) {
       if (state.failures > 0) await this.attempts.clear(schedule.id, studentId)

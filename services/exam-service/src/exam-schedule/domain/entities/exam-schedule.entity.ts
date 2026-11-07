@@ -29,6 +29,9 @@ export interface ExamSchedule {
   kind: ExamScheduleKind
   makeupOfId: string | null
   tokenRotation: number
+  activityId?: string | null
+  activityTokenRotation?: number | null
+  activityTokenMode?: 'ROTATING' | 'STATIC' | null
   minSubmitMinutes: number
   status: ExamScheduleStatus
   createdById: string
