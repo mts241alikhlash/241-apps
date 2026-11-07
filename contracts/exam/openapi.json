@@ -2264,7 +2264,7 @@
             "bearer": []
           }
         ],
-        "summary": "Upload a proctoring snapshot (JPEG, 50 KB)",
+        "summary": "Upload a proctoring snapshot (JPEG, 1 MB)",
         "tags": [
           "Student Exams"
         ]

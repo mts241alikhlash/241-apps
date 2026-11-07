@@ -1184,7 +1184,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Upload a proctoring snapshot (JPEG, 50 KB) */
+        /** Upload a proctoring snapshot (JPEG, 1 MB) */
         post: operations["SessionExamController_snapshot"];
         delete?: never;
         options?: never;

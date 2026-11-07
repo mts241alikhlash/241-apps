@@ -10,7 +10,7 @@ import {
   type SessionActor,
 } from '../../session-access.service.js'
 
-export const PROCTOR_SNAPSHOT_MAX_BYTES = 50_000
+export const PROCTOR_SNAPSHOT_MAX_BYTES = 1_000_000
 export const EVIDENCE_SNAPSHOT_CAP = 12
 export const SNAPSHOT_RETENTION_MS = 48 * 60 * 60 * 1000
 
@@ -48,7 +48,7 @@ export class UploadProctorSnapshotUseCase {
     now: Date = new Date(),
   ): Promise<UploadedProctorSnapshot> {
     if (input.buffer.length > PROCTOR_SNAPSHOT_MAX_BYTES) {
-      throw new BadRequestException('Ukuran foto maksimal 50 KB')
+      throw new BadRequestException('Ukuran foto maksimal 1 MB')
     }
     if (detectImageType(input.buffer) !== 'image/jpeg') {
       throw new BadRequestException('Foto harus JPEG')
