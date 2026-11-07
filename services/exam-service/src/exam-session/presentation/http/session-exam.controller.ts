@@ -315,7 +315,7 @@ export class SessionExamController {
       limits: { fileSize: 1_000_000, files: 1 },
     }),
   )
-  @ApiOperation({ summary: 'Upload a proctoring snapshot (JPEG, 50 KB)' })
+  @ApiOperation({ summary: 'Upload a proctoring snapshot (JPEG, 1 MB)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

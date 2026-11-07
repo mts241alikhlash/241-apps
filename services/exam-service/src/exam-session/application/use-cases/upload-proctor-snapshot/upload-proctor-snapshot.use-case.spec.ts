@@ -15,6 +15,7 @@ import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
 import { SessionAccessService } from '../../session-access.service.js'
 import { fakeStorage } from '../../proctor-snapshot.test-support.js'
 import {
+  PROCTOR_SNAPSHOT_MAX_BYTES,
   UploadProctorSnapshotUseCase,
   latestSnapshotKey,
 } from './upload-proctor-snapshot.use-case.js'
@@ -63,7 +64,7 @@ describe('UploadProctorSnapshotUseCase', () => {
     expect(calls.uploaded).toEqual([])
   })
 
-  it('rejects a JPEG larger than 50 000 bytes', async () => {
+  it('rejects a JPEG larger than the snapshot limit', async () => {
     const { useCase, calls } = await setup()
 
     await expect(
@@ -71,7 +72,10 @@ describe('UploadProctorSnapshotUseCase', () => {
         STUDENT_USER,
         'a',
         {
-          buffer: Buffer.concat([JPEG, Buffer.alloc(50_000)]),
+          buffer: Buffer.concat([
+            JPEG,
+            Buffer.alloc(PROCTOR_SNAPSHOT_MAX_BYTES),
+          ]),
           kind: 'LIVE',
           capturedAt: NOW,
         },

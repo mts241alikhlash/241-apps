@@ -11,10 +11,10 @@ import type { Response } from 'express'
 export class SnapshotTooLargeFilter implements ExceptionFilter {
   catch(_exception: PayloadTooLargeException, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>()
-    const error = new BadRequestException('Ukuran foto maksimal 50 KB')
+    const error = new BadRequestException('Ukuran foto maksimal 1 MB')
     response.status(error.getStatus()).json({
       statusCode: error.getStatus(),
-      message: 'Ukuran foto maksimal 50 KB',
+      message: 'Ukuran foto maksimal 1 MB',
       data: null,
     })
   }
