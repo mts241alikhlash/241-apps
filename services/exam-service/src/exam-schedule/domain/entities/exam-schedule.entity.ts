@@ -32,6 +32,7 @@ export interface ExamSchedule {
   activityId?: string | null
   activityTokenRotation?: number | null
   activityTokenMode?: 'ROTATING' | 'STATIC' | null
+  activityPolicy?: unknown
   minSubmitMinutes: number
   status: ExamScheduleStatus
   createdById: string

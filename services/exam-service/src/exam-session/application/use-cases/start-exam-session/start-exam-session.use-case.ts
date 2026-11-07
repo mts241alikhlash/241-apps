@@ -1,3 +1,4 @@
+import { tryParsePolicy } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import { randomBytes } from 'node:crypto'
 import {
@@ -153,6 +154,7 @@ export class StartExamSessionUseCase {
       seatNumber: seat?.seatNumber ?? null,
       allowWebClient: seat?.allowWebClient ?? false,
       allowLateEntry: seat?.allowLateEntry ?? false,
+      policy: tryParsePolicy(schedule.activityPolicy),
     })
     if (created !== null) return this.result(created, now)
 

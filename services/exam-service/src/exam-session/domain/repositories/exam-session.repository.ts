@@ -1,3 +1,4 @@
+import type { ExamPolicy } from '../../../exam-activity/domain/policies/exam-policy.policy.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
   AnswerPayload,
@@ -116,6 +117,7 @@ export interface NewExamSession {
   seatNumber?: number | null
   allowWebClient?: boolean
   allowLateEntry?: boolean
+  policy?: ExamPolicy | null
 }
 
 export abstract class IExamSessionRepository {

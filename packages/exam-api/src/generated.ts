@@ -2383,7 +2383,7 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             /** @enum {string} */
-            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
+            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "ABSENCE_GAP" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
         };
         SessionEventItemDto: {
             /** @description Stable id of the event on the tablet */
@@ -2393,7 +2393,7 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             /** @enum {string} */
-            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
+            type: "PERMISSION_DIALOG" | "SCREEN_OFF" | "FOCUS_LOST_BRIEF" | "OVERLAY_OR_SHADE" | "CALL_OR_MIC_ACTIVE" | "ABSENCE_GAP" | "SCREEN_SHARE_DETECTED" | "LEFT_APP" | "VIOLATION_LOCKED" | "CALL_SUSPENDED";
         };
         SessionHeartbeatDto: {
             absentSince: string | null;

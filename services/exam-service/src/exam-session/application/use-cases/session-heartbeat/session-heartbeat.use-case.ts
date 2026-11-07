@@ -1,3 +1,4 @@
+import { CheckAbsenceGapUseCase } from '../check-absence-gap/check-absence-gap.use-case.js'
 import { Injectable } from '@nestjs/common'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { SessionAccessService } from '../../session-access.service.js'
@@ -14,6 +15,7 @@ export class SessionHeartbeatUseCase {
   constructor(
     private readonly access: SessionAccessService,
     private readonly sessions: IExamSessionRepository,
+    private readonly absence: CheckAbsenceGapUseCase,
   ) {}
 
   async execute(
@@ -30,6 +32,7 @@ export class SessionHeartbeatUseCase {
         serverTime: now,
       }
     }
+    await this.absence.execute(session, now)
     const patched =
       (await this.sessions.applyRecovery(session.id, { lastSeenAt: now })) ??
       session

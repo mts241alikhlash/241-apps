@@ -1,3 +1,4 @@
+import type { ExamPolicy } from '../../../exam-activity/domain/policies/exam-policy.policy.js'
 import type { AnswerPayload } from '../policies/validate-answer-shape.policy.js'
 
 export const EXAM_SESSION_STATUSES = [
@@ -36,6 +37,7 @@ export interface ExamSession {
   roomId: string | null
   seatNumber: number | null
   requiresTokenReentry: boolean
+  policy?: ExamPolicy | null
   lockedByViolation: boolean
   allowWebClient: boolean
   allowLateEntry: boolean

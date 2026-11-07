@@ -98,3 +98,14 @@ export function parsePolicy(
   }
   return policy
 }
+
+export function tryParsePolicy(
+  value: unknown,
+  base: ExamPolicy = DEFAULT_POLICIES.UJIAN_KETAT,
+): ExamPolicy | null {
+  try {
+    return parsePolicy(value, base)
+  } catch {
+    return null
+  }
+}

@@ -1,3 +1,4 @@
+import { tryParsePolicy } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import type { Prisma } from '../../../../generated/prisma/client.js'
 import type {
   ExamAnswerRecord,
@@ -45,6 +46,7 @@ export function toSession(row: SessionRow): ExamSession {
     unsyncedCount: row.unsyncedCount,
     lastBatteryLevel: row.lastBatteryLevel,
     isCharging: row.isCharging,
+    policy: tryParsePolicy(row.policy),
     dndGranted: row.dndGranted,
     lockTaskActive: row.lockTaskActive,
     batteryUnrestricted: row.batteryUnrestricted,

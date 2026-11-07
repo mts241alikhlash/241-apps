@@ -46,7 +46,15 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
 
   async createInitial(input: NewExamSession): Promise<ExamSession | null> {
     try {
-      const row = await this.prisma.examSession.create({ data: input })
+      const row = await this.prisma.examSession.create({
+        data: {
+          ...input,
+          policy:
+            input.policy === undefined || input.policy === null
+              ? Prisma.DbNull
+              : (input.policy as unknown as Prisma.InputJsonValue),
+        },
+      })
       return toSession(row)
     } catch (error) {
       if (
