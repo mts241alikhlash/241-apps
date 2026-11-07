@@ -130,6 +130,9 @@ describe('SaveAnswersBatchUseCase', () => {
         pendingLocalCount: 4,
         batteryLevel: 61,
         isCharging: true,
+        dndGranted: false,
+        lockTaskActive: true,
+        batteryUnrestricted: true,
       },
       NOW,
     )
@@ -139,6 +142,9 @@ describe('SaveAnswersBatchUseCase', () => {
       unsyncedCount: 4,
       lastBatteryLevel: 61,
       isCharging: true,
+      dndGranted: false,
+      lockTaskActive: true,
+      batteryUnrestricted: true,
       lastSeenAt: NOW,
     })
   })

@@ -7,6 +7,7 @@ import {
   History,
   Laptop,
   RefreshCw,
+  ShieldAlert,
   Timer,
   Undo2,
   UserX,
@@ -57,6 +58,25 @@ const batteryText = (session: RoomMonitorSession): string => {
   if (session.batteryLevel === null) return '-'
   const charging = session.isCharging === true ? ' (dicas)' : ''
   return `${session.batteryLevel}%${charging}`
+}
+
+type ReadinessFlag = 'dndGranted' | 'lockTaskActive' | 'batteryUnrestricted'
+
+const READINESS_LABELS = [
+  ['dndGranted', 'DND'],
+  ['lockTaskActive', 'pinning layar'],
+  ['batteryUnrestricted', 'optimisasi baterai'],
+] as const satisfies readonly [ReadinessFlag, string][]
+
+export const readinessWarnings = (session: RoomMonitorSession): string[] =>
+  READINESS_LABELS.filter(([flag]) => session[flag] !== true).map(
+    ([, label]) => label,
+  )
+
+const readinessText = (session: RoomMonitorSession | null): string => {
+  if (session === null) return '-'
+  const warnings = readinessWarnings(session)
+  return warnings.length === 0 ? 'Siap' : `Belum siap: ${warnings.join(' · ')}`
 }
 
 const activityText = (session: RoomMonitorSession | null): string => {
@@ -230,6 +250,34 @@ export function buildRoomParticipantColumns(
             ],
           ),
         ])
+      },
+    },
+    {
+      id: 'readiness',
+      header: 'Perangkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Perangkat',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          readinessText(row.session),
+      },
+      cell: ({ row }) => {
+        const session = row.original.session
+        if (session === null) return '-'
+        const warnings = readinessWarnings(session)
+        return h(
+          'span',
+          {
+            class:
+              warnings.length > 0
+                ? 'flex items-center gap-1 font-medium text-destructive'
+                : 'flex items-center gap-1 text-muted-foreground',
+          },
+          [
+            warnings.length > 0 ? h(ShieldAlert, { class: 'size-3.5' }) : null,
+            h('span', {}, readinessText(session)),
+          ],
+        )
       },
     },
     {

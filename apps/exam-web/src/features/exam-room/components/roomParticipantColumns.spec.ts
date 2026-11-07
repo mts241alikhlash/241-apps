@@ -3,6 +3,7 @@ import type { VNode } from 'vue'
 import {
   buildRoomParticipantColumns,
   isLowBattery,
+  readinessWarnings,
   syncText,
 } from './roomParticipantColumns'
 import type { RoomMonitorParticipant, RoomMonitorSession } from '../types'
@@ -22,6 +23,9 @@ const session = (
   lastSeenAt: '2026-11-02T01:10:00.000Z',
   batteryLevel: 80,
   isCharging: false,
+  dndGranted: true,
+  lockTaskActive: true,
+  batteryUnrestricted: true,
   kioskMode: 'STRICT',
   allowWebClient: false,
   violationCount: 0,
@@ -151,6 +155,52 @@ describe('low battery', () => {
     const battery = children[1]
 
     expect(String(battery.props?.class)).toContain('text-destructive')
+  })
+})
+
+describe('device readiness', () => {
+  it('names every flag that is not granted', () => {
+    expect(
+      readinessWarnings(
+        session({
+          dndGranted: false,
+          lockTaskActive: true,
+          batteryUnrestricted: null,
+        }),
+      ),
+    ).toEqual(['DND', 'optimisasi baterai'])
+  })
+
+  it('says nothing is missing once the three flags are true', () => {
+    expect(readinessWarnings(session())).toEqual([])
+    expect(cellText('readiness', participant())).toBe('Siap')
+  })
+
+  it('warns with the failing flag in the readiness cell', () => {
+    expect(
+      cellText(
+        'readiness',
+        participant({ session: session({ lockTaskActive: false }) }),
+      ),
+    ).toBe('Belum siap: pinning layar')
+  })
+
+  it('paints the readiness cell destructive and shows the shield when a flag fails', () => {
+    const node = cellOf('readiness')({
+      row: {
+        original: participant({
+          session: session({ dndGranted: null }),
+        }),
+      },
+    }) as VNode
+    const children = node.children as VNode[]
+
+    expect(String(node.props?.class)).toContain('text-destructive')
+    expect(children[0]).not.toBeNull()
+  })
+
+  it('shows a dash for a student who has not started', () => {
+    expect(cellText('readiness', participant({ session: null }))).toBe('-')
   })
 })
 

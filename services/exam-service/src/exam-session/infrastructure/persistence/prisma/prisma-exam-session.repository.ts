@@ -195,6 +195,9 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
           unsyncedCount: telemetry.unsyncedCount,
           lastBatteryLevel: telemetry.batteryLevel,
           isCharging: telemetry.isCharging,
+          dndGranted: telemetry.dndGranted,
+          lockTaskActive: telemetry.lockTaskActive,
+          batteryUnrestricted: telemetry.batteryUnrestricted,
           lastSeenAt: telemetry.now,
         },
       })

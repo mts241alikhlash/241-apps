@@ -74,6 +74,9 @@ export interface RoomMonitorSession {
   lastSeenAt: string | null
   batteryLevel: number | null
   isCharging: boolean | null
+  dndGranted: boolean | null
+  lockTaskActive: boolean | null
+  batteryUnrestricted: boolean | null
   kioskMode: string
   allowWebClient: boolean
   violationCount: number
@@ -313,6 +316,9 @@ export class GetRoomMonitorUseCase {
                   lastSeenAt: row.session.lastSeenAt?.toISOString() ?? null,
                   batteryLevel: row.session.lastBatteryLevel,
                   isCharging: row.session.isCharging,
+                  dndGranted: row.session.dndGranted,
+                  lockTaskActive: row.session.lockTaskActive,
+                  batteryUnrestricted: row.session.batteryUnrestricted,
                   kioskMode: row.session.kioskMode,
                   allowWebClient: row.session.allowWebClient,
                   violationCount: row.session.violationCount,

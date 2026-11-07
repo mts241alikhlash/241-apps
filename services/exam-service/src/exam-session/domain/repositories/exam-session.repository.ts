@@ -29,6 +29,9 @@ export interface SessionTelemetryUpdate {
   unsyncedCount?: number
   batteryLevel?: number | null
   isCharging?: boolean | null
+  dndGranted?: boolean | null
+  lockTaskActive?: boolean | null
+  batteryUnrestricted?: boolean | null
 }
 
 export interface SkippedAnswerBatchItem {

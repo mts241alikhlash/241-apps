@@ -33,6 +33,9 @@ describe('FakeExamSessionRepository.saveAnswersBatch', () => {
       unsyncedCount: 0,
       batteryLevel: 82,
       isCharging: false,
+      dndGranted: false,
+      lockTaskActive: true,
+      batteryUnrestricted: false,
     })
 
     expect(result.saved).toHaveLength(46)
@@ -42,6 +45,9 @@ describe('FakeExamSessionRepository.saveAnswersBatch', () => {
     expect(session?.unsyncedCount).toBe(0)
     expect(session?.lastBatteryLevel).toBe(82)
     expect(session?.isCharging).toBe(false)
+    expect(session?.dndGranted).toBe(false)
+    expect(session?.lockTaskActive).toBe(true)
+    expect(session?.batteryUnrestricted).toBe(false)
     expect(session?.lastSeenAt).toEqual(NOW)
   })
 
@@ -150,11 +156,17 @@ describe('FakeExamSessionRepository.saveAnswersBatch', () => {
       now: NOW,
       batteryLevel: null,
       isCharging: null,
+      dndGranted: null,
+      lockTaskActive: null,
+      batteryUnrestricted: null,
     })
 
     const session = sessions.sessions.get('a')
     expect(session?.lastBatteryLevel).toBeNull()
     expect(session?.isCharging).toBeNull()
+    expect(session?.dndGranted).toBeNull()
+    expect(session?.lockTaskActive).toBeNull()
+    expect(session?.batteryUnrestricted).toBeNull()
     expect(session?.lastSeenAt).toEqual(NOW)
   })
 

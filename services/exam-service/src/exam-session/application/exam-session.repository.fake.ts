@@ -69,6 +69,9 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
       unsyncedCount: 0,
       lastBatteryLevel: null,
       isCharging: null,
+      dndGranted: null,
+      lockTaskActive: null,
+      batteryUnrestricted: null,
       createdAt: now,
       updatedAt: now,
     }
@@ -185,6 +188,18 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
         telemetry.isCharging === undefined
           ? session.isCharging
           : telemetry.isCharging,
+      dndGranted:
+        telemetry.dndGranted === undefined
+          ? session.dndGranted
+          : telemetry.dndGranted,
+      lockTaskActive:
+        telemetry.lockTaskActive === undefined
+          ? session.lockTaskActive
+          : telemetry.lockTaskActive,
+      batteryUnrestricted:
+        telemetry.batteryUnrestricted === undefined
+          ? session.batteryUnrestricted
+          : telemetry.batteryUnrestricted,
       lastSeenAt: telemetry.now,
       absentSince: session.absentSince,
       updatedAt: telemetry.now,

@@ -77,6 +77,11 @@ export class RoomMonitorSessionDto {
   lastSeenAt!: string | null
   @ApiProperty({ type: Number, nullable: true }) batteryLevel!: number | null
   @ApiProperty({ type: Boolean, nullable: true }) isCharging!: boolean | null
+  @ApiProperty({ type: Boolean, nullable: true }) dndGranted!: boolean | null
+  @ApiProperty({ type: Boolean, nullable: true }) lockTaskActive!:
+    boolean | null
+  @ApiProperty({ type: Boolean, nullable: true })
+  batteryUnrestricted!: boolean | null
   @ApiProperty() kioskMode!: string
   @ApiProperty() allowWebClient!: boolean
   @ApiProperty() violationCount!: number
@@ -105,6 +110,9 @@ export class RoomMonitorSessionDto {
     dto.lastSeenAt = domain.lastSeenAt
     dto.batteryLevel = domain.batteryLevel
     dto.isCharging = domain.isCharging
+    dto.dndGranted = domain.dndGranted
+    dto.lockTaskActive = domain.lockTaskActive
+    dto.batteryUnrestricted = domain.batteryUnrestricted
     dto.kioskMode = domain.kioskMode
     dto.allowWebClient = domain.allowWebClient
     dto.violationCount = domain.violationCount

@@ -48,6 +48,9 @@ export interface RoomMonitorSession {
   lastSeenAt: string | null
   batteryLevel: number | null
   isCharging: boolean | null
+  dndGranted: boolean | null
+  lockTaskActive: boolean | null
+  batteryUnrestricted: boolean | null
   kioskMode: string
   allowWebClient: boolean
   violationCount: number
