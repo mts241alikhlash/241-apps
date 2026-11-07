@@ -14,7 +14,6 @@ secrets/
 *.tsbuildinfo
 .pnpm-store/
 .changeset/pre.json
-# AI tooling (local-only)
 .claude/
 .agents/
 .specify/
