@@ -99,7 +99,7 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
           activityId: created.id,
           actorId,
           action: 'CREATE_ACTIVITY',
-          after: created as unknown as Prisma.InputJsonValue,
+          after: created,
         },
       })
       return toEntity(created)
@@ -149,12 +149,8 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
           activityId: id,
           actorId,
           action: 'ROTATE_TOKEN',
-          before: {
-            tokenRotation: before.tokenRotation,
-          } as Prisma.InputJsonValue,
-          after: {
-            tokenRotation: updated.tokenRotation,
-          } as Prisma.InputJsonValue,
+          before: { tokenRotation: before.tokenRotation },
+          after: { tokenRotation: updated.tokenRotation },
         },
       })
       return toEntity(updated)

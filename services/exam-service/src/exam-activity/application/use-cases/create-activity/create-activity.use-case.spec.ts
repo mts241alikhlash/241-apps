@@ -42,40 +42,42 @@ class FakeActivityRepository implements ExamActivityRepository {
   readonly audits: string[] = []
   stored = activity()
 
-  async findPreset(name: string) {
-    return name === 'UJIAN_KETAT'
-      ? { id: PRESET_ID, policy: DEFAULT_POLICIES.UJIAN_KETAT }
-      : null
+  findPreset(name: string) {
+    return Promise.resolve(
+      name === 'UJIAN_KETAT'
+        ? { id: PRESET_ID, policy: DEFAULT_POLICIES.UJIAN_KETAT }
+        : null,
+    )
   }
 
-  async create(input: Parameters<ExamActivityRepository['create']>[0]) {
+  create(input: Parameters<ExamActivityRepository['create']>[0]) {
     this.created.push({
       classroomIds: input.classroomIds,
       activityId: this.stored.id,
     })
     this.audits.push('CREATE_ACTIVITY')
-    return this.stored
+    return Promise.resolve(this.stored)
   }
 
-  async findById(id: string) {
-    return id === this.stored.id ? this.stored : null
+  findById(id: string) {
+    return Promise.resolve(id === this.stored.id ? this.stored : null)
   }
 
-  async updatePolicy(id: string, policy: ExamActivity['policy']) {
-    if (id !== this.stored.id) return null
+  updatePolicy(id: string, policy: ExamActivity['policy']) {
+    if (id !== this.stored.id) return Promise.resolve(null)
     this.audits.push('UPDATE_POLICY')
     this.stored = { ...this.stored, policy }
-    return this.stored
+    return Promise.resolve(this.stored)
   }
 
-  async rotateToken(id: string) {
-    if (id !== this.stored.id) return null
+  rotateToken(id: string) {
+    if (id !== this.stored.id) return Promise.resolve(null)
     this.audits.push('ROTATE_TOKEN')
-    return this.stored
+    return Promise.resolve(this.stored)
   }
 
-  async listSchedules() {
-    return [{ id: 'schedule-1', classroomId: 'class-7a' }]
+  listSchedules() {
+    return Promise.resolve([{ id: 'schedule-1', classroomId: 'class-7a' }])
   }
 }
 
@@ -121,7 +123,7 @@ describe('CreateActivityUseCase', () => {
     await expect(
       new CreateActivityUseCase(repo).execute({
         ...command,
-        presetName: 'TUGAS' as never,
+        presetName: 'TUGAS',
       }),
     ).rejects.toBeInstanceOf(NotFoundException)
   })

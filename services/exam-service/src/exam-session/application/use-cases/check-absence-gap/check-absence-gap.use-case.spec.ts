@@ -50,9 +50,9 @@ function session(overrides: Partial<ExamSession> = {}): ExamSession {
 class FakeSessions {
   patches: Record<string, unknown>[] = []
 
-  async applyRecovery(_id: string, patch: Record<string, unknown>) {
+  applyRecovery(_id: string, patch: Record<string, unknown>) {
     this.patches.push(patch)
-    return null
+    return Promise.resolve(null)
   }
 }
 
@@ -60,13 +60,13 @@ class FakeRooms {
   written: unknown[] = []
   existing: { type: string }[] = []
 
-  async listSessionEvents() {
-    return this.existing
+  listSessionEvents() {
+    return Promise.resolve(this.existing)
   }
 
-  async recordSessionEvents(_sessionId: string, events: unknown[]) {
+  recordSessionEvents(_sessionId: string, events: unknown[]) {
     this.written.push(...events)
-    return events
+    return Promise.resolve(events)
   }
 }
 
