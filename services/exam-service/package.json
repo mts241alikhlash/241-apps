@@ -1,6 +1,6 @@
 {
   "name": "exam-service",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "241 Academic — exams: question bank, exam packages, sessions and scoring",
   "author": "mhrmnvl",
   "private": true,
