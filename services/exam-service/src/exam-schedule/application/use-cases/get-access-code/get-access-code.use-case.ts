@@ -1,3 +1,4 @@
+import { codeScopeOf } from '../../../domain/policies/access-code-scope.policy.js'
 import {
   ConflictException,
   Injectable,
@@ -27,10 +28,15 @@ export class GetAccessCodeUseCase {
     if (found.status !== 'SCHEDULED') {
       throw new ConflictException(CANCELLED_MESSAGE)
     }
-    const derived = this.codes.codeFor(found.id, found.tokenRotation, now)
+    const codeScope = codeScopeOf(found, now)
+    const derived = this.codes.codeFor(
+      codeScope.scope,
+      codeScope.rotation,
+      codeScope.at,
+    )
     return {
       accessCode: derived.code,
-      rotation: found.tokenRotation,
+      rotation: codeScope.rotation,
       expiresAt: derived.expiresAt,
       slotIndex: derived.slotIndex,
     }

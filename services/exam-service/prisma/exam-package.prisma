@@ -114,6 +114,7 @@ model ExamSchedule {
   kind            ExamScheduleKind   @default(REGULAR)
   makeupOfId      String?            @map("makeup_of_id") @db.Uuid
   tokenRotation   Int                @default(0) @map("token_rotation")
+  activityId      String?            @map("activity_id") @db.Uuid
   minSubmitMinutes Int               @default(0) @map("min_submit_minutes")
   status          ExamScheduleStatus @default(SCHEDULED)
   createdById     String             @map("created_by_id") @db.Uuid
@@ -121,6 +122,7 @@ model ExamSchedule {
   updatedAt       DateTime           @updatedAt @map("updated_at")
 
   package      ExamPackage               @relation(fields: [packageId], references: [id])
+  activity     ExamActivity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
   event        ExamEvent?                @relation(fields: [eventId], references: [id])
   makeupOf     ExamSchedule?             @relation("Makeups", fields: [makeupOfId], references: [id], onDelete: Restrict)
   makeups      ExamSchedule[]            @relation("Makeups")
@@ -131,6 +133,7 @@ model ExamSchedule {
   @@index([packageId])
   @@index([makeupOfId])
   @@index([eventId])
+  @@index([activityId])
   @@map("exam_schedules")
 }
 

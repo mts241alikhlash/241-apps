@@ -35,6 +35,7 @@ import { SeatFlagService } from './application/seat-flag.service.js'
 import { ISessionRecoveryRepository } from './domain/repositories/session-recovery.port.js'
 import { PrismaSessionRecoveryRepository } from './infrastructure/persistence/prisma/prisma-session-recovery.repository.js'
 import { ResumeExamSessionUseCase } from './application/use-cases/resume-exam-session/resume-exam-session.use-case.js'
+import { CheckAbsenceGapUseCase } from './application/use-cases/check-absence-gap/check-absence-gap.use-case.js'
 import { SessionHeartbeatUseCase } from './application/use-cases/session-heartbeat/session-heartbeat.use-case.js'
 import { RecordSessionEventsUseCase } from './application/use-cases/record-session-events/record-session-events.use-case.js'
 import { SuspendSessionUseCase } from './application/use-cases/suspend-session/suspend-session.use-case.js'
@@ -98,6 +99,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     SeatFlagService,
     ResumeExamSessionUseCase,
     SessionHeartbeatUseCase,
+    CheckAbsenceGapUseCase,
     RecordSessionEventsUseCase,
     SuspendSessionUseCase,
     ReopenSessionUseCase,

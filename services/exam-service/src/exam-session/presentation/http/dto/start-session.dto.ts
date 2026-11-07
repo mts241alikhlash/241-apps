@@ -1,3 +1,4 @@
+import { ExamPolicyDto } from '../../../../exam-activity/presentation/http/dto/exam-activity.dto.js'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString, MaxLength, MinLength } from 'class-validator'
 import type { StartedSession } from '../../../application/use-cases/start-exam-session/start-exam-session.use-case.js'
@@ -23,11 +24,15 @@ export class StartedSessionDto {
   @ApiProperty({ description: 'Server clock, epoch milliseconds' })
   serverTime!: number
 
+  @ApiProperty({ type: ExamPolicyDto })
+  policy!: ExamPolicyDto
+
   static fromDomain(domain: StartedSession): StartedSessionDto {
     const dto = new StartedSessionDto()
     dto.sessionId = domain.sessionId
     dto.deadline = domain.deadline.getTime()
     dto.serverTime = domain.serverTime.getTime()
+    dto.policy = { ...domain.policy }
     return dto
   }
 }

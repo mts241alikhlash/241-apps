@@ -46,6 +46,7 @@ model ExamSession {
   unsyncedCount  Int             @default(0) @map("unsynced_count")
   lastBatteryLevel Int?          @map("last_battery_level")
   isCharging     Boolean?        @map("is_charging")
+  policy         Json?
   dndGranted     Boolean?        @map("dnd_granted")
   lockTaskActive Boolean?        @map("lock_task_active")
   batteryUnrestricted Boolean?   @map("battery_unrestricted")
@@ -124,6 +125,7 @@ enum SessionEventType {
   FOCUS_LOST_BRIEF
   OVERLAY_OR_SHADE
   CALL_OR_MIC_ACTIVE
+  ABSENCE_GAP
   SCREEN_SHARE_DETECTED
   LEFT_APP
   VIOLATION_LOCKED

@@ -20,6 +20,7 @@ import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { AuthorLookupModule } from './platform/author-lookup/author-lookup.module.js'
 import { AcademicLookupModule } from './platform/academic-lookup/academic-lookup.module.js'
 import { ExamFileModule } from './exam-file/exam-file.module.js'
+import { ExamActivityModule } from './exam-activity/exam-activity.module.js'
 import { ExamPackageModule } from './exam-package/exam-package.module.js'
 import { ExamScheduleModule } from './exam-schedule/exam-schedule.module.js'
 import { ScorePublisherModule } from './platform/score-publisher/score-publisher.module.js'
@@ -47,6 +48,7 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
     AcademicLookupModule,
     AuthorLookupModule,
     QuestionModule,
+    ExamActivityModule,
     ExamPackageModule,
     ExamScheduleModule,
     ExamSessionModule,

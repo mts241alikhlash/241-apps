@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
+import { examActivityRoutes } from '@/features/exam-activity'
 import { examPackageRoutes } from '@/features/exam-package'
 import { examEventRoutes } from '@/features/exam-event'
 import { examGradingRoutes } from '@/features/exam-grading'
@@ -28,6 +29,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     component: appLayout,
     children: [
+      ...examActivityRoutes,
       ...examEventRoutes,
       ...examPackageRoutes,
       ...examScheduleRoutes,

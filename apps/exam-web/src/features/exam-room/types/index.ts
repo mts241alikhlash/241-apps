@@ -330,6 +330,8 @@ const EVENT_LABELS: Record<string, string> = {
   SUBMIT_ROOM_REPORT: 'Serahkan berita acara',
   VERIFY_ROOM_REPORT: 'Verifikasi berita acara',
   REOPEN_ROOM_REPORT: 'Buka berita acara',
+  CALL_SUSPENDED: 'Ujian dijeda karena panggilan',
+  ABSENCE_GAP: 'Hilang sementara',
 }
 
 export const monitorStatusLabel = (status: MonitorStatus): string =>

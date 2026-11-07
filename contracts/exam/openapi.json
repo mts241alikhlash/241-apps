@@ -41,6 +41,164 @@
         ]
       }
     },
+    "/exam-activities": {
+      "post": {
+        "operationId": "ExamActivityController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateActivityRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create one activity for a grade and its classes",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}/policy": {
+      "patch": {
+        "operationId": "ExamActivityController_policy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityPolicyRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change the enforcement policy of an activity",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}/token/rotate": {
+      "post": {
+        "operationId": "ExamActivityController_rotate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Invalidate the previous access code of an activity",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
     "/exam-packages": {
       "get": {
         "operationId": "ExamPackageController_findAll",
@@ -5785,6 +5943,247 @@
           "pairs"
         ]
       },
+      "CreateActivityRequestDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "UH",
+              "QUIZ",
+              "ASSIGNMENT",
+              "UTS",
+              "UAS"
+            ],
+            "type": "string"
+          },
+          "classroomIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "presetName": {
+            "enum": [
+              "UJIAN_KETAT",
+              "ULANGAN_KELAS",
+              "TUGAS"
+            ],
+            "type": "string"
+          },
+          "tokenMode": {
+            "enum": [
+              "ROTATING",
+              "STATIC"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1440
+          }
+        },
+        "required": [
+          "semesterId",
+          "gradeId",
+          "subjectId",
+          "packageId",
+          "type",
+          "classroomIds",
+          "presetName",
+          "tokenMode",
+          "startsAt",
+          "endsAt",
+          "durationMinutes"
+        ]
+      },
+      "ExamPolicyDto": {
+        "type": "object",
+        "properties": {
+          "violationLimit": {
+            "type": "number"
+          },
+          "focusThresholdMs": {
+            "type": "number"
+          },
+          "snapshotIntervalMs": {
+            "type": "number"
+          },
+          "heartbeatIntervalMs": {
+            "type": "number"
+          },
+          "gapRecordedMs": {
+            "type": "number"
+          },
+          "gapTokenMs": {
+            "type": "number"
+          },
+          "gapViolationFrom": {
+            "type": "number"
+          },
+          "tokenSlotSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "violationLimit",
+          "focusThresholdMs",
+          "snapshotIntervalMs",
+          "heartbeatIntervalMs",
+          "gapRecordedMs",
+          "gapTokenMs",
+          "gapViolationFrom",
+          "tokenSlotSeconds"
+        ]
+      },
+      "ExamActivityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "tokenMode": {
+            "type": "string"
+          },
+          "tokenRotation": {
+            "type": "number"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "semesterId",
+          "eventId",
+          "gradeId",
+          "subjectId",
+          "packageId",
+          "type",
+          "tokenMode",
+          "tokenRotation",
+          "policy",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "status"
+        ]
+      },
+      "UpdateActivityPolicyRequestDto": {
+        "type": "object",
+        "properties": {
+          "violationLimit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "focusThresholdMs": {
+            "type": "number",
+            "minimum": 3000,
+            "maximum": 60000
+          },
+          "snapshotIntervalMs": {
+            "type": "number",
+            "minimum": 10000,
+            "maximum": 300000
+          },
+          "heartbeatIntervalMs": {
+            "type": "number",
+            "minimum": 10000,
+            "maximum": 120000
+          },
+          "gapRecordedMs": {
+            "type": "number",
+            "minimum": 30000,
+            "maximum": 600000
+          },
+          "gapTokenMs": {
+            "type": "number",
+            "minimum": 30000,
+            "maximum": 3600000
+          },
+          "gapViolationFrom": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "tokenSlotSeconds": {
+            "type": "number",
+            "minimum": 300,
+            "maximum": 3600
+          }
+        }
+      },
       "ExamPackageSummaryDto": {
         "type": "object",
         "properties": {
@@ -6870,12 +7269,16 @@
           "serverTime": {
             "type": "number",
             "description": "Server clock, epoch milliseconds"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
           }
         },
         "required": [
           "sessionId",
           "deadline",
-          "serverTime"
+          "serverTime",
+          "policy"
         ]
       },
       "PaperChoiceDto": {
@@ -7217,6 +7620,7 @@
               "FOCUS_LOST_BRIEF",
               "OVERLAY_OR_SHADE",
               "CALL_OR_MIC_ACTIVE",
+              "ABSENCE_GAP",
               "SCREEN_SHARE_DETECTED",
               "LEFT_APP",
               "VIOLATION_LOCKED",
@@ -7278,6 +7682,7 @@
               "FOCUS_LOST_BRIEF",
               "OVERLAY_OR_SHADE",
               "CALL_OR_MIC_ACTIVE",
+              "ABSENCE_GAP",
               "SCREEN_SHARE_DETECTED",
               "LEFT_APP",
               "VIOLATION_LOCKED",

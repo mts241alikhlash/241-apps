@@ -1,3 +1,9 @@
+import {
+  DEFAULT_POLICIES,
+  type ExamPolicy,
+} from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
+import { tryParsePolicy } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
+import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import { randomBytes } from 'node:crypto'
 import {
   ConflictException,
@@ -30,6 +36,7 @@ export interface StartedSession {
   sessionId: string
   deadline: Date
   serverTime: Date
+  policy: ExamPolicy
 }
 
 @Injectable()
@@ -99,12 +106,13 @@ export class StartExamSessionUseCase {
         HttpStatus.TOO_MANY_REQUESTS,
       )
     }
+    const codeScope = codeScopeOf(schedule, now)
     const correct = this.codes.matches(
-      schedule.id,
-      schedule.tokenRotation,
+      codeScope.scope,
+      codeScope.rotation,
       input.accessCode,
-      now,
-      true,
+      codeScope.at,
+      codeScope.allowPreviousSlotGrace,
     )
     if (correct) {
       if (state.failures > 0) await this.attempts.clear(schedule.id, studentId)
@@ -151,6 +159,7 @@ export class StartExamSessionUseCase {
       seatNumber: seat?.seatNumber ?? null,
       allowWebClient: seat?.allowWebClient ?? false,
       allowLateEntry: seat?.allowLateEntry ?? false,
+      policy: tryParsePolicy(schedule.activityPolicy),
     })
     if (created !== null) return this.result(created, now)
 
@@ -274,6 +283,7 @@ export class StartExamSessionUseCase {
       sessionId: session.id,
       deadline: session.deadline,
       serverTime: now,
+      policy: session.policy ?? DEFAULT_POLICIES.UJIAN_KETAT,
     }
   }
 }

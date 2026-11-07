@@ -1,3 +1,4 @@
+import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import {
   ConflictException,
   ForbiddenException,
@@ -143,12 +144,13 @@ export class ResumeExamSessionUseCase {
         'Jadwal ujian tidak ditemukan',
       )
     }
+    const codeScope = codeScopeOf(schedule, now)
     return this.codes.matches(
-      schedule.id,
-      schedule.tokenRotation,
+      codeScope.scope,
+      codeScope.rotation,
       given,
-      now,
-      true,
+      codeScope.at,
+      codeScope.allowPreviousSlotGrace,
     )
   }
 }

@@ -737,7 +737,9 @@ describe('session heartbeat', () => {
       f.sessions,
       new FakeSessionFinalizer(),
     )
-    return new SessionHeartbeatUseCase(access, f.sessions)
+    return new SessionHeartbeatUseCase(access, f.sessions, {
+      execute: () => Promise.resolve(),
+    } as never)
   }
 
   it('refreshes lastSeenAt without touching the violation count', async () => {
