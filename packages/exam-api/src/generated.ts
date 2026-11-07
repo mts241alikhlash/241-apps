@@ -2062,10 +2062,12 @@ export interface components {
             allowWebClient: boolean;
             answeredCount: number;
             batteryLevel: number | null;
+            batteryUnrestricted: boolean | null;
             /** @enum {string|null} */
             cameraBlocked: "network" | "permission" | "battery" | "stopped" | "hardware" | "cameraBusy" | null;
             /** Format: date-time */
             deadline: string;
+            dndGranted: boolean | null;
             extraMinutes: number;
             isCharging: boolean | null;
             kioskMode: string;
@@ -2076,6 +2078,7 @@ export interface components {
             lastSnapshotAt: string | null;
             latestSnapshotUrl: string | null;
             lockedByViolation: boolean;
+            lockTaskActive: boolean | null;
             requiresTokenReentry: boolean;
             /** Format: uuid */
             sessionId: string;
@@ -2170,7 +2173,10 @@ export interface components {
         SaveAnswersBatchDto: {
             answers: components["schemas"]["SaveAnswerItemDto"][];
             batteryLevel?: number | null;
+            batteryUnrestricted?: boolean | null;
+            dndGranted?: boolean | null;
             isCharging?: boolean | null;
+            lockTaskActive?: boolean | null;
             pendingLocalCount?: number;
         };
         SaveAnswersBatchResultDto: {

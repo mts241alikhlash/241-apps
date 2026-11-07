@@ -7007,6 +7007,18 @@
             "type": "boolean",
             "nullable": true
           },
+          "dndGranted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lockTaskActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "batteryUnrestricted": {
+            "type": "boolean",
+            "nullable": true
+          },
           "pendingLocalCount": {
             "type": "number",
             "minimum": 0
@@ -8097,6 +8109,18 @@
             "type": "boolean",
             "nullable": true
           },
+          "dndGranted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lockTaskActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "batteryUnrestricted": {
+            "type": "boolean",
+            "nullable": true
+          },
           "kioskMode": {
             "type": "string"
           },
@@ -8151,6 +8175,9 @@
           "lastSeenAt",
           "batteryLevel",
           "isCharging",
+          "dndGranted",
+          "lockTaskActive",
+          "batteryUnrestricted",
           "kioskMode",
           "allowWebClient",
           "violationCount",

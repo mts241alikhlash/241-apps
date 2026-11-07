@@ -45,6 +45,9 @@ export interface ExamSession {
   unsyncedCount: number
   lastBatteryLevel: number | null
   isCharging: boolean | null
+  dndGranted: boolean | null
+  lockTaskActive: boolean | null
+  batteryUnrestricted: boolean | null
   createdAt: Date
   updatedAt: Date
 }

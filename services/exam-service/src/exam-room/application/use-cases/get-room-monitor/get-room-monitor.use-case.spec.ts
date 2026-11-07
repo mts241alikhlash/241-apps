@@ -347,6 +347,28 @@ describe('GetRoomMonitorUseCase', () => {
     expect(result.data[0].packageTitle).toBe('PAS Matematika')
   })
 
+  it('carries the device readiness flags the app reported', async () => {
+    const { fixture, monitor } = await build()
+    startSession(fixture, fixture.studentIds[0], {
+      dndGranted: true,
+      lockTaskActive: false,
+      batteryUnrestricted: null,
+    })
+
+    const result = await monitor.execute(
+      ROOM_TECH,
+      fixture.room.id,
+      { page: 1, limit: 5 },
+      MONITOR_NOW,
+    )
+
+    expect(result.data[0].session).toMatchObject({
+      dndGranted: true,
+      lockTaskActive: false,
+      batteryUnrestricted: null,
+    })
+  })
+
   it('exposes the snapshot stamp, the block reason, and the read path', async () => {
     const { fixture, monitor } = await build()
     startSession(fixture, fixture.studentIds[0], {

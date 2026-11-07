@@ -46,6 +46,9 @@ model ExamSession {
   unsyncedCount  Int             @default(0) @map("unsynced_count")
   lastBatteryLevel Int?          @map("last_battery_level")
   isCharging     Boolean?        @map("is_charging")
+  dndGranted     Boolean?        @map("dnd_granted")
+  lockTaskActive Boolean?        @map("lock_task_active")
+  batteryUnrestricted Boolean?   @map("battery_unrestricted")
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt    DateTime          @updatedAt @map("updated_at")
 

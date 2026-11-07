@@ -25,6 +25,9 @@ export interface SaveAnswersBatchInput {
   pendingLocalCount?: number
   batteryLevel?: number
   isCharging?: boolean
+  dndGranted?: boolean
+  lockTaskActive?: boolean
+  batteryUnrestricted?: boolean
 }
 
 export interface ConfirmedAnswer {
@@ -99,6 +102,9 @@ export class SaveAnswersBatchUseCase {
         unsyncedCount: input.pendingLocalCount,
         batteryLevel: input.batteryLevel,
         isCharging: input.isCharging,
+        dndGranted: input.dndGranted,
+        lockTaskActive: input.lockTaskActive,
+        batteryUnrestricted: input.batteryUnrestricted,
       })
 
     return {

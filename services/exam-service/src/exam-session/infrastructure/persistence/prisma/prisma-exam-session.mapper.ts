@@ -45,6 +45,9 @@ export function toSession(row: SessionRow): ExamSession {
     unsyncedCount: row.unsyncedCount,
     lastBatteryLevel: row.lastBatteryLevel,
     isCharging: row.isCharging,
+    dndGranted: row.dndGranted,
+    lockTaskActive: row.lockTaskActive,
+    batteryUnrestricted: row.batteryUnrestricted,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }

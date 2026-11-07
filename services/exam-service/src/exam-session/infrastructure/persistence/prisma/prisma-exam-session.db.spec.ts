@@ -121,7 +121,15 @@ suite('Prisma saveAnswersBatch against a real database', () => {
     const result = await sessions.saveAnswersBatch(
       sessionId,
       items(paper.questionIds),
-      { now: NOW, unsyncedCount: 0, batteryLevel: 64, isCharging: true },
+      {
+        now: NOW,
+        unsyncedCount: 0,
+        batteryLevel: 64,
+        isCharging: true,
+        dndGranted: true,
+        lockTaskActive: false,
+        batteryUnrestricted: true,
+      },
     )
 
     expect(result.saved).toHaveLength(46)
@@ -133,6 +141,9 @@ suite('Prisma saveAnswersBatch against a real database', () => {
     expect(row?.unsyncedCount).toBe(0)
     expect(row?.lastBatteryLevel).toBe(64)
     expect(row?.isCharging).toBe(true)
+    expect(row?.dndGranted).toBe(true)
+    expect(row?.lockTaskActive).toBe(false)
+    expect(row?.batteryUnrestricted).toBe(true)
     expect(row?.lastSeenAt).toEqual(NOW)
   })
 

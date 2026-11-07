@@ -62,6 +62,21 @@ export class SaveAnswersBatchDto {
   @IsBoolean()
   isCharging?: boolean
 
+  @ApiPropertyOptional({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  dndGranted?: boolean
+
+  @ApiPropertyOptional({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  lockTaskActive?: boolean
+
+  @ApiPropertyOptional({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  batteryUnrestricted?: boolean
+
   @ApiPropertyOptional({ minimum: 0 })
   @IsOptional()
   @IsInt()
