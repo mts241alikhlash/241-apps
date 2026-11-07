@@ -13,8 +13,6 @@ local   all             postgres                                peer
 host    all             all             127.0.0.1/32            scram-sha-256
 HBA
 
-# the stubs read their state from files, so the test can emulate what the server would look like
-# after each run (the network exists, PostgreSQL restarted with the new listen_addresses, ...)
 cat > "$work/stubs/docker" <<'STUB'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "$STUB_LOG"

@@ -76,8 +76,6 @@ while read -r pgpass_path; do
   [[ ! -e "$pgpass_path" ]] || fail "the password file $pgpass_path was left behind"
 done < "$work/pgpass.paths"
 
-# the deploy host runs next to PostgreSQL: the container-facing host in DATABASE_URL is not reachable
-# from it (docker's MASQUERADE rewrites host traffic to the bridge address), so connect over the loopback
 [[ "$(head -1 "$work/conn.log")" == "127.0.0.1:5433:mts241" ]] || fail "bootstrap connected to $(head -1 "$work/conn.log"), not the loopback"
 grep -q '^127\.0\.0\.1:5433:' "$work/pgpass.seen" || fail "the password file does not match the connection host"
 
