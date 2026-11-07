@@ -3,6 +3,7 @@ import {
   DEFAULT_POLICIES,
   type ExamPolicy,
   parsePolicy,
+  tryParsePolicy,
 } from './exam-policy.policy.js'
 
 const valid: ExamPolicy = {
@@ -50,5 +51,11 @@ describe('parsePolicy', () => {
     expect(DEFAULT_POLICIES.TUGAS.gapRecordedMs).toBe(300_000)
     expect(DEFAULT_POLICIES.TUGAS.gapViolationFrom).toBe(3)
     expect(DEFAULT_POLICIES.ULANGAN_KELAS.violationLimit).toBe(3)
+  })
+
+  it('returns null instead of throwing for a corrupted stored policy', () => {
+    expect(tryParsePolicy({ violationLimit: 0 })).toBeNull()
+    expect(tryParsePolicy({ violationLimit: 5 })?.violationLimit).toBe(5)
+    expect(tryParsePolicy(null)?.violationLimit).toBe(3)
   })
 })
