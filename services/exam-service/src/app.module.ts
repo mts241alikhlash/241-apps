@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerModule } from '@nestjs/throttler'
+import { UserThrottlerGuard } from './core/throttling/user-throttler.guard.js'
 import { LoggerModule } from 'nestjs-pino'
 import { AppConfigModule } from '@mts241alikhlash/nest-core/config'
 import { envSchema } from './core/config/env.validation.js'
@@ -79,8 +80,8 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
   ],
   controllers: [],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: UserThrottlerGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
