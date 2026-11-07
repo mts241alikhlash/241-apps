@@ -1,5 +1,15 @@
 # infra
 
+## 0.2.0
+
+### Minor Changes
+
+- 8a2f799: Configure the Docker network subnet, the PostgreSQL listener and the firewall from provision.sh, so provisioning no longer needs hand-written pg_hba and ufw rules.
+
+### Patch Changes
+
+- e1d623a: Let the backup shell create each dump file, since pg_dump runs as postgres and the backup tree is root-only.
+
 ## 0.1.2
 
 ### Patch Changes
