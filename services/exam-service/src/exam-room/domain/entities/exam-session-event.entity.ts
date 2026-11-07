@@ -7,6 +7,7 @@ export const SESSION_EVENT_TYPES = [
   'SCREEN_SHARE_DETECTED',
   'LEFT_APP',
   'VIOLATION_LOCKED',
+  'CALL_SUSPENDED',
 ] as const
 
 export type SessionEventType = (typeof SESSION_EVENT_TYPES)[number]

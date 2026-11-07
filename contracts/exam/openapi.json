@@ -2032,6 +2032,84 @@
         ]
       }
     },
+    "/student-exams/{sessionId}/suspension": {
+      "post": {
+        "operationId": "SessionExamController_suspension",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Send 'web' from a browser; the Android app omits it",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionSuspensionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionSuspensionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Give back the time a phone call took",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
     "/student-exams/{sessionId}/resume": {
       "post": {
         "operationId": "SessionExamController_resume",
@@ -7141,7 +7219,8 @@
               "CALL_OR_MIC_ACTIVE",
               "SCREEN_SHARE_DETECTED",
               "LEFT_APP",
-              "VIOLATION_LOCKED"
+              "VIOLATION_LOCKED",
+              "CALL_SUSPENDED"
             ],
             "type": "string"
           },
@@ -7201,7 +7280,8 @@
               "CALL_OR_MIC_ACTIVE",
               "SCREEN_SHARE_DETECTED",
               "LEFT_APP",
-              "VIOLATION_LOCKED"
+              "VIOLATION_LOCKED",
+              "CALL_SUSPENDED"
             ]
           },
           "isViolation": {
@@ -7279,6 +7359,57 @@
           "requiresTokenReentry",
           "absentSince",
           "serverTime"
+        ]
+      },
+      "SessionSuspensionRequestDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "enum": [
+              "CALL"
+            ],
+            "type": "string"
+          },
+          "seconds": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 900
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "reason",
+          "seconds",
+          "clientId"
+        ]
+      },
+      "SessionSuspensionDto": {
+        "type": "object",
+        "properties": {
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalizeAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "extraMinutes": {
+            "type": "number",
+            "description": "Minutes this report added to the session"
+          },
+          "suspendedSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "deadline",
+          "finalizeAt",
+          "extraMinutes",
+          "suspendedSeconds"
         ]
       },
       "ResumeSessionRequestDto": {

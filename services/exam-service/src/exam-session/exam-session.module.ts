@@ -37,6 +37,7 @@ import { PrismaSessionRecoveryRepository } from './infrastructure/persistence/pr
 import { ResumeExamSessionUseCase } from './application/use-cases/resume-exam-session/resume-exam-session.use-case.js'
 import { SessionHeartbeatUseCase } from './application/use-cases/session-heartbeat/session-heartbeat.use-case.js'
 import { RecordSessionEventsUseCase } from './application/use-cases/record-session-events/record-session-events.use-case.js'
+import { SuspendSessionUseCase } from './application/use-cases/suspend-session/suspend-session.use-case.js'
 import { ReopenSessionUseCase } from './application/use-cases/reopen-session/reopen-session.use-case.js'
 import { ResetSessionUseCase } from './application/use-cases/reset-session/reset-session.use-case.js'
 import { ExtendSessionTimeUseCase } from './application/use-cases/extend-session-time/extend-session-time.use-case.js'
@@ -98,6 +99,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ResumeExamSessionUseCase,
     SessionHeartbeatUseCase,
     RecordSessionEventsUseCase,
+    SuspendSessionUseCase,
     ReopenSessionUseCase,
     ResetSessionUseCase,
     ExtendSessionTimeUseCase,

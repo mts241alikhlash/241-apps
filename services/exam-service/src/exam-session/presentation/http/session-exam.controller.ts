@@ -41,6 +41,7 @@ import { ListSavedAnswersUseCase } from '../../application/use-cases/list-saved-
 import { RecordSessionEventsUseCase } from '../../application/use-cases/record-session-events/record-session-events.use-case.js'
 import { ResumeExamSessionUseCase } from '../../application/use-cases/resume-exam-session/resume-exam-session.use-case.js'
 import { SessionHeartbeatUseCase } from '../../application/use-cases/session-heartbeat/session-heartbeat.use-case.js'
+import { SuspendSessionUseCase } from '../../application/use-cases/suspend-session/suspend-session.use-case.js'
 import { UploadProctorSnapshotUseCase } from '../../application/use-cases/upload-proctor-snapshot/upload-proctor-snapshot.use-case.js'
 import { SNAPSHOT_KINDS } from '../../domain/entities/exam-proctor-snapshot.entity.js'
 import { ClientPlatformHeader } from './client-platform.decorator.js'
@@ -58,6 +59,10 @@ import {
 } from './dto/record-violations.dto.js'
 import { CameraBlockedDto } from './dto/camera-blocked.dto.js'
 import { SessionHeartbeatDto } from './dto/session-heartbeat.dto.js'
+import {
+  SessionSuspensionDto,
+  SessionSuspensionRequestDto,
+} from './dto/session-suspension.dto.js'
 import { SnapshotTooLargeFilter } from './snapshot-too-large.filter.js'
 import {
   ProctorSnapshotUploadedDto,
@@ -101,6 +106,7 @@ export class SessionExamController {
     private readonly recordEvents: RecordSessionEventsUseCase,
     private readonly resumeSession: ResumeExamSessionUseCase,
     private readonly heartbeat: SessionHeartbeatUseCase,
+    private readonly suspendSession: SuspendSessionUseCase,
     private readonly uploadSnapshot: UploadProctorSnapshotUseCase,
   ) {}
 
@@ -255,6 +261,32 @@ export class SessionExamController {
       absentSince: beat.absentSince?.toISOString() ?? null,
       serverTime: beat.serverTime.toISOString(),
     }
+  }
+
+  @Post('suspension')
+  @HttpCode(201)
+  @RequirePermissions('exam-sessions.take')
+  @ApiOperation({ summary: 'Give back the time a phone call took' })
+  @ApiParam({ name: 'sessionId', format: 'uuid' })
+  @ApiResponse({ status: 201, type: SessionSuspensionDto })
+  async suspension(
+    @CurrentUser() user: { id: string },
+    @DeviceId() deviceId: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Body() body: SessionSuspensionRequestDto,
+  ): Promise<SessionSuspensionDto> {
+    return SessionSuspensionDto.fromDomain(
+      await this.suspendSession.execute(
+        { id: user.id, deviceId },
+        sessionId,
+        {
+          reason: body.reason,
+          seconds: body.seconds,
+          clientId: body.clientId,
+        },
+        new Date(),
+      ),
+    )
   }
 
   @Post('resume')
