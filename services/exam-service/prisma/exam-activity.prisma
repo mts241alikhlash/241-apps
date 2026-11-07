@@ -1,0 +1,68 @@
+enum ActivityTokenMode {
+  ROTATING
+  STATIC
+}
+
+enum ActivityStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  CLOSED
+}
+
+model ExamPolicyPreset {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(80)
+  policy    Json
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  activities ExamActivity[]
+
+  @@map("exam_policy_presets")
+}
+
+model ExamActivity {
+  id              String            @id @default(uuid()) @db.Uuid
+  semesterId      String            @map("semester_id") @db.Uuid
+  eventId         String?           @map("event_id") @db.Uuid
+  gradeId         String            @map("grade_id") @db.Uuid
+  subjectId       String            @map("subject_id") @db.Uuid
+  packageId       String            @map("package_id") @db.Uuid
+  type            ExamType
+  tokenMode       ActivityTokenMode @default(ROTATING) @map("token_mode")
+  tokenRotation   Int               @default(0) @map("token_rotation")
+  presetId        String?           @map("preset_id") @db.Uuid
+  policy          Json
+  startsAt        DateTime          @map("starts_at")
+  endsAt          DateTime          @map("ends_at")
+  durationMinutes Int               @map("duration_minutes")
+  status          ActivityStatus    @default(DRAFT)
+  createdById     String            @map("created_by_id") @db.Uuid
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  preset    ExamPolicyPreset?        @relation(fields: [presetId], references: [id], onDelete: SetNull)
+  schedules ExamSchedule[]
+  auditLogs ExamActivityAuditLog[]
+
+  @@index([semesterId, status])
+  @@index([gradeId, startsAt])
+  @@map("exam_activities")
+}
+
+model ExamActivityAuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  activityId String   @map("activity_id") @db.Uuid
+  actorId    String   @map("actor_id") @db.Uuid
+  action     String   @db.VarChar(40)
+  before     Json?
+  after      Json?
+  at         DateTime @default(now())
+
+  activity ExamActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([activityId, at])
+  @@map("exam_activity_audit_logs")
+}
