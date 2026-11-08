@@ -12,6 +12,8 @@ export interface SessionColumnOptions {
   onReset?: (session: ScheduleSession) => void
   canReadHistory?: boolean
   onHistory?: (session: ScheduleSession) => void
+  canViewPhotos?: boolean
+  onPhotos?: (session: ScheduleSession) => void
 }
 
 const timeFormat = new Intl.DateTimeFormat('id-ID', {
@@ -146,6 +148,19 @@ export function buildSessionColumns(
                 onClick: () => options.onHistory?.(session),
               },
               () => 'Riwayat',
+            ),
+          )
+        }
+        if (options.canViewPhotos && options.onPhotos) {
+          buttons.push(
+            h(
+              Button,
+              {
+                size: 'sm',
+                variant: 'ghost',
+                onClick: () => options.onPhotos?.(session),
+              },
+              () => 'Foto',
             ),
           )
         }

@@ -119,7 +119,12 @@ export class RoomAccessService {
   }
 
   assertCanActWithoutRoom(user: RoomStaffUser): Promise<void> {
-    if (!user.permissions?.includes(MANAGE_ALL)) return Promise.reject(denied())
+    if (
+      !user.permissions?.includes(MANAGE_ALL) &&
+      !user.permissions?.includes(SUPERVISE)
+    ) {
+      return Promise.reject(denied())
+    }
     return Promise.resolve()
   }
 
