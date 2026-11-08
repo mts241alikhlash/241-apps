@@ -203,6 +203,12 @@ describe('RoomAccessService', () => {
       access.assertCanRelease(ADMIN, ROOM_B, NOW),
     ).resolves.toMatchObject({ id: ROOM_B })
     await expect(access.assertCanActWithoutRoom(ADMIN)).resolves.toBeUndefined()
+    await expect(
+      access.assertCanActWithoutRoom({
+        id: 'u-sup',
+        permissions: ['exam-rooms.supervise'],
+      }),
+    ).resolves.toBeUndefined()
   })
 
   it('refuses a user with no exam-room permission at all', async () => {
