@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.2.1
+
+### Patch Changes
+
+- e89c1f1: Memungkinkan guru dan pengawas melihat foto pengawas (galeri foto bukti kamera) pada sesi ujian atau tugas yang tidak memiliki ruangan melalui tombol Foto di halaman daftar sesi jadwal.
+
 ## 0.2.0
 
 ### Minor Changes

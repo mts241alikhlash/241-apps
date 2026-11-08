@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.1.4
+
+### Patch Changes
+
+- e89c1f1: Memungkinkan guru dan pengawas melihat foto pengawas (galeri foto bukti kamera) pada sesi ujian atau tugas yang tidak memiliki ruangan melalui tombol Foto di halaman daftar sesi jadwal.
+
 ## 0.1.3
 
 ### Patch Changes
