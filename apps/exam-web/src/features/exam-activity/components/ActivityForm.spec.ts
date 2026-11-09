@@ -3,9 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import ActivityForm from './ActivityForm.vue'
 
-const { patch } = vi.hoisted(() => ({ patch: vi.fn() }))
+const { patch, post } = vi.hoisted(() => ({
+  patch: vi.fn(),
+  post: vi.fn(),
+}))
 vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get: vi.fn(), post: vi.fn(), patch },
+  default: { get: vi.fn(), post, patch },
 }))
 
 const props = {
@@ -107,6 +110,49 @@ describe('ActivityForm', () => {
     expect(patch).toHaveBeenCalledWith('/exam-activities/activity-1', {
       status: 'ACTIVE',
     })
+  })
+
+  it('confirms before leaving ACTIVE', async () => {
+    const confirm = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true)
+    vi.stubGlobal('confirm', confirm)
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: { ...pastActivity, status: 'ACTIVE' } },
+    })
+    await wrapper.find('#activity-status').setValue('CLOSED')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(confirm).toHaveBeenCalledWith(
+      expect.stringContaining('sesi yang masih berjalan'),
+    )
+    expect(patch).not.toHaveBeenCalled()
+
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(patch).toHaveBeenCalledWith('/exam-activities/activity-1', {
+      status: 'CLOSED',
+    })
+    vi.unstubAllGlobals()
+  })
+
+  it('asks the registry to issue participant numbers', async () => {
+    post.mockResolvedValueOnce({ data: { data: { issued: true } } })
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: pastActivity },
+    })
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Terbitkan nomor peserta')!
+      .trigger('click')
+    await flushPromises()
+
+    expect(post).toHaveBeenCalledWith(
+      '/exam-activities/activity-1/participant-numbers/issue',
+      {},
+    )
+    expect(wrapper.emitted('numbers-issued')?.[0]).toEqual([true])
   })
 
   it('warns when the activity is activated outside its window', async () => {

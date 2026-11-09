@@ -32,6 +32,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   submit: [payload: ActivityCreatePayload]
   'status-saved': []
+  'numbers-issued': [issued: boolean]
 }>()
 
 const isEdit = computed(
@@ -40,6 +41,7 @@ const isEdit = computed(
 
 const status = ref<ActivityStatus>(props.activity?.status ?? 'DRAFT')
 const savingStatus = ref(false)
+const issuingNumbers = ref(false)
 const statusError = ref<string | null>(null)
 
 const outsideWindow = computed(() => {
@@ -97,6 +99,15 @@ function toggleClassroom(id: string, checked: boolean): void {
 async function saveStatus(): Promise<void> {
   const item = props.activity
   if (item === null || item === undefined || savingStatus.value) return
+  if (
+    item.status === 'ACTIVE' &&
+    status.value !== 'ACTIVE' &&
+    !window.confirm(
+      'Menghentikan kegiatan aktif akan mengumpulkan sesi yang masih berjalan. Lanjutkan?',
+    )
+  ) {
+    return
+  }
   savingStatus.value = true
   statusError.value = null
   try {
@@ -106,6 +117,20 @@ async function saveStatus(): Promise<void> {
     statusError.value = 'Status kegiatan gagal disimpan.'
   } finally {
     savingStatus.value = false
+  }
+}
+
+async function issueNumbers(): Promise<void> {
+  const item = props.activity
+  if (item === null || item === undefined || issuingNumbers.value) return
+  issuingNumbers.value = true
+  try {
+    const response = await examActivityApi.issueParticipantNumbers(item.id)
+    emit('numbers-issued', response.data.data.issued)
+  } catch {
+    emit('numbers-issued', false)
+  } finally {
+    issuingNumbers.value = false
   }
 }
 
@@ -168,6 +193,14 @@ async function submit(): Promise<void> {
       >
         {{ statusError }}
       </p>
+
+      <button
+        type="button"
+        :disabled="issuingNumbers"
+        @click="issueNumbers"
+      >
+        {{ issuingNumbers ? 'Menerbitkan…' : 'Terbitkan nomor peserta' }}
+      </button>
     </template>
 
     <template v-else>

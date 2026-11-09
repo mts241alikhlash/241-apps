@@ -30,6 +30,12 @@ export const examActivityApi = {
       policy,
     ),
 
+  issueParticipantNumbers: (id: string) =>
+    api.post<ApiSingleResponse<{ issued: boolean }>>(
+      `/exam-activities/${seg(id)}/participant-numbers/issue`,
+      {},
+    ),
+
   rotateToken: (id: string) =>
     api.post<ApiSingleResponse<ExamActivityRecord>>(
       `/exam-activities/${id}/token/rotate`,

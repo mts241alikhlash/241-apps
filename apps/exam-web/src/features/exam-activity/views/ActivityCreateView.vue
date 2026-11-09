@@ -98,6 +98,11 @@ function statusSaved(): void {
   toast.success('Status kegiatan disimpan')
 }
 
+function numbersIssued(issued: boolean): void {
+  if (issued) toast.success('Nomor peserta diterbitkan')
+  else toast.error('Nomor peserta belum bisa diterbitkan')
+}
+
 onMounted(() => {
   if (editingId.value !== '') void loadActivity()
   else void load()
@@ -128,6 +133,7 @@ onMounted(() => {
       :is-admin="true"
       :activity="activity"
       @status-saved="statusSaved"
+      @numbers-issued="numbersIssued"
     />
     <ActivityForm
       v-else-if="semesterId !== ''"
