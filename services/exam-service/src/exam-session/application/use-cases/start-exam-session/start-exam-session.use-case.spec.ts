@@ -369,11 +369,7 @@ describe('StartExamSessionUseCase', () => {
         classroomId: CLASSROOM_7A.id,
         seatNumber: 12,
       })
-      await attach({ status: 'CLOSED' })
-      schedules.schedules.set(schedule.id, {
-        ...(await schedules.findById(schedule.id))!,
-        eventId: event.id,
-      })
+      await attach({ status: 'CLOSED', eventId: event.id })
 
       await expect(
         start(
@@ -386,6 +382,16 @@ describe('StartExamSessionUseCase', () => {
       ).rejects.toThrow(
         'Waktu ujian sudah berakhir di Ruang 01, nomor peserta 2024001',
       )
+    })
+
+    it('says the window has not opened while the activity is not active yet', async () => {
+      await attach({
+        status: 'SCHEDULED',
+        startsAt: new Date('2026-11-02T03:00:00.000Z'),
+        endsAt: new Date('2026-11-02T06:00:00.000Z'),
+      })
+
+      await expect(start(build())).rejects.toThrow('Ujian belum dibuka')
     })
   })
 
@@ -512,8 +518,9 @@ describe('StartExamSessionUseCase', () => {
     const startMakeup = (
       makeup: ExamSchedule,
       enrollments = new FakeEnrollment(),
+      participants = new FakeParticipantNumber(),
     ) =>
-      build(new FakeStudentIdentity(), enrollments).execute(
+      build(new FakeStudentIdentity(), enrollments, participants).execute(
         STUDENT_USER,
         makeup.id,
         {
@@ -536,9 +543,58 @@ describe('StartExamSessionUseCase', () => {
 
     it('keeps the makeup on its own window, not the window of the activity', async () => {
       const makeup = await withMakeup()
-      await attach()
+      await attach({
+        startsAt: new Date(MAKEUP_NOW.getTime() + 60 * 60_000),
+        endsAt: new Date(MAKEUP_NOW.getTime() + 2 * 60 * 60_000),
+      })
 
       await expect(startMakeup(makeup)).resolves.toBeDefined()
+    })
+
+    it('refuses the makeup when the activity is closed', async () => {
+      const makeup = await withMakeup()
+      await attach({ status: 'CLOSED' })
+
+      const error = await startMakeup(makeup).catch((thrown: unknown) => thrown)
+
+      expect(error).toBeInstanceOf(ConflictException)
+      expect(error).toMatchObject({ code: 'WINDOW_CLOSED' })
+    })
+
+    it('names the room of the activity event when it refuses the makeup', async () => {
+      const makeup = await withMakeup()
+      const event = await rooms.createEvent({
+        semesterId: schedule.semesterId,
+        name: 'UTS Ganjil',
+        type: 'UTS',
+        startsAt: new Date('2026-11-05T01:00:00.000Z'),
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        createdById: USER.id,
+      })
+      const room = await rooms.createRoom({
+        eventId: event.id,
+        code: 'R01',
+        name: 'Ruang 01',
+        capacity: 30,
+      })
+      await rooms.assignSeat({
+        roomId: room.id,
+        eventId: event.id,
+        studentId: STUDENT_ID,
+        classroomId: CLASSROOM_7A.id,
+        seatNumber: 9,
+      })
+      await attach({ status: 'CLOSED', eventId: event.id })
+
+      await expect(
+        startMakeup(
+          makeup,
+          undefined,
+          new FakeParticipantNumber({ number: '2024001' }),
+        ),
+      ).rejects.toThrow(
+        'Waktu ujian sudah berakhir di Ruang 01, nomor peserta 2024001',
+      )
     })
 
     it('does not accept the token of the regular exam', async () => {

@@ -99,8 +99,8 @@ export class StartExamSessionUseCase {
     if (schedule.status !== 'SCHEDULED') {
       throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
     }
-    await this.lifecycle.assertOpen(schedule.id, now, () =>
-      this.whereabouts(schedule, studentId, enrollment.semesterId),
+    await this.lifecycle.assertOpen(schedule, now, (eventId) =>
+      this.whereabouts(eventId, studentId, enrollment.semesterId),
     )
 
     const state = await this.attempts.get(schedule.id, studentId)
@@ -182,15 +182,15 @@ export class StartExamSessionUseCase {
   }
 
   private async whereabouts(
-    schedule: ExamSchedule,
+    eventId: string | null,
     studentId: string,
     semesterId: string,
   ): Promise<WindowClosedPlace> {
     try {
       const [seat, participantNumber] = await Promise.all([
-        schedule.eventId === null
+        eventId === null
           ? null
-          : this.rooms.findSeatForStudent(schedule.eventId, studentId),
+          : this.rooms.findSeatForStudent(eventId, studentId),
         this.participants.findNumber(studentId, semesterId).catch(() => null),
       ])
       return { roomName: seat?.roomName ?? null, participantNumber }

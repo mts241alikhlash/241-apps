@@ -19,6 +19,13 @@ export function examLifecycle(
   return 'FINISHED'
 }
 
+export function lifecycleWindow(
+  schedule: LifecycleWindow & { kind: 'REGULAR' | 'MAKEUP' },
+  activity: LifecycleWindow | null,
+): LifecycleWindow {
+  return schedule.kind === 'MAKEUP' ? schedule : (activity ?? schedule)
+}
+
 export function scheduleLifecycle(
   schedule: LifecycleWindow & { kind: 'REGULAR' | 'MAKEUP' },
   activity: (LifecycleWindow & { status: ExamActivityStatus }) | null,
@@ -26,7 +33,7 @@ export function scheduleLifecycle(
 ): ExamLifecycle {
   return examLifecycle(
     activity?.status ?? 'ACTIVE',
-    schedule.kind === 'MAKEUP' ? schedule : (activity ?? schedule),
+    lifecycleWindow(schedule, activity),
     now,
   )
 }
