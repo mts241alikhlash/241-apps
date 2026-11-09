@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common'
 import { IEnrollmentRepository } from '../../../../enrollment/domain/repositories/enrollment.repository.js'
 import {
   IAcademicLookupPort,
@@ -20,7 +24,16 @@ interface Candidate {
   studentId: string
   nis: string
   name: string | null
+  gradeLevel: number | null
+}
+
+interface GradedCandidate extends Candidate {
   gradeLevel: number
+}
+
+export interface IssueParticipantNumbersResult {
+  issued: number
+  skipped: string[]
 }
 
 @Injectable()
@@ -33,7 +46,7 @@ export class IssueParticipantNumbersUseCase {
     private readonly participantNumbers: IParticipantNumberRepository,
   ) {}
 
-  async execute(semesterId: string): Promise<{ issued: number }> {
+  async execute(semesterId: string): Promise<IssueParticipantNumbersResult> {
     const semester = await this.academicLookup.findSemesterContext(semesterId)
     if (!semester) {
       throw new NotFoundException(`Semester ${semesterId} not found`)
@@ -41,7 +54,7 @@ export class IssueParticipantNumbersUseCase {
 
     const enrollments =
       await this.enrollmentRepository.listActiveForSemester(semesterId)
-    if (enrollments.length === 0) return { issued: 0 }
+    if (enrollments.length === 0) return { issued: 0, skipped: [] }
 
     const refs = await this.studentIdentity.listRefsByIds(
       enrollments.map((enrollment) => enrollment.studentId),
@@ -78,8 +91,15 @@ export class IssueParticipantNumbersUseCase {
       gradeLevel:
         gradeLevelFromClassroom(ref.id) ??
         (ref.gradeId ? levelByGradeId.get(ref.gradeId) : undefined) ??
-        0,
+        null,
     }))
+    const graded = candidates.filter(
+      (candidate): candidate is GradedCandidate =>
+        candidate.gradeLevel !== null,
+    )
+    const skipped = candidates
+      .filter((candidate) => candidate.gradeLevel === null)
+      .map((candidate) => candidate.studentId)
 
     const prefix = numberPrefix(semester)
     const issued = await this.participantNumbers.issue(
@@ -95,7 +115,7 @@ export class IssueParticipantNumbersUseCase {
         }
 
         const drafts: ParticipantNumberRow[] = []
-        for (const candidate of sortByGradeThenName(candidates)) {
+        for (const candidate of sortByGradeThenName(graded)) {
           if (numbered.has(candidate.studentId)) continue
           const ordinal = (nextOrdinal.get(candidate.gradeLevel) ?? 0) + 1
           nextOrdinal.set(candidate.gradeLevel, ordinal)
@@ -113,21 +133,27 @@ export class IssueParticipantNumbersUseCase {
       },
     )
 
-    return { issued }
+    return { issued, skipped }
   }
 }
 
 function numberPrefix(semester: SemesterContext): string {
-  const startYear = semester.academicYearName?.match(/\d{4}/)?.[0]
-  const year = startYear
-    ? Number(startYear) % 100
-    : new Date().getFullYear() % 100
-  const term =
-    semester.sequence >= 1 && semester.sequence <= 9 ? semester.sequence : 1
-  return `${SCHOOL_CODE}-${String(year).padStart(2, '0')}${term}-`
+  const startYear = semester.academicYearName?.match(/^\d{4}/)?.[0]
+  if (!startYear) {
+    throw new UnprocessableEntityException(
+      `Semester ${semester.id} has no academic year name starting with a 4-digit year`,
+    )
+  }
+  if (semester.sequence < 1 || semester.sequence > 9) {
+    throw new UnprocessableEntityException(
+      `Semester ${semester.id} has semester type sequence ${semester.sequence}; a participant number needs 1-9`,
+    )
+  }
+  const year = Number(startYear) % 100
+  return `${SCHOOL_CODE}-${String(year).padStart(2, '0')}${semester.sequence}-`
 }
 
-function sortByGradeThenName(candidates: Candidate[]): Candidate[] {
+function sortByGradeThenName(candidates: GradedCandidate[]): GradedCandidate[] {
   return [...candidates].sort((a, b) => {
     if (a.gradeLevel !== b.gradeLevel) return a.gradeLevel - b.gradeLevel
     if (a.name && b.name) {

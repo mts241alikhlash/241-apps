@@ -139,7 +139,7 @@ describe('IssueParticipantNumbersUseCase', () => {
 
     const result = await useCase.execute('sem-1')
 
-    expect(result).toEqual({ issued: 2 })
+    expect(result).toEqual({ issued: 2, skipped: [] })
   })
 
   it('formats the number from school code, year, term, grade and ordinal', async () => {
@@ -164,7 +164,7 @@ describe('IssueParticipantNumbersUseCase', () => {
     await useCase.execute('sem-1')
     const second = await useCase.execute('sem-1')
 
-    expect(second).toEqual({ issued: 0 })
+    expect(second).toEqual({ issued: 0, skipped: [] })
     expect(rows.map((row) => row.number).sort()).toEqual([
       '241-261-08-001',
       '241-261-08-002',
@@ -187,7 +187,7 @@ describe('IssueParticipantNumbersUseCase', () => {
     })
     const result = await useCase.execute('sem-1')
 
-    expect(result).toEqual({ issued: 1 })
+    expect(result).toEqual({ issued: 1, skipped: [] })
     expect(rows.find((row) => row.studentId === 'student-citra')?.number).toBe(
       '241-261-08-003',
     )
@@ -243,6 +243,41 @@ describe('IssueParticipantNumbersUseCase', () => {
     await useCase.execute('sem-1')
 
     expect(rows[0]?.number).toBe('241-262-08-001')
+  })
+
+  it('skips a student no grade can be resolved for', async () => {
+    const { useCase, rows } = setup([
+      ani,
+      {
+        id: 'student-ungraded',
+        userId: 'user-ungraded',
+        nis: '2026009',
+        gradeId: null,
+        name: 'Eko',
+        classroomId: 'classroom-unknown',
+        gradeLevel: null,
+      },
+    ])
+
+    const result = await useCase.execute('sem-1')
+
+    expect(result).toEqual({ issued: 1, skipped: ['student-ungraded'] })
+    expect(rows.map((row) => row.studentId)).toEqual(['student-ani'])
+  })
+
+  it('fails when the semester has no 4-digit academic year', async () => {
+    const { useCase } = setup([ani], {
+      ...semester,
+      academicYearName: null,
+    })
+
+    await expect(useCase.execute('sem-1')).rejects.toThrow(/academic year/)
+  })
+
+  it('fails when the term sequence is outside 1-9', async () => {
+    const { useCase } = setup([ani], { ...semester, sequence: 99 })
+
+    await expect(useCase.execute('sem-1')).rejects.toThrow(/sequence 99/)
   })
 
   it('fails when the semester is unknown', async () => {
