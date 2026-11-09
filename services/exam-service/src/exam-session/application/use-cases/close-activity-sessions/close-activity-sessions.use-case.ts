@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
 
@@ -8,7 +7,6 @@ export class CloseActivitySessionsUseCase {
   constructor(
     private readonly sessions: IExamSessionRepository,
     private readonly finalizer: FinalizeSessionService,
-    private readonly rooms: IExamRoomRepository,
   ) {}
 
   async execute(
@@ -17,16 +15,21 @@ export class CloseActivitySessionsUseCase {
     now: Date = new Date(),
   ): Promise<number> {
     const ids = await this.sessions.findInProgressIdsByActivity(activityId)
+    let closed = 0
     for (const id of ids) {
-      await this.finalizer.finalize(id, 'EXPIRED', now)
-      await this.rooms.writeAuditLog({
-        sessionId: id,
-        action: 'CLOSED_BY_ADMIN',
-        actorId,
-        reason: 'Kegiatan ujian ditutup',
-        metadata: { activityId },
-      })
+      const session = await this.finalizer.finalizeIfRunning(
+        id,
+        'EXPIRED',
+        now,
+        {
+          action: 'CLOSED_BY_ADMIN',
+          actorId,
+          reason: 'Kegiatan ujian ditutup',
+          metadata: { activityId },
+        },
+      )
+      if (session !== null) closed += 1
     }
-    return ids.length
+    return closed
   }
 }

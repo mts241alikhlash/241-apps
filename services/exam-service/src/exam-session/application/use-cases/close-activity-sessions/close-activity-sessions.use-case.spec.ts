@@ -1,5 +1,4 @@
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
-import { FakeExamRoomRepository } from '../../../../exam-room/application/exam-room.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
 import type { AnswerPayload } from '../../../domain/policies/validate-answer-shape.policy.js'
@@ -25,19 +24,16 @@ describe('CloseActivitySessionsUseCase', () => {
   let schedules: FakeExamScheduleRepository
   let questions: FakeQuestionRepository
   let sessions: FakeExamSessionRepository
-  let rooms: FakeExamRoomRepository
   let useCase: CloseActivitySessionsUseCase
 
   beforeEach(() => {
     packages = new FakeExamPackageRepository()
     schedules = new FakeExamScheduleRepository(packages)
     questions = new FakeQuestionRepository()
-    sessions = new FakeExamSessionRepository()
-    rooms = new FakeExamRoomRepository()
+    sessions = new FakeExamSessionRepository(schedules)
     useCase = new CloseActivitySessionsUseCase(
       sessions,
       new FinalizeSessionService(sessions, schedules, packages, questions),
-      rooms,
     )
   })
 
@@ -60,12 +56,17 @@ describe('CloseActivitySessionsUseCase', () => {
     })
   }
 
+  const belongTo = (scheduleId: string, activityId: string) => {
+    const schedule = schedules.schedules.get(scheduleId)!
+    schedules.schedules.set(scheduleId, { ...schedule, activityId })
+  }
+
   it('expires every running session and keeps the saved answers', async () => {
     const { schedule, questionIds } = await schedulePaper(
       { packages, schedules, questions },
       [ESSAY],
     )
-    sessions.activityOfSchedule.set(schedule.id, ACTIVITY_ID)
+    belongTo(schedule.id, ACTIVITY_ID)
     sessions.sessions.set('a', sessionFor(schedule, { id: 'a' }))
     sessions.sessions.set(
       'b',
@@ -94,7 +95,7 @@ describe('CloseActivitySessionsUseCase', () => {
       text: 'jawaban',
     })
     expect(
-      rooms.auditLogs.map((row) => ({
+      sessions.auditLogs.map((row) => ({
         action: row.action,
         sessionId: row.sessionId,
         actorId: row.actorId,
@@ -124,8 +125,8 @@ describe('CloseActivitySessionsUseCase', () => {
     const other = await schedulePaper({ packages, schedules, questions }, [
       ESSAY,
     ])
-    sessions.activityOfSchedule.set(schedule.id, ACTIVITY_ID)
-    sessions.activityOfSchedule.set(other.schedule.id, OTHER_ACTIVITY_ID)
+    belongTo(schedule.id, ACTIVITY_ID)
+    belongTo(other.schedule.id, OTHER_ACTIVITY_ID)
     sessions.sessions.set('a', sessionFor(schedule, { id: 'a' }))
     sessions.sessions.set('z', sessionFor(other.schedule, { id: 'z' }))
     saveAnswer('a', questionIds[0])
@@ -134,6 +135,45 @@ describe('CloseActivitySessionsUseCase', () => {
 
     expect(sessions.sessions.get('a')?.status).toBe('EXPIRED')
     expect(sessions.sessions.get('z')?.status).toBe('IN_PROGRESS')
-    expect(rooms.auditLogs).toHaveLength(1)
+    expect(sessions.auditLogs).toHaveLength(1)
+  })
+
+  it('closes nothing and audits nothing when the audit write fails', async () => {
+    const { schedule, questionIds } = await schedulePaper(
+      { packages, schedules, questions },
+      [ESSAY],
+    )
+    belongTo(schedule.id, ACTIVITY_ID)
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a' }))
+    saveAnswer('a', questionIds[0])
+    sessions.auditFailure = new Error('audit down')
+
+    await expect(useCase.execute(ACTIVITY_ID, ADMIN_ID, LATER)).rejects.toThrow(
+      'audit down',
+    )
+
+    expect(sessions.sessions.get('a')?.status).toBe('IN_PROGRESS')
+    expect(sessions.auditLogs).toHaveLength(0)
+  })
+
+  it('skips a session the student submitted while the close was running', async () => {
+    const { schedule, questionIds } = await schedulePaper(
+      { packages, schedules, questions },
+      [ESSAY],
+    )
+    belongTo(schedule.id, ACTIVITY_ID)
+    sessions.sessions.set(
+      'b',
+      sessionFor(schedule, { id: 'b', status: 'SUBMITTED', submittedAt: NOW }),
+    )
+    saveAnswer('b', questionIds[0])
+    vi.spyOn(sessions, 'findInProgressIdsByActivity').mockResolvedValueOnce([
+      'b',
+    ])
+
+    expect(await useCase.execute(ACTIVITY_ID, ADMIN_ID, LATER)).toBe(0)
+
+    expect(sessions.sessions.get('b')?.status).toBe('SUBMITTED')
+    expect(sessions.auditLogs).toHaveLength(0)
   })
 })

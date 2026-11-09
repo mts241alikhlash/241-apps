@@ -1,4 +1,5 @@
 import type { ExamPolicy } from '../../../exam-activity/domain/policies/exam-policy.policy.js'
+import type { SessionAuditAction } from '../../../exam-room/domain/entities/exam-session-audit-log.entity.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
   AnswerPayload,
@@ -77,6 +78,13 @@ export interface SessionClosure {
   publish?: boolean
 }
 
+export interface SessionCloseAudit {
+  action: SessionAuditAction
+  actorId: string
+  reason: string
+  metadata?: Record<string, unknown>
+}
+
 export interface SessionRecoveryPatch {
   requiresTokenReentry?: boolean
   deviceId?: string | null
@@ -143,6 +151,7 @@ export abstract class IExamSessionRepository {
   abstract close(
     id: string,
     build: (answers: ExamAnswerRecord[]) => SessionClosure,
+    audit?: SessionCloseAudit,
   ): Promise<ExamSession | null>
   abstract applyGrade(
     input: GradeAnswerInput,

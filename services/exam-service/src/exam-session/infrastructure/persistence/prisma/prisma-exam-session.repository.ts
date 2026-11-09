@@ -19,6 +19,7 @@ import {
   type ScheduleSessionCounts,
   type SessionTelemetryUpdate,
   type SessionClosure,
+  type SessionCloseAudit,
   type SessionRecoveryPatch,
 } from '../../../domain/repositories/exam-session.repository.js'
 import { toAnswer, toSession } from './prisma-exam-session.mapper.js'
@@ -216,6 +217,7 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
   async close(
     id: string,
     build: (answers: ExamAnswerRecord[]) => SessionClosure,
+    audit?: SessionCloseAudit,
   ): Promise<ExamSession | null> {
     return this.prisma.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM exam_sessions WHERE id = ${id}::uuid FOR UPDATE`
@@ -233,6 +235,19 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
           maxScore: closure.maxScore,
         },
       })
+      if (audit !== undefined) {
+        await tx.examSessionAuditLog.create({
+          data: {
+            sessionId: id,
+            roomId: current.roomId,
+            scheduleId: current.scheduleId,
+            action: audit.action,
+            actorId: audit.actorId,
+            reason: audit.reason,
+            metadata: (audit.metadata ?? {}) as Prisma.InputJsonValue,
+          },
+        })
+      }
       if (closure.status === 'GRADED' && closure.publish !== false) {
         await tx.scorePublication.upsert({
           where: { sessionId: id },

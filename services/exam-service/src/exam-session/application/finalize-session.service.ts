@@ -4,7 +4,10 @@ import { IExamScheduleRepository } from '../../exam-schedule/domain/repositories
 import { IQuestionRepository } from '../../question/domain/repositories/question.repository.js'
 import type { ExamSession } from '../domain/entities/exam-session.entity.js'
 import { computeSessionResult } from '../domain/policies/compute-session-result.policy.js'
-import { IExamSessionRepository } from '../domain/repositories/exam-session.repository.js'
+import {
+  IExamSessionRepository,
+  type SessionCloseAudit,
+} from '../domain/repositories/exam-session.repository.js'
 import { ISessionFinalizer } from '../domain/repositories/session-finalizer.port.js'
 import { loadPaperSources } from './load-paper-sources.js'
 
@@ -40,25 +43,7 @@ export class FinalizeSessionService extends ISessionFinalizer {
     }
     if (session.status !== 'IN_PROGRESS') return session
 
-    const sources = await loadPaperSources(
-      this.schedules,
-      this.packages,
-      this.questions,
-      session.scheduleId,
-    )
-    const closed = await this.sessions.close(session.id, (answers) => {
-      const result = computeSessionResult(sources, answers)
-      const graded = result.pendingManual === 0
-      return {
-        status: graded ? 'GRADED' : as,
-        submittedAt: as === 'SUBMITTED' ? now : null,
-        gradedAt: graded ? now : null,
-        rawScore: result.rawScore,
-        maxScore: result.maxScore,
-        scores: result.scores,
-        publish: !(as === 'EXPIRED' && answers.length === 0),
-      }
-    })
+    const closed = await this.closeRunning(session, as, now)
     if (closed !== null) return closed
 
     const current = await this.sessions.findById(session.id)
@@ -66,5 +51,50 @@ export class FinalizeSessionService extends ISessionFinalizer {
       throw new NotFoundException('Sesi ujian tidak ditemukan')
     }
     return current
+  }
+
+  async finalizeIfRunning(
+    sessionId: string,
+    as: 'SUBMITTED' | 'EXPIRED',
+    now: Date,
+    audit: SessionCloseAudit,
+  ): Promise<ExamSession | null> {
+    const session = await this.sessions.findById(sessionId)
+    if (session === null) {
+      throw new NotFoundException('Sesi ujian tidak ditemukan')
+    }
+    if (session.status !== 'IN_PROGRESS') return null
+    return this.closeRunning(session, as, now, audit)
+  }
+
+  private async closeRunning(
+    session: ExamSession,
+    as: 'SUBMITTED' | 'EXPIRED',
+    now: Date,
+    audit?: SessionCloseAudit,
+  ): Promise<ExamSession | null> {
+    const sources = await loadPaperSources(
+      this.schedules,
+      this.packages,
+      this.questions,
+      session.scheduleId,
+    )
+    return this.sessions.close(
+      session.id,
+      (answers) => {
+        const result = computeSessionResult(sources, answers)
+        const graded = result.pendingManual === 0
+        return {
+          status: graded ? 'GRADED' : as,
+          submittedAt: as === 'SUBMITTED' ? now : null,
+          gradedAt: graded ? now : null,
+          rawScore: result.rawScore,
+          maxScore: result.maxScore,
+          scores: result.scores,
+          publish: !(as === 'EXPIRED' && answers.length === 0),
+        }
+      },
+      audit,
+    )
   }
 }
