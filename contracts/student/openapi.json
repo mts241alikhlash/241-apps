@@ -1449,6 +1449,55 @@
         ]
       }
     },
+    "/students/participant-numbers/issue": {
+      "post": {
+        "description": "exam-service calls this after creating an activity so its students already have a number. Idempotent: students that have one are kept.",
+        "operationId": "StudentInternalController_issueParticipantNumbers",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueParticipantNumbersRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IssueParticipantNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid provisioning token"
+          }
+        },
+        "summary": "Issue the missing participant numbers of a semester",
+        "tags": [
+          "Students"
+        ]
+      }
+    },
     "/students/by-user/{userId}": {
       "get": {
         "operationId": "StudentInternalController_byUser",
@@ -4752,6 +4801,38 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "IssueParticipantNumbersRequestDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "semesterId"
+        ]
+      },
+      "IssueParticipantNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "type": "number",
+            "description": "How many numbers this call created"
+          },
+          "skipped": {
+            "description": "Students without a grade level, so they got no number",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "issued",
+          "skipped"
         ]
       },
       "StudentIdByUserDataDto": {

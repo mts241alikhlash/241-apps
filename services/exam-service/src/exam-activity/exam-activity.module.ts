@@ -1,5 +1,8 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
+import { ExamSessionModule } from '../exam-session/exam-session.module.js'
 import { CreateActivityUseCase } from './application/use-cases/create-activity/create-activity.use-case.js'
+import { ListActivitiesUseCase } from './application/use-cases/list-activities/list-activities.use-case.js'
+import { UpdateActivityStatusUseCase } from './application/use-cases/update-activity-status/update-activity-status.use-case.js'
 import {
   RotateActivityTokenUseCase,
   UpdateActivityPolicyUseCase,
@@ -9,10 +12,13 @@ import { PrismaExamActivityRepository } from './infrastructure/persistence/prism
 import { ExamActivityController } from './presentation/http/exam-activity.controller.js'
 
 @Module({
+  imports: [forwardRef(() => ExamSessionModule)],
   controllers: [ExamActivityController],
   providers: [
     { provide: ExamActivityRepository, useClass: PrismaExamActivityRepository },
     CreateActivityUseCase,
+    ListActivitiesUseCase,
+    UpdateActivityStatusUseCase,
     UpdateActivityPolicyUseCase,
     RotateActivityTokenUseCase,
   ],

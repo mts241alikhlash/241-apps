@@ -11,7 +11,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List the activities of the active semester */
+        get: operations["ExamActivityController_list"];
         put?: never;
         /** Create one activity for a grade and its classes */
         post: operations["ExamActivityController_create"];
@@ -19,6 +20,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/exam-activities/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change the status of an activity */
+        patch: operations["ExamActivityController_changeStatus"];
         trace?: never;
     };
     "/exam-activities/{id}/policy": {
@@ -1403,7 +1421,7 @@ export interface components {
         };
         AuditLogDto: {
             /** @enum {string} */
-            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT";
+            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN";
             /** Format: uuid */
             actorId: string;
             /** Format: date-time */
@@ -2531,6 +2549,10 @@ export interface components {
             tokenSlotSeconds?: number;
             violationLimit?: number;
         };
+        UpdateActivityStatusRequestDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
+        };
         UpdateExamEventDto: {
             /** Format: date-time */
             endsAt?: string;
@@ -2592,6 +2614,31 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ExamActivityController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamActivityController_create: {
         parameters: {
             query?: never;
@@ -2606,6 +2653,37 @@ export interface operations {
         };
         responses: {
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_changeStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityStatusRequestDto"];
+            };
+        };
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

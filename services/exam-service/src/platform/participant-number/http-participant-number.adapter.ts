@@ -28,4 +28,10 @@ export class HttpParticipantNumberAdapter extends IParticipantNumberPort {
     if (typeof number === 'string') return number
     return this.client.malformed(URL_KEY)
   }
+
+  async issueNumbers(semesterId: string): Promise<void> {
+    await this.client.postData(URL_KEY, '/students/participant-numbers/issue', {
+      semesterId,
+    })
+  }
 }

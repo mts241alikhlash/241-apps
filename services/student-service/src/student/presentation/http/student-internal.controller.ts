@@ -22,6 +22,7 @@ import {
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
+import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ParticipantNumberResponseDto } from './dto/response/participant-number-response.dto.js'
 import { IStudentIdentityReadPort } from '../../domain/repositories/student-identity-read.port.js'
 
@@ -64,6 +65,23 @@ export class StudentRefListResponseDto {
   data!: StudentRefDto[]
 }
 
+export class IssueParticipantNumbersRequestDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  semesterId!: string
+}
+
+export class IssueParticipantNumbersResponseDto {
+  @ApiProperty({ description: 'How many numbers this call created' })
+  issued!: number
+
+  @ApiProperty({
+    type: [String],
+    description: 'Students without a grade level, so they got no number',
+  })
+  skipped!: string[]
+}
+
 @ApiTags('Students')
 @Public()
 @UseGuards(ProvisioningTokenGuard)
@@ -72,6 +90,7 @@ export class StudentInternalController {
   constructor(
     private readonly studentIdentityRead: IStudentIdentityReadPort,
     private readonly getParticipantNumber: GetParticipantNumberUseCase,
+    private readonly issueNumbers: IssueParticipantNumbersUseCase,
   ) {}
 
   @Post('by-ids')
@@ -94,6 +113,25 @@ export class StudentInternalController {
     return {
       data: rows.map(({ id, userId, nis }) => ({ id, userId, nis })),
     }
+  }
+
+  @Post('participant-numbers/issue')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Issue the missing participant numbers of a semester',
+    description:
+      'exam-service calls this after creating an activity so its students ' +
+      'already have a number. Idempotent: students that have one are kept.',
+  })
+  @ApiResponse({ status: 200, type: IssueParticipantNumbersResponseDto })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid provisioning token',
+  })
+  async issueParticipantNumbers(
+    @Body() dto: IssueParticipantNumbersRequestDto,
+  ): Promise<IssueParticipantNumbersResponseDto> {
+    return this.issueNumbers.execute(dto.semesterId)
   }
 
   @Get('by-user/:userId')

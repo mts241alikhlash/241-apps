@@ -61,7 +61,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ExamFileModule,
     QuestionModule,
     forwardRef(() => ExamRoomModule),
-    ExamActivityModule,
+    forwardRef(() => ExamActivityModule),
   ],
   controllers: [
     StudentExamController,

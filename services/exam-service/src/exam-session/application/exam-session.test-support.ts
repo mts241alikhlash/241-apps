@@ -154,6 +154,10 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
     if (this.options.failWith) return Promise.reject(this.options.failWith)
     return Promise.resolve(this.options.number ?? null)
   }
+
+  issueNumbers() {
+    return Promise.resolve()
+  }
 }
 
 export async function scheduleExam(

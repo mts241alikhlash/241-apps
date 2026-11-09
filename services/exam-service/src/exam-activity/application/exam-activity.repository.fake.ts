@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { ExamPolicy } from '../domain/policies/exam-policy.policy.js'
 import type {
+  ActivityStatus,
   ExamActivity,
   NewExamActivity,
 } from '../domain/entities/exam-activity.entity.js'
@@ -53,5 +54,21 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
 
   listSchedules() {
     return Promise.resolve([])
+  }
+
+  listBySemester(semesterId: string) {
+    return Promise.resolve(
+      [...this.activities.values()].filter(
+        (activity) => activity.semesterId === semesterId,
+      ),
+    )
+  }
+
+  updateStatus(id: string, status: ActivityStatus) {
+    const activity = this.activities.get(id)
+    if (activity === undefined) return Promise.resolve(null)
+    const updated: ExamActivity = { ...activity, status }
+    this.activities.set(id, updated)
+    return Promise.resolve(updated)
   }
 }

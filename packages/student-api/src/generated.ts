@@ -825,6 +825,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/students/participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue the missing participant numbers of a semester
+         * @description exam-service calls this after creating an activity so its students already have a number. Idempotent: students that have one are kept.
+         */
+        post: operations["StudentInternalController_issueParticipantNumbers"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/students/with-relations": {
         parameters: {
             query?: never;
@@ -1358,6 +1378,16 @@ export interface components {
             id: string;
             /** @example 2026/2027 */
             name: string;
+        };
+        IssueParticipantNumbersRequestDto: {
+            /** Format: uuid */
+            semesterId: string;
+        };
+        IssueParticipantNumbersResponseDto: {
+            /** @description How many numbers this call created */
+            issued: number;
+            /** @description Students without a grade level, so they got no number */
+            skipped: string[];
         };
         MyClassroomResponseClassmatesClassroomDto: {
             academicYearId: string;
@@ -4795,6 +4825,42 @@ export interface operations {
                         statusCode?: number;
                     };
                 };
+            };
+        };
+    };
+    StudentInternalController_issueParticipantNumbers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueParticipantNumbersRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueParticipantNumbersResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -19,6 +20,8 @@ import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
+import { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
+import { UpdateActivityStatusUseCase } from '../../application/use-cases/update-activity-status/update-activity-status.use-case.js'
 import {
   RotateActivityTokenUseCase,
   UpdateActivityPolicyUseCase,
@@ -27,6 +30,7 @@ import {
   CreateActivityRequestDto,
   ExamActivityDto,
   UpdateActivityPolicyRequestDto,
+  UpdateActivityStatusRequestDto,
 } from './dto/exam-activity.dto.js'
 
 @ApiTags('Exam Activities')
@@ -36,9 +40,33 @@ import {
 export class ExamActivityController {
   constructor(
     private readonly createActivity: CreateActivityUseCase,
+    private readonly listActivities: ListActivitiesUseCase,
+    private readonly updateStatus: UpdateActivityStatusUseCase,
     private readonly updatePolicy: UpdateActivityPolicyUseCase,
     private readonly rotateToken: RotateActivityTokenUseCase,
   ) {}
+
+  @Get()
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({ summary: 'List the activities of the active semester' })
+  @ApiResponse({ status: 200, type: [ExamActivityDto] })
+  async list(): Promise<ExamActivityDto[]> {
+    const activities = await this.listActivities.execute()
+    return activities.map((activity) => ExamActivityDto.of(activity))
+  }
+
+  @Patch(':id')
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({ summary: 'Change the status of an activity' })
+  @ApiResponse({ status: 200, type: ExamActivityDto })
+  async changeStatus(
+    @CurrentUser() user: { id: string },
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateActivityStatusRequestDto,
+  ): Promise<ExamActivityDto> {
+    const activity = await this.updateStatus.execute(user.id, id, dto.status)
+    return ExamActivityDto.of(activity)
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

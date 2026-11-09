@@ -9,8 +9,15 @@ function build(answer: unknown) {
   const malformed = vi.fn((): never => {
     throw new ServiceUnavailableException('malformed')
   })
-  const client = { getData, malformed } as unknown as ServiceClient
-  return { adapter: new HttpParticipantNumberAdapter(client), getData }
+  const postData = vi.fn((_key: string, _path: string, _body: unknown) =>
+    Promise.resolve({ issued: 0, skipped: [] }),
+  )
+  const client = { getData, postData, malformed } as unknown as ServiceClient
+  return {
+    adapter: new HttpParticipantNumberAdapter(client),
+    getData,
+    postData,
+  }
 }
 
 describe('HttpParticipantNumberAdapter', () => {
@@ -39,5 +46,17 @@ describe('HttpParticipantNumberAdapter', () => {
     await expect(
       build({ number: 241 }).adapter.findNumber('stu-1', 'sem-1'),
     ).rejects.toThrow('malformed')
+  })
+
+  it('asks student-service to issue the semester’s numbers', async () => {
+    const { adapter, postData } = build({ issued: 2, skipped: [] })
+
+    await adapter.issueNumbers('sem 1')
+
+    expect(postData).toHaveBeenCalledWith(
+      'STUDENT_SERVICE_URL',
+      '/students/participant-numbers/issue',
+      { semesterId: 'sem 1' },
+    )
   })
 })
