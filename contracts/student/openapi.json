@@ -1501,6 +1501,64 @@
         ]
       }
     },
+    "/students/by-id/{studentId}/participant-number": {
+      "get": {
+        "description": "exam-service projects the number into a student’s exam list, so it cannot use the account-token route. Null when no number was issued.",
+        "operationId": "StudentInternalController_participantNumber",
+        "parameters": [
+          {
+            "name": "studentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "semesterId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ParticipantNumberResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid provisioning token"
+          }
+        },
+        "summary": "A student’s participant number, for service callers",
+        "tags": [
+          "Students"
+        ]
+      }
+    },
     "/students/export": {
       "get": {
         "operationId": "StudentImportExportController_export",
@@ -4724,6 +4782,19 @@
           "data"
         ]
       },
+      "ParticipantNumberResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "nullable": true,
+            "description": "Registry number for the semester, or null when none was issued"
+          }
+        },
+        "required": [
+          "number"
+        ]
+      },
       "BulkImportStudentRowDto": {
         "type": "object",
         "properties": {
@@ -6930,19 +7001,6 @@
           "supervisor",
           "classmates",
           "subjects"
-        ]
-      },
-      "ParticipantNumberResponseDto": {
-        "type": "object",
-        "properties": {
-          "number": {
-            "type": "string",
-            "nullable": true,
-            "description": "Registry number for the semester, or null when none was issued"
-          }
-        },
-        "required": [
-          "number"
         ]
       },
       "CreateStudentDto": {

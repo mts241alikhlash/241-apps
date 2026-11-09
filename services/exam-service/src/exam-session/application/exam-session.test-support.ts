@@ -16,6 +16,7 @@ import {
   IEnrollmentLookupPort,
   type ActiveEnrollment,
 } from '../../platform/enrollment-lookup/enrollment-lookup.port.js'
+import { IParticipantNumberPort } from '../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../platform/student-directory/student-directory.port.js'
 import { IStudentIdentityReadPort } from '../../platform/student-identity/student-identity.port.js'
 import { seedPackage } from '../../exam-package/application/exam-package.test-support.js'
@@ -89,6 +90,22 @@ export class FakeEnrollment extends IEnrollmentLookupPort {
 
 export const down = () =>
   new ServiceUnavailableException('student-service down')
+
+export class FakeParticipantNumber extends IParticipantNumberPort {
+  constructor(
+    private readonly options: {
+      number?: string | null
+      failWith?: Error
+    } = {},
+  ) {
+    super()
+  }
+
+  findNumber() {
+    if (this.options.failWith) return Promise.reject(this.options.failWith)
+    return Promise.resolve(this.options.number ?? null)
+  }
+}
 
 export async function scheduleExam(
   fixtures: {

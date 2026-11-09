@@ -1849,15 +1849,35 @@ export interface components {
             studentId: string;
         };
         MyExamDto: {
+            /**
+             * Format: uuid
+             * @description The activity this exam belongs to, when it belongs to one
+             */
+            activityId: string | null;
+            /** @enum {string|null} */
+            activityStatus: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED" | null;
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
+            /** Format: uuid */
+            eventId: string | null;
+            /** @description Null when the event cannot be named right now */
+            eventName: string | null;
             /**
              * Format: uuid
              * @description The schedule id
              */
             id: string;
+            /** @enum {string} */
+            lifecycle: "UPCOMING" | "OPEN" | "FINISHED";
+            /** @description True for a makeup sitting */
+            makeup: boolean;
             minSubmitMinutes: number;
+            /** @description Only filled while the exam is open; null when none was issued */
+            participantNumber: string | null;
+            /** @description Only filled while the exam is open */
+            roomName: string | null;
+            seatNumber: number | null;
             /** Format: uuid */
             sessionId: string | null;
             /** Format: date-time */

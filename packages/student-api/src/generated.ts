@@ -663,6 +663,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/students/by-id/{studentId}/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A student’s participant number, for service callers
+         * @description exam-service projects the number into a student’s exam list, so it cannot use the account-token route. Null when no number was issued.
+         */
+        get: operations["StudentInternalController_participantNumber"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/students/by-ids": {
         parameters: {
             query?: never;
@@ -4500,6 +4520,42 @@ export interface operations {
                         statusCode?: number;
                     };
                 };
+            };
+        };
+    };
+    StudentInternalController_participantNumber: {
+        parameters: {
+            query?: {
+                semesterId?: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

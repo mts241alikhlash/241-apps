@@ -1,9 +1,15 @@
 import { ServiceUnavailableException } from '@nestjs/common'
+import { FakeExamActivityRepository } from '../../../../exam-activity/application/exam-activity.repository.fake.js'
+import type { ExamActivity } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
+import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
+import { FakeExamRoomRepository } from '../../../../exam-room/application/exam-room.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import {
   CLASSROOM_7A,
   FakeAcademicLookup,
+  SEMESTER_ID,
+  USER,
 } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { SUBJECT_ID } from '../../../../exam-package/application/exam-package.test-support.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
@@ -11,6 +17,7 @@ import { FakeExamSessionRepository } from '../../exam-session.repository.fake.js
 import {
   ENDS,
   FakeEnrollment,
+  FakeParticipantNumber,
   FakeStudentIdentity,
   NOW,
   STARTS,
@@ -27,12 +34,16 @@ describe('ListMyExamsUseCase', () => {
   let schedules: FakeExamScheduleRepository
   let questions: FakeQuestionRepository
   let sessions: FakeExamSessionRepository
+  let activities: FakeExamActivityRepository
+  let rooms: FakeExamRoomRepository
 
   beforeEach(() => {
     packages = new FakeExamPackageRepository()
     schedules = new FakeExamScheduleRepository(packages)
     questions = new FakeQuestionRepository()
     sessions = new FakeExamSessionRepository()
+    activities = new FakeExamActivityRepository()
+    rooms = new FakeExamRoomRepository()
   })
 
   const build = (
@@ -41,6 +52,7 @@ describe('ListMyExamsUseCase', () => {
     academic = new FakeAcademicLookup({
       subjects: [{ id: SUBJECT_ID, name: 'Matematika' }],
     }),
+    participants = new FakeParticipantNumber(),
   ) =>
     new ListMyExamsUseCase(
       students,
@@ -49,6 +61,9 @@ describe('ListMyExamsUseCase', () => {
       packages,
       sessions,
       academic,
+      activities,
+      rooms,
+      participants,
     )
 
   const fixtures = () => ({ packages, schedules, questions })
@@ -332,6 +347,156 @@ describe('ListMyExamsUseCase', () => {
       const list = await build().execute(STUDENT_USER, MAKEUP_NOW)
 
       expect(list.map((exam) => exam.id)).not.toContain(makeup.id)
+    })
+  })
+
+  describe('the activity, room and seat', () => {
+    const newActivity = async (
+      overrides: Partial<ExamActivity> = {},
+    ): Promise<ExamActivity> => {
+      const activity = await activities.create({
+        activity: {
+          semesterId: SEMESTER_ID,
+          eventId: null,
+          gradeId: CLASSROOM_7A.gradeId,
+          subjectId: SUBJECT_ID,
+          packageId: 'pkg-1',
+          type: 'UH',
+          tokenMode: 'STATIC',
+          presetId: null,
+          policy: DEFAULT_POLICIES.ULANGAN_KELAS,
+          startsAt: STARTS,
+          endsAt: ENDS,
+          durationMinutes: 90,
+          createdById: USER.id,
+        },
+        classroomIds: [],
+        actorId: USER.id,
+      })
+      const seeded = { ...activity, status: 'ACTIVE' as const, ...overrides }
+      activities.activities.set(seeded.id, seeded)
+      return seeded
+    }
+
+    const newEvent = async (name = 'Ujian Tengah Semester') =>
+      rooms.createEvent({
+        semesterId: SEMESTER_ID,
+        name,
+        type: 'UTS',
+        startsAt: STARTS,
+        endsAt: ENDS,
+        createdById: USER.id,
+      })
+
+    const seatStudent = async (eventId: string, seatNumber = 7) => {
+      const room = await rooms.createRoom({
+        eventId,
+        code: `R-${seatNumber}`,
+        name: `R-${seatNumber}`,
+        capacity: 30,
+      })
+      await rooms.assignSeat({
+        roomId: room.id,
+        eventId,
+        studentId: STUDENT_ID,
+        classroomId: CLASSROOM_7A.id,
+        seatNumber,
+      })
+      return room
+    }
+
+    it('projects an active activity with its room, seat and participant number', async () => {
+      const exam = await scheduleExam(fixtures())
+      const event = await newEvent()
+      const activity = await newActivity({ eventId: event.id })
+      schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
+      await seatStudent(event.id)
+
+      const [row] = await build(
+        undefined,
+        undefined,
+        undefined,
+        new FakeParticipantNumber({ number: '241-261-08-001' }),
+      ).execute(STUDENT_USER, NOW)
+
+      expect(row).toMatchObject({
+        activityId: activity.id,
+        activityStatus: 'ACTIVE',
+        eventId: event.id,
+        eventName: 'Ujian Tengah Semester',
+        lifecycle: 'OPEN',
+        roomName: 'R-7',
+        seatNumber: 7,
+        participantNumber: '241-261-08-001',
+        makeup: false,
+      })
+    })
+
+    it('keeps the room, seat and number back while the activity window has not opened', async () => {
+      const exam = await scheduleExam(fixtures())
+      const event = await newEvent()
+      const activity = await newActivity({
+        eventId: event.id,
+        startsAt: new Date('2026-11-02T03:00:00.000Z'),
+        endsAt: new Date('2026-11-02T05:00:00.000Z'),
+      })
+      schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
+      await seatStudent(event.id)
+
+      const [row] = await build(
+        undefined,
+        undefined,
+        undefined,
+        new FakeParticipantNumber({ number: '241-261-08-001' }),
+      ).execute(STUDENT_USER, NOW)
+
+      expect(row).toMatchObject({
+        lifecycle: 'UPCOMING',
+        roomName: null,
+        seatNumber: null,
+        participantNumber: null,
+      })
+    })
+
+    it('makes a makeup inherit the activity and event of its base schedule', async () => {
+      const original = await scheduleExam(fixtures())
+      const event = await newEvent()
+      const activity = await newActivity({
+        eventId: event.id,
+        startsAt: new Date('2026-11-05T01:00:00.000Z'),
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+      })
+      schedules.schedules.set(original.id, {
+        ...original,
+        activityId: activity.id,
+      })
+      const makeup = await schedules.createMakeup({
+        packageId: original.packageId,
+        classroomId: original.classroomId,
+        semesterId: original.semesterId,
+        startsAt: new Date('2026-11-05T01:00:00.000Z'),
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        durationMinutes: 90,
+        type: original.type,
+        createdById: original.createdById,
+        makeupOfId: original.id,
+        participants: [
+          { studentId: STUDENT_ID, reason: 'SICK' as const, note: null },
+        ],
+      })
+      if (makeup === null) throw new Error('makeup not created')
+
+      const list = await build().execute(
+        STUDENT_USER,
+        new Date('2026-11-05T02:00:00.000Z'),
+      )
+
+      expect(list.find((row) => row.id === makeup.id)).toMatchObject({
+        makeup: true,
+        activityId: activity.id,
+        eventId: event.id,
+        lifecycle: 'OPEN',
+      })
     })
   })
 })

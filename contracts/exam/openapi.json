@@ -7218,6 +7218,58 @@
             "type": "string",
             "nullable": true,
             "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The activity this exam belongs to, when it belongs to one"
+          },
+          "activityStatus": {
+            "nullable": true,
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when the event cannot be named right now"
+          },
+          "lifecycle": {
+            "enum": [
+              "UPCOMING",
+              "OPEN",
+              "FINISHED"
+            ],
+            "type": "string"
+          },
+          "roomName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Only filled while the exam is open"
+          },
+          "seatNumber": {
+            "type": "number",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Only filled while the exam is open; null when none was issued"
+          },
+          "makeup": {
+            "type": "boolean",
+            "description": "True for a makeup sitting"
           }
         },
         "required": [
@@ -7231,7 +7283,16 @@
           "durationMinutes",
           "minSubmitMinutes",
           "status",
-          "sessionId"
+          "sessionId",
+          "activityId",
+          "activityStatus",
+          "eventId",
+          "eventName",
+          "lifecycle",
+          "roomName",
+          "seatNumber",
+          "participantNumber",
+          "makeup"
         ]
       },
       "StartSessionDto": {

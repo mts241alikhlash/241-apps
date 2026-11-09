@@ -7,17 +7,22 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import { ArrayMaxSize, IsArray, IsUUID } from 'class-validator'
 import {
   ApiOperation,
+  ApiParam,
   ApiProperty,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
+import { ParticipantNumberResponseDto } from './dto/response/participant-number-response.dto.js'
 import { IStudentIdentityReadPort } from '../../domain/repositories/student-identity-read.port.js'
 
 export class StudentIdByUserDataDto {
@@ -64,7 +69,10 @@ export class StudentRefListResponseDto {
 @UseGuards(ProvisioningTokenGuard)
 @Controller('students')
 export class StudentInternalController {
-  constructor(private readonly studentIdentityRead: IStudentIdentityReadPort) {}
+  constructor(
+    private readonly studentIdentityRead: IStudentIdentityReadPort,
+    private readonly getParticipantNumber: GetParticipantNumberUseCase,
+  ) {}
 
   @Post('by-ids')
   @HttpCode(HttpStatus.OK)
@@ -103,5 +111,29 @@ export class StudentInternalController {
         studentId: await this.studentIdentityRead.findStudentIdByUserId(userId),
       },
     }
+  }
+
+  @Get('by-id/:studentId/participant-number')
+  @ApiOperation({
+    summary: 'A student’s participant number, for service callers',
+    description:
+      'exam-service projects the number into a student’s exam list, so it ' +
+      'cannot use the account-token route. Null when no number was issued.',
+  })
+  @ApiParam({ name: 'studentId', format: 'uuid' })
+  @ApiQuery({ name: 'semesterId', required: false, format: 'uuid' })
+  @ApiResponse({ status: 200, type: ParticipantNumberResponseDto })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid provisioning token',
+  })
+  async participantNumber(
+    @Param('studentId', ParseUUIDPipe) studentId: string,
+    @Query('semesterId', new ParseUUIDPipe({ optional: true }))
+    semesterId?: string,
+  ): Promise<ParticipantNumberResponseDto> {
+    return ParticipantNumberResponseDto.fromDomain(
+      await this.getParticipantNumber.execute(studentId, semesterId),
+    )
   }
 }

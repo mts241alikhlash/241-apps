@@ -30,6 +30,7 @@ import { ReleaseSessionUseCase } from './application/use-cases/release-session/r
 import { SessionExamController } from './presentation/http/session-exam.controller.js'
 import { StudentExamController } from './presentation/http/student-exam.controller.js'
 import { ExamRoomModule } from '../exam-room/exam-room.module.js'
+import { ExamActivityModule } from '../exam-activity/exam-activity.module.js'
 import { SessionRecoveryService } from './application/session-recovery.service.js'
 import { SeatFlagService } from './application/seat-flag.service.js'
 import { ISessionRecoveryRepository } from './domain/repositories/session-recovery.port.js'
@@ -58,6 +59,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ExamFileModule,
     QuestionModule,
     forwardRef(() => ExamRoomModule),
+    ExamActivityModule,
   ],
   controllers: [
     StudentExamController,
