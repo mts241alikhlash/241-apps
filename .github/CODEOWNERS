@@ -1,0 +1,7 @@
+# The owner decides what ships: the lock pins production images, the workflows
+# that build and deploy them, and the deploy guide itself.
+/infra/deployment/lock.json @mhrmnvl
+/infra/compose/ @mhrmnvl
+/.github/workflows/ @mhrmnvl
+/docs/guides/deploy.md @mhrmnvl
+/docs/guides/rollback.md @mhrmnvl
