@@ -4,11 +4,7 @@ import {
   IAcademicLookupPort,
   SemesterContext,
 } from '../../../../platform/academic-lookup/academic-lookup.port.js'
-import { IProfileLookupPort } from '../../../../platform/profile-lookup/profile-lookup.port.js'
-import {
-  IParticipantNumberRepository,
-  ParticipantNumberRow,
-} from '../../../domain/repositories/participant-number.repository.js'
+import { ParticipantNumberRow } from '../../../domain/repositories/participant-number.repository.js'
 import { IStudentIdentityReadPort } from '../../../domain/repositories/student-identity-read.port.js'
 import { IssueParticipantNumbersUseCase } from './issue-participant-numbers.use-case.js'
 
@@ -35,11 +31,12 @@ interface StudentSeed {
 function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
   const rows: ParticipantNumberRow[] = []
   const participantRepository = {
-    findByStudent: vi.fn(
-      async (studentId: string, semesterId: string) =>
+    findByStudent: vi.fn((studentId: string, semesterId: string) =>
+      Promise.resolve(
         rows.find(
           (row) => row.studentId === studentId && row.semesterId === semesterId,
         ) ?? null,
+      ),
     ),
     issue: vi.fn(
       async (
@@ -60,7 +57,7 @@ function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
   const useCase = new IssueParticipantNumbersUseCase(
     {
       findSemesterContext: vi.fn().mockResolvedValue(context),
-      listClassroomsByIds: vi.fn().mockImplementation(async () =>
+      listClassroomsByIds: vi.fn().mockImplementation(() =>
         seeds.map((seed) => ({
           id: seed.classroomId,
           code: '7A',
@@ -72,7 +69,7 @@ function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
           gradeName: null,
         })),
       ),
-      listGradesByIds: vi.fn().mockImplementation(async () =>
+      listGradesByIds: vi.fn().mockImplementation(() =>
         seeds.map((seed) => ({
           id: seed.gradeId ?? 'grade-unknown',
           level: 8,
@@ -81,7 +78,7 @@ function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
       ),
     } as unknown as IAcademicLookupPort,
     {
-      listActiveForSemester: vi.fn().mockImplementation(async () =>
+      listActiveForSemester: vi.fn().mockImplementation(() =>
         seeds.map((seed) => ({
           studentId: seed.id,
           classroomId: seed.classroomId,
@@ -89,7 +86,7 @@ function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
       ),
     } as unknown as IEnrollmentRepository,
     {
-      listRefsByIds: vi.fn().mockImplementation(async () =>
+      listRefsByIds: vi.fn().mockImplementation(() =>
         seeds.map(({ id, userId, nis, gradeId }) => ({
           id,
           userId,
@@ -101,13 +98,13 @@ function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
     {
       findByUserIds: vi
         .fn()
-        .mockImplementation(async () =>
+        .mockImplementation(() =>
           seeds
             .filter((seed) => seed.name !== undefined)
             .map((seed) => ({ userId: seed.userId, name: seed.name })),
         ),
-    } as unknown as IProfileLookupPort,
-    participantRepository as unknown as IParticipantNumberRepository,
+    },
+    participantRepository,
   )
 
   return { useCase, rows, participantRepository }

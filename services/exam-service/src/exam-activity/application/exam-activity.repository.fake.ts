@@ -58,9 +58,9 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
 
   listBySemester(semesterId: string) {
     return Promise.resolve(
-      [...this.activities.values()].filter(
-        (activity) => activity.semesterId === semesterId,
-      ),
+      [...this.activities.values()]
+        .filter((activity) => activity.semesterId === semesterId)
+        .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()),
     )
   }
 

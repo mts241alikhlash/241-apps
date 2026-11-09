@@ -22,6 +22,9 @@ export class UpdateActivityStatusUseCase {
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
     }
+    if (current.status === 'ACTIVE' && status !== 'ACTIVE') {
+      await this.closeSessions.execute(activityId, actorId)
+    }
     const updated = await this.activities.updateStatus(
       activityId,
       status,
@@ -29,9 +32,6 @@ export class UpdateActivityStatusUseCase {
     )
     if (updated === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
-    }
-    if (current.status === 'ACTIVE' && status !== 'ACTIVE') {
-      await this.closeSessions.execute(activityId, actorId)
     }
     return updated
   }

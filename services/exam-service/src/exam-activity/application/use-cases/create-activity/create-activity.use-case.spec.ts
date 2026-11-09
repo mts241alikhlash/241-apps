@@ -1,9 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 import { DEFAULT_POLICIES } from '../../../domain/policies/exam-policy.policy.js'
@@ -148,15 +149,22 @@ describe('CreateActivityUseCase', () => {
     expect(participants.issued).toEqual(['sem-1'])
   })
 
-  it('keeps the activity when the registry cannot issue', async () => {
+  it('keeps the activity and logs when the registry cannot issue', async () => {
     const repo = new FakeActivityRepository()
     const participants = new FakeParticipants()
     participants.failure = new Error('registry down')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => {
+      return undefined
+    })
 
     await expect(
       new CreateActivityUseCase(repo, participants).execute(command),
     ).resolves.toMatchObject({ id: 'activity-1' })
     expect(repo.created).toHaveLength(1)
+    expect(warn).toHaveBeenCalledExactlyOnceWith(
+      expect.stringContaining('sem-1'),
+    )
+    warn.mockRestore()
   })
 
   it('refuses an activity without classrooms', async () => {

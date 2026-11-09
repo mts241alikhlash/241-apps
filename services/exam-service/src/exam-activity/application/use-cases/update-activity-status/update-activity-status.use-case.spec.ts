@@ -59,6 +59,17 @@ describe('UpdateActivityStatusUseCase', () => {
     )
   })
 
+  it('keeps the activity ACTIVE when closing the sessions fails', async () => {
+    const repo = seeded('ACTIVE')
+    const { useCase, closeSessions } = build(repo)
+    closeSessions.execute.mockRejectedValueOnce(new Error('finalizer down'))
+
+    await expect(
+      useCase.execute('admin-1', 'activity-1', 'CLOSED'),
+    ).rejects.toThrow('finalizer down')
+    expect(repo.activities.get('activity-1')?.status).toBe('ACTIVE')
+  })
+
   it('leaves the sessions alone when the activity never ran', async () => {
     const repo = seeded('SCHEDULED')
     const { useCase, closeSessions } = build(repo)
