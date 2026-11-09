@@ -9,9 +9,11 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarHeader,
   SidebarToggle,
+  useSidebar,
 } from '@mts241alikhlash/ui/sidebar'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const props = withDefaults(
   defineProps<
@@ -28,6 +30,8 @@ const props = withDefaults(
 )
 
 const { user, syncAuthenticatedUserProfile } = useAuthSession()
+const { state: sidebarState } = useSidebar()
+const isCollapsed = computed(() => sidebarState.value === 'collapsed')
 const { filteredSections } = useMenuVisibility(
   props.menuSections,
   props.permissionsFor,
@@ -58,6 +62,12 @@ function handleScroll(e: Event) {
     :variant="props.variant"
     :collapsible="props.collapsible"
   >
+    <SidebarHeader
+      class="flex h-12 flex-row items-center"
+      :class="isCollapsed ? 'justify-center px-0' : 'justify-start px-2'"
+    >
+      <slot name="header" />
+    </SidebarHeader>
     <SidebarContent>
       <div
         ref="scrollContainer"

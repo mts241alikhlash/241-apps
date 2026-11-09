@@ -141,12 +141,9 @@ const columns = computed(() =>
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card
-      gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
-    >
-      <div class="space-y-4 p-0 sm:px-0">
+  <div class="px-2 pb-4 pt-1 sm:px-2 sm:pb-6 sm:pt-1">
+    <Card gap="none">
+      <div class="space-y-4 p-4 sm:p-6">
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"

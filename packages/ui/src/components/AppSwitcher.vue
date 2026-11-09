@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@mts241alikhlash/ui/dropdown-menu'
+import { useSidebar } from './ui/sidebar/utils'
 
 export interface AppSwitcherItem {
   key: string
@@ -24,6 +25,15 @@ const emit = defineEmits<{
   select: [app: AppSwitcherItem]
 }>()
 
+let sidebar: ReturnType<typeof useSidebar> | null = null
+try {
+  sidebar = useSidebar()
+} catch {
+  sidebar = null
+}
+
+const isCollapsed = computed(() => sidebar?.state.value === 'collapsed')
+
 const current = computed(
   () => props.apps.find((app) => app.key === props.currentKey) ?? props.apps[0],
 )
@@ -34,16 +44,24 @@ const current = computed(
     <DropdownMenuTrigger as-child>
       <button
         type="button"
-        class="hover:bg-accent data-[state=open]:bg-accent flex items-center gap-2 rounded-md p-1 outline-hidden focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring"
+        class="hover:bg-accent data-[state=open]:bg-accent flex items-center rounded-md outline-hidden focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring"
+        :class="
+          isCollapsed
+            ? 'size-8 justify-center p-0 mx-auto'
+            : 'w-full justify-start gap-2 px-1.5 py-1 text-left'
+        "
       >
         <img
           :src="current.logo"
           :alt="current.name"
-          class="size-7 rounded-md object-contain"
+          class="size-7 shrink-0 rounded-md object-contain"
         />
-        <span class="text-sm font-medium max-md:hidden">{{
-          current.name
-        }}</span>
+        <span
+          v-if="!isCollapsed"
+          class="truncate text-left text-sm font-medium"
+        >
+          {{ current.name }}
+        </span>
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent

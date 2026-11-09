@@ -98,16 +98,14 @@ describe('header controls', () => {
     wrapper.unmount()
   })
 
-  it('shows the breadcrumb inside the inset, not in the top bar', () => {
+  it('shows the breadcrumb in the top bar header', () => {
     const wrapper = mountLayout()
-    const inset = wrapper.get('[data-slot="sidebar-inset"]')
-    expect(inset.find('[data-slot="breadcrumb"]').exists()).toBe(true)
     expect(
       wrapper
         .get('header[data-app-topbar]')
         .find('[data-slot="breadcrumb"]')
         .exists(),
-    ).toBe(false)
+    ).toBe(true)
     wrapper.unmount()
   })
 

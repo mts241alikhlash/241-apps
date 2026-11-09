@@ -3,7 +3,13 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card, CardHeader, CardTitle } from '@mts241alikhlash/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examRoomService } from '../services/examRoomService'
 import type { RoomOverview } from '../types'
@@ -41,15 +47,15 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader standard>
-        <CardTitle size="lg">Ruang Ujian</CardTitle>
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Ruang Ujian</CardTitle>
       </CardHeader>
-      <div class="space-y-4 p-0 sm:px-0">
+      <CardContent class="flex min-h-0 flex-1 flex-col overflow-auto p-2">
         <div
           v-if="error"
           class="m-4 space-y-3 rounded-md border p-4"
@@ -68,6 +74,7 @@ onMounted(load)
           mobile="cards"
           row-clickable
           hide-pagination
+          :page-size="rooms.length"
           :columns="columns"
           :data="rooms"
           :is-loading="loading"
@@ -77,10 +84,13 @@ onMounted(load)
           "
         >
           <template #empty>
-            <p>Belum ada ruangan aktif untuk Anda.</p>
+            <p class="p-6 text-center text-muted-foreground">
+              Belum ada ruangan aktif untuk Anda.
+            </p>
           </template>
         </DataTable>
-      </div>
+      </CardContent>
+      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

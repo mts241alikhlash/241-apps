@@ -26,15 +26,11 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import { ChangePasswordSection } from '../profile'
 import { NavUser } from '@mts241alikhlash/ui'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@mts241alikhlash/ui/sidebar'
+import { SidebarInset, SidebarProvider } from '@mts241alikhlash/ui/sidebar'
 import { TooltipProvider } from '@mts241alikhlash/ui/tooltip'
 import { useAuthSession } from '../auth'
 import type { MenuSection } from '@mts241alikhlash/web-shared/types/menu.types'
-import { Menu, Search } from '@lucide/vue'
+import { Search } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { BreadcrumbItemType } from '@mts241alikhlash/web-shared/types/breadcrumb.types'
 import { provideBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
@@ -45,11 +41,6 @@ const router = useRouter()
 const openSearch = ref(false)
 
 const isPasswordDialogOpen = ref(false)
-const scrolled = ref(false)
-
-function handleScroll(event: Event) {
-  scrolled.value = (event.target as HTMLElement).scrollTop > 0
-}
 
 const ROLE_LABELS: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
@@ -127,77 +118,21 @@ const searchGroups = computed(() => {
 
 <template>
   <SidebarProvider
-    class="h-svh pt-12"
-    style="--sidebar-offset: 3rem; --sidebar-width: 11rem"
+    class="h-svh"
+    style="--sidebar-width: 11rem"
   >
-    <header
-      data-app-topbar
-      class="fixed inset-x-0 top-0 z-20 flex h-12 items-center gap-2 bg-background px-3"
-    >
-      <SidebarTrigger
-        class="size-8 shrink-0 md:hidden"
-        aria-label="Buka menu"
-      >
-        <Menu class="size-4" />
-      </SidebarTrigger>
-      <div class="max-md:absolute max-md:left-1/2 max-md:-translate-x-1/2">
-        <slot name="app-switcher" />
-      </div>
-      <div class="ml-auto flex shrink-0 items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Cari halaman"
-          class="hidden size-8 rounded-full bg-muted transition-colors hover:bg-muted/80 md:inline-flex"
-          @click="openSearch = true"
-        >
-          <Search class="size-4" />
-        </Button>
-
-        <CommandDialog v-model:open="openSearch">
-          <CommandInput placeholder="Ketik pencarian..." />
-          <CommandList>
-            <CommandEmpty>Tidak ada hasil yang ditemukan.</CommandEmpty>
-            <CommandGroup
-              v-for="group in searchGroups"
-              :key="group.heading"
-              :heading="group.heading"
-            >
-              <CommandItem
-                v-for="item in group.items"
-                :key="item.title"
-                :value="item.title"
-                @select="
-                  () => {
-                    router.push(item.url)
-                    openSearch = false
-                  }
-                "
-              >
-                {{ item.title }}
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </CommandDialog>
-
-        <NavUser
-          compact
-          :user="userData"
-          @view-profile="handleViewProfile"
-          @change-password="openPasswordDialog"
-          @logout="handleLogout"
-        />
-      </div>
-    </header>
     <TooltipProvider :delay-duration="100">
       <AppSidebar
         :menu-sections="menuSections"
         :permissions-for="permissionsFor"
-      />
-      <SidebarInset class="h-[calc(100svh-3rem)] overflow-hidden">
+      >
+        <template #header>
+          <slot name="app-switcher" />
+        </template>
+      </AppSidebar>
+      <SidebarInset class="flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
         <header
-          class="flex h-8 min-w-0 shrink-0 items-center gap-2 border-b px-4 transition-colors sm:px-6"
-          :class="scrolled ? 'border-border' : 'border-transparent'"
+          class="mx-2 mt-2 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-border bg-card/85 px-3 shadow-xs backdrop-blur-md"
         >
           <slot name="breadcrumb">
             <Breadcrumb class="min-w-0">
@@ -237,11 +172,55 @@ const searchGroups = computed(() => {
               </BreadcrumbList>
             </Breadcrumb>
           </slot>
+          <div class="ml-auto flex shrink-0 items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Cari halaman"
+              class="hidden size-8 rounded-full bg-muted transition-colors hover:bg-muted/80 md:inline-flex"
+              @click="openSearch = true"
+            >
+              <Search class="size-4" />
+            </Button>
+
+            <CommandDialog v-model:open="openSearch">
+              <CommandInput placeholder="Ketik pencarian..." />
+              <CommandList>
+                <CommandEmpty>Tidak ada hasil yang ditemukan.</CommandEmpty>
+                <CommandGroup
+                  v-for="group in searchGroups"
+                  :key="group.heading"
+                  :heading="group.heading"
+                >
+                  <CommandItem
+                    v-for="item in group.items"
+                    :key="item.title"
+                    :value="item.title"
+                    @select="
+                      () => {
+                        router.push(item.url)
+                        openSearch = false
+                      }
+                    "
+                  >
+                    {{ item.title }}
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </CommandDialog>
+
+            <NavUser
+              compact
+              :user="userData"
+              @view-profile="handleViewProfile"
+              @change-password="openPasswordDialog"
+              @logout="handleLogout"
+            />
+          </div>
         </header>
         <div
           data-app-scroll
-          class="min-h-0 min-w-0 flex-1 overflow-auto"
-          @scroll="handleScroll"
+          class="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto px-2 pb-2"
         >
           <slot><RouterView /></slot>
         </div>
