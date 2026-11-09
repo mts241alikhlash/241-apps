@@ -20,6 +20,7 @@ import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
+import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
 import { UpdateActivityStatusUseCase } from '../../application/use-cases/update-activity-status/update-activity-status.use-case.js'
 import {
@@ -29,6 +30,7 @@ import {
 import {
   CreateActivityRequestDto,
   ExamActivityDto,
+  IssueParticipantNumbersResponseDto,
   UpdateActivityPolicyRequestDto,
   UpdateActivityStatusRequestDto,
 } from './dto/exam-activity.dto.js'
@@ -44,6 +46,7 @@ export class ExamActivityController {
     private readonly updateStatus: UpdateActivityStatusUseCase,
     private readonly updatePolicy: UpdateActivityPolicyUseCase,
     private readonly rotateToken: RotateActivityTokenUseCase,
+    private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
   ) {}
 
   @Get()
@@ -66,6 +69,21 @@ export class ExamActivityController {
   ): Promise<ExamActivityDto> {
     const activity = await this.updateStatus.execute(user.id, id, dto.status)
     return ExamActivityDto.of(activity)
+  }
+
+  @Post(':id/participant-numbers/issue')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({
+    summary: 'Issue the participant numbers of the activity semester again',
+  })
+  @ApiResponse({ status: 200, type: IssueParticipantNumbersResponseDto })
+  async issueNumbers(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<IssueParticipantNumbersResponseDto> {
+    return IssueParticipantNumbersResponseDto.of(
+      (await this.issueParticipantNumbers.execute(id)).issued,
+    )
   }
 
   @Post()

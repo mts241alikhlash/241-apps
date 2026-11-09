@@ -73,6 +73,16 @@ export class UpdateActivityStatusRequestDto {
   status!: (typeof ACTIVITY_STATUSES)[number]
 }
 
+export class IssueParticipantNumbersResponseDto {
+  @ApiProperty() issued!: boolean
+
+  static of(issued: boolean): IssueParticipantNumbersResponseDto {
+    const dto = new IssueParticipantNumbersResponseDto()
+    dto.issued = issued
+    return dto
+  }
+}
+
 export class UpdateActivityPolicyRequestDto {
   @ApiPropertyOptional()
   @IsOptional()

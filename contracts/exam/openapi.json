@@ -191,6 +191,55 @@
         ]
       }
     },
+    "/exam-activities/{id}/participant-numbers/issue": {
+      "post": {
+        "operationId": "ExamActivityController_issueNumbers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IssueParticipantNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue the participant numbers of the activity semester again",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
     "/exam-activities/{id}/policy": {
       "patch": {
         "operationId": "ExamActivityController_policy",
@@ -6171,6 +6220,17 @@
           "status"
         ]
       },
+      "IssueParticipantNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "issued"
+        ]
+      },
       "CreateActivityRequestDto": {
         "type": "object",
         "properties": {
@@ -8319,6 +8379,11 @@
             "nullable": true,
             "format": "uuid"
           },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
           "status": {
             "enum": [
               "SCHEDULED",
@@ -8358,6 +8423,7 @@
           "type",
           "kind",
           "makeupOfId",
+          "activityId",
           "status",
           "createdById",
           "hasSessions",

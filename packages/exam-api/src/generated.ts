@@ -39,6 +39,23 @@ export interface paths {
         patch: operations["ExamActivityController_changeStatus"];
         trace?: never;
     };
+    "/exam-activities/{id}/participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the participant numbers of the activity semester again */
+        post: operations["ExamActivityController_issueNumbers"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-activities/{id}/policy": {
         parameters: {
             query?: never;
@@ -1703,6 +1720,8 @@ export interface components {
         };
         ExamScheduleDto: {
             /** Format: uuid */
+            activityId: string | null;
+            /** Format: uuid */
             classroomId: string;
             classroomName: string | null;
             /** Format: date-time */
@@ -1858,6 +1877,9 @@ export interface components {
             created: number;
             errors: components["schemas"]["ImportErrorDto"][];
             questionIds: string[];
+        };
+        IssueParticipantNumbersResponseDto: {
+            issued: boolean;
         };
         MakeupParticipantDto: {
             note?: string | null;
@@ -2690,6 +2712,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_issueNumbers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueParticipantNumbersResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
