@@ -20,6 +20,7 @@ import { assessMakeupEligibility } from '../../../../exam-schedule/domain/polici
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { isLocked } from '../../../domain/policies/access-attempt.policy.js'
@@ -31,6 +32,10 @@ import { computeTimes } from '../../../domain/policies/session-times.policy.js'
 import { IExamAccessAttemptRepository } from '../../../domain/repositories/exam-access-attempt.repository.js'
 import { ISessionFinalizer } from '../../../domain/repositories/session-finalizer.port.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
+import {
+  LifecycleGate,
+  type WindowClosedPlace,
+} from '../../lifecycle-gate.service.js'
 
 export interface StartedSession {
   sessionId: string
@@ -50,6 +55,8 @@ export class StartExamSessionUseCase {
     private readonly codes: AccessCodeService,
     private readonly finalizer: ISessionFinalizer,
     private readonly rooms: IExamRoomRepository,
+    private readonly participants: IParticipantNumberPort,
+    private readonly lifecycle: LifecycleGate,
   ) {}
 
   async execute(
@@ -85,19 +92,15 @@ export class StartExamSessionUseCase {
     } else {
       await this.assertNoMakeupSitting(schedule.id, studentId)
     }
+    const { eventId } = await this.lifecycle.sourceOf(schedule)
     const seat =
-      schedule.eventId === null
-        ? null
-        : await this.rooms.findSeat(schedule.eventId, studentId)
+      eventId === null ? null : await this.rooms.findSeat(eventId, studentId)
     if (schedule.status !== 'SCHEDULED') {
       throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
     }
-    if (now.getTime() < schedule.startsAt.getTime()) {
-      throw new ForbiddenException('Ujian belum dibuka')
-    }
-    if (now.getTime() >= schedule.endsAt.getTime()) {
-      throw new ForbiddenException('Waktu ujian sudah berakhir')
-    }
+    await this.lifecycle.assertOpen(schedule, now, (eventId) =>
+      this.whereabouts(eventId, studentId, enrollment.semesterId),
+    )
 
     const state = await this.attempts.get(schedule.id, studentId)
     if (isLocked(state, now)) {
@@ -126,7 +129,7 @@ export class StartExamSessionUseCase {
       studentId,
     )
     await this.assertClientGate(
-      schedule,
+      eventId,
       existing ?? seat,
       input.platform,
       now,
@@ -177,8 +180,26 @@ export class StartExamSessionUseCase {
     )
   }
 
+  private async whereabouts(
+    eventId: string | null,
+    studentId: string,
+    semesterId: string,
+  ): Promise<WindowClosedPlace> {
+    try {
+      const [seat, participantNumber] = await Promise.all([
+        eventId === null
+          ? null
+          : this.rooms.findSeatForStudent(eventId, studentId),
+        this.participants.findNumber(studentId, semesterId).catch(() => null),
+      ])
+      return { roomName: seat?.roomName ?? null, participantNumber }
+    } catch {
+      return {}
+    }
+  }
+
   private async assertClientGate(
-    schedule: ExamSchedule,
+    eventId: string | null,
     seat: {
       allowWebClient: boolean
       allowLateEntry: boolean
@@ -187,8 +208,8 @@ export class StartExamSessionUseCase {
     now: Date,
     startedAt?: Date,
   ): Promise<void> {
-    if (schedule.eventId === null) return
-    const event = await this.rooms.findEventById(schedule.eventId)
+    if (eventId === null) return
+    const event = await this.rooms.findEventById(eventId)
     if (event === null) return
     assertClientAllowed({
       platform: platform ?? 'native',

@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common'
+import { ExamActivityRepository } from '../../../../exam-activity/domain/repositories/exam-activity.repository.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
+import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import type {
   ExamSchedule,
   ExamType,
@@ -11,6 +14,11 @@ import type {
 import { loadSittings } from '../../../../exam-schedule/application/student-sittings.js'
 import { assessMakeupEligibility } from '../../../../exam-schedule/domain/policies/makeup-eligibility.policy.js'
 import type { MyExamStatus } from '../../../domain/entities/exam-session.entity.js'
+import {
+  scheduleLifecycle,
+  type ExamActivityStatus,
+  type ExamLifecycle,
+} from '../../../domain/policies/exam-lifecycle.policy.js'
 import { myExamStatus } from '../../../domain/policies/my-exam-status.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 
@@ -26,6 +34,15 @@ export interface MyExam {
   minSubmitMinutes: number
   status: MyExamStatus
   sessionId: string | null
+  activityId: string | null
+  activityStatus: ExamActivityStatus | null
+  eventId: string | null
+  eventName: string | null
+  lifecycle: ExamLifecycle
+  roomName: string | null
+  seatNumber: number | null
+  participantNumber: string | null
+  makeup: boolean
 }
 
 const RANK: Record<MyExamStatus, number> = {
@@ -44,6 +61,9 @@ export class ListMyExamsUseCase {
     private readonly packages: IExamPackageRepository,
     private readonly sessions: IExamSessionRepository,
     private readonly academic: IAcademicLookupPort,
+    private readonly activities: ExamActivityRepository,
+    private readonly rooms: IExamRoomRepository,
+    private readonly participants: IParticipantNumberPort,
   ) {}
 
   async execute(
@@ -72,17 +92,49 @@ export class ListMyExamsUseCase {
     )
     const sessionOf = new Map(sessions.map((s) => [s.scheduleId, s]))
 
+    const eventNames = new Map<string, Promise<string | null>>()
+    const eventName = (eventId: string): Promise<string | null> => {
+      const cached = eventNames.get(eventId)
+      if (cached !== undefined) return cached
+      const name = this.rooms
+        .findEventById(eventId)
+        .then((event) => event?.name ?? null)
+      eventNames.set(eventId, name)
+      return name
+    }
+    let participantNumber: Promise<string | null> | null = null
+    const number = (): Promise<string | null> => {
+      participantNumber ??= this.participants
+        .findNumber(studentId, enrollment.semesterId)
+        .catch(() => null)
+      return participantNumber
+    }
+
     const rows: MyExam[] = []
     for (const schedule of schedules) {
+      const original =
+        schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
+          ? await this.schedules.findById(schedule.makeupOfId)
+          : null
       if (
         schedule.kind === 'MAKEUP' &&
-        !(await this.canSitMakeup(schedule, studentId))
+        !(await this.canSitMakeup(schedule, original, studentId))
       ) {
         continue
       }
       const pkg = await this.packages.findById(schedule.packageId)
       if (pkg === null) continue
       const session = sessionOf.get(schedule.id) ?? null
+      const source = original ?? schedule
+      const activity = source.activityId
+        ? await this.activities.findById(source.activityId)
+        : null
+      const eventId = activity?.eventId ?? source.eventId
+      const lifecycle = scheduleLifecycle(schedule, activity, now)
+      const seat =
+        lifecycle === 'OPEN' && eventId !== null
+          ? await this.rooms.findSeatForStudent(eventId, studentId)
+          : null
       rows.push({
         id: schedule.id,
         title:
@@ -96,8 +148,17 @@ export class ListMyExamsUseCase {
         endsAt: schedule.endsAt,
         durationMinutes: schedule.durationMinutes,
         minSubmitMinutes: schedule.minSubmitMinutes,
-        status: myExamStatus(schedule, session, now),
+        status: myExamStatus(schedule, session, now, lifecycle),
         sessionId: session?.id ?? null,
+        activityId: activity?.id ?? null,
+        activityStatus: activity?.status ?? null,
+        eventId,
+        eventName: eventId === null ? null : await eventName(eventId),
+        lifecycle,
+        roomName: seat?.roomName ?? null,
+        seatNumber: seat?.seatNumber ?? null,
+        participantNumber: await number(),
+        makeup: schedule.kind === 'MAKEUP',
       })
     }
     const names = await this.subjectNames(rows.map((row) => row.subjectId))
@@ -114,10 +175,9 @@ export class ListMyExamsUseCase {
 
   private async canSitMakeup(
     makeup: ExamSchedule,
+    original: ExamSchedule | null,
     studentId: string,
   ): Promise<boolean> {
-    if (makeup.makeupOfId === null) return false
-    const original = await this.schedules.findById(makeup.makeupOfId)
     if (original?.status !== 'SCHEDULED') return false
     const sittings = await loadSittings(
       this.schedules,

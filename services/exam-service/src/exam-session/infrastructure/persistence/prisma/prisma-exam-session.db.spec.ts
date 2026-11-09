@@ -7,7 +7,7 @@ import type { SaveAnswerBatchItem } from '../../../domain/repositories/exam-sess
 const enabled = process.env.EXAM_DB_TESTS === '1'
 const suite = enabled ? describe : describe.skip
 
-suite('Prisma saveAnswersBatch against a real database', () => {
+suite('PrismaExamSessionRepository against a real database', () => {
   const prisma = new PrismaService({
     get: (key: string) => process.env[key],
   } as unknown as ConfigService)
@@ -24,6 +24,7 @@ suite('Prisma saveAnswersBatch against a real database', () => {
   const packageIds: string[] = []
   const scheduleIds: string[] = []
   const sessionIds: string[] = []
+  const activityIds: string[] = []
   const NOW = new Date('2026-11-03T02:00:00.000Z')
 
   async function schedule(count: number) {
@@ -66,7 +67,44 @@ suite('Prisma saveAnswersBatch against a real database', () => {
       },
     })
     scheduleIds.push(row.id)
-    return { scheduleId: row.id, questionIds: ids }
+    return { scheduleId: row.id, questionIds: ids, packageId: pkg.id }
+  }
+
+  async function activity(packageId: string) {
+    const row = await prisma.examActivity.create({
+      data: {
+        semesterId,
+        gradeId,
+        subjectId,
+        packageId,
+        type: 'UH',
+        policy: {},
+        startsAt: new Date('2026-11-02T01:00:00.000Z'),
+        endsAt: new Date('2026-11-02T04:00:00.000Z'),
+        durationMinutes: 90,
+        createdById: userId,
+      },
+    })
+    activityIds.push(row.id)
+    return row.id
+  }
+
+  async function makeup(originalScheduleId: string, packageId: string) {
+    const row = await prisma.examSchedule.create({
+      data: {
+        packageId,
+        classroomId,
+        semesterId,
+        startsAt: new Date('2026-11-05T01:00:00.000Z'),
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        durationMinutes: 90,
+        kind: 'MAKEUP',
+        makeupOfId: originalScheduleId,
+        createdById: userId,
+      },
+    })
+    scheduleIds.push(row.id)
+    return row.id
   }
 
   async function session(scheduleId: string) {
@@ -106,12 +144,29 @@ suite('Prisma saveAnswersBatch against a real database', () => {
       where: { makeupOfId: { in: scheduleIds } },
     })
     await prisma.examSchedule.deleteMany({ where: { id: { in: scheduleIds } } })
+    await prisma.examActivity.deleteMany({ where: { id: { in: activityIds } } })
     await prisma.examPackageItem.deleteMany({
       where: { packageId: { in: packageIds } },
     })
     await prisma.question.deleteMany({ where: { id: { in: questionIds } } })
     await prisma.examPackage.deleteMany({ where: { id: { in: packageIds } } })
     await prisma.$disconnect()
+  })
+
+  it('finds the running sessions of an activity and of its makeups', async () => {
+    const paper = await schedule(1)
+    const activityId = await activity(paper.packageId)
+    await prisma.examSchedule.update({
+      where: { id: paper.scheduleId },
+      data: { activityId },
+    })
+    const makeupId = await makeup(paper.scheduleId, paper.packageId)
+    const regularSession = await session(paper.scheduleId)
+    const makeupSession = await session(makeupId)
+
+    const found = await sessions.findInProgressIdsByActivity(activityId)
+
+    expect(new Set(found)).toEqual(new Set([regularSession, makeupSession]))
   })
 
   it('saves 46 answers in one transaction with the telemetry', async () => {

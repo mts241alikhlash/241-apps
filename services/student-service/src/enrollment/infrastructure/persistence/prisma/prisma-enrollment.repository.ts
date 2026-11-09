@@ -230,6 +230,15 @@ export class PrismaEnrollmentRepository extends IEnrollmentRepository {
     return this.decorate(await findManyActiveByIds(this.prisma, ids))
   }
 
+  async listActiveForSemester(
+    semesterId: string,
+  ): Promise<{ studentId: string; classroomId: string }[]> {
+    return this.prisma.studentEnrollment.findMany({
+      where: { semesterId, status: EnrollmentStatus.ACTIVE, deletedAt: null },
+      select: { studentId: true, classroomId: true },
+    })
+  }
+
   async findActiveEnrollment(
     studentId: string,
     semesterId?: string,

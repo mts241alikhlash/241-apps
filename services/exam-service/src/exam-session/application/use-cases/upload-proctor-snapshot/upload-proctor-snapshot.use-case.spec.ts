@@ -10,9 +10,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { fakeStorage } from '../../proctor-snapshot.test-support.js'
 import {
   PROCTOR_SNAPSHOT_MAX_BYTES,
@@ -37,7 +37,7 @@ async function setup() {
   ])
   sessions.sessions.set('a', sessionFor(schedule, { id: 'a' }))
   const useCase = new UploadProctorSnapshotUseCase(
-    new SessionAccessService(sessions, new FakeSessionFinalizer()),
+    sessionAccess(sessions, new FakeSessionFinalizer(), schedules),
     sessions,
     snapshots,
     storage,

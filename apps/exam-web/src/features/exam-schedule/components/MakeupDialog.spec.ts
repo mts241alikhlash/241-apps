@@ -83,6 +83,7 @@ const original: ExamSchedule = {
   classroomName: 'VII A',
   semesterId: 'sem',
   eventId: null,
+  activityId: null,
   type: 'UTS',
   kind: 'REGULAR',
   makeupOfId: null,

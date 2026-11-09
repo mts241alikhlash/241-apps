@@ -1,12 +1,13 @@
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
 import type {
+  ActivityStatus,
   ActivityTokenMode,
   ExamActivity,
   NewExamActivity,
 } from '../entities/exam-activity.entity.js'
 
 export interface ActivityAuditEntry {
-  action: 'CREATE_ACTIVITY' | 'UPDATE_POLICY' | 'ROTATE_TOKEN'
+  action: 'CREATE_ACTIVITY' | 'UPDATE_POLICY' | 'ROTATE_TOKEN' | 'UPDATE_STATUS'
   before: unknown
   after: unknown
 }
@@ -33,6 +34,12 @@ export abstract class ExamActivityRepository {
   abstract listSchedules(
     activityId: string,
   ): Promise<{ id: string; classroomId: string }[]>
+  abstract listBySemester(semesterId: string): Promise<ExamActivity[]>
+  abstract updateStatus(
+    id: string,
+    status: ActivityStatus,
+    actorId: string,
+  ): Promise<ExamActivity | null>
 }
 
 export interface ActivityScheduleCopy {

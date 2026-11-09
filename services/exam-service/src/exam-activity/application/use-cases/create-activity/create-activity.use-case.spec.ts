@@ -1,12 +1,14 @@
 import {
   BadRequestException,
   ConflictException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 import { DEFAULT_POLICIES } from '../../../domain/policies/exam-policy.policy.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { CreateActivityUseCase } from './create-activity.use-case.js'
 import {
   RotateActivityTokenUseCase,
@@ -79,6 +81,35 @@ class FakeActivityRepository implements ExamActivityRepository {
   listSchedules() {
     return Promise.resolve([{ id: 'schedule-1', classroomId: 'class-7a' }])
   }
+
+  listBySemester(semesterId: string) {
+    return Promise.resolve(
+      this.stored.semesterId === semesterId ? [this.stored] : [],
+    )
+  }
+
+  updateStatus(id: string, status: ExamActivity['status']) {
+    if (id !== this.stored.id) return Promise.resolve(null)
+    this.audits.push('UPDATE_STATUS')
+    this.stored = { ...this.stored, status }
+    return Promise.resolve(this.stored)
+  }
+}
+
+class FakeParticipants extends IParticipantNumberPort {
+  readonly issued: string[] = []
+  failure: Error | null = null
+
+  findNumber() {
+    return Promise.resolve(null)
+  }
+
+  issueNumbers(semesterId: string) {
+    this.issued.push(semesterId)
+    return this.failure === null
+      ? Promise.resolve()
+      : Promise.reject(this.failure)
+  }
 }
 
 const command = {
@@ -99,7 +130,9 @@ const command = {
 describe('CreateActivityUseCase', () => {
   it('creates the activity with one schedule per chosen classroom', async () => {
     const repo = new FakeActivityRepository()
-    await new CreateActivityUseCase(repo).execute(command)
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute(
+      command,
+    )
 
     expect(repo.created).toEqual([
       { classroomIds: ['class-9a', 'class-9b'], activityId: 'activity-1' },
@@ -107,10 +140,37 @@ describe('CreateActivityUseCase', () => {
     expect(repo.audits).toEqual(['CREATE_ACTIVITY'])
   })
 
+  it('asks the registry to issue the semester’s participant numbers', async () => {
+    const repo = new FakeActivityRepository()
+    const participants = new FakeParticipants()
+
+    await new CreateActivityUseCase(repo, participants).execute(command)
+
+    expect(participants.issued).toEqual(['sem-1'])
+  })
+
+  it('keeps the activity and logs when the registry cannot issue', async () => {
+    const repo = new FakeActivityRepository()
+    const participants = new FakeParticipants()
+    participants.failure = new Error('registry down')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => {
+      return undefined
+    })
+
+    await expect(
+      new CreateActivityUseCase(repo, participants).execute(command),
+    ).resolves.toMatchObject({ id: 'activity-1' })
+    expect(repo.created).toHaveLength(1)
+    expect(warn).toHaveBeenCalledExactlyOnceWith(
+      expect.stringContaining('sem-1'),
+    )
+    warn.mockRestore()
+  })
+
   it('refuses an activity without classrooms', async () => {
     const repo = new FakeActivityRepository()
     await expect(
-      new CreateActivityUseCase(repo).execute({
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
         ...command,
         classroomIds: [],
       }),
@@ -121,7 +181,7 @@ describe('CreateActivityUseCase', () => {
   it('refuses an unknown preset', async () => {
     const repo = new FakeActivityRepository()
     await expect(
-      new CreateActivityUseCase(repo).execute({
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
         ...command,
         presetName: 'TUGAS',
       }),

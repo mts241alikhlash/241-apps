@@ -2,7 +2,7 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Ban, KeyRound, UserRoundPlus, Users } from '@lucide/vue'
+import { Ban, KeyRound, SquarePen, UserRoundPlus, Users } from '@lucide/vue'
 import type { ExamSchedule } from '../types'
 import { examTypeLabel, phaseLabel, phaseTone } from '../types'
 import { formatWindow } from '../utils/formatWindow'
@@ -15,6 +15,7 @@ export interface ScheduleColumnOptions {
   canSessions: boolean
   canMakeup?: boolean
   canParticipants?: boolean
+  canManageActivity?: boolean
   now: () => Date
   onEdit: (schedule: ExamSchedule) => void
   onCancel: (schedule: ExamSchedule) => void
@@ -22,6 +23,7 @@ export interface ScheduleColumnOptions {
   onSessions: (schedule: ExamSchedule) => void
   onMakeup?: (schedule: ExamSchedule) => void
   onParticipants?: (schedule: ExamSchedule) => void
+  onStatus?: (schedule: ExamSchedule) => void
 }
 
 const BADGE_VARIANT = {
@@ -160,6 +162,13 @@ export function buildScheduleColumns(
             label: 'Peserta',
             icon: Users,
             onClick: () => options.onParticipants?.(row.original),
+          })
+        }
+        if (row.original.activityId !== null && options.canManageActivity) {
+          items.push({
+            label: 'Ubah status',
+            icon: SquarePen,
+            onClick: () => options.onStatus?.(row.original),
           })
         }
         return h(ActionCell, {

@@ -6,21 +6,39 @@ enum StudentStatus {
 }
 
 model Student {
-  id        String        @id @default(uuid()) @db.Uuid
-  userId    String        @unique @map("user_id") @db.Uuid
-  nis       String        @db.VarChar(20)
-  nisn      String        @db.VarChar(20)
-  status    StudentStatus @default(ACTIVE)
-  gradeId   String?       @map("grade_id") @db.Uuid
-  deletedAt DateTime?     @map("deleted_at")
-  parents         StudentParent[]
-  enrollments     StudentEnrollment[]
-  graduations     StudentGraduation[]
-  graduationHolds StudentGraduationHold[]
+  id                 String                     @id @default(uuid()) @db.Uuid
+  userId             String                     @unique @map("user_id") @db.Uuid
+  nis                String                     @db.VarChar(20)
+  nisn               String                     @db.VarChar(20)
+  status             StudentStatus              @default(ACTIVE)
+  gradeId            String?                    @map("grade_id") @db.Uuid
+  deletedAt          DateTime?                  @map("deleted_at")
+  parents            StudentParent[]
+  enrollments        StudentEnrollment[]
+  participantNumbers StudentParticipantNumber[]
+  graduations        StudentGraduation[]
+  graduationHolds    StudentGraduationHold[]
 
   @@unique([nis], where: { deletedAt: null })
   @@unique([nisn], where: { deletedAt: null })
   @@index([status])
   @@index([gradeId])
   @@map("students")
+}
+
+model StudentParticipantNumber {
+  id         String   @id @default(uuid()) @db.Uuid
+  studentId  String   @map("student_id") @db.Uuid
+  semesterId String   @map("semester_id") @db.Uuid
+  gradeLevel Int      @map("grade_level")
+  ordinal    Int
+  number     String   @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id])
+
+  @@unique([semesterId, gradeLevel, ordinal])
+  @@unique([semesterId, studentId])
+  @@index([studentId])
+  @@map("student_participant_numbers")
 }

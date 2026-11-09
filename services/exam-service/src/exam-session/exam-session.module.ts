@@ -7,6 +7,7 @@ import { StartExamSessionUseCase } from './application/use-cases/start-exam-sess
 import { ListMyExamsUseCase } from './application/use-cases/list-my-exams/list-my-exams.use-case.js'
 import { IExamAccessAttemptRepository } from './domain/repositories/exam-access-attempt.repository.js'
 import { SessionAccessService } from './application/session-access.service.js'
+import { LifecycleGate } from './application/lifecycle-gate.service.js'
 import { SaveAnswerUseCase } from './application/use-cases/save-answer/save-answer.use-case.js'
 import { SaveAnswersBatchUseCase } from './application/use-cases/save-answers-batch/save-answers-batch.use-case.js'
 import { GetPaperUseCase } from './application/use-cases/get-paper/get-paper.use-case.js'
@@ -16,6 +17,7 @@ import { ISessionFinalizer } from './domain/repositories/session-finalizer.port.
 import { FinalizeDueSessionsJob } from './infrastructure/jobs/finalize-due-sessions.job.js'
 import { FinalizeSessionService } from './application/finalize-session.service.js'
 import { FinalizeDueSessionsUseCase } from './application/use-cases/finalize-due-sessions/finalize-due-sessions.use-case.js'
+import { CloseActivitySessionsUseCase } from './application/use-cases/close-activity-sessions/close-activity-sessions.use-case.js'
 import { RecordViolationsUseCase } from './application/use-cases/record-violations/record-violations.use-case.js'
 import { ReportCameraBlockedUseCase } from './application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'
 import { SubmitExamSessionUseCase } from './application/use-cases/submit-exam-session/submit-exam-session.use-case.js'
@@ -30,6 +32,7 @@ import { ReleaseSessionUseCase } from './application/use-cases/release-session/r
 import { SessionExamController } from './presentation/http/session-exam.controller.js'
 import { StudentExamController } from './presentation/http/student-exam.controller.js'
 import { ExamRoomModule } from '../exam-room/exam-room.module.js'
+import { ExamActivityModule } from '../exam-activity/exam-activity.module.js'
 import { SessionRecoveryService } from './application/session-recovery.service.js'
 import { SeatFlagService } from './application/seat-flag.service.js'
 import { ISessionRecoveryRepository } from './domain/repositories/session-recovery.port.js'
@@ -58,6 +61,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ExamFileModule,
     QuestionModule,
     forwardRef(() => ExamRoomModule),
+    forwardRef(() => ExamActivityModule),
   ],
   controllers: [
     StudentExamController,
@@ -83,6 +87,8 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ReleaseSessionUseCase,
     FinalizeDueSessionsUseCase,
     FinalizeDueSessionsJob,
+    CloseActivitySessionsUseCase,
+    LifecycleGate,
     SessionAccessService,
     GetPaperUseCase,
     SaveAnswerUseCase,
@@ -122,6 +128,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     SeatFlagService,
     AllowWebClientUseCase,
     AllowLateEntryUseCase,
+    CloseActivitySessionsUseCase,
   ],
 })
 export class ExamSessionModule {}

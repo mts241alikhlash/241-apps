@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import type { FakeExamScheduleRepository } from '../../exam-schedule/application/exam-schedule.repository.fake.js'
+import type { ExamSessionAuditLog } from '../../exam-room/domain/entities/exam-session-audit-log.entity.js'
 import type {
   ExamAnswerRecord,
   ExamSession,
@@ -13,6 +15,7 @@ import {
   type SaveAnswerInput,
   type ScheduleSessionCounts,
   type SessionClosure,
+  type SessionCloseAudit,
   type SessionRecoveryPatch,
   type SessionTelemetryUpdate,
   type SkippedAnswerBatchItem,
@@ -20,6 +23,15 @@ import {
 
 export class FakeExamSessionRepository extends IExamSessionRepository {
   readonly sessions = new Map<string, ExamSession>()
+  readonly auditLogs: ExamSessionAuditLog[] = []
+  auditFailure: Error | null = null
+
+  private readonly schedules: FakeExamScheduleRepository | undefined
+
+  constructor(schedules?: FakeExamScheduleRepository) {
+    super()
+    this.schedules = schedules
+  }
 
   findById(id: string) {
     return Promise.resolve(this.sessions.get(id) ?? null)
@@ -211,9 +223,16 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
     })
   }
 
-  close(id: string, build: (answers: ExamAnswerRecord[]) => SessionClosure) {
+  close(
+    id: string,
+    build: (answers: ExamAnswerRecord[]) => SessionClosure,
+    audit?: SessionCloseAudit,
+  ) {
     const session = this.sessions.get(id)
     if (session?.status !== 'IN_PROGRESS') return Promise.resolve(null)
+    if (audit !== undefined && this.auditFailure !== null) {
+      return Promise.reject(this.auditFailure)
+    }
     const closure = build(
       [...this.answers.values()].filter((answer) => answer.sessionId === id),
     )
@@ -226,6 +245,19 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
       maxScore: closure.maxScore,
     }
     this.sessions.set(id, closed)
+    if (audit !== undefined) {
+      this.auditLogs.push({
+        id: randomUUID(),
+        sessionId: id,
+        roomId: session.roomId,
+        scheduleId: session.scheduleId,
+        action: audit.action,
+        actorId: audit.actorId,
+        reason: audit.reason,
+        metadata: audit.metadata ?? {},
+        createdAt: new Date(),
+      })
+    }
     if (closure.status === 'GRADED' && closure.publish !== false) {
       this.publications.set(id, 'PENDING')
     }
@@ -285,6 +317,20 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
         .slice(0, limit)
         .map((session) => session.id),
     )
+  }
+
+  async findInProgressIdsByActivity(activityId: string) {
+    const ids: string[] = []
+    for (const session of this.sessions.values()) {
+      if (session.status !== 'IN_PROGRESS') continue
+      const schedule = await this.schedules?.findById(session.scheduleId)
+      const owner =
+        schedule?.activityId == null && schedule?.makeupOfId != null
+          ? await this.schedules?.findById(schedule.makeupOfId)
+          : schedule
+      if (owner?.activityId === activityId) ids.push(session.id)
+    }
+    return ids
   }
 
   recordViolations(id: string, count: number) {

@@ -39,15 +39,19 @@ import { ResumeExamSessionUseCase } from './use-cases/resume-exam-session/resume
 import { RecordSessionEventsUseCase } from './use-cases/record-session-events/record-session-events.use-case.js'
 import { SessionHeartbeatUseCase } from './use-cases/session-heartbeat/session-heartbeat.use-case.js'
 import { SuspendSessionUseCase } from './use-cases/suspend-session/suspend-session.use-case.js'
-import { SessionAccessService } from './session-access.service.js'
 import { StartExamSessionUseCase } from './use-cases/start-exam-session/start-exam-session.use-case.js'
 import { CreateExamScheduleUseCase } from '../../exam-schedule/application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
 import { FakeAcademicLookup } from '../../exam-schedule/application/exam-schedule.test-support.js'
 import { CLASSROOM_7A } from '../../exam-schedule/application/exam-schedule.test-support.js'
 import { FakeExamAccessAttemptRepository } from './exam-access-attempt.repository.fake.js'
+import { FakeExamActivityRepository } from '../../exam-activity/application/exam-activity.repository.fake.js'
+import { LifecycleGate } from './lifecycle-gate.service.js'
 import {
   FakeEnrollment,
+  FakeParticipantNumber,
   FakeStudentIdentity,
+  activityFor,
+  sessionAccess,
 } from './exam-session.test-support.js'
 import { FinalizeSessionService } from './finalize-session.service.js'
 import { SaveAnswerUseCase } from './use-cases/save-answer/save-answer.use-case.js'
@@ -65,6 +69,7 @@ interface Fixtures {
   questions: FakeQuestionRepository
   rooms: FakeExamRoomRepository
   sessions: FakeExamSessionRepository
+  activities: FakeExamActivityRepository
   recovery: SessionRecoveryService
   access: RoomAccessService
   schedule: { id: string }
@@ -79,6 +84,7 @@ async function setup(): Promise<Fixtures> {
   const questions = new FakeQuestionRepository()
   const rooms = new FakeExamRoomRepository()
   const sessions = new FakeExamSessionRepository()
+  const activities = new FakeExamActivityRepository()
   const access = new RoomAccessService(rooms)
   const recovery = new SessionRecoveryService(
     sessions,
@@ -123,6 +129,7 @@ async function setup(): Promise<Fixtures> {
     questions,
     rooms,
     sessions,
+    activities,
     recovery,
     access,
     schedule,
@@ -639,6 +646,8 @@ describe('allow flags before the session starts', () => {
       new AccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       f.rooms,
+      new FakeParticipantNumber(),
+      new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
     )
   }
 
@@ -733,9 +742,10 @@ describe('allow flags before the session starts', () => {
 
 describe('session heartbeat', () => {
   function buildBeat(f: Fixtures) {
-    const access = new SessionAccessService(
+    const access = sessionAccess(
       f.sessions,
       new FakeSessionFinalizer(),
+      f.schedules,
     )
     return new SessionHeartbeatUseCase(access, f.sessions, {
       execute: () => Promise.resolve(),
@@ -777,9 +787,10 @@ describe('call suspension', () => {
   const CLIENT_ID = '3f0d0e6a-6b1f-4b1a-9c5f-4d6e7f8a9b0c'
 
   function build(f: Fixtures) {
-    const access = new SessionAccessService(
+    const access = sessionAccess(
       f.sessions,
       new FakeSessionFinalizer(),
+      f.schedules,
     )
     return new SuspendSessionUseCase(access, f.sessions, f.rooms)
   }
@@ -867,9 +878,10 @@ describe('call suspension', () => {
 
 describe('record session events', () => {
   function build(f: Fixtures) {
-    const access = new SessionAccessService(
+    const access = sessionAccess(
       f.sessions,
       new FakeSessionFinalizer(),
+      f.schedules,
     )
     return new RecordSessionEventsUseCase(access, f.sessions, f.rooms)
   }
@@ -969,9 +981,10 @@ describe('record session events', () => {
       requiresTokenReentry: true,
     })
     const actor = { id: STUDENT_USER.id, deviceId: 'device-1' }
-    const access = new SessionAccessService(
+    const access = sessionAccess(
       f.sessions,
       new FakeSessionFinalizer(),
+      f.schedules,
     )
     const batch = new SaveAnswersBatchUseCase(
       access,
@@ -1038,9 +1051,10 @@ describe('record session events', () => {
     const session = seed(f.sessions, f.schedule.id, {
       lockedByViolation: true,
     })
-    const access = new SessionAccessService(
+    const access = sessionAccess(
       f.sessions,
       new FakeSessionFinalizer(),
+      f.schedules,
     )
 
     await expect(
@@ -1062,6 +1076,7 @@ describe('resume', () => {
       new AccessCodeService(SECRET),
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
+      new LifecycleGate(f.schedules, f.activities),
     )
   }
 
@@ -1087,6 +1102,56 @@ describe('resume', () => {
 
     expect(resumed.session.requiresTokenReentry).toBe(false)
     expect(resumed.serverTime).toEqual(NOW)
+  })
+
+  it('refuses to resume once the activity is closed', async () => {
+    const f = await setup()
+    const schedule = f.schedules.schedules.get(f.schedule.id)!
+    const activity = await activityFor(f.activities, schedule, {
+      status: 'CLOSED',
+    })
+    f.schedules.schedules.set(schedule.id, {
+      ...schedule,
+      activityId: activity.id,
+    })
+    const session = seed(f.sessions, f.schedule.id, {
+      requiresTokenReentry: true,
+    })
+
+    await expect(
+      build(f).execute(
+        { id: STUDENT_USER.id },
+        session.id,
+        { accessCode: 'AAAAAA', deviceId: 'device-1' },
+        NOW,
+      ),
+    ).rejects.toMatchObject({
+      status: 409,
+      response: { code: 'WINDOW_CLOSED' },
+    })
+  })
+
+  it('refuses to resume before the window opens', async () => {
+    const f = await setup()
+    const schedule = f.schedules.schedules.get(f.schedule.id)!
+    f.schedules.schedules.set(schedule.id, {
+      ...schedule,
+      startsAt: new Date(NOW.getTime() + 60 * 60_000),
+      endsAt: new Date(NOW.getTime() + 2 * 60 * 60_000),
+    })
+    const session = seed(f.sessions, f.schedule.id)
+
+    await expect(
+      build(f).execute(
+        { id: STUDENT_USER.id },
+        session.id,
+        { accessCode: 'AAAAAA', deviceId: 'device-1' },
+        NOW,
+      ),
+    ).rejects.toMatchObject({
+      status: 409,
+      response: { code: 'WINDOW_CLOSED' },
+    })
   })
 
   it('locks a session left longer than five minutes when it resumes', async () => {
@@ -1274,6 +1339,8 @@ describe('seated sessions in production', () => {
       new AccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       f.rooms,
+      new FakeParticipantNumber(),
+      new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
     ).execute(
       STUDENT_USER,
       scheduled.id,
@@ -1317,6 +1384,7 @@ describe('seated sessions in production', () => {
       new AccessCodeService(SECRET),
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
+      new LifecycleGate(f.schedules, f.activities),
     ).execute(
       { id: STUDENT_USER.id },
       stored.id,
@@ -1347,6 +1415,8 @@ describe('client gates', () => {
       new AccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       f.rooms,
+      new FakeParticipantNumber(),
+      new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
     )
   }
 
@@ -1465,6 +1535,7 @@ describe('client gates', () => {
       new AccessCodeService(SECRET),
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
+      new LifecycleGate(f.schedules, f.activities),
     )
 
     await expect(

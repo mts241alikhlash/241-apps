@@ -12,7 +12,10 @@ import {
 } from 'class-validator'
 import { EXAM_TYPES } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
-import { ACTIVITY_TOKEN_MODES } from '../../../domain/entities/exam-activity.entity.js'
+import {
+  ACTIVITY_STATUSES,
+  ACTIVITY_TOKEN_MODES,
+} from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamPolicy } from '../../../domain/policies/exam-policy.policy.js'
 
 export const EXAM_PRESET_NAMES = [
@@ -62,6 +65,22 @@ export class CreateActivityRequestDto {
   @Min(1)
   @Max(1440)
   durationMinutes!: number
+}
+
+export class UpdateActivityStatusRequestDto {
+  @ApiProperty({ enum: ACTIVITY_STATUSES })
+  @IsIn([...ACTIVITY_STATUSES])
+  status!: (typeof ACTIVITY_STATUSES)[number]
+}
+
+export class IssueParticipantNumbersResponseDto {
+  @ApiProperty() issued!: boolean
+
+  static of(issued: boolean): IssueParticipantNumbersResponseDto {
+    const dto = new IssueParticipantNumbersResponseDto()
+    dto.issued = issued
+    return dto
+  }
 }
 
 export class UpdateActivityPolicyRequestDto {

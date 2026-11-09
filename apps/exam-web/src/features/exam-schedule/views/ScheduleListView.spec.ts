@@ -7,13 +7,16 @@ import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
 import { CARDS, cardRows, rowActionProps } from '@/test/dataTableCards'
 
-const { filters, refresh, permissions, cancelSchedule } = vi.hoisted(() => ({
-  filters: {} as Record<'classroomId' | 'status', Ref<string>> &
-    Record<'page' | 'pageSize', Ref<number>>,
-  refresh: vi.fn(),
-  permissions: new Set<string>(),
-  cancelSchedule: vi.fn(),
-}))
+const { filters, refresh, permissions, cancelSchedule, push } = vi.hoisted(
+  () => ({
+    filters: {} as Record<'classroomId' | 'status', Ref<string>> &
+      Record<'page' | 'pageSize', Ref<number>>,
+    refresh: vi.fn(),
+    permissions: new Set<string>(),
+    cancelSchedule: vi.fn(),
+    push: vi.fn(),
+  }),
+)
 const listState = {
   schedules: ref<ExamSchedule[]>([]),
   totalItems: ref(0),
@@ -22,6 +25,9 @@ const listState = {
   filtersPending: ref(false),
 }
 
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push }),
+}))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),
@@ -132,6 +138,7 @@ const schedule = (overrides: Partial<ExamSchedule> = {}): ExamSchedule => ({
   classroomName: 'VII A',
   semesterId: 'sem',
   eventId: null,
+  activityId: null,
   type: 'UTS',
   startsAt: toInstant('2030-11-02', '08:00'),
   endsAt: toInstant('2030-11-02', '11:00'),
@@ -149,8 +156,8 @@ const schedule = (overrides: Partial<ExamSchedule> = {}): ExamSchedule => ({
 describe('ScheduleListView', () => {
   beforeEach(() => {
     permissions.clear()
-    ;['read', 'create', 'update', 'cancel', 'access-code'].forEach((action) =>
-      permissions.add(`exam-schedules.${action}`),
+    ;['read', 'create', 'update', 'cancel', 'access-code', 'manage'].forEach(
+      (action) => permissions.add(`exam-schedules.${action}`),
     )
     permissions.add('exam-grading.read')
     permissions.add('exam-grading.grade')
@@ -301,6 +308,55 @@ describe('ScheduleListView', () => {
       label: string
     }[]
     expect(items.map((entry) => entry.label)).toEqual(['Batalkan', 'Susulan'])
+    wrapper.unmount()
+  })
+
+  it('opens the activity status screen from the schedule row', async () => {
+    listState.schedules.value = [schedule({ activityId: 'activity-1' })]
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    const items = rowActionProps(
+      wrapper,
+      schedule({ activityId: 'activity-1' }),
+    ).items as unknown as {
+      label: string
+      onClick: () => void
+    }[]
+    items.find((entry) => entry.label === 'Ubah status')!.onClick()
+    await flushPromises()
+
+    expect(push).toHaveBeenCalledWith({
+      path: '/exam/activities/new',
+      query: { id: 'activity-1' },
+    })
+    wrapper.unmount()
+  })
+
+  it('offers no status action without exam-schedules.manage', async () => {
+    listState.schedules.value = [schedule({ activityId: 'activity-1' })]
+    permissions.delete('exam-schedules.manage')
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    const items = rowActionProps(
+      wrapper,
+      schedule({ activityId: 'activity-1' }),
+    ).items as unknown as { label: string }[]
+
+    expect(items.map((entry) => entry.label)).not.toContain('Ubah status')
+    wrapper.unmount()
+  })
+
+  it('offers no status action on a schedule without an activity', async () => {
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    const items = rowActionProps(wrapper, schedule()).items as unknown as {
+      label: string
+    }[]
+
+    expect(items.map((entry) => entry.label)).not.toContain('Ubah status')
     wrapper.unmount()
   })
 

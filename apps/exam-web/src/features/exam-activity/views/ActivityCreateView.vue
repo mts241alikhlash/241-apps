@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
@@ -9,10 +10,15 @@ import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
   ClassroomOption,
+  ExamActivityRecord,
   GradeOption,
   PackageOption,
 } from '../types'
 
+const route = useRoute()
+const editingId = computed(() =>
+  typeof route.query.id === 'string' ? route.query.id : '',
+)
 const semesterId = ref('')
 const grades = ref<GradeOption[]>([])
 const classrooms = ref<ClassroomOption[]>([])
@@ -20,6 +26,8 @@ const packages = ref<PackageOption[]>([])
 const isAdmin = ref(false)
 const submitting = ref(false)
 const error = ref<string | null>(null)
+const activity = ref<ExamActivityRecord | null>(null)
+const loadingActivity = ref(editingId.value !== '')
 
 async function load(): Promise<void> {
   const [semesters, rooms, packs] = await Promise.all([
@@ -72,14 +80,44 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
   }
 }
 
+async function loadActivity(): Promise<void> {
+  loadingActivity.value = true
+  try {
+    const response = await examActivityApi.list()
+    activity.value =
+      response.data.data.find((item) => item.id === editingId.value) ?? null
+    if (activity.value === null) error.value = 'Kegiatan tidak ditemukan.'
+  } catch {
+    error.value = 'Kegiatan gagal dimuat.'
+  } finally {
+    loadingActivity.value = false
+  }
+}
+
+function statusSaved(): void {
+  toast.success('Status kegiatan disimpan')
+}
+
+function numbersIssued(issued: boolean): void {
+  if (issued) toast.success('Nomor peserta diterbitkan')
+  else toast.error('Nomor peserta belum bisa diterbitkan')
+}
+
 onMounted(() => {
-  void load()
+  if (editingId.value !== '') void loadActivity()
+  else void load()
 })
 </script>
 
 <template>
   <section class="grid gap-4 p-4">
-    <h1 class="text-lg font-semibold">Buat kegiatan ujian atau tugas</h1>
+    <h1 class="text-lg font-semibold">
+      {{
+        editingId !== ''
+          ? 'Status kegiatan ujian'
+          : 'Buat kegiatan ujian atau tugas'
+      }}
+    </h1>
     <p
       v-if="error !== null"
       role="alert"
@@ -87,7 +125,18 @@ onMounted(() => {
       {{ error }}
     </p>
     <ActivityForm
-      v-if="semesterId !== ''"
+      v-if="activity !== null"
+      :semester-id="activity.semesterId"
+      :grades="[]"
+      :classrooms="[]"
+      :packages="[]"
+      :is-admin="true"
+      :activity="activity"
+      @status-saved="statusSaved"
+      @numbers-issued="numbersIssued"
+    />
+    <ActivityForm
+      v-else-if="semesterId !== ''"
       :semester-id="semesterId"
       :grades="grades"
       :classrooms="classrooms"
@@ -96,6 +145,7 @@ onMounted(() => {
       :submitting="submitting"
       @submit="submit"
     />
+    <p v-else-if="loadingActivity">Memuat kegiatan…</p>
     <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
   </section>
 </template>

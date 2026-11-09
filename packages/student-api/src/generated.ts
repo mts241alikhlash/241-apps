@@ -592,6 +592,26 @@ export interface paths {
         patch: operations["StudentController_update"];
         trace?: never;
     };
+    "/students/{id}/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A student’s participant number for a semester
+         * @description Defaults to the semester of the student’s active enrollment when semesterId is omitted.
+         */
+        get: operations["StudentController_findParticipantNumber"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/students/{id}/toggle-active": {
         parameters: {
             query?: never;
@@ -637,6 +657,26 @@ export interface paths {
         put?: never;
         /** Apply a previewed bulk import: create the new rows, and update or skip each conflicting one as the caller decided */
         post: operations["StudentImportExportController_resolveBulkImportConflicts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/students/by-id/{studentId}/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A student’s participant number, for service callers
+         * @description exam-service projects the number into a student’s exam list, so it cannot use the account-token route. Null when no number was issued.
+         */
+        get: operations["StudentInternalController_participantNumber"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -759,6 +799,46 @@ export interface paths {
         get: operations["StudentController_findMyClassroom"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/students/me/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your participant number — no id parameter exists
+         * @description The semester is the one your active enrollment belongs to; null when you have no enrollment or the registry has no number for it.
+         */
+        get: operations["StudentController_findMyParticipantNumber"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/students/participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue the missing participant numbers of a semester
+         * @description exam-service calls this after creating an activity so its students already have a number. Idempotent: students that have one are kept.
+         */
+        post: operations["StudentInternalController_issueParticipantNumbers"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1299,6 +1379,16 @@ export interface components {
             /** @example 2026/2027 */
             name: string;
         };
+        IssueParticipantNumbersRequestDto: {
+            /** Format: uuid */
+            semesterId: string;
+        };
+        IssueParticipantNumbersResponseDto: {
+            /** @description How many numbers this call created */
+            issued: number;
+            /** @description Students without a grade level, so they got no number */
+            skipped: string[];
+        };
         MyClassroomResponseClassmatesClassroomDto: {
             academicYearId: string;
             capacity: number;
@@ -1768,6 +1858,10 @@ export interface components {
              * @enum {string}
              */
             relation: "FATHER" | "MOTHER" | "GUARDIAN";
+        };
+        ParticipantNumberResponseDto: {
+            /** @description Registry number for the semester, or null when none was issued */
+            number: string | null;
         };
         PromotionDto: {
             /**
@@ -4324,6 +4418,36 @@ export interface operations {
             };
         };
     };
+    StudentController_findParticipantNumber: {
+        parameters: {
+            query?: {
+                semesterId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number, or null when none was issued */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     StudentController_toggleActive: {
         parameters: {
             query: {
@@ -4426,6 +4550,42 @@ export interface operations {
                         statusCode?: number;
                     };
                 };
+            };
+        };
+    };
+    StudentInternalController_participantNumber: {
+        parameters: {
+            query?: {
+                semesterId?: string;
+            };
+            header?: never;
+            path: {
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -4639,6 +4799,68 @@ export interface operations {
                         statusCode?: number;
                     };
                 };
+            };
+        };
+    };
+    StudentController_findMyParticipantNumber: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your participant number, or null */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    StudentInternalController_issueParticipantNumbers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueParticipantNumbersRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueParticipantNumbersResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

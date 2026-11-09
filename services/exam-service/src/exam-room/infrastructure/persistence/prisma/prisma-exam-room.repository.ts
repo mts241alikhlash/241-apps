@@ -269,6 +269,17 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     return row ? toExamRoomSeat(row) : null
   }
 
+  async findSeatForStudent(
+    eventId: string,
+    studentId: string,
+  ): Promise<{ roomName: string; seatNumber: number } | null> {
+    const row = await this.prisma.examRoomSeat.findFirst({
+      where: { eventId, studentId },
+      include: { room: true },
+    })
+    return row ? { roomName: row.room.name, seatNumber: row.seatNumber } : null
+  }
+
   async listSeatsByRoom(roomId: string): Promise<ExamRoomSeat[]> {
     const rows = await this.prisma.examRoomSeat.findMany({
       where: { roomId },

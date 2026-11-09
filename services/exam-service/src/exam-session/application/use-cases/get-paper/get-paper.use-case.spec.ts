@@ -9,9 +9,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { GetPaperUseCase } from './get-paper.use-case.js'
 
 describe('GetPaperUseCase', () => {
@@ -29,7 +29,7 @@ describe('GetPaperUseCase', () => {
     sessions = new FakeExamSessionRepository()
     finalizer = new FakeSessionFinalizer()
     useCase = new GetPaperUseCase(
-      new SessionAccessService(sessions, finalizer),
+      sessionAccess(sessions, finalizer, schedules),
       schedules,
       packages,
       questions,

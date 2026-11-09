@@ -83,6 +83,10 @@ export abstract class IExamRoomRepository {
     eventId: string,
     studentId: string,
   ): Promise<ExamRoomSeat | null>
+  abstract findSeatForStudent(
+    eventId: string,
+    studentId: string,
+  ): Promise<{ roomName: string; seatNumber: number } | null>
   abstract listSeatsByRoom(roomId: string): Promise<ExamRoomSeat[]>
   abstract listSeatsByEvent(eventId: string): Promise<ExamRoomSeat[]>
   abstract removeSeat(roomId: string, studentId: string): Promise<boolean>

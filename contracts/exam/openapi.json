@@ -42,6 +42,47 @@
       }
     },
     "/exam-activities": {
+      "get": {
+        "operationId": "ExamActivityController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExamActivityDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List the activities of the active semester",
+        "tags": [
+          "Exam Activities"
+        ]
+      },
       "post": {
         "operationId": "ExamActivityController_create",
         "parameters": [],
@@ -86,6 +127,114 @@
           }
         ],
         "summary": "Create one activity for a grade and its classes",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}": {
+      "patch": {
+        "operationId": "ExamActivityController_changeStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityStatusRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change the status of an activity",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}/participant-numbers/issue": {
+      "post": {
+        "operationId": "ExamActivityController_issueNumbers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IssueParticipantNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue the participant numbers of the activity semester again",
         "tags": [
           "Exam Activities"
         ]
@@ -196,1377 +345,6 @@
         "summary": "Invalidate the previous access code of an activity",
         "tags": [
           "Exam Activities"
-        ]
-      }
-    },
-    "/exam-packages": {
-      "get": {
-        "operationId": "ExamPackageController_findAll",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "subjectId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "gradeId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "DRAFT",
-                "SUBMITTED",
-                "RETURNED",
-                "APPROVED",
-                "LOCKED"
-              ]
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maxLength": 100,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ExamPackageSummaryDto"
-                      }
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "number"
-                        },
-                        "page": {
-                          "type": "number"
-                        },
-                        "limit": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List packages: your own in every status and the approved or locked ones of others",
-        "tags": [
-          "Exam Packages"
-        ]
-      },
-      "post": {
-        "operationId": "ExamPackageController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExamPackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create an empty draft package",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}": {
-      "get": {
-        "operationId": "ExamPackageController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageViewDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a package with its questions, their markers and the review history",
-        "tags": [
-          "Exam Packages"
-        ]
-      },
-      "patch": {
-        "operationId": "ExamPackageController_rename",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RenameExamPackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Rename a package",
-        "tags": [
-          "Exam Packages"
-        ]
-      },
-      "delete": {
-        "operationId": "ExamPackageController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete a package that is not waiting for review or scheduled",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/copy": {
-      "post": {
-        "operationId": "ExamPackageController_copy",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Copy an approved or scheduled package into a new draft",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/questions/{questionId}": {
-      "get": {
-        "operationId": "ExamPackageController_findQuestion",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "questionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/QuestionDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a question of a package with its current version",
-        "tags": [
-          "Exam Packages"
-        ]
-      },
-      "patch": {
-        "operationId": "ExamPackageController_updateQuestion",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "questionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateQuestionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Change a question of a package",
-        "tags": [
-          "Exam Packages"
-        ]
-      },
-      "delete": {
-        "operationId": "ExamPackageController_removeQuestion",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "questionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Remove a question from a package",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/questions": {
-      "post": {
-        "operationId": "ExamPackageController_addQuestion",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddPackageQuestionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Write a new question inside a package",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/questions/take": {
-      "post": {
-        "operationId": "ExamPackageController_takeQuestions",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TakePackageQuestionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Copy questions from an approved or scheduled package",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/questions/order": {
-      "put": {
-        "operationId": "ExamPackageController_reorderQuestions",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReorderPackageQuestionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Put the questions of a package in a new order",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/submit": {
-      "post": {
-        "operationId": "ExamPackageController_submit",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Submit a package for review",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/approve": {
-      "post": {
-        "operationId": "ExamPackageController_approve",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ApproveExamPackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Approve a submitted package",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/return": {
-      "post": {
-        "operationId": "ExamPackageController_returnPackage",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReturnExamPackageDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamPackageDetailDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Return a submitted package with a note and notes on questions",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-packages/{id}/items/{itemId}/adjust-key": {
-      "post": {
-        "operationId": "ExamPackageController_adjustKey",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "itemId",
-            "required": true,
-            "in": "path",
-            "description": "ExamPackageItem.id; a question id is still accepted",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AdjustPackageItemKeyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AdjustedPackageItemKeyDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark a question as a bonus or replace its key, then rescore finished sessions",
-        "tags": [
-          "Exam Packages"
-        ]
-      }
-    },
-    "/exam-schedules": {
-      "get": {
-        "operationId": "ExamScheduleController_findAll",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "classroomId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "packageId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "SCHEDULED",
-                "CANCELLED"
-              ]
-            }
-          },
-          {
-            "name": "from",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ExamScheduleDto"
-                      }
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "number"
-                        },
-                        "page": {
-                          "type": "number"
-                        },
-                        "limit": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List exam schedules",
-        "tags": [
-          "Exam Schedules"
-        ]
-      },
-      "post": {
-        "operationId": "ExamScheduleController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExamScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Schedule a package for a classroom and lock the package",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}": {
-      "get": {
-        "operationId": "ExamScheduleController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get an exam schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      },
-      "patch": {
-        "operationId": "ExamScheduleController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateExamScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Change the window and duration of a schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/cancel": {
-      "post": {
-        "operationId": "ExamScheduleController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel a schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/access-code": {
-      "get": {
-        "operationId": "ExamScheduleController_accessCode",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AccessCodeDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The access code students enter to start",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/access-code/rotate": {
-      "post": {
-        "operationId": "ExamScheduleController_rotateAccessCode",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AccessCodeDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Replace the access code with a new one",
-        "tags": [
-          "Exam Schedules"
         ]
       }
     },
@@ -3218,6 +1996,1377 @@
         "summary": "Add compensation minutes to one session",
         "tags": [
           "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-packages": {
+      "get": {
+        "operationId": "ExamPackageController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "subjectId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "gradeId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "SUBMITTED",
+                "RETURNED",
+                "APPROVED",
+                "LOCKED"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExamPackageSummaryDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List packages: your own in every status and the approved or locked ones of others",
+        "tags": [
+          "Exam Packages"
+        ]
+      },
+      "post": {
+        "operationId": "ExamPackageController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an empty draft package",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}": {
+      "get": {
+        "operationId": "ExamPackageController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageViewDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a package with its questions, their markers and the review history",
+        "tags": [
+          "Exam Packages"
+        ]
+      },
+      "patch": {
+        "operationId": "ExamPackageController_rename",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameExamPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rename a package",
+        "tags": [
+          "Exam Packages"
+        ]
+      },
+      "delete": {
+        "operationId": "ExamPackageController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a package that is not waiting for review or scheduled",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/copy": {
+      "post": {
+        "operationId": "ExamPackageController_copy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Copy an approved or scheduled package into a new draft",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/questions/{questionId}": {
+      "get": {
+        "operationId": "ExamPackageController_findQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/QuestionDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a question of a package with its current version",
+        "tags": [
+          "Exam Packages"
+        ]
+      },
+      "patch": {
+        "operationId": "ExamPackageController_updateQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change a question of a package",
+        "tags": [
+          "Exam Packages"
+        ]
+      },
+      "delete": {
+        "operationId": "ExamPackageController_removeQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a question from a package",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/questions": {
+      "post": {
+        "operationId": "ExamPackageController_addQuestion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPackageQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Write a new question inside a package",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/questions/take": {
+      "post": {
+        "operationId": "ExamPackageController_takeQuestions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TakePackageQuestionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Copy questions from an approved or scheduled package",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/questions/order": {
+      "put": {
+        "operationId": "ExamPackageController_reorderQuestions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderPackageQuestionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Put the questions of a package in a new order",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/submit": {
+      "post": {
+        "operationId": "ExamPackageController_submit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit a package for review",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/approve": {
+      "post": {
+        "operationId": "ExamPackageController_approve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveExamPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve a submitted package",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/return": {
+      "post": {
+        "operationId": "ExamPackageController_returnPackage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnExamPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackageDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Return a submitted package with a note and notes on questions",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/items/{itemId}/adjust-key": {
+      "post": {
+        "operationId": "ExamPackageController_adjustKey",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "itemId",
+            "required": true,
+            "in": "path",
+            "description": "ExamPackageItem.id; a question id is still accepted",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustPackageItemKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AdjustedPackageItemKeyDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a question as a bonus or replace its key, then rescore finished sessions",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-schedules": {
+      "get": {
+        "operationId": "ExamScheduleController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "classroomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "packageId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SCHEDULED",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExamScheduleDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List exam schedules",
+        "tags": [
+          "Exam Schedules"
+        ]
+      },
+      "post": {
+        "operationId": "ExamScheduleController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamScheduleDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Schedule a package for a classroom and lock the package",
+        "tags": [
+          "Exam Schedules"
+        ]
+      }
+    },
+    "/exam-schedules/{id}": {
+      "get": {
+        "operationId": "ExamScheduleController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamScheduleDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get an exam schedule",
+        "tags": [
+          "Exam Schedules"
+        ]
+      },
+      "patch": {
+        "operationId": "ExamScheduleController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamScheduleDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change the window and duration of a schedule",
+        "tags": [
+          "Exam Schedules"
+        ]
+      }
+    },
+    "/exam-schedules/{id}/cancel": {
+      "post": {
+        "operationId": "ExamScheduleController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a schedule",
+        "tags": [
+          "Exam Schedules"
+        ]
+      }
+    },
+    "/exam-schedules/{id}/access-code": {
+      "get": {
+        "operationId": "ExamScheduleController_accessCode",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccessCodeDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The access code students enter to start",
+        "tags": [
+          "Exam Schedules"
+        ]
+      }
+    },
+    "/exam-schedules/{id}/access-code/rotate": {
+      "post": {
+        "operationId": "ExamScheduleController_rotateAccessCode",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AccessCodeDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace the access code with a new one",
+        "tags": [
+          "Exam Schedules"
         ]
       }
     },
@@ -5943,91 +6092,6 @@
           "pairs"
         ]
       },
-      "CreateActivityRequestDto": {
-        "type": "object",
-        "properties": {
-          "semesterId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "enum": [
-              "UH",
-              "QUIZ",
-              "ASSIGNMENT",
-              "UTS",
-              "UAS"
-            ],
-            "type": "string"
-          },
-          "classroomIds": {
-            "minItems": 1,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "presetName": {
-            "enum": [
-              "UJIAN_KETAT",
-              "ULANGAN_KELAS",
-              "TUGAS"
-            ],
-            "type": "string"
-          },
-          "tokenMode": {
-            "enum": [
-              "ROTATING",
-              "STATIC"
-            ],
-            "type": "string"
-          },
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1440
-          }
-        },
-        "required": [
-          "semesterId",
-          "gradeId",
-          "subjectId",
-          "packageId",
-          "type",
-          "classroomIds",
-          "presetName",
-          "tokenMode",
-          "startsAt",
-          "endsAt",
-          "durationMinutes"
-        ]
-      },
       "ExamPolicyDto": {
         "type": "object",
         "properties": {
@@ -6139,6 +6203,119 @@
           "status"
         ]
       },
+      "UpdateActivityStatusRequestDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "IssueParticipantNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "issued"
+        ]
+      },
+      "CreateActivityRequestDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "UH",
+              "QUIZ",
+              "ASSIGNMENT",
+              "UTS",
+              "UAS"
+            ],
+            "type": "string"
+          },
+          "classroomIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "presetName": {
+            "enum": [
+              "UJIAN_KETAT",
+              "ULANGAN_KELAS",
+              "TUGAS"
+            ],
+            "type": "string"
+          },
+          "tokenMode": {
+            "enum": [
+              "ROTATING",
+              "STATIC"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1440
+          }
+        },
+        "required": [
+          "semesterId",
+          "gradeId",
+          "subjectId",
+          "packageId",
+          "type",
+          "classroomIds",
+          "presetName",
+          "tokenMode",
+          "startsAt",
+          "endsAt",
+          "durationMinutes"
+        ]
+      },
       "UpdateActivityPolicyRequestDto": {
         "type": "object",
         "properties": {
@@ -6183,983 +6360,6 @@
             "maximum": 3600
           }
         }
-      },
-      "ExamPackageSummaryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "DRAFT",
-              "SUBMITTED",
-              "RETURNED",
-              "APPROVED",
-              "LOCKED"
-            ],
-            "type": "string"
-          },
-          "lockedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "itemCount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "subjectId",
-          "gradeId",
-          "status",
-          "lockedAt",
-          "createdById",
-          "createdAt",
-          "updatedAt",
-          "itemCount"
-        ]
-      },
-      "ExamPackageListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamPackageSummaryDto"
-            }
-          },
-          "total": {
-            "type": "number"
-          },
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "data",
-          "total",
-          "page",
-          "limit"
-        ]
-      },
-      "ExamPackageItemViewDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionVersion": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          },
-          "type": {
-            "enum": [
-              "MULTIPLE_CHOICE",
-              "MULTIPLE_RESPONSE",
-              "TRUE_FALSE",
-              "SHORT_ANSWER",
-              "ESSAY"
-            ],
-            "type": "string"
-          },
-          "marker": {
-            "enum": [
-              "NEW",
-              "CHANGED",
-              "COPIED"
-            ],
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "points": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "questionId",
-          "questionVersion",
-          "position",
-          "type",
-          "marker",
-          "summary",
-          "points"
-        ]
-      },
-      "PackageQuestionNoteResponseDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "note": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "questionId",
-          "note"
-        ]
-      },
-      "PackageReviewDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "action": {
-            "enum": [
-              "SUBMIT",
-              "APPROVE",
-              "RETURN"
-            ],
-            "type": "string"
-          },
-          "byUserId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "note": {
-            "type": "string",
-            "nullable": true
-          },
-          "questionNotes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PackageQuestionNoteResponseDto"
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "action",
-          "byUserId",
-          "note",
-          "questionNotes",
-          "createdAt"
-        ]
-      },
-      "ExamPackageViewDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "DRAFT",
-              "SUBMITTED",
-              "RETURNED",
-              "APPROVED",
-              "LOCKED"
-            ],
-            "type": "string"
-          },
-          "lockedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamPackageItemViewDto"
-            }
-          },
-          "reviews": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PackageReviewDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "subjectId",
-          "gradeId",
-          "status",
-          "lockedAt",
-          "createdById",
-          "createdAt",
-          "updatedAt",
-          "items",
-          "reviews"
-        ]
-      },
-      "CreateExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "title",
-          "subjectId",
-          "gradeId"
-        ]
-      },
-      "ExamPackageItemDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionVersion": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "questionId",
-          "questionVersion",
-          "position"
-        ]
-      },
-      "ExamPackageDetailDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "DRAFT",
-              "SUBMITTED",
-              "RETURNED",
-              "APPROVED",
-              "LOCKED"
-            ],
-            "type": "string"
-          },
-          "lockedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamPackageItemDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "subjectId",
-          "gradeId",
-          "status",
-          "lockedAt",
-          "createdById",
-          "createdAt",
-          "updatedAt",
-          "items"
-        ]
-      },
-      "RenameExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          }
-        },
-        "required": [
-          "title"
-        ]
-      },
-      "QuestionVersionDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "number": {
-            "type": "number"
-          },
-          "bodyHtml": {
-            "type": "string"
-          },
-          "content": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "points": {
-            "type": "number"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "questionId",
-          "number",
-          "bodyHtml",
-          "content",
-          "points",
-          "createdById",
-          "createdAt"
-        ]
-      },
-      "QuestionDetailDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "authorEmployeeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "enum": [
-              "MULTIPLE_CHOICE",
-              "MULTIPLE_RESPONSE",
-              "TRUE_FALSE",
-              "SHORT_ANSWER",
-              "ESSAY"
-            ],
-            "type": "string"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "copiedFromQuestionId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "currentVersion": {
-            "type": "number"
-          },
-          "revision": {
-            "type": "number"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "current": {
-            "$ref": "#/components/schemas/QuestionVersionDto"
-          }
-        },
-        "required": [
-          "id",
-          "subjectId",
-          "gradeId",
-          "authorEmployeeId",
-          "type",
-          "packageId",
-          "copiedFromQuestionId",
-          "currentVersion",
-          "revision",
-          "createdById",
-          "createdAt",
-          "updatedAt",
-          "current"
-        ]
-      },
-      "AddPackageQuestionDto": {
-        "type": "object",
-        "properties": {
-          "authorEmployeeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "enum": [
-              "MULTIPLE_CHOICE",
-              "MULTIPLE_RESPONSE",
-              "TRUE_FALSE",
-              "SHORT_ANSWER",
-              "ESSAY"
-            ],
-            "type": "string"
-          },
-          "bodyHtml": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 20000
-          },
-          "content": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "points": {
-            "type": "number",
-            "minimum": 0.25,
-            "maximum": 100
-          }
-        },
-        "required": [
-          "type",
-          "bodyHtml",
-          "content",
-          "points"
-        ]
-      },
-      "TakePackageQuestionsDto": {
-        "type": "object",
-        "properties": {
-          "sourcePackageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionIds": {
-            "uniqueItems": true,
-            "minItems": 1,
-            "maxItems": 200,
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "required": [
-          "sourcePackageId",
-          "questionIds"
-        ]
-      },
-      "ReorderPackageQuestionsDto": {
-        "type": "object",
-        "properties": {
-          "questionIds": {
-            "uniqueItems": true,
-            "minItems": 1,
-            "maxItems": 200,
-            "description": "Every question of the package, in the new order",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "required": [
-          "questionIds"
-        ]
-      },
-      "UpdateQuestionDto": {
-        "type": "object",
-        "properties": {
-          "bodyHtml": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 20000
-          },
-          "content": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "points": {
-            "type": "number",
-            "minimum": 0.25,
-            "maximum": 100
-          }
-        }
-      },
-      "ApproveExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "note": {
-            "type": "string",
-            "maxLength": 1000
-          }
-        }
-      },
-      "PackageQuestionNoteDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "note": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
-          }
-        },
-        "required": [
-          "questionId",
-          "note"
-        ]
-      },
-      "ReturnExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "note": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
-          },
-          "questionNotes": {
-            "maxItems": 200,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PackageQuestionNoteDto"
-            }
-          }
-        },
-        "required": [
-          "note",
-          "questionNotes"
-        ]
-      },
-      "AdjustPackageItemKeyDto": {
-        "type": "object",
-        "properties": {
-          "resolution": {
-            "enum": [
-              "NORMAL",
-              "BONUS_ALL",
-              "KEY_OVERRIDE"
-            ],
-            "type": "string"
-          },
-          "overrideContent": {
-            "type": "object",
-            "description": "The replacement answer key; required for KEY_OVERRIDE, ignored otherwise"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 5,
-            "maxLength": 300
-          }
-        },
-        "required": [
-          "resolution",
-          "reason"
-        ]
-      },
-      "AdjustedPackageItemKeyDto": {
-        "type": "object",
-        "properties": {
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "resolution": {
-            "enum": [
-              "NORMAL",
-              "BONUS_ALL",
-              "KEY_OVERRIDE"
-            ],
-            "type": "string"
-          },
-          "rescoredSessions": {
-            "type": "number",
-            "description": "Finished sessions whose scores were recomputed"
-          }
-        },
-        "required": [
-          "packageId",
-          "questionId",
-          "resolution",
-          "rescoredSessions"
-        ]
-      },
-      "ExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "packageTitle": {
-            "type": "string"
-          },
-          "classroomId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "classroomName": {
-            "type": "string",
-            "nullable": true
-          },
-          "semesterId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number"
-          },
-          "minSubmitMinutes": {
-            "type": "number"
-          },
-          "type": {
-            "enum": [
-              "UH",
-              "QUIZ",
-              "ASSIGNMENT",
-              "UTS",
-              "UAS"
-            ],
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "REGULAR",
-              "MAKEUP"
-            ],
-            "type": "string"
-          },
-          "makeupOfId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "SCHEDULED",
-              "CANCELLED"
-            ],
-            "type": "string"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "hasSessions": {
-            "type": "boolean",
-            "description": "True once a student started: it can no longer be cancelled"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "packageId",
-          "packageTitle",
-          "classroomId",
-          "classroomName",
-          "semesterId",
-          "eventId",
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "minSubmitMinutes",
-          "type",
-          "kind",
-          "makeupOfId",
-          "status",
-          "createdById",
-          "hasSessions",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "ExamScheduleListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamScheduleDto"
-            }
-          },
-          "total": {
-            "type": "number"
-          },
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "data",
-          "total",
-          "page",
-          "limit"
-        ]
-      },
-      "CreateExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1440
-          },
-          "minSubmitMinutes": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1440,
-            "default": 0
-          },
-          "type": {
-            "enum": [
-              "UH",
-              "QUIZ",
-              "ASSIGNMENT",
-              "UTS",
-              "UAS"
-            ],
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "classroomId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "type",
-          "packageId",
-          "classroomId"
-        ]
-      },
-      "UpdateExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1440
-          },
-          "minSubmitMinutes": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1440,
-            "default": 0
-          },
-          "type": {
-            "enum": [
-              "UH",
-              "QUIZ",
-              "ASSIGNMENT",
-              "UTS",
-              "UAS"
-            ],
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it"
-          }
-        },
-        "required": [
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "type"
-        ]
-      },
-      "AccessCodeDto": {
-        "type": "object",
-        "properties": {
-          "accessCode": {
-            "type": "string",
-            "example": "K7M2QX"
-          },
-          "rotation": {
-            "type": "number"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "slotIndex": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "accessCode",
-          "rotation",
-          "expiresAt",
-          "slotIndex"
-        ]
       },
       "MyExamDto": {
         "type": "object",
@@ -7218,6 +6418,58 @@
             "type": "string",
             "nullable": true,
             "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The activity this exam belongs to, when it belongs to one"
+          },
+          "activityStatus": {
+            "nullable": true,
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when the event cannot be named right now"
+          },
+          "lifecycle": {
+            "enum": [
+              "UPCOMING",
+              "OPEN",
+              "FINISHED"
+            ],
+            "type": "string"
+          },
+          "roomName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Only filled while the exam is open"
+          },
+          "seatNumber": {
+            "type": "number",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when no number was issued for the semester"
+          },
+          "makeup": {
+            "type": "boolean",
+            "description": "True for a makeup sitting"
           }
         },
         "required": [
@@ -7231,7 +6483,16 @@
           "durationMinutes",
           "minSubmitMinutes",
           "status",
-          "sessionId"
+          "sessionId",
+          "activityId",
+          "activityStatus",
+          "eventId",
+          "eventName",
+          "lifecycle",
+          "roomName",
+          "seatNumber",
+          "participantNumber",
+          "makeup"
         ]
       },
       "StartSessionDto": {
@@ -8090,7 +7351,8 @@
               "ASSIGN_SUPERVISOR",
               "SUBMIT_ROOM_REPORT",
               "VERIFY_ROOM_REPORT",
-              "REOPEN_ROOM_REPORT"
+              "REOPEN_ROOM_REPORT",
+              "CLOSED_BY_ADMIN"
             ]
           },
           "actorId": {
@@ -8335,6 +7597,989 @@
         "required": [
           "reason",
           "minutes"
+        ]
+      },
+      "ExamPackageSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "RETURNED",
+              "APPROVED",
+              "LOCKED"
+            ],
+            "type": "string"
+          },
+          "lockedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "itemCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "gradeId",
+          "status",
+          "lockedAt",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "itemCount"
+        ]
+      },
+      "ExamPackageListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamPackageSummaryDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "ExamPackageItemViewDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionVersion": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "ESSAY"
+            ],
+            "type": "string"
+          },
+          "marker": {
+            "enum": [
+              "NEW",
+              "CHANGED",
+              "COPIED"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "questionId",
+          "questionVersion",
+          "position",
+          "type",
+          "marker",
+          "summary",
+          "points"
+        ]
+      },
+      "PackageQuestionNoteResponseDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "note"
+        ]
+      },
+      "PackageReviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "action": {
+            "enum": [
+              "SUBMIT",
+              "APPROVE",
+              "RETURN"
+            ],
+            "type": "string"
+          },
+          "byUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "questionNotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PackageQuestionNoteResponseDto"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "byUserId",
+          "note",
+          "questionNotes",
+          "createdAt"
+        ]
+      },
+      "ExamPackageViewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "RETURNED",
+              "APPROVED",
+              "LOCKED"
+            ],
+            "type": "string"
+          },
+          "lockedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamPackageItemViewDto"
+            }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PackageReviewDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "gradeId",
+          "status",
+          "lockedAt",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "items",
+          "reviews"
+        ]
+      },
+      "CreateExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "title",
+          "subjectId",
+          "gradeId"
+        ]
+      },
+      "ExamPackageItemDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionVersion": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "questionId",
+          "questionVersion",
+          "position"
+        ]
+      },
+      "ExamPackageDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "RETURNED",
+              "APPROVED",
+              "LOCKED"
+            ],
+            "type": "string"
+          },
+          "lockedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamPackageItemDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "gradeId",
+          "status",
+          "lockedAt",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "items"
+        ]
+      },
+      "RenameExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "QuestionVersionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "number"
+          },
+          "bodyHtml": {
+            "type": "string"
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "points": {
+            "type": "number"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "questionId",
+          "number",
+          "bodyHtml",
+          "content",
+          "points",
+          "createdById",
+          "createdAt"
+        ]
+      },
+      "QuestionDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorEmployeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "ESSAY"
+            ],
+            "type": "string"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "copiedFromQuestionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "currentVersion": {
+            "type": "number"
+          },
+          "revision": {
+            "type": "number"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "current": {
+            "$ref": "#/components/schemas/QuestionVersionDto"
+          }
+        },
+        "required": [
+          "id",
+          "subjectId",
+          "gradeId",
+          "authorEmployeeId",
+          "type",
+          "packageId",
+          "copiedFromQuestionId",
+          "currentVersion",
+          "revision",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "current"
+        ]
+      },
+      "AddPackageQuestionDto": {
+        "type": "object",
+        "properties": {
+          "authorEmployeeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "ESSAY"
+            ],
+            "type": "string"
+          },
+          "bodyHtml": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "points": {
+            "type": "number",
+            "minimum": 0.25,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "type",
+          "bodyHtml",
+          "content",
+          "points"
+        ]
+      },
+      "TakePackageQuestionsDto": {
+        "type": "object",
+        "properties": {
+          "sourcePackageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionIds": {
+            "uniqueItems": true,
+            "minItems": 1,
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "sourcePackageId",
+          "questionIds"
+        ]
+      },
+      "ReorderPackageQuestionsDto": {
+        "type": "object",
+        "properties": {
+          "questionIds": {
+            "uniqueItems": true,
+            "minItems": 1,
+            "maxItems": 200,
+            "description": "Every question of the package, in the new order",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "questionIds"
+        ]
+      },
+      "UpdateQuestionDto": {
+        "type": "object",
+        "properties": {
+          "bodyHtml": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "content": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "points": {
+            "type": "number",
+            "minimum": 0.25,
+            "maximum": 100
+          }
+        }
+      },
+      "ApproveExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "PackageQuestionNoteDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "questionId",
+          "note"
+        ]
+      },
+      "ReturnExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "questionNotes": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PackageQuestionNoteDto"
+            }
+          }
+        },
+        "required": [
+          "note",
+          "questionNotes"
+        ]
+      },
+      "AdjustPackageItemKeyDto": {
+        "type": "object",
+        "properties": {
+          "resolution": {
+            "enum": [
+              "NORMAL",
+              "BONUS_ALL",
+              "KEY_OVERRIDE"
+            ],
+            "type": "string"
+          },
+          "overrideContent": {
+            "type": "object",
+            "description": "The replacement answer key; required for KEY_OVERRIDE, ignored otherwise"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "resolution",
+          "reason"
+        ]
+      },
+      "AdjustedPackageItemKeyDto": {
+        "type": "object",
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resolution": {
+            "enum": [
+              "NORMAL",
+              "BONUS_ALL",
+              "KEY_OVERRIDE"
+            ],
+            "type": "string"
+          },
+          "rescoredSessions": {
+            "type": "number",
+            "description": "Finished sessions whose scores were recomputed"
+          }
+        },
+        "required": [
+          "packageId",
+          "questionId",
+          "resolution",
+          "rescoredSessions"
+        ]
+      },
+      "ExamScheduleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageTitle": {
+            "type": "string"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "UH",
+              "QUIZ",
+              "ASSIGNMENT",
+              "UTS",
+              "UAS"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "REGULAR",
+              "MAKEUP"
+            ],
+            "type": "string"
+          },
+          "makeupOfId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "SCHEDULED",
+              "CANCELLED"
+            ],
+            "type": "string"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hasSessions": {
+            "type": "boolean",
+            "description": "True once a student started: it can no longer be cancelled"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "packageId",
+          "packageTitle",
+          "classroomId",
+          "classroomName",
+          "semesterId",
+          "eventId",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "minSubmitMinutes",
+          "type",
+          "kind",
+          "makeupOfId",
+          "activityId",
+          "status",
+          "createdById",
+          "hasSessions",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ExamScheduleListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamScheduleDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "CreateExamScheduleDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440,
+            "default": 0
+          },
+          "type": {
+            "enum": [
+              "UH",
+              "QUIZ",
+              "ASSIGNMENT",
+              "UTS",
+              "UAS"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The exam event this schedule belongs to; seats come from it"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "type",
+          "packageId",
+          "classroomId"
+        ]
+      },
+      "UpdateExamScheduleDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440,
+            "default": 0
+          },
+          "type": {
+            "enum": [
+              "UH",
+              "QUIZ",
+              "ASSIGNMENT",
+              "UTS",
+              "UAS"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The exam event this schedule belongs to; seats come from it"
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "type"
+        ]
+      },
+      "AccessCodeDto": {
+        "type": "object",
+        "properties": {
+          "accessCode": {
+            "type": "string",
+            "example": "K7M2QX"
+          },
+          "rotation": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "slotIndex": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "accessCode",
+          "rotation",
+          "expiresAt",
+          "slotIndex"
         ]
       },
       "ExamEventDto": {

@@ -330,6 +330,7 @@ const EVENT_LABELS: Record<string, string> = {
   SUBMIT_ROOM_REPORT: 'Serahkan berita acara',
   VERIFY_ROOM_REPORT: 'Verifikasi berita acara',
   REOPEN_ROOM_REPORT: 'Buka berita acara',
+  CLOSED_BY_ADMIN: 'Ditutup admin',
   CALL_SUSPENDED: 'Ujian dijeda karena panggilan',
   ABSENCE_GAP: 'Hilang sementara',
 }

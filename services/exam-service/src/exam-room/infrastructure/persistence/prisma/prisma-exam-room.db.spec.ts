@@ -191,6 +191,30 @@ suite('Prisma exam rooms against a real database', () => {
     ).rejects.toBeInstanceOf(SeatAlreadyTakenError)
   })
 
+  it("returns only the student's own room and seat", async () => {
+    const created = await event()
+    const first = await rooms.createRoom({
+      eventId: created.id,
+      code: 'R-1',
+      name: 'Ruang 1',
+      capacity: 30,
+    })
+
+    await rooms.assignSeat({
+      roomId: first.id,
+      eventId: created.id,
+      studentId: studentOne,
+      classroomId,
+      seatNumber: 7,
+    })
+
+    expect(await rooms.findSeatForStudent(created.id, studentOne)).toEqual({
+      roomName: 'Ruang 1',
+      seatNumber: 7,
+    })
+    expect(await rooms.findSeatForStudent(created.id, studentTwo)).toBeNull()
+  })
+
   it('refuses a duplicate room code in one event', async () => {
     const created = await event()
     await room(created.id, 'R1')

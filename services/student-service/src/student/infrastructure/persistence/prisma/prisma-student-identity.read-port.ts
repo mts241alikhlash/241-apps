@@ -23,7 +23,7 @@ export class PrismaStudentIdentityReadPort extends IStudentIdentityReadPort {
     if (ids.length === 0) return []
     return this.prisma.student.findMany({
       where: { id: { in: ids }, deletedAt: null },
-      select: { id: true, userId: true, nis: true },
+      select: { id: true, userId: true, nis: true, gradeId: true },
     })
   }
 }

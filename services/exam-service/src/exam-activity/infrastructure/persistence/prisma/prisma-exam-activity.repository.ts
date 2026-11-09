@@ -163,4 +163,33 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
       select: { id: true, classroomId: true },
     })
   }
+
+  async listBySemester(semesterId: string) {
+    const rows = await this.prisma.examActivity.findMany({
+      where: { semesterId },
+      orderBy: { startsAt: 'asc' },
+    })
+    return rows.map(toEntity)
+  }
+
+  async updateStatus(id: string, status: ActivityStatus, actorId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.examActivity.findUnique({ where: { id } })
+      if (before === null) return null
+      const updated = await tx.examActivity.update({
+        where: { id },
+        data: { status },
+      })
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId: id,
+          actorId,
+          action: 'UPDATE_STATUS',
+          before: { status: before.status },
+          after: { status: updated.status },
+        },
+      })
+      return toEntity(updated)
+    })
+  }
 }

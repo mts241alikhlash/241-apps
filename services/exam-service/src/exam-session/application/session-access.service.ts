@@ -7,6 +7,7 @@ import {
 import type { ExamSession } from '../domain/entities/exam-session.entity.js'
 import { IExamSessionRepository } from '../domain/repositories/exam-session.repository.js'
 import { ISessionFinalizer } from '../domain/repositories/session-finalizer.port.js'
+import { LifecycleGate } from './lifecycle-gate.service.js'
 
 export interface SessionActor {
   id: string
@@ -18,6 +19,7 @@ export class SessionAccessService {
   constructor(
     private readonly sessions: IExamSessionRepository,
     private readonly finalizer: ISessionFinalizer,
+    private readonly lifecycle: LifecycleGate,
   ) {}
 
   async loadOwned(
@@ -33,6 +35,7 @@ export class SessionAccessService {
       )
     }
     const current = await this.finalizer.finalizeIfDue(session, now)
+    await this.lifecycle.assertOpen(current.scheduleId, now)
     if (
       current.status === 'IN_PROGRESS' &&
       current.deviceId !== actor.deviceId

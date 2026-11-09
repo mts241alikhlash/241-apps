@@ -20,6 +20,7 @@ import {
 import { ISessionFinalizer } from '../../../domain/repositories/session-finalizer.port.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { ABSENCE_LOCK_MS } from '../record-session-events/record-session-events.use-case.js'
+import { LifecycleGate } from '../../lifecycle-gate.service.js'
 
 export interface ResumeExamSessionInput {
   accessCode: string
@@ -41,6 +42,7 @@ export class ResumeExamSessionUseCase {
     private readonly codes: AccessCodeService,
     private readonly roomCodes: RoomAccessCodeService,
     private readonly finalizer: ISessionFinalizer,
+    private readonly lifecycle: LifecycleGate,
   ) {}
 
   async execute(
@@ -56,6 +58,7 @@ export class ResumeExamSessionUseCase {
         'Sesi ujian tidak ditemukan',
       )
     }
+    await this.lifecycle.assertOpen(found.scheduleId, now)
     const session = await this.finalizer.finalizeIfDue(found, now)
     if (session.lockedByViolation) {
       throw new ForbiddenException({

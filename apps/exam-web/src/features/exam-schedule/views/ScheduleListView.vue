@@ -106,6 +106,7 @@ const columns = computed(() =>
     canSessions: hasPermission('exam-sessions.read'),
     canMakeup: hasPermission('exam-grading.grade'),
     canParticipants: hasPermission('exam-grading.read'),
+    canManageActivity: hasPermission('exam-schedules.manage'),
     now: () => new Date(),
     onEdit: openEdit,
     onCancel: (schedule) => {
@@ -127,6 +128,13 @@ const columns = computed(() =>
     },
     onParticipants: (schedule) => {
       participantsTarget.value = schedule
+    },
+    onStatus: (schedule) => {
+      if (schedule.activityId === null) return
+      void router.push({
+        path: '/exam/activities/new',
+        query: { id: schedule.activityId },
+      })
     },
   }),
 )

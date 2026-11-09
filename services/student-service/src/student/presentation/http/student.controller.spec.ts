@@ -12,6 +12,8 @@ import { ExportStudentsUseCase } from '../../application/use-cases/export-studen
 import { GetStudentByIdUseCase } from '../../application/use-cases/get-student-by-id/get-student-by-id.use-case.js'
 import { GetMyStudentUseCase } from '../../application/use-cases/get-my-student/get-my-student.use-case.js'
 import { GetMyClassroomUseCase } from '../../application/use-cases/get-my-classroom/get-my-classroom.use-case.js'
+import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
+import { IStudentIdentityReadPort } from '../../domain/repositories/student-identity-read.port.js'
 import { GetStudentsUseCase } from '../../application/use-cases/get-students/get-students.use-case.js'
 import { ResolveBulkImportConflictsUseCase } from '../../application/use-cases/resolve-bulk-import-conflicts/resolve-bulk-import-conflicts.use-case.js'
 import { ToggleStudentActiveUseCase } from '../../application/use-cases/toggle-student-active/toggle-student-active.use-case.js'
@@ -38,6 +40,8 @@ describe('StudentController & StudentImportExportController', () => {
   const mockGetStudentByIdService = { execute: vi.fn() }
   const mockGetMyStudentService = { execute: vi.fn() }
   const mockGetMyClassroomService = { execute: vi.fn() }
+  const mockGetParticipantNumberService = { execute: vi.fn() }
+  const mockStudentIdentityRead = { findStudentIdByUserId: vi.fn() }
   const mockCreateStudentService = { execute: vi.fn() }
   const mockUpdateStudentService = { execute: vi.fn() }
   const mockDeleteStudentService = { execute: vi.fn() }
@@ -62,6 +66,14 @@ describe('StudentController & StudentImportExportController', () => {
         { provide: GetStudentByIdUseCase, useValue: mockGetStudentByIdService },
         { provide: GetMyStudentUseCase, useValue: mockGetMyStudentService },
         { provide: GetMyClassroomUseCase, useValue: mockGetMyClassroomService },
+        {
+          provide: GetParticipantNumberUseCase,
+          useValue: mockGetParticipantNumberService,
+        },
+        {
+          provide: IStudentIdentityReadPort,
+          useValue: mockStudentIdentityRead,
+        },
         { provide: CreateStudentUseCase, useValue: mockCreateStudentService },
         {
           provide: CreateStudentWithRelationsUseCase,
@@ -117,6 +129,58 @@ describe('StudentController & StudentImportExportController', () => {
 
       expect(mockGetStudentsService.execute).toHaveBeenCalledWith(query)
       expect(result).toEqual(expected)
+    })
+  })
+
+  describe('findParticipantNumber', () => {
+    it('delegates with the id and the semester', async () => {
+      mockGetParticipantNumberService.execute.mockResolvedValue(
+        '241-261-08-001',
+      )
+
+      const result = await controller.findParticipantNumber('stu-1', 'sem-1')
+
+      expect(mockGetParticipantNumberService.execute).toHaveBeenCalledWith(
+        'stu-1',
+        'sem-1',
+      )
+      expect(result).toEqual({ number: '241-261-08-001' })
+    })
+
+    it('answers null when the registry has no number', async () => {
+      mockGetParticipantNumberService.execute.mockResolvedValue(null)
+
+      const result = await controller.findParticipantNumber('stu-1')
+
+      expect(result).toEqual({ number: null })
+    })
+  })
+
+  describe('findMyParticipantNumber', () => {
+    it('resolves the student behind the account', async () => {
+      mockStudentIdentityRead.findStudentIdByUserId.mockResolvedValue('stu-1')
+      mockGetParticipantNumberService.execute.mockResolvedValue(
+        '241-261-08-002',
+      )
+
+      const result = await controller.findMyParticipantNumber(mockUser)
+
+      expect(
+        mockStudentIdentityRead.findStudentIdByUserId,
+      ).toHaveBeenCalledWith(mockUser.id)
+      expect(mockGetParticipantNumberService.execute).toHaveBeenCalledWith(
+        'stu-1',
+      )
+      expect(result).toEqual({ number: '241-261-08-002' })
+    })
+
+    it('answers a wrapped null when the account owns no student record', async () => {
+      mockStudentIdentityRead.findStudentIdByUserId.mockResolvedValue(null)
+
+      const result = await controller.findMyParticipantNumber(mockUser)
+
+      expect(result).toEqual({ number: null })
+      expect(mockGetParticipantNumberService.execute).not.toHaveBeenCalled()
     })
   })
 

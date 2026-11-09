@@ -26,6 +26,8 @@ export class ExamScheduleDto {
   @ApiProperty({ enum: EXAM_SCHEDULE_KINDS }) kind!: ExamScheduleKind
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   makeupOfId!: string | null
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  activityId!: string | null
   @ApiProperty({ enum: EXAM_SCHEDULE_STATUSES }) status!: ExamScheduleStatus
   @ApiProperty({ format: 'uuid' }) createdById!: string
   @ApiProperty({
@@ -55,6 +57,7 @@ export class ExamScheduleDto {
     dto.type = domain.type
     dto.kind = domain.kind
     dto.makeupOfId = domain.makeupOfId
+    dto.activityId = domain.activityId ?? null
     dto.status = domain.status
     dto.hasSessions = domain.hasSessions ?? false
     dto.createdById = domain.createdById

@@ -129,6 +129,24 @@ describe('FakeExamRoomRepository seats', () => {
     expect(await rooms.findSeat(created.id, 'student-3')).toBeNull()
   })
 
+  it("returns only the student's own room and seat", async () => {
+    const { rooms, event: created, built } = await setup()
+
+    await rooms.assignSeat({
+      roomId: built[0].id,
+      eventId: created.id,
+      studentId: 'student-1',
+      classroomId: 'class-7a',
+      seatNumber: 7,
+    })
+
+    expect(await rooms.findSeatForStudent(created.id, 'student-1')).toEqual({
+      roomName: 'Ruang 1',
+      seatNumber: 7,
+    })
+    expect(await rooms.findSeatForStudent(created.id, 'student-2')).toBeNull()
+  })
+
   it('refuses to rename a room onto a code already used in the event', async () => {
     const { rooms, built } = await setup([2, 2])
 

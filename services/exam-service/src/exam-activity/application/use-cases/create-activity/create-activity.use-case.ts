@@ -1,12 +1,14 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common'
 import type { ExamType } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ActivityTokenMode } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import {
   DEFAULT_POLICIES,
   type ExamPresetName,
@@ -33,7 +35,12 @@ export interface CreateActivityCommand {
 
 @Injectable()
 export class CreateActivityUseCase {
-  constructor(private readonly activities: ExamActivityRepository) {}
+  private readonly logger = new Logger(CreateActivityUseCase.name)
+
+  constructor(
+    private readonly activities: ExamActivityRepository,
+    private readonly participants: IParticipantNumberPort,
+  ) {}
 
   async execute(command: CreateActivityCommand): Promise<ExamActivity> {
     if (command.classroomIds.length === 0) {
@@ -52,7 +59,7 @@ export class CreateActivityUseCase {
     if (preset === null) {
       throw new NotFoundException('Preset kebijakan tidak ditemukan')
     }
-    return this.activities.create({
+    const activity = await this.activities.create({
       activity: {
         semesterId: command.semesterId,
         eventId: command.eventId ?? null,
@@ -74,5 +81,15 @@ export class CreateActivityUseCase {
       classroomIds: command.classroomIds,
       actorId: command.actorId,
     })
+
+    try {
+      await this.participants.issueNumbers(command.semesterId)
+    } catch (error) {
+      this.logger.warn(
+        `Participant numbers unavailable for semester ${command.semesterId}: ${(error as Error).message}`,
+      )
+    }
+
+    return activity
   }
 }

@@ -36,6 +36,7 @@ import { PermissionModule } from '@mts241alikhlash/nest-core/access-control'
 import { EmployeeIdentityModule } from './platform/employee-identity/employee-identity.module.js'
 import { EnrollmentLookupModule } from './platform/enrollment-lookup/enrollment-lookup.module.js'
 import { StudentIdentityModule } from './platform/student-identity/student-identity.module.js'
+import { ParticipantNumberModule } from './platform/participant-number/participant-number.module.js'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
 
@@ -79,6 +80,7 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
     EmployeeIdentityModule,
     StudentIdentityModule,
     EnrollmentLookupModule,
+    ParticipantNumberModule,
   ],
   controllers: [],
   providers: [

@@ -1,5 +1,8 @@
 import type { ExamType } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { ServiceUnavailableException } from '@nestjs/common'
+import { FakeExamActivityRepository } from '../../exam-activity/application/exam-activity.repository.fake.js'
+import type { ExamActivity } from '../../exam-activity/domain/entities/exam-activity.entity.js'
+import { DEFAULT_POLICIES } from '../../exam-activity/domain/policies/exam-policy.policy.js'
 import type { FakeExamPackageRepository } from '../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamRoomRepository } from '../../exam-room/application/exam-room.repository.fake.js'
 import { CreateExamScheduleUseCase } from '../../exam-schedule/application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
@@ -16,6 +19,7 @@ import {
   IEnrollmentLookupPort,
   type ActiveEnrollment,
 } from '../../platform/enrollment-lookup/enrollment-lookup.port.js'
+import { IParticipantNumberPort } from '../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../platform/student-directory/student-directory.port.js'
 import { IStudentIdentityReadPort } from '../../platform/student-identity/student-identity.port.js'
 import { seedPackage } from '../../exam-package/application/exam-package.test-support.js'
@@ -26,6 +30,10 @@ import type {
   QuestionType,
 } from '../../question/domain/value-objects/question-content.js'
 import type { ExamSession } from '../domain/entities/exam-session.entity.js'
+import type { FakeExamSessionRepository } from './exam-session.repository.fake.js'
+import type { ISessionFinalizer } from '../domain/repositories/session-finalizer.port.js'
+import { LifecycleGate } from './lifecycle-gate.service.js'
+import { SessionAccessService } from './session-access.service.js'
 
 export const STUDENT_USER = {
   id: '10101010-1010-4010-8010-101010101010',
@@ -89,6 +97,68 @@ export class FakeEnrollment extends IEnrollmentLookupPort {
 
 export const down = () =>
   new ServiceUnavailableException('student-service down')
+
+export function sessionAccess(
+  sessions: FakeExamSessionRepository,
+  finalizer: ISessionFinalizer,
+  schedules: FakeExamScheduleRepository,
+  activities = new FakeExamActivityRepository(),
+): SessionAccessService {
+  return new SessionAccessService(
+    sessions,
+    finalizer,
+    new LifecycleGate(schedules, activities),
+  )
+}
+
+export async function activityFor(
+  activities: FakeExamActivityRepository,
+  schedule: ExamSchedule,
+  overrides: Partial<ExamActivity> = {},
+): Promise<ExamActivity> {
+  const activity = await activities.create({
+    activity: {
+      semesterId: schedule.semesterId,
+      eventId: null,
+      gradeId: CLASSROOM_7A.gradeId,
+      subjectId: schedule.subjectId,
+      packageId: schedule.packageId,
+      type: schedule.type,
+      tokenMode: 'STATIC',
+      presetId: null,
+      policy: DEFAULT_POLICIES.ULANGAN_KELAS,
+      startsAt: STARTS,
+      endsAt: ENDS,
+      durationMinutes: 90,
+      createdById: USER.id,
+    },
+    classroomIds: [],
+    actorId: USER.id,
+  })
+  const seeded = { ...activity, status: 'ACTIVE' as const, ...overrides }
+  activities.activities.set(seeded.id, seeded)
+  return seeded
+}
+
+export class FakeParticipantNumber extends IParticipantNumberPort {
+  constructor(
+    private readonly options: {
+      number?: string | null
+      failWith?: Error
+    } = {},
+  ) {
+    super()
+  }
+
+  findNumber() {
+    if (this.options.failWith) return Promise.reject(this.options.failWith)
+    return Promise.resolve(this.options.number ?? null)
+  }
+
+  issueNumbers() {
+    return Promise.resolve()
+  }
+}
 
 export async function scheduleExam(
   fixtures: {

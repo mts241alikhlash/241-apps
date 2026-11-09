@@ -95,6 +95,15 @@ describe('CreateExamScheduleUseCase', () => {
         minSubmitMinutes: created.minSubmitMinutes,
         status: 'OPEN',
         sessionId: null,
+        activityId: null,
+        activityStatus: null,
+        eventId: null,
+        eventName: null,
+        lifecycle: 'OPEN',
+        roomName: null,
+        seatNumber: null,
+        participantNumber: null,
+        makeup: false,
       }).minSubmitMinutes,
     ).toBe(20)
   })

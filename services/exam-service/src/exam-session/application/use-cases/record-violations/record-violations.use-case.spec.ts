@@ -9,9 +9,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { RecordViolationsUseCase } from './record-violations.use-case.js'
 
 describe('RecordViolationsUseCase', () => {
@@ -34,7 +34,7 @@ describe('RecordViolationsUseCase', () => {
     return {
       sessions,
       useCase: new RecordViolationsUseCase(
-        new SessionAccessService(sessions, finalizer),
+        sessionAccess(sessions, finalizer, schedules),
         sessions,
       ),
     }

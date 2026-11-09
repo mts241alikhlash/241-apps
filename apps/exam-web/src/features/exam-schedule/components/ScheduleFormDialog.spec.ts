@@ -123,6 +123,7 @@ const existing: ExamSchedule = {
   classroomName: 'VII A',
   semesterId: 'sem',
   eventId: null,
+  activityId: null,
   type: 'UTS',
   startsAt: toInstant('2030-11-02', '08:00'),
   endsAt: toInstant('2030-11-02', '11:00'),

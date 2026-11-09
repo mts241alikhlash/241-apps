@@ -10,9 +10,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { SaveAnswersBatchUseCase } from './save-answers-batch.use-case.js'
 
 describe('SaveAnswersBatchUseCase', () => {
@@ -36,7 +36,7 @@ describe('SaveAnswersBatchUseCase', () => {
     return {
       questionIds: paper.questionIds,
       useCase: new SaveAnswersBatchUseCase(
-        new SessionAccessService(sessions, new FakeSessionFinalizer()),
+        sessionAccess(sessions, new FakeSessionFinalizer(), schedules),
         schedules,
         packages,
         questions,

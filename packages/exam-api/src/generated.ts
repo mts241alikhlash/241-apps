@@ -11,10 +11,45 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List the activities of the active semester */
+        get: operations["ExamActivityController_list"];
         put?: never;
         /** Create one activity for a grade and its classes */
         post: operations["ExamActivityController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-activities/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change the status of an activity */
+        patch: operations["ExamActivityController_changeStatus"];
+        trace?: never;
+    };
+    "/exam-activities/{id}/participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the participant numbers of the activity semester again */
+        post: operations["ExamActivityController_issueNumbers"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1403,7 +1438,7 @@ export interface components {
         };
         AuditLogDto: {
             /** @enum {string} */
-            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT";
+            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN";
             /** Format: uuid */
             actorId: string;
             /** Format: date-time */
@@ -1685,6 +1720,8 @@ export interface components {
         };
         ExamScheduleDto: {
             /** Format: uuid */
+            activityId: string | null;
+            /** Format: uuid */
             classroomId: string;
             classroomName: string | null;
             /** Format: date-time */
@@ -1841,6 +1878,9 @@ export interface components {
             errors: components["schemas"]["ImportErrorDto"][];
             questionIds: string[];
         };
+        IssueParticipantNumbersResponseDto: {
+            issued: boolean;
+        };
         MakeupParticipantDto: {
             note?: string | null;
             /** @enum {string} */
@@ -1849,15 +1889,35 @@ export interface components {
             studentId: string;
         };
         MyExamDto: {
+            /**
+             * Format: uuid
+             * @description The activity this exam belongs to, when it belongs to one
+             */
+            activityId: string | null;
+            /** @enum {string|null} */
+            activityStatus: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED" | null;
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
+            /** Format: uuid */
+            eventId: string | null;
+            /** @description Null when the event cannot be named right now */
+            eventName: string | null;
             /**
              * Format: uuid
              * @description The schedule id
              */
             id: string;
+            /** @enum {string} */
+            lifecycle: "UPCOMING" | "OPEN" | "FINISHED";
+            /** @description True for a makeup sitting */
+            makeup: boolean;
             minSubmitMinutes: number;
+            /** @description Null when no number was issued for the semester */
+            participantNumber: string | null;
+            /** @description Only filled while the exam is open */
+            roomName: string | null;
+            seatNumber: number | null;
             /** Format: uuid */
             sessionId: string | null;
             /** Format: date-time */
@@ -2511,6 +2571,10 @@ export interface components {
             tokenSlotSeconds?: number;
             violationLimit?: number;
         };
+        UpdateActivityStatusRequestDto: {
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
+        };
         UpdateExamEventDto: {
             /** Format: date-time */
             endsAt?: string;
@@ -2572,6 +2636,31 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ExamActivityController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamActivityController_create: {
         parameters: {
             query?: never;
@@ -2592,6 +2681,64 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_changeStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityStatusRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_issueNumbers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueParticipantNumbersResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
