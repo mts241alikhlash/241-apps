@@ -152,11 +152,11 @@ export class StudentController {
   })
   async findMyParticipantNumber(
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<ParticipantNumberResponseDto | null> {
+  ): Promise<ParticipantNumberResponseDto> {
     const studentId = await this.studentIdentityRead.findStudentIdByUserId(
       user.id,
     )
-    if (!studentId) return null
+    if (!studentId) return ParticipantNumberResponseDto.fromDomain(null)
     return ParticipantNumberResponseDto.fromDomain(
       await this.getParticipantNumberService.execute(studentId),
     )

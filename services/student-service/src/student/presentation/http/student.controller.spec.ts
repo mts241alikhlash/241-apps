@@ -174,12 +174,12 @@ describe('StudentController & StudentImportExportController', () => {
       expect(result).toEqual({ number: '241-261-08-002' })
     })
 
-    it('answers null when the account owns no student record', async () => {
+    it('answers a wrapped null when the account owns no student record', async () => {
       mockStudentIdentityRead.findStudentIdByUserId.mockResolvedValue(null)
 
       const result = await controller.findMyParticipantNumber(mockUser)
 
-      expect(result).toBeNull()
+      expect(result).toEqual({ number: null })
       expect(mockGetParticipantNumberService.execute).not.toHaveBeenCalled()
     })
   })
