@@ -7265,7 +7265,7 @@
           "participantNumber": {
             "type": "string",
             "nullable": true,
-            "description": "Only filled while the exam is open; null when none was issued"
+            "description": "Null when no number was issued for the semester"
           },
           "makeup": {
             "type": "boolean",

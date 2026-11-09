@@ -1873,7 +1873,7 @@ export interface components {
             /** @description True for a makeup sitting */
             makeup: boolean;
             minSubmitMinutes: number;
-            /** @description Only filled while the exam is open; null when none was issued */
+            /** @description Null when no number was issued for the semester */
             participantNumber: string | null;
             /** @description Only filled while the exam is open */
             roomName: string | null;

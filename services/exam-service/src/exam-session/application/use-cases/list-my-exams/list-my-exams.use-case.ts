@@ -104,10 +104,9 @@ export class ListMyExamsUseCase {
     }
     let participantNumber: Promise<string | null> | null = null
     const number = (): Promise<string | null> => {
-      participantNumber ??= this.participants.findNumber(
-        studentId,
-        enrollment.semesterId,
-      )
+      participantNumber ??= this.participants
+        .findNumber(studentId, enrollment.semesterId)
+        .catch(() => null)
       return participantNumber
     }
 
@@ -133,7 +132,7 @@ export class ListMyExamsUseCase {
       const eventId = activity?.eventId ?? source.eventId
       const lifecycle = examLifecycle(
         activity?.status ?? 'ACTIVE',
-        activity ?? schedule,
+        schedule.kind === 'MAKEUP' ? schedule : (activity ?? schedule),
         now,
       )
       const seat =
@@ -162,7 +161,7 @@ export class ListMyExamsUseCase {
         lifecycle,
         roomName: seat?.roomName ?? null,
         seatNumber: seat?.seatNumber ?? null,
-        participantNumber: lifecycle === 'OPEN' ? await number() : null,
+        participantNumber: await number(),
         makeup: schedule.kind === 'MAKEUP',
       })
     }

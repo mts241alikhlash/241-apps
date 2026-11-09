@@ -432,7 +432,7 @@ describe('ListMyExamsUseCase', () => {
       })
     })
 
-    it('keeps the room, seat and number back while the activity window has not opened', async () => {
+    it('keeps the room and seat back while the activity window has not opened', async () => {
       const exam = await scheduleExam(fixtures())
       const event = await newEvent()
       const activity = await newActivity({
@@ -454,11 +454,25 @@ describe('ListMyExamsUseCase', () => {
         lifecycle: 'UPCOMING',
         roomName: null,
         seatNumber: null,
-        participantNumber: null,
+        participantNumber: '241-261-08-001',
       })
     })
 
-    it('makes a makeup inherit the activity and event of its base schedule', async () => {
+    it('still lists the exams when the participant registry cannot be read', async () => {
+      await scheduleExam(fixtures())
+
+      const [row] = await build(
+        undefined,
+        undefined,
+        undefined,
+        new FakeParticipantNumber({ failWith: down() }),
+      ).execute(STUDENT_USER, NOW)
+
+      expect(row.lifecycle).toBe('OPEN')
+      expect(row.participantNumber).toBeNull()
+    })
+
+    it('makes a makeup inherit the activity and event but keeps its own window', async () => {
       const original = await scheduleExam(fixtures())
       const event = await newEvent()
       const activity = await newActivity({
@@ -474,8 +488,8 @@ describe('ListMyExamsUseCase', () => {
         packageId: original.packageId,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
-        startsAt: new Date('2026-11-05T01:00:00.000Z'),
-        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        startsAt: new Date('2026-11-10T01:00:00.000Z'),
+        endsAt: new Date('2026-11-10T04:00:00.000Z'),
         durationMinutes: 90,
         type: original.type,
         createdById: original.createdById,
@@ -485,18 +499,23 @@ describe('ListMyExamsUseCase', () => {
         ],
       })
       if (makeup === null) throw new Error('makeup not created')
+      const at = async (now: Date) =>
+        (await build().execute(STUDENT_USER, now)).find(
+          (row) => row.id === makeup.id,
+        )
 
-      const list = await build().execute(
-        STUDENT_USER,
-        new Date('2026-11-05T02:00:00.000Z'),
-      )
-
-      expect(list.find((row) => row.id === makeup.id)).toMatchObject({
+      expect(await at(new Date('2026-11-10T02:00:00.000Z'))).toMatchObject({
         makeup: true,
         activityId: activity.id,
         eventId: event.id,
         lifecycle: 'OPEN',
       })
+      expect((await at(new Date('2026-11-05T02:00:00.000Z')))?.lifecycle).toBe(
+        'UPCOMING',
+      )
+      expect((await at(new Date('2026-11-10T05:00:00.000Z')))?.lifecycle).toBe(
+        'FINISHED',
+      )
     })
   })
 })

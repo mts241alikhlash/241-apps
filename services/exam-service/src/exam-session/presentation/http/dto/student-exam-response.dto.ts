@@ -59,8 +59,7 @@ export class MyExamDto {
   @ApiProperty({
     type: String,
     nullable: true,
-    description:
-      'Only filled while the exam is open; null when none was issued',
+    description: 'Null when no number was issued for the semester',
   })
   participantNumber!: string | null
   @ApiProperty({ description: 'True for a makeup sitting' })
