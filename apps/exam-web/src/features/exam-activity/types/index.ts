@@ -6,6 +6,25 @@ export const ACTIVITY_TOKEN_MODES = ['ROTATING', 'STATIC'] as const
 
 export type ActivityTokenMode = (typeof ACTIVITY_TOKEN_MODES)[number]
 
+export const ACTIVITY_STATUSES = [
+  'DRAFT',
+  'SCHEDULED',
+  'ACTIVE',
+  'CLOSED',
+] as const
+
+export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
+
+export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
+  DRAFT: 'Draf',
+  SCHEDULED: 'Terjadwal',
+  ACTIVE: 'Berlangsung',
+  CLOSED: 'Ditutup',
+}
+
+export const activityStatusLabel = (status: ActivityStatus): string =>
+  ACTIVITY_STATUS_LABELS[status]
+
 export const EXAM_TYPES = ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS'] as const
 
 export interface GradeOption {
@@ -42,11 +61,14 @@ export interface ActivityCreatePayload {
 
 export interface ExamActivityRecord {
   id: string
+  semesterId: string
   gradeId: string
-  status: string
+  status: ActivityStatus
   tokenMode: ActivityTokenMode
   tokenRotation: number
   durationMinutes: number
+  startsAt: string
+  endsAt: string
   policy: Record<string, number>
 }
 

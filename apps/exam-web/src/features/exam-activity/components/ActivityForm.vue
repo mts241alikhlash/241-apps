@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
+  ActivityStatus,
   ActivityTokenMode,
   ClassroomOption,
+  ExamActivityRecord,
   GradeOption,
   PackageOption,
   PresetName,
 } from '../types'
-import { ACTIVITY_TOKEN_MODES, EXAM_TYPES, PRESET_LABELS } from '../types'
+import {
+  ACTIVITY_STATUSES,
+  ACTIVITY_TOKEN_MODES,
+  activityStatusLabel,
+  EXAM_TYPES,
+  PRESET_LABELS,
+} from '../types'
 
 const props = defineProps<{
   semesterId: string
@@ -16,10 +25,36 @@ const props = defineProps<{
   classrooms: ClassroomOption[]
   packages: PackageOption[]
   isAdmin: boolean
+  activity?: ExamActivityRecord | null
   submitting?: boolean
 }>()
 
-const emit = defineEmits<{ submit: [payload: ActivityCreatePayload] }>()
+const emit = defineEmits<{
+  submit: [payload: ActivityCreatePayload]
+  'status-saved': []
+}>()
+
+const isEdit = computed(
+  () => props.activity !== null && props.activity !== undefined,
+)
+
+const status = ref<ActivityStatus>(props.activity?.status ?? 'DRAFT')
+const savingStatus = ref(false)
+const statusError = ref<string | null>(null)
+
+const outsideWindow = computed(() => {
+  const item = props.activity
+  if (item === null || item === undefined) return false
+  const now = Date.now()
+  return (
+    now < new Date(item.startsAt).getTime() ||
+    now >= new Date(item.endsAt).getTime()
+  )
+})
+
+const statusWarning = computed(
+  () => status.value === 'ACTIVE' && outsideWindow.value,
+)
 
 const gradeId = ref('')
 const classroomIds = ref<string[]>([])
@@ -59,7 +94,26 @@ function toggleClassroom(id: string, checked: boolean): void {
     : classroomIds.value.filter((item) => item !== id)
 }
 
-function submit(): void {
+async function saveStatus(): Promise<void> {
+  const item = props.activity
+  if (item === null || item === undefined || savingStatus.value) return
+  savingStatus.value = true
+  statusError.value = null
+  try {
+    await examActivityApi.updateStatus(item.id, status.value)
+    emit('status-saved')
+  } catch {
+    statusError.value = 'Status kegiatan gagal disimpan.'
+  } finally {
+    savingStatus.value = false
+  }
+}
+
+async function submit(): Promise<void> {
+  if (isEdit.value) {
+    await saveStatus()
+    return
+  }
   const item = chosenPackage.value
   if (!canSubmit.value || item === null) return
   emit('submit', {
@@ -83,138 +137,173 @@ function submit(): void {
     class="grid gap-4"
     @submit.prevent="submit"
   >
-    <label class="grid gap-1">
-      <span>Tingkat</span>
-      <select v-model="gradeId">
-        <option value="">Pilih tingkat</option>
-        <option
-          v-for="grade in grades"
-          :key="grade.id"
-          :value="grade.id"
+    <template v-if="isEdit">
+      <label class="grid gap-1">
+        <span>Status kegiatan</span>
+        <select
+          id="activity-status"
+          v-model="status"
         >
-          {{ grade.label }}
-        </option>
-      </select>
-    </label>
+          <option
+            v-for="value in ACTIVITY_STATUSES"
+            :key="value"
+            :value="value"
+          >
+            {{ activityStatusLabel(value) }}
+          </option>
+        </select>
+      </label>
 
-    <fieldset class="grid gap-1">
-      <legend>Kelas yang ikut</legend>
-      <p v-if="gradeId === ''">Pilih tingkat dulu.</p>
-      <p v-else-if="visibleClassrooms.length === 0">
-        Belum ada kelas aktif pada tingkat ini.
-      </p>
-      <label
-        v-for="room in visibleClassrooms"
-        :key="room.id"
-        class="flex items-center gap-2"
+      <p
+        v-if="statusWarning"
+        role="status"
       >
-        <input
-          type="checkbox"
-          :value="room.id"
-          :checked="classroomIds.includes(room.id)"
-          @change="
-            toggleClassroom(
-              room.id,
-              ($event.target as HTMLInputElement).checked,
-            )
-          "
-        />
-        <span>{{ room.label }}</span>
-      </label>
-    </fieldset>
+        Kegiatan aktif, tetapi sekarang di luar jendela waktu. Siswa belum bisa
+        masuk sampai jendela dibuka.
+      </p>
 
-    <label class="grid gap-1">
-      <span>Paket soal</span>
-      <select v-model="packageId">
-        <option value="">Pilih paket</option>
-        <option
-          v-for="item in packages"
-          :key="item.id"
-          :value="item.id"
-        >
-          {{ item.label }}
-        </option>
-      </select>
-    </label>
+      <p
+        v-if="statusError !== null"
+        role="alert"
+      >
+        {{ statusError }}
+      </p>
+    </template>
 
-    <label class="grid gap-1">
-      <span>Jenis</span>
-      <select v-model="type">
-        <option
-          v-for="value in EXAM_TYPES"
-          :key="value"
-          :value="value"
-        >
-          {{ value }}
-        </option>
-      </select>
-    </label>
-
-    <label class="grid gap-1">
-      <span>Preset kebijakan</span>
-      <select v-model="presetName">
-        <option
-          v-for="(label, name) in PRESET_LABELS"
-          :key="name"
-          :value="name"
-        >
-          {{ label }}
-        </option>
-      </select>
-    </label>
-
-    <label class="grid gap-1">
-      <span>Jenis token</span>
-      <select v-model="tokenMode">
-        <option
-          v-for="value in ACTIVITY_TOKEN_MODES"
-          :key="value"
-          :value="value"
-        >
-          {{ value === 'ROTATING' ? 'Berputar (ujian)' : 'Tetap (tugas)' }}
-        </option>
-      </select>
-    </label>
-
-    <div class="grid gap-4 sm:grid-cols-3">
+    <template v-else>
       <label class="grid gap-1">
-        <span>Mulai</span>
-        <input
-          v-model="startsAt"
-          type="datetime-local"
-        />
+        <span>Tingkat</span>
+        <select v-model="gradeId">
+          <option value="">Pilih tingkat</option>
+          <option
+            v-for="grade in grades"
+            :key="grade.id"
+            :value="grade.id"
+          >
+            {{ grade.label }}
+          </option>
+        </select>
       </label>
-      <label class="grid gap-1">
-        <span>Selesai</span>
-        <input
-          v-model="endsAt"
-          type="datetime-local"
-        />
-      </label>
-      <label class="grid gap-1">
-        <span>Durasi (menit)</span>
-        <input
-          v-model.number="durationMinutes"
-          type="number"
-          min="1"
-          max="1440"
-        />
-      </label>
-    </div>
 
-    <fieldset
-      v-if="isAdmin"
-      class="grid gap-1"
-    >
-      <legend>Lanjutan (admin)</legend>
-      <p>Angka penegakan diubah lewat preset atau sesudah kegiatan dibuat.</p>
-    </fieldset>
+      <fieldset class="grid gap-1">
+        <legend>Kelas yang ikut</legend>
+        <p v-if="gradeId === ''">Pilih tingkat dulu.</p>
+        <p v-else-if="visibleClassrooms.length === 0">
+          Belum ada kelas aktif pada tingkat ini.
+        </p>
+        <label
+          v-for="room in visibleClassrooms"
+          :key="room.id"
+          class="flex items-center gap-2"
+        >
+          <input
+            type="checkbox"
+            :value="room.id"
+            :checked="classroomIds.includes(room.id)"
+            @change="
+              toggleClassroom(
+                room.id,
+                ($event.target as HTMLInputElement).checked,
+              )
+            "
+          />
+          <span>{{ room.label }}</span>
+        </label>
+      </fieldset>
+
+      <label class="grid gap-1">
+        <span>Paket soal</span>
+        <select v-model="packageId">
+          <option value="">Pilih paket</option>
+          <option
+            v-for="item in packages"
+            :key="item.id"
+            :value="item.id"
+          >
+            {{ item.label }}
+          </option>
+        </select>
+      </label>
+
+      <label class="grid gap-1">
+        <span>Jenis</span>
+        <select v-model="type">
+          <option
+            v-for="value in EXAM_TYPES"
+            :key="value"
+            :value="value"
+          >
+            {{ value }}
+          </option>
+        </select>
+      </label>
+
+      <label class="grid gap-1">
+        <span>Preset kebijakan</span>
+        <select v-model="presetName">
+          <option
+            v-for="(label, name) in PRESET_LABELS"
+            :key="name"
+            :value="name"
+          >
+            {{ label }}
+          </option>
+        </select>
+      </label>
+
+      <label class="grid gap-1">
+        <span>Jenis token</span>
+        <select v-model="tokenMode">
+          <option
+            v-for="value in ACTIVITY_TOKEN_MODES"
+            :key="value"
+            :value="value"
+          >
+            {{ value === 'ROTATING' ? 'Berputar (ujian)' : 'Tetap (tugas)' }}
+          </option>
+        </select>
+      </label>
+
+      <div class="grid gap-4 sm:grid-cols-3">
+        <label class="grid gap-1">
+          <span>Mulai</span>
+          <input
+            v-model="startsAt"
+            type="datetime-local"
+          />
+        </label>
+        <label class="grid gap-1">
+          <span>Selesai</span>
+          <input
+            v-model="endsAt"
+            type="datetime-local"
+          />
+        </label>
+        <label class="grid gap-1">
+          <span>Durasi (menit)</span>
+          <input
+            v-model.number="durationMinutes"
+            type="number"
+            min="1"
+            max="1440"
+          />
+        </label>
+      </div>
+
+      <fieldset
+        v-if="isAdmin"
+        class="grid gap-1"
+      >
+        <legend>Lanjutan (admin)</legend>
+        <p>Angka penegakan diubah lewat preset atau sesudah kegiatan dibuat.</p>
+      </fieldset>
+    </template>
 
     <button
       type="submit"
-      :disabled="!canSubmit || submitting === true"
+      :disabled="isEdit ? savingStatus : !canSubmit || submitting === true"
     >
-      Simpan kegiatan
+      {{ isEdit ? 'Simpan status' : 'Simpan kegiatan' }}
     </button>
   </form>
 </template>

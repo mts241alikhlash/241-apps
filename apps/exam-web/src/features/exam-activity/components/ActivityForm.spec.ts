@@ -1,7 +1,12 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
 import ActivityForm from './ActivityForm.vue'
+
+const { patch } = vi.hoisted(() => ({ patch: vi.fn() }))
+vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
+  default: { get: vi.fn(), post: vi.fn(), patch },
+}))
 
 const props = {
   semesterId: 'sem-1',
@@ -22,7 +27,22 @@ const props = {
 
 const open = () => mount(ActivityForm, { props })
 
+const pastActivity = {
+  id: 'activity-1',
+  semesterId: 'sem-1',
+  gradeId: 'grade-7',
+  status: 'DRAFT' as const,
+  tokenMode: 'ROTATING' as const,
+  tokenRotation: 1,
+  durationMinutes: 90,
+  policy: {},
+  startsAt: '2020-11-10T01:00:00.000Z',
+  endsAt: '2020-11-10T04:00:00.000Z',
+}
+
 describe('ActivityForm', () => {
+  beforeEach(() => vi.clearAllMocks())
+
   it('only offers the classrooms of the chosen grade', async () => {
     const wrapper = open()
     await wrapper.findAll('select')[0].setValue('grade-7')
@@ -74,5 +94,29 @@ describe('ActivityForm', () => {
     expect(open().text()).not.toContain('Lanjutan (admin)')
     const admin = mount(ActivityForm, { props: { ...props, isAdmin: true } })
     expect(admin.text()).toContain('Lanjutan (admin)')
+  })
+
+  it('patches the chosen status for an existing activity', async () => {
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: pastActivity },
+    })
+    await wrapper.find('#activity-status').setValue('ACTIVE')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(patch).toHaveBeenCalledWith('/exam-activities/activity-1', {
+      status: 'ACTIVE',
+    })
+  })
+
+  it('warns when the activity is activated outside its window', async () => {
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: pastActivity },
+    })
+    expect(wrapper.text()).not.toContain('di luar jendela')
+    await wrapper.find('#activity-status').setValue('ACTIVE')
+    expect(wrapper.text()).toContain('di luar jendela')
+    await wrapper.find('#activity-status').setValue('CLOSED')
+    expect(wrapper.text()).not.toContain('di luar jendela')
   })
 })
