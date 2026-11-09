@@ -17,6 +17,7 @@ import { ISessionFinalizer } from './domain/repositories/session-finalizer.port.
 import { FinalizeDueSessionsJob } from './infrastructure/jobs/finalize-due-sessions.job.js'
 import { FinalizeSessionService } from './application/finalize-session.service.js'
 import { FinalizeDueSessionsUseCase } from './application/use-cases/finalize-due-sessions/finalize-due-sessions.use-case.js'
+import { CloseActivitySessionsUseCase } from './application/use-cases/close-activity-sessions/close-activity-sessions.use-case.js'
 import { RecordViolationsUseCase } from './application/use-cases/record-violations/record-violations.use-case.js'
 import { ReportCameraBlockedUseCase } from './application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'
 import { SubmitExamSessionUseCase } from './application/use-cases/submit-exam-session/submit-exam-session.use-case.js'
@@ -86,6 +87,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ReleaseSessionUseCase,
     FinalizeDueSessionsUseCase,
     FinalizeDueSessionsJob,
+    CloseActivitySessionsUseCase,
     LifecycleGate,
     SessionAccessService,
     GetPaperUseCase,
@@ -126,6 +128,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     SeatFlagService,
     AllowWebClientUseCase,
     AllowLateEntryUseCase,
+    CloseActivitySessionsUseCase,
   ],
 })
 export class ExamSessionModule {}

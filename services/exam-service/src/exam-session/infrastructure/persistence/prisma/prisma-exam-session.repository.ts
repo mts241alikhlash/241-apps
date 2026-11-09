@@ -328,6 +328,14 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
     return rows.map((row) => row.id)
   }
 
+  async findInProgressIdsByActivity(activityId: string): Promise<string[]> {
+    const rows = await this.prisma.examSession.findMany({
+      where: { status: 'IN_PROGRESS', schedule: { activityId } },
+      select: { id: true },
+    })
+    return rows.map((row) => row.id)
+  }
+
   async recordViolations(id: string, count: number): Promise<void> {
     await this.prisma.examSession.updateMany({
       where: { id, status: 'IN_PROGRESS', violationCount: { lt: count } },

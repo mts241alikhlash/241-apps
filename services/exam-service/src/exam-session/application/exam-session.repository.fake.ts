@@ -287,6 +287,20 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
     )
   }
 
+  readonly activityOfSchedule = new Map<string, string>()
+
+  findInProgressIdsByActivity(activityId: string) {
+    return Promise.resolve(
+      [...this.sessions.values()]
+        .filter(
+          (session) =>
+            session.status === 'IN_PROGRESS' &&
+            this.activityOfSchedule.get(session.scheduleId) === activityId,
+        )
+        .map((session) => session.id),
+    )
+  }
+
   recordViolations(id: string, count: number) {
     const session = this.sessions.get(id)
     if (session?.status === 'IN_PROGRESS' && session.violationCount < count) {

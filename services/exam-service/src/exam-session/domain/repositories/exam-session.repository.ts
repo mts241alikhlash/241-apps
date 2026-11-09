@@ -153,6 +153,7 @@ export abstract class IExamSessionRepository {
     limit: number,
     excludeIds: string[],
   ): Promise<string[]>
+  abstract findInProgressIdsByActivity(activityId: string): Promise<string[]>
   abstract findPageBySchedule(
     scheduleId: string,
     page: number,
