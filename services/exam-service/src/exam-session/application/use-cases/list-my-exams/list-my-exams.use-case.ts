@@ -148,7 +148,7 @@ export class ListMyExamsUseCase {
         endsAt: schedule.endsAt,
         durationMinutes: schedule.durationMinutes,
         minSubmitMinutes: schedule.minSubmitMinutes,
-        status: myExamStatus(schedule, session, now),
+        status: myExamStatus(schedule, session, now, lifecycle),
         sessionId: session?.id ?? null,
         activityId: activity?.id ?? null,
         activityStatus: activity?.status ?? null,

@@ -458,6 +458,16 @@ describe('ListMyExamsUseCase', () => {
       })
     })
 
+    it('does not call an exam open while its activity is not active', async () => {
+      const exam = await scheduleExam(fixtures())
+      const activity = await newActivity({ status: 'SCHEDULED' })
+      schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
+
+      const [row] = await build().execute(STUDENT_USER, NOW)
+
+      expect(row).toMatchObject({ lifecycle: 'FINISHED', status: 'FINISHED' })
+    })
+
     it('still lists the exams when the participant registry cannot be read', async () => {
       await scheduleExam(fixtures())
 
