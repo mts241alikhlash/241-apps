@@ -1,5 +1,16 @@
 # exam-web
 
+## 0.2.0
+
+### Minor Changes
+
+- 474bda9: Menambahkan pemilih status kegiatan pada formulir kegiatan di exam-web. Memilih status mengirim `PATCH /exam-activities/{id}` dengan `{ status }`, dan status `ACTIVE` memberi peringatan bila sekarang di luar jendela kegiatan.
+
+### Patch Changes
+
+- 474bda9: Menambah `POST /exam-activities/{id}/participant-numbers/issue` untuk menerbitkan ulang nomor peserta semester kegiatan secara best-effort, dan mengekspos `activityId` pada setiap jadwal agar baris jadwal bisa membuka layar status kegiatan.
+- 474bda9: Memungkinkan guru dan pengawas melihat foto pengawas (galeri foto bukti kamera) pada sesi ujian atau tugas yang tidak memiliki ruangan melalui tombol Foto di halaman daftar sesi jadwal.
+
 ## 0.1.4
 
 ### Patch Changes
