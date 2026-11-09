@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common'
+import { FakeExamActivityRepository } from '../../../../exam-activity/application/exam-activity.repository.fake.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
@@ -12,6 +13,7 @@ import { AccessCodeService } from '../../../../exam-schedule/application/access-
 import {
   FakeEnrollment,
   FakeStudentDirectory,
+  FakeParticipantNumber,
   FakeStudentIdentity,
   NOW,
   STUDENT_USER,
@@ -20,6 +22,7 @@ import {
   sessionFor,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
+import { LifecycleGate } from '../../lifecycle-gate.service.js'
 import { StartExamSessionUseCase } from '../start-exam-session/start-exam-session.use-case.js'
 import { ListScheduleSessionsUseCase } from '../list-schedule-sessions/list-schedule-sessions.use-case.js'
 import { ReleaseSessionUseCase } from './release-session.use-case.js'
@@ -115,6 +118,8 @@ describe('ReleaseSessionUseCase', () => {
       codes,
       new FakeSessionFinalizer(),
       rooms,
+      new FakeParticipantNumber(),
+      new LifecycleGate(schedules, new FakeExamActivityRepository()),
     )
     const input = (deviceId: string) => ({
       accessCode: codes.codeFor(schedule.id, schedule.tokenRotation, NOW).code,

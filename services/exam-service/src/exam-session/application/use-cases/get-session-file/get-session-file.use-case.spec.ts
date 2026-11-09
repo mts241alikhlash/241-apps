@@ -11,9 +11,9 @@ import {
   STUDENT_USER,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { GetSessionFileUseCase } from './get-session-file.use-case.js'
 
 const USED = '8a1f3c52-1b2d-4e6f-9a7b-0c1d2e3f4a5b'
@@ -59,7 +59,7 @@ describe('GetSessionFileUseCase', () => {
     }
     sessions.sessions.set('a', sessionFor(schedule, { id: 'a' }))
     return new GetSessionFileUseCase(
-      new SessionAccessService(sessions, new FakeSessionFinalizer()),
+      sessionAccess(sessions, new FakeSessionFinalizer(), schedules),
       schedules,
       packages,
       questions,

@@ -7,6 +7,7 @@ import { StartExamSessionUseCase } from './application/use-cases/start-exam-sess
 import { ListMyExamsUseCase } from './application/use-cases/list-my-exams/list-my-exams.use-case.js'
 import { IExamAccessAttemptRepository } from './domain/repositories/exam-access-attempt.repository.js'
 import { SessionAccessService } from './application/session-access.service.js'
+import { LifecycleGate } from './application/lifecycle-gate.service.js'
 import { SaveAnswerUseCase } from './application/use-cases/save-answer/save-answer.use-case.js'
 import { SaveAnswersBatchUseCase } from './application/use-cases/save-answers-batch/save-answers-batch.use-case.js'
 import { GetPaperUseCase } from './application/use-cases/get-paper/get-paper.use-case.js'
@@ -85,6 +86,7 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     ReleaseSessionUseCase,
     FinalizeDueSessionsUseCase,
     FinalizeDueSessionsJob,
+    LifecycleGate,
     SessionAccessService,
     GetPaperUseCase,
     SaveAnswerUseCase,

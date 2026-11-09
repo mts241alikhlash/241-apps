@@ -9,9 +9,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { ListSavedAnswersUseCase } from './list-saved-answers.use-case.js'
 
 describe('ListSavedAnswersUseCase', () => {
@@ -40,7 +40,7 @@ describe('ListSavedAnswersUseCase', () => {
       updatedAt: NOW,
     })
     const useCase = new ListSavedAnswersUseCase(
-      new SessionAccessService(sessions, new FakeSessionFinalizer()),
+      sessionAccess(sessions, new FakeSessionFinalizer(), schedules),
       sessions,
     )
 

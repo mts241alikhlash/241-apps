@@ -4,25 +4,34 @@ import {
   HttpException,
   NotFoundException,
 } from '@nestjs/common'
+import { FakeExamActivityRepository } from '../../../../exam-activity/application/exam-activity.repository.fake.js'
+import type { ExamActivity } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { AccessCodeService } from '../../../../exam-schedule/application/access-code.service.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import type { ExamSchedule } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import {
+  CLASSROOM_7A,
+  USER,
+} from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
 import { FakeExamAccessAttemptRepository } from '../../exam-access-attempt.repository.fake.js'
 import { FakeExamSessionRepository } from '../../exam-session.repository.fake.js'
 import {
   ENDS,
   FakeEnrollment,
+  FakeParticipantNumber,
   FakeStudentIdentity,
   NOW,
   STARTS,
   STUDENT_ID,
   STUDENT_USER,
+  activityFor,
   scheduleExam,
   sessionFor,
 } from '../../exam-session.test-support.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
+import { LifecycleGate } from '../../lifecycle-gate.service.js'
 import { StartExamSessionUseCase } from './start-exam-session.use-case.js'
 import { FakeExamRoomRepository } from '../../../../exam-room/application/exam-room.repository.fake.js'
 
@@ -37,6 +46,7 @@ describe('StartExamSessionUseCase', () => {
   let sessions: FakeExamSessionRepository
   let attempts: FakeExamAccessAttemptRepository
   let rooms: FakeExamRoomRepository
+  let activities: FakeExamActivityRepository
   let schedule: ExamSchedule
 
   beforeEach(async () => {
@@ -46,12 +56,14 @@ describe('StartExamSessionUseCase', () => {
     sessions = new FakeExamSessionRepository()
     attempts = new FakeExamAccessAttemptRepository()
     rooms = new FakeExamRoomRepository()
+    activities = new FakeExamActivityRepository()
     schedule = await scheduleExam({ packages, schedules, questions })
   })
 
   const build = (
     students = new FakeStudentIdentity(),
     enrollments = new FakeEnrollment(),
+    participants = new FakeParticipantNumber(),
   ) =>
     new StartExamSessionUseCase(
       students,
@@ -62,6 +74,8 @@ describe('StartExamSessionUseCase', () => {
       codes,
       new FinalizeSessionService(sessions, schedules, packages, questions),
       rooms,
+      participants,
+      new LifecycleGate(schedules, activities),
     )
 
   const start = (
@@ -83,6 +97,15 @@ describe('StartExamSessionUseCase', () => {
       },
       overrides.now ?? NOW,
     )
+
+  const attach = async (overrides: Partial<ExamActivity> = {}) => {
+    const activity = await activityFor(activities, schedule, overrides)
+    schedules.schedules.set(schedule.id, {
+      ...schedule,
+      activityId: activity.id,
+    })
+    return activity
+  }
 
   it('starts a session whose deadline follows the duration', async () => {
     const started = await start(build())
@@ -282,6 +305,90 @@ describe('StartExamSessionUseCase', () => {
     )
   })
 
+  describe('the activity lifecycle', () => {
+    it('refuses to start before the activity window opens', async () => {
+      await attach({
+        startsAt: new Date('2026-11-02T03:00:00.000Z'),
+        endsAt: new Date('2026-11-02T06:00:00.000Z'),
+      })
+
+      const error = await start(build()).catch((thrown: unknown) => thrown)
+
+      expect(error).toBeInstanceOf(ConflictException)
+      expect(error).toMatchObject({ code: 'WINDOW_CLOSED' })
+      expect(sessions.sessions.size).toBe(0)
+    })
+
+    it('refuses to start once the activity is closed', async () => {
+      await attach({ status: 'CLOSED' })
+
+      const error = await start(build()).catch((thrown: unknown) => thrown)
+
+      expect(error).toBeInstanceOf(ConflictException)
+      expect(error).toMatchObject({ code: 'WINDOW_CLOSED' })
+      expect(sessions.sessions.size).toBe(0)
+    })
+
+    it('lets the student start inside the activity window', async () => {
+      const activity = await attach()
+
+      const started = await build().execute(
+        STUDENT_USER,
+        schedule.id,
+        {
+          accessCode: codes.codeFor(`activity:${activity.id}`, 0, NOW).code,
+          deviceId: 'device-1',
+        },
+        NOW,
+      )
+
+      expect((await sessions.findById(started.sessionId))?.status).toBe(
+        'IN_PROGRESS',
+      )
+    })
+
+    it('names the room and the participant number when it refuses', async () => {
+      const event = await rooms.createEvent({
+        semesterId: schedule.semesterId,
+        name: 'UTS Ganjil',
+        type: 'UTS',
+        startsAt: STARTS,
+        endsAt: ENDS,
+        createdById: USER.id,
+      })
+      const room = await rooms.createRoom({
+        eventId: event.id,
+        code: 'R01',
+        name: 'Ruang 01',
+        capacity: 30,
+      })
+      await rooms.assignSeat({
+        roomId: room.id,
+        eventId: event.id,
+        studentId: STUDENT_ID,
+        classroomId: CLASSROOM_7A.id,
+        seatNumber: 12,
+      })
+      await attach({ status: 'CLOSED' })
+      schedules.schedules.set(schedule.id, {
+        ...(await schedules.findById(schedule.id))!,
+        eventId: event.id,
+      })
+
+      await expect(
+        start(
+          build(
+            undefined,
+            undefined,
+            new FakeParticipantNumber({ number: '2024001' }),
+          ),
+        ),
+      ).rejects.toThrow(
+        'Waktu ujian sudah berakhir di Ruang 01, nomor peserta 2024001',
+      )
+    })
+  })
+
   it('refuses a cancelled schedule', async () => {
     schedules.schedules.set(schedule.id, { ...schedule, status: 'CANCELLED' })
 
@@ -425,6 +532,13 @@ describe('StartExamSessionUseCase', () => {
       expect((await sessions.findById(started.sessionId))?.scheduleId).toBe(
         makeup.id,
       )
+    })
+
+    it('keeps the makeup on its own window, not the window of the activity', async () => {
+      const makeup = await withMakeup()
+      await attach()
+
+      await expect(startMakeup(makeup)).resolves.toBeDefined()
     })
 
     it('does not accept the token of the regular exam', async () => {

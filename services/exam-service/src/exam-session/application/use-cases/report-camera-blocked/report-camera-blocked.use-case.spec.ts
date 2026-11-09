@@ -8,9 +8,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { ReportCameraBlockedUseCase } from './report-camera-blocked.use-case.js'
 
 describe('ReportCameraBlockedUseCase', () => {
@@ -33,7 +33,7 @@ describe('ReportCameraBlockedUseCase', () => {
     return {
       sessions,
       useCase: new ReportCameraBlockedUseCase(
-        new SessionAccessService(sessions, finalizer),
+        sessionAccess(sessions, finalizer, schedules),
         sessions,
       ),
     }

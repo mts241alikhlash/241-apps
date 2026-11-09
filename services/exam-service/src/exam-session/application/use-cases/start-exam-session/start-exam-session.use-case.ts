@@ -20,6 +20,7 @@ import { assessMakeupEligibility } from '../../../../exam-schedule/domain/polici
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { isLocked } from '../../../domain/policies/access-attempt.policy.js'
@@ -31,6 +32,10 @@ import { computeTimes } from '../../../domain/policies/session-times.policy.js'
 import { IExamAccessAttemptRepository } from '../../../domain/repositories/exam-access-attempt.repository.js'
 import { ISessionFinalizer } from '../../../domain/repositories/session-finalizer.port.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
+import {
+  LifecycleGate,
+  type WindowClosedPlace,
+} from '../../lifecycle-gate.service.js'
 
 export interface StartedSession {
   sessionId: string
@@ -50,6 +55,8 @@ export class StartExamSessionUseCase {
     private readonly codes: AccessCodeService,
     private readonly finalizer: ISessionFinalizer,
     private readonly rooms: IExamRoomRepository,
+    private readonly participants: IParticipantNumberPort,
+    private readonly lifecycle: LifecycleGate,
   ) {}
 
   async execute(
@@ -92,12 +99,9 @@ export class StartExamSessionUseCase {
     if (schedule.status !== 'SCHEDULED') {
       throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
     }
-    if (now.getTime() < schedule.startsAt.getTime()) {
-      throw new ForbiddenException('Ujian belum dibuka')
-    }
-    if (now.getTime() >= schedule.endsAt.getTime()) {
-      throw new ForbiddenException('Waktu ujian sudah berakhir')
-    }
+    await this.lifecycle.assertOpen(schedule.id, now, () =>
+      this.whereabouts(schedule, studentId, enrollment.semesterId),
+    )
 
     const state = await this.attempts.get(schedule.id, studentId)
     if (isLocked(state, now)) {
@@ -175,6 +179,24 @@ export class StartExamSessionUseCase {
       input.deviceId,
       now,
     )
+  }
+
+  private async whereabouts(
+    schedule: ExamSchedule,
+    studentId: string,
+    semesterId: string,
+  ): Promise<WindowClosedPlace> {
+    try {
+      const [seat, participantNumber] = await Promise.all([
+        schedule.eventId === null
+          ? null
+          : this.rooms.findSeatForStudent(schedule.eventId, studentId),
+        this.participants.findNumber(studentId, semesterId).catch(() => null),
+      ])
+      return { roomName: seat?.roomName ?? null, participantNumber }
+    } catch {
+      return {}
+    }
   }
 
   private async assertClientGate(

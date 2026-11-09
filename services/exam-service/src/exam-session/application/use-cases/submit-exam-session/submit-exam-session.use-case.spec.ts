@@ -10,9 +10,9 @@ import {
   choiceSpec,
   schedulePaper,
   sessionFor,
+  sessionAccess,
 } from '../../exam-session.test-support.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
-import { SessionAccessService } from '../../session-access.service.js'
 import { SaveAnswersBatchUseCase } from '../save-answers-batch/save-answers-batch.use-case.js'
 import { SubmitExamSessionUseCase } from './submit-exam-session.use-case.js'
 
@@ -43,7 +43,7 @@ describe('SubmitExamSessionUseCase', () => {
       packages,
       questions,
     )
-    const access = new SessionAccessService(sessions, finalizer)
+    const access = sessionAccess(sessions, finalizer, schedules)
     const saveBatch = new SaveAnswersBatchUseCase(
       access,
       schedules,

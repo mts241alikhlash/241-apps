@@ -15,7 +15,7 @@ import { loadSittings } from '../../../../exam-schedule/application/student-sitt
 import { assessMakeupEligibility } from '../../../../exam-schedule/domain/policies/makeup-eligibility.policy.js'
 import type { MyExamStatus } from '../../../domain/entities/exam-session.entity.js'
 import {
-  examLifecycle,
+  scheduleLifecycle,
   type ExamActivityStatus,
   type ExamLifecycle,
 } from '../../../domain/policies/exam-lifecycle.policy.js'
@@ -130,11 +130,7 @@ export class ListMyExamsUseCase {
         ? await this.activities.findById(source.activityId)
         : null
       const eventId = activity?.eventId ?? source.eventId
-      const lifecycle = examLifecycle(
-        activity?.status ?? 'ACTIVE',
-        schedule.kind === 'MAKEUP' ? schedule : (activity ?? schedule),
-        now,
-      )
+      const lifecycle = scheduleLifecycle(schedule, activity, now)
       const seat =
         lifecycle === 'OPEN' && eventId !== null
           ? await this.rooms.findSeatForStudent(eventId, studentId)
