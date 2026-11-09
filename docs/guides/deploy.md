@@ -8,6 +8,15 @@ A deploy applies the pinned image digests in `infra/deployment/lock.json` to the
 - The server is provisioned ([provision-vps](provision-vps.md)) and the `production` GitHub Environment has its secrets (`DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_HOST`) and the owner as required reviewer. Server and key facts are in `AGENTS.local.md` and the owner's notes, not in this repository.
 - Read [rollback](rollback.md) first: there is no staging to rehearse on.
 
+## Gates the owner keeps
+
+Two decisions are the owner's alone, and automation must never take either:
+
+1. **Merging the `Update the lock` pull request.** That merge decides which released images production runs. Do not enable auto-merge on it, and do not merge it on the owner's behalf.
+2. **Approving the `Deploy` run.** The `production` environment has the owner as its required reviewer with **Prevent self-review** on, so whoever starts the run — a person, an agent, or a token — still waits for someone else to approve. Approve only after the run reports `waiting`, and record the reason in the deployment comment.
+
+Branch protection on `main` requires one approving review, a code-owner review for the paths in `.github/CODEOWNERS`, and the `ci-ok` check. An agent session may prepare a lock pull request and dispatch the deploy, then stops: it reports the pull request and the run, and waits.
+
 ## 1. Update the lock
 
 The `Update lock` workflow (`.github/workflows/update-lock.yml`) starts after every successful `Release` and can be run by hand from the Actions tab. It pins the newest released versions from the repository tags and the digests in GHCR, builds the gateway image when its configuration changed, and opens or updates the pull request `Update the lock`. See [release](release.md).
