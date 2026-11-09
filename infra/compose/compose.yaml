@@ -122,7 +122,7 @@ services:
 
   exam-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/exam-web@sha256:aab87c2b532d3b07fd174c1e4dcb50c3bacee808c22349c381540f3b7ddf9849
+    image: ghcr.io/mts241alikhlash/exam-web@sha256:7d1e109d60c7b71aa85606d7da2180177c937032d82b836064bb06e135b359d2
   identity-service:
     <<: *service-defaults
     image: ghcr.io/mts241alikhlash/identity-service@sha256:13dd18683b84fb561dc8d6cb9b7231874f57ef2f1a7968366c16a786ce638575
@@ -223,7 +223,7 @@ services:
 
   student-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/student-service@sha256:7547c5e989d535547b4db3731aa57f36908c59828d2fcb4d67026075ec617e90
+    image: ghcr.io/mts241alikhlash/student-service@sha256:3a5496e01d48ea8fe17e6349d8d1e770b8be0b4e180cee07a6eceebb3be479ac
     env_file:
       - path: env/student-service.env
     expose:
@@ -251,7 +251,7 @@ services:
 
   exam-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:02760be84b643abcfb2ee649236d6ad322fddf35fcffc5bc1a07f5a1bab026d3
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:cc0e01c1bfbf034de9f1712cfcd98ac0446289a57fcee4c62aedb9f53e4bbd0f
     env_file:
       - path: env/exam-service.env
     expose:
@@ -314,7 +314,7 @@ services:
 
   student-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/student-service@sha256:7547c5e989d535547b4db3731aa57f36908c59828d2fcb4d67026075ec617e90
+    image: ghcr.io/mts241alikhlash/student-service@sha256:3a5496e01d48ea8fe17e6349d8d1e770b8be0b4e180cee07a6eceebb3be479ac
     profiles: ['migrate']
     env_file:
       - path: env/student-service.env
@@ -328,7 +328,7 @@ services:
 
   exam-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:02760be84b643abcfb2ee649236d6ad322fddf35fcffc5bc1a07f5a1bab026d3
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:cc0e01c1bfbf034de9f1712cfcd98ac0446289a57fcee4c62aedb9f53e4bbd0f
     profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
