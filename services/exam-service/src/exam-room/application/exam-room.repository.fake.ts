@@ -313,15 +313,11 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     return Promise.resolve(found ?? null)
   }
 
-  findSeatForStudent(eventId: string, studentId: string) {
-    const found = [...this.seats.values()].find(
-      (row) => row.eventId === eventId && row.studentId === studentId,
-    )
-    if (found === undefined) return Promise.resolve(null)
+  async findSeatForStudent(eventId: string, studentId: string) {
+    const found = await this.findSeat(eventId, studentId)
+    if (found === null) return null
     const room = this.rooms.get(found.roomId)
-    return Promise.resolve(
-      room ? { roomName: room.name, seatNumber: found.seatNumber } : null,
-    )
+    return room ? { roomName: room.name, seatNumber: found.seatNumber } : null
   }
 
   listSeatsByRoom(roomId: string) {

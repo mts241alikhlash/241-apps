@@ -274,7 +274,7 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     studentId: string,
   ): Promise<{ roomName: string; seatNumber: number } | null> {
     const row = await this.prisma.examRoomSeat.findFirst({
-      where: { studentId, room: { eventId } },
+      where: { eventId, studentId },
       include: { room: true },
     })
     return row ? { roomName: row.room.name, seatNumber: row.seatNumber } : null

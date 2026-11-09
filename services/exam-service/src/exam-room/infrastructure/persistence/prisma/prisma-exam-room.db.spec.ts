@@ -196,7 +196,7 @@ suite('Prisma exam rooms against a real database', () => {
     const first = await rooms.createRoom({
       eventId: created.id,
       code: 'R-1',
-      name: 'R-1',
+      name: 'Ruang 1',
       capacity: 30,
     })
 
@@ -209,7 +209,7 @@ suite('Prisma exam rooms against a real database', () => {
     })
 
     expect(await rooms.findSeatForStudent(created.id, studentOne)).toEqual({
-      roomName: 'R-1',
+      roomName: 'Ruang 1',
       seatNumber: 7,
     })
     expect(await rooms.findSeatForStudent(created.id, studentTwo)).toBeNull()
