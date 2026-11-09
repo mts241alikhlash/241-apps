@@ -82,7 +82,10 @@ export class StudentInternalController {
     description: 'Missing or invalid provisioning token',
   })
   async byIds(@Body() dto: StudentIdsDto): Promise<StudentRefListResponseDto> {
-    return { data: await this.studentIdentityRead.listRefsByIds(dto.ids) }
+    const rows = await this.studentIdentityRead.listRefsByIds(dto.ids)
+    return {
+      data: rows.map(({ id, userId, nis }) => ({ id, userId, nis })),
+    }
   }
 
   @Get('by-user/:userId')

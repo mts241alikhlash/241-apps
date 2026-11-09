@@ -592,6 +592,26 @@ export interface paths {
         patch: operations["StudentController_update"];
         trace?: never;
     };
+    "/students/{id}/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A student’s participant number for a semester
+         * @description Defaults to the semester of the student’s active enrollment when semesterId is omitted.
+         */
+        get: operations["StudentController_findParticipantNumber"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/students/{id}/toggle-active": {
         parameters: {
             query?: never;
@@ -757,6 +777,26 @@ export interface paths {
         };
         /** The classroom you are enrolled in — no id parameter exists */
         get: operations["StudentController_findMyClassroom"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/students/me/participant-number": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your participant number — no id parameter exists
+         * @description The semester is the one your active enrollment belongs to; null when you have no enrollment or the registry has no number for it.
+         */
+        get: operations["StudentController_findMyParticipantNumber"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1768,6 +1808,10 @@ export interface components {
              * @enum {string}
              */
             relation: "FATHER" | "MOTHER" | "GUARDIAN";
+        };
+        ParticipantNumberResponseDto: {
+            /** @description Registry number for the semester, or null when none was issued */
+            number: string | null;
         };
         PromotionDto: {
             /**
@@ -4324,6 +4368,36 @@ export interface operations {
             };
         };
     };
+    StudentController_findParticipantNumber: {
+        parameters: {
+            query?: {
+                semesterId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The number, or null when none was issued */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     StudentController_toggleActive: {
         parameters: {
             query: {
@@ -4633,6 +4707,32 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["MyClassroomResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    StudentController_findMyParticipantNumber: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Your participant number, or null */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

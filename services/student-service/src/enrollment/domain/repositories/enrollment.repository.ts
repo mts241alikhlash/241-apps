@@ -88,6 +88,9 @@ export abstract class IEnrollmentRepository {
     classroomIdMap: Map<string, string>,
   ): Promise<{ created: number; skipped: number }>
   abstract findManyActiveByIds(ids: string[]): Promise<EnrollmentWithDetails[]>
+  abstract listActiveForSemester(
+    semesterId: string,
+  ): Promise<{ studentId: string; classroomId: string }[]>
   abstract createMany(
     data: CreateEnrollmentRepositoryInput[],
   ): Promise<{ count: number }>

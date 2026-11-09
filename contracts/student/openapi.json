@@ -2010,6 +2010,107 @@
         ]
       }
     },
+    "/students/me/participant-number": {
+      "get": {
+        "description": "The semester is the one your active enrollment belongs to; null when you have no enrollment or the registry has no number for it.",
+        "operationId": "StudentController_findMyParticipantNumber",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Your participant number, or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ParticipantNumberResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Your participant number — no id parameter exists",
+        "tags": [
+          "Students"
+        ]
+      }
+    },
+    "/students/{id}/participant-number": {
+      "get": {
+        "description": "Defaults to the semester of the student’s active enrollment when semesterId is omitted.",
+        "operationId": "StudentController_findParticipantNumber",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "semesterId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number, or null when none was issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ParticipantNumberResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "A student’s participant number for a semester",
+        "tags": [
+          "Students"
+        ]
+      }
+    },
     "/students/{id}": {
       "get": {
         "operationId": "StudentController_findOne",
@@ -6829,6 +6930,19 @@
           "supervisor",
           "classmates",
           "subjects"
+        ]
+      },
+      "ParticipantNumberResponseDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "nullable": true,
+            "description": "Registry number for the semester, or null when none was issued"
+          }
+        },
+        "required": [
+          "number"
         ]
       },
       "CreateStudentDto": {
