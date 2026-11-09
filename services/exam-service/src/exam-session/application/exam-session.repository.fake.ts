@@ -324,7 +324,11 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
     for (const session of this.sessions.values()) {
       if (session.status !== 'IN_PROGRESS') continue
       const schedule = await this.schedules?.findById(session.scheduleId)
-      if (schedule?.activityId === activityId) ids.push(session.id)
+      const owner =
+        schedule?.activityId == null && schedule?.makeupOfId != null
+          ? await this.schedules?.findById(schedule.makeupOfId)
+          : schedule
+      if (owner?.activityId === activityId) ids.push(session.id)
     }
     return ids
   }

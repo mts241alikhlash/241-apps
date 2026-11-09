@@ -541,6 +541,70 @@ describe('StartExamSessionUseCase', () => {
       )
     })
 
+    it('seats the makeup from the room and seat of the parent event', async () => {
+      const event = await rooms.createEvent({
+        semesterId: schedule.semesterId,
+        name: 'UTS Ganjil',
+        type: 'UTS',
+        startsAt: MAKEUP_NOW,
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        createdById: USER.id,
+      })
+      const room = await rooms.createRoom({
+        eventId: event.id,
+        code: 'R01',
+        name: 'Ruang 01',
+        capacity: 30,
+      })
+      await rooms.assignSeat({
+        roomId: room.id,
+        eventId: event.id,
+        studentId: STUDENT_ID,
+        classroomId: CLASSROOM_7A.id,
+        seatNumber: 12,
+      })
+      schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
+      const makeup = await withMakeup()
+
+      const started = await startMakeup(makeup)
+
+      expect(await sessions.findById(started.sessionId)).toMatchObject({
+        roomId: room.id,
+        seatNumber: 12,
+      })
+    })
+
+    it('applies the client gate of the parent event to the makeup', async () => {
+      const event = await rooms.createEvent({
+        semesterId: schedule.semesterId,
+        name: 'UTS Ganjil',
+        type: 'UTS',
+        startsAt: MAKEUP_NOW,
+        endsAt: new Date('2026-11-05T04:00:00.000Z'),
+        requireAndroidApp: true,
+        createdById: USER.id,
+      })
+      schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
+      const makeup = await withMakeup()
+
+      await expect(
+        build().execute(
+          STUDENT_USER,
+          makeup.id,
+          {
+            accessCode: codes.codeFor(
+              makeup.id,
+              makeup.tokenRotation,
+              MAKEUP_NOW,
+            ).code,
+            deviceId: 'device-1',
+            platform: 'web',
+          },
+          MAKEUP_NOW,
+        ),
+      ).rejects.toThrow('Jadwal ini wajib dikerjakan dari aplikasi Android')
+    })
+
     it('keeps the makeup on its own window, not the window of the activity', async () => {
       const makeup = await withMakeup()
       await attach({

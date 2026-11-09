@@ -117,6 +117,42 @@ describe('CloseActivitySessionsUseCase', () => {
     ])
   })
 
+  it('expires the running makeup sessions of the activity too', async () => {
+    const { schedule, questionIds } = await schedulePaper(
+      { packages, schedules, questions },
+      [ESSAY],
+    )
+    belongTo(schedule.id, ACTIVITY_ID)
+    const makeup = await schedules.createMakeup({
+      packageId: schedule.packageId,
+      classroomId: schedule.classroomId,
+      semesterId: schedule.semesterId,
+      startsAt: new Date('2026-11-05T01:00:00.000Z'),
+      endsAt: new Date('2026-11-05T04:00:00.000Z'),
+      durationMinutes: 90,
+      type: schedule.type,
+      createdById: schedule.createdById,
+      makeupOfId: schedule.id,
+      participants: [],
+    })
+    sessions.sessions.set('m', sessionFor(makeup!, { id: 'm' }))
+    saveAnswer('m', questionIds[0])
+
+    expect(await useCase.execute(ACTIVITY_ID, ADMIN_ID, LATER)).toBe(1)
+
+    expect(sessions.sessions.get('m')?.status).toBe('EXPIRED')
+    expect(sessions.answers.get('answer-m')?.answer).toEqual({
+      text: 'jawaban',
+    })
+    expect(sessions.auditLogs).toMatchObject([
+      {
+        action: 'CLOSED_BY_ADMIN',
+        sessionId: 'm',
+        metadata: { activityId: ACTIVITY_ID },
+      },
+    ])
+  })
+
   it('leaves the running sessions of another activity alone', async () => {
     const { schedule, questionIds } = await schedulePaper(
       { packages, schedules, questions },

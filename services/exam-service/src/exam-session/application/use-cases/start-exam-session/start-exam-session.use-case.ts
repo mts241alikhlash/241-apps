@@ -92,10 +92,9 @@ export class StartExamSessionUseCase {
     } else {
       await this.assertNoMakeupSitting(schedule.id, studentId)
     }
+    const { eventId } = await this.lifecycle.sourceOf(schedule)
     const seat =
-      schedule.eventId === null
-        ? null
-        : await this.rooms.findSeat(schedule.eventId, studentId)
+      eventId === null ? null : await this.rooms.findSeat(eventId, studentId)
     if (schedule.status !== 'SCHEDULED') {
       throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
     }
@@ -130,7 +129,7 @@ export class StartExamSessionUseCase {
       studentId,
     )
     await this.assertClientGate(
-      schedule,
+      eventId,
       existing ?? seat,
       input.platform,
       now,
@@ -200,7 +199,7 @@ export class StartExamSessionUseCase {
   }
 
   private async assertClientGate(
-    schedule: ExamSchedule,
+    eventId: string | null,
     seat: {
       allowWebClient: boolean
       allowLateEntry: boolean
@@ -209,8 +208,8 @@ export class StartExamSessionUseCase {
     now: Date,
     startedAt?: Date,
   ): Promise<void> {
-    if (schedule.eventId === null) return
-    const event = await this.rooms.findEventById(schedule.eventId)
+    if (eventId === null) return
+    const event = await this.rooms.findEventById(eventId)
     if (event === null) return
     assertClientAllowed({
       platform: platform ?? 'native',

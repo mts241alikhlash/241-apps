@@ -345,7 +345,12 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
 
   async findInProgressIdsByActivity(activityId: string): Promise<string[]> {
     const rows = await this.prisma.examSession.findMany({
-      where: { status: 'IN_PROGRESS', schedule: { activityId } },
+      where: {
+        status: 'IN_PROGRESS',
+        schedule: {
+          OR: [{ activityId }, { makeupOf: { activityId } }],
+        },
+      },
       select: { id: true },
     })
     return rows.map((row) => row.id)

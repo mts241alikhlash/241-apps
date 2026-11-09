@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import type { ExamActivity } from '../../exam-activity/domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../exam-activity/domain/repositories/exam-activity.repository.js'
 import type { ExamSchedule } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { IExamScheduleRepository } from '../../exam-schedule/domain/repositories/exam-schedule.repository.js'
@@ -20,6 +21,23 @@ export class LifecycleGate {
     private readonly activities: ExamActivityRepository,
   ) {}
 
+  async sourceOf(schedule: ExamSchedule): Promise<{
+    owner: ExamSchedule
+    activity: ExamActivity | null
+    eventId: string | null
+  }> {
+    const original =
+      schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
+        ? await this.schedules.findById(schedule.makeupOfId)
+        : null
+    const owner = original ?? schedule
+    const activity =
+      owner.activityId === undefined || owner.activityId === null
+        ? null
+        : await this.activities.findById(owner.activityId)
+    return { owner, activity, eventId: activity?.eventId ?? owner.eventId }
+  }
+
   async assertOpen(
     target: string | ExamSchedule | null,
     now: Date,
@@ -30,17 +48,8 @@ export class LifecycleGate {
         ? await this.schedules.findById(target)
         : target
     if (schedule === null) return
-    const original =
-      schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
-        ? await this.schedules.findById(schedule.makeupOfId)
-        : null
-    const owner = original ?? schedule
-    const activity =
-      owner.activityId === undefined || owner.activityId === null
-        ? null
-        : await this.activities.findById(owner.activityId)
+    const { activity, eventId } = await this.sourceOf(schedule)
     if (scheduleLifecycle(schedule, activity, now) === 'OPEN') return
-    const eventId = activity?.eventId ?? owner.eventId
     const where = place === undefined ? {} : await place(eventId)
     const room = where.roomName == null ? '' : ` di ${where.roomName}`
     const number =
