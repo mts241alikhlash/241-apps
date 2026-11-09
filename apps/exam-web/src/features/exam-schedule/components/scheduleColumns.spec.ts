@@ -12,6 +12,7 @@ const schedule = (overrides: Partial<ExamSchedule> = {}): ExamSchedule => ({
   classroomName: 'VII A',
   semesterId: 'sem',
   eventId: null,
+  activityId: null,
   type: 'UTS',
   startsAt: toInstant('2026-11-02', '08:00'),
   endsAt: toInstant('2026-11-02', '11:00'),
@@ -157,6 +158,30 @@ describe('buildScheduleColumns', () => {
       'Token',
       'Batalkan',
     ])
+  })
+
+  it('offers the activity status entry for a schedule with an activity', () => {
+    const props = actionProps(
+      {
+        canManageActivity: true,
+        onStatus: vi.fn(),
+        now: () => new Date(toInstant('2026-11-02', '07:00')),
+      },
+      schedule({ activityId: 'activity-1' }),
+    )
+
+    expect(labels(props)).toContain('Ubah status')
+    expect(
+      labels(
+        actionProps(
+          { canManageActivity: false },
+          schedule({ activityId: 'activity-1' }),
+        ),
+      ),
+    ).not.toContain('Ubah status')
+    expect(
+      labels(actionProps({ canManageActivity: true }, schedule())),
+    ).not.toContain('Ubah status')
   })
 
   it('hides the sessions action without the permission', () => {

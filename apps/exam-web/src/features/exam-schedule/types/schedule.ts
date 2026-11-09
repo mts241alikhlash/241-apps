@@ -20,6 +20,7 @@ export interface ExamSchedule {
   classroomName: string | null
   semesterId: string
   eventId: string | null
+  activityId: string | null
   type: ExamType
   kind: ExamScheduleKind
   makeupOfId: string | null
