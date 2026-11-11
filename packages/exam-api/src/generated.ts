@@ -473,6 +473,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-policy-presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the default enforcement policy presets */
+        get: operations["ExamPolicyPresetController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-policy-presets/{type}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update one policy preset */
+        patch: operations["ExamPolicyPresetController_update"];
+        trace?: never;
+    };
     "/exam-questions/scope": {
         parameters: {
             query?: never;
@@ -1742,6 +1776,15 @@ export interface components {
             snapshotIntervalMs: number;
             tokenSlotSeconds: number;
             violationLimit: number;
+        };
+        ExamPolicyPresetDto: {
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
+            policy: components["schemas"]["ExamPolicyDto"];
+            /** @enum {string} */
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+            /** Format: date-time */
+            updatedAt: string;
         };
         ExamRoomDto: {
             building: string | null;
@@ -3775,6 +3818,62 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamPackageDetailDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamPolicyPresetController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamPolicyPresetDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamPolicyPresetController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityPolicyRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamPolicyPresetDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

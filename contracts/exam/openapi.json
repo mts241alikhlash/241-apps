@@ -409,6 +409,114 @@
         ]
       }
     },
+    "/exam-policy-presets": {
+      "get": {
+        "operationId": "ExamPolicyPresetController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExamPolicyPresetDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List the default enforcement policy presets",
+        "tags": [
+          "Exam Policy Presets"
+        ]
+      }
+    },
+    "/exam-policy-presets/{type}": {
+      "patch": {
+        "operationId": "ExamPolicyPresetController_update",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "DAILY",
+                "ASSIGNMENT",
+                "MIDTERM",
+                "FINAL"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityPolicyRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPolicyPresetDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one policy preset",
+        "tags": [
+          "Exam Policy Presets"
+        ]
+      }
+    },
     "/me/exams": {
       "get": {
         "operationId": "StudentExamController_findMine",
@@ -6583,6 +6691,40 @@
             "maximum": 3600
           }
         }
+      },
+      "ExamPolicyPresetDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
+            ],
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "type",
+          "category",
+          "policy",
+          "updatedAt"
+        ]
       },
       "MyExamDto": {
         "type": "object",

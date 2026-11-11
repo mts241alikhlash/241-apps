@@ -66,6 +66,14 @@ class FakeActivityRepository implements ExamActivityRepository {
     })
   }
 
+  listPresets() {
+    return Promise.resolve([])
+  }
+
+  updatePreset() {
+    return Promise.resolve(null)
+  }
+
   findEventRef(eventId: string) {
     return Promise.resolve(this.events.get(eventId) ?? null)
   }
