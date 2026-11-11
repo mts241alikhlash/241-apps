@@ -31,7 +31,9 @@ function buildWhere(
     ...(query.status ? { status: query.status } : {}),
     ...(query.from ? { endsAt: { gte: query.from } } : {}),
     ...(query.to ? { startsAt: { lte: query.to } } : {}),
-    ...(query.category ? { type: { in: typesInCategory(query.category) } } : {}),
+    ...(query.category
+      ? { type: { in: typesInCategory(query.category) } }
+      : {}),
   }
 }
 

@@ -84,10 +84,7 @@ export class CreateActivityUseCase {
         type: command.type,
         tokenMode: command.tokenMode,
         presetId: preset.id,
-        policy: parsePolicy(
-          preset.policy,
-          DEFAULT_POLICIES[presetName],
-        ),
+        policy: parsePolicy(preset.policy, DEFAULT_POLICIES[presetName]),
         startsAt: command.startsAt,
         endsAt: command.endsAt,
         durationMinutes: command.durationMinutes,

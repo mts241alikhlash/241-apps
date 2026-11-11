@@ -55,8 +55,8 @@ describe('ManageExamEventsUseCase', () => {
       },
     )
 
-    await expect(
-      useCase.update(event.id, { type: 'DAILY' }),
-    ).rejects.toThrow(UnprocessableEntityException)
+    await expect(useCase.update(event.id, { type: 'DAILY' })).rejects.toThrow(
+      UnprocessableEntityException,
+    )
   })
 })

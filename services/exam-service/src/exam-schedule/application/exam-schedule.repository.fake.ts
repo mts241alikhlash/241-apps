@@ -33,7 +33,9 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
       .filter((row) => !query.status || row.status === query.status)
       .filter((row) => !query.from || row.endsAt >= query.from)
       .filter((row) => !query.to || row.startsAt <= query.to)
-      .filter((row) => !query.category || categoryOf(row.type) === query.category)
+      .filter(
+        (row) => !query.category || categoryOf(row.type) === query.category,
+      )
     return Promise.resolve({
       data: rows.slice(
         (query.page - 1) * query.limit,
@@ -48,7 +50,9 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
   findForGrading(query: ExamScheduleGradingQuery) {
     const rows = [...this.schedules.values()]
       .filter((row) => row.semesterId === query.semesterId)
-      .filter((row) => !query.category || categoryOf(row.type) === query.category)
+      .filter(
+        (row) => !query.category || categoryOf(row.type) === query.category,
+      )
       .filter(
         (row) =>
           this.withSessions(row.id) ||

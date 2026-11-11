@@ -56,9 +56,7 @@ export abstract class ExamActivityRepository {
     id: string,
     actorId: string,
   ): Promise<ExamActivity | null>
-  abstract listSchedules(
-    activityId: string,
-  ): Promise<ActivityScheduleSummary[]>
+  abstract listSchedules(activityId: string): Promise<ActivityScheduleSummary[]>
   abstract listBySemester(
     semesterId: string,
     category?: ExamCategory,

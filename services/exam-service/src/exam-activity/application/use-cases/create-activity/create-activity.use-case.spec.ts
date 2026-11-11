@@ -55,7 +55,8 @@ class FakeActivityRepository implements ExamActivityRepository {
   readonly audits: string[] = []
   readonly events = new Map<string, ActivityEventRef>()
   readonly presets = new Set<ExamPresetName>(['DAILY', 'MIDTERM', 'FINAL'])
-  lastCreatedActivity: Parameters<ExamActivityRepository['create']>[0]['activity'] | null = null
+  lastCreatedActivity:
+    Parameters<ExamActivityRepository['create']>[0]['activity'] | null = null
   stored = activity()
 
   findPreset(name: string) {
@@ -335,7 +336,12 @@ describe('Activity patch DTO immutability', () => {
   it('rejects type, presetId, and tokenMode on UpdateActivityPolicyRequestDto', async () => {
     await expect(
       pipe.transform(
-        { violationLimit: 5, type: 'FINAL', presetId: 'p-1', tokenMode: 'STATIC' },
+        {
+          violationLimit: 5,
+          type: 'FINAL',
+          presetId: 'p-1',
+          tokenMode: 'STATIC',
+        },
         { type: 'body', metatype: UpdateActivityPolicyRequestDto },
       ),
     ).rejects.toBeInstanceOf(BadRequestException)

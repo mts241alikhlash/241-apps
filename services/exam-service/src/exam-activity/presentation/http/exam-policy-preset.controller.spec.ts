@@ -47,11 +47,9 @@ describe('ExamPolicyPresetController', () => {
       updatedAt: '2026-11-10T01:00:00.000Z',
     })
 
-    const patched = await controller.update(
-      { id: 'admin-1' },
-      'DAILY',
-      { violationLimit: 5 },
-    )
+    const patched = await controller.update({ id: 'admin-1' }, 'DAILY', {
+      violationLimit: 5,
+    })
     expect(patched).toMatchObject({
       type: 'DAILY',
       category: 'NON_EXAM',

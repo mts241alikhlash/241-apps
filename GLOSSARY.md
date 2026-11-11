@@ -101,8 +101,11 @@ Indonesian domain terms, the name used in code, and what they mean. One heading 
 
 - **Paket Soal** — `ExamPackage` — a set of questions; reviewed through **Persetujuan Paket** (`ExamPackageReview`).
 - **Bank Soal** — `Question`, with versions `QuestionVersion` — the question bank.
-- **Kegiatan Ujian** — `ExamEvent` — an exam period.
-- **Jadwal Ujian** — `ExamSchedule` — when a package is sat, by which participants (`ExamScheduleParticipant`).
+- **Periode Ujian** — `ExamEvent` — an official exam period (only for `MIDTERM` and `FINAL`).
+- **Kegiatan** — `ExamActivity` — one grade-level exam or classwork activity that generates per-classroom schedules (`ExamSchedule`) and copies a policy preset (`ExamPolicyPreset`).
+- **Jenis Ujian** — `ExamType` — the four activity and schedule types: **Ulangan Harian** (`DAILY`), **Tugas** (`ASSIGNMENT`), **UTS** (`MIDTERM`), and **UAS** (`FINAL`).
+- **Kategori Ujian** — `ExamCategory` — derived from `ExamType` on the server: **Ujian** (`EXAM`, covering `MIDTERM` and `FINAL`) and **Non-ujian** (`NON_EXAM`, covering `DAILY` and `ASSIGNMENT`).
+- **Jadwal Ujian** — `ExamSchedule` — when a package is sat by a classroom, or by selected makeup participants (`ExamScheduleParticipant`).
 - **Ruang Ujian** — `ExamRoom` — an exam room with seats and supervisors (**pengawas**).
 - **Sesi Ujian** — `ExamSession` — one participant's sitting, with answers (`ExamAnswer`).
 - **Nilai Ujian** — an exam score from grading a session; it may or may not be taken into a **Nilai Rapor**.

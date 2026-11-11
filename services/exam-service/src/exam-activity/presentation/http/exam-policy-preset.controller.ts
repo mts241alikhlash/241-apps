@@ -55,8 +55,6 @@ export class ExamPolicyPresetController {
     if (!EXAM_TYPES.includes(type)) {
       throw new BadRequestException('Jenis kegiatan tidak dikenal')
     }
-    return ExamPolicyPresetDto.of(
-      await this.presets.update(user.id, type, dto),
-    )
+    return ExamPolicyPresetDto.of(await this.presets.update(user.id, type, dto))
   }
 }

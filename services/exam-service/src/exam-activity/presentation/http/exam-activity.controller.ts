@@ -57,9 +57,7 @@ export class ExamActivityController {
   @RequirePermissions('exam-schedules.manage')
   @ApiOperation({ summary: 'List the activities of the active semester' })
   @ApiResponse({ status: 200, type: [ExamActivityDto] })
-  async list(
-    @Query() query: ExamActivityQueryDto,
-  ): Promise<ExamActivityDto[]> {
+  async list(@Query() query: ExamActivityQueryDto): Promise<ExamActivityDto[]> {
     const activities = await this.listActivities.execute(query.category)
     return activities.map((activity) => ExamActivityDto.of(activity))
   }

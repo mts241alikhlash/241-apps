@@ -1,75 +1,73 @@
-# Bispro kegiatan ujian & tugas
+# Bispro kegiatan ujian & non-ujian
 
-Dokumen ini menjelaskan cara kerja kegiatan di aplikasi ujian, siapa yang mengatur apa, dan langkah operasionalnya. Acuannya kode `exam-service` (kegiatan, jadwal, sesi) dan aplikasi siswa.
+Dokumen ini menjelaskan taksonomi jenis dan kategori ujian, cara kerja kegiatan (`ExamActivity`), preset kebijakan (`ExamPolicyPreset`), siapa yang membuat apa, serta pemisahan menu **Ujian** dan **Non-ujian**. Acuannya kode `exam-service`, `exam-web`, dan `exam-android`.
 
-## 1. Apa itu "kegiatan"
+## 1. Jenis, kategori, dan istilah
 
-**Kegiatan** adalah satu baris yang mewakili satu ujian atau satu tugas untuk satu **tingkat**, dengan kelas-kelas yang dipilih. Sistem membuatkan **jadwal per kelas** secara otomatis dari kegiatan itu — guru tidak membuat jadwal satu per satu.
+- **Periode Ujian (`ExamEvent`)**: rentang pelaksanaan resmi yang dibuka admin (hanya untuk **UTS** dan **UAS**).
+- **Kegiatan (`ExamActivity`)**: satu ujian atau kegiatan kelas untuk satu **tingkat**, dengan kelas-kelas yang dipilih. Sistem membuatkan **jadwal per kelas (`ExamSchedule`)** secara otomatis.
+- **Empat jenis (`ExamType`) dan dua kategori (`ExamCategory`)**:
 
-Isi kegiatan: tingkat, kelas yang ikut, mapel, paket soal, jendela waktu, durasi, jenis token, dan satu **preset kebijakan**.
+| Kode (`ExamType`) | Label UI       | Kategori (`ExamCategory`) | Label Kategori |
+| ----------------- | -------------- | ------------------------- | -------------- |
+| `DAILY`           | Ulangan Harian | `NON_EXAM`                | Non-ujian      |
+| `ASSIGNMENT`      | Tugas          | `NON_EXAM`                | Non-ujian      |
+| `MIDTERM`         | UTS            | `EXAM`                    | Ujian          |
+| `FINAL`           | UAS            | `EXAM`                    | Ujian          |
 
-## 2. Preset dan artinya
+Kategori diturunkan di server dari `type` (lihat [ADR 0009](../adr/0009-exam-category-derives-from-type.md)). Jadwal **susulan (`MAKEUP`)** selalu mewarisi `type` (dan otomatis `category`) dari jadwal induknya.
 
-| Setelan                                        | Ujian ketat (UTS/UAS) | Ulangan kelas      | Tugas/PR                  |
-| ---------------------------------------------- | --------------------- | ------------------ | ------------------------- |
-| Batas pelanggaran sebelum dikumpulkan otomatis | 3                     | 3                  | 3                         |
-| Ambang "fokus hilang"                          | 10 detik              | 10 detik           | 10 detik                  |
-| Jeda foto pengawas                             | 15 detik              | 15 detik           | 30 detik                  |
-| Detak kehadiran                                | 15 detik              | 15 detik           | 15 detik                  |
-| Hilang dicatat mulai                           | 60 detik              | 60 detik           | 5 menit                   |
-| Hilang wajib token mulai                       | 5 menit               | 5 menit            | 30 menit                  |
-| Hilang dihitung pelanggaran                    | kejadian ke-2         | kejadian ke-2      | kejadian ke-3             |
-| Token                                          | berputar 600 detik    | berputar 600 detik | **tetap** sepanjang tugas |
+## 2. Preset kebijakan (4 kolom)
 
-Angka di atas adalah nilai awal preset. **Admin** boleh mengubahnya; **guru** tidak.
+Setiap jenis memiliki satu preset bawaan di tabel `exam_policy_presets`:
 
-## 3. Token
+| Setelan                                        | UTS (`MIDTERM`)    | UAS (`FINAL`)      | Ulangan Harian (`DAILY`) | Tugas (`ASSIGNMENT`)      |
+| ---------------------------------------------- | ------------------ | ------------------ | ------------------------ | ------------------------- |
+| Batas pelanggaran sebelum dikumpulkan otomatis | 3                  | 3                  | 3                        | 3                         |
+| Ambang "fokus hilang"                          | 10 detik           | 10 detik           | 10 detik                 | 10 detik                  |
+| Jeda foto pengawas                             | 15 detik           | 15 detik           | 15 detik                 | 30 detik                  |
+| Detak kehadiran                                | 15 detik           | 15 detik           | 15 detik                 | 15 detik                  |
+| Hilang dicatat mulai                           | 60 detik           | 60 detik           | 60 detik                 | 5 menit                   |
+| Hilang wajib token mulai                       | 5 menit            | 5 menit            | 5 menit                  | 30 menit                  |
+| Hilang dihitung pelanggaran                    | kejadian ke-2      | kejadian ke-2      | kejadian ke-2            | kejadian ke-3             |
+| Token                                          | berputar 600 detik | berputar 600 detik | berputar 600 detik       | **tetap** sepanjang tugas |
+
+Aturan kunci preset dan token:
+
+- **Ujian (`MIDTERM`, `FINAL`)**: wajib memakai preset jenisnya sendiri (`PRESET_LOCKED` bila diganti) dan wajib memakai **token berputar (`ROTATING`)** (`TOKEN_MODE_LOCKED` bila `STATIC`).
+- **Non-ujian (`DAILY`, `ASSIGNMENT`)**: boleh memilih preset `DAILY` atau `ASSIGNMENT` dan bebas memilih token berputar atau tetap.
+- Preset hanya **cetakan**: saat kegiatan dibuat, angkanya disalin ke `exam_activities.policy`. Mengubah preset di halaman **Pengaturan → Preset** hanya berlaku untuk kegiatan **baru**; kegiatan yang sudah ada tidak berubah.
+
+## 3. Siapa membuat dan mengubah apa
+
+| Aksi                                                                | Guru (`exam-schedules.manage`)                                                | Admin (`exam-schedules.manage-all`)     |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------- |
+| Membuat kegiatan `DAILY` / `ASSIGNMENT`                             | Ya, kapan saja                                                                | Ya                                      |
+| Membuat kegiatan `MIDTERM` (UTS)                                    | Ya, hanya di dalam `ExamEvent` `MIDTERM` berstatus `ACTIVE` dan dalam rentang | Ya, wajib tertaut `ExamEvent` `MIDTERM` |
+| Membuat kegiatan `FINAL` (UAS)                                      | Tidak (`FINAL_ADMIN_ONLY`)                                                    | Ya, wajib tertaut `ExamEvent` `FINAL`   |
+| Membuka / mengelola Periode Ujian (`ExamEvent` UTS/UAS)             | Tidak                                                                         | Ya                                      |
+| Membuat jadwal susulan (`MAKEUP`)                                   | Ya (`exam-grading.grade`), jenis ikut jadwal induk                            | Ya                                      |
+| Mengubah kebijakan kegiatan (`PATCH /exam-activities/:id/policy`)   | Tidak                                                                         | Ya (selama status bukan `ACTIVE`)       |
+| Mengganti token kegiatan (`POST /exam-activities/:id/token/rotate`) | Tidak                                                                         | Ya                                      |
+| Mengubah angka preset (`PATCH /exam-policy-presets/:type`)          | Tidak                                                                         | Ya                                      |
+| Tambah waktu / lepas perangkat / buka ulang sesi                    | Pengawas di ruang                                                             | Ya                                      |
+
+## 4. Pemisahan menu Ujian dan Non-ujian
+
+Di `exam-web`, navigasi dibagi berdasarkan kategori server:
+
+- **Bank Soal**: Paket Soal, Persetujuan Paket (dipakai bersama).
+- **Ujian (`category = EXAM`)**: Periode Ujian, Kegiatan, Jadwal, Ruang, Penilaian.
+- **Non-ujian (`category = NON_EXAM`)**: Kegiatan, Jadwal, Penilaian.
+- **Saya**: Ujian Saya (menampilkan semua jadwal siswa dengan badge kategori).
+- **Pengaturan**: Preset (`/settings/presets`, khusus `exam-schedules.manage-all`).
+
+Di `exam-android`, tab/menu siswa memisahkan daftar berdasarkan field `category` dari server (`EXAM` untuk Ujian, `NON_EXAM` untuk Non-ujian), termasuk jadwal susulan yang mengikuti kategori jadwal induknya.
+
+## 5. Token dan pengawasan saat sesi berjalan
 
 - Satu kode per **kegiatan** (mapel), dipakai semua kelas yang ikut.
-- Ujian: kode berganti setiap 10 menit; pengawas membacakan kode yang sedang berlaku. Kode dari 10 menit sebelumnya masih diterima (toleransi 90 detik).
-- Tugas: kode **tetap** selama masa tugas, diumumkan sekali.
-- Kode bocor → admin menjalankan **ganti token**; kode lama langsung tidak sah.
-- **Keluar aplikasi = wajib memasukkan kode lagi.** Aplikasi mati sendiri, HP restart, atau jaringan putus bukan pelanggaran dan tidak meminta kode — tapi waktunya tetap berjalan.
-- Hilang lebih dari batas "wajib token" (5 menit untuk ujian) membuat siswa harus meminta kode ke pengawas, dan kejadiannya tercatat.
-
-## 4. Siapa boleh mengubah apa
-
-|                                                                    | Guru              | Admin |
-| ------------------------------------------------------------------ | ----------------- | ----- |
-| Membuat kegiatan (tingkat + pilih kelas)                           | Ya                | Ya    |
-| Memilih preset                                                     | Ya                | Ya    |
-| Durasi, jendela/tenggat, jenis token                               | Ya                | Ya    |
-| Angka penegakan (batas pelanggaran, ambang fokus, gap, slot token) | Tidak             | Ya    |
-| Ganti token kegiatan                                               | Tidak             | Ya    |
-| Tambah waktu / lepas perangkat / buka ulang sesi                   | Pengawas di ruang | Ya    |
-
-Preset hanya **cetakan**: saat kegiatan dibuat, nilainya disalin ke kegiatan itu. Mengubah preset berlaku untuk kegiatan **baru**; kegiatan yang sedang berjalan tidak ikut berubah (server menolak perubahan kebijakan pada kegiatan ACTIVE).
-
-## 5. Langkah guru
-
-1. Buat kegiatan → pilih **tingkat** → centang **kelas** yang ikut.
-2. Pilih mapel + paket soal, pilih preset, atur durasi dan jendela.
-3. Pilih jenis token: berputar (ujian) atau tetap (tugas).
-4. Simpan → sistem membuat jadwal per kelas.
-5. Umumkan kode (ujian: baca kode berjalan; tugas: kode tetap sekali).
-
-## 6. Langkah pengawas saat ujian
-
-1. Pastikan tiap HP lolos layar **kesiapan perangkat** (DND aktif, penyematan layar, optimisasi baterai dimatikan). Monitor menandai perangkat yang belum siap.
-2. Bacakan kode kegiatan yang sedang berlaku.
-3. Pantau monitor: status sesi, foto pengawas, dan riwayat kejadian (default hanya menampilkan pelanggaran yang dihitung).
-4. Bila siswa tertinggal: **tambah waktu**. Bila HP rusak/ganti: **lepas perangkat** (siswa lalu memasukkan kode lagi).
-5. Panggilan masuk → ujian otomatis dijeda, snapshot berhenti, dan waktu dikembalikan saat panggilan selesai. Kejadiannya tampil di riwayat, bukan pelanggaran.
-
-## 7. Setelah ujian
-
-1. Soal objektif dinilai otomatis; esai dinilai manual di halaman penilaian.
-2. Publikasikan skor setelah semua sesi dinilai.
-
-## 8. Kasus yang sering ditanya
-
-- **Siswa hilang 10 menit lalu kembali:** waktu tetap berjalan, kejadian `Hilang sementara` tercatat; karena lewat batas, siswa harus memasukkan kode lagi. Kejadian ke-2 baru dihitung pelanggaran.
-- **HP siswa mati lalu dinyalakan:** lanjut tanpa kode; waktu tetap berjalan.
-- **Siswa memasang ulang aplikasi:** sesi dikenali dari perangkat + kode terkini; jawaban tersimpan di server.
-- **Ujian dua mapel di satu ruang:** masing-masing mapel punya kode sendiri; pengawas membacakan sesuai jadwal yang sedang berjalan.
-- **Tugas dikerjakan di rumah:** token tetap, jendela lebar, pengawasan (kunci + kamera) tetap aktif **selama sesi dibuka** — kamera tidak menyala di luar sesi.
+- Ujian (`MIDTERM`, `FINAL`): kode selalu berputar sesuai `tokenSlotSeconds`; kode dari slot sebelumnya masih diterima dengan masa tenggang.
+- Kode bocor → admin menjalankan **Ganti token** pada halaman detail kegiatan; kode lama langsung tidak berlaku.
+- Keluar aplikasi = wajib memasukkan kode lagi. Aplikasi mati sendiri, HP restart, atau jaringan putus bukan pelanggaran dan tidak meminta kode, tetapi waktu ujian tetap berjalan.
+- Panggilan masuk menjeda ujian sementara dan mengembalikan waktu saat panggilan selesai.
