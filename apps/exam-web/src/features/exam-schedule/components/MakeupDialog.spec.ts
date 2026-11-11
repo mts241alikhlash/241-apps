@@ -84,7 +84,7 @@ const original: ExamSchedule = {
   semesterId: 'sem',
   eventId: null,
   activityId: null,
-  type: 'UTS',
+  type: 'MIDTERM',
   kind: 'REGULAR',
   makeupOfId: null,
   startsAt: toInstant('2026-11-02', '08:00'),

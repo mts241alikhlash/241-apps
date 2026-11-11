@@ -28,7 +28,8 @@ const props = {
   ],
 }
 
-const open = () => mount(ActivityForm, { props })
+const open = (overrides: Record<string, unknown> = {}) =>
+  mount(ActivityForm, { props: { ...props, ...overrides } })
 
 const pastActivity = {
   id: 'activity-1',
@@ -48,7 +49,7 @@ describe('ActivityForm', () => {
 
   it('only offers the classrooms of the chosen grade', async () => {
     const wrapper = open()
-    await wrapper.findAll('select')[0].setValue('grade-7')
+    await wrapper.find('#activity-grade').setValue('grade-7')
 
     expect(wrapper.text()).toContain('VII-A')
     expect(wrapper.text()).toContain('VII-B')
@@ -57,9 +58,9 @@ describe('ActivityForm', () => {
 
   it('clears the chosen classrooms when the grade changes', async () => {
     const wrapper = open()
-    await wrapper.findAll('select')[0].setValue('grade-7')
+    await wrapper.find('#activity-grade').setValue('grade-7')
     await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
-    await wrapper.findAll('select')[0].setValue('grade-9')
+    await wrapper.find('#activity-grade').setValue('grade-9')
 
     expect(
       wrapper
@@ -68,12 +69,36 @@ describe('ActivityForm', () => {
     ).toHaveLength(0)
   })
 
+  it('locks preset and token mode to Token berputar when MIDTERM is selected', async () => {
+    const wrapper = open({
+      isAdmin: true,
+      events: [{ id: 'ev-1', name: 'UTS Ganjil', type: 'MIDTERM' }],
+    })
+    await wrapper.find('#activity-type').setValue('MIDTERM')
+
+    expect(wrapper.text()).toContain('Kebijakan UTS')
+    expect(wrapper.text()).toContain('Token berputar')
+    expect(wrapper.find('#activity-preset').exists()).toBe(false)
+    expect(wrapper.find('#activity-token-mode').exists()).toBe(false)
+  })
+
+  it('lets DAILY activities choose between DAILY and ASSIGNMENT presets', async () => {
+    const wrapper = open()
+    await wrapper.find('#activity-type').setValue('DAILY')
+
+    const presetOptions = wrapper
+      .find('#activity-preset')
+      .findAll('option')
+      .map((opt) => (opt.element as HTMLOptionElement).value)
+    expect(presetOptions).toEqual(['DAILY', 'ASSIGNMENT'])
+  })
+
   it('submits the chosen classrooms and the package subject', async () => {
     const wrapper = open()
-    await wrapper.findAll('select')[0].setValue('grade-7')
+    await wrapper.find('#activity-grade').setValue('grade-7')
     await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
     await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
-    await wrapper.findAll('select')[1].setValue('package-1')
+    await wrapper.find('#activity-package').setValue('package-1')
     await wrapper
       .findAll('input[type="datetime-local"]')[0]
       .setValue('2026-11-10T08:00')
@@ -87,7 +112,8 @@ describe('ActivityForm', () => {
       classroomIds: ['class-7a', 'class-7b'],
       packageId: 'package-1',
       subjectId: 'subject-inf',
-      presetName: 'UJIAN_KETAT',
+      type: 'DAILY',
+      presetName: 'DAILY',
       tokenMode: 'ROTATING',
       durationMinutes: 90,
     })
@@ -95,7 +121,7 @@ describe('ActivityForm', () => {
 
   it('keeps the admin section hidden from teachers', () => {
     expect(open().text()).not.toContain('Lanjutan (admin)')
-    const admin = mount(ActivityForm, { props: { ...props, isAdmin: true } })
+    const admin = open({ isAdmin: true })
     expect(admin.text()).toContain('Lanjutan (admin)')
   })
 

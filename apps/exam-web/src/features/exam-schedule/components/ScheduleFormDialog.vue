@@ -23,7 +23,7 @@ import {
 import type { ExamPackageSummary } from '@/features/exam-package/types'
 import type { Classroom } from '@/features/lookup/classroom'
 import type { ExamEvent } from '@/features/exam-event/types'
-import { EXAM_TYPES, examTypeLabel } from '../types'
+import { EXAM_TYPES, examTypeLabel } from '@/features/exam-shared/examType'
 import { useScheduleForm } from '../composables/useScheduleForm'
 import { examScheduleService } from '../services/examScheduleService'
 import type { ExamSchedule } from '../types'

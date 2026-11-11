@@ -22,10 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { EXAM_TYPES, examTypeLabel } from '@/features/exam-schedule/types'
+import { examTypeLabel, typesFor } from '@/features/exam-shared/examType'
 import { useEventForm } from '../composables/useEventForm'
 import { EVENT_STATUSES, eventStatusLabel } from '../types'
 import type { ExamEvent } from '../types'
+
+const EVENT_EXAM_TYPES = typesFor('EXAM', true, true)
 
 const props = defineProps<{
   open: boolean
@@ -113,7 +115,7 @@ onMounted(() => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
-                  v-for="option in EXAM_TYPES"
+                  v-for="option in EVENT_EXAM_TYPES"
                   :key="option"
                   :value="option"
                 >

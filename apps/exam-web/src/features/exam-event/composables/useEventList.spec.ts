@@ -30,7 +30,7 @@ const event: ExamEvent = {
   id: 'e1',
   semesterId: 'sem-1',
   name: 'UTS Ganjil',
-  type: 'UTS',
+  type: 'MIDTERM',
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-06T09:00:00.000Z',
   lateToleranceMinutes: 30,

@@ -101,7 +101,7 @@ describe('examScheduleService', () => {
       {
         packageId: 'p1',
         classroomId: 'c1',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: '2030-11-02T01:00:00.000Z',
         endsAt: '2030-11-02T04:00:00.000Z',
         durationMinutes: 90,

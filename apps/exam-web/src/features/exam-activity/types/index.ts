@@ -1,10 +1,15 @@
-export const PRESET_NAMES = ['UJIAN_KETAT', 'ULANGAN_KELAS', 'TUGAS'] as const
+import type { components } from '@mts241alikhlash/exam-api'
+import type { ExamCategory, ExamType } from '@/features/exam-shared/examType'
 
-export type PresetName = (typeof PRESET_NAMES)[number]
+type Schemas = components['schemas']
+
+export type { ExamCategory, ExamType }
+
+export type PresetName = ExamType
 
 export const ACTIVITY_TOKEN_MODES = ['ROTATING', 'STATIC'] as const
 
-export type ActivityTokenMode = (typeof ACTIVITY_TOKEN_MODES)[number]
+export type ActivityTokenMode = Schemas['CreateActivityRequestDto']['tokenMode']
 
 export const ACTIVITY_STATUSES = [
   'DRAFT',
@@ -13,7 +18,7 @@ export const ACTIVITY_STATUSES = [
   'CLOSED',
 ] as const
 
-export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
+export type ActivityStatus = Schemas['ExamActivityDto']['status']
 
 export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
   DRAFT: 'Draf',
@@ -24,8 +29,6 @@ export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
 
 export const activityStatusLabel = (status: ActivityStatus): string =>
   ACTIVITY_STATUS_LABELS[status]
-
-export const EXAM_TYPES = ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS'] as const
 
 export interface GradeOption {
   id: string
@@ -44,25 +47,23 @@ export interface PackageOption {
   label: string
 }
 
-export interface ActivityCreatePayload {
-  semesterId: string
-  eventId?: string
-  gradeId: string
-  subjectId: string
-  packageId: string
-  type: (typeof EXAM_TYPES)[number]
-  classroomIds: string[]
-  presetName: PresetName
-  tokenMode: ActivityTokenMode
-  startsAt: string
-  endsAt: string
-  durationMinutes: number
+export interface EventOption {
+  id: string
+  name: string
+  type: ExamType
 }
+
+export type ActivityCreatePayload = Schemas['CreateActivityRequestDto']
 
 export interface ExamActivityRecord {
   id: string
   semesterId: string
+  eventId?: string | null
   gradeId: string
+  subjectId?: string
+  packageId?: string
+  type?: ExamType
+  category?: ExamCategory
   status: ActivityStatus
   tokenMode: ActivityTokenMode
   tokenRotation: number
@@ -72,8 +73,6 @@ export interface ExamActivityRecord {
   policy: Record<string, number>
 }
 
-export const PRESET_LABELS: Record<PresetName, string> = {
-  UJIAN_KETAT: 'Ujian ketat (UTS/UAS)',
-  ULANGAN_KELAS: 'Ulangan di kelas',
-  TUGAS: 'Tugas / PR',
-}
+export type ExamActivitySchedule = Schemas['ExamActivityScheduleDto']
+
+export type ExamActivityDetail = Schemas['ExamActivityDetailDto']

@@ -1,12 +1,14 @@
+import { examTypeLabel } from '@/features/exam-shared/examType'
 import type {
   ExamScheduleStatus,
   MakeupReason,
   MakeupRefusal,
   ParticipantStatus,
-  ExamType,
   ExamSessionStatus,
   SchedulePhase,
 } from './schedule'
+
+export { examTypeLabel }
 
 export type PhaseTone = 'neutral' | 'info' | 'success' | 'warning'
 
@@ -28,16 +30,6 @@ const PHASE_TONES: Record<SchedulePhase, PhaseTone> = {
   RUNNING: 'success',
   ENDED: 'neutral',
 }
-
-const EXAM_TYPE_LABELS: Record<ExamType, string> = {
-  UH: 'Ulangan Harian',
-  QUIZ: 'Quiz',
-  ASSIGNMENT: 'Tugas',
-  UTS: 'UTS',
-  UAS: 'UAS',
-}
-
-export const examTypeLabel = (type: ExamType): string => EXAM_TYPE_LABELS[type]
 
 export const scheduleStatusLabel = (status: ExamScheduleStatus): string =>
   STATUS_LABELS[status]

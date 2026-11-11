@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import {
+  categoryOf,
+  examTypeLabel,
+  typesFor,
+  type ExamCategory,
+  type ExamType,
+} from '@/features/exam-shared/examType'
 import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
   ActivityStatus,
   ActivityTokenMode,
   ClassroomOption,
+  EventOption,
   ExamActivityRecord,
   GradeOption,
   PackageOption,
@@ -15,8 +23,6 @@ import {
   ACTIVITY_STATUSES,
   ACTIVITY_TOKEN_MODES,
   activityStatusLabel,
-  EXAM_TYPES,
-  PRESET_LABELS,
 } from '../types'
 
 const props = defineProps<{
@@ -24,6 +30,8 @@ const props = defineProps<{
   grades: GradeOption[]
   classrooms: ClassroomOption[]
   packages: PackageOption[]
+  events?: EventOption[]
+  category?: ExamCategory
   isAdmin: boolean
   activity?: ExamActivityRecord | null
   submitting?: boolean
@@ -58,15 +66,67 @@ const statusWarning = computed(
   () => status.value === 'ACTIVE' && outsideWindow.value,
 )
 
+const midtermEventActive = computed(() =>
+  (props.events ?? []).some((event) => event.type === 'MIDTERM'),
+)
+
+const availableTypes = computed<ExamType[]>(() => {
+  if (props.category) {
+    return typesFor(props.category, props.isAdmin, midtermEventActive.value)
+  }
+  return [
+    ...typesFor('NON_EXAM', props.isAdmin, midtermEventActive.value),
+    ...typesFor('EXAM', props.isAdmin, midtermEventActive.value),
+  ]
+})
+
+const nonExamPresetTypes: readonly PresetName[] = ['DAILY', 'ASSIGNMENT']
+
 const gradeId = ref('')
 const classroomIds = ref<string[]>([])
 const packageId = ref('')
-const type = ref<(typeof EXAM_TYPES)[number]>('UH')
-const presetName = ref<PresetName>('UJIAN_KETAT')
+const eventId = ref('')
+const type = ref<ExamType>(availableTypes.value[0] ?? 'DAILY')
+const presetName = ref<PresetName>(type.value)
 const tokenMode = ref<ActivityTokenMode>('ROTATING')
 const startsAt = ref('')
 const endsAt = ref('')
 const durationMinutes = ref(90)
+
+const isExamType = computed(() => categoryOf(type.value) === 'EXAM')
+
+const filteredEvents = computed(() =>
+  (props.events ?? []).filter((event) => event.type === type.value),
+)
+
+watch(
+  availableTypes,
+  (options) => {
+    if (options.length > 0 && !options.includes(type.value)) {
+      type.value = options[0]
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  type,
+  (nextType) => {
+    presetName.value = nextType
+    if (categoryOf(nextType) === 'EXAM') {
+      tokenMode.value = 'ROTATING'
+      const matching = (props.events ?? []).filter(
+        (event) => event.type === nextType,
+      )
+      if (!matching.some((event) => event.id === eventId.value)) {
+        eventId.value = matching[0]?.id ?? ''
+      }
+    } else {
+      eventId.value = ''
+    }
+  },
+  { immediate: true },
+)
 
 const visibleClassrooms = computed(() =>
   props.classrooms.filter((room) => room.gradeId === gradeId.value),
@@ -81,6 +141,7 @@ const canSubmit = computed(
     gradeId.value !== '' &&
     classroomIds.value.length > 0 &&
     packageId.value !== '' &&
+    (!isExamType.value || eventId.value !== '') &&
     startsAt.value !== '' &&
     endsAt.value !== '' &&
     durationMinutes.value > 0,
@@ -143,13 +204,16 @@ async function submit(): Promise<void> {
   if (!canSubmit.value || item === null) return
   emit('submit', {
     semesterId: props.semesterId,
+    ...(isExamType.value && eventId.value !== ''
+      ? { eventId: eventId.value }
+      : {}),
     gradeId: gradeId.value,
     subjectId: item.subjectId,
     packageId: item.id,
     type: type.value,
     classroomIds: [...classroomIds.value],
-    presetName: presetName.value,
-    tokenMode: tokenMode.value,
+    presetName: isExamType.value ? type.value : presetName.value,
+    tokenMode: isExamType.value ? 'ROTATING' : tokenMode.value,
     startsAt: new Date(startsAt.value).toISOString(),
     endsAt: new Date(endsAt.value).toISOString(),
     durationMinutes: durationMinutes.value,
@@ -206,7 +270,10 @@ async function submit(): Promise<void> {
     <template v-else>
       <label class="grid gap-1">
         <span>Tingkat</span>
-        <select v-model="gradeId">
+        <select
+          id="activity-grade"
+          v-model="gradeId"
+        >
           <option value="">Pilih tingkat</option>
           <option
             v-for="grade in grades"
@@ -246,7 +313,10 @@ async function submit(): Promise<void> {
 
       <label class="grid gap-1">
         <span>Paket soal</span>
-        <select v-model="packageId">
+        <select
+          id="activity-package"
+          v-model="packageId"
+        >
           <option value="">Pilih paket</option>
           <option
             v-for="item in packages"
@@ -260,39 +330,96 @@ async function submit(): Promise<void> {
 
       <label class="grid gap-1">
         <span>Jenis</span>
-        <select v-model="type">
+        <select
+          id="activity-type"
+          v-model="type"
+        >
           <option
-            v-for="value in EXAM_TYPES"
+            v-for="value in availableTypes"
             :key="value"
             :value="value"
           >
-            {{ value }}
+            {{ examTypeLabel(value) }}
           </option>
         </select>
       </label>
 
-      <label class="grid gap-1">
-        <span>Preset kebijakan</span>
-        <select v-model="presetName">
+      <label
+        v-if="isExamType"
+        class="grid gap-1"
+      >
+        <span>Periode ujian</span>
+        <select
+          id="activity-event"
+          v-model="eventId"
+        >
+          <option value="">Pilih periode ujian</option>
           <option
-            v-for="(label, name) in PRESET_LABELS"
+            v-for="event in filteredEvents"
+            :key="event.id"
+            :value="event.id"
+          >
+            {{ event.name }}
+          </option>
+        </select>
+      </label>
+
+      <div
+        v-if="isExamType"
+        class="grid gap-1"
+      >
+        <span>Preset kebijakan</span>
+        <p
+          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        >
+          Kebijakan {{ examTypeLabel(type) }}
+        </p>
+      </div>
+      <label
+        v-else
+        class="grid gap-1"
+      >
+        <span>Preset kebijakan</span>
+        <select
+          id="activity-preset"
+          v-model="presetName"
+        >
+          <option
+            v-for="name in nonExamPresetTypes"
             :key="name"
             :value="name"
           >
-            {{ label }}
+            {{ examTypeLabel(name) }}
           </option>
         </select>
       </label>
 
-      <label class="grid gap-1">
+      <div
+        v-if="isExamType"
+        class="grid gap-1"
+      >
         <span>Jenis token</span>
-        <select v-model="tokenMode">
+        <p
+          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        >
+          Token berputar
+        </p>
+      </div>
+      <label
+        v-else
+        class="grid gap-1"
+      >
+        <span>Jenis token</span>
+        <select
+          id="activity-token-mode"
+          v-model="tokenMode"
+        >
           <option
             v-for="value in ACTIVITY_TOKEN_MODES"
             :key="value"
             :value="value"
           >
-            {{ value === 'ROTATING' ? 'Berputar (ujian)' : 'Tetap (tugas)' }}
+            {{ value === 'ROTATING' ? 'Token berputar' : 'Token tetap' }}
           </option>
         </select>
       </label>

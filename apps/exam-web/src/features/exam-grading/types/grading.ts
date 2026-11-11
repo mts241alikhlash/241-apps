@@ -1,4 +1,5 @@
 import type {
+  ExamCategory,
   ExamSessionStatus,
   ExamType,
 } from '@/features/exam-schedule/types'
@@ -14,6 +15,7 @@ export interface GradingSchedule {
   classroomName: string | null
   semesterId: string
   type: ExamType
+  category?: ExamCategory
   startsAt: string
   endsAt: string
   sessions: number

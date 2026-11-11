@@ -1184,6 +1184,9 @@ importers:
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@mts241alikhlash/exam-api':
+        specifier: workspace:*
+        version: link:../../packages/exam-api
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config

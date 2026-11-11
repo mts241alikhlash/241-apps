@@ -12,7 +12,7 @@ vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
 }))
 
 const window = {
-  type: 'UTS' as const,
+  type: 'MIDTERM' as const,
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-02T04:00:00.000Z',
   durationMinutes: 90,
