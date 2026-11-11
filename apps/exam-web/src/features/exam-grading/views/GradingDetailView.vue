@@ -6,6 +6,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -95,75 +96,79 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="space-y-4 px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
               label="Kembali ke Daftar Siswa"
               @click="router.push(sessionsLocation)"
             />
-            <CardTitle size="lg">{{ studentLabel }}</CardTitle>
+            <CardTitle class="font-semibold">{{ studentLabel }}</CardTitle>
           </div>
+          <span
+            v-if="detail"
+            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          >
+            {{
+              waiting > 0
+                ? `${waiting} jawaban belum dinilai`
+                : detail.session.rawScore !== null
+                  ? `Nilai: ${detail.session.rawScore} / ${detail.session.maxScore}`
+                  : 'Semua jawaban sudah dinilai'
+            }}
+          </span>
         </div>
       </CardHeader>
       <CardContent
-        v-if="detail"
-        variant="standard"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        <p v-if="loading">Memuat…</p>
+        <div
+          v-else-if="error"
+          class="space-y-3 rounded-md border p-4"
+          role="alert"
         >
-          {{
-            waiting > 0
-              ? `${waiting} jawaban belum dinilai`
-              : detail.session.rawScore !== null
-                ? `Nilai: ${detail.session.rawScore} / ${detail.session.maxScore}`
-                : 'Semua jawaban sudah dinilai'
-          }}
-        </p>
+          <p>{{ error }}</p>
+          <Button
+            variant="outline"
+            @click="load"
+          >
+            Coba lagi
+          </Button>
+        </div>
+        <template v-else-if="detail">
+          <p v-if="detail.items.length === 0">
+            Ujian ini tidak punya soal isian singkat atau uraian.
+          </p>
+          <p
+            v-if="!finished"
+            class="rounded-md border p-3"
+          >
+            Siswa ini masih mengerjakan. Jawaban bisa dinilai setelah ujian
+            selesai.
+          </p>
+          <p
+            v-else-if="!hasPermission('exam-grading.grade')"
+            class="rounded-md border p-3"
+          >
+            Anda hanya bisa melihat jawaban; menilai butuh izin penilaian.
+          </p>
+          <ItemGradeCard
+            v-for="item in detail.items"
+            :key="item.questionId"
+            :session-id="detail.session.sessionId"
+            :item="item"
+            :can-grade="canGrade"
+            @graded="onGraded"
+          />
+        </template>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
-
-    <p v-if="loading">Memuat…</p>
-    <div
-      v-else-if="error"
-      class="space-y-3 rounded-md border p-4"
-      role="alert"
-    >
-      <p>{{ error }}</p>
-      <Button
-        variant="outline"
-        @click="load"
-      >
-        Coba lagi
-      </Button>
-    </div>
-    <template v-else-if="detail">
-      <p v-if="detail.items.length === 0">
-        Ujian ini tidak punya soal isian singkat atau uraian.
-      </p>
-      <p
-        v-if="!finished"
-        class="rounded-md border p-3"
-      >
-        Siswa ini masih mengerjakan. Jawaban bisa dinilai setelah ujian selesai.
-      </p>
-      <p
-        v-else-if="!hasPermission('exam-grading.grade')"
-        class="rounded-md border p-3"
-      >
-        Anda hanya bisa melihat jawaban; menilai butuh izin penilaian.
-      </p>
-      <ItemGradeCard
-        v-for="item in detail.items"
-        :key="item.questionId"
-        :session-id="detail.session.sessionId"
-        :item="item"
-        :can-grade="canGrade"
-        @graded="onGraded"
-      />
-    </template>
   </div>
 </template>

@@ -7,6 +7,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -142,7 +143,7 @@ const recoveryAction = ref<RecoveryAction>('reopen')
 
 const title = computed(() => {
   const current = room.value
-  return current === null ? 'Ruang Ujian' : `${current.code} — ${current.name}`
+  return current === null ? 'Ruang Ujian' : `${current.code} · ${current.name}`
 })
 
 const roomSubtitle = computed(() => {
@@ -163,7 +164,7 @@ const freshnessText = computed(() => {
   const seconds = secondsSinceLastSuccess.value
   const stamp = lastUpdatedServerTime.value
   if (staleness.value !== 'fresh') {
-    return `Koneksi terputus — data terakhir ${seconds} detik lalu`
+    return `Koneksi terputus: data terakhir ${seconds} detik lalu`
   }
   const clock =
     stamp === null
@@ -297,9 +298,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
@@ -307,7 +311,7 @@ onUnmounted(() => {
               @click="router.push('/exam/rooms')"
             />
             <div class="flex flex-col">
-              <CardTitle size="lg">{{ title }}</CardTitle>
+              <CardTitle class="font-semibold">{{ title }}</CardTitle>
               <span
                 v-if="roomSubtitle"
                 class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
@@ -354,8 +358,7 @@ onUnmounted(() => {
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
         <RoomMonitorSummaryCards :summary="summary" />
 
@@ -473,6 +476,7 @@ onUnmounted(() => {
           </TabsContent>
         </Tabs>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <SessionTimelineDialog

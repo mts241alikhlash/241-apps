@@ -2,6 +2,13 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
 import { examPackageApi } from '@/features/exam-package/api/examPackageApi'
@@ -110,42 +117,55 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="grid gap-4 p-4">
-    <h1 class="text-lg font-semibold">
-      {{
-        editingId !== ''
-          ? 'Status kegiatan ujian'
-          : 'Buat kegiatan ujian atau tugas'
-      }}
-    </h1>
-    <p
-      v-if="error !== null"
-      role="alert"
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      {{ error }}
-    </p>
-    <ActivityForm
-      v-if="activity !== null"
-      :semester-id="activity.semesterId"
-      :grades="[]"
-      :classrooms="[]"
-      :packages="[]"
-      :is-admin="true"
-      :activity="activity"
-      @status-saved="statusSaved"
-      @numbers-issued="numbersIssued"
-    />
-    <ActivityForm
-      v-else-if="semesterId !== ''"
-      :semester-id="semesterId"
-      :grades="grades"
-      :classrooms="classrooms"
-      :packages="packages"
-      :is-admin="isAdmin"
-      :submitting="submitting"
-      @submit="submit"
-    />
-    <p v-else-if="loadingActivity">Memuat kegiatan…</p>
-    <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
-  </section>
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">
+          {{
+            editingId !== ''
+              ? 'Status Kegiatan Ujian'
+              : 'Buat Kegiatan Ujian atau Tugas'
+          }}
+        </CardTitle>
+      </CardHeader>
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+      >
+        <p
+          v-if="error !== null"
+          role="alert"
+          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+        >
+          {{ error }}
+        </p>
+        <ActivityForm
+          v-if="activity !== null"
+          :semester-id="activity.semesterId"
+          :grades="[]"
+          :classrooms="[]"
+          :packages="[]"
+          :is-admin="true"
+          :activity="activity"
+          @status-saved="statusSaved"
+          @numbers-issued="numbersIssued"
+        />
+        <ActivityForm
+          v-else-if="semesterId !== ''"
+          :semester-id="semesterId"
+          :grades="grades"
+          :classrooms="classrooms"
+          :packages="packages"
+          :is-admin="isAdmin"
+          :submitting="submitting"
+          @submit="submit"
+        />
+        <p v-else-if="loadingActivity">Memuat kegiatan…</p>
+        <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
+      </CardContent>
+      <CardFooter variant="thin" />
+    </Card>
+  </div>
 </template>

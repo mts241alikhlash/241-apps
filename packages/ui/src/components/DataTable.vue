@@ -173,7 +173,8 @@ const table = useVueTable({
 function pinClass(column: Column<TData, unknown>, part: 'header' | 'cell') {
   const side = column.getIsPinned()
   if (!side) return null
-  const base = 'sticky z-10 bg-muted'
+  const base =
+    part === 'header' ? 'sticky z-10 bg-muted' : 'sticky z-10 bg-inherit'
   if (side === 'right') {
     if (!column.getIsFirstColumn('right')) return base
     return part === 'header'
@@ -424,7 +425,7 @@ defineExpose({ table })
 
     <div
       :class="[
-        'border rounded-md bg-background overflow-x-auto',
+        'border rounded-md bg-card overflow-x-auto',
         mobile === 'cards' && 'hidden md:block',
       ]"
     >
@@ -433,7 +434,7 @@ defineExpose({ table })
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"
             :key="headerGroup.id"
-            class="bg-muted/50 hover:bg-muted/50"
+            class="bg-muted hover:bg-muted"
           >
             <TableHead
               v-for="header in headerGroup.headers"
@@ -473,6 +474,9 @@ defineExpose({ table })
             <TableRow
               v-for="i in 5"
               :key="i"
+              :class="
+                i % 2 === 1 ? 'bg-card' : 'bg-blue-50/60 dark:bg-blue-950/20'
+              "
             >
               <TableCell
                 v-for="j in columns.length"
@@ -485,8 +489,15 @@ defineExpose({ table })
           </template>
           <template v-else-if="table.getRowModel().rows?.length">
             <TableRow
-              v-for="row in table.getRowModel().rows"
+              v-for="(row, index) in table.getRowModel().rows"
               :key="row.id"
+              :class="[
+                index % 2 === 0
+                  ? 'bg-card hover:bg-muted/50'
+                  : 'bg-blue-50/60 hover:bg-blue-100/60 dark:bg-blue-950/20 dark:hover:bg-blue-900/30',
+                rowClickable && 'cursor-pointer',
+              ]"
+              @click="rowClickable && emit('row-click', row.original)"
             >
               <TableCell
                 v-for="cell in row.getVisibleCells()"
@@ -515,6 +526,10 @@ defineExpose({ table })
                     )?.strong,
                   },
                 ]"
+                @click="
+                  ['actions', 'select'].includes(cell.column.id) &&
+                  $event.stopPropagation()
+                "
               >
                 <FlexRender
                   :render="cell.column.columnDef.cell"
@@ -544,12 +559,15 @@ defineExpose({ table })
     >
       <div
         v-if="isLoading"
-        class="divide-y rounded-md border bg-background"
+        class="divide-y rounded-md border bg-card"
       >
         <div
           v-for="i in 4"
           :key="i"
-          class="space-y-1.5 px-3 py-2.5"
+          :class="[
+            'space-y-1.5 px-3 py-2.5',
+            i % 2 === 1 ? 'bg-card' : 'bg-blue-50/60 dark:bg-blue-950/20',
+          ]"
         >
           <Skeleton class="h-4 w-2/3" />
           <Skeleton class="h-3 w-1/2" />
@@ -557,12 +575,17 @@ defineExpose({ table })
       </div>
       <ul
         v-else-if="table.getRowModel().rows.length"
-        class="divide-y rounded-md border bg-background"
+        class="divide-y rounded-md border bg-card"
       >
         <li
-          v-for="row in table.getRowModel().rows"
+          v-for="(row, index) in table.getRowModel().rows"
           :key="row.id"
-          class="flex min-w-0 items-start"
+          :class="[
+            'flex min-w-0 items-start',
+            index % 2 === 0
+              ? 'bg-card hover:bg-muted/50'
+              : 'bg-blue-50/60 hover:bg-blue-100/60 dark:bg-blue-950/20 dark:hover:bg-blue-900/30',
+          ]"
         >
           <div
             v-if="cardParts(row).select"

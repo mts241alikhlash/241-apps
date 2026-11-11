@@ -141,7 +141,7 @@ watch(
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>{{ title }}</DialogTitle>
-        <DialogDescription>{{ subject }} — {{ description }}</DialogDescription>
+        <DialogDescription>{{ subject }} · {{ description }}</DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
         <div

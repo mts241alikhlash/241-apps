@@ -88,7 +88,7 @@ watch(
       <DialogHeader standard>
         <DialogTitle>Catat Ketidakhadiran</DialogTitle>
         <DialogDescription>
-          {{ studentName }} — alasan ini mengalir ke kandidat ujian susulan.
+          {{ studentName }}. Alasan ini mengalir ke kandidat ujian susulan.
         </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">

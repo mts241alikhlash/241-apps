@@ -6,6 +6,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -62,21 +63,26 @@ function changePageSize(size: number) {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Penilaian Ujian"
             @click="router.push('/exam/grading')"
           />
-          <CardTitle size="lg">{{ examTitle }}</CardTitle>
+          <CardTitle class="font-semibold">{{ examTitle }}</CardTitle>
         </div>
       </CardHeader>
-      <CardContent variant="flush">
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+      >
         <div
           v-if="listError"
-          class="m-4 space-y-3 rounded-md border p-4"
+          class="space-y-3 rounded-md border p-4"
           role="alert"
         >
           <p class="text-[length:var(--text-control,0.75rem)]">
@@ -138,6 +144,7 @@ function changePageSize(size: number) {
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

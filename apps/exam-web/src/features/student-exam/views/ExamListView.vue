@@ -5,6 +5,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -84,10 +85,13 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-3xl space-y-4 p-4">
-    <Card>
-      <CardHeader standard>
-        <CardTitle size="lg">Daftar Ujian</CardTitle>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Daftar Ujian</CardTitle>
         <Button
           variant="outline"
           size="sm"
@@ -100,8 +104,7 @@ onMounted(load)
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
         <p class="text-[length:var(--text-control)] text-muted-foreground">
           Ujian yang tersedia untuk kelas Anda.
@@ -184,6 +187,7 @@ onMounted(load)
           </section>
         </div>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

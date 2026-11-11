@@ -4,7 +4,13 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { DataTable, SearchInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card } from '@mts241alikhlash/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
 import {
   Dialog,
   DialogBody,
@@ -109,12 +115,25 @@ onMounted(() => examPackageService.loadReferences())
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <div class="space-y-4 p-0 sm:px-0">
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Paket Soal</CardTitle>
+        <Button
+          v-if="hasPermission('exam-packages.create')"
+          class="shrink-0"
+          @click="createOpen = true"
+        >
+          <Plus class="mr-1.5 size-4" />
+          Tambah
+        </Button>
+      </CardHeader>
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+      >
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"
@@ -145,16 +164,6 @@ onMounted(() => examPackageService.loadReferences())
           @update:page-size="changePageSize"
           @row-click="openPackage"
         >
-          <template #header-left>
-            <Button
-              v-if="hasPermission('exam-packages.create')"
-              class="shrink-0"
-              @click="createOpen = true"
-            >
-              <Plus class="mr-1.5 size-4" />
-              Tambah
-            </Button>
-          </template>
           <template #header-right>
             <div class="flex items-end">
               <div
@@ -217,7 +226,8 @@ onMounted(() => examPackageService.loadReferences())
             </div>
           </template>
         </DataTable>
-      </div>
+      </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <Dialog v-model:open="filterOpen">

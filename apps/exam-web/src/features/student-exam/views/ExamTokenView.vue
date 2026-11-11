@@ -5,11 +5,13 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
+import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { studentExamService } from '../services/studentExamService'
 import { displayTitle } from '../logic/exam'
 import type { MyExam } from '../types'
@@ -69,34 +71,50 @@ async function start() {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-md space-y-4 p-4">
-    <Card>
-      <CardHeader standard>
-        <CardTitle size="lg">Token Ujian</CardTitle>
+  <div class="flex min-h-0 flex-1 flex-col items-center justify-center p-4">
+    <Card
+      gap="none"
+      class="w-full max-w-md overflow-hidden"
+    >
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Token Ujian</CardTitle>
       </CardHeader>
 
-      <CardContent
-        variant="standard"
-        class="space-y-4"
-      >
-        <div class="space-y-1">
+      <CardContent class="p-4 sm:p-6 space-y-4">
+        <div
+          v-if="loading"
+          class="space-y-2"
+        >
+          <Skeleton class="h-3.5 w-20" />
+          <Skeleton class="h-5 w-3/4" />
+          <Skeleton class="h-3.5 w-24" />
+        </div>
+        <div
+          v-else-if="exam"
+          class="space-y-1"
+        >
           <p
             class="text-[length:var(--text-control,0.75rem)] font-semibold text-muted-foreground"
           >
             Detail ujian
           </p>
           <p class="font-medium">
-            {{ exam ? displayTitle(exam) : 'Memuat…' }}
+            {{ displayTitle(exam) }}
           </p>
-          <p
-            v-if="exam"
-            class="text-[length:var(--text-control)] text-muted-foreground"
-          >
+          <p class="text-[length:var(--text-control)] text-muted-foreground">
             {{ exam.durationMinutes }} menit
           </p>
         </div>
+        <div
+          v-else-if="error && !exam"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          role="alert"
+        >
+          {{ error }}
+        </div>
 
         <FloatingLabelField
+          v-if="!error || exam"
           label="Token ujian"
           :for="fieldId"
           floating
@@ -113,20 +131,22 @@ async function start() {
         </FloatingLabelField>
 
         <p
-          v-if="error"
+          v-if="error && exam"
           class="text-[length:var(--text-control)] text-destructive"
         >
           {{ error }}
         </p>
 
         <Button
+          v-if="!error || exam"
           class="w-full"
-          :disabled="submitting || loading"
+          :disabled="submitting || loading || !code.trim()"
           @click="start"
         >
           {{ submitting ? 'Memulai…' : 'Mulai ujian' }}
         </Button>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

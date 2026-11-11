@@ -19,7 +19,7 @@ const props = withDefaults(
     :data-size="props.size"
     :class="
       cn(
-        'group/card bg-card text-card-foreground flex flex-col overflow-hidden rounded-md text-[length:var(--text-control,0.75rem)] ring-1 ring-foreground/10 [--ff-label-bg:var(--card)]',
+        'group/card bg-card text-card-foreground flex flex-col overflow-hidden rounded-lg border border-border shadow-xs text-[length:var(--text-control,0.75rem)] [--ff-label-bg:var(--card)]',
         props.gap === 'default'
           ? props.size === 'sm'
             ? 'gap-3 py-3'

@@ -39,12 +39,12 @@ describe('theme.css', () => {
     expect(css).toContain('--destructive: oklch(0.48 0.17 27)')
   })
 
-  it('lets the sidebar share the page background for the inset look', () => {
-    expect(css).toContain('--sidebar: var(--background)')
+  it('lets the sidebar use the card background', () => {
+    expect(css).toContain('--sidebar: var(--card)')
   })
 
   it('keeps the identity colors the apps already use', () => {
-    expect(css).toContain('--background: oklch(0.985 0.003 260)')
+    expect(css).toContain('--background: oklch(0.96 0.005 260)')
     expect(css).toContain('--chart-1: oklch(0.646 0.222 41.116)')
     expect(css).toContain('--radius: 0.625rem')
   })

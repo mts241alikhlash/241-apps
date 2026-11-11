@@ -75,18 +75,16 @@ describe('header controls', () => {
     wrapper.unmount()
   })
 
-  it('puts the page under a full-width top bar', () => {
+  it('floats the top bar inside the content inset', () => {
     const wrapper = mountLayout()
-    expect(wrapper.find('[data-slot="sidebar-inset"]').exists()).toBe(true)
-    const topBar = wrapper.get('header[data-app-topbar]')
-    expect(topBar.classes()).toContain('fixed')
-    expect(
-      wrapper.get('[data-slot="sidebar-wrapper"]').attributes('style'),
-    ).toContain('--sidebar-offset')
+    const inset = wrapper.get('[data-slot="sidebar-inset"]')
+    const topBar = inset.get('header[data-app-topbar]')
+    expect(topBar.classes()).toContain('rounded-lg')
+    expect(topBar.classes()).not.toContain('fixed')
     wrapper.unmount()
   })
 
-  it('puts the app switcher on the left and gives every header control the same 32 px size', () => {
+  it('keeps the app switcher in the top bar for small screens and gives every header control the same 32 px size', () => {
     const wrapper = mountLayout()
     const topBar = wrapper.get('header[data-app-topbar]')
     expect(topBar.find('header-app-switcher-stub').exists()).toBe(true)
@@ -98,16 +96,14 @@ describe('header controls', () => {
     wrapper.unmount()
   })
 
-  it('shows the breadcrumb inside the inset, not in the top bar', () => {
+  it('shows the breadcrumb in the top bar header', () => {
     const wrapper = mountLayout()
-    const inset = wrapper.get('[data-slot="sidebar-inset"]')
-    expect(inset.find('[data-slot="breadcrumb"]').exists()).toBe(true)
     expect(
       wrapper
         .get('header[data-app-topbar]')
         .find('[data-slot="breadcrumb"]')
         .exists(),
-    ).toBe(false)
+    ).toBe(true)
     wrapper.unmount()
   })
 

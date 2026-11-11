@@ -11,6 +11,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -193,32 +194,32 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <BackButton
-              label="Kembali ke Kegiatan Ujian"
-              @click="router.push('/exam/events')"
-            />
-            <CardTitle size="lg">
-              {{ event?.name ?? 'Kegiatan Ujian' }}
-            </CardTitle>
-          </div>
-          <Button
-            v-if="canManage && event"
-            @click="openCreateRoom"
-          >
-            <Plus class="mr-1.5 size-4" />
-            Tambah Ruangan
-          </Button>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
+        <div class="flex items-center gap-3">
+          <BackButton
+            label="Kembali ke Kegiatan Ujian"
+            @click="router.push('/exam/events')"
+          />
+          <CardTitle class="font-semibold">
+            {{ event?.name ?? 'Kegiatan Ujian' }}
+          </CardTitle>
         </div>
+        <Button
+          v-if="canManage && event"
+          @click="openCreateRoom"
+        >
+          <Plus class="mr-1.5 size-4" />
+          Tambah Ruangan
+        </Button>
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
         <div
           v-if="loadFailed"
@@ -310,6 +311,7 @@ onMounted(async () => {
           </Tabs>
         </template>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <RoomFormDialog

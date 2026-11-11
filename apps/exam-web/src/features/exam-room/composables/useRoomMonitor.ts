@@ -85,7 +85,7 @@ export function useRoomMonitor(options: RoomMonitorOptions) {
       ensureClock()
     } catch {
       failed.value = true
-      error.value = 'Koneksi terputus — menampilkan data terakhir.'
+      error.value = 'Koneksi terputus: menampilkan data terakhir.'
     } finally {
       inFlight = false
       loading.value = false
