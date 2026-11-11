@@ -71,10 +71,10 @@ describe('AppLayout', () => {
     document.body.innerHTML = ''
   })
 
-  it('renders a flush sidebar that collapses to icons', async () => {
+  it('renders a floating sidebar that collapses to icons', async () => {
     const wrapper = await mountLayout()
     const sidebar = wrapper.get('[data-slot="sidebar"][data-variant]')
-    expect(sidebar.attributes('data-variant')).toBe('sidebar')
+    expect(sidebar.attributes('data-variant')).toBe('floating')
     await wrapper.get('[data-slot="sidebar-toggle"]').trigger('click')
     await flushPromises()
     expect(
@@ -98,9 +98,11 @@ describe('AppLayout', () => {
     expect(wrapper.text()).toContain('Tersembunyi')
   })
 
-  it('sizes the content under the top bar without an inset gap', async () => {
+  it('gives the content inset the full viewport height', async () => {
     const wrapper = await mountLayout()
-    expect(wrapper.html()).toContain('h-[calc(100svh-3rem)]')
-    expect(wrapper.html()).not.toContain('100svh-3rem-0.5rem')
+    expect(wrapper.get('[data-slot="sidebar-inset"]').classes()).toContain(
+      'h-svh',
+    )
+    expect(wrapper.html()).not.toContain('100svh-3rem')
   })
 })

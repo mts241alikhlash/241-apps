@@ -3,7 +3,13 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card } from '@mts241alikhlash/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import MakeupDialog from '@/features/exam-schedule/components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '@/features/exam-schedule/components/MakeupParticipantsDialog.vue'
@@ -58,12 +64,17 @@ function changePageSize(size: number) {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <div class="space-y-4 p-0 sm:px-0">
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Penilaian Ujian</CardTitle>
+      </CardHeader>
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+      >
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"
@@ -96,7 +107,8 @@ function changePageSize(size: number) {
             <p>Belum ada ujian yang dikerjakan siswa kelas Anda.</p>
           </template>
         </DataTable>
-      </div>
+      </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <MakeupDialog

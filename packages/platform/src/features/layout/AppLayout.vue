@@ -26,11 +26,15 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import { ChangePasswordSection } from '../profile'
 import { NavUser } from '@mts241alikhlash/ui'
-import { SidebarInset, SidebarProvider } from '@mts241alikhlash/ui/sidebar'
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@mts241alikhlash/ui/sidebar'
 import { TooltipProvider } from '@mts241alikhlash/ui/tooltip'
 import { useAuthSession } from '../auth'
 import type { MenuSection } from '@mts241alikhlash/web-shared/types/menu.types'
-import { Search } from '@lucide/vue'
+import { Menu, Search } from '@lucide/vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { BreadcrumbItemType } from '@mts241alikhlash/web-shared/types/breadcrumb.types'
 import { provideBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
@@ -119,10 +123,11 @@ const searchGroups = computed(() => {
 <template>
   <SidebarProvider
     class="h-svh"
-    style="--sidebar-width: 11rem"
+    style="--sidebar-width: 12rem"
   >
     <TooltipProvider :delay-duration="100">
       <AppSidebar
+        variant="floating"
         :menu-sections="menuSections"
         :permissions-for="permissionsFor"
       >
@@ -132,46 +137,68 @@ const searchGroups = computed(() => {
       </AppSidebar>
       <SidebarInset class="flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
         <header
-          class="mx-2 mt-2 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-border bg-card/85 px-3 shadow-xs backdrop-blur-md"
+          data-app-topbar
+          class="relative mr-2 ml-2 md:ml-0 mt-2 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-border bg-card/85 px-3 shadow-xs backdrop-blur-md"
         >
-          <slot name="breadcrumb">
-            <Breadcrumb class="min-w-0">
-              <BreadcrumbList class="min-w-0 flex-nowrap">
-                <template v-if="resolvedBreadcrumbs.length > 0">
-                  <template
-                    v-for="(item, index) in resolvedBreadcrumbs"
-                    :key="index"
-                  >
-                    <BreadcrumbItem
-                      :class="{
-                        'hidden md:block':
-                          index < resolvedBreadcrumbs.length - 1,
-                      }"
+          <SidebarTrigger
+            class="size-8 shrink-0 md:hidden"
+            aria-label="Buka menu"
+          >
+            <Menu class="size-4" />
+          </SidebarTrigger>
+          <div class="hidden md:flex min-w-0 items-center">
+            <slot name="breadcrumb">
+              <Breadcrumb class="min-w-0">
+                <BreadcrumbList class="min-w-0 flex-nowrap">
+                  <template v-if="resolvedBreadcrumbs.length > 0">
+                    <template
+                      v-for="(item, index) in resolvedBreadcrumbs"
+                      :key="index"
                     >
-                      <BreadcrumbPage
-                        v-if="index === resolvedBreadcrumbs.length - 1"
-                        class="block max-w-28 truncate sm:max-w-xs"
+                      <BreadcrumbItem
+                        :class="{
+                          'hidden md:block':
+                            index < resolvedBreadcrumbs.length - 1,
+                        }"
                       >
-                        {{ item.title }}
-                      </BreadcrumbPage>
-                      <BreadcrumbLink
-                        v-else-if="item.href"
-                        :href="item.href"
-                        class="block max-w-40 truncate"
-                      >
-                        {{ item.title }}
-                      </BreadcrumbLink>
-                      <span v-else>{{ item.title }}</span>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator
-                      v-if="index < resolvedBreadcrumbs.length - 1"
-                      class="hidden md:block"
-                    />
+                        <BreadcrumbPage
+                          v-if="index === resolvedBreadcrumbs.length - 1"
+                          class="block max-w-28 truncate sm:max-w-xs"
+                        >
+                          {{ item.title }}
+                        </BreadcrumbPage>
+                        <BreadcrumbLink
+                          v-else-if="item.href"
+                          :href="item.href"
+                          class="block max-w-40 truncate"
+                        >
+                          {{ item.title }}
+                        </BreadcrumbLink>
+                        <span v-else>{{ item.title }}</span>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator
+                        v-if="index < resolvedBreadcrumbs.length - 1"
+                        class="hidden md:block"
+                      />
+                    </template>
                   </template>
-                </template>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </slot>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </slot>
+          </div>
+          <div
+            class="pointer-events-auto absolute left-1/2 flex -translate-x-1/2 items-center justify-center md:hidden"
+          >
+            <slot name="mobile-logo">
+              <slot name="app-switcher">
+                <img
+                  :src="'/logo.webp'"
+                  alt="Logo"
+                  class="size-7 rounded-md object-contain"
+                />
+              </slot>
+            </slot>
+          </div>
           <div class="ml-auto flex shrink-0 items-center gap-2">
             <Button
               variant="ghost"
@@ -220,7 +247,7 @@ const searchGroups = computed(() => {
         </header>
         <div
           data-app-scroll
-          class="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto px-2 pb-2"
+          class="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto px-2 md:pl-0 md:pr-2 pb-2"
         >
           <slot><RouterView /></slot>
         </div>

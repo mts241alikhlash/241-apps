@@ -17,6 +17,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -157,62 +158,89 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <BackButton
-              label="Kembali ke Paket Soal"
-              @click="router.push('/exam/packages')"
-            />
-            <CardTitle size="lg">{{ pkg?.title ?? 'Paket Soal' }}</CardTitle>
-          </div>
-          <div
-            v-if="pkg"
-            class="flex flex-wrap gap-2"
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
+        <div class="flex items-center gap-3">
+          <BackButton
+            label="Kembali ke Paket Soal"
+            @click="router.push('/exam/packages')"
+          />
+          <CardTitle class="font-semibold">{{
+            pkg?.title ?? 'Paket Soal'
+          }}</CardTitle>
+        </div>
+        <div
+          v-if="pkg"
+          class="flex flex-wrap items-center gap-2"
+        >
+          <Button
+            v-if="canEdit"
+            variant="outline"
+            @click="renameOpen = true"
           >
-            <Button
-              v-if="canEdit"
-              variant="outline"
-              @click="renameOpen = true"
-            >
-              Ganti judul
-            </Button>
-            <Button
-              v-if="canCopy"
-              variant="outline"
-              @click="copy"
-            >
-              Salin
-            </Button>
-            <Button
-              v-if="canDelete"
-              variant="outline"
-              @click="deleteOpen = true"
-            >
-              Hapus
-            </Button>
-            <Button
-              v-if="canSchedule"
-              @click="scheduleOpen = true"
-            >
-              Jadwalkan
-            </Button>
-            <Button
-              v-if="canSubmit"
-              :disabled="builder.busy.value"
-              @click="builder.submit()"
-            >
-              Ajukan
-            </Button>
-          </div>
+            Ganti judul
+          </Button>
+          <Button
+            v-if="canCopy"
+            variant="outline"
+            @click="copy"
+          >
+            Salin
+          </Button>
+          <Button
+            v-if="canDelete"
+            variant="outline"
+            @click="deleteOpen = true"
+          >
+            Hapus
+          </Button>
+          <DropdownMenu v-if="canEdit">
+            <DropdownMenuTrigger as-child>
+              <Button class="shrink-0">
+                <Plus class="mr-1.5 size-4" />
+                Tambah soal
+                <ChevronDown class="ml-1.5 size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                @select="router.push(`/exam/packages/${id}/questions/new`)"
+              >
+                Buat baru
+              </DropdownMenuItem>
+              <DropdownMenuItem @select="takeOpen = true">
+                Ambil dari paket lain
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="hasPermission('exam-questions.create')"
+                @select="router.push(`/exam/packages/${id}/import`)"
+              >
+                Impor Excel/Word
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            v-if="canSchedule"
+            @click="scheduleOpen = true"
+          >
+            Jadwalkan
+          </Button>
+          <Button
+            v-if="canSubmit"
+            :disabled="builder.busy.value"
+            @click="builder.submit()"
+          >
+            Ajukan
+          </Button>
         </div>
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
         <div
           v-if="loadFailed"
@@ -270,33 +298,6 @@ onMounted(async () => {
             :total-items="pkg.items.length"
             item-label="soal"
           >
-            <template #header-left>
-              <DropdownMenu v-if="canEdit">
-                <DropdownMenuTrigger as-child>
-                  <Button class="shrink-0">
-                    <Plus class="mr-1.5 size-4" />
-                    Tambah soal
-                    <ChevronDown class="ml-1.5 size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    @select="router.push(`/exam/packages/${id}/questions/new`)"
-                  >
-                    Buat baru
-                  </DropdownMenuItem>
-                  <DropdownMenuItem @select="takeOpen = true">
-                    Ambil dari paket lain
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    v-if="hasPermission('exam-questions.create')"
-                    @select="router.push(`/exam/packages/${id}/import`)"
-                  >
-                    Impor Excel/Word
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </template>
             <template #empty>
               <p>Paket ini belum berisi soal.</p>
             </template>
@@ -325,6 +326,7 @@ onMounted(async () => {
           </details>
         </template>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <ScheduleFormDialog

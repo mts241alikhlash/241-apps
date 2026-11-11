@@ -11,8 +11,10 @@ describe('Card family', () => {
       expect.arrayContaining([
         'gap-4',
         'py-4',
-        'ring-1',
-        'rounded-md',
+        'border',
+        'border-border',
+        'shadow-xs',
+        'rounded-lg',
         'flex',
         'flex-col',
       ]),

@@ -54,11 +54,6 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
         :class="
           cn(
             'bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden',
-            variant === 'inset' || variant === 'floating'
-              ? side === 'left'
-                ? 'rounded-r-[12px]'
-                : 'rounded-l-[12px]'
-              : '',
           )
         "
         :style="{
@@ -92,7 +87,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
           'group-data-[collapsible=offcanvas]:w-0',
           'group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
-            ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(1)))]'
+            ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]'
             : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon)',
         )
       "
@@ -105,7 +100,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
             ? 'left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width)'
             : 'right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width)',
           variant === 'floating' || variant === 'inset'
-            ? 'px-1 py-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(1)))]'
+            ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]'
             : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
           props.class,
         )
@@ -114,7 +109,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
     >
       <div
         data-sidebar="sidebar"
-        class="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-md group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+        class="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:overflow-hidden group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-xs"
       >
         <slot />
       </div>

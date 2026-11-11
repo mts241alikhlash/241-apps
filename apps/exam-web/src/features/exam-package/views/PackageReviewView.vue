@@ -85,15 +85,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex flex-wrap items-center gap-3">
           <BackButton
             label="Kembali ke Persetujuan Paket"
             @click="router.push('/exam/package-approvals')"
           />
-          <CardTitle size="lg">{{ pkg?.title ?? 'Tinjau Paket' }}</CardTitle>
+          <CardTitle class="font-semibold">{{
+            pkg?.title ?? 'Tinjau Paket'
+          }}</CardTitle>
           <template v-if="pkg">
             <Badge variant="outline">{{
               store.subjectName(pkg.subjectId)
@@ -104,8 +109,7 @@ onMounted(() => {
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-6"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
       >
         <div
           v-if="review.loadFailed.value"

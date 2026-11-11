@@ -3,7 +3,13 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card } from '@mts241alikhlash/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
@@ -88,9 +94,25 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="px-2 pb-4 pt-1 sm:px-2 sm:pb-6 sm:pt-1">
-    <Card gap="none">
-      <div class="space-y-4 p-4 sm:p-6">
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
+        <CardTitle class="font-semibold">Kegiatan Ujian</CardTitle>
+        <Button
+          v-if="canManage && semesterId"
+          class="shrink-0"
+          @click="openCreate"
+        >
+          <Plus class="mr-1.5 size-4" />
+          Tambah
+        </Button>
+      </CardHeader>
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+      >
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"
@@ -119,16 +141,6 @@ onMounted(async () => {
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
-          <template #header-left>
-            <Button
-              v-if="canManage && semesterId"
-              class="shrink-0"
-              @click="openCreate"
-            >
-              <Plus class="mr-1.5 size-4" />
-              Tambah
-            </Button>
-          </template>
           <template #header-right>
             <div class="flex flex-wrap gap-2">
               <FloatingLabelField
@@ -186,7 +198,8 @@ onMounted(async () => {
             <p>Belum ada kegiatan ujian pada semester ini.</p>
           </template>
         </DataTable>
-      </div>
+      </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <EventFormDialog

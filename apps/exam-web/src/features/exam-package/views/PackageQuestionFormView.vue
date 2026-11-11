@@ -167,15 +167,18 @@ async function save() {
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke paket"
             @click="router.push(`/exam/packages/${packageId}`)"
           />
-          <CardTitle size="lg">
+          <CardTitle class="font-semibold">
             {{ isEdit ? 'Ubah Soal' : 'Tambah Soal' }}
           </CardTitle>
         </div>
@@ -183,8 +186,7 @@ async function save() {
 
       <CardContent
         v-if="!loading"
-        variant="standard"
-        class="space-y-6"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
       >
         <div
           v-if="detail"

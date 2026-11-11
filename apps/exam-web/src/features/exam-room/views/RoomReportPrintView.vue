@@ -6,6 +6,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -119,16 +120,19 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
               label="Kembali ke Ruang Ujian"
               @click="router.push(`/exam/rooms/${roomId}`)"
             />
-            <CardTitle size="lg">Cetak Berita Acara</CardTitle>
+            <CardTitle class="font-semibold">Cetak Berita Acara</CardTitle>
           </div>
           <Button
             :disabled="loading || report === null"
@@ -140,7 +144,9 @@ onMounted(load)
         </div>
       </CardHeader>
 
-      <CardContent variant="standard">
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+      >
         <div
           v-if="error"
           class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
@@ -210,7 +216,7 @@ onMounted(load)
               Berita Acara Pelaksanaan Ujian
             </h1>
             <p class="text-[length:var(--text-control,0.75rem)] tabular-nums">
-              {{ meta?.room.code }} — {{ meta?.room.name }} · {{ slotWindow }}
+              {{ meta?.room.code }} · {{ meta?.room.name }} · {{ slotWindow }}
             </p>
             <p class="text-[length:var(--text-control,0.75rem)]">
               Status: {{ reportStatusLabel(report.status) }}
@@ -334,7 +340,7 @@ onMounted(load)
                 :key="entry.id"
                 class="tabular-nums"
               >
-                {{ dateTimeFormat.format(new Date(entry.createdAt)) }} —
+                {{ dateTimeFormat.format(new Date(entry.createdAt)) }}:
                 {{ eventLabel(entry.action) }}: {{ entry.reason }}
               </li>
             </ol>
@@ -355,7 +361,7 @@ onMounted(load)
                   :key="note.id"
                   class="tabular-nums"
                 >
-                  {{ dateTimeFormat.format(new Date(note.recordedAt)) }} —
+                  {{ dateTimeFormat.format(new Date(note.recordedAt)) }}:
                   {{ note.studentName ?? 'Siswa' }} ({{ note.category }}):
                   {{ note.note }}
                 </li>
@@ -385,6 +391,7 @@ onMounted(load)
           </section>
         </div>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

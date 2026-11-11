@@ -48,7 +48,7 @@ const current = computed(
         :class="
           isCollapsed
             ? 'size-8 justify-center p-0 mx-auto'
-            : 'w-full justify-start gap-2 px-1.5 py-1 text-left'
+            : 'w-full justify-start gap-2 px-1.5 py-1 text-left max-md:size-8 max-md:justify-center max-md:p-0'
         "
       >
         <img
@@ -58,7 +58,7 @@ const current = computed(
         />
         <span
           v-if="!isCollapsed"
-          class="truncate text-left text-sm font-medium"
+          class="max-md:hidden truncate text-left text-sm font-medium"
         >
           {{ current.name }}
         </span>

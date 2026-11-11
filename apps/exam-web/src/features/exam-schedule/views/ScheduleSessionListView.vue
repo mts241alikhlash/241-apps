@@ -6,6 +6,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -103,18 +104,23 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
-    <Card gap="none">
-      <CardHeader standard>
+  <div class="flex min-h-0 flex-1 flex-col">
+    <Card
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader variant="muted">
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Jadwal Ujian"
             @click="router.push('/exam/schedules')"
           />
-          <CardTitle size="lg">{{ title }}</CardTitle>
+          <CardTitle class="font-semibold">{{ title }}</CardTitle>
         </div>
       </CardHeader>
-      <CardContent variant="flush">
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+      >
         <div
           v-if="error"
           class="m-4 space-y-3 rounded-md border p-4"
@@ -142,6 +148,7 @@ onMounted(load)
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter variant="thin" />
     </Card>
 
     <SessionRecoveryDialog

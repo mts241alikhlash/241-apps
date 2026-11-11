@@ -23,7 +23,7 @@ const props = withDefaults(
     }
   >(),
   {
-    variant: 'sidebar',
+    variant: 'floating',
     collapsible: 'icon',
     permissionsFor: (codes: string[]) => codes,
   },

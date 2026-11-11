@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
+import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
 import type { RoomOverview } from '../types'
 
 export interface RoomOverviewColumnOptions {
@@ -13,21 +13,20 @@ export function buildRoomOverviewColumns(
 ): ColumnDef<RoomOverview>[] {
   return [
     {
-      id: 'room',
-      header: 'Ruangan',
+      id: 'code',
+      header: 'Kode',
       meta: { align: 'left', strong: true },
       cell: ({ row }) =>
-        h('div', { class: 'flex flex-col' }, [
-          h('span', { class: 'tabular-nums' }, row.original.code),
-          h(
-            'span',
-            {
-              class:
-                'text-[length:var(--text-control,0.75rem)] text-muted-foreground',
-            },
-            row.original.name,
-          ),
-        ]),
+        h('span', { class: 'tabular-nums' }, row.original.code),
+    },
+    {
+      id: 'name',
+      header: 'Ruangan',
+      meta: {
+        mobileLabel: 'Ruangan',
+        mobileValue: (row: RoomOverview) => row.name,
+      },
+      cell: ({ row }) => row.original.name,
     },
     {
       id: 'building',
@@ -102,15 +101,12 @@ export function buildRoomOverviewColumns(
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            size: 'sm',
-            variant: 'outline',
-            onClick: () => options.onOpen(row.original),
-          },
-          () => 'Pantau',
-        ),
+        h(ActionCell, {
+          viewLabel: 'Pantau',
+          hideEdit: true,
+          hideDelete: true,
+          onView: () => options.onOpen(row.original),
+        }),
     },
   ]
 }

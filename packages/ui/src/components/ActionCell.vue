@@ -84,12 +84,16 @@ function confirmDelete() {
 </script>
 
 <template>
-  <div class="relative flex justify-center items-center">
+  <div
+    class="relative flex justify-center items-center"
+    @click.stop
+  >
     <Tooltip :delay-duration="300">
       <TooltipTrigger as-child>
         <DropdownMenu :modal="false">
           <DropdownMenuTrigger
             class="size-[var(--control-h-md,1.75rem)] p-0 flex items-center justify-center data-[state=open]:bg-muted border-none text-muted-foreground hover:bg-muted focus:ring-0 shadow-none rounded-md outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors [&_svg]:size-[var(--icon-control,0.875rem)]"
+            @click.stop
           >
             <span class="sr-only">Opsi</span>
             <Settings2 />
