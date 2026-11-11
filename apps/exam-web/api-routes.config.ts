@@ -13,13 +13,14 @@ export const SERVICE_PREFIXES = {
   ],
 
   exam: [
+    '/exam-activities',
     '/exam-events',
     '/exam-rooms',
-    '/exam-reports',
     '/exam-files',
     '/exam-grading',
     '/exam-imports',
     '/exam-packages',
+    '/exam-policy-presets',
     '/exam-questions',
     '/exam-schedules',
     '/exam-sessions',
