@@ -11,7 +11,7 @@ function buildActivityRoutes(
     {
       path: `${prefix}/activities`,
       name: `${namePrefix}Activities`,
-      component: () => import('./views/ActivityCreateView.vue'),
+      component: () => import('./views/ActivityListView.vue'),
       meta: {
         title: `Kegiatan ${sectionTitle}`,
         category,
@@ -42,7 +42,7 @@ function buildActivityRoutes(
     {
       path: `${prefix}/activities/:id`,
       name: `${namePrefix}ActivityDetail`,
-      component: () => import('./views/ActivityCreateView.vue'),
+      component: () => import('./views/ActivityDetailView.vue'),
       meta: {
         title: `Detail Kegiatan ${sectionTitle}`,
         category,

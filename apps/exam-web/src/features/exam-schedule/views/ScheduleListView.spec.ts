@@ -321,7 +321,7 @@ describe('ScheduleListView', () => {
     wrapper.unmount()
   })
 
-  it('opens the activity status screen from the schedule row', async () => {
+  it('opens the activity status screen from the schedule row following the active section', async () => {
     listState.schedules.value = [schedule({ activityId: 'activity-1' })]
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
@@ -341,6 +341,25 @@ describe('ScheduleListView', () => {
       query: { id: 'activity-1' },
     })
     wrapper.unmount()
+
+    routeMeta.category = 'NON_EXAM'
+    const classwork = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    const classworkItems = rowActionProps(
+      classwork,
+      schedule({ activityId: 'activity-1' }),
+    ).items as unknown as {
+      label: string
+      onClick: () => void
+    }[]
+    classworkItems.find((entry) => entry.label === 'Ubah status')!.onClick()
+    await flushPromises()
+
+    expect(push).toHaveBeenCalledWith({
+      path: '/classwork/activities/new',
+      query: { id: 'activity-1' },
+    })
+    classwork.unmount()
   })
 
   it('offers no status action without exam-schedules.manage', async () => {

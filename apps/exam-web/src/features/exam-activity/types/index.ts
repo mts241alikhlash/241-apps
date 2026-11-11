@@ -55,6 +55,14 @@ export interface EventOption {
 
 export type ActivityCreatePayload = Schemas['CreateActivityRequestDto']
 
+export type ActivityPolicyPayload = Schemas['UpdateActivityPolicyRequestDto']
+
+export type ExamPolicy = Schemas['ExamPolicyDto']
+
+export interface ExamActivityQuery {
+  category?: ExamCategory
+}
+
 export interface ExamActivityRecord {
   id: string
   semesterId: string
@@ -70,9 +78,11 @@ export interface ExamActivityRecord {
   durationMinutes: number
   startsAt: string
   endsAt: string
-  policy: Record<string, number>
+  policy: ExamPolicy | Record<string, number>
 }
 
 export type ExamActivitySchedule = Schemas['ExamActivityScheduleDto']
 
-export type ExamActivityDetail = Schemas['ExamActivityDetailDto']
+export interface ExamActivityDetail extends ExamActivityRecord {
+  schedules: ExamActivitySchedule[]
+}
