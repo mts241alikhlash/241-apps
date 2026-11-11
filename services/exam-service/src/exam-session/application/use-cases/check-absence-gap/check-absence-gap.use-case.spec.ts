@@ -42,7 +42,7 @@ function session(overrides: Partial<ExamSession> = {}): ExamSession {
     unsyncedCount: 0,
     lastBatteryLevel: null,
     isCharging: null,
-    policy: { ...DEFAULT_POLICIES.UJIAN_KETAT },
+    policy: { ...DEFAULT_POLICIES.MIDTERM },
     ...overrides,
   } as ExamSession
 }

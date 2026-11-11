@@ -14,7 +14,7 @@ const NOW = new Date('2026-11-02T02:00:00Z')
 const event = () => ({
   semesterId: randomUUID(),
   name: 'UTS Ganjil',
-  type: 'UTS' as const,
+  type: 'MIDTERM' as const,
   startsAt: new Date('2026-11-02T01:00:00Z'),
   endsAt: new Date('2026-11-02T05:00:00Z'),
   createdById: randomUUID(),

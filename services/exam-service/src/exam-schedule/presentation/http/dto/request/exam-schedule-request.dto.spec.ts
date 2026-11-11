@@ -13,7 +13,7 @@ const valid = {
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-02T04:00:00.000Z',
   durationMinutes: 90,
-  type: 'UTS',
+  type: 'MIDTERM',
 }
 
 describe('UpdateExamScheduleDto', () => {
@@ -38,7 +38,7 @@ describe('UpdateExamScheduleDto', () => {
   })
 
   it('accepts every exam type', () => {
-    for (const type of ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS']) {
+    for (const type of ['DAILY', 'ASSIGNMENT', 'MIDTERM', 'FINAL']) {
       expect(errorsFor({ ...valid, type })).toEqual([])
     }
   })

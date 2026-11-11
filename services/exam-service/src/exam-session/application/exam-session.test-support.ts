@@ -126,7 +126,7 @@ export async function activityFor(
       type: schedule.type,
       tokenMode: 'STATIC',
       presetId: null,
-      policy: DEFAULT_POLICIES.ULANGAN_KELAS,
+      policy: DEFAULT_POLICIES.DAILY,
       startsAt: STARTS,
       endsAt: ENDS,
       durationMinutes: 90,
@@ -187,7 +187,7 @@ export async function scheduleExam(
       startsAt: overrides.startsAt ?? STARTS,
       endsAt: overrides.endsAt ?? ENDS,
       durationMinutes: overrides.durationMinutes ?? 90,
-      type: overrides.type ?? 'UH',
+      type: overrides.type ?? 'DAILY',
     },
     new Date('2026-10-30T00:00:00.000Z'),
   )
@@ -297,7 +297,7 @@ export async function schedulePaper(
       startsAt: STARTS,
       endsAt: ENDS,
       durationMinutes: 90,
-      type: 'UH',
+      type: 'DAILY',
     },
     new Date('2026-10-30T00:00:00.000Z'),
   )

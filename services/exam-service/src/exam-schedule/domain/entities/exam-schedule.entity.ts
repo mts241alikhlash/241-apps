@@ -1,6 +1,10 @@
 export const EXAM_SCHEDULE_STATUSES = ['SCHEDULED', 'CANCELLED'] as const
 
-export const EXAM_TYPES = ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS'] as const
+export const EXAM_TYPES = ['DAILY', 'ASSIGNMENT', 'MIDTERM', 'FINAL'] as const
+
+export const EXAM_CATEGORIES = ['EXAM', 'NON_EXAM'] as const
+
+export type ExamCategory = (typeof EXAM_CATEGORIES)[number]
 
 export const EXAM_SCHEDULE_KINDS = ['REGULAR', 'MAKEUP'] as const
 

@@ -159,7 +159,7 @@ suite('Prisma queries against a real database', () => {
       startsAt: new Date('2099-01-01T01:00:00.000Z'),
       endsAt: new Date('2099-01-01T03:00:00.000Z'),
       durationMinutes: 60,
-      type: 'UH',
+      type: 'DAILY',
       createdById: userId,
       makeupOfId: quiet.scheduleId,
       participants: [{ studentId: id(), reason: 'SICK', note: null }],
@@ -226,21 +226,21 @@ suite('Prisma queries against a real database', () => {
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       durationMinutes: 90,
-      type: 'UAS' as const,
+      type: 'FINAL' as const,
     }
 
     const changed = await schedules.updateWindow(quiet.scheduleId, fields)
     const refused = await schedules.updateWindow(started.scheduleId, fields)
     const sameType = await schedules.updateWindow(started.scheduleId, {
       ...fields,
-      type: 'UH',
+      type: 'DAILY',
       endsAt: new Date('2026-11-02T05:00:00.000Z'),
     })
 
-    expect(changed?.type).toBe('UAS')
+    expect(changed?.type).toBe('FINAL')
     expect(refused).toBeNull()
-    expect(sameType?.type).toBe('UH')
-    expect((await schedules.findById(started.scheduleId))?.type).toBe('UH')
+    expect(sameType?.type).toBe('DAILY')
+    expect((await schedules.findById(started.scheduleId))?.type).toBe('DAILY')
   })
 
   it('counts sessions per schedule and tells which schedules have any', async () => {

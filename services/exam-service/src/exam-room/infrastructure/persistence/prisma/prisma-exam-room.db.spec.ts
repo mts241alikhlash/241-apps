@@ -47,7 +47,7 @@ suite('Prisma exam rooms against a real database', () => {
     const created = await rooms.createEvent({
       semesterId,
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00Z'),
       endsAt: new Date('2026-11-02T05:00:00Z'),
       createdById: userId,
@@ -73,7 +73,7 @@ suite('Prisma exam rooms against a real database', () => {
         startsAt: new Date('2026-11-02T01:00:00Z'),
         endsAt: new Date('2026-11-02T03:00:00Z'),
         durationMinutes: 90,
-        type: 'UTS',
+        type: 'MIDTERM',
         createdById: userId,
       },
     })

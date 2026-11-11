@@ -40,7 +40,7 @@ describe('Update and cancel exam schedule', () => {
         startsAt: START,
         endsAt: END,
         durationMinutes: 90,
-        type: 'UH',
+        type: 'DAILY',
       })
     ).id
   })
@@ -56,7 +56,7 @@ describe('Update and cancel exam schedule', () => {
       startsAt: START,
       endsAt: later,
       durationMinutes: 120,
-      type: 'UH',
+      type: 'DAILY',
     })
 
     expect(updated.endsAt).toEqual(later)
@@ -72,11 +72,11 @@ describe('Update and cancel exam schedule', () => {
       startsAt: START,
       endsAt: END,
       durationMinutes: 90,
-      type: 'UAS',
+      type: 'FINAL',
     })
 
-    expect(updated.type).toBe('UAS')
-    expect((await schedules.findById(scheduleId))?.type).toBe('UAS')
+    expect(updated.type).toBe('FINAL')
+    expect((await schedules.findById(scheduleId))?.type).toBe('FINAL')
   })
 
   it('refuses an invalid window without changing the schedule', async () => {
@@ -87,7 +87,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: END,
           durationMinutes: 500,
-          type: 'UH',
+          type: 'DAILY',
         },
       ),
     ).rejects.toThrow('Durasi tidak boleh lebih panjang')
@@ -98,7 +98,7 @@ describe('Update and cancel exam schedule', () => {
     await expect(
       new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
         '00000000-0000-4000-8000-000000000000',
-        { startsAt: START, endsAt: END, durationMinutes: 60, type: 'UH' },
+        { startsAt: START, endsAt: END, durationMinutes: 60, type: 'DAILY' },
       ),
     ).rejects.toThrow(NotFoundException)
   })
@@ -119,7 +119,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: END,
           durationMinutes: 60,
-          type: 'UH',
+          type: 'DAILY',
         },
       ),
     ).rejects.toThrow(ConflictException)
@@ -146,13 +146,13 @@ describe('Update and cancel exam schedule', () => {
             startsAt: START,
             endsAt: later,
             durationMinutes: 90,
-            type: 'UTS',
+            type: 'MIDTERM',
           },
         ),
       ).rejects.toThrow(
         'Jadwal sudah punya sesi: hanya waktu selesai yang bisa diperpanjang',
       )
-      expect((await schedules.findById(scheduleId))?.type).toBe('UH')
+      expect((await schedules.findById(scheduleId))?.type).toBe('DAILY')
     })
 
     it('can only be extended', async () => {
@@ -162,7 +162,7 @@ describe('Update and cancel exam schedule', () => {
         startsAt: START,
         endsAt: later,
         durationMinutes: 90,
-        type: 'UH',
+        type: 'DAILY',
       })
       expect(extended.endsAt).toEqual(later)
 
@@ -173,7 +173,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: new Date(START.getTime() + 60_000),
           endsAt: later,
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).rejects.toThrow(message)
       await expect(
@@ -181,7 +181,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: later,
           durationMinutes: 60,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).rejects.toThrow(message)
       await expect(
@@ -189,7 +189,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: END,
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).rejects.toThrow(message)
     })
@@ -220,7 +220,7 @@ describe('Update and cancel exam schedule', () => {
             startsAt: START,
             endsAt: END,
             durationMinutes: 60,
-            type: 'UH',
+            type: 'DAILY',
           },
         ),
       ).rejects.toThrow(
@@ -263,7 +263,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: new Date(END.getTime() - 60_000),
           endsAt: new Date('2026-11-03T04:00:00.000Z'),
           durationMinutes: 60,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).rejects.toThrow('Susulan harus dimulai setelah ujian utama berakhir')
     })
@@ -276,7 +276,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: makeup.startsAt,
           endsAt: makeup.endsAt,
           durationMinutes: 60,
-          type: 'UAS',
+          type: 'FINAL',
         }),
       ).rejects.toThrow('Jenis ujian susulan sama dengan ujian utama')
     })
@@ -288,7 +288,7 @@ describe('Update and cancel exam schedule', () => {
         startsAt: new Date('2026-11-03T02:00:00.000Z'),
         endsAt: new Date('2026-11-03T05:00:00.000Z'),
         durationMinutes: 60,
-        type: 'UH',
+        type: 'DAILY',
       })
 
       expect(moved.startsAt).toEqual(new Date('2026-11-03T02:00:00.000Z'))
@@ -302,7 +302,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: new Date('2026-11-03T02:00:00.000Z'),
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).rejects.toThrow('Ujian utama tidak bisa diperpanjang melewati susulan')
       await expect(
@@ -310,7 +310,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: new Date('2026-11-03T00:30:00.000Z'),
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
         }),
       ).resolves.toBeDefined()
     })
@@ -324,7 +324,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: END,
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
           eventId: '11111111-1111-4111-8111-111111111111',
         },
       ),
@@ -336,7 +336,7 @@ describe('Update and cancel exam schedule', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: START,
       endsAt: END,
       createdById: USER.id,
@@ -350,7 +350,7 @@ describe('Update and cancel exam schedule', () => {
       startsAt: START,
       endsAt: END,
       durationMinutes: 90,
-      type: 'UH',
+      type: 'DAILY',
       eventId: event.id,
     })
 
@@ -361,7 +361,7 @@ describe('Update and cancel exam schedule', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: START,
       endsAt: END,
       createdById: USER.id,
@@ -375,7 +375,7 @@ describe('Update and cancel exam schedule', () => {
           startsAt: START,
           endsAt: END,
           durationMinutes: 90,
-          type: 'UH',
+          type: 'DAILY',
           eventId: event.id,
         },
       ),

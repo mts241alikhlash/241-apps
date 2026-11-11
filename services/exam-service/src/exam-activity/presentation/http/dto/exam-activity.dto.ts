@@ -18,11 +18,7 @@ import {
 } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamPolicy } from '../../../domain/policies/exam-policy.policy.js'
 
-export const EXAM_PRESET_NAMES = [
-  'UJIAN_KETAT',
-  'ULANGAN_KELAS',
-  'TUGAS',
-] as const
+export const EXAM_PRESET_NAMES = EXAM_TYPES
 
 export class CreateActivityRequestDto {
   @ApiProperty({ format: 'uuid' }) @IsUUID() semesterId!: string

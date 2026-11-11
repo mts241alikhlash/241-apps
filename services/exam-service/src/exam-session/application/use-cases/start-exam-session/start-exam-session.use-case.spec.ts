@@ -128,7 +128,7 @@ describe('StartExamSessionUseCase', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:45:00.000Z'),
       endsAt: ENDS,
       createdById: 'admin-1',
@@ -351,7 +351,7 @@ describe('StartExamSessionUseCase', () => {
       const event = await rooms.createEvent({
         semesterId: schedule.semesterId,
         name: 'UTS Ganjil',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: STARTS,
         endsAt: ENDS,
         createdById: USER.id,
@@ -545,7 +545,7 @@ describe('StartExamSessionUseCase', () => {
       const event = await rooms.createEvent({
         semesterId: schedule.semesterId,
         name: 'UTS Ganjil',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: MAKEUP_NOW,
         endsAt: new Date('2026-11-05T04:00:00.000Z'),
         createdById: USER.id,
@@ -578,7 +578,7 @@ describe('StartExamSessionUseCase', () => {
       const event = await rooms.createEvent({
         semesterId: schedule.semesterId,
         name: 'UTS Ganjil',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: MAKEUP_NOW,
         endsAt: new Date('2026-11-05T04:00:00.000Z'),
         requireAndroidApp: true,
@@ -630,7 +630,7 @@ describe('StartExamSessionUseCase', () => {
       const event = await rooms.createEvent({
         semesterId: schedule.semesterId,
         name: 'UTS Ganjil',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: new Date('2026-11-05T01:00:00.000Z'),
         endsAt: new Date('2026-11-05T04:00:00.000Z'),
         createdById: USER.id,

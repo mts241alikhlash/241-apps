@@ -13,11 +13,10 @@ enum PackageReviewAction {
 }
 
 enum ExamType {
-  UH
-  QUIZ
+  DAILY
   ASSIGNMENT
-  UTS
-  UAS
+  MIDTERM
+  FINAL
 }
 
 enum ExamScheduleStatus {
@@ -110,7 +109,7 @@ model ExamSchedule {
   startsAt        DateTime           @map("starts_at")
   endsAt          DateTime           @map("ends_at")
   durationMinutes Int                @map("duration_minutes")
-  type            ExamType           @default(UH)
+  type            ExamType           @default(DAILY)
   kind            ExamScheduleKind   @default(REGULAR)
   makeupOfId      String?            @map("makeup_of_id") @db.Uuid
   tokenRotation   Int                @default(0) @map("token_rotation")

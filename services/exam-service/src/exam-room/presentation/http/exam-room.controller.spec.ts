@@ -182,7 +182,7 @@ describe('ExamRoomController seat batch', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -229,7 +229,7 @@ describe('ExamRoomController seat batch', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -354,7 +354,7 @@ describe('ExamRoomController capacity and bulk distribution', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -438,7 +438,7 @@ describe('ExamRoomController supervisor slots', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -478,7 +478,7 @@ describe('ExamRoomController supervisor slots', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -512,7 +512,7 @@ describe('ManageExamRoomsUseCase rotate token audit', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -549,7 +549,7 @@ describe('ExamEventController supervised listing', () => {
     const mine = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: 'admin-1',
@@ -557,7 +557,7 @@ describe('ExamEventController supervised listing', () => {
     const other = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Genap',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-03T01:00:00.000Z'),
       endsAt: new Date('2026-11-03T04:00:00.000Z'),
       createdById: 'admin-1',

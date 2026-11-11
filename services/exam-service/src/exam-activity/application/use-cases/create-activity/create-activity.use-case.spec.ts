@@ -25,11 +25,11 @@ function activity(overrides: Partial<ExamActivity> = {}): ExamActivity {
     gradeId: 'grade-9',
     subjectId: 'subject-inf',
     packageId: 'package-1',
-    type: 'UH',
+    type: 'DAILY',
     tokenMode: 'ROTATING',
     tokenRotation: 0,
     presetId: PRESET_ID,
-    policy: { ...DEFAULT_POLICIES.UJIAN_KETAT },
+    policy: { ...DEFAULT_POLICIES.DAILY },
     startsAt: new Date('2026-11-10T01:00:00Z'),
     endsAt: new Date('2026-11-10T04:00:00Z'),
     durationMinutes: 90,
@@ -46,8 +46,8 @@ class FakeActivityRepository implements ExamActivityRepository {
 
   findPreset(name: string) {
     return Promise.resolve(
-      name === 'UJIAN_KETAT'
-        ? { id: PRESET_ID, policy: DEFAULT_POLICIES.UJIAN_KETAT }
+      name === 'DAILY'
+        ? { id: PRESET_ID, policy: DEFAULT_POLICIES.DAILY }
         : null,
     )
   }
@@ -118,9 +118,9 @@ const command = {
   gradeId: 'grade-9',
   subjectId: 'subject-inf',
   packageId: 'package-1',
-  type: 'UH' as const,
+  type: 'DAILY' as const,
   classroomIds: ['class-9a', 'class-9b'],
-  presetName: 'UJIAN_KETAT' as const,
+  presetName: 'DAILY' as const,
   tokenMode: 'ROTATING' as const,
   startsAt: new Date('2026-11-10T01:00:00Z'),
   endsAt: new Date('2026-11-10T04:00:00Z'),
@@ -183,7 +183,7 @@ describe('CreateActivityUseCase', () => {
     await expect(
       new CreateActivityUseCase(repo, new FakeParticipants()).execute({
         ...command,
-        presetName: 'TUGAS',
+        presetName: 'ASSIGNMENT',
       }),
     ).rejects.toBeInstanceOf(NotFoundException)
   })

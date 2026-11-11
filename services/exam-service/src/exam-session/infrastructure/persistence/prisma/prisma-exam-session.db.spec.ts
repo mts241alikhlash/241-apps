@@ -77,7 +77,7 @@ suite('PrismaExamSessionRepository against a real database', () => {
         gradeId,
         subjectId,
         packageId,
-        type: 'UH',
+        type: 'DAILY',
         policy: {},
         startsAt: new Date('2026-11-02T01:00:00.000Z'),
         endsAt: new Date('2026-11-02T04:00:00.000Z'),

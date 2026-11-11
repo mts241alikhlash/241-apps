@@ -12,7 +12,7 @@ const view = {
   startsAt: new Date('2026-11-02T01:00:00.000Z'),
   endsAt: new Date('2026-11-02T04:00:00.000Z'),
   durationMinutes: 90,
-  type: 'UH' as const,
+  type: 'DAILY' as const,
   kind: 'MAKEUP' as const,
   makeupOfId: '44444444-4444-4444-8444-444444444444',
   tokenRotation: 3,

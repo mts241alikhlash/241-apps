@@ -88,7 +88,7 @@ export async function seedMonitorRoom(
   const event = await rooms.createEvent({
     semesterId: SEMESTER_ID,
     name: 'PAS Ganjil',
-    type: 'UAS',
+    type: 'FINAL',
     startsAt: SLOT_START,
     endsAt: SLOT_END,
     createdById: 'admin-1',
@@ -146,7 +146,7 @@ export async function seedMonitorRoom(
     startsAt: SLOT_START,
     endsAt: SLOT_END,
     durationMinutes: 90,
-    type: 'UAS',
+    type: 'FINAL',
     createdById: 'admin-1',
   })
   if (schedule7A === null) throw new Error('schedule not created')
@@ -158,7 +158,7 @@ export async function seedMonitorRoom(
     startsAt: SLOT_START,
     endsAt: SLOT_END,
     durationMinutes: 90,
-    type: 'UAS',
+    type: 'FINAL',
     createdById: 'admin-1',
   })
   if (schedule8A === null) throw new Error('schedule not created')
@@ -170,7 +170,7 @@ export async function seedMonitorRoom(
     startsAt: new Date('2026-11-03T01:30:00.000Z'),
     endsAt: new Date('2026-11-03T03:00:00.000Z'),
     durationMinutes: 90,
-    type: 'UAS',
+    type: 'FINAL',
     createdById: 'admin-1',
   })
   if (foreignSchedule === null) throw new Error('schedule not created')

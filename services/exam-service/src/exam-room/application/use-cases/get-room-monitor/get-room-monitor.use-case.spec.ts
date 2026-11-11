@@ -259,7 +259,7 @@ describe('GetRoomMonitorUseCase', () => {
       startsAt: new Date('2026-11-02T01:30:00.000Z'),
       endsAt: new Date('2026-11-02T03:00:00.000Z'),
       durationMinutes: 90,
-      type: 'UAS',
+      type: 'FINAL',
       createdById: 'admin-1',
     })
     if (overlapping === null) throw new Error('schedule not created')

@@ -10,7 +10,7 @@ describe('GradingScheduleDto', () => {
       classroomId: 'c1',
       classroomName: 'VII A',
       semesterId: 'sem',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T03:00:00.000Z'),
       sessions: 3,
@@ -18,7 +18,7 @@ describe('GradingScheduleDto', () => {
       graded: 2,
     } as GradingSchedule
 
-    expect(GradingScheduleDto.fromDomain(schedule).type).toBe('UTS')
+    expect(GradingScheduleDto.fromDomain(schedule).type).toBe('MIDTERM')
   })
 
   it('marks the title of a makeup', () => {
@@ -29,7 +29,7 @@ describe('GradingScheduleDto', () => {
       classroomId: 'c1',
       classroomName: 'VII A',
       semesterId: 'sem',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-05T01:00:00.000Z'),
       endsAt: new Date('2026-11-05T03:00:00.000Z'),
       sessions: 1,
@@ -62,7 +62,7 @@ describe('GradingScheduleDto', () => {
       classroomId: 'c1',
       classroomName: 'VII A',
       semesterId: 'sem',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: new Date('2026-11-02T01:00:00.000Z'),
       endsAt: new Date('2026-11-02T03:00:00.000Z'),
       sessions: 0,

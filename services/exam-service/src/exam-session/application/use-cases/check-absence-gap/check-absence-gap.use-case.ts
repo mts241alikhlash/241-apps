@@ -17,7 +17,7 @@ export class CheckAbsenceGapUseCase {
 
   async execute(session: ExamSession, now: Date = new Date()): Promise<void> {
     if (session.status !== 'IN_PROGRESS') return
-    const policy = session.policy ?? DEFAULT_POLICIES.UJIAN_KETAT
+    const policy = session.policy ?? DEFAULT_POLICIES.MIDTERM
     const events = await this.rooms.listSessionEvents(session.id)
     const priorGaps = events.filter((row) => row.type === 'ABSENCE_GAP').length
     const evaluation = evaluateAbsenceGap({

@@ -53,7 +53,7 @@ describe('CreateExamScheduleUseCase', () => {
     startsAt: START,
     endsAt: END,
     durationMinutes: 90,
-    type: 'UH' as const,
+    type: 'DAILY' as const,
     ...overrides,
   })
 
@@ -109,10 +109,10 @@ describe('CreateExamScheduleUseCase', () => {
   })
 
   it('keeps the exam type it was given', async () => {
-    const created = await build().execute(USER, input({ type: 'UAS' }))
+    const created = await build().execute(USER, input({ type: 'FINAL' }))
 
-    expect(created.type).toBe('UAS')
-    expect((await schedules.findById(created.id))?.type).toBe('UAS')
+    expect(created.type).toBe('FINAL')
+    expect((await schedules.findById(created.id))?.type).toBe('FINAL')
   })
 
   it('refuses a classroom of another grade', async () => {
@@ -237,7 +237,7 @@ describe('CreateExamScheduleUseCase', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: START,
       endsAt: END,
       createdById: 'admin-1',
