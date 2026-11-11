@@ -1,4 +1,5 @@
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
+import type { ActivityEventRef } from '../policies/activity-rules.policy.js'
 import type {
   ActivityStatus,
   ActivityTokenMode,
@@ -16,6 +17,7 @@ export abstract class ExamActivityRepository {
   abstract findPreset(
     name: string,
   ): Promise<{ id: string; policy: unknown } | null>
+  abstract findEventRef(eventId: string): Promise<ActivityEventRef | null>
   abstract create(input: {
     activity: NewExamActivity
     classroomIds: string[]

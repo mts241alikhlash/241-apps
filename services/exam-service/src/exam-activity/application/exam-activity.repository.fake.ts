@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { ExamPolicy } from '../domain/policies/exam-policy.policy.js'
+import type { ActivityEventRef } from '../domain/policies/activity-rules.policy.js'
 import type {
   ActivityStatus,
   ExamActivity,
@@ -9,9 +10,14 @@ import { ExamActivityRepository } from '../domain/repositories/exam-activity.rep
 
 export class FakeExamActivityRepository extends ExamActivityRepository {
   readonly activities = new Map<string, ExamActivity>()
+  readonly events = new Map<string, ActivityEventRef>()
 
   findPreset() {
     return Promise.resolve(null)
+  }
+
+  findEventRef(eventId: string) {
+    return Promise.resolve(this.events.get(eventId) ?? null)
   }
 
   create(input: {

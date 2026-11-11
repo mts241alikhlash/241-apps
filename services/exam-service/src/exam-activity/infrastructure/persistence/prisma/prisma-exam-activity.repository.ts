@@ -60,6 +60,13 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     })
   }
 
+  async findEventRef(eventId: string) {
+    return this.prisma.examEvent.findUnique({
+      where: { id: eventId },
+      select: { type: true, status: true, startsAt: true, endsAt: true },
+    })
+  }
+
   async create(input: Parameters<ExamActivityRepository['create']>[0]) {
     const { activity, classroomIds, actorId } = input
     return this.prisma.$transaction(async (tx) => {

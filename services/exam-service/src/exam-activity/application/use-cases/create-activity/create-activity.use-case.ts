@@ -14,11 +14,13 @@ import {
   type ExamPresetName,
   parsePolicy,
 } from '../../../domain/policies/exam-policy.policy.js'
+import { assertActivityAllowed } from '../../../domain/policies/activity-rules.policy.js'
 
 const MAX_DURATION_MINUTES = 24 * 60
 
 export interface CreateActivityCommand {
   actorId: string
+  manageAll: boolean
   semesterId: string
   eventId?: string | null
   gradeId: string
@@ -26,7 +28,7 @@ export interface CreateActivityCommand {
   packageId: string
   type: ExamType
   classroomIds: string[]
-  presetName: ExamPresetName
+  presetName?: ExamPresetName
   tokenMode: ActivityTokenMode
   startsAt: Date
   endsAt: Date
@@ -55,7 +57,20 @@ export class CreateActivityUseCase {
     if (command.endsAt.getTime() <= command.startsAt.getTime()) {
       throw new BadRequestException('Jendela kegiatan tidak masuk akal')
     }
-    const preset = await this.activities.findPreset(command.presetName)
+    const presetName = command.presetName ?? command.type
+    const event = command.eventId
+      ? await this.activities.findEventRef(command.eventId)
+      : null
+    assertActivityAllowed({
+      type: command.type,
+      presetName,
+      tokenMode: command.tokenMode,
+      manageAll: command.manageAll,
+      event,
+      startsAt: command.startsAt,
+      endsAt: command.endsAt,
+    })
+    const preset = await this.activities.findPreset(presetName)
     if (preset === null) {
       throw new NotFoundException('Preset kebijakan tidak ditemukan')
     }
@@ -71,7 +86,7 @@ export class CreateActivityUseCase {
         presetId: preset.id,
         policy: parsePolicy(
           preset.policy,
-          DEFAULT_POLICIES[command.presetName],
+          DEFAULT_POLICIES[presetName],
         ),
         startsAt: command.startsAt,
         endsAt: command.endsAt,

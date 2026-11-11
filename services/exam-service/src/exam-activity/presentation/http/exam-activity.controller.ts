@@ -92,11 +92,12 @@ export class ExamActivityController {
   @ApiOperation({ summary: 'Create one activity for a grade and its classes' })
   @ApiResponse({ status: 201, type: ExamActivityDto })
   async create(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { id: string; permissions: string[] },
     @Body() dto: CreateActivityRequestDto,
   ): Promise<ExamActivityDto> {
     const activity = await this.createActivity.execute({
       actorId: user.id,
+      manageAll: user.permissions.includes('exam-schedules.manage-all'),
       semesterId: dto.semesterId,
       eventId: dto.eventId ?? null,
       gradeId: dto.gradeId,

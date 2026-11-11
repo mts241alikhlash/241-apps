@@ -44,9 +44,10 @@ export class CreateActivityRequestDto {
   @IsUUID('4', { each: true })
   classroomIds!: string[]
 
-  @ApiProperty({ enum: EXAM_PRESET_NAMES })
+  @ApiPropertyOptional({ enum: EXAM_PRESET_NAMES })
+  @IsOptional()
   @IsIn([...EXAM_PRESET_NAMES])
-  presetName!: (typeof EXAM_PRESET_NAMES)[number]
+  presetName?: (typeof EXAM_PRESET_NAMES)[number]
 
   @ApiProperty({ enum: ACTIVITY_TOKEN_MODES })
   @IsIn([...ACTIVITY_TOKEN_MODES])

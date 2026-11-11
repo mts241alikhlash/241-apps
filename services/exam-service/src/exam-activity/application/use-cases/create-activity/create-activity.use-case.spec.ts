@@ -1,14 +1,25 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Logger,
   NotFoundException,
+  UnprocessableEntityException,
+  ValidationPipe,
 } from '@nestjs/common'
 import { describe, expect, it, vi } from 'vitest'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
-import { DEFAULT_POLICIES } from '../../../domain/policies/exam-policy.policy.js'
+import type { ActivityEventRef } from '../../../domain/policies/activity-rules.policy.js'
+import {
+  DEFAULT_POLICIES,
+  type ExamPresetName,
+} from '../../../domain/policies/exam-policy.policy.js'
 import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
+import {
+  UpdateActivityPolicyRequestDto,
+  UpdateActivityStatusRequestDto,
+} from '../../../presentation/http/dto/exam-activity.dto.js'
 import { CreateActivityUseCase } from './create-activity.use-case.js'
 import {
   RotateActivityTokenUseCase,
@@ -42,17 +53,25 @@ function activity(overrides: Partial<ExamActivity> = {}): ExamActivity {
 class FakeActivityRepository implements ExamActivityRepository {
   readonly created: { classroomIds: string[]; activityId: string }[] = []
   readonly audits: string[] = []
+  readonly events = new Map<string, ActivityEventRef>()
+  readonly presets = new Set<ExamPresetName>(['DAILY', 'MIDTERM', 'FINAL'])
+  lastCreatedActivity: Parameters<ExamActivityRepository['create']>[0]['activity'] | null = null
   stored = activity()
 
   findPreset(name: string) {
-    return Promise.resolve(
-      name === 'DAILY'
-        ? { id: PRESET_ID, policy: DEFAULT_POLICIES.DAILY }
-        : null,
-    )
+    if (!this.presets.has(name as ExamPresetName)) return Promise.resolve(null)
+    return Promise.resolve({
+      id: `preset-${name}`,
+      policy: DEFAULT_POLICIES[name as ExamPresetName],
+    })
+  }
+
+  findEventRef(eventId: string) {
+    return Promise.resolve(this.events.get(eventId) ?? null)
   }
 
   create(input: Parameters<ExamActivityRepository['create']>[0]) {
+    this.lastCreatedActivity = input.activity
     this.created.push({
       classroomIds: input.classroomIds,
       activityId: this.stored.id,
@@ -114,6 +133,7 @@ class FakeParticipants extends IParticipantNumberPort {
 
 const command = {
   actorId: 'admin-1',
+  manageAll: true,
   semesterId: 'sem-1',
   gradeId: 'grade-9',
   subjectId: 'subject-inf',
@@ -138,6 +158,64 @@ describe('CreateActivityUseCase', () => {
       { classroomIds: ['class-9a', 'class-9b'], activityId: 'activity-1' },
     ])
     expect(repo.audits).toEqual(['CREATE_ACTIVITY'])
+  })
+
+  it('defaults presetName to type when teacher creates DAILY without presetName', async () => {
+    const repo = new FakeActivityRepository()
+    const { presetName: _omitted, ...withoutPreset } = command
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+      ...withoutPreset,
+      manageAll: false,
+      type: 'DAILY',
+    })
+
+    expect(repo.lastCreatedActivity?.presetId).toBe('preset-DAILY')
+    expect(repo.lastCreatedActivity?.policy).toEqual(DEFAULT_POLICIES.DAILY)
+  })
+
+  it('allows teacher to create MIDTERM inside an active MIDTERM event', async () => {
+    const repo = new FakeActivityRepository()
+    repo.events.set('event-pts', {
+      type: 'MIDTERM',
+      status: 'ACTIVE',
+      startsAt: new Date('2026-11-10T00:00:00Z'),
+      endsAt: new Date('2026-11-10T06:00:00Z'),
+    })
+    const { presetName: _omitted, ...withoutPreset } = command
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+      ...withoutPreset,
+      manageAll: false,
+      type: 'MIDTERM',
+      eventId: 'event-pts',
+      tokenMode: 'ROTATING',
+    })
+
+    expect(repo.lastCreatedActivity?.presetId).toBe('preset-MIDTERM')
+    expect(repo.created).toHaveLength(1)
+  })
+
+  it('propagates policy errors without creating the activity', async () => {
+    const repo = new FakeActivityRepository()
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...command,
+        manageAll: false,
+        type: 'FINAL',
+        presetName: 'FINAL',
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    expect(repo.created).toEqual([])
+
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...command,
+        manageAll: true,
+        type: 'MIDTERM',
+        presetName: 'DAILY',
+        eventId: 'event-pts',
+      }),
+    ).rejects.toBeInstanceOf(UnprocessableEntityException)
+    expect(repo.created).toEqual([])
   })
 
   it('asks the registry to issue the semester’s participant numbers', async () => {
@@ -220,5 +298,31 @@ describe('RotateActivityTokenUseCase', () => {
     const repo = new FakeActivityRepository()
     await new RotateActivityTokenUseCase(repo).execute('admin-1', 'activity-1')
     expect(repo.audits).toEqual(['ROTATE_TOKEN'])
+  })
+})
+
+describe('Activity patch DTO immutability', () => {
+  const pipe = new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  })
+
+  it('rejects type, presetId, and tokenMode on UpdateActivityStatusRequestDto', async () => {
+    await expect(
+      pipe.transform(
+        { status: 'SCHEDULED', type: 'FINAL' },
+        { type: 'body', metatype: UpdateActivityStatusRequestDto },
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('rejects type, presetId, and tokenMode on UpdateActivityPolicyRequestDto', async () => {
+    await expect(
+      pipe.transform(
+        { violationLimit: 5, type: 'FINAL', presetId: 'p-1', tokenMode: 'STATIC' },
+        { type: 'body', metatype: UpdateActivityPolicyRequestDto },
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException)
   })
 })
