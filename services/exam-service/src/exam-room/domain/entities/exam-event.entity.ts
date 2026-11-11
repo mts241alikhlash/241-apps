@@ -34,6 +34,7 @@ export interface NewExamEvent {
 
 export interface ExamEventEdit {
   name?: string
+  type?: ExamType
   startsAt?: Date
   endsAt?: Date
   lateToleranceMinutes?: number

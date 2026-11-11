@@ -51,6 +51,11 @@ export class CreateExamEventDto {
 export class UpdateExamEventDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @Length(1, 150) name?: string
 
+  @ApiPropertyOptional({ enum: EXAM_TYPES })
+  @IsOptional()
+  @IsIn(EXAM_TYPES)
+  type?: ExamType
+
   @ApiPropertyOptional({ format: 'date-time' })
   @IsOptional()
   @IsISO8601()
