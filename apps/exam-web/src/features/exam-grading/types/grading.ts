@@ -80,6 +80,7 @@ export interface GradingScheduleQuery {
   page?: number
   limit?: number
   semesterId?: string
+  category?: ExamCategory
 }
 
 export interface GradingSessionQuery {

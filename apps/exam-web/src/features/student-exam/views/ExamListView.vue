@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -11,6 +12,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { RefreshCw } from '@lucide/vue'
+import { categoryOf, examCategoryLabel } from '@/features/exam-shared/examType'
 import { studentExamService } from '../services/studentExamService'
 import {
   GROUP_LABEL,
@@ -161,7 +163,16 @@ onMounted(load)
                 class="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div class="min-w-0">
-                  <p class="truncate font-medium">{{ displayTitle(exam) }}</p>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <p class="truncate font-medium">{{ displayTitle(exam) }}</p>
+                    <Badge variant="outline">
+                      {{
+                        examCategoryLabel(
+                          exam.category ?? categoryOf(exam.type),
+                        )
+                      }}
+                    </Badge>
+                  </div>
                   <p
                     class="text-[length:var(--text-control)] text-muted-foreground"
                   >

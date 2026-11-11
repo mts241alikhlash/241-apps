@@ -35,6 +35,21 @@ export const routes: RouteRecordRaw[] = [
       ...examScheduleRoutes,
       ...examRoomRoutes,
       ...examGradingRoutes,
+      {
+        path: '/settings/presets',
+        name: 'ExamPresets',
+        component: () =>
+          import('@/features/exam-activity/views/ActivityCreateView.vue'),
+        meta: {
+          title: 'Preset Kebijakan',
+          requiresAuth: true,
+          requiredPermission: 'exam-schedules.manage-all',
+          breadcrumbs: [
+            { title: 'Pengaturan', href: '#' },
+            { title: 'Preset', href: '/settings/presets' },
+          ],
+        },
+      },
       ...studentExamRoutes,
       ...profileRoutes,
     ],

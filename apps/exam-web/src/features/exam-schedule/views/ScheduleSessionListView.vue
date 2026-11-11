@@ -27,6 +27,10 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const scheduleId = computed(() => String(route.params.scheduleId ?? ''))
+const sectionPrefix = computed(() =>
+  route.meta?.category === 'NON_EXAM' ? '/classwork' : '/exam',
+)
+const schedulesHref = computed(() => `${sectionPrefix.value}/schedules`)
 const title = computed(() =>
   typeof route.query.judul === 'string' && route.query.judul !== ''
     ? route.query.judul
@@ -42,7 +46,7 @@ const recoveryAction = ref<RecoveryAction>('reopen')
 const photoSession = ref<ScheduleSession | null>(null)
 
 useBreadcrumbs(() => [
-  { title: 'Jadwal Ujian', href: '/exam/schedules' },
+  { title: 'Jadwal Ujian', href: schedulesHref.value },
   { title: title.value },
 ])
 
@@ -113,7 +117,7 @@ onMounted(load)
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Jadwal Ujian"
-            @click="router.push('/exam/schedules')"
+            @click="router.push(schedulesHref)"
           />
           <CardTitle class="font-semibold">{{ title }}</CardTitle>
         </div>

@@ -18,7 +18,10 @@ const listState = {
   listError: ref<string | null>(null),
 }
 
-vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push }),
+  useRoute: () => ({ meta: { category: 'EXAM' } }),
+}))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),

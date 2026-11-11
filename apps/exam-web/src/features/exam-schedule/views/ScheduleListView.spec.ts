@@ -7,16 +7,16 @@ import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
 import { CARDS, cardRows, rowActionProps } from '@/test/dataTableCards'
 
-const { filters, refresh, permissions, cancelSchedule, push } = vi.hoisted(
-  () => ({
-    filters: {} as Record<'classroomId' | 'status', Ref<string>> &
+const { filters, refresh, permissions, cancelSchedule, push, routeMeta } =
+  vi.hoisted(() => ({
+    filters: {} as Record<'classroomId' | 'status' | 'category', Ref<string>> &
       Record<'page' | 'pageSize', Ref<number>>,
     refresh: vi.fn(),
     permissions: new Set<string>(),
     cancelSchedule: vi.fn(),
     push: vi.fn(),
-  }),
-)
+    routeMeta: { category: 'EXAM' },
+  }))
 const listState = {
   schedules: ref<ExamSchedule[]>([]),
   totalItems: ref(0),
@@ -27,6 +27,7 @@ const listState = {
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
+  useRoute: () => ({ meta: routeMeta, path: '/exam/schedules' }),
 }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
@@ -166,7 +167,16 @@ describe('ScheduleListView', () => {
     listState.loading.value = false
     listState.listError.value = null
     listState.filtersPending.value = false
+    routeMeta.category = 'EXAM'
     vi.clearAllMocks()
+  })
+
+  it('passes route.meta.category to useScheduleList when opened under /classwork/schedules', async () => {
+    routeMeta.category = 'NON_EXAM'
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(filters.category?.value).toBe('NON_EXAM')
+    wrapper.unmount()
   })
 
   it('lists schedules with package, classroom, window, duration and phase', async () => {

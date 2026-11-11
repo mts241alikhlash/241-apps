@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { DataTable } from '@mts241alikhlash/ui'
 import {
   AlertDialog,
@@ -47,17 +47,27 @@ import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
 import { useScheduleList } from '../composables/useScheduleList'
 import { examScheduleService } from '../services/examScheduleService'
 import { SCHEDULE_STATUSES, scheduleStatusLabel } from '../types'
-import type { ExamSchedule } from '../types'
+import type { ExamCategory, ExamSchedule } from '../types'
 
+const route = useRoute()
 const router = useRouter()
 const { hasPermission } = useAuthSession()
+
+const category = computed<ExamCategory | undefined>(() =>
+  route.meta?.category === 'EXAM' || route.meta?.category === 'NON_EXAM'
+    ? route.meta.category
+    : undefined,
+)
+const sectionPrefix = computed(() =>
+  category.value === 'NON_EXAM' ? '/classwork' : '/exam',
+)
 
 const status = ref('ALL')
 const page = ref(1)
 const pageSize = ref(10)
 
 const { schedules, totalItems, loading, listError, filtersPending, refresh } =
-  useScheduleList({ status }, page, pageSize)
+  useScheduleList({ status, category }, page, pageSize)
 
 watch(
   status,
@@ -123,7 +133,7 @@ const columns = computed(() =>
     },
     onSessions: (schedule) => {
       void router.push({
-        path: `/exam/schedules/${schedule.id}/sessions`,
+        path: `${sectionPrefix.value}/schedules/${schedule.id}/sessions`,
         query: {
           judul: `${schedule.packageTitle} · ${schedule.classroomName ?? '-'}`,
         },
@@ -138,7 +148,7 @@ const columns = computed(() =>
     onStatus: (schedule) => {
       if (schedule.activityId === null) return
       void router.push({
-        path: '/exam/activities/new',
+        path: `${sectionPrefix.value}/activities/new`,
         query: { id: schedule.activityId },
       })
     },
@@ -313,6 +323,7 @@ const columns = computed(() =>
       v-if="formOpen"
       v-model:open="formOpen"
       :schedule="editing"
+      :category="category"
       @saved="refresh()"
     />
 

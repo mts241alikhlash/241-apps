@@ -23,7 +23,12 @@ import {
 import type { ExamPackageSummary } from '@/features/exam-package/types'
 import type { Classroom } from '@/features/lookup/classroom'
 import type { ExamEvent } from '@/features/exam-event/types'
-import { EXAM_TYPES, examTypeLabel } from '@/features/exam-shared/examType'
+import {
+  EXAM_TYPES,
+  categoryOf,
+  examTypeLabel,
+  type ExamCategory,
+} from '@/features/exam-shared/examType'
 import { useScheduleForm } from '../composables/useScheduleForm'
 import { examScheduleService } from '../services/examScheduleService'
 import type { ExamSchedule } from '../types'
@@ -31,10 +36,17 @@ import type { ExamSchedule } from '../types'
 const props = defineProps<{
   open: boolean
   schedule?: ExamSchedule | null
+  category?: ExamCategory
   packageId?: string
   packageGradeId?: string
   packageTitle?: string
 }>()
+
+const allowedTypes = computed(() =>
+  props.category
+    ? EXAM_TYPES.filter((item) => categoryOf(item) === props.category)
+    : EXAM_TYPES,
+)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -263,7 +275,7 @@ async function save() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
-                  v-for="option in EXAM_TYPES"
+                  v-for="option in allowedTypes"
                   :key="option"
                   :value="option"
                 >

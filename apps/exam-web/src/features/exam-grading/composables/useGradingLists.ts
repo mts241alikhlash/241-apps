@@ -1,16 +1,27 @@
 import type { Ref } from 'vue'
 import { usePagedList } from '@/features/exam-bank/composables/usePagedList'
 import type { ExamSessionStatus } from '@/features/exam-schedule/types'
+import type { ExamCategory } from '@/features/exam-shared/examType'
 import { examGradingApi } from '../api/examGradingApi'
 
-export function useGradingSchedules(page: Ref<number>, pageSize: Ref<number>) {
+export function useGradingSchedules(
+  page: Ref<number>,
+  pageSize: Ref<number>,
+  category?: Ref<ExamCategory | undefined>,
+) {
   const list = usePagedList({
     page,
     pageSize,
     scope: ['exam-grading', 'schedules'],
-    filters: {},
+    filters: { category },
     fetchPage: async (current, limit) =>
-      (await examGradingApi.getSchedules({ page: current, limit })).data,
+      (
+        await examGradingApi.getSchedules({
+          page: current,
+          limit,
+          category: category?.value,
+        })
+      ).data,
     errorMessage: 'Gagal memuat daftar ujian.',
   })
   return { ...list, schedules: list.items }
