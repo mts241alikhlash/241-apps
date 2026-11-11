@@ -1,5 +1,6 @@
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
+  ExamCategory,
   ExamSchedule,
   ExamScheduleStatus,
   ExamType,
@@ -17,6 +18,7 @@ export interface ExamScheduleListQuery {
   status?: ExamScheduleStatus
   from?: Date
   to?: Date
+  category?: ExamCategory
 }
 
 export interface ExamScheduleGradingQuery {
@@ -25,6 +27,7 @@ export interface ExamScheduleGradingQuery {
   now: Date
   page: number
   limit: number
+  category?: ExamCategory
 }
 
 export interface NewExamSchedule {

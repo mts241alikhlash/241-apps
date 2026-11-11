@@ -44,7 +44,20 @@
     "/exam-activities": {
       "get": {
         "operationId": "ExamActivityController_list",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EXAM",
+                "NON_EXAM"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -133,6 +146,54 @@
       }
     },
     "/exam-activities/{id}": {
+      "get": {
+        "operationId": "ExamActivityController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get one activity with its classroom schedules",
+        "tags": [
+          "Exam Activities"
+        ]
+      },
       "patch": {
         "operationId": "ExamActivityController_changeStatus",
         "parameters": [
@@ -3029,6 +3090,18 @@
               "format": "date-time",
               "type": "string"
             }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EXAM",
+                "NON_EXAM"
+              ]
+            }
           }
         ],
         "responses": {
@@ -5384,6 +5457,18 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EXAM",
+                "NON_EXAM"
+              ]
+            }
           }
         ],
         "responses": {
@@ -6160,6 +6245,19 @@
             "format": "uuid"
           },
           "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
+            ],
             "type": "string"
           },
           "tokenMode": {
@@ -6194,6 +6292,7 @@
           "subjectId",
           "packageId",
           "type",
+          "category",
           "tokenMode",
           "tokenRotation",
           "policy",
@@ -6201,6 +6300,131 @@
           "endsAt",
           "durationMinutes",
           "status"
+        ]
+      },
+      "ExamActivityScheduleDto": {
+        "type": "object",
+        "properties": {
+          "scheduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "scheduleId",
+          "classroomId",
+          "classroomName",
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "ExamActivityDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
+            ],
+            "type": "string"
+          },
+          "tokenMode": {
+            "type": "string"
+          },
+          "tokenRotation": {
+            "type": "number"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamActivityScheduleDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "semesterId",
+          "eventId",
+          "gradeId",
+          "subjectId",
+          "packageId",
+          "type",
+          "category",
+          "tokenMode",
+          "tokenRotation",
+          "policy",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "status",
+          "schedules"
         ]
       },
       "UpdateActivityStatusRequestDto": {
@@ -6257,11 +6481,10 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
             ],
             "type": "string"
           },
@@ -6275,9 +6498,10 @@
           },
           "presetName": {
             "enum": [
-              "UJIAN_KETAT",
-              "ULANGAN_KELAS",
-              "TUGAS"
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
             ],
             "type": "string"
           },
@@ -6309,7 +6533,6 @@
           "packageId",
           "type",
           "classroomIds",
-          "presetName",
           "tokenMode",
           "startsAt",
           "endsAt",
@@ -6383,11 +6606,17 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
             ],
             "type": "string"
           },
@@ -6478,6 +6707,7 @@
           "subjectId",
           "subjectName",
           "type",
+          "category",
           "startsAt",
           "endsAt",
           "durationMinutes",
@@ -8359,11 +8589,17 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
             ],
             "type": "string"
           },
@@ -8421,6 +8657,7 @@
           "durationMinutes",
           "minSubmitMinutes",
           "type",
+          "category",
           "kind",
           "makeupOfId",
           "activityId",
@@ -8481,11 +8718,10 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
             ],
             "type": "string"
           },
@@ -8536,11 +8772,10 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
             ],
             "type": "string"
           },
@@ -8598,11 +8833,17 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
             ],
             "type": "string"
           },
@@ -8637,6 +8878,7 @@
           "semesterId",
           "name",
           "type",
+          "category",
           "startsAt",
           "endsAt",
           "lateToleranceMinutes",
@@ -8685,11 +8927,10 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
             ],
             "type": "string"
           },
@@ -8728,6 +8969,15 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 150
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
           },
           "startsAt": {
             "type": "string",
@@ -10105,11 +10355,17 @@
           },
           "type": {
             "enum": [
-              "UH",
-              "QUIZ",
+              "DAILY",
               "ASSIGNMENT",
-              "UTS",
-              "UAS"
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
             ],
             "type": "string"
           },
@@ -10153,6 +10409,7 @@
           "classroomName",
           "semesterId",
           "type",
+          "category",
           "packageId",
           "durationMinutes",
           "kind",

@@ -159,6 +159,26 @@ describe('grading queries', () => {
         ).total,
       ).toBe(0)
     })
+
+    it('filters grading schedules by category when requested', async () => {
+      const w = build()
+      const { schedule, questionIds } = await paperWithManual(w)
+      submitted(w, schedule, { [questionIds[1]]: { text: 'jawab' } })
+
+      const examPage = await listSchedules(w).execute(TEACHER, {
+        page: 1,
+        limit: 10,
+        category: 'EXAM',
+      })
+      const nonExamPage = await listSchedules(w).execute(TEACHER, {
+        page: 1,
+        limit: 10,
+        category: 'NON_EXAM',
+      })
+
+      expect(examPage.total).toBe(0)
+      expect(nonExamPage.total).toBe(1)
+    })
   })
 
   describe('sessions of a schedule', () => {

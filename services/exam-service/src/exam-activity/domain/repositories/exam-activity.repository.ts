@@ -1,3 +1,4 @@
+import type { ExamCategory } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
 import type { ActivityEventRef } from '../policies/activity-rules.policy.js'
 import type {
@@ -11,6 +12,13 @@ export interface ActivityAuditEntry {
   action: 'CREATE_ACTIVITY' | 'UPDATE_POLICY' | 'ROTATE_TOKEN' | 'UPDATE_STATUS'
   before: unknown
   after: unknown
+}
+
+export interface ActivityScheduleSummary {
+  id: string
+  classroomId: string
+  startsAt: Date
+  endsAt: Date
 }
 
 export abstract class ExamActivityRepository {
@@ -35,8 +43,11 @@ export abstract class ExamActivityRepository {
   ): Promise<ExamActivity | null>
   abstract listSchedules(
     activityId: string,
-  ): Promise<{ id: string; classroomId: string }[]>
-  abstract listBySemester(semesterId: string): Promise<ExamActivity[]>
+  ): Promise<ActivityScheduleSummary[]>
+  abstract listBySemester(
+    semesterId: string,
+    category?: ExamCategory,
+  ): Promise<ExamActivity[]>
   abstract updateStatus(
     id: string,
     status: ActivityStatus,

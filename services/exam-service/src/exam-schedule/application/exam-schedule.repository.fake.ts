@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { FakeExamPackageRepository } from '../../exam-package/application/exam-package.repository.fake.js'
 import type { ExamSchedule } from '../domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../domain/policies/exam-category.policy.js'
 import type {
   NewParticipant,
   ScheduleParticipant,
@@ -32,6 +33,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
       .filter((row) => !query.status || row.status === query.status)
       .filter((row) => !query.from || row.endsAt >= query.from)
       .filter((row) => !query.to || row.startsAt <= query.to)
+      .filter((row) => !query.category || categoryOf(row.type) === query.category)
     return Promise.resolve({
       data: rows.slice(
         (query.page - 1) * query.limit,
@@ -46,6 +48,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
   findForGrading(query: ExamScheduleGradingQuery) {
     const rows = [...this.schedules.values()]
       .filter((row) => row.semesterId === query.semesterId)
+      .filter((row) => !query.category || categoryOf(row.type) === query.category)
       .filter(
         (row) =>
           this.withSessions(row.id) ||

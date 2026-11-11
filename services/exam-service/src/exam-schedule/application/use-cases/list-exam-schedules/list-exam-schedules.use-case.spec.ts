@@ -114,4 +114,45 @@ describe('List and get exam schedules', () => {
 
     expect(page.data[0].hasSessions).toBe(false)
   })
+
+  it('filters schedules by category when requested', async () => {
+    const packages = new FakeExamPackageRepository()
+    const repo = new FakeExamScheduleRepository(packages)
+    const pkg = await approvedPackage(packages, new FakeQuestionRepository())
+    const creator = new CreateExamScheduleUseCase(
+      repo,
+      packages,
+      new FakeAcademicLookup(),
+      new FakeExamRoomRepository(),
+    )
+    for (let i = 0; i < 3; i += 1) {
+      await creator.execute(USER, {
+        packageId: pkg.id,
+        classroomId: CLASSROOM_7A.id,
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'DAILY',
+      })
+    }
+    for (let i = 0; i < 2; i += 1) {
+      await creator.execute(USER, {
+        packageId: pkg.id,
+        classroomId: CLASSROOM_7A.id,
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'MIDTERM',
+      })
+    }
+
+    const examPage = await new ListExamSchedulesUseCase(
+      repo,
+      new FakeAcademicLookup(),
+      guard,
+    ).execute({ category: 'EXAM' })
+
+    expect(examPage.total).toBe(2)
+    expect(examPage.data.every((row) => row.type === 'MIDTERM')).toBe(true)
+  })
 })

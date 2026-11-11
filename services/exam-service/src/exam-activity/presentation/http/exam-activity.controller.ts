@@ -8,11 +8,13 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -29,7 +31,9 @@ import {
 } from '../../application/use-cases/update-activity-policy/update-activity-policy.use-case.js'
 import {
   CreateActivityRequestDto,
+  ExamActivityDetailDto,
   ExamActivityDto,
+  ExamActivityQueryDto,
   IssueParticipantNumbersResponseDto,
   UpdateActivityPolicyRequestDto,
   UpdateActivityStatusRequestDto,
@@ -53,9 +57,23 @@ export class ExamActivityController {
   @RequirePermissions('exam-schedules.manage')
   @ApiOperation({ summary: 'List the activities of the active semester' })
   @ApiResponse({ status: 200, type: [ExamActivityDto] })
-  async list(): Promise<ExamActivityDto[]> {
-    const activities = await this.listActivities.execute()
+  async list(
+    @Query() query: ExamActivityQueryDto,
+  ): Promise<ExamActivityDto[]> {
+    const activities = await this.listActivities.execute(query.category)
     return activities.map((activity) => ExamActivityDto.of(activity))
+  }
+
+  @Get(':id')
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({ summary: 'Get one activity with its classroom schedules' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: ExamActivityDetailDto })
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ExamActivityDetailDto> {
+    const detail = await this.listActivities.findOne(id)
+    return ExamActivityDetailDto.ofDetail(detail.activity, detail.schedules)
   }
 
   @Patch(':id')

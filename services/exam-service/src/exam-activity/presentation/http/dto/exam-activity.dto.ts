@@ -10,7 +10,13 @@ import {
   Max,
   Min,
 } from 'class-validator'
-import { EXAM_TYPES } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import {
+  EXAM_CATEGORIES,
+  EXAM_TYPES,
+  type ExamCategory,
+  type ExamType,
+} from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import {
   ACTIVITY_STATUSES,
@@ -149,6 +155,13 @@ export class ExamPolicyDto implements ExamPolicy {
   @ApiProperty() tokenSlotSeconds!: number
 }
 
+export class ExamActivityQueryDto {
+  @ApiPropertyOptional({ enum: EXAM_CATEGORIES })
+  @IsOptional()
+  @IsIn([...EXAM_CATEGORIES])
+  category?: ExamCategory
+}
+
 export class ExamActivityDto {
   @ApiProperty({ format: 'uuid' }) id!: string
   @ApiProperty({ format: 'uuid' }) semesterId!: string
@@ -156,7 +169,8 @@ export class ExamActivityDto {
   @ApiProperty({ format: 'uuid' }) gradeId!: string
   @ApiProperty({ format: 'uuid' }) subjectId!: string
   @ApiProperty({ format: 'uuid' }) packageId!: string
-  @ApiProperty() type!: string
+  @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
+  @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty() tokenMode!: string
   @ApiProperty() tokenRotation!: number
   @ApiProperty({ type: ExamPolicyDto }) policy!: ExamPolicyDto
@@ -174,6 +188,7 @@ export class ExamActivityDto {
     dto.subjectId = activity.subjectId
     dto.packageId = activity.packageId
     dto.type = activity.type
+    dto.category = categoryOf(activity.type)
     dto.tokenMode = activity.tokenMode
     dto.tokenRotation = activity.tokenRotation
     dto.policy = { ...activity.policy }
@@ -181,6 +196,45 @@ export class ExamActivityDto {
     dto.endsAt = activity.endsAt.toISOString()
     dto.durationMinutes = activity.durationMinutes
     dto.status = activity.status
+    return dto
+  }
+}
+
+export class ExamActivityScheduleDto {
+  @ApiProperty({ format: 'uuid' }) scheduleId!: string
+  @ApiProperty({ format: 'uuid' }) classroomId!: string
+  @ApiProperty({ type: String, nullable: true }) classroomName!: string | null
+  @ApiProperty({ format: 'date-time' }) startsAt!: string
+  @ApiProperty({ format: 'date-time' }) endsAt!: string
+}
+
+export class ExamActivityDetailDto extends ExamActivityDto {
+  @ApiProperty({ type: () => [ExamActivityScheduleDto] })
+  schedules!: ExamActivityScheduleDto[]
+
+  static ofDetail(
+    activity: ExamActivity,
+    schedules: {
+      scheduleId: string
+      classroomId: string
+      classroomName: string | null
+      startsAt: Date
+      endsAt: Date
+    }[],
+  ): ExamActivityDetailDto {
+    const dto = Object.assign(
+      new ExamActivityDetailDto(),
+      ExamActivityDto.of(activity),
+    )
+    dto.schedules = schedules.map((row) => {
+      const item = new ExamActivityScheduleDto()
+      item.scheduleId = row.scheduleId
+      item.classroomId = row.classroomId
+      item.classroomName = row.classroomName
+      item.startsAt = row.startsAt.toISOString()
+      item.endsAt = row.endsAt.toISOString()
+      return item
+    })
     return dto
   }
 }

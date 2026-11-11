@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import type { ExamCategory } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../exam-schedule/domain/policies/exam-category.policy.js'
 import type { ExamPolicy } from '../domain/policies/exam-policy.policy.js'
 import type { ActivityEventRef } from '../domain/policies/activity-rules.policy.js'
 import type {
@@ -6,11 +8,15 @@ import type {
   ExamActivity,
   NewExamActivity,
 } from '../domain/entities/exam-activity.entity.js'
-import { ExamActivityRepository } from '../domain/repositories/exam-activity.repository.js'
+import {
+  type ActivityScheduleSummary,
+  ExamActivityRepository,
+} from '../domain/repositories/exam-activity.repository.js'
 
 export class FakeExamActivityRepository extends ExamActivityRepository {
   readonly activities = new Map<string, ExamActivity>()
   readonly events = new Map<string, ActivityEventRef>()
+  readonly activitySchedules = new Map<string, ActivityScheduleSummary[]>()
 
   findPreset() {
     return Promise.resolve(null)
@@ -32,6 +38,15 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
       status: 'DRAFT',
     }
     this.activities.set(activity.id, activity)
+    this.activitySchedules.set(
+      activity.id,
+      input.classroomIds.map((classroomId) => ({
+        id: randomUUID(),
+        classroomId,
+        startsAt: activity.startsAt,
+        endsAt: activity.endsAt,
+      })),
+    )
     return Promise.resolve(activity)
   }
 
@@ -58,14 +73,18 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     return Promise.resolve(updated)
   }
 
-  listSchedules() {
-    return Promise.resolve([])
+  listSchedules(activityId: string) {
+    return Promise.resolve(this.activitySchedules.get(activityId) ?? [])
   }
 
-  listBySemester(semesterId: string) {
+  listBySemester(semesterId: string, category?: ExamCategory) {
     return Promise.resolve(
       [...this.activities.values()]
         .filter((activity) => activity.semesterId === semesterId)
+        .filter(
+          (activity) =>
+            category === undefined || categoryOf(activity.type) === category,
+        )
         .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()),
     )
   }

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import type { Prisma } from '../../../../generated/prisma/client.js'
+import type { ExamCategory } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { typesInCategory } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type {
   ActivityStatus,
   ActivityTokenMode,
@@ -167,13 +169,17 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   async listSchedules(activityId: string) {
     return this.prisma.examSchedule.findMany({
       where: { activityId },
-      select: { id: true, classroomId: true },
+      select: { id: true, classroomId: true, startsAt: true, endsAt: true },
+      orderBy: { startsAt: 'asc' },
     })
   }
 
-  async listBySemester(semesterId: string) {
+  async listBySemester(semesterId: string, category?: ExamCategory) {
     const rows = await this.prisma.examActivity.findMany({
-      where: { semesterId },
+      where: {
+        semesterId,
+        ...(category ? { type: { in: typesInCategory(category) } } : {}),
+      },
       orderBy: { startsAt: 'asc' },
     })
     return rows.map(toEntity)

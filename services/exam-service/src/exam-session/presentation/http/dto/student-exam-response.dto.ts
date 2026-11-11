@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { ACTIVITY_STATUSES } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
-import { EXAM_TYPES } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import {
+  EXAM_CATEGORIES,
+  EXAM_TYPES,
+  type ExamCategory,
+} from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type { MyExam } from '../../../application/use-cases/list-my-exams/list-my-exams.use-case.js'
 
 const MY_EXAM_STATUSES = [
@@ -23,6 +28,7 @@ export class MyExamDto {
   })
   subjectName!: string | null
   @ApiProperty({ enum: EXAM_TYPES }) type!: MyExam['type']
+  @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ format: 'date-time' }) endsAt!: string
   @ApiProperty() durationMinutes!: number
@@ -72,6 +78,7 @@ export class MyExamDto {
     dto.subjectId = domain.subjectId
     dto.subjectName = domain.subjectName
     dto.type = domain.type
+    dto.category = categoryOf(domain.type)
     dto.startsAt = domain.startsAt.toISOString()
     dto.endsAt = domain.endsAt.toISOString()
     dto.durationMinutes = domain.durationMinutes

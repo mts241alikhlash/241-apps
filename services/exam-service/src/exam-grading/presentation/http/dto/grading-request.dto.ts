@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,6 +10,10 @@ import {
   Min,
 } from 'class-validator'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
+import {
+  EXAM_CATEGORIES,
+  type ExamCategory,
+} from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { EXAM_SESSION_STATUSES } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 import type { ExamSessionStatus } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 
@@ -20,6 +25,11 @@ export class GradingScheduleQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsUUID()
   semesterId?: string
+
+  @ApiPropertyOptional({ enum: EXAM_CATEGORIES })
+  @IsOptional()
+  @IsIn(EXAM_CATEGORIES)
+  category?: ExamCategory
 }
 
 export class GradingSessionQueryDto extends PaginationQueryDto {

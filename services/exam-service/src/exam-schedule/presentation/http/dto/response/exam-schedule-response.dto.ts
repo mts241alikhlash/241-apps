@@ -1,13 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
 import {
+  EXAM_CATEGORIES,
   EXAM_SCHEDULE_KINDS,
   EXAM_SCHEDULE_STATUSES,
   EXAM_TYPES,
+  type ExamCategory,
   type ExamScheduleKind,
   type ExamScheduleStatus,
   type ExamType,
   type ExamScheduleView,
 } from '../../../../domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../domain/policies/exam-category.policy.js'
 
 export class ExamScheduleDto {
   @ApiProperty({ format: 'uuid' }) id!: string
@@ -23,6 +26,7 @@ export class ExamScheduleDto {
   @ApiProperty() durationMinutes!: number
   @ApiProperty() minSubmitMinutes!: number
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
+  @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ enum: EXAM_SCHEDULE_KINDS }) kind!: ExamScheduleKind
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   makeupOfId!: string | null
@@ -55,6 +59,7 @@ export class ExamScheduleDto {
     dto.durationMinutes = domain.durationMinutes
     dto.minSubmitMinutes = domain.minSubmitMinutes
     dto.type = domain.type
+    dto.category = categoryOf(domain.type)
     dto.kind = domain.kind
     dto.makeupOfId = domain.makeupOfId
     dto.activityId = domain.activityId ?? null

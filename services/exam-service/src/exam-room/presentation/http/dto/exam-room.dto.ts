@@ -15,9 +15,12 @@ import {
 } from 'class-validator'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import {
+  EXAM_CATEGORIES,
   EXAM_TYPES,
+  type ExamCategory,
   type ExamType,
 } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import { EXAM_EVENT_STATUSES } from '../../../../exam-room/domain/entities/exam-event.entity.js'
 
 export class CreateExamEventDto {
@@ -103,6 +106,7 @@ export class ExamEventDto {
   @ApiProperty({ format: 'uuid' }) semesterId!: string
   @ApiProperty() name!: string
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
+  @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ format: 'date-time' }) endsAt!: string
   @ApiProperty() lateToleranceMinutes!: number
@@ -127,6 +131,7 @@ export class ExamEventDto {
     dto.semesterId = domain.semesterId
     dto.name = domain.name
     dto.type = domain.type
+    dto.category = categoryOf(domain.type)
     dto.startsAt = domain.startsAt.toISOString()
     dto.endsAt = domain.endsAt.toISOString()
     dto.lateToleranceMinutes = domain.lateToleranceMinutes

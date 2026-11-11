@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
 import {
+  EXAM_CATEGORIES,
   EXAM_SCHEDULE_KINDS,
   EXAM_TYPES,
+  type ExamCategory,
   type ExamScheduleKind,
   type ExamType,
 } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { GradingSessionDetail } from '../../../application/use-cases/get-grading-session/get-grading-session.use-case.js'
 import type { GradingItem } from '../../../application/grading-item.js'
@@ -26,6 +29,7 @@ export class GradingScheduleDto {
   @ApiProperty({ type: String, nullable: true }) classroomName!: string | null
   @ApiProperty({ format: 'uuid' }) semesterId!: string
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
+  @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ format: 'uuid' }) packageId!: string
   @ApiProperty() durationMinutes!: number
   @ApiProperty({ enum: EXAM_SCHEDULE_KINDS }) kind!: ExamScheduleKind
@@ -47,6 +51,7 @@ export class GradingScheduleDto {
     dto.classroomName = domain.classroomName
     dto.semesterId = domain.semesterId
     dto.type = domain.type
+    dto.category = categoryOf(domain.type)
     dto.packageId = domain.packageId
     dto.durationMinutes = domain.durationMinutes
     dto.kind = domain.kind

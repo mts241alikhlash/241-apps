@@ -12,8 +12,10 @@ import {
 } from 'class-validator'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import {
+  EXAM_CATEGORIES,
   EXAM_SCHEDULE_STATUSES,
   EXAM_TYPES,
+  type ExamCategory,
   type ExamScheduleStatus,
   type ExamType,
 } from '../../../../domain/entities/exam-schedule.entity.js'
@@ -89,4 +91,9 @@ export class ExamScheduleQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsDateString()
   to?: string
+
+  @ApiPropertyOptional({ enum: EXAM_CATEGORIES })
+  @IsOptional()
+  @IsIn(EXAM_CATEGORIES)
+  category?: ExamCategory
 }

@@ -98,7 +98,14 @@ class FakeActivityRepository implements ExamActivityRepository {
   }
 
   listSchedules() {
-    return Promise.resolve([{ id: 'schedule-1', classroomId: 'class-7a' }])
+    return Promise.resolve([
+      {
+        id: 'schedule-1',
+        classroomId: 'class-7a',
+        startsAt: this.stored.startsAt,
+        endsAt: this.stored.endsAt,
+      },
+    ])
   }
 
   listBySemester(semesterId: string) {

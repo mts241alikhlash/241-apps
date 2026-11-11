@@ -3,6 +3,7 @@ import { PrismaService } from '../../../../core/database/prisma.service.js'
 import type { Prisma } from '../../../../generated/prisma/client.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamSchedule } from '../../../domain/entities/exam-schedule.entity.js'
+import { typesInCategory } from '../../../domain/policies/exam-category.policy.js'
 import type {
   NewParticipant,
   ScheduleParticipant,
@@ -30,6 +31,7 @@ function buildWhere(
     ...(query.status ? { status: query.status } : {}),
     ...(query.from ? { endsAt: { gte: query.from } } : {}),
     ...(query.to ? { startsAt: { lte: query.to } } : {}),
+    ...(query.category ? { type: { in: typesInCategory(query.category) } } : {}),
   }
 }
 
@@ -65,6 +67,9 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     }
     const where: Prisma.ExamScheduleWhereInput = {
       semesterId: query.semesterId,
+      ...(query.category
+        ? { type: { in: typesInCategory(query.category) } }
+        : {}),
       AND: [
         {
           OR: [

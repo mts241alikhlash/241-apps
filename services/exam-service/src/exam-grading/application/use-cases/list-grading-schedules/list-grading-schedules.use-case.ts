@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { withClassroomNames } from '../../../../exam-schedule/application/with-classroom-names.js'
-import type { ExamScheduleView } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import type {
+  ExamCategory,
+  ExamScheduleView,
+} from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import type { ScheduleSessionCounts } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
@@ -25,7 +28,12 @@ export class ListGradingSchedulesUseCase {
 
   async execute(
     user: GradingUser,
-    query: { page: number; limit: number; semesterId?: string },
+    query: {
+      page: number
+      limit: number
+      semesterId?: string
+      category?: ExamCategory
+    },
     now: Date = new Date(),
   ): Promise<PaginatedResult<GradingSchedule>> {
     const semesterId =
@@ -42,6 +50,7 @@ export class ListGradingSchedulesUseCase {
       now,
       page: query.page,
       limit: query.limit,
+      category: query.category,
     })
 
     const [named, counts] = await Promise.all([

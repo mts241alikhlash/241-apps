@@ -19,6 +19,7 @@ describe('GradingScheduleDto', () => {
     } as GradingSchedule
 
     expect(GradingScheduleDto.fromDomain(schedule).type).toBe('MIDTERM')
+    expect(GradingScheduleDto.fromDomain(schedule).category).toBe('EXAM')
   })
 
   it('marks the title of a makeup', () => {
