@@ -119,6 +119,26 @@ describe('ActivityForm', () => {
     })
   })
 
+  it('blocks the form and explains when a teacher has no active midterm period', async () => {
+    const wrapper = open({ category: 'EXAM', events: [] })
+    await wrapper.find('#activity-grade').setValue('grade-7')
+    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
+    await wrapper.find('#activity-package').setValue('package-1')
+    await wrapper
+      .findAll('input[type="datetime-local"]')[0]
+      .setValue('2026-11-10T08:00')
+    await wrapper
+      .findAll('input[type="datetime-local"]')[1]
+      .setValue('2026-11-10T11:00')
+
+    expect(wrapper.text()).toContain('Belum ada periode UTS yang aktif')
+    expect(
+      wrapper.find('button[type="submit"]').attributes('disabled'),
+    ).toBeDefined()
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('submit')).toBeUndefined()
+  })
+
   it('keeps the admin section hidden from teachers', () => {
     expect(open().text()).not.toContain('Lanjutan (admin)')
     const admin = open({ isAdmin: true })

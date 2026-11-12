@@ -80,6 +80,8 @@ const availableTypes = computed<ExamType[]>(() => {
   ]
 })
 
+const noTypeAvailable = computed(() => availableTypes.value.length === 0)
+
 const nonExamPresetTypes: readonly PresetName[] = ['DAILY', 'ASSIGNMENT']
 
 const gradeId = ref('')
@@ -138,6 +140,7 @@ const chosenPackage = computed(
 
 const canSubmit = computed(
   () =>
+    !noTypeAvailable.value &&
     gradeId.value !== '' &&
     classroomIds.value.length > 0 &&
     packageId.value !== '' &&
@@ -327,6 +330,14 @@ async function submit(): Promise<void> {
           </option>
         </select>
       </label>
+
+      <p
+        v-if="noTypeAvailable"
+        role="alert"
+      >
+        Belum ada periode UTS yang aktif. Minta tata usaha atau kurikulum
+        membuka periode UTS sebelum membuat kegiatan ujian.
+      </p>
 
       <label class="grid gap-1">
         <span>Jenis</span>
