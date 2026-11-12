@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, useId, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BackButton, DataTable, SearchInput } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
@@ -28,7 +28,6 @@ import {
 import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
-import RoomCameraGrid from '../components/RoomCameraGrid.vue'
 import RoomMonitorSummaryCards from '../components/RoomMonitorSummaryCards.vue'
 import RoomReportTab from '../components/RoomReportTab.vue'
 import RecordAbsenceDialog from '../components/RecordAbsenceDialog.vue'
@@ -38,7 +37,7 @@ import SessionTimelineDialog from '../components/SessionTimelineDialog.vue'
 import { buildRoomParticipantColumns } from '../components/roomParticipantColumns'
 import { useRoomMonitor } from '../composables/useRoomMonitor'
 import { abilitiesFor, examRoomService } from '../services/examRoomService'
-import type { RoomCameraSeat, RoomMonitorParticipant } from '../types'
+import type { RoomMonitorParticipant } from '../types'
 import { MONITOR_STATUSES, monitorStatusLabel } from '../types'
 import type { MonitorStatus, RecoveryAction } from '../types'
 
@@ -79,61 +78,6 @@ const {
 const abilities = computed(() => abilitiesFor(hasPermission))
 
 const tab = ref('participants')
-
-const cameraSeats = ref<RoomCameraSeat[]>([])
-const cameraLoading = ref(false)
-const cameraError = ref<string | null>(null)
-let cameraTicket = 0
-
-async function loadCameraSeats() {
-  if (roomId.value === '') return
-  const ticket = ++cameraTicket
-  cameraLoading.value = true
-  try {
-    const roster = await examRoomService.loadRoster(roomId.value, slotId.value)
-    if (ticket !== cameraTicket) return
-    cameraError.value = null
-    cameraSeats.value = roster.data.flatMap((row) => {
-      const session = row.session
-      if (session === null) return []
-      return [
-        {
-          sessionId: session.sessionId,
-          studentName: row.studentName,
-          nis: row.nis,
-          lastSnapshotAt: session.lastSnapshotAt,
-          cameraBlocked: session.cameraBlocked,
-          latestSnapshotUrl: session.latestSnapshotUrl,
-        },
-      ]
-    })
-  } catch {
-    if (ticket !== cameraTicket) return
-    cameraError.value = 'Gagal memuat daftar siswa kamera pengawas.'
-  } finally {
-    if (ticket === cameraTicket) cameraLoading.value = false
-  }
-}
-
-const CAMERA_POLL_MS = 15_000
-let cameraTimer: ReturnType<typeof setInterval> | null = null
-
-function stopCameraPoll() {
-  if (cameraTimer === null) return
-  clearInterval(cameraTimer)
-  cameraTimer = null
-}
-
-watch(
-  [tab, roomId, slotId],
-  () => {
-    stopCameraPoll()
-    if (tab.value !== 'camera') return
-    void loadCameraSeats()
-    cameraTimer = setInterval(() => void loadCameraSeats(), CAMERA_POLL_MS)
-  },
-  { immediate: true },
-)
 
 const timelineTarget = ref<RoomMonitorParticipant | null>(null)
 const absenceTarget = ref<RoomMonitorParticipant | null>(null)
@@ -293,7 +237,6 @@ onMounted(async () => {
 })
 onUnmounted(() => {
   stop()
-  stopCameraPoll()
 })
 </script>
 
@@ -370,7 +313,6 @@ onUnmounted(() => {
             <TabsTrigger value="participants"
               >Peserta &amp; Progres</TabsTrigger
             >
-            <TabsTrigger value="camera">Kamera Pengawas</TabsTrigger>
             <TabsTrigger value="report">Berita Acara</TabsTrigger>
           </TabsList>
 
@@ -435,35 +377,6 @@ onUnmounted(() => {
                 <p>Tidak ada peserta yang cocok dengan filter.</p>
               </template>
             </DataTable>
-          </TabsContent>
-
-          <TabsContent value="camera">
-            <div
-              v-if="cameraError"
-              class="mb-4 space-y-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
-              role="alert"
-              data-testid="camera-error"
-            >
-              <p>{{ cameraError }}</p>
-              <Button
-                variant="outline"
-                data-testid="camera-retry"
-                @click="loadCameraSeats"
-              >
-                Coba lagi
-              </Button>
-            </div>
-            <p
-              v-if="cameraLoading && cameraSeats.length === 0"
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-            >
-              Memuat kamera pengawas…
-            </p>
-            <RoomCameraGrid
-              v-else
-              :seats="cameraSeats"
-              :server-time="lastUpdatedServerTime"
-            />
           </TabsContent>
 
           <TabsContent value="report">

@@ -16,7 +16,6 @@ import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   SessionRecoveryDialog,
   SessionTimelineDialog,
-  SessionSnapshotGalleryDialog,
 } from '@/features/exam-room'
 import type { RecoveryAction } from '@/features/exam-room/types'
 import { examScheduleService } from '../services/examScheduleService'
@@ -42,7 +41,6 @@ const error = ref<string | null>(null)
 const timelineSession = ref<ScheduleSession | null>(null)
 const recoverySession = ref<ScheduleSession | null>(null)
 const recoveryAction = ref<RecoveryAction>('reopen')
-const photoSession = ref<ScheduleSession | null>(null)
 
 useBreadcrumbs(() => [
   { title: 'Jadwal Ujian', href: schedulesHref.value },
@@ -56,11 +54,6 @@ const canRecover = computed(
     hasPermission('exam-rooms.manage-all'),
 )
 const canReadHistory = computed(
-  () =>
-    hasPermission('exam-rooms.supervise') ||
-    hasPermission('exam-rooms.manage-all'),
-)
-const canViewPhotos = computed(
   () =>
     hasPermission('exam-rooms.supervise') ||
     hasPermission('exam-rooms.manage-all'),
@@ -81,10 +74,6 @@ const columns = computed(() =>
     canReadHistory: canReadHistory.value,
     onHistory: (session) => {
       timelineSession.value = session
-    },
-    canViewPhotos: canViewPhotos.value,
-    onPhotos: (session) => {
-      photoSession.value = session
     },
   }),
 )
@@ -170,13 +159,6 @@ onMounted(load)
       :student-name="timelineSession?.studentName ?? null"
       :session-id="timelineSession?.sessionId ?? null"
       @update:open="(value: boolean) => value || (timelineSession = null)"
-    />
-
-    <SessionSnapshotGalleryDialog
-      :open="photoSession !== null"
-      :session-id="photoSession?.sessionId ?? null"
-      :student-name="photoSession?.studentName ?? null"
-      @update:open="(value: boolean) => value || (photoSession = null)"
     />
   </div>
 </template>

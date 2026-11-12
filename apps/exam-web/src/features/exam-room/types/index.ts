@@ -57,51 +57,6 @@ export interface RoomMonitorSession {
   lockedByViolation: boolean
   requiresTokenReentry: boolean
   lastEvent: { type: string; occurredAt: string; detail: string | null } | null
-  latestSnapshotUrl: string | null
-  lastSnapshotAt: string | null
-  cameraBlocked: string | null
-}
-
-export const CAMERA_BLOCKED_REASONS = [
-  'network',
-  'permission',
-  'battery',
-  'stopped',
-  'hardware',
-  'cameraBusy',
-] as const
-
-export type CameraBlockedReason = (typeof CAMERA_BLOCKED_REASONS)[number]
-
-const CAMERA_BLOCKED_LABELS: Record<CameraBlockedReason, string> = {
-  network: 'Jaringan bermasalah',
-  permission: 'Izin kamera ditolak',
-  battery: 'Baterai lemah',
-  stopped: 'Dihentikan siswa',
-  hardware: 'Kamera bermasalah',
-  cameraBusy: 'Kamera dipakai aplikasi lain',
-}
-
-export const cameraBlockedLabel = (reason: string): string =>
-  CAMERA_BLOCKED_LABELS[reason as CameraBlockedReason] ?? reason
-
-export interface RoomCameraSeat {
-  sessionId: string
-  studentName: string | null
-  nis: string | null
-  lastSnapshotAt: string | null
-  cameraBlocked: string | null
-  latestSnapshotUrl: string | null
-}
-
-export interface ProctorSnapshotEvidence {
-  id: string
-  sessionId: string
-  kind: 'SESSION_START' | 'VIOLATION_RETURN' | 'PERIODIC_EVIDENCE'
-  sizeBytes: number
-  capturedAt: string
-  expiresAt: string
-  createdAt: string
 }
 
 export interface RoomMonitorAbsence {

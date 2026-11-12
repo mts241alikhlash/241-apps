@@ -45,8 +45,15 @@ async function savePreset(preset: ExamPolicyPreset): Promise<void> {
   if (savingType.value !== null) return
   savingType.value = preset.type
   try {
+    const policy = preset.policy
     const response = await examPresetApi.update(preset.type, {
-      ...preset.policy,
+      violationLimit: policy.violationLimit,
+      focusThresholdMs: policy.focusThresholdMs,
+      heartbeatIntervalMs: policy.heartbeatIntervalMs,
+      gapRecordedMs: policy.gapRecordedMs,
+      gapTokenMs: policy.gapTokenMs,
+      gapViolationFrom: policy.gapViolationFrom,
+      tokenSlotSeconds: policy.tokenSlotSeconds,
     })
     remember([response.data.data])
     presets.value = presets.value.map((item) =>
@@ -116,7 +123,6 @@ onMounted(load)
                 <th class="p-3 font-semibold">Kategori</th>
                 <th class="p-3 font-semibold">Batas Pelanggaran</th>
                 <th class="p-3 font-semibold">Hilang Fokus (ms)</th>
-                <th class="p-3 font-semibold">Interval Foto (ms)</th>
                 <th class="p-3 font-semibold">Detak Sesi (ms)</th>
                 <th class="p-3 font-semibold">Jeda Putus (ms)</th>
                 <th class="p-3 font-semibold">Jeda Token (ms)</th>
@@ -153,16 +159,6 @@ onMounted(load)
                     min="3000"
                     max="60000"
                     :aria-label="`Hilang fokus ${examTypeLabel(item.type)}`"
-                    class="w-24 rounded border px-2 py-1"
-                  />
-                </td>
-                <td class="p-3">
-                  <input
-                    v-model.number="item.policy.snapshotIntervalMs"
-                    type="number"
-                    min="10000"
-                    max="300000"
-                    :aria-label="`Interval foto ${examTypeLabel(item.type)}`"
                     class="w-24 rounded border px-2 py-1"
                   />
                 </td>

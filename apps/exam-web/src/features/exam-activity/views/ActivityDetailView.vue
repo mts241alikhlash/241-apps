@@ -219,12 +219,6 @@ onMounted(load)
                 </dd>
               </div>
               <div>
-                <dt class="text-xs text-muted-foreground">Interval foto</dt>
-                <dd class="font-medium">
-                  {{ detail.policy.snapshotIntervalMs }} ms
-                </dd>
-              </div>
-              <div>
                 <dt class="text-xs text-muted-foreground">
                   Slot token berputar
                 </dt>

@@ -27,7 +27,6 @@ const emit = defineEmits<{
 
 const violationLimit = ref(props.policy.violationLimit ?? 3)
 const focusThresholdMs = ref(props.policy.focusThresholdMs ?? 15000)
-const snapshotIntervalMs = ref(props.policy.snapshotIntervalMs ?? 30000)
 const heartbeatIntervalMs = ref(props.policy.heartbeatIntervalMs ?? 30000)
 const gapRecordedMs = ref(props.policy.gapRecordedMs ?? 60000)
 const gapTokenMs = ref(props.policy.gapTokenMs ?? 300000)
@@ -42,7 +41,6 @@ watch(
   (next) => {
     violationLimit.value = next.violationLimit ?? 3
     focusThresholdMs.value = next.focusThresholdMs ?? 15000
-    snapshotIntervalMs.value = next.snapshotIntervalMs ?? 30000
     heartbeatIntervalMs.value = next.heartbeatIntervalMs ?? 30000
     gapRecordedMs.value = next.gapRecordedMs ?? 60000
     gapTokenMs.value = next.gapTokenMs ?? 300000
@@ -58,7 +56,6 @@ async function submit(): Promise<void> {
   const payload: ActivityPolicyPayload = {
     violationLimit: violationLimit.value,
     focusThresholdMs: focusThresholdMs.value,
-    snapshotIntervalMs: snapshotIntervalMs.value,
     heartbeatIntervalMs: heartbeatIntervalMs.value,
     gapRecordedMs: gapRecordedMs.value,
     gapTokenMs: gapTokenMs.value,
@@ -123,16 +120,6 @@ async function submit(): Promise<void> {
                 type="number"
                 min="3000"
                 max="60000"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
-              <span>Interval foto (ms)</span>
-              <input
-                v-model.number="snapshotIntervalMs"
-                type="number"
-                min="10000"
-                max="300000"
                 class="rounded-md border px-3 py-2"
               />
             </label>

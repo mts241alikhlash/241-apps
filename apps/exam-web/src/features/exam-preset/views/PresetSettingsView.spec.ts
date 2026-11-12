@@ -140,6 +140,9 @@ describe('PresetSettingsView', () => {
         focusThresholdMs: 15000,
       }),
     )
+    expect(updatePreset.mock.calls[0][1]).not.toHaveProperty(
+      'snapshotIntervalMs',
+    )
     wrapper.unmount()
   })
 

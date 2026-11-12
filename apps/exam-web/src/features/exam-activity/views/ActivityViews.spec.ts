@@ -97,7 +97,6 @@ const sampleDetail = (
   policy: {
     violationLimit: 3,
     focusThresholdMs: 15000,
-    snapshotIntervalMs: 30000,
     heartbeatIntervalMs: 30000,
     gapRecordedMs: 60000,
     gapTokenMs: 300000,

@@ -112,26 +112,4 @@ describe('buildSessionColumns', () => {
 
     expect(onRelease).toHaveBeenCalledWith(session())
   })
-
-  it('offers photos button to the supervisor and triggers onPhotos', () => {
-    const onPhotos = vi.fn()
-    const cell = (
-      buildSessionColumns({
-        canRelease: false,
-        onRelease: vi.fn(),
-        canViewPhotos: true,
-        onPhotos,
-      }).find((column) => column.id === 'actions')!.cell as (ctx: {
-        row: { original: ScheduleSession }
-      }) => VNode
-    )({ row: { original: session({ status: 'IN_PROGRESS' }) } })
-
-    expect(childText(cell)).toContain('Foto')
-    const button = (cell.children as VNode[]).find((b) => {
-      const slots = b.children as { default?: () => unknown }
-      return slots?.default?.() === 'Foto'
-    })
-    ;(button!.props as { onClick: () => void }).onClick()
-    expect(onPhotos).toHaveBeenCalledWith(session({ status: 'IN_PROGRESS' }))
-  })
 })
