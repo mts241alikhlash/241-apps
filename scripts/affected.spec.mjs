@@ -10,7 +10,6 @@ for (const file of [
   '.node-version',
   '.github/workflows/validate.yml',
   'scripts/affected.mjs',
-  'contracts/hr/openapi.json',
 ]) {
   test(`${file} makes everything affected`, () => {
     assert.equal(
@@ -30,6 +29,20 @@ test('a package change prints the pnpm filter', () => {
 test('a nested package.json is not a root change', () => {
   assert.equal(
     affectedFilter(['services/hr-service/package.json'], 'abc'),
+    '...[abc]',
+  )
+})
+
+test('a contract change only affects the packages that changed with it', () => {
+  assert.equal(
+    affectedFilter(
+      [
+        'contracts/exam.openapi.json',
+        'services/exam-service/src/a.ts',
+        'packages/exam-api/src/generated.ts',
+      ],
+      'abc',
+    ),
     '...[abc]',
   )
 })
