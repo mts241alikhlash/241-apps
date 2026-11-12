@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import {
-  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -82,24 +81,6 @@ export class StorageService {
 
     this.logger.log(`Uploaded file successfully: ${filePath}`)
     return filePath
-  }
-
-  async deleteObject(filePath: string): Promise<void> {
-    try {
-      await this.client.send(
-        new DeleteObjectCommand({ Bucket: this.bucket, Key: filePath }),
-      )
-    } catch (err) {
-      this.logger.error(
-        `Failed to delete file from ${filePath}`,
-        err instanceof Error ? err.stack : undefined,
-      )
-      throw new InternalServerErrorException(
-        `Failed to delete file: ${String(err)}`,
-      )
-    }
-
-    this.logger.log(`Deleted file successfully: ${filePath}`)
   }
 
   async getSignedUrl(filePath: string): Promise<string> {
