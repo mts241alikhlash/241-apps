@@ -39,8 +39,7 @@ export function assertTypeAllowed(input: {
 
   if (input.type === 'MIDTERM' && !input.manageAll) {
     if (
-      input.event === null ||
-      input.event.type !== 'MIDTERM' ||
+      input.event?.type !== 'MIDTERM' ||
       input.event.status !== 'ACTIVE' ||
       input.startsAt.getTime() < input.event.startsAt.getTime() ||
       input.endsAt.getTime() > input.event.endsAt.getTime()
@@ -53,7 +52,7 @@ export function assertTypeAllowed(input: {
   }
 
   if (categoryOf(input.type) === 'EXAM') {
-    if (input.event === null || input.event.type !== input.type) {
+    if (input.event?.type !== input.type) {
       throw new ApiUnprocessableException(
         'EVENT_REQUIRED',
         'Kegiatan ujian wajib memilih periode ujian yang sejenis.',
