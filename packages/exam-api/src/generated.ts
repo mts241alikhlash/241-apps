@@ -1476,8 +1476,7 @@ export interface components {
              * @description The exam event this schedule belongs to; seats come from it
              */
             eventId?: string;
-            /** @default 0 */
-            minSubmitMinutes: number;
+            minSubmitMinutes?: number;
             /** Format: uuid */
             packageId: string;
             /** Format: date-time */
@@ -2596,8 +2595,7 @@ export interface components {
              * @description The exam event this schedule belongs to; seats come from it
              */
             eventId?: string;
-            /** @default 0 */
-            minSubmitMinutes: number;
+            minSubmitMinutes?: number;
             /** Format: date-time */
             startsAt: string;
             /** @enum {string} */

@@ -40,7 +40,7 @@ export class UpdateExamScheduleDto {
   @Max(1440)
   durationMinutes!: number
 
-  @ApiPropertyOptional({ minimum: 0, maximum: 1440, default: 0 })
+  @ApiPropertyOptional({ minimum: 0, maximum: 1440 })
   @Type(() => Number)
   @IsOptional()
   @IsInt()

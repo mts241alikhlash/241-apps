@@ -8490,8 +8490,7 @@
           "minSubmitMinutes": {
             "type": "number",
             "minimum": 0,
-            "maximum": 1440,
-            "default": 0
+            "maximum": 1440
           },
           "type": {
             "enum": [
@@ -8544,8 +8543,7 @@
           "minSubmitMinutes": {
             "type": "number",
             "minimum": 0,
-            "maximum": 1440,
-            "default": 0
+            "maximum": 1440
           },
           "type": {
             "enum": [
