@@ -6,6 +6,7 @@ import {
   createServiceClient,
   unwrap,
   unwrapBlob,
+  unwrapPage,
 } from './service-client'
 import { getIndonesianErrorMessage } from './error-handler'
 
@@ -126,6 +127,26 @@ describe('unwrap', () => {
     expect(err).toBeInstanceOf(ServiceRequestError)
     expect(err.code).toBe('ERR_NETWORK')
     expect(getIndonesianErrorMessage(err, 'f')).toMatch(/tidak/i)
+  })
+})
+
+describe('unwrapPage', () => {
+  it('fills missing meta fields with defaults', async () => {
+    fetchMock.mockResolvedValueOnce(
+      json(200, { data: [1], meta: { total: 5 } }),
+    )
+    expect(await unwrapPage(client().GET('/x'))).toEqual({
+      data: [1],
+      meta: { total: 5, page: 1, limit: 0 },
+    })
+  })
+
+  it('defaults the whole meta when absent', async () => {
+    fetchMock.mockResolvedValueOnce(json(200, {}))
+    expect(await unwrapPage(client().GET('/x'))).toEqual({
+      data: [],
+      meta: { total: 0, page: 1, limit: 0 },
+    })
   })
 })
 
