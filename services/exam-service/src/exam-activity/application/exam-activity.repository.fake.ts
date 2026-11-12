@@ -132,7 +132,7 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     )
   }
 
-  updateStatus(id: string, status: ActivityStatus) {
+  updateStatus(id: string, status: ActivityStatus, _actorId: string) {
     const activity = this.activities.get(id)
     if (activity === undefined) return Promise.resolve(null)
     const updated: ExamActivity = { ...activity, status }
