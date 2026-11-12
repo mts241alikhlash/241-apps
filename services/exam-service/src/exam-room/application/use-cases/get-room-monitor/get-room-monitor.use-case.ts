@@ -124,16 +124,18 @@ export interface RoomMonitorResult {
   meta: RoomMonitorMeta
 }
 
-interface RosterRow {
+interface RosterRowBase {
   seat: ExamRoomSeat
   scheduleId: string
   packageTitle: string
   subjectName: string | null
   totalQuestions: number
-  session: ExamSession | null
-  scheduleEndsAt: Date | null
   absence: ExamRoomReportAbsence | null
 }
+
+type RosterRow =
+  | (RosterRowBase & { session: null; scheduleEndsAt: null })
+  | (RosterRowBase & { session: ExamSession; scheduleEndsAt: Date })
 
 function clampLimit(limit: number | undefined): number {
   if (limit === undefined) return MONITOR_DEFAULT_LIMIT
@@ -237,7 +239,7 @@ export class GetRoomMonitorUseCase {
           schedule === undefined
             ? null
             : (sessionOf.get(`${schedule.id}:${seat.studentId}`) ?? null)
-        return {
+        const base = {
           seat,
           scheduleId: session?.scheduleId ?? schedule?.id ?? '',
           packageTitle: schedule?.packageTitle ?? '',
@@ -249,8 +251,6 @@ export class GetRoomMonitorUseCase {
             schedule === undefined
               ? 0
               : (questionCounts.get(schedule.packageId) ?? 0),
-          session,
-          scheduleEndsAt: schedule?.endsAt ?? null,
           absence:
             session !== null
               ? null
@@ -260,6 +260,10 @@ export class GetRoomMonitorUseCase {
                     row.scheduleId === schedule?.id,
                 ) ?? null),
         }
+        if (session === null || schedule === undefined) {
+          return { ...base, session: null, scheduleEndsAt: null }
+        }
+        return { ...base, session, scheduleEndsAt: schedule.endsAt }
       })
       .sort((a, b) => a.seat.seatNumber - b.seat.seatNumber)
 
@@ -307,7 +311,7 @@ export class GetRoomMonitorUseCase {
                   status: row.session.status,
                   startedAt: row.session.startedAt.toISOString(),
                   deadline: row.session.deadline.toISOString(),
-                  scheduleEndsAt: row.scheduleEndsAt?.toISOString() ?? '',
+                  scheduleEndsAt: row.scheduleEndsAt.toISOString(),
                   submittedAt: row.session.submittedAt?.toISOString() ?? null,
                   extraMinutes: row.session.extraMinutes,
                   answeredCount:
