@@ -241,11 +241,11 @@ async function save() {
                 :id="`${fieldId}-event`"
                 class="w-full"
               >
-                <SelectValue placeholder="Tanpa ruangan (UH harian)" />
+                <SelectValue placeholder="Tanpa ruangan (Ulangan Harian)" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem :value="NO_EVENT">
-                  Tanpa kegiatan (UH/kuis di kelas)
+                  Tanpa kegiatan (Ulangan Harian atau Tugas di kelas)
                 </SelectItem>
                 <SelectItem
                   v-for="item in events"

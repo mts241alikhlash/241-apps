@@ -344,4 +344,12 @@ describe('ScheduleFormDialog', () => {
     ).toBeDefined()
     wrapper.unmount()
   })
+
+  it('names the no-event options with the glossary terms', () => {
+    const html = open().html()
+
+    expect(html).toContain('Ulangan Harian')
+    expect(html).not.toMatch(/\bUH\b/)
+    expect(html.toLowerCase()).not.toContain('kuis')
+  })
 })
