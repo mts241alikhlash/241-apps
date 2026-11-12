@@ -6,32 +6,26 @@ import {
   TEST_RULES,
   TYPECHECK_RULES,
   frame,
-  typescript,
+  TYPESCRIPT,
 } from './shared.js'
 
-export function nest({
-  tsconfigRootDir,
-  typecheck = false,
-  ignores = [],
-  overrides = [],
-}) {
+export function nest({ tsconfigRootDir, ignores = [], overrides = [] }) {
   return frame({
-    typecheck,
     ignores,
     overrides,
     body: [
-      ...typescript(typecheck),
+      ...TYPESCRIPT,
       {
         languageOptions: {
           globals: { ...globals.node },
           parserOptions: {
             tsconfigRootDir,
-            ...(typecheck && { projectService: true }),
+            projectService: true,
           },
         },
         rules: {
           ...COMMON_RULES,
-          ...(typecheck && TYPECHECK_RULES),
+          ...TYPECHECK_RULES,
         },
       },
       {
