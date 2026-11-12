@@ -15,6 +15,7 @@ const session = (
   status: 'IN_PROGRESS',
   startedAt: '2026-11-02T01:00:00.000Z',
   deadline: '2026-11-02T02:30:00.000Z',
+  scheduleEndsAt: '2026-11-02T04:00:00.000Z',
   submittedAt: null,
   extraMinutes: 0,
   answeredCount: 38,

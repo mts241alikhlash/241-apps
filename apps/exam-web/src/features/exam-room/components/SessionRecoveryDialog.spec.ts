@@ -165,6 +165,41 @@ describe('SessionRecoveryDialog', () => {
     late.unmount()
   })
 
+  it('disables extending when the exam window is over', async () => {
+    const wrapper = open('extend-time', { maxExtendMinutes: 0 })
+    await wrapper.find('textarea').setValue('Listrik padam')
+
+    const save = wrapper
+      .findAll('button')
+      .find((item) => item.text() === 'Simpan')!
+    expect(wrapper.find('input').attributes('disabled')).toBeDefined()
+    expect(save.attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('Jendela ujian sudah habis')
+    wrapper.unmount()
+  })
+
+  it('caps the minutes input at the remaining window', () => {
+    const wrapper = open('extend-time', { maxExtendMinutes: 45 })
+
+    expect(wrapper.find('input').attributes('max')).toBe('45')
+    expect(wrapper.text()).not.toContain('Jendela ujian sudah habis')
+    wrapper.unmount()
+  })
+
+  it('disables reopening when the exam window is closed', async () => {
+    const wrapper = open('reopen', { windowOpen: false })
+    await wrapper.find('textarea').setValue('Terkirim tidak sengaja')
+
+    const save = wrapper
+      .findAll('button')
+      .find((item) => item.text() === 'Simpan')!
+    expect(save.attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('Jendela ujian sudah habis')
+    await confirm(wrapper, 'Terkirim tidak sengaja')
+    expect(reopenSession).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
   it('refuses to submit without a reason of five characters', async () => {
     const wrapper = open('release')
     const save = wrapper

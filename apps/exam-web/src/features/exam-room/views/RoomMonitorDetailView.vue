@@ -84,6 +84,33 @@ const absenceTarget = ref<RoomMonitorParticipant | null>(null)
 const fieldNoteTarget = ref<RoomMonitorParticipant | null>(null)
 const recoveryTarget = ref<RoomMonitorParticipant | null>(null)
 const recoveryAction = ref<RecoveryAction>('reopen')
+const MAX_TOTAL_EXTRA_MINUTES = 180
+const MS_PER_MINUTE = 60_000
+
+const recoverySession = computed(() => recoveryTarget.value?.session ?? null)
+
+const recoveryMaxExtendMinutes = computed(() => {
+  const session = recoverySession.value
+  if (session === null) return null
+  const windowMinutes = Math.floor(
+    (Date.parse(session.scheduleEndsAt) - Date.parse(session.deadline)) /
+      MS_PER_MINUTE,
+  )
+  return Math.max(
+    0,
+    Math.min(windowMinutes, MAX_TOTAL_EXTRA_MINUTES - session.extraMinutes),
+  )
+})
+
+const recoveryWindowOpen = computed(() => {
+  const session = recoverySession.value
+  if (session === null) return true
+  const windowEnd = Math.max(
+    Date.parse(session.scheduleEndsAt),
+    Date.parse(session.deadline) + session.extraMinutes * MS_PER_MINUTE,
+  )
+  return Date.now() <= windowEnd
+})
 
 const title = computed(() => {
   const current = room.value
@@ -424,6 +451,8 @@ onUnmounted(() => {
       :student-name="recoveryTarget?.studentName ?? null"
       :session-id="recoveryTarget?.session?.sessionId ?? null"
       :action="recoveryAction"
+      :max-extend-minutes="recoveryMaxExtendMinutes"
+      :window-open="recoveryWindowOpen"
       @update:open="(value: boolean) => value || (recoveryTarget = null)"
       @done="refresh()"
     />
