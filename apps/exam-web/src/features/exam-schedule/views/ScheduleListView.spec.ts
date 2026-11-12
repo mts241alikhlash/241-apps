@@ -189,7 +189,7 @@ describe('ScheduleListView', () => {
     expect(cardRows(wrapper)).toHaveLength(1)
     expect(text).toContain('UTS Matematika')
     expect(text).toContain('VII A')
-    expect(text).toContain('2 November 2030')
+    expect(text).toContain('2 Nov 08:00 – 11:00 WIB')
     expect(text).toContain('90 menit')
     expect(text).toContain('Belum mulai')
     wrapper.unmount()

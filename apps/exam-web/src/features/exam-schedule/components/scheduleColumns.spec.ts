@@ -85,7 +85,7 @@ describe('buildScheduleColumns', () => {
     ])
     expect(mobile('type')).toBe('UTS')
     expect(mobile('classroom')).toBe('VII A')
-    expect(mobile('window')).toContain('08.00')
+    expect(mobile('window')).toContain('2 Nov 08:00 – 11:00 WIB')
     expect(mobile('duration')).toBe('90 menit')
     expect(mobile('phase')).toBe('Berlangsung')
   })
