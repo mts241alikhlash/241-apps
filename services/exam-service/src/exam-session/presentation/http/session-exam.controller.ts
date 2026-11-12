@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Controller,
   Body,
   Get,
@@ -9,17 +8,10 @@ import {
   Post,
   Res,
   StreamableFile,
-  UploadedFile,
-  UseFilters,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { Throttle } from '@nestjs/throttler'
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
   ApiHeader,
   ApiOperation,
   ApiParam,
@@ -33,7 +25,6 @@ import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { GetPaperUseCase } from '../../application/use-cases/get-paper/get-paper.use-case.js'
 import { GetSessionFileUseCase } from '../../application/use-cases/get-session-file/get-session-file.use-case.js'
 import { RecordViolationsUseCase } from '../../application/use-cases/record-violations/record-violations.use-case.js'
-import { ReportCameraBlockedUseCase } from '../../application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'
 import { SubmitExamSessionUseCase } from '../../application/use-cases/submit-exam-session/submit-exam-session.use-case.js'
 import { SaveAnswerUseCase } from '../../application/use-cases/save-answer/save-answer.use-case.js'
 import { SaveAnswersBatchUseCase } from '../../application/use-cases/save-answers-batch/save-answers-batch.use-case.js'
@@ -42,8 +33,6 @@ import { RecordSessionEventsUseCase } from '../../application/use-cases/record-s
 import { ResumeExamSessionUseCase } from '../../application/use-cases/resume-exam-session/resume-exam-session.use-case.js'
 import { SessionHeartbeatUseCase } from '../../application/use-cases/session-heartbeat/session-heartbeat.use-case.js'
 import { SuspendSessionUseCase } from '../../application/use-cases/suspend-session/suspend-session.use-case.js'
-import { UploadProctorSnapshotUseCase } from '../../application/use-cases/upload-proctor-snapshot/upload-proctor-snapshot.use-case.js'
-import { SNAPSHOT_KINDS } from '../../domain/entities/exam-proctor-snapshot.entity.js'
 import { ClientPlatformHeader } from './client-platform.decorator.js'
 import { DeviceId } from './device-id.decorator.js'
 import type { ClientPlatform } from '../../domain/policies/client-gate.policy.js'
@@ -57,17 +46,11 @@ import {
   RecordViolationsRequestDto,
   ViolationCountDto,
 } from './dto/record-violations.dto.js'
-import { CameraBlockedDto } from './dto/camera-blocked.dto.js'
 import { SessionHeartbeatDto } from './dto/session-heartbeat.dto.js'
 import {
   SessionSuspensionDto,
   SessionSuspensionRequestDto,
 } from './dto/session-suspension.dto.js'
-import { SnapshotTooLargeFilter } from './snapshot-too-large.filter.js'
-import {
-  ProctorSnapshotUploadedDto,
-  UploadProctorSnapshotDto,
-} from './dto/proctor-snapshot.dto.js'
 import {
   SubmitSessionRequestDto,
   SubmitSessionResponseDto,
@@ -102,12 +85,10 @@ export class SessionExamController {
     private readonly saveAnswersBatch: SaveAnswersBatchUseCase,
     private readonly submitSession: SubmitExamSessionUseCase,
     private readonly recordViolations: RecordViolationsUseCase,
-    private readonly reportCameraBlocked: ReportCameraBlockedUseCase,
     private readonly recordEvents: RecordSessionEventsUseCase,
     private readonly resumeSession: ResumeExamSessionUseCase,
     private readonly heartbeat: SessionHeartbeatUseCase,
     private readonly suspendSession: SuspendSessionUseCase,
-    private readonly uploadSnapshot: UploadProctorSnapshotUseCase,
   ) {}
 
   @Get('questions')
@@ -315,72 +296,6 @@ export class SessionExamController {
         new Date(),
       ),
     )
-  }
-
-  @Post('camera-blocked')
-  @HttpCode(204)
-  @RequirePermissions('exam-sessions.take')
-  @ApiOperation({ summary: 'Record why the camera cannot take a snapshot' })
-  @ApiParam({ name: 'sessionId', format: 'uuid' })
-  @ApiResponse({ status: 204 })
-  async cameraBlocked(
-    @CurrentUser() user: { id: string },
-    @DeviceId() deviceId: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @Body() body: CameraBlockedDto,
-  ): Promise<void> {
-    await this.reportCameraBlocked.execute(
-      { id: user.id, deviceId },
-      sessionId,
-      body.reason,
-      new Date(),
-    )
-  }
-
-  @Post('proctor-snapshot')
-  @HttpCode(201)
-  @Throttle({ default: { limit: 600, ttl: 60_000 } })
-  @RequirePermissions('exam-sessions.take')
-  @UseFilters(SnapshotTooLargeFilter)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 1_000_000, files: 1 },
-    }),
-  )
-  @ApiOperation({ summary: 'Upload a proctoring snapshot (JPEG, 1 MB)' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['file', 'kind', 'capturedAt'],
-      properties: {
-        file: { type: 'string', format: 'binary' },
-        kind: { type: 'string', enum: [...SNAPSHOT_KINDS] },
-        capturedAt: { type: 'string', format: 'date-time' },
-      },
-    },
-  })
-  @ApiParam({ name: 'sessionId', format: 'uuid' })
-  @ApiResponse({ status: 201, type: ProctorSnapshotUploadedDto })
-  async snapshot(
-    @CurrentUser() user: { id: string },
-    @DeviceId() deviceId: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @UploadedFile() file: Express.Multer.File | undefined,
-    @Body() body: UploadProctorSnapshotDto,
-  ): Promise<ProctorSnapshotUploadedDto> {
-    if (!file) throw new BadRequestException('Foto wajib dilampirkan')
-    const { evidenceId } = await this.uploadSnapshot.execute(
-      { id: user.id, deviceId },
-      sessionId,
-      {
-        buffer: file.buffer,
-        kind: body.kind,
-        capturedAt: new Date(body.capturedAt),
-      },
-      new Date(),
-    )
-    return ProctorSnapshotUploadedDto.of(evidenceId)
   }
 
   @Post('submit')

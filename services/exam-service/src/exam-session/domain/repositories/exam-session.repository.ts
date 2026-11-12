@@ -170,9 +170,6 @@ export abstract class IExamSessionRepository {
     status?: ExamSessionStatus,
   ): Promise<PaginatedResult<ExamSession>>
   abstract recordViolations(id: string, count: number): Promise<void>
-  abstract recordSnapshot(id: string, at: Date): Promise<void>
-  abstract clearLastSnapshotAt(ids: string[]): Promise<void>
-  abstract setCameraBlocked(id: string, reason: string): Promise<void>
   abstract countsBySchedule(
     scheduleIds: string[],
   ): Promise<Map<string, ScheduleSessionCounts>>

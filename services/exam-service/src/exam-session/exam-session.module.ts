@@ -19,13 +19,10 @@ import { FinalizeSessionService } from './application/finalize-session.service.j
 import { FinalizeDueSessionsUseCase } from './application/use-cases/finalize-due-sessions/finalize-due-sessions.use-case.js'
 import { CloseActivitySessionsUseCase } from './application/use-cases/close-activity-sessions/close-activity-sessions.use-case.js'
 import { RecordViolationsUseCase } from './application/use-cases/record-violations/record-violations.use-case.js'
-import { ReportCameraBlockedUseCase } from './application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'
 import { SubmitExamSessionUseCase } from './application/use-cases/submit-exam-session/submit-exam-session.use-case.js'
 import { IExamSessionRepository } from './domain/repositories/exam-session.repository.js'
 import { PrismaExamAccessAttemptRepository } from './infrastructure/persistence/prisma/prisma-exam-access-attempt.repository.js'
 import { PrismaExamSessionRepository } from './infrastructure/persistence/prisma/prisma-exam-session.repository.js'
-import { IExamProctorSnapshotRepository } from './domain/repositories/exam-proctor-snapshot.repository.js'
-import { PrismaExamProctorSnapshotRepository } from './infrastructure/persistence/prisma/prisma-exam-proctor-snapshot.repository.js'
 import { ExamSessionAdminController } from './presentation/http/exam-session-admin.controller.js'
 import { ListScheduleSessionsUseCase } from './application/use-cases/list-schedule-sessions/list-schedule-sessions.use-case.js'
 import { ReleaseSessionUseCase } from './application/use-cases/release-session/release-session.use-case.js'
@@ -48,11 +45,6 @@ import { ExtendSessionTimeUseCase } from './application/use-cases/extend-session
 import { AllowWebClientUseCase } from './application/use-cases/allow-web-client/allow-web-client.use-case.js'
 import { AllowLateEntryUseCase } from './application/use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ListSessionAuditLogsUseCase } from './application/use-cases/list-session-audit-logs/list-session-audit-logs.use-case.js'
-import { UploadProctorSnapshotUseCase } from './application/use-cases/upload-proctor-snapshot/upload-proctor-snapshot.use-case.js'
-import { GetProctorSnapshotUseCase } from './application/use-cases/get-proctor-snapshot/get-proctor-snapshot.use-case.js'
-import { ListSessionSnapshotsUseCase } from './application/use-cases/list-session-snapshots/list-session-snapshots.use-case.js'
-import { CleanupExpiredSnapshotsUseCase } from './application/use-cases/cleanup-expired-snapshots/cleanup-expired-snapshots.use-case.js'
-import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapshot-cleanup.job.js'
 
 @Module({
   imports: [
@@ -71,10 +63,6 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
   providers: [
     { provide: IExamSessionRepository, useClass: PrismaExamSessionRepository },
     {
-      provide: IExamProctorSnapshotRepository,
-      useClass: PrismaExamProctorSnapshotRepository,
-    },
-    {
       provide: IExamAccessAttemptRepository,
       useClass: PrismaExamAccessAttemptRepository,
     },
@@ -82,7 +70,6 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     { provide: ISessionFinalizer, useExisting: FinalizeSessionService },
     SubmitExamSessionUseCase,
     RecordViolationsUseCase,
-    ReportCameraBlockedUseCase,
     ListScheduleSessionsUseCase,
     ReleaseSessionUseCase,
     FinalizeDueSessionsUseCase,
@@ -114,15 +101,9 @@ import { ProctorSnapshotCleanupJob } from './infrastructure/jobs/proctor-snapsho
     AllowWebClientUseCase,
     AllowLateEntryUseCase,
     ListSessionAuditLogsUseCase,
-    UploadProctorSnapshotUseCase,
-    GetProctorSnapshotUseCase,
-    ListSessionSnapshotsUseCase,
-    CleanupExpiredSnapshotsUseCase,
-    ProctorSnapshotCleanupJob,
   ],
   exports: [
     IExamSessionRepository,
-    IExamProctorSnapshotRepository,
     ISessionRecoveryRepository,
     SessionRecoveryService,
     SeatFlagService,

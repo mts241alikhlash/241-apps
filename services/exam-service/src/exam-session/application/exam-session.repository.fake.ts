@@ -66,9 +66,6 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
       violationCount: 0,
       lastSeenAt: null,
       absentSince: null,
-      lastSnapshotAt: null,
-      snapshotCount: 0,
-      cameraBlocked: null,
       roomId: input.roomId ?? null,
       seatNumber: input.seatNumber ?? null,
       requiresTokenReentry: false,
@@ -337,37 +334,6 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
     const session = this.sessions.get(id)
     if (session?.status === 'IN_PROGRESS' && session.violationCount < count) {
       this.sessions.set(id, { ...session, violationCount: count })
-    }
-    return Promise.resolve()
-  }
-
-  recordSnapshot(id: string, at: Date) {
-    const session = this.sessions.get(id)
-    if (session?.status === 'IN_PROGRESS') {
-      this.sessions.set(id, {
-        ...session,
-        lastSeenAt: at,
-        absentSince: session.absentSince,
-        lastSnapshotAt: at,
-        cameraBlocked: null,
-        snapshotCount: session.snapshotCount + 1,
-      })
-    }
-    return Promise.resolve()
-  }
-
-  clearLastSnapshotAt(ids: string[]) {
-    for (const id of ids) {
-      const session = this.sessions.get(id)
-      if (session) this.sessions.set(id, { ...session, lastSnapshotAt: null })
-    }
-    return Promise.resolve()
-  }
-
-  setCameraBlocked(id: string, reason: string) {
-    const session = this.sessions.get(id)
-    if (session?.status === 'IN_PROGRESS' && session.cameraBlocked === null) {
-      this.sessions.set(id, { ...session, cameraBlocked: reason })
     }
     return Promise.resolve()
   }

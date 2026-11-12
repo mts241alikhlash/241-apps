@@ -363,33 +363,6 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
     })
   }
 
-  async recordSnapshot(id: string, at: Date): Promise<void> {
-    await this.prisma.examSession.updateMany({
-      where: { id, status: 'IN_PROGRESS' },
-      data: {
-        lastSnapshotAt: at,
-        lastSeenAt: at,
-        cameraBlocked: null,
-        snapshotCount: { increment: 1 },
-      },
-    })
-  }
-
-  async clearLastSnapshotAt(ids: string[]): Promise<void> {
-    if (ids.length === 0) return
-    await this.prisma.examSession.updateMany({
-      where: { id: { in: ids } },
-      data: { lastSnapshotAt: null },
-    })
-  }
-
-  async setCameraBlocked(id: string, reason: string): Promise<void> {
-    await this.prisma.examSession.updateMany({
-      where: { id, status: 'IN_PROGRESS', cameraBlocked: null },
-      data: { cameraBlocked: reason },
-    })
-  }
-
   async countsBySchedule(
     scheduleIds: string[],
   ): Promise<Map<string, ScheduleSessionCounts>> {

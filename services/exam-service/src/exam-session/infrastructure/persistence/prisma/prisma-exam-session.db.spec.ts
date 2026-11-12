@@ -309,65 +309,6 @@ suite('PrismaExamSessionRepository against a real database', () => {
     expect(await prisma.examAnswer.count({ where: { sessionId } })).toBe(1)
   })
 
-  it('records a snapshot on the session row', async () => {
-    const paper = await schedule(1)
-    const sessionId = await session(paper.scheduleId)
-    await prisma.examSession.update({
-      where: { id: sessionId },
-      data: { cameraBlocked: 'network' },
-    })
-
-    await sessions.recordSnapshot(sessionId, NOW)
-
-    const row = await prisma.examSession.findUnique({
-      where: { id: sessionId },
-    })
-    expect(row?.lastSnapshotAt).toEqual(NOW)
-    expect(row?.lastSeenAt).toEqual(NOW)
-    expect(row?.cameraBlocked).toBeNull()
-    expect(row?.snapshotCount).toBe(1)
-
-    await sessions.recordSnapshot(sessionId, NOW)
-
-    expect(
-      (await prisma.examSession.findUnique({ where: { id: sessionId } }))
-        ?.snapshotCount,
-    ).toBe(2)
-  })
-
-  it('clears lastSnapshotAt for the sessions it is given', async () => {
-    const paper = await schedule(1)
-    const sessionId = await session(paper.scheduleId)
-    await sessions.recordSnapshot(sessionId, NOW)
-
-    await sessions.clearLastSnapshotAt([sessionId])
-
-    const row = await prisma.examSession.findUnique({
-      where: { id: sessionId },
-    })
-    expect(row?.lastSnapshotAt).toBeNull()
-    expect(row?.snapshotCount).toBe(1)
-  })
-
-  it('ignores a snapshot for a session that is no longer running', async () => {
-    const paper = await schedule(1)
-    const sessionId = await session(paper.scheduleId)
-    await prisma.examSession.update({
-      where: { id: sessionId },
-      data: { status: 'SUBMITTED', cameraBlocked: 'network' },
-    })
-
-    await sessions.recordSnapshot(sessionId, NOW)
-
-    const row = await prisma.examSession.findUnique({
-      where: { id: sessionId },
-    })
-    expect(row?.lastSnapshotAt).toBeNull()
-    expect(row?.lastSeenAt).toBeNull()
-    expect(row?.cameraBlocked).toBe('network')
-    expect(row?.snapshotCount).toBe(0)
-  })
-
   it('reports the stored answer count after the session closed', async () => {
     const paper = await schedule(3)
     const sessionId = await session(paper.scheduleId)

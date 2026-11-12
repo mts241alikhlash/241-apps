@@ -14,7 +14,6 @@ import {
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
 import { ROOM_EXECUTION_CONDITIONS } from '../../../../exam-room/domain/entities/exam-room-report.entity.js'
 import { MAKEUP_REASONS } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
-import { CAMERA_BLOCKED_REASONS } from '../../../../exam-session/application/use-cases/report-camera-blocked/report-camera-blocked.use-case.js'
 import type {
   RoomMonitorMeta,
   RoomMonitorParticipant,
@@ -89,12 +88,6 @@ export class RoomMonitorSessionDto {
   @ApiProperty() requiresTokenReentry!: boolean
   @ApiProperty({ type: Object, nullable: true })
   lastEvent!: { type: string; occurredAt: string; detail: string | null } | null
-  @ApiProperty({ type: String, format: 'date-time', nullable: true })
-  lastSnapshotAt!: string | null
-  @ApiProperty({ type: String, nullable: true, enum: CAMERA_BLOCKED_REASONS })
-  cameraBlocked!: string | null
-  @ApiProperty({ type: String, nullable: true })
-  latestSnapshotUrl!: string | null
 
   static fromDomain(domain: RoomMonitorSession): RoomMonitorSessionDto {
     const dto = new RoomMonitorSessionDto()
@@ -119,9 +112,6 @@ export class RoomMonitorSessionDto {
     dto.lockedByViolation = domain.lockedByViolation
     dto.requiresTokenReentry = domain.requiresTokenReentry
     dto.lastEvent = domain.lastEvent
-    dto.lastSnapshotAt = domain.lastSnapshotAt
-    dto.cameraBlocked = domain.cameraBlocked
-    dto.latestSnapshotUrl = domain.latestSnapshotUrl
     return dto
   }
 }

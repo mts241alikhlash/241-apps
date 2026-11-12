@@ -83,9 +83,6 @@ export interface RoomMonitorSession {
   lockedByViolation: boolean
   requiresTokenReentry: boolean
   lastEvent: { type: string; occurredAt: string; detail: string | null } | null
-  lastSnapshotAt: string | null
-  cameraBlocked: string | null
-  latestSnapshotUrl: string | null
 }
 
 export interface RoomMonitorParticipant {
@@ -332,13 +329,6 @@ export class GetRoomMonitorUseCase {
                           occurredAt: event.occurredAt.toISOString(),
                           detail: event.detail,
                         },
-                  lastSnapshotAt:
-                    row.session.lastSnapshotAt?.toISOString() ?? null,
-                  cameraBlocked: row.session.cameraBlocked,
-                  latestSnapshotUrl:
-                    row.session.lastSnapshotAt === null
-                      ? null
-                      : `/exam-sessions/${row.session.id}/snapshots/latest`,
                 },
           absence:
             row.absence === null

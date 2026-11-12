@@ -14,21 +14,6 @@ const anyExpected: Record<string, string[]> = {
   reopen: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   reset: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   extendTime: ['exam-rooms.technician', 'exam-rooms.manage-all'],
-  snapshots: [
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  ],
-  latestSnapshot: [
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  ],
-  snapshot: [
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  ],
 }
 
 describe('ExamSessionAdminController permissions', () => {
