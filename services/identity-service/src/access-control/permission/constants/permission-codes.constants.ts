@@ -920,6 +920,13 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
     code: 'exam-schedules.update',
     description: 'Update exam schedules',
   },
+  {
+    module: 'exam-schedules',
+    action: 'manage-all',
+    code: 'exam-schedules.manage-all',
+    description:
+      'Create final exam activities and edit policy presets for every teacher',
+  },
 
   {
     module: 'exam-grading',

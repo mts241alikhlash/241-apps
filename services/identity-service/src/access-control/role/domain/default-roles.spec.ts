@@ -530,6 +530,12 @@ describe('default roles', () => {
       }
     })
 
+    it('gives exam-schedules.manage-all to the curriculum roles but not the operator', () => {
+      expect(holders('exam-schedules.manage-all')).toEqual(
+        admins.filter((role) => role !== 'OPERATOR').sort(),
+      )
+    })
+
     it('lets the principal and the technician read the event', () => {
       expect(holders('exam-events.read')).toEqual(
         [...admins, 'EXAM_TECHNICIAN', 'PRINCIPAL'].sort(),
@@ -565,6 +571,7 @@ describe('default roles', () => {
     it('keeps all six codes out of every broad grant', () => {
       for (const code of [
         ...managing,
+        'exam-schedules.manage-all',
         'exam-events.read',
         'exam-rooms.supervise',
         'exam-rooms.technician',
