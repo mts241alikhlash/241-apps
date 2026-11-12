@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_POLICIES,
+  POLICY_KEYS,
   type ExamPolicy,
   parsePolicy,
   tryParsePolicy,
@@ -9,7 +10,6 @@ import {
 const valid: ExamPolicy = {
   violationLimit: 4,
   focusThresholdMs: 12_000,
-  snapshotIntervalMs: 20_000,
   heartbeatIntervalMs: 15_000,
   gapRecordedMs: 90_000,
   gapTokenMs: 480_000,
@@ -58,5 +58,14 @@ describe('parsePolicy', () => {
     expect(tryParsePolicy({ violationLimit: 0 })).toBeNull()
     expect(tryParsePolicy({ violationLimit: 5 })?.violationLimit).toBe(5)
     expect(tryParsePolicy(null)?.violationLimit).toBe(3)
+  })
+})
+
+describe('camera settings', () => {
+  it('has no camera setting', () => {
+    expect(POLICY_KEYS).not.toContain('snapshotIntervalMs')
+    for (const policy of Object.values(DEFAULT_POLICIES)) {
+      expect(policy).not.toHaveProperty('snapshotIntervalMs')
+    }
   })
 })

@@ -4,7 +4,6 @@ import type { ExamType } from '../../../exam-schedule/domain/entities/exam-sched
 export interface ExamPolicy {
   violationLimit: number
   focusThresholdMs: number
-  snapshotIntervalMs: number
   heartbeatIntervalMs: number
   gapRecordedMs: number
   gapTokenMs: number
@@ -17,7 +16,6 @@ export type ExamPresetName = ExamType
 const BOUNDS = {
   violationLimit: [1, 10],
   focusThresholdMs: [3_000, 60_000],
-  snapshotIntervalMs: [10_000, 300_000],
   heartbeatIntervalMs: [10_000, 120_000],
   gapRecordedMs: [30_000, 600_000],
   gapTokenMs: [30_000, 3_600_000],
@@ -31,7 +29,6 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
   DAILY: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
-    snapshotIntervalMs: 15_000,
     heartbeatIntervalMs: 15_000,
     gapRecordedMs: 60_000,
     gapTokenMs: 300_000,
@@ -41,7 +38,6 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
   ASSIGNMENT: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
-    snapshotIntervalMs: 30_000,
     heartbeatIntervalMs: 15_000,
     gapRecordedMs: 300_000,
     gapTokenMs: 1_800_000,
@@ -51,7 +47,6 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
   MIDTERM: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
-    snapshotIntervalMs: 15_000,
     heartbeatIntervalMs: 15_000,
     gapRecordedMs: 60_000,
     gapTokenMs: 300_000,
@@ -61,7 +56,6 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
   FINAL: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
-    snapshotIntervalMs: 15_000,
     heartbeatIntervalMs: 15_000,
     gapRecordedMs: 60_000,
     gapTokenMs: 300_000,

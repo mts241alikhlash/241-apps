@@ -105,13 +105,6 @@ export class UpdateActivityPolicyRequestDto {
   @IsOptional()
   @IsInt()
   @Min(10_000)
-  @Max(300_000)
-  snapshotIntervalMs?: number
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsInt()
-  @Min(10_000)
   @Max(120_000)
   heartbeatIntervalMs?: number
 
@@ -147,7 +140,6 @@ export class UpdateActivityPolicyRequestDto {
 export class ExamPolicyDto implements ExamPolicy {
   @ApiProperty() violationLimit!: number
   @ApiProperty() focusThresholdMs!: number
-  @ApiProperty() snapshotIntervalMs!: number
   @ApiProperty() heartbeatIntervalMs!: number
   @ApiProperty() gapRecordedMs!: number
   @ApiProperty() gapTokenMs!: number
