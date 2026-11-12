@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
-import type { Prisma } from '../../../../generated/prisma/client.js'
+import { Prisma } from '../../../../generated/prisma/client.js'
 import {
   EXAM_TYPES,
   type ExamCategory,
@@ -89,19 +89,25 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   }
 
   async updatePreset(type: ExamType, policy: ExamActivity['policy']) {
-    const existing = await this.prisma.examPolicyPreset.findUnique({
-      where: { name: type },
-    })
-    if (existing === null) return null
-    const updated = await this.prisma.examPolicyPreset.update({
-      where: { name: type },
-      data: { policy: policy as unknown as Prisma.InputJsonValue },
-    })
-    return {
-      id: updated.id,
-      type,
-      policy: parsePolicy(updated.policy, DEFAULT_POLICIES[type]),
-      updatedAt: updated.updatedAt,
+    try {
+      const updated = await this.prisma.examPolicyPreset.update({
+        where: { name: type },
+        data: { policy: policy as unknown as Prisma.InputJsonValue },
+      })
+      return {
+        id: updated.id,
+        type,
+        policy: parsePolicy(updated.policy, DEFAULT_POLICIES[type]),
+        updatedAt: updated.updatedAt,
+      }
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return null
+      }
+      throw error
     }
   }
 

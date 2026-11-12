@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common'
 import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { describe, expect, it, vi } from 'vitest'
 import { DEFAULT_POLICIES } from '../../domain/policies/exam-policy.policy.js'
@@ -21,7 +20,7 @@ describe('ExamPolicyPresetController', () => {
     ).toEqual(['exam-schedules.manage-all'])
   })
 
-  it('maps presets to ExamPolicyPresetDto with category and rejects unknown type', async () => {
+  it('maps presets to ExamPolicyPresetDto with category', async () => {
     const now = new Date('2026-11-10T01:00:00.000Z')
     const list = vi.fn().mockResolvedValue([
       {
@@ -55,11 +54,5 @@ describe('ExamPolicyPresetController', () => {
       category: 'NON_EXAM',
       policy: { ...DEFAULT_POLICIES.DAILY, violationLimit: 5 },
     })
-
-    await expect(
-      controller.update({ id: 'admin-1' }, 'QUIZ' as never, {
-        violationLimit: 5,
-      }),
-    ).rejects.toBeInstanceOf(BadRequestException)
   })
 })

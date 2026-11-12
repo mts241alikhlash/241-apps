@@ -1,12 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common'
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -52,9 +44,6 @@ export class ExamPolicyPresetController {
     @Param('type') type: ExamType,
     @Body() dto: UpdateActivityPolicyRequestDto,
   ): Promise<ExamPolicyPresetDto> {
-    if (!EXAM_TYPES.includes(type)) {
-      throw new BadRequestException('Jenis kegiatan tidak dikenal')
-    }
     return ExamPolicyPresetDto.of(await this.presets.update(user.id, type, dto))
   }
 }
