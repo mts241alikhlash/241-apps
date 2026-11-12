@@ -40,8 +40,8 @@ const pastActivity = {
   packageId: 'package-1',
   type: 'DAILY' as const,
   category: 'EXAM' as const,
-  status: 'DRAFT',
-  tokenMode: 'ROTATING',
+  status: 'DRAFT' as const,
+  tokenMode: 'ROTATING' as const,
   tokenRotation: 1,
   durationMinutes: 90,
   policy: {
@@ -127,7 +127,7 @@ describe('ActivityForm', () => {
       subjectId: 'subject-inf',
       type: 'DAILY',
       presetName: 'DAILY',
-      tokenMode: 'ROTATING',
+      tokenMode: 'ROTATING' as const,
       durationMinutes: 90,
     })
   })

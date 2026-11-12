@@ -27,8 +27,8 @@ export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
   CLOSED: 'Ditutup',
 }
 
-export const activityStatusLabel = (status: string): string =>
-  (ACTIVITY_STATUS_LABELS as Record<string, string>)[status] ?? status
+export const activityStatusLabel = (status: ActivityStatus): string =>
+  ACTIVITY_STATUS_LABELS[status]
 
 export interface GradeOption {
   id: string

@@ -47,9 +47,7 @@ const isEdit = computed(
   () => props.activity !== null && props.activity !== undefined,
 )
 
-const status = ref<ActivityStatus>(
-  (props.activity?.status as ActivityStatus | undefined) ?? 'DRAFT',
-)
+const status = ref<ActivityStatus>(props.activity?.status ?? 'DRAFT')
 const savingStatus = ref(false)
 const issuingNumbers = ref(false)
 const statusError = ref<string | null>(null)
