@@ -62,14 +62,12 @@ describe('examScheduleService', () => {
   it('offers only approved and already scheduled packages, sorted by title', async () => {
     getPackages.mockImplementation(({ status }: { status: string }) =>
       Promise.resolve({
-        data: {
-          data:
-            status === 'APPROVED'
-              ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
-              : status === 'LOCKED'
-                ? [{ id: 'l', title: 'UAS Ganjil' }]
-                : [{ id: 'd', title: 'Draf' }],
-        },
+        data:
+          status === 'APPROVED'
+            ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
+            : status === 'LOCKED'
+              ? [{ id: 'l', title: 'UAS Ganjil' }]
+              : [{ id: 'd', title: 'Draf' }],
       }),
     )
 

@@ -45,7 +45,7 @@ export const examScheduleService = {
         ),
       )
       return responses
-        .flatMap((response) => response.data?.data ?? [])
+        .flatMap((response) => response.data)
         .sort((a, b) => a.title.localeCompare(b.title))
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar paket.'))

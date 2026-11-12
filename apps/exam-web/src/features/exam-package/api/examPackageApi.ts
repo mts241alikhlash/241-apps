@@ -1,98 +1,129 @@
+import {
+  unwrap,
+  unwrapPage,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
-import type { QuestionDetail } from '@/features/exam-bank/types'
-import type {
-  AdjustedKey,
   AdjustKeyPayload,
   AddQuestionPayload,
   ExamPackageCreatePayload,
   ExamPackageQueryParams,
-  ExamPackageSummary,
-  ExamPackageView,
   ReturnPayload,
   TakePayload,
   UpdateQuestionPayload,
 } from '../types'
 
-const seg = encodeURIComponent
-
-const base = (id: string) => `/exam-packages/${seg(id)}`
-
 export const examPackageApi = {
-  getPackages: (params?: ExamPackageQueryParams) =>
-    api.get<ApiPaginatedResponse<ExamPackageSummary>>('/exam-packages', {
-      params,
-    }),
+  getPackages: (query?: ExamPackageQueryParams) =>
+    unwrapPage(examClient.GET('/exam-packages', { params: { query } })),
 
   getPackage: (id: string) =>
-    api.get<ApiSingleResponse<ExamPackageView>>(base(id)),
+    unwrap(examClient.GET('/exam-packages/{id}', { params: { path: { id } } })),
 
   getPackageQuestion: (id: string, questionId: string) =>
-    api.get<ApiSingleResponse<QuestionDetail>>(
-      `${base(id)}/questions/${seg(questionId)}`,
+    unwrap(
+      examClient.GET('/exam-packages/{id}/questions/{questionId}', {
+        params: { path: { id, questionId } },
+      }),
     ),
 
-  createPackage: (payload: ExamPackageCreatePayload) =>
-    api.post<ApiSingleResponse<ExamPackageView>>('/exam-packages', payload),
+  createPackage: (body: ExamPackageCreatePayload) =>
+    unwrap(examClient.POST('/exam-packages', { body })),
 
   renamePackage: (id: string, title: string) =>
-    api.patch<ApiSingleResponse<ExamPackageView>>(base(id), { title }),
+    unwrap(
+      examClient.PATCH('/exam-packages/{id}', {
+        params: { path: { id } },
+        body: { title },
+      }),
+    ),
 
-  deletePackage: (id: string) => api.delete(base(id)),
+  deletePackage: (id: string) =>
+    unwrap(
+      examClient.DELETE('/exam-packages/{id}', { params: { path: { id } } }),
+    ),
 
   copyPackage: (id: string) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(`${base(id)}/copy`),
+    unwrap(
+      examClient.POST('/exam-packages/{id}/copy', {
+        params: { path: { id } },
+      }),
+    ),
 
-  addQuestion: (id: string, payload: AddQuestionPayload) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(
-      `${base(id)}/questions`,
-      payload,
+  addQuestion: (id: string, body: AddQuestionPayload) =>
+    unwrap(
+      examClient.POST('/exam-packages/{id}/questions', {
+        params: { path: { id } },
+        body: { ...body, content: { ...body.content } },
+      }),
     ),
 
   updateQuestion: (
     id: string,
     questionId: string,
-    payload: UpdateQuestionPayload,
+    body: UpdateQuestionPayload,
   ) =>
-    api.patch<ApiSingleResponse<ExamPackageView>>(
-      `${base(id)}/questions/${seg(questionId)}`,
-      payload,
+    unwrap(
+      examClient.PATCH('/exam-packages/{id}/questions/{questionId}', {
+        params: { path: { id, questionId } },
+        body: {
+          ...body,
+          content: body.content && { ...body.content },
+        },
+      }),
     ),
 
   removeQuestion: (id: string, questionId: string) =>
-    api.delete<ApiSingleResponse<ExamPackageView>>(
-      `${base(id)}/questions/${seg(questionId)}`,
+    unwrap(
+      examClient.DELETE('/exam-packages/{id}/questions/{questionId}', {
+        params: { path: { id, questionId } },
+      }),
     ),
 
   reorderQuestions: (id: string, questionIds: string[]) =>
-    api.put<ApiSingleResponse<ExamPackageView>>(`${base(id)}/questions/order`, {
-      questionIds,
-    }),
+    unwrap(
+      examClient.PUT('/exam-packages/{id}/questions/order', {
+        params: { path: { id } },
+        body: { questionIds },
+      }),
+    ),
 
-  takeQuestions: (id: string, payload: TakePayload) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(
-      `${base(id)}/questions/take`,
-      payload,
+  takeQuestions: (id: string, body: TakePayload) =>
+    unwrap(
+      examClient.POST('/exam-packages/{id}/questions/take', {
+        params: { path: { id } },
+        body,
+      }),
     ),
 
   submitPackage: (id: string) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(`${base(id)}/submit`),
-
-  approvePackage: (id: string, note?: string) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(
-      `${base(id)}/approve`,
-      note === undefined ? {} : { note },
+    unwrap(
+      examClient.POST('/exam-packages/{id}/submit', {
+        params: { path: { id } },
+      }),
     ),
 
-  returnPackage: (id: string, payload: ReturnPayload) =>
-    api.post<ApiSingleResponse<ExamPackageView>>(`${base(id)}/return`, payload),
+  approvePackage: (id: string, note?: string) =>
+    unwrap(
+      examClient.POST('/exam-packages/{id}/approve', {
+        params: { path: { id } },
+        body: note === undefined ? {} : { note },
+      }),
+    ),
 
-  adjustItemKey: (id: string, itemId: string, payload: AdjustKeyPayload) =>
-    api.post<ApiSingleResponse<AdjustedKey>>(
-      `${base(id)}/items/${seg(itemId)}/adjust-key`,
-      payload,
+  returnPackage: (id: string, body: ReturnPayload) =>
+    unwrap(
+      examClient.POST('/exam-packages/{id}/return', {
+        params: { path: { id } },
+        body,
+      }),
+    ),
+
+  adjustItemKey: (id: string, itemId: string, body: AdjustKeyPayload) =>
+    unwrap(
+      examClient.POST('/exam-packages/{id}/items/{itemId}/adjust-key', {
+        params: { path: { id, itemId } },
+        body,
+      }),
     ),
 }

@@ -1,4 +1,7 @@
+import type { components } from '@mts241alikhlash/exam-api'
 import type { QuestionContent, QuestionType } from '@/features/exam-bank/types'
+
+type Schemas = components['schemas']
 
 export const PACKAGE_STATUSES = [
   'DRAFT',
@@ -16,66 +19,23 @@ export const RESOLUTIONS = ['NORMAL', 'BONUS_ALL', 'KEY_OVERRIDE'] as const
 
 export type ItemResolution = (typeof RESOLUTIONS)[number]
 
-export interface AdjustKeyPayload {
-  resolution: ItemResolution
-  overrideContent?: unknown
-  reason: string
-}
+export type AdjustKeyPayload = Schemas['AdjustPackageItemKeyDto']
 
-export interface AdjustedKey {
-  packageId: string
-  questionId: string
-  resolution: ItemResolution
-  rescoredSessions: number
-}
+export type AdjustedKey = Schemas['AdjustedPackageItemKeyDto']
 
-export interface ExamPackageSummary {
-  id: string
-  title: string
-  subjectId: string
-  gradeId: string
-  status: ExamPackageStatus
-  lockedAt: string | null
-  createdById: string
-  createdAt: string
-  updatedAt: string
-  itemCount: number
-}
+export type ExamPackageSummary = Schemas['ExamPackageSummaryDto']
 
-export interface ExamPackageItemView {
-  questionId: string
-  questionVersion: number
-  position: number
-  type: QuestionType
-  marker: QuestionMarker
-  summary: string
-  points: number
-}
+export type ExamPackageItemView = Schemas['ExamPackageItemViewDto']
 
-export interface PackageQuestionNote {
-  questionId: string
-  note: string
-}
+export type PackageQuestionNote = Schemas['PackageQuestionNoteResponseDto']
 
-export interface PackageReview {
-  id: string
-  action: 'SUBMIT' | 'APPROVE' | 'RETURN'
-  byUserId: string
-  note: string | null
-  questionNotes: PackageQuestionNote[]
-  createdAt: string
-}
+export type PackageReview = Schemas['PackageReviewDto']
 
-export interface ExamPackageView extends Omit<ExamPackageSummary, 'itemCount'> {
-  items: ExamPackageItemView[]
-  reviews: PackageReview[]
-}
+export type ExamPackageDetail = Schemas['ExamPackageDetailDto']
 
-export interface ExamPackageCreatePayload {
-  title: string
-  subjectId: string
-  gradeId: string
-}
+export type ExamPackageView = Schemas['ExamPackageViewDto']
+
+export type ExamPackageCreatePayload = Schemas['CreateExamPackageDto']
 
 export interface AddQuestionPayload {
   type: QuestionType
@@ -91,15 +51,9 @@ export interface UpdateQuestionPayload {
   points?: number
 }
 
-export interface TakePayload {
-  sourcePackageId: string
-  questionIds: string[]
-}
+export type TakePayload = Schemas['TakePackageQuestionsDto']
 
-export interface ReturnPayload {
-  note: string
-  questionNotes: PackageQuestionNote[]
-}
+export type ReturnPayload = Schemas['ReturnExamPackageDto']
 
 export interface ExamPackageQueryParams {
   page?: number

@@ -37,7 +37,7 @@ describe('examPackageService', () => {
   })
 
   it('returns the package a change leaves behind', async () => {
-    createPackage.mockResolvedValue({ data: { data: { id: 'p9' } } })
+    createPackage.mockResolvedValue({ id: 'p9' })
 
     const result = await examPackageService.create({
       title: 'UTS',
@@ -51,12 +51,10 @@ describe('examPackageService', () => {
   it('merges the approved and the scheduled packages of a subject and grade by title', async () => {
     getPackages.mockImplementation(({ status }: { status: string }) =>
       Promise.resolve({
-        data: {
-          data:
-            status === 'APPROVED'
-              ? [{ id: 'a', title: 'UAS' }]
-              : [{ id: 'b', title: 'Bank' }],
-        },
+        data:
+          status === 'APPROVED'
+            ? [{ id: 'a', title: 'UAS' }]
+            : [{ id: 'b', title: 'Bank' }],
       }),
     )
 

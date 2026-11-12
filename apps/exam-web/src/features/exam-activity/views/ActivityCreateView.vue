@@ -84,7 +84,7 @@ async function load(): Promise<void> {
     left.label.localeCompare(right.label),
   )
 
-  packages.value = packs.data.data.map((item) => ({
+  packages.value = packs.data.map((item) => ({
     id: item.id,
     subjectId: item.subjectId,
     label: item.title,
