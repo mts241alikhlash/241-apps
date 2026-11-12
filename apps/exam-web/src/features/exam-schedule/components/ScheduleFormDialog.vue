@@ -31,7 +31,7 @@ import {
 } from '@/features/exam-shared/examType'
 import { useScheduleForm } from '../composables/useScheduleForm'
 import { examScheduleService } from '../services/examScheduleService'
-import type { ExamSchedule } from '../types'
+import type { ExamSchedule, ExamType } from '../types'
 
 const props = defineProps<{
   open: boolean
@@ -50,7 +50,7 @@ const allowedTypes = computed(() =>
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  saved: []
+  saved: [type: ExamType]
 }>()
 
 const isEdit = computed(() => Boolean(props.schedule))
@@ -122,7 +122,7 @@ onMounted(async () => {
 async function save() {
   const saved = await form.submit()
   if (saved) {
-    emit('saved')
+    emit('saved', type.value as ExamType)
     emit('update:open', false)
   }
 }

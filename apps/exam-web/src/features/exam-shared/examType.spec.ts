@@ -5,6 +5,7 @@ import {
   EXAM_TYPE_LABEL,
   examCategoryLabel,
   examTypeLabel,
+  sectionPrefixOf,
   typesFor,
 } from './examType'
 
@@ -29,5 +30,11 @@ describe('examType', () => {
     expect(typesFor('EXAM', false, false)).toEqual([])
     expect(typesFor('EXAM', false, true)).toEqual(['MIDTERM'])
     expect(typesFor('EXAM', true, false)).toEqual(['MIDTERM', 'FINAL'])
+  })
+
+  it('maps a category to its menu section', () => {
+    expect(sectionPrefixOf('EXAM')).toBe('/exam')
+    expect(sectionPrefixOf('NON_EXAM')).toBe('/classwork')
+    expect(sectionPrefixOf(undefined)).toBe('/exam')
   })
 })

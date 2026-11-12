@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { DataTable } from '@mts241alikhlash/ui'
 import {
   AlertDialog,
@@ -47,20 +48,12 @@ import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
 import { useScheduleList } from '../composables/useScheduleList'
 import { examScheduleService } from '../services/examScheduleService'
 import { SCHEDULE_STATUSES, scheduleStatusLabel } from '../types'
-import type { ExamCategory, ExamSchedule } from '../types'
+import type { ExamSchedule } from '../types'
 
-const route = useRoute()
 const router = useRouter()
 const { hasPermission } = useAuthSession()
 
-const category = computed<ExamCategory | undefined>(() =>
-  route.meta?.category === 'EXAM' || route.meta?.category === 'NON_EXAM'
-    ? route.meta.category
-    : undefined,
-)
-const sectionPrefix = computed(() =>
-  category.value === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { category, sectionPrefix } = useRouteCategory()
 
 const status = ref('ALL')
 const page = ref(1)

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { BackButton, DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -26,9 +27,7 @@ import { useGradingSessions } from '../composables/useGradingLists'
 const route = useRoute()
 const router = useRouter()
 const scheduleId = computed(() => String(route.params.scheduleId ?? ''))
-const sectionPrefix = computed(() =>
-  route.meta?.category === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { sectionPrefix } = useRouteCategory()
 const gradingBaseHref = computed(() => `${sectionPrefix.value}/grading`)
 const examTitle = computed(() =>
   typeof route.query.judul === 'string' && route.query.judul !== ''

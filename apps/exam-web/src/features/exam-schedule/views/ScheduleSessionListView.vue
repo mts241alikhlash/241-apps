@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { BackButton, DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -27,9 +28,7 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const scheduleId = computed(() => String(route.params.scheduleId ?? ''))
-const sectionPrefix = computed(() =>
-  route.meta?.category === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { sectionPrefix } = useRouteCategory()
 const schedulesHref = computed(() => `${sectionPrefix.value}/schedules`)
 const title = computed(() =>
   typeof route.query.judul === 'string' && route.query.judul !== ''

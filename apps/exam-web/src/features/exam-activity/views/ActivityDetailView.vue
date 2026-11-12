@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
@@ -22,10 +23,7 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
-import {
-  examTypeLabel,
-  type ExamCategory,
-} from '@/features/exam-shared/examType'
+import { examTypeLabel } from '@/features/exam-shared/examType'
 import ActivityPolicyDialog from '../components/ActivityPolicyDialog.vue'
 import { examActivityApi } from '../api/examActivityApi'
 import {
@@ -39,14 +37,7 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const activityId = computed(() => String(route.params.id ?? ''))
-const category = computed<ExamCategory | undefined>(() =>
-  route.meta?.category === 'EXAM' || route.meta?.category === 'NON_EXAM'
-    ? route.meta.category
-    : undefined,
-)
-const sectionPrefix = computed(() =>
-  category.value === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { sectionPrefix } = useRouteCategory()
 const canManageAll = computed(() => hasPermission('exam-schedules.manage-all'))
 
 const detail = ref<ExamActivityDetail | null>(null)

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
@@ -15,7 +16,6 @@ import { semesterApi } from '@/features/lookup/semester'
 import { examPackageApi } from '@/features/exam-package/api/examPackageApi'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examEventService } from '@/features/exam-event/services/examEventService'
-import type { ExamCategory } from '@/features/exam-shared/examType'
 import ActivityForm from '../components/ActivityForm.vue'
 import { examActivityApi } from '../api/examActivityApi'
 import type {
@@ -32,11 +32,7 @@ const { hasPermission } = useAuthSession()
 const editingId = computed(() =>
   typeof route.query.id === 'string' ? route.query.id : '',
 )
-const category = computed<ExamCategory | undefined>(() =>
-  route.meta.category === 'EXAM' || route.meta.category === 'NON_EXAM'
-    ? route.meta.category
-    : undefined,
-)
+const { category } = useRouteCategory()
 const semesterId = ref('')
 const grades = ref<GradeOption[]>([])
 const classrooms = ref<ClassroomOption[]>([])

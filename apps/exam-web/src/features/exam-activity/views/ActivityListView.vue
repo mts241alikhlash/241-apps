@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { Plus } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -11,25 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import {
-  examTypeLabel,
-  type ExamCategory,
-} from '@/features/exam-shared/examType'
+import { examTypeLabel } from '@/features/exam-shared/examType'
 import { examActivityApi } from '../api/examActivityApi'
 import { activityStatusLabel, type ExamActivityRecord } from '../types'
 
-const route = useRoute()
 const router = useRouter()
 const { hasPermission } = useAuthSession()
 
-const category = computed<ExamCategory | undefined>(() =>
-  route.meta?.category === 'EXAM' || route.meta?.category === 'NON_EXAM'
-    ? route.meta.category
-    : undefined,
-)
-const sectionPrefix = computed(() =>
-  category.value === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { category, sectionPrefix } = useRouteCategory()
 const heading = computed(() =>
   category.value === 'NON_EXAM' ? 'Kegiatan Non-ujian' : 'Kegiatan Ujian',
 )

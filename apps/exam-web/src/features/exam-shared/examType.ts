@@ -46,3 +46,6 @@ export function typesFor(
   if (manageAll) return ['MIDTERM', 'FINAL']
   return midtermEventActive ? ['MIDTERM'] : []
 }
+
+export const sectionPrefixOf = (category: ExamCategory | undefined): string =>
+  category === 'NON_EXAM' ? '/classwork' : '/exam'

@@ -262,7 +262,7 @@ describe('ScheduleFormDialog', () => {
       { mode: 'edit', id: 's1' },
       expect.objectContaining({ durationMinutes: 90 }),
     )
-    expect(wrapper.emitted('saved')).toHaveLength(1)
+    expect(wrapper.emitted('saved')).toEqual([['MIDTERM']])
     expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
     wrapper.unmount()
   })

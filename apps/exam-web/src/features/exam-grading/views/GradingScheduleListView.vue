@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -14,24 +15,15 @@ import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import MakeupDialog from '@/features/exam-schedule/components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '@/features/exam-schedule/components/MakeupParticipantsDialog.vue'
 import type { MakeupOrigin } from '@/features/exam-schedule/types'
-import type { ExamCategory } from '@/features/exam-shared/examType'
 import type { GradingSchedule } from '../types'
 import { buildGradingScheduleColumns } from '../components/gradingColumns'
 import { useGradingSchedules } from '../composables/useGradingLists'
 
-const route = useRoute()
 const router = useRouter()
 const { hasPermission } = useAuthSession()
 const makeupTarget = ref<MakeupOrigin | null>(null)
 const participantsTarget = ref<GradingSchedule | null>(null)
-const category = computed<ExamCategory | undefined>(() =>
-  route.meta?.category === 'EXAM' || route.meta?.category === 'NON_EXAM'
-    ? route.meta.category
-    : undefined,
-)
-const sectionPrefix = computed(() =>
-  category.value === 'NON_EXAM' ? '/classwork' : '/exam',
-)
+const { category, sectionPrefix } = useRouteCategory()
 
 function originOf(schedule: GradingSchedule): MakeupOrigin {
   return {
