@@ -2,16 +2,25 @@ import { describe, expect, it } from 'vitest'
 import { fromInstant, toInstant } from './instant'
 
 describe('toInstant and fromInstant', () => {
-  it('turns a local date and time into a UTC instant', () => {
-    const instant = toInstant('2026-11-02', '08:30')
-
-    expect(instant.endsWith('Z')).toBe(true)
-    expect(new Date(instant).getTime()).toBe(
-      new Date(2026, 10, 2, 8, 30).getTime(),
-    )
+  it('reads the date and time as WIB (+07:00) into a UTC instant', () => {
+    expect(toInstant('2026-11-12', '08:00')).toBe('2026-11-12T01:00:00.000Z')
   })
 
-  it('round-trips back to the same local date and time', () => {
+  it('ignores the browser zone', () => {
+    const previous = process.env.TZ
+    process.env.TZ = 'America/New_York'
+    try {
+      expect(toInstant('2026-11-12', '08:00')).toBe('2026-11-12T01:00:00.000Z')
+      expect(fromInstant('2026-11-12T01:00:00.000Z')).toEqual({
+        date: '2026-11-12',
+        time: '08:00',
+      })
+    } finally {
+      process.env.TZ = previous
+    }
+  })
+
+  it('round-trips back to the same WIB date and time', () => {
     expect(fromInstant(toInstant('2026-11-02', '08:30'))).toEqual({
       date: '2026-11-02',
       time: '08:30',

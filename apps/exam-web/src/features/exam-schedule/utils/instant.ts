@@ -1,15 +1,15 @@
 const pad = (value: number) => String(value).padStart(2, '0')
 
+const WIB_OFFSET_MS = 7 * 60 * 60 * 1000
+
 export function toInstant(date: string, time: string): string {
-  const [year, month, day] = date.split('-').map(Number)
-  const [hours, minutes] = time.split(':').map(Number)
-  return new Date(year, month - 1, day, hours, minutes).toISOString()
+  return new Date(`${date}T${time}:00+07:00`).toISOString()
 }
 
 export function fromInstant(iso: string): { date: string; time: string } {
-  const value = new Date(iso)
+  const value = new Date(new Date(iso).getTime() + WIB_OFFSET_MS)
   return {
-    date: `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`,
-    time: `${pad(value.getHours())}:${pad(value.getMinutes())}`,
+    date: `${value.getUTCFullYear()}-${pad(value.getUTCMonth() + 1)}-${pad(value.getUTCDate())}`,
+    time: `${pad(value.getUTCHours())}:${pad(value.getUTCMinutes())}`,
   }
 }
