@@ -67,6 +67,7 @@ export class CreateActivityUseCase {
       tokenMode: command.tokenMode,
       manageAll: command.manageAll,
       event,
+      eventId: command.eventId ?? null,
       startsAt: command.startsAt,
       endsAt: command.endsAt,
     })

@@ -234,6 +234,20 @@ describe('CreateActivityUseCase', () => {
     expect(repo.created).toEqual([])
   })
 
+  it('refuses an event id on a daily activity even when the id is unknown', async () => {
+    const repo = new FakeActivityRepository()
+
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...command,
+        type: 'DAILY',
+        presetName: 'DAILY',
+        eventId: 'no-such-event',
+      }),
+    ).rejects.toMatchObject({ response: { code: 'EVENT_NOT_ALLOWED' } })
+    expect(repo.created).toEqual([])
+  })
+
   it('asks the registry to issue the semester’s participant numbers', async () => {
     const repo = new FakeActivityRepository()
     const participants = new FakeParticipants()

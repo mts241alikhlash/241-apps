@@ -15,6 +15,7 @@ export const API_ERROR_CODES = [
   'EVENT_REQUIRED',
   'EVENT_TYPE_NOT_EXAM',
   'EVENT_TYPE_LINKED',
+  'EVENT_NOT_ALLOWED',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

@@ -66,6 +66,7 @@ export class UpdateExamScheduleUseCase {
       type: next.type,
       manageAll,
       event,
+      eventId,
       startsAt: next.startsAt,
       endsAt: next.endsAt,
     })

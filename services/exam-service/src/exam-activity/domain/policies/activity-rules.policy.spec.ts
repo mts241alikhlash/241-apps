@@ -44,6 +44,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: true,
           event: activeMidtermEvent,
+          eventId: 'event-1',
           startsAt,
           endsAt,
         }),
@@ -60,6 +61,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'STATIC',
           manageAll: true,
           event: { ...activeMidtermEvent, type: 'FINAL' },
+          eventId: 'event-1',
           startsAt,
           endsAt,
         }),
@@ -76,6 +78,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: false,
           event: { ...activeMidtermEvent, type: 'FINAL' },
+          eventId: 'event-1',
           startsAt,
           endsAt,
         }),
@@ -92,6 +95,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: true,
           event: null,
+          eventId: null,
           startsAt,
           endsAt,
         }),
@@ -108,6 +112,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: false,
           event: { ...activeMidtermEvent, status: 'DRAFT' },
+          eventId: 'event-1',
           startsAt,
           endsAt,
         }),
@@ -124,6 +129,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: false,
           event: activeMidtermEvent,
+          eventId: 'event-1',
           startsAt,
           endsAt: new Date(activeMidtermEvent.endsAt.getTime() + 60_000),
         }),
@@ -140,6 +146,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'ROTATING',
           manageAll: true,
           event: { ...activeMidtermEvent, type: 'FINAL' },
+          eventId: 'event-1',
           startsAt,
           endsAt,
         }),
@@ -155,6 +162,7 @@ describe('assertActivityAllowed', () => {
         tokenMode: 'STATIC',
         manageAll: false,
         event: null,
+        eventId: null,
         startsAt,
         endsAt,
       }),
@@ -170,6 +178,7 @@ describe('assertActivityAllowed', () => {
           tokenMode: 'STATIC',
           manageAll: false,
           event: null,
+          eventId: null,
           startsAt,
           endsAt,
         }),
@@ -185,9 +194,30 @@ describe('assertActivityAllowed', () => {
         tokenMode: 'ROTATING',
         manageAll: false,
         event: activeMidtermEvent,
+        eventId: 'event-1',
         startsAt,
         endsAt,
       }),
     ).not.toThrow()
   })
+
+  it.each(['DAILY', 'ASSIGNMENT'] as const)(
+    '%s with an event id -> EVENT_NOT_ALLOWED',
+    (type) => {
+      expect(
+        codeOf(() =>
+          assertActivityAllowed({
+            type,
+            presetName: type,
+            tokenMode: 'STATIC',
+            manageAll: false,
+            event: null,
+            eventId: '11111111-1111-4111-8111-111111111111',
+            startsAt,
+            endsAt,
+          }),
+        ),
+      ).toEqual({ code: 'EVENT_NOT_ALLOWED', status: 422 })
+    },
+  )
 })

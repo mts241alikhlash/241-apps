@@ -402,28 +402,43 @@ describe('Update and cancel exam schedule', () => {
   })
 
   it('points a sessionless schedule at an existing event', async () => {
-    const event = await rooms.createEvent({
-      semesterId: 'sem-1',
-      name: 'UTS Ganjil',
-      type: 'MIDTERM',
-      startsAt: START,
-      endsAt: END,
-      createdById: USER.id,
-    })
+    const event = await activeEvent('MIDTERM')
 
     const updated = await new UpdateExamScheduleUseCase(
       schedules,
       guard,
       rooms,
-    ).execute(scheduleId, {
-      startsAt: START,
-      endsAt: END,
-      durationMinutes: 90,
-      type: 'DAILY',
-      eventId: event.id,
-    })
+    ).execute(
+      scheduleId,
+      {
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'MIDTERM',
+        eventId: event.id,
+      },
+      true,
+    )
 
     expect(updated.eventId).toBe(event.id)
+  })
+
+  it('refuses an event id on a daily schedule', async () => {
+    const event = await activeEvent('MIDTERM')
+
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'DAILY',
+          eventId: event.id,
+        },
+        true,
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EVENT_NOT_ALLOWED' } })
   })
 
   it('refuses to re-point a schedule that already has sessions', async () => {

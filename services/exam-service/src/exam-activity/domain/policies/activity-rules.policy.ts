@@ -17,9 +17,17 @@ export function assertTypeAllowed(input: {
   type: ExamType
   manageAll: boolean
   event: ActivityEventRef | null
+  eventId: string | null
   startsAt: Date
   endsAt: Date
 }): void {
+  if (categoryOf(input.type) === 'NON_EXAM' && input.eventId !== null) {
+    throw new ApiUnprocessableException(
+      'EVENT_NOT_ALLOWED',
+      'Penilaian Harian dan Tugas tidak terhubung ke periode ujian.',
+    )
+  }
+
   if (input.type === 'FINAL' && !input.manageAll) {
     throw new ApiForbiddenException(
       'FINAL_ADMIN_ONLY',
@@ -58,6 +66,7 @@ export function assertActivityAllowed(input: {
   tokenMode: ActivityTokenMode
   manageAll: boolean
   event: ActivityEventRef | null
+  eventId: string | null
   startsAt: Date
   endsAt: Date
 }): void {

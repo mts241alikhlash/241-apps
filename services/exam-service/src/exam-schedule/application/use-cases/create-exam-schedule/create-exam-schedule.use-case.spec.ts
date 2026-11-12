@@ -314,12 +314,24 @@ describe('CreateExamScheduleUseCase', () => {
     })
 
     const created = await build(new FakeAcademicLookup(), rooms).execute(
-      USER,
-      input({ eventId: event.id }),
+      { ...USER, manageAll: true },
+      input({ type: 'MIDTERM', eventId: event.id }),
     )
 
     expect(created.eventId).toBe(event.id)
     expect((await schedules.findById(created.id))?.eventId).toBe(event.id)
+  })
+
+  it('refuses an event id on a daily schedule', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'MIDTERM')
+
+    await expect(
+      build(new FakeAcademicLookup(), rooms).execute(
+        USER,
+        input({ type: 'DAILY', eventId: event.id }),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EVENT_NOT_ALLOWED' } })
   })
 
   it('refuses an exam event that does not exist', async () => {
