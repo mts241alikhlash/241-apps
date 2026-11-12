@@ -11,6 +11,7 @@ import {
   getAccessToken,
   handleRefreshFailure,
   refreshAccessToken,
+  refreshSession,
   setAccessToken,
 } from './auth-session'
 import type { RefreshedUser } from './auth-session'
@@ -25,24 +26,9 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-interface RefreshTokenResponse {
-  data?: { accessToken?: string; user?: RefreshedUser }
-  accessToken?: string
-  user?: RefreshedUser
-}
-
 async function restoreSession(): Promise<RefreshedUser | null> {
   try {
-    const res = await axios.post<RefreshTokenResponse>(
-      `${API_BASE_URL}/auth/refresh`,
-      {},
-      { withCredentials: true },
-    )
-    const token: string | undefined =
-      res.data?.data?.accessToken ?? res.data?.accessToken
-    if (!token) throw new Error('No access token in refresh response')
-    setAccessToken(token)
-    return res.data?.data?.user ?? res.data?.user ?? null
+    return (await refreshSession()).user
   } catch (error) {
     if (isServiceUnavailable(error)) {
       toast.error('Layanan sedang tidak tersedia', {
@@ -69,6 +55,8 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+let refreshing = false
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -85,17 +73,29 @@ api.interceptors.response.use(
       originalRequest
     ) {
       originalRequest._retry = true
+      const leader = !refreshing
+      refreshing = true
 
       let newToken: string
       try {
         newToken = await refreshAccessToken()
       } catch (refreshError) {
+        if (!leader) return Promise.reject(new Error('Token refresh failed'))
+        refreshing = false
         handleRefreshFailure(refreshError)
         return Promise.reject(error)
       }
 
       originalRequest.headers.Authorization = `Bearer ${newToken}`
-      return api(originalRequest as AxiosRequestConfig)
+      if (!leader) return api(originalRequest as AxiosRequestConfig)
+
+      try {
+        return await api(originalRequest as AxiosRequestConfig)
+      } catch (retryError) {
+        handleRefreshFailure(retryError)
+      } finally {
+        refreshing = false
+      }
     }
 
     return Promise.reject(error)

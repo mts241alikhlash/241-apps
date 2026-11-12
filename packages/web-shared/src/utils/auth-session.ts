@@ -12,7 +12,7 @@ export interface RefreshedUser {
   isActive: boolean
 }
 
-interface RefreshTokenResponse {
+export interface RefreshTokenResponse {
   data?: { accessToken?: string; user?: RefreshedUser }
   accessToken?: string
   user?: RefreshedUser
@@ -23,8 +23,13 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(
   '',
 )
 
+interface RefreshedSession {
+  token: string
+  user: RefreshedUser | null
+}
+
 let accessToken: string | null = null
-let inflight: Promise<string> | null = null
+let inflight: Promise<RefreshedSession> | null = null
 const handled = new WeakSet<object>()
 
 function getAccessToken(): string | null {
@@ -42,7 +47,7 @@ function clearSession() {
   }
 }
 
-function refreshAccessToken(): Promise<string> {
+function refreshSession(): Promise<RefreshedSession> {
   inflight ??= axios
     .post<RefreshTokenResponse>(
       `${API_BASE_URL}/auth/refresh`,
@@ -54,12 +59,16 @@ function refreshAccessToken(): Promise<string> {
         res.data?.data?.accessToken ?? res.data?.accessToken
       if (!token) throw new Error('No access token in refresh response')
       setAccessToken(token)
-      return token
+      return { token, user: res.data?.data?.user ?? res.data?.user ?? null }
     })
     .finally(() => {
       inflight = null
     })
   return inflight
+}
+
+async function refreshAccessToken(): Promise<string> {
+  return (await refreshSession()).token
 }
 
 function handleRefreshFailure(error: unknown) {
@@ -94,5 +103,6 @@ export {
   getAccessToken,
   handleRefreshFailure,
   refreshAccessToken,
+  refreshSession,
   setAccessToken,
 }

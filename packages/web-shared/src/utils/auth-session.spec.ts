@@ -63,6 +63,7 @@ describe('handleRefreshFailure', () => {
   })
 
   it('clears the session and announces expiry on a 401', () => {
+    vi.useFakeTimers()
     setAccessToken('gone')
     handleRefreshFailure({ response: { status: 401 } })
 
@@ -71,6 +72,35 @@ describe('handleRefreshFailure', () => {
       description: 'Kamu akan diarahkan ke halaman login.',
       duration: 4000,
     })
+    vi.useRealTimers()
+  })
+
+  it('redirects to /login after 1500 ms', () => {
+    vi.useFakeTimers()
+    const location = { pathname: '/exams', href: '/exams' }
+    vi.stubGlobal('window', { location, localStorage: { removeItem: vi.fn() } })
+
+    handleRefreshFailure({ response: { status: 401 } })
+    vi.advanceTimersByTime(1499)
+    expect(location.href).toBe('/exams')
+    vi.advanceTimersByTime(1)
+    expect(location.href).toBe('/login')
+
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
+  it('does not redirect when already on /login', () => {
+    vi.useFakeTimers()
+    const location = { pathname: '/login', href: '/login?x=1' }
+    vi.stubGlobal('window', { location, localStorage: { removeItem: vi.fn() } })
+
+    handleRefreshFailure({ response: { status: 401 } })
+    vi.advanceTimersByTime(2000)
+    expect(location.href).toBe('/login?x=1')
+
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
   it('reports one error only once', () => {
