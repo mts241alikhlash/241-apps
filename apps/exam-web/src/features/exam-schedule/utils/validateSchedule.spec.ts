@@ -82,4 +82,18 @@ describe('validateSchedule', () => {
       }),
     ).toBe('Jendela ujian maksimal 14 hari')
   })
+
+  it('allows a window of exactly 14 days and blocks one minute more', () => {
+    const window = {
+      startDate: '2026-11-12',
+      startTime: '08:00',
+      durationMinutes: 60,
+    }
+    expect(
+      validateSchedule({ ...window, endDate: '2026-11-26', endTime: '08:00' }),
+    ).toBeNull()
+    expect(
+      validateSchedule({ ...window, endDate: '2026-11-26', endTime: '08:01' }),
+    ).toBe('Jendela ujian maksimal 14 hari')
+  })
 })

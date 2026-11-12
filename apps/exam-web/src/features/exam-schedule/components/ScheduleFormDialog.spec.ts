@@ -334,16 +334,12 @@ describe('ScheduleFormDialog', () => {
     wrapper.unmount()
   })
 
-  it('does not let a window of several days be saved from here', async () => {
-    const wrapper = open({
-      schedule: { ...existing, endsAt: toInstant('2030-11-04', '12:00') },
-    })
+  it('shows a start date and an end date', async () => {
+    const wrapper = open()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('lebih dari satu hari')
-    expect(
-      buttonByText(wrapper, 'Simpan')!.attributes('disabled'),
-    ).toBeDefined()
+    expect(wrapper.findAll('input[id$="-start-date"]')).toHaveLength(1)
+    expect(wrapper.findAll('input[id$="-end-date"]')).toHaveLength(1)
     wrapper.unmount()
   })
 

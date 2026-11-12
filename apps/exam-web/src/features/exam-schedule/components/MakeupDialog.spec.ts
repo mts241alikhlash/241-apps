@@ -112,7 +112,8 @@ async function open() {
 }
 
 async function fillWindow(wrapper: Wrapper) {
-  await wrapper.get('input[id$="-date"]').setValue('2026-11-04')
+  await wrapper.get('input[id$="-start-date"]').setValue('2026-11-04')
+  await wrapper.get('input[id$="-end-date"]').setValue('2026-11-04')
   await wrapper.get('input[id$="-start"]').setValue('08:00')
   await wrapper.get('input[id$="-end"]').setValue('11:00')
 }

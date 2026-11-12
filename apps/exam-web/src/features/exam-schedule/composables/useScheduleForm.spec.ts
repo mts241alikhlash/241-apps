@@ -37,7 +37,8 @@ function filled() {
   form.packageId.value = 'p1'
   form.classroomId.value = 'c1'
   form.type.value = 'MIDTERM'
-  form.date.value = '2026-11-02'
+  form.startDate.value = '2026-11-02'
+  form.endDate.value = '2026-11-02'
   form.startTime.value = '08:00'
   form.endTime.value = '11:00'
   form.durationMinutes.value = 90
@@ -101,11 +102,30 @@ describe('useScheduleForm', () => {
     )
   })
 
+  it('sends a cross-day window with a two-day difference', async () => {
+    saveSchedule.mockResolvedValue({ success: true, data: existing })
+    const form = filled()
+    form.endDate.value = '2026-11-04'
+
+    expect(form.multiDay).toBe(true)
+    expect(form.problem.value).toBeNull()
+    await form.submit()
+
+    expect(saveSchedule).toHaveBeenCalledWith(
+      { mode: 'create' },
+      expect.objectContaining({
+        startsAt: toInstant('2026-11-02', '08:00'),
+        endsAt: toInstant('2026-11-04', '11:00'),
+      }),
+    )
+  })
+
   it('starts from the schedule when editing and sends only the window', async () => {
     saveSchedule.mockResolvedValue({ success: true, data: existing })
     const form = useScheduleForm({ mode: 'edit', schedule: existing })
 
-    expect(form.date.value).toBe('2026-11-02')
+    expect(form.startDate.value).toBe('2026-11-02')
+    expect(form.endDate.value).toBe('2026-11-02')
     expect(form.startTime.value).toBe('08:00')
     expect(form.endTime.value).toBe('11:00')
     expect(form.durationMinutes.value).toBe(90)
@@ -196,7 +216,7 @@ describe('useScheduleForm', () => {
     expect(form.saving.value).toBe(false)
   })
 
-  it('refuses to edit a window that runs over more than one day', () => {
+  it('edits a window that runs over more than one day', () => {
     const form = useScheduleForm({
       mode: 'edit',
       schedule: {
@@ -206,15 +226,16 @@ describe('useScheduleForm', () => {
     })
 
     expect(form.multiDay).toBe(true)
-    expect(form.problem.value).toBe(
-      'Jadwal ini berlangsung lebih dari satu hari dan hanya bisa diubah lewat API.',
-    )
+    expect(form.endDate.value).toBe('2026-11-04')
+    expect(form.problem.value).toBeNull()
   })
 
   it('treats a single-day window as editable', () => {
     const form = useScheduleForm({ mode: 'edit', schedule: existing })
 
     expect(form.multiDay).toBe(false)
+    expect(form.endDate.value).toBe('2026-11-02')
+    expect(form.problem.value).toBeNull()
   })
 
   it('locks the type of a makeup even before anyone started it', () => {

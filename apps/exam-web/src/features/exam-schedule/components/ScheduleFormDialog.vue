@@ -64,8 +64,9 @@ const {
   classroomId,
   eventId,
   type,
-  date,
+  startDate,
   startTime,
+  endDate,
   endTime,
   durationMinutes,
 } = form
@@ -285,13 +286,24 @@ async function save() {
             </Select>
           </FloatingLabelField>
           <FloatingLabelField
-            label="Tanggal"
-            :for="`${fieldId}-date`"
+            label="Tanggal mulai"
+            :for="`${fieldId}-start-date`"
             floating
           >
             <DatePicker
-              :id="`${fieldId}-date`"
-              v-model="date"
+              :id="`${fieldId}-start-date`"
+              v-model="startDate"
+              allow-future-dates
+            />
+          </FloatingLabelField>
+          <FloatingLabelField
+            label="Tanggal selesai"
+            :for="`${fieldId}-end-date`"
+            floating
+          >
+            <DatePicker
+              :id="`${fieldId}-end-date`"
+              v-model="endDate"
               allow-future-dates
             />
           </FloatingLabelField>

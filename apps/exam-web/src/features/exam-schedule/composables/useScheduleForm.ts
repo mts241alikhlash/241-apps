@@ -13,8 +13,6 @@ export function useScheduleForm(options: ScheduleFormOptions) {
   const end =
     options.mode === 'edit' ? fromInstant(options.schedule.endsAt) : null
 
-  const multiDay = start !== null && end !== null && start.date !== end.date
-
   const typeLocked =
     options.mode === 'edit' &&
     (options.schedule.hasSessions || options.schedule.kind === 'MAKEUP')
@@ -27,7 +25,8 @@ export function useScheduleForm(options: ScheduleFormOptions) {
   const eventId = ref(
     options.mode === 'edit' ? (options.schedule.eventId ?? '') : '',
   )
-  const date = ref(start?.date ?? '')
+  const startDate = ref(start?.date ?? '')
+  const endDate = ref(end?.date ?? '')
   const startTime = ref(start?.time ?? '')
   const endTime = ref(end?.time ?? '')
   const durationMinutes = ref<number | null>(
@@ -45,17 +44,15 @@ export function useScheduleForm(options: ScheduleFormOptions) {
   )
 
   const problem = computed<string | null>(() => {
-    if (multiDay) {
-      return 'Jadwal ini berlangsung lebih dari satu hari dan hanya bisa diubah lewat API.'
-    }
     if (options.mode === 'create') {
       if (!packageId.value) return 'Pilih paket'
       if (!classroomId.value) return 'Pilih kelas'
       if (!type.value) return 'Pilih jenis ujian'
     }
     return validateSchedule({
-      date: date.value,
+      startDate: startDate.value,
       startTime: startTime.value,
+      endDate: endDate.value,
       endTime: endTime.value,
       durationMinutes: durationMinutes.value,
     })
@@ -66,8 +63,8 @@ export function useScheduleForm(options: ScheduleFormOptions) {
       type: (typeLocked && options.mode === 'edit'
         ? options.schedule.type
         : type.value) as ExamType,
-      startsAt: toInstant(date.value, startTime.value),
-      endsAt: toInstant(date.value, endTime.value),
+      startsAt: toInstant(startDate.value, startTime.value),
+      endsAt: toInstant(endDate.value, endTime.value),
       durationMinutes: durationMinutes.value ?? 0,
     }
     if (options.mode === 'create' && eventId.value === '') return base
@@ -106,11 +103,14 @@ export function useScheduleForm(options: ScheduleFormOptions) {
     eventId,
     type,
     typeLocked,
-    date,
+    startDate,
     startTime,
+    endDate,
     endTime,
     durationMinutes,
-    multiDay,
+    get multiDay() {
+      return startDate.value !== endDate.value
+    },
     saving,
     error,
     problem,
