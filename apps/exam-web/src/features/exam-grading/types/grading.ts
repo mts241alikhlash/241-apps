@@ -1,80 +1,22 @@
+import type { components } from '@mts241alikhlash/exam-api'
 import type {
   ExamCategory,
   ExamSessionStatus,
-  ExamType,
 } from '@/features/exam-schedule/types'
 
-export interface GradingSchedule {
-  id: string
-  title: string
-  packageId: string
-  durationMinutes: number
-  kind: 'REGULAR' | 'MAKEUP'
-  subjectId: string
-  classroomId: string
-  classroomName: string | null
-  semesterId: string
-  type: ExamType
-  category?: ExamCategory
-  startsAt: string
-  endsAt: string
-  sessions: number
-  awaitingGrading: number
-  graded: number
-}
+type Schemas = components['schemas']
 
-export type PublicationState = 'PENDING' | 'SENT' | null
+export type GradingSchedule = Schemas['GradingScheduleDto']
 
-export interface GradingSessionRow {
-  sessionId: string
-  studentId: string
-  studentName: string | null
-  studentNis: string | null
-  status: ExamSessionStatus
-  submittedAt: string | null
-  rawScore: number | null
-  maxScore: number | null
-  awaitingGrading: boolean
-  violationCount: number
-  publication: PublicationState
-}
+export type GradingSessionRow = Schemas['GradingSessionRowDto']
 
-export type AnswerPayload =
-  { key: string } | { keys: string[] } | { value: boolean } | { text: string }
+export type PublicationState = GradingSessionRow['publication']
 
-export interface GradingItem {
-  questionId: string
-  number: number
-  type: 'SHORT_ANSWER' | 'ESSAY'
-  bodyHtml: string
-  points: number
-  guideHtml: string | null
-  acceptedAnswers: string[] | null
-  answer: AnswerPayload | null
-  score: number | null
-  note: string | null
-  gradedAt: string | null
-  needsGrading: boolean
-}
+export type GradingItem = Schemas['GradingItemDto']
 
-export interface GradingDetail {
-  session: {
-    sessionId: string
-    scheduleId: string
-    studentId: string
-    studentName: string | null
-    studentNis: string | null
-    status: ExamSessionStatus
-    rawScore: number | null
-    maxScore: number | null
-  }
-  items: GradingItem[]
-}
+export type GradingDetail = Schemas['GradingSessionDetailDto']
 
-export interface GradePayload {
-  score: number
-  note?: string
-}
+export type GradePayload = Schemas['GradeAnswerDto']
 
 export interface GradingScheduleQuery {
   page?: number

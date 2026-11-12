@@ -14,14 +14,12 @@ export function useGradingSchedules(
     pageSize,
     scope: ['exam-grading', 'schedules'],
     filters: { category },
-    fetchPage: async (current, limit) =>
-      (
-        await examGradingApi.getSchedules({
-          page: current,
-          limit,
-          category: category?.value,
-        })
-      ).data,
+    fetchPage: (current, limit) =>
+      examGradingApi.getSchedules({
+        page: current,
+        limit,
+        category: category?.value,
+      }),
     errorMessage: 'Gagal memuat daftar ujian.',
   })
   return { ...list, schedules: list.items }
@@ -38,17 +36,15 @@ export function useGradingSessions(
     pageSize,
     scope: ['exam-grading', 'sessions'],
     filters: { scheduleId, status },
-    fetchPage: async (current, limit) =>
-      (
-        await examGradingApi.getSessions(scheduleId.value, {
-          page: current,
-          limit,
-          status:
-            status.value === 'ALL'
-              ? undefined
-              : (status.value as ExamSessionStatus),
-        })
-      ).data,
+    fetchPage: (current, limit) =>
+      examGradingApi.getSessions(scheduleId.value, {
+        page: current,
+        limit,
+        status:
+          status.value === 'ALL'
+            ? undefined
+            : (status.value as ExamSessionStatus),
+      }),
     errorMessage: 'Gagal memuat daftar siswa.',
   })
   return { ...list, sessions: list.items }

@@ -9,8 +9,7 @@ export type LoadResult =
 export const examGradingService = {
   async loadSession(sessionId: string): Promise<LoadResult> {
     try {
-      const response = await examGradingApi.getSession(sessionId)
-      return { success: true, data: response.data.data }
+      return { success: true, data: await examGradingApi.getSession(sessionId) }
     } catch (err: unknown) {
       return {
         success: false,
@@ -25,13 +24,9 @@ export const examGradingService = {
     payload: GradePayload,
   ): Promise<GradingItem | null> {
     try {
-      const response = await examGradingApi.grade(
-        sessionId,
-        questionId,
-        payload,
-      )
+      const item = await examGradingApi.grade(sessionId, questionId, payload)
       toast.success('Nilai disimpan.')
-      return response.data.data
+      return item
     } catch (err: unknown) {
       toast.error(messageOf(err, 'Gagal menyimpan nilai.'))
       return null
