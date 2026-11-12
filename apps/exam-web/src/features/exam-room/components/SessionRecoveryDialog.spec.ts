@@ -186,6 +186,13 @@ describe('SessionRecoveryDialog', () => {
     wrapper.unmount()
   })
 
+  it('caps the minutes input at the per-request limit', () => {
+    const wrapper = open('extend-time', { maxExtendMinutes: 150 })
+
+    expect(wrapper.find('input').attributes('max')).toBe('120')
+    wrapper.unmount()
+  })
+
   it('disables reopening when the exam window is closed', async () => {
     const wrapper = open('reopen', { windowOpen: false })
     await wrapper.find('textarea').setValue('Terkirim tidak sengaja')

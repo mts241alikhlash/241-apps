@@ -66,7 +66,7 @@ const descriptions = {
 const title = computed(() => titles[props.action])
 const description = computed(() => descriptions[props.action])
 const destructive = computed(() => props.action === 'reset')
-const extendLimit = computed(() => props.maxExtendMinutes ?? 120)
+const extendLimit = computed(() => Math.min(props.maxExtendMinutes ?? 120, 120))
 const windowClosed = computed(
   () =>
     (props.action === 'extend-time' && extendLimit.value === 0) ||
