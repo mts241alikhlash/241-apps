@@ -21,6 +21,11 @@ const presets = ref<ExamPolicyPreset[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 const savingType = ref<ExamType | null>(null)
+const savedPolicies = new Map<ExamType, ExamPolicyPreset['policy']>()
+
+function remember(list: ExamPolicyPreset[]): void {
+  for (const item of list) savedPolicies.set(item.type, { ...item.policy })
+}
 
 async function load(): Promise<void> {
   loading.value = true
@@ -28,6 +33,7 @@ async function load(): Promise<void> {
   try {
     const response = await examPresetApi.list()
     presets.value = response.data.data
+    remember(presets.value)
   } catch (err: unknown) {
     error.value = messageOf(err, 'Gagal memuat daftar preset kebijakan.')
   } finally {
@@ -42,11 +48,14 @@ async function savePreset(preset: ExamPolicyPreset): Promise<void> {
     const response = await examPresetApi.update(preset.type, {
       ...preset.policy,
     })
+    remember([response.data.data])
     presets.value = presets.value.map((item) =>
       item.type === preset.type ? response.data.data : item,
     )
     toast.success(`Preset ${examTypeLabel(preset.type)} disimpan.`)
   } catch (err: unknown) {
+    const lastSaved = savedPolicies.get(preset.type)
+    if (lastSaved !== undefined) Object.assign(preset.policy, lastSaved)
     toast.error(messageOf(err, 'Gagal menyimpan preset kebijakan.'))
   } finally {
     savingType.value = null

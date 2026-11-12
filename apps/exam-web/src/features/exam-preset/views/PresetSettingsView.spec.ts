@@ -148,4 +148,50 @@ describe('PresetSettingsView', () => {
     const resolved = router.resolve('/settings/presets')
     expect(resolved.meta.requiredPermission).toBe('exam-schedules.manage-all')
   })
+
+  it('puts the saved value back when saving fails', async () => {
+    listPresets.mockResolvedValue({
+      data: { data: structuredClone(samplePresets) },
+    })
+    updatePreset.mockRejectedValue(new Error('Network Error'))
+    const wrapper = mount(PresetSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    const input = wrapper.get('input[aria-label="Batas pelanggaran UTS"]')
+    await input.setValue('9')
+    expect((input.element as HTMLInputElement).value).toBe('9')
+    await wrapper.get('[data-test="save-preset-MIDTERM"]').trigger('click')
+    await flushPromises()
+
+    expect((input.element as HTMLInputElement).value).toBe('3')
+    wrapper.unmount()
+  })
+
+  it('keeps the new value as the baseline after a successful save', async () => {
+    listPresets.mockResolvedValue({
+      data: { data: structuredClone(samplePresets) },
+    })
+    updatePreset.mockResolvedValueOnce({
+      data: {
+        data: {
+          ...samplePresets[2],
+          policy: { ...samplePresets[2].policy, violationLimit: 4 },
+        },
+      },
+    })
+    updatePreset.mockRejectedValueOnce(new Error('Network Error'))
+    const wrapper = mount(PresetSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    const input = () => wrapper.get('input[aria-label="Batas pelanggaran UTS"]')
+    await input().setValue('4')
+    await wrapper.get('[data-test="save-preset-MIDTERM"]').trigger('click')
+    await flushPromises()
+    await input().setValue('8')
+    await wrapper.get('[data-test="save-preset-MIDTERM"]').trigger('click')
+    await flushPromises()
+
+    expect((input().element as HTMLInputElement).value).toBe('4')
+    wrapper.unmount()
+  })
 })
