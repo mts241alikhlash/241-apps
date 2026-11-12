@@ -32,7 +32,7 @@ async function load(): Promise<void> {
   error.value = null
   try {
     const response = await examPresetApi.list()
-    presets.value = response.data.data
+    presets.value = response
     remember(presets.value)
   } catch (err: unknown) {
     error.value = messageOf(err, 'Gagal memuat daftar preset kebijakan.')
@@ -55,9 +55,9 @@ async function savePreset(preset: ExamPolicyPreset): Promise<void> {
       gapViolationFrom: policy.gapViolationFrom,
       tokenSlotSeconds: policy.tokenSlotSeconds,
     })
-    remember([response.data.data])
+    remember([response])
     presets.value = presets.value.map((item) =>
-      item.type === preset.type ? response.data.data : item,
+      item.type === preset.type ? response : item,
     )
     toast.success(`Preset ${examTypeLabel(preset.type)} disimpan.`)
   } catch (err: unknown) {

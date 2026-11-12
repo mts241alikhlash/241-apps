@@ -100,7 +100,7 @@ const samplePresets = [
 describe('PresetSettingsView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    listPresets.mockResolvedValue({ data: { data: samplePresets } })
+    listPresets.mockResolvedValue(samplePresets)
   })
 
   it('renders 4 presets with type labels and the note "Berlaku untuk kegiatan baru"', async () => {
@@ -119,12 +119,8 @@ describe('PresetSettingsView', () => {
 
   it('calls PATCH /exam-policy-presets/{type} when saving a preset', async () => {
     updatePreset.mockResolvedValue({
-      data: {
-        data: {
-          ...samplePresets[2],
-          policy: { ...samplePresets[2].policy, violationLimit: 4 },
-        },
-      },
+      ...samplePresets[2],
+      policy: { ...samplePresets[2].policy, violationLimit: 4 },
     })
     const wrapper = mount(PresetSettingsView, { global: { stubs } })
     await flushPromises()
@@ -153,9 +149,7 @@ describe('PresetSettingsView', () => {
   })
 
   it('puts the saved value back when saving fails', async () => {
-    listPresets.mockResolvedValue({
-      data: { data: structuredClone(samplePresets) },
-    })
+    listPresets.mockResolvedValue(structuredClone(samplePresets))
     updatePreset.mockRejectedValue(new Error('Network Error'))
     const wrapper = mount(PresetSettingsView, { global: { stubs } })
     await flushPromises()
@@ -171,16 +165,10 @@ describe('PresetSettingsView', () => {
   })
 
   it('keeps the new value as the baseline after a successful save', async () => {
-    listPresets.mockResolvedValue({
-      data: { data: structuredClone(samplePresets) },
-    })
+    listPresets.mockResolvedValue(structuredClone(samplePresets))
     updatePreset.mockResolvedValueOnce({
-      data: {
-        data: {
-          ...samplePresets[2],
-          policy: { ...samplePresets[2].policy, violationLimit: 4 },
-        },
-      },
+      ...samplePresets[2],
+      policy: { ...samplePresets[2].policy, violationLimit: 4 },
     })
     updatePreset.mockRejectedValueOnce(new Error('Network Error'))
     const wrapper = mount(PresetSettingsView, { global: { stubs } })
