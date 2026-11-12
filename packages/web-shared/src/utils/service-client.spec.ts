@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import createClient from 'openapi-fetch'
-import { setAccessToken } from './auth-session'
+import { toast } from 'vue-sonner'
+import { getAccessToken, setAccessToken } from './auth-session'
 import {
   ServiceRequestError,
   createServiceClient,
@@ -29,6 +30,7 @@ function client() {
 beforeEach(() => {
   fetchMock.mockReset()
   postMock.mockReset()
+  vi.mocked(toast.error).mockClear()
   postMock.mockResolvedValue({ data: { accessToken: 't2' } })
   vi.stubGlobal('fetch', fetchMock)
   setAccessToken('t1')
@@ -88,6 +90,17 @@ describe('createServiceClient', () => {
     expect(res.data).toEqual({ data: 'ok' })
     expect(seen[1]!.body).toContain('hello')
     expect(seen[0]!.ct).toMatch(/^multipart\/form-data; boundary=/)
+  })
+
+  it('passes a network failure of the retry to the caller', async () => {
+    fetchMock
+      .mockResolvedValueOnce(json(401, {}))
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    const err: any = await unwrap(client().GET('/x')).catch((e: any) => e)
+    expect(err).toBeInstanceOf(ServiceRequestError)
+    expect(err.code).toBe('ERR_NETWORK')
+    expect(toast.error).not.toHaveBeenCalled()
+    expect(getAccessToken()).toBe('t2')
   })
 
   it('never refreshes for /auth/ paths', async () => {

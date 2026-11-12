@@ -64,14 +64,15 @@ export function createServiceClient<Paths extends {}>(
       if (response.status !== 401 || !retry || isAuthPath(request.url)) {
         return response
       }
+      let token: string
       try {
-        const token = await refreshAccessToken()
-        retry.headers.set('Authorization', `Bearer ${token}`)
-        return await options.fetch(retry)
+        token = await refreshAccessToken()
       } catch (error) {
         handleRefreshFailure(error)
         return response
       }
+      retry.headers.set('Authorization', `Bearer ${token}`)
+      return options.fetch(retry)
     },
     onError({ id }) {
       clones.delete(id)
