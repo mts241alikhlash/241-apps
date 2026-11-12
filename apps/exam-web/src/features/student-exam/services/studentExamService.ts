@@ -14,7 +14,12 @@ import type {
 
 function bodyOf(error: unknown): { message?: unknown; code?: unknown } | null {
   if (!(error instanceof ServiceRequestError)) return null
-  return error.response.data
+  if (error.response.status === 0 || error.code === 'ERR_NETWORK') return null
+  const data = error.response.data
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null
+  const message = data.message
+  if (typeof message === 'string' && /^\s*</.test(message)) return null
+  return data
 }
 
 export function examErrorMessage(error: unknown, fallback: string): string {
