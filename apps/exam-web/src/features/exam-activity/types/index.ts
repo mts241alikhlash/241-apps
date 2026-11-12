@@ -18,7 +18,7 @@ export const ACTIVITY_STATUSES = [
   'CLOSED',
 ] as const
 
-export type ActivityStatus = Schemas['UpdateActivityStatusRequestDto']['status']
+export type ActivityStatus = Schemas['ExamActivityDto']['status']
 
 export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
   DRAFT: 'Draf',
