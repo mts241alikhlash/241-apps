@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import createClient from 'openapi-fetch'
+import { AxiosError } from 'axios'
+import type { InternalAxiosRequestConfig } from 'axios'
+import api from './api'
 import { toast } from 'vue-sonner'
 import { getAccessToken, setAccessToken } from './auth-session'
 import {
@@ -14,7 +17,13 @@ import { getIndonesianErrorMessage } from './error-handler'
 vi.mock('vue-sonner', () => ({ toast: { error: vi.fn() } }))
 vi.hoisted(() => vi.stubEnv('VITE_API_BASE_URL', 'http://api.test'))
 const postMock = vi.hoisted(() => vi.fn())
-vi.mock('axios', () => ({ default: { post: postMock } }))
+vi.mock('axios', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('axios')>()
+  return {
+    ...actual,
+    default: Object.assign(actual.default, { post: postMock }),
+  }
+})
 
 const fetchMock = vi.fn()
 const json = (status: number, body: unknown) =>
@@ -101,6 +110,74 @@ describe('createServiceClient', () => {
     expect(err.code).toBe('ERR_NETWORK')
     expect(toast.error).not.toHaveBeenCalled()
     expect(getAccessToken()).toBe('t2')
+  })
+
+  it('ends the session when the refresh fails', async () => {
+    vi.useFakeTimers()
+    postMock.mockRejectedValue(
+      new AxiosError('failed', 'ERR_BAD_REQUEST', undefined, null, {
+        status: 401,
+        statusText: '',
+        headers: {},
+        config: {} as InternalAxiosRequestConfig,
+        data: {},
+      }),
+    )
+    fetchMock.mockResolvedValueOnce(json(401, {}))
+    const err: any = await unwrap(client().GET('/x')).catch((e: any) => e)
+    expect(err).toBeInstanceOf(ServiceRequestError)
+    expect(err.response.status).toBe(401)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(getAccessToken()).toBeNull()
+    expect(toast.error).toHaveBeenCalledWith(
+      'Sesi telah berakhir',
+      expect.anything(),
+    )
+    vi.useRealTimers()
+  })
+
+  it('refreshes once for parallel 401s from axios and fetch', async () => {
+    let release = () => {}
+    postMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          release = () => resolve({ data: { accessToken: 't2' } })
+        }),
+    )
+    api.defaults.adapter = (config: InternalAxiosRequestConfig) => {
+      const response = {
+        data: 'axios-ok',
+        status: 200,
+        statusText: '',
+        headers: {},
+        config,
+      }
+      if (config.headers.Authorization === 'Bearer t2') {
+        return Promise.resolve(response)
+      }
+      return Promise.reject(
+        new AxiosError('failed', 'ERR_BAD_REQUEST', config, null, {
+          ...response,
+          status: 401,
+        }),
+      )
+    }
+    fetchMock.mockImplementation(async (input: Request) =>
+      input.headers.get('authorization') === 'Bearer t2'
+        ? json(200, { data: 'fetch-ok' })
+        : json(401, {}),
+    )
+    const both = Promise.all([api.get('/a'), unwrap(client().GET('/x'))])
+    await vi.waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled()
+      expect(postMock).toHaveBeenCalled()
+    })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    release()
+    const [a, b] = await both
+    expect(a.data).toBe('axios-ok')
+    expect(b).toBe('fetch-ok')
+    expect(postMock).toHaveBeenCalledTimes(1)
   })
 
   it('never refreshes for /auth/ paths', async () => {
