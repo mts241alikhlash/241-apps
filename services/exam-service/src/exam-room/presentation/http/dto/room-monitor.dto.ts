@@ -72,6 +72,7 @@ export class RoomMonitorSessionDto {
   status!: string
   @ApiProperty({ format: 'date-time' }) startedAt!: string
   @ApiProperty({ format: 'date-time' }) deadline!: string
+  @ApiProperty({ format: 'date-time' }) scheduleEndsAt!: string
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   submittedAt!: string | null
   @ApiProperty() extraMinutes!: number
@@ -101,6 +102,7 @@ export class RoomMonitorSessionDto {
     dto.status = domain.status
     dto.startedAt = domain.startedAt
     dto.deadline = domain.deadline
+    dto.scheduleEndsAt = domain.scheduleEndsAt
     dto.submittedAt = domain.submittedAt
     dto.extraMinutes = domain.extraMinutes
     dto.answeredCount = domain.answeredCount

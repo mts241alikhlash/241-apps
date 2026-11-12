@@ -66,6 +66,7 @@ export interface RoomMonitorSession {
   status: ExamSession['status']
   startedAt: string
   deadline: string
+  scheduleEndsAt: string
   submittedAt: string | null
   extraMinutes: number
   answeredCount: number
@@ -130,6 +131,7 @@ interface RosterRow {
   subjectName: string | null
   totalQuestions: number
   session: ExamSession | null
+  scheduleEndsAt: Date | null
   absence: ExamRoomReportAbsence | null
 }
 
@@ -248,6 +250,7 @@ export class GetRoomMonitorUseCase {
               ? 0
               : (questionCounts.get(schedule.packageId) ?? 0),
           session,
+          scheduleEndsAt: schedule?.endsAt ?? null,
           absence:
             session !== null
               ? null
@@ -304,6 +307,7 @@ export class GetRoomMonitorUseCase {
                   status: row.session.status,
                   startedAt: row.session.startedAt.toISOString(),
                   deadline: row.session.deadline.toISOString(),
+                  scheduleEndsAt: row.scheduleEndsAt?.toISOString() ?? '',
                   submittedAt: row.session.submittedAt?.toISOString() ?? null,
                   extraMinutes: row.session.extraMinutes,
                   answeredCount:

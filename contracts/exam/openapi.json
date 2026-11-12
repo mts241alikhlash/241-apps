@@ -9185,6 +9185,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "scheduleEndsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "submittedAt": {
             "type": "string",
             "nullable": true,
@@ -9257,6 +9261,7 @@
           "status",
           "startedAt",
           "deadline",
+          "scheduleEndsAt",
           "submittedAt",
           "extraMinutes",
           "answeredCount",

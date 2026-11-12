@@ -2291,6 +2291,8 @@ export interface components {
             lockedByViolation: boolean;
             lockTaskActive: boolean | null;
             requiresTokenReentry: boolean;
+            /** Format: date-time */
+            scheduleEndsAt: string;
             /** Format: uuid */
             sessionId: string;
             /** Format: date-time */
