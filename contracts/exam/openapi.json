@@ -7994,6 +7994,170 @@
           "title"
         ]
       },
+      "ChoiceDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ],
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "html"
+        ]
+      },
+      "SingleKeyAnswerDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "MultipleChoiceContentDto": {
+        "type": "object",
+        "properties": {
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChoiceDto"
+            }
+          },
+          "answer": {
+            "$ref": "#/components/schemas/SingleKeyAnswerDto"
+          }
+        },
+        "required": [
+          "choices",
+          "answer"
+        ]
+      },
+      "MultiKeyAnswerDto": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D",
+                "E"
+              ]
+            }
+          }
+        },
+        "required": [
+          "keys"
+        ]
+      },
+      "MultipleResponseContentDto": {
+        "type": "object",
+        "properties": {
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChoiceDto"
+            }
+          },
+          "answer": {
+            "$ref": "#/components/schemas/MultiKeyAnswerDto"
+          }
+        },
+        "required": [
+          "choices",
+          "answer"
+        ]
+      },
+      "BooleanAnswerDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "TrueFalseContentDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/BooleanAnswerDto"
+          }
+        },
+        "required": [
+          "answer"
+        ]
+      },
+      "ShortAnswerAnswerDto": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ignoreCase": {
+            "type": "boolean"
+          },
+          "ignoreHarakat": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accepted",
+          "ignoreCase",
+          "ignoreHarakat"
+        ]
+      },
+      "ShortAnswerContentDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/ShortAnswerAnswerDto"
+          }
+        },
+        "required": [
+          "answer"
+        ]
+      },
+      "EssayContentDto": {
+        "type": "object",
+        "properties": {
+          "guideHtml": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "guideHtml"
+        ]
+      },
       "QuestionVersionDto": {
         "type": "object",
         "properties": {
@@ -8012,8 +8176,23 @@
             "type": "string"
           },
           "content": {
-            "type": "object",
-            "additionalProperties": true
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MultipleChoiceContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/MultipleResponseContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/TrueFalseContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/ShortAnswerContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/EssayContentDto"
+              }
+            ]
           },
           "points": {
             "type": "number"

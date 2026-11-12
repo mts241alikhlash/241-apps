@@ -1406,6 +1406,14 @@ export interface components {
             /** Format: uuid */
             sessionId: string | null;
         };
+        BooleanAnswerDto: {
+            value: boolean;
+        };
+        ChoiceDto: {
+            html: string;
+            /** @enum {string} */
+            key: "A" | "B" | "C" | "D" | "E";
+        };
         ConfirmedAnswerDto: {
             clientId: string;
             /** Format: uuid */
@@ -1495,6 +1503,9 @@ export interface components {
             participants: components["schemas"]["MakeupParticipantDto"][];
             /** Format: date-time */
             startsAt: string;
+        };
+        EssayContentDto: {
+            guideHtml: string | null;
         };
         ExamActivityDetailDto: {
             /** @enum {string} */
@@ -1902,6 +1913,17 @@ export interface components {
             /** Format: uuid */
             studentId: string;
         };
+        MultiKeyAnswerDto: {
+            keys: ("A" | "B" | "C" | "D" | "E")[];
+        };
+        MultipleChoiceContentDto: {
+            answer: components["schemas"]["SingleKeyAnswerDto"];
+            choices: components["schemas"]["ChoiceDto"][];
+        };
+        MultipleResponseContentDto: {
+            answer: components["schemas"]["MultiKeyAnswerDto"];
+            choices: components["schemas"]["ChoiceDto"][];
+        };
         MyExamDto: {
             /**
              * Format: uuid
@@ -2029,9 +2051,7 @@ export interface components {
         };
         QuestionVersionDto: {
             bodyHtml: string;
-            content: {
-                [key: string]: unknown;
-            };
+            content: components["schemas"]["MultipleChoiceContentDto"] | components["schemas"]["MultipleResponseContentDto"] | components["schemas"]["TrueFalseContentDto"] | components["schemas"]["ShortAnswerContentDto"] | components["schemas"]["EssayContentDto"];
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
@@ -2495,6 +2515,18 @@ export interface components {
             reason: string | null;
             type: string | null;
         };
+        ShortAnswerAnswerDto: {
+            accepted: string[];
+            ignoreCase: boolean;
+            ignoreHarakat: boolean;
+        };
+        ShortAnswerContentDto: {
+            answer: components["schemas"]["ShortAnswerAnswerDto"];
+        };
+        SingleKeyAnswerDto: {
+            /** @enum {string} */
+            key: "A" | "B" | "C" | "D" | "E";
+        };
         StartedSessionDto: {
             /** @description End of the working time, epoch milliseconds */
             deadline: number;
@@ -2552,6 +2584,9 @@ export interface components {
             questionIds: string[];
             /** Format: uuid */
             sourcePackageId: string;
+        };
+        TrueFalseContentDto: {
+            answer: components["schemas"]["BooleanAnswerDto"];
         };
         UpdateActivityPolicyRequestDto: {
             focusThresholdMs?: number;
