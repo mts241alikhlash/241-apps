@@ -6067,6 +6067,10 @@
             "type": "string"
           },
           "tokenMode": {
+            "enum": [
+              "ROTATING",
+              "STATIC"
+            ],
             "type": "string"
           },
           "tokenRotation": {
@@ -6087,6 +6091,12 @@
             "type": "number"
           },
           "status": {
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
             "type": "string"
           }
         },
@@ -6185,6 +6195,10 @@
             "type": "string"
           },
           "tokenMode": {
+            "enum": [
+              "ROTATING",
+              "STATIC"
+            ],
             "type": "string"
           },
           "tokenRotation": {
@@ -6205,6 +6219,12 @@
             "type": "number"
           },
           "status": {
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
             "type": "string"
           },
           "schedules": {

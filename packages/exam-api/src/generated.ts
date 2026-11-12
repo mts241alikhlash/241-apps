@@ -1515,10 +1515,12 @@ export interface components {
             semesterId: string;
             /** Format: date-time */
             startsAt: string;
-            status: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
-            tokenMode: string;
+            /** @enum {string} */
+            tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
             /** @enum {string} */
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
@@ -1542,10 +1544,12 @@ export interface components {
             semesterId: string;
             /** Format: date-time */
             startsAt: string;
-            status: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
-            tokenMode: string;
+            /** @enum {string} */
+            tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
             /** @enum {string} */
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
