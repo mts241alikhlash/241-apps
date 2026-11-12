@@ -4325,7 +4325,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ExamRoomSeatDto"
+                        "$ref": "#/components/schemas/ExamRoomSeatResponseDto"
                       }
                     }
                   }
@@ -4386,7 +4386,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ExamRoomSeatDto"
+                        "$ref": "#/components/schemas/ExamRoomSeatResponseDto"
                       }
                     }
                   }
@@ -9644,6 +9644,28 @@
             "nullable": true
           }
         }
+      },
+      "ExamRoomSeatResponseDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seatNumber": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "studentId",
+          "classroomId",
+          "seatNumber"
+        ]
       },
       "ExamRoomSeatDto": {
         "type": "object",

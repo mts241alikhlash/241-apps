@@ -214,6 +214,14 @@ export class ExamRoomSeatDto {
   seatNumber?: number
 }
 
+export class ExamRoomSeatResponseDto {
+  @ApiProperty({ format: 'uuid' }) studentId!: string
+
+  @ApiProperty({ format: 'uuid' }) classroomId!: string
+
+  @ApiProperty({ minimum: 1 }) seatNumber!: number
+}
+
 export class ExamRoomDto {
   @ApiProperty({ format: 'uuid' }) id!: string
   @ApiProperty({ format: 'uuid' }) eventId!: string

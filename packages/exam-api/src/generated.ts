@@ -1720,6 +1720,13 @@ export interface components {
             /** Format: uuid */
             studentId: string;
         };
+        ExamRoomSeatResponseDto: {
+            /** Format: uuid */
+            classroomId: string;
+            seatNumber: number;
+            /** Format: uuid */
+            studentId: string;
+        };
         ExamScheduleDto: {
             /** Format: uuid */
             activityId: string | null;
@@ -4176,7 +4183,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data?: components["schemas"]["ExamRoomSeatDto"][];
+                        data?: components["schemas"]["ExamRoomSeatResponseDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
@@ -4207,7 +4214,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data?: components["schemas"]["ExamRoomSeatDto"][];
+                        data?: components["schemas"]["ExamRoomSeatResponseDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
