@@ -21,7 +21,7 @@ describe('examGradingService', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('loads the answers of a session', async () => {
-    getSession.mockResolvedValue({ data: { data: { items: [] } } })
+    getSession.mockResolvedValue({ items: [] })
 
     expect(await examGradingService.loadSession('x1')).toEqual({
       success: true,
@@ -39,7 +39,7 @@ describe('examGradingService', () => {
   })
 
   it('returns the graded item and tells the teacher it was saved', async () => {
-    grade.mockResolvedValue({ data: { data: { questionId: 'q1', score: 7 } } })
+    grade.mockResolvedValue({ questionId: 'q1', score: 7 })
 
     expect(await examGradingService.grade('x1', 'q1', { score: 7 })).toEqual({
       questionId: 'q1',

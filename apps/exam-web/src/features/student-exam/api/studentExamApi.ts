@@ -1,17 +1,6 @@
-import api from '@mts241alikhlash/web-shared/utils/api'
-import type { ApiEnvelope } from '@mts241alikhlash/web-shared/types/api'
-import type {
-  MyExam,
-  SaveAnswersBatchRequest,
-  SaveAnswersBatchResult,
-  SavedAnswer,
-  SessionPaper,
-  StartedSession,
-  SubmitRequest,
-  SubmittedSession,
-} from '../types'
-
-const seg = encodeURIComponent
+import { unwrap } from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
+import type { SaveAnswersBatchRequest, SubmitRequest } from '../types'
 
 const deviceHeaders = (deviceId: string) => ({
   'X-Device-Id': deviceId,
@@ -19,42 +8,48 @@ const deviceHeaders = (deviceId: string) => ({
 })
 
 export const studentExamApi = {
-  listExams: () => api.get<ApiEnvelope<MyExam[]>>('/me/exams'),
+  listExams: () => unwrap(examClient.GET('/me/exams')),
 
   startSession: (scheduleId: string, accessCode: string, deviceId: string) =>
-    api.post<ApiEnvelope<StartedSession>>(
-      `/me/exams/${seg(scheduleId)}/sessions`,
-      { accessCode, deviceId },
-      { headers: { 'X-Client-Platform': 'web' } },
+    unwrap(
+      examClient.POST('/me/exams/{scheduleId}/sessions', {
+        params: { path: { scheduleId } },
+        body: { accessCode, deviceId },
+        headers: { 'X-Client-Platform': 'web' },
+      }),
     ),
 
   getQuestions: (sessionId: string, deviceId: string) =>
-    api.get<ApiEnvelope<SessionPaper>>(
-      `/student-exams/${seg(sessionId)}/questions`,
-      { headers: deviceHeaders(deviceId) },
+    unwrap(
+      examClient.GET('/student-exams/{sessionId}/questions', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+      }),
     ),
 
   getAnswers: (sessionId: string, deviceId: string) =>
-    api.get<ApiEnvelope<SavedAnswer[]>>(
-      `/student-exams/${seg(sessionId)}/answers`,
-      { headers: deviceHeaders(deviceId) },
+    unwrap(
+      examClient.GET('/student-exams/{sessionId}/answers', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+      }),
     ),
 
   saveAnswersBatch: (
     sessionId: string,
     deviceId: string,
-    payload: SaveAnswersBatchRequest,
+    body: SaveAnswersBatchRequest,
   ) =>
-    api.post<ApiEnvelope<SaveAnswersBatchResult>>(
-      `/student-exams/${seg(sessionId)}/answers/batch`,
-      payload,
-      { headers: deviceHeaders(deviceId) },
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/answers/batch', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+        body,
+      }),
     ),
 
-  submit: (sessionId: string, deviceId: string, payload: SubmitRequest = {}) =>
-    api.post<ApiEnvelope<SubmittedSession>>(
-      `/student-exams/${seg(sessionId)}/submit`,
-      payload,
-      { headers: deviceHeaders(deviceId) },
+  submit: (sessionId: string, deviceId: string, body: SubmitRequest = {}) =>
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/submit', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+        body,
+      }),
     ),
 }

@@ -38,7 +38,7 @@ describe('QuestionHtml', () => {
   })
 
   it('loads each picture through the exam files API', async () => {
-    getImage.mockResolvedValue({ data: new Blob(['x'], { type: 'image/png' }) })
+    getImage.mockResolvedValue(new Blob(['x'], { type: 'image/png' }))
     const wrapper = mount(QuestionHtml, {
       props: {
         html: '<p><img data-file-id="3d2a9b2e-0000-4000-8000-000000000001"></p>',
@@ -53,7 +53,7 @@ describe('QuestionHtml', () => {
   })
 
   it('asks for the same picture only once', async () => {
-    getImage.mockResolvedValue({ data: new Blob(['x']) })
+    getImage.mockResolvedValue(new Blob(['x']))
     mount(QuestionHtml, {
       props: {
         html: '<p><img data-file-id="3d2a9b2e-6a4f-4b1c-9d0e-1f2a3b4c5d6e"><img data-file-id="3d2a9b2e-6a4f-4b1c-9d0e-1f2a3b4c5d6e"></p>',

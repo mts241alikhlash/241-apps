@@ -20,6 +20,16 @@ const exam = (overrides: Partial<MyExam> = {}): MyExam => ({
   minSubmitMinutes: 0,
   status: 'OPEN',
   sessionId: null,
+  activityId: null,
+  activityStatus: null,
+  category: 'NON_EXAM',
+  eventId: null,
+  eventName: null,
+  lifecycle: 'OPEN',
+  makeup: false,
+  participantNumber: null,
+  roomName: null,
+  seatNumber: null,
   ...overrides,
 })
 
@@ -108,7 +118,7 @@ describe('countAnswered', () => {
     ]
     const answers = new Map([
       ['q1', { key: 'A' as const }],
-      ['q2', { key: '' as const }],
+      ['q2', { text: '' }],
     ])
     expect(countAnswered(questions, answers)).toBe(1)
   })

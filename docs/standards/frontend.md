@@ -8,7 +8,7 @@ Applies to the Vue 3 + Vite apps in `apps/` and the Vue packages in `packages/` 
 **Why.** One shape means any feature is found the same way in every app.
 **Check.** review; `routes:check` verifies the emitted routing manifest.
 
-**Rule.** Data flows `views/components -> composables -> services -> api`. `api/` holds the HTTP calls through the shared `api` instance; `services/` maps and orchestrates; components never call `api/` directly.
+**Rule.** Data flows `views/components -> composables -> services -> api`. `api/` holds the HTTP calls through a `createServiceClient` client from `@mts241alikhlash/web-shared/utils/service-client` (typed by the generated `*-api` package) with contract paths and `unwrap`, `unwrapPage` or `unwrapBlob`; no URL helpers and no manual `encodeURIComponent`, the client encodes path params. The shared `api` instance (axios) remains only for endpoints missing from a contract; `services/` maps and orchestrates; components never call `api/` directly.
 **Why.** Components stay presentational and the call sites are searchable.
 **Check.** review. The envelope typing of every call is checked by `api-calls-read-the-envelope.spec.ts` where present.
 

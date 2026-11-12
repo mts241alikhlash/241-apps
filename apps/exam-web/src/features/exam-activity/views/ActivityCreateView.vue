@@ -52,7 +52,7 @@ async function load(): Promise<void> {
   ])
 
   const activeSemester =
-    semesters.data.data.find((item) => item.isActive) ?? semesters.data.data[0]
+    semesters.data.find((item) => item.isActive) ?? semesters.data[0]
   semesterId.value = activeSemester?.id ?? ''
   if (semesterId.value !== '') {
     const activeEvents = await examEventService.loadEventOptions(
@@ -65,14 +65,14 @@ async function load(): Promise<void> {
     }))
   }
 
-  classrooms.value = rooms.data.data.map((room) => ({
+  classrooms.value = rooms.data.map((room) => ({
     id: room.id,
     gradeId: room.gradeId,
     label: room.displayName,
   }))
 
   const seen = new Map<string, GradeOption>()
-  for (const room of rooms.data.data) {
+  for (const room of rooms.data) {
     if (room.grade !== undefined && room.grade !== null) {
       seen.set(room.gradeId, {
         id: room.gradeId,
@@ -84,7 +84,7 @@ async function load(): Promise<void> {
     left.label.localeCompare(right.label),
   )
 
-  packages.value = packs.data.data.map((item) => ({
+  packages.value = packs.data.map((item) => ({
     id: item.id,
     subjectId: item.subjectId,
     label: item.title,
@@ -109,7 +109,7 @@ async function loadActivity(): Promise<void> {
   loadingActivity.value = true
   try {
     const response = await examActivityApi.get(editingId.value)
-    activity.value = response.data.data
+    activity.value = response
   } catch {
     error.value = 'Kegiatan gagal dimuat.'
   } finally {

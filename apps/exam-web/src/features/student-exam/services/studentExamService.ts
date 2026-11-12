@@ -1,5 +1,4 @@
-import type { ApiEnvelope } from '@mts241alikhlash/web-shared/types/api'
-import { isAxiosError } from 'axios'
+import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 import { studentExamApi } from '../api/studentExamApi'
 import { deviceId } from './deviceId'
 import type {
@@ -13,14 +12,21 @@ import type {
   SubmittedSession,
 } from '../types'
 
+function bodyOf(error: unknown): { message?: unknown; code?: unknown } | null {
+  if (!(error instanceof ServiceRequestError)) return null
+  if (error.response.status === 0 || error.code === 'ERR_NETWORK') return null
+  const data = error.response.data
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null
+  const message = data.message
+  if (typeof message === 'string' && /^\s*</.test(message)) return null
+  return data
+}
+
 export function examErrorMessage(error: unknown, fallback: string): string {
-  if (isAxiosError(error)) {
-    const message = (error.response?.data as { message?: unknown } | null)
-      ?.message
-    if (typeof message === 'string' && message.trim()) return message
-    if (Array.isArray(message) && typeof message[0] === 'string') {
-      return message[0]
-    }
+  const message = bodyOf(error)?.message
+  if (typeof message === 'string' && message.trim()) return message
+  if (Array.isArray(message) && typeof message[0] === 'string') {
+    return message[0]
   }
   return fallback
 }
@@ -43,23 +49,14 @@ export const API_ERROR_CODES = {
 } as const
 
 function codeOf(error: unknown): string | null {
-  if (!isAxiosError(error)) return null
-  const body = error.response?.data as { code?: unknown } | null
-  return typeof body?.code === 'string' && body.code.trim() ? body.code : null
-}
-
-function unwrap<T>(response: { data: ApiEnvelope<T> }): T {
-  const payload = response.data?.data
-  if (payload === null || payload === undefined) {
-    throw new Error('Respons server kosong.')
-  }
-  return payload
+  const code = bodyOf(error)?.code
+  return typeof code === 'string' && code.trim() ? code : null
 }
 
 export const studentExamService = {
   async listExams(): Promise<MyExam[]> {
     try {
-      return unwrap(await studentExamApi.listExams())
+      return await studentExamApi.listExams()
     } catch (error) {
       throw new Error(examErrorMessage(error, 'Daftar ujian gagal dimuat.'), {
         cause: error,
@@ -72,12 +69,10 @@ export const studentExamService = {
     accessCode: string,
   ): Promise<StartedSession> {
     try {
-      return unwrap(
-        await studentExamApi.startSession(
-          scheduleId,
-          accessCode.trim(),
-          deviceId(),
-        ),
+      return await studentExamApi.startSession(
+        scheduleId,
+        accessCode.trim(),
+        deviceId(),
       )
     } catch (error) {
       throw new Error(examErrorMessage(error, 'Ujian gagal dimulai.'), {
@@ -88,7 +83,7 @@ export const studentExamService = {
 
   async getQuestions(sessionId: string): Promise<SessionPaper> {
     try {
-      return unwrap(await studentExamApi.getQuestions(sessionId, deviceId()))
+      return await studentExamApi.getQuestions(sessionId, deviceId())
     } catch (error) {
       throw new Error(examErrorMessage(error, 'Soal gagal dimuat.'), {
         cause: error,
@@ -98,7 +93,7 @@ export const studentExamService = {
 
   async getAnswers(sessionId: string): Promise<SavedAnswer[]> {
     try {
-      return unwrap(await studentExamApi.getAnswers(sessionId, deviceId()))
+      return await studentExamApi.getAnswers(sessionId, deviceId())
     } catch (error) {
       throw new Error(examErrorMessage(error, 'Jawaban gagal dimuat.'), {
         cause: error,
@@ -112,12 +107,10 @@ export const studentExamService = {
     pendingLocalCount?: number,
   ): Promise<SaveAnswersBatchResult> {
     try {
-      return unwrap(
-        await studentExamApi.saveAnswersBatch(sessionId, deviceId(), {
-          answers,
-          pendingLocalCount,
-        }),
-      )
+      return await studentExamApi.saveAnswersBatch(sessionId, deviceId(), {
+        answers,
+        pendingLocalCount,
+      })
     } catch (error) {
       throw new Error(examErrorMessage(error, 'Jawaban gagal disimpan.'), {
         cause: error,
@@ -130,7 +123,7 @@ export const studentExamService = {
     payload: SubmitRequest = {},
   ): Promise<SubmittedSession> {
     try {
-      return unwrap(await studentExamApi.submit(sessionId, deviceId(), payload))
+      return await studentExamApi.submit(sessionId, deviceId(), payload)
     } catch (error) {
       throw new ExamApiError(
         examErrorMessage(error, 'Ujian gagal dikumpulkan.'),

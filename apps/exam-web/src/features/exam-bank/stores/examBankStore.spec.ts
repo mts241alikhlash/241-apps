@@ -45,7 +45,7 @@ describe('exam bank store', () => {
       { id: 'a', name: 'Akidah' },
     ]
     store.grades = [
-      { id: 'g8', level: 8, name: null },
+      { id: 'g8', level: 8, name: '' },
       { id: 'g7', level: 7, name: 'VII' },
     ]
 

@@ -18,7 +18,7 @@ export const ACTIVITY_STATUSES = [
   'CLOSED',
 ] as const
 
-export type ActivityStatus = Schemas['ExamActivityDto']['status']
+export type ActivityStatus = Schemas['UpdateActivityStatusRequestDto']['status']
 
 export const ACTIVITY_STATUS_LABELS: Record<ActivityStatus, string> = {
   DRAFT: 'Draf',
@@ -63,26 +63,8 @@ export interface ExamActivityQuery {
   category?: ExamCategory
 }
 
-export interface ExamActivityRecord {
-  id: string
-  semesterId: string
-  eventId?: string | null
-  gradeId: string
-  subjectId?: string
-  packageId?: string
-  type?: ExamType
-  category?: ExamCategory
-  status: ActivityStatus
-  tokenMode: ActivityTokenMode
-  tokenRotation: number
-  durationMinutes: number
-  startsAt: string
-  endsAt: string
-  policy: ExamPolicy | Record<string, number>
-}
+export type ExamActivityRecord = Schemas['ExamActivityDto']
 
 export type ExamActivitySchedule = Schemas['ExamActivityScheduleDto']
 
-export interface ExamActivityDetail extends ExamActivityRecord {
-  schedules: ExamActivitySchedule[]
-}
+export type ExamActivityDetail = Schemas['ExamActivityDetailDto']

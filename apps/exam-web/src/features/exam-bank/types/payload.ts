@@ -1,43 +1,24 @@
-export interface ScopePair {
-  subjectId: string
-  subjectName: string | null
-  gradeId: string
-  gradeLevel: number | null
-  gradeName: string | null
-}
+import type { components as AcademicComponents } from '@mts241alikhlash/academic-api'
+import type { components } from '@mts241alikhlash/exam-api'
 
-export interface QuestionScope {
-  all: boolean
-  employeeId: string | null
-  pairs: ScopePair[]
-}
+type Schemas = components['schemas']
+type AcademicSchemas = AcademicComponents['schemas']
+
+export type ScopePair = Schemas['ScopePairDto']
+
+export type QuestionScope = Schemas['QuestionScopeDto']
 
 export interface NamedOption {
   id: string
   name: string
 }
 
-export interface GradeRecord {
-  id: string
-  level: number
-  name: string | null
-}
+export type GradeRecord = AcademicSchemas['GradePageItemResponseDto']
 
-export interface ExamFile {
-  id: string
-  mimeType: string
-  sizeBytes: number
-}
+export type ExamFile = Schemas['ExamFileDto']
 
-export interface ImportRowError {
-  row: number
-  reason: string
-}
+export type ImportRowError = Schemas['ImportErrorDto']
 
-export interface ImportResult {
-  created: number
-  questionIds: string[]
-  errors: ImportRowError[]
-}
+export type ImportResult = Schemas['ImportResultDto']
 
 export type TemplateFormat = 'xlsx' | 'docx'

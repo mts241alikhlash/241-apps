@@ -70,6 +70,7 @@ const schedule = (
   classroomName: 'VII A',
   semesterId: 'sem',
   type: 'MIDTERM',
+  category: 'EXAM',
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-02T04:00:00.000Z',
   sessions: 0,

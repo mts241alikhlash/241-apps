@@ -94,7 +94,7 @@ async function uploadImage(file: File) {
   uploading.value = true
   try {
     const response = await examBankApi.uploadImage(file)
-    const id = response.data?.data?.id
+    const id = response?.id
     if (id) {
       editor.value
         ?.chain()

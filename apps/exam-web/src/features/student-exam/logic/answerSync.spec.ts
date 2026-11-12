@@ -21,7 +21,7 @@ import type {
   SkippedAnswer,
 } from '../types'
 
-const payload = (key: string) => ({ key })
+const payload = (key: 'A' | 'B' | 'C') => ({ key })
 
 function rowsWith(count: number): AnswerRows {
   const rows: AnswerRows = new Map()

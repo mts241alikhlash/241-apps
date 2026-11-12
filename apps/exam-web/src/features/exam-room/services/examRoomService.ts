@@ -4,6 +4,8 @@ import { messageOf } from '@/features/exam-package/utils/messageOf'
 import type {
   Letterhead,
   MonitorAbilities,
+  RoomAbsencePayload,
+  RoomFieldNotePayload,
   RoomMonitorMeta,
   RoomMonitorParticipant,
   RoomMonitorQuery,
@@ -41,7 +43,7 @@ export const examRoomService = {
       const response = await examRoomApi.getOverview(
         eventId === undefined ? undefined : { eventId },
       )
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response ?? [] }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat daftar ruangan.')
     }
@@ -54,8 +56,8 @@ export const examRoomService = {
     try {
       const response = await examRoomApi.getMonitor(roomId, query)
       return {
-        data: response.data?.data ?? [],
-        meta: response.data?.meta ?? null,
+        data: response.data,
+        meta: response.meta,
       }
     } catch {
       throw new Error('monitor-failed')
@@ -92,7 +94,7 @@ export const examRoomService = {
   async loadSupervisors(roomId: string): Promise<SupervisorSlotRow[]> {
     try {
       const response = await examRoomApi.getSupervisors(roomId)
-      return response.data?.data ?? []
+      return response ?? []
     } catch {
       return []
     }
@@ -103,7 +105,7 @@ export const examRoomService = {
   ): Promise<Outcome<SessionTimelineEntry[]>> {
     try {
       const response = await examRoomApi.getTimeline(sessionId)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response ?? [] }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat riwayat kejadian.')
     }
@@ -193,7 +195,7 @@ export const examRoomService = {
   ): Promise<Outcome<RoomReport>> {
     try {
       const response = await examRoomApi.getReport(roomId, slotId)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat berita acara.')
     }
@@ -206,7 +208,7 @@ export const examRoomService = {
   ): Promise<Outcome<RoomReport>> {
     try {
       const response = await examRoomApi.saveReport(roomId, slotId, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyimpan berita acara.')
     }
@@ -215,16 +217,11 @@ export const examRoomService = {
   async recordAbsence(
     roomId: string,
     slotId: string,
-    payload: {
-      studentId: string
-      scheduleId: string
-      reason: string
-      note?: string
-    },
+    payload: RoomAbsencePayload,
   ): Promise<Outcome<RoomReport>> {
     try {
       const response = await examRoomApi.recordAbsence(roomId, slotId, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal mencatat ketidakhadiran.')
     }
@@ -233,12 +230,7 @@ export const examRoomService = {
   async recordFieldNote(
     roomId: string,
     slotId: string,
-    payload: {
-      studentId: string
-      sessionId?: string
-      category: string
-      note: string
-    },
+    payload: RoomFieldNotePayload,
   ): Promise<Outcome<RoomReport>> {
     try {
       const response = await examRoomApi.recordFieldNote(
@@ -246,7 +238,7 @@ export const examRoomService = {
         slotId,
         payload,
       )
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal mencatat pelanggaran fisik.')
     }
@@ -259,7 +251,7 @@ export const examRoomService = {
     try {
       const response = await examRoomApi.submitReport(roomId, slotId)
       toast.success('Berita acara diserahkan dan dikunci.')
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyerahkan berita acara.')
     }
@@ -272,7 +264,7 @@ export const examRoomService = {
     try {
       const response = await examRoomApi.verifyReport(roomId, slotId)
       toast.success('Berita acara diverifikasi.')
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memverifikasi berita acara.')
     }
@@ -281,16 +273,9 @@ export const examRoomService = {
   async loadLetterhead(): Promise<Letterhead> {
     try {
       const response = await examRoomApi.getLetterhead()
-      return (
-        response.data?.data ?? {
-          name: null,
-          address: '',
-          nsm: null,
-          npsn: null,
-        }
-      )
+      return response ?? { name: '', address: '', nsm: null, npsn: null }
     } catch {
-      return { name: null, address: '', nsm: null, npsn: null }
+      return { name: '', address: '', nsm: null, npsn: null }
     }
   },
 }

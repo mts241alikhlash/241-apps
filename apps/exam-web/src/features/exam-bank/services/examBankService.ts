@@ -13,14 +13,14 @@ export const examBankService = {
     const store = useExamBankStore()
     try {
       const response = await examBankApi.getScope()
-      store.scope = response.data?.data ?? { all: false, pairs: [] }
+      store.scope = response ?? { all: false, pairs: [] }
       if (store.scope.all) {
         const [subjectRes, gradeRes] = await Promise.all([
           subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
           examBankApi.getGrades({ limit: PAGINATION.REFERENCE_LIMIT }),
         ])
-        store.subjects = subjectRes.data?.data ?? []
-        store.grades = gradeRes.data?.data ?? []
+        store.subjects = subjectRes.data
+        store.grades = gradeRes.data
       }
     } catch (err: unknown) {
       toast.error(
@@ -37,10 +37,7 @@ export const examBankService = {
       })
       const teachers = new Map<string, string>()
       for (const row of rows) {
-        teachers.set(
-          row.employeeId,
-          row.employee?.user?.profile?.name ?? row.employee?.nip ?? '-',
-        )
+        teachers.set(row.employeeId, row.employee?.user?.profile?.name ?? '-')
       }
       return [...teachers]
         .map(([id, name]) => ({ id, name }))
@@ -54,7 +51,7 @@ export const examBankService = {
   async downloadTemplate(format: TemplateFormat): Promise<void> {
     try {
       const response = await examBankApi.downloadTemplate(format)
-      const url = URL.createObjectURL(response.data)
+      const url = URL.createObjectURL(response)
       const link = document.createElement('a')
       link.href = url
       link.download = `template-soal.${format}`
@@ -80,7 +77,7 @@ export const examBankService = {
     }
     try {
       const response = await examBankApi.importQuestions(form)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,

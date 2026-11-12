@@ -45,7 +45,7 @@ export const examScheduleService = {
         ),
       )
       return responses
-        .flatMap((response) => response.data?.data ?? [])
+        .flatMap((response) => response.data)
         .sort((a, b) => a.title.localeCompare(b.title))
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar paket.'))
@@ -59,7 +59,7 @@ export const examScheduleService = {
         isActive: true,
         limit: 1,
       })
-      const academicYearId = semesters.data?.data?.[0]?.academicYearId
+      const academicYearId = semesters.data[0]?.academicYearId
       if (!academicYearId) return []
       const response = await classroomApi.getClassrooms({
         gradeId,
@@ -67,7 +67,7 @@ export const examScheduleService = {
         isActive: true,
         limit: PAGINATION.REFERENCE_LIMIT,
       })
-      return response.data?.data ?? []
+      return response.data
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar kelas.'))
       return []
@@ -80,7 +80,7 @@ export const examScheduleService = {
         isActive: true,
         limit: 1,
       })
-      const semesterId = semesters.data?.data?.[0]?.id
+      const semesterId = semesters.data[0]?.id
       if (!semesterId) return []
       return await examEventService.loadEventOptions(semesterId)
     } catch {
@@ -99,7 +99,7 @@ export const examScheduleService = {
               payload as ScheduleCreatePayload,
             )
           : await examScheduleApi.updateSchedule(target.id, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -111,7 +111,7 @@ export const examScheduleService = {
   async loadAbsentees(id: string): Promise<Outcome<Absentee[]>> {
     try {
       const response = await examScheduleApi.getAbsentees(id)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -126,7 +126,7 @@ export const examScheduleService = {
   ): Promise<Outcome<ExamSchedule>> {
     try {
       const response = await examScheduleApi.createMakeup(id, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -138,7 +138,7 @@ export const examScheduleService = {
   async loadParticipants(id: string): Promise<Outcome<MakeupParticipant[]>> {
     try {
       const response = await examScheduleApi.getParticipants(id)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -191,7 +191,7 @@ export const examScheduleService = {
   async loadAccessCode(id: string): Promise<AccessCodeResult> {
     try {
       const response = await examScheduleApi.getAccessCode(id)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -203,7 +203,7 @@ export const examScheduleService = {
   async rotateAccessCode(id: string): Promise<AccessCodeResult> {
     try {
       const response = await examScheduleApi.rotateAccessCode(id)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,
@@ -223,11 +223,11 @@ export const examScheduleService = {
         page: 1,
         limit: PAGINATION.REFERENCE_LIMIT,
       })
-      const data = response.data?.data ?? []
+      const data = response.data
       return {
         success: true,
         data,
-        total: response.data?.meta?.total ?? data.length,
+        total: response.meta.total || data.length,
       }
     } catch (err: unknown) {
       return {
@@ -262,7 +262,7 @@ export const examScheduleService = {
   async loadSessionAudit(sessionId: string): Promise<SessionAuditEntry[]> {
     try {
       const response = await examScheduleApi.getSessionAuditLogs(sessionId)
-      return response.data?.data ?? []
+      return response
     } catch (err: unknown) {
       toast.error(messageOf(err, 'Gagal memuat riwayat sesi.'))
       return []

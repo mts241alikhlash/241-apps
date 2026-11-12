@@ -1,88 +1,91 @@
+import {
+  unwrap,
+  unwrapPage,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
-import type {
-  AccessCode,
-  Absentee,
-  ExamSchedule,
   MakeupCreatePayload,
-  MakeupParticipant,
   MakeupParticipantInput,
   ScheduleCreatePayload,
   SchedulePayload,
   ScheduleQueryParams,
-  ScheduleSession,
-  SessionAuditEntry,
 } from '../types'
 
-const seg = encodeURIComponent
+const idPath = (id: string) => ({ params: { path: { id } } })
 
 export const examScheduleApi = {
-  getSchedules: (params?: ScheduleQueryParams) =>
-    api.get<ApiPaginatedResponse<ExamSchedule>>('/exam-schedules', { params }),
+  getSchedules: (query?: ScheduleQueryParams) =>
+    unwrapPage(examClient.GET('/exam-schedules', { params: { query } })),
 
   getSchedule: (id: string) =>
-    api.get<ApiSingleResponse<ExamSchedule>>(`/exam-schedules/${seg(id)}`),
+    unwrap(examClient.GET('/exam-schedules/{id}', idPath(id))),
 
-  createSchedule: (payload: ScheduleCreatePayload) =>
-    api.post<ApiSingleResponse<ExamSchedule>>('/exam-schedules', payload),
+  createSchedule: (body: ScheduleCreatePayload) =>
+    unwrap(examClient.POST('/exam-schedules', { body })),
 
-  updateSchedule: (id: string, payload: SchedulePayload) =>
-    api.patch<ApiSingleResponse<ExamSchedule>>(
-      `/exam-schedules/${seg(id)}`,
-      payload,
-    ),
+  updateSchedule: (id: string, body: SchedulePayload) =>
+    unwrap(examClient.PATCH('/exam-schedules/{id}', { ...idPath(id), body })),
 
-  cancelSchedule: (id: string) => api.post(`/exam-schedules/${seg(id)}/cancel`),
+  cancelSchedule: (id: string) =>
+    unwrap(examClient.POST('/exam-schedules/{id}/cancel', idPath(id))),
 
   getAccessCode: (id: string) =>
-    api.get<ApiSingleResponse<AccessCode>>(
-      `/exam-schedules/${seg(id)}/access-code`,
+    unwrap(examClient.GET('/exam-schedules/{id}/access-code', idPath(id))),
+
+  getSessions: (id: string, query?: { page?: number; limit?: number }) =>
+    unwrapPage(
+      examClient.GET('/exam-schedules/{id}/sessions', {
+        params: { path: { id }, query },
+      }),
     ),
 
-  getSessions: (id: string, params?: { page?: number; limit?: number }) =>
-    api.get<ApiPaginatedResponse<ScheduleSession>>(
-      `/exam-schedules/${seg(id)}/sessions`,
-      { params },
+  releaseSession: (id: string, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/release', {
+        ...idPath(id),
+        body: { reason },
+      }),
     ),
 
-  releaseSession: (sessionId: string, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/release`, { reason }),
-
-  resetSession: (sessionId: string, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/reset`, { reason }),
-
-  getSessionAuditLogs: (sessionId: string) =>
-    api.get<ApiSingleResponse<SessionAuditEntry[]>>(
-      `/exam-sessions/${seg(sessionId)}/audit-logs`,
+  resetSession: (id: string, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/reset', {
+        ...idPath(id),
+        body: { reason },
+      }),
     ),
+
+  getSessionAuditLogs: (id: string) =>
+    unwrap(examClient.GET('/exam-sessions/{id}/audit-logs', idPath(id))),
 
   getAbsentees: (id: string) =>
-    api.get<ApiSingleResponse<Absentee[]>>(
-      `/exam-schedules/${seg(id)}/absentees`,
-    ),
+    unwrap(examClient.GET('/exam-schedules/{id}/absentees', idPath(id))),
 
-  createMakeup: (id: string, payload: MakeupCreatePayload) =>
-    api.post<ApiSingleResponse<ExamSchedule>>(
-      `/exam-schedules/${seg(id)}/makeups`,
-      payload,
+  createMakeup: (id: string, body: MakeupCreatePayload) =>
+    unwrap(
+      examClient.POST('/exam-schedules/{id}/makeups', { ...idPath(id), body }),
     ),
 
   getParticipants: (id: string) =>
-    api.get<ApiSingleResponse<MakeupParticipant[]>>(
-      `/exam-schedules/${seg(id)}/participants`,
-    ),
+    unwrap(examClient.GET('/exam-schedules/{id}/participants', idPath(id))),
 
   addParticipants: (id: string, participants: MakeupParticipantInput[]) =>
-    api.post(`/exam-schedules/${seg(id)}/participants`, { participants }),
+    unwrap(
+      examClient.POST('/exam-schedules/{id}/participants', {
+        ...idPath(id),
+        body: { participants },
+      }),
+    ),
 
   removeParticipant: (id: string, studentId: string) =>
-    api.delete(`/exam-schedules/${seg(id)}/participants/${seg(studentId)}`),
+    unwrap(
+      examClient.DELETE('/exam-schedules/{id}/participants/{studentId}', {
+        params: { path: { id, studentId } },
+      }),
+    ),
 
   rotateAccessCode: (id: string) =>
-    api.post<ApiSingleResponse<AccessCode>>(
-      `/exam-schedules/${seg(id)}/access-code/rotate`,
+    unwrap(
+      examClient.POST('/exam-schedules/{id}/access-code/rotate', idPath(id)),
     ),
 }

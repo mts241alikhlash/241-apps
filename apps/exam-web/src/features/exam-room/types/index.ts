@@ -1,3 +1,9 @@
+import type { components as IdentityComponents } from '@mts241alikhlash/identity-api'
+import type { components } from '@mts241alikhlash/exam-api'
+
+type Schemas = components['schemas']
+type IdentitySchemas = IdentityComponents['schemas']
+
 export const MONITOR_STATUSES = [
   'ALL',
   'NOT_STARTED',
@@ -21,99 +27,21 @@ export const ROOM_EXECUTION_CONDITIONS = [
 
 export type RoomExecutionCondition = (typeof ROOM_EXECUTION_CONDITIONS)[number]
 
-export interface RoomOverview {
-  id: string
-  eventId: string
-  code: string
-  name: string
-  building: string | null
-  capacity: number
-  registeredCount: number
-  technicianName: string | null
-  currentSupervisorName: string | null
-  isSubstituted: boolean
-  isActiveNow: boolean
-}
+export type RoomOverview = Schemas['RoomOverviewDto']
 
-export interface RoomMonitorSession {
-  sessionId: string
-  status: 'IN_PROGRESS' | 'SUBMITTED' | 'EXPIRED' | 'GRADED'
-  startedAt: string
-  deadline: string
-  submittedAt: string | null
-  extraMinutes: number
-  answeredCount: number
-  syncedAnswerCount: number
-  unsyncedCount: number
-  lastSeenAt: string | null
-  batteryLevel: number | null
-  isCharging: boolean | null
-  dndGranted: boolean | null
-  lockTaskActive: boolean | null
-  batteryUnrestricted: boolean | null
-  kioskMode: string
-  allowWebClient: boolean
-  violationCount: number
-  lockedByViolation: boolean
-  requiresTokenReentry: boolean
-  lastEvent: { type: string; occurredAt: string; detail: string | null } | null
-}
+export type RoomMonitorSession = Schemas['RoomMonitorSessionDto']
 
-export interface RoomMonitorAbsence {
-  reason: string
-  note: string | null
-}
+export type RoomMonitorAbsence = Schemas['RoomMonitorAbsenceDto']
 
-export interface RoomMonitorParticipant {
-  seatNumber: number
-  studentId: string
-  studentName: string | null
-  nis: string | null
-  classroomName: string | null
-  subjectName: string | null
-  packageTitle: string
-  scheduleId: string
-  totalQuestions: number
-  session: RoomMonitorSession | null
-  absence: RoomMonitorAbsence | null
-}
+export type RoomMonitorParticipant = Schemas['RoomMonitorParticipantDto']
 
-export interface RoomMonitorSummary {
-  totalRegistered: number
-  notStartedCount: number
-  inProgressCount: number
-  offlineOrUnsyncedCount: number
-  lockedOrViolationCount: number
-  finishedCount: number
-  absentMarkedCount: number
-}
+export type RoomMonitorSummary = Schemas['RoomMonitorSummaryDto']
 
-export interface RoomMonitorRoom {
-  id: string
-  code: string
-  name: string
-  capacity: number
-  technicianName: string | null
-  currentSupervisorName: string | null
-  scheduledSupervisorName: string | null
-  isSubstituted: boolean
-}
+export type RoomMonitorRoom = Schemas['RoomMonitorRoomDto']
 
-export interface RoomMonitorToken {
-  accessCode: string
-  expiresAt: string
-  rotation: number
-}
+export type RoomMonitorToken = Schemas['RoomMonitorTokenDto']
 
-export interface RoomMonitorMeta {
-  page: number
-  limit: number
-  total: number
-  serverTime: string
-  room: RoomMonitorRoom
-  token: RoomMonitorToken | null
-  summary: RoomMonitorSummary
-}
+export type RoomMonitorMeta = Schemas['RoomMonitorMetaDto']
 
 export interface RoomMonitorQuery {
   page?: number
@@ -124,114 +52,27 @@ export interface RoomMonitorQuery {
   slotId?: string
 }
 
-export interface SessionTimelineEntry {
-  id: string
-  kind: 'EVENT' | 'AUDIT'
-  occurredAt: string
-  type: string | null
-  action: string | null
-  isViolation: boolean
-  detail: string | null
-  actorId: string | null
-  reason: string | null
-  metadata: Record<string, unknown>
-}
+export type SessionTimelineEntry = Schemas['SessionTimelineEntryDto']
 
-export interface RoomReportSchedule {
-  scheduleId: string
-  packageTitle: string
-  subjectName: string | null
-  classroomName: string | null
-  startsAt: string
-  endsAt: string
-  registeredCount: number
-  startedCount: number
-  submittedCount: number
-  absentCount: number
-}
+export type RoomReportSchedule = Schemas['ReportScheduleDto']
 
-export interface RoomReportAbsence {
-  id: string
-  studentId: string
-  studentName: string | null
-  nis: string | null
-  scheduleId: string
-  reason: string
-  note: string | null
-  updatedAt: string
-}
+export type RoomReportAbsence = Schemas['ReportAbsenceDto']
 
-export interface RoomReportFieldNote {
-  id: string
-  studentId: string
-  studentName: string | null
-  sessionId: string | null
-  category: string
-  note: string
-  recordedAt: string
-}
+export type RoomReportFieldNote = Schemas['ReportFieldNoteDto']
 
-export interface RoomReportAudit {
-  id: string
-  sessionId: string | null
-  action: string
-  actorId: string
-  reason: string
-  metadata: Record<string, unknown>
-  createdAt: string
-}
+export type RoomReportAudit = Schemas['ReportAuditDto']
 
-export interface RoomReport {
-  reportId: string
-  roomId: string
-  slotId: string
-  status: RoomReportStatus
-  condition: RoomExecutionCondition
-  incidentNotes: string | null
-  submittedAt: string | null
-  verifiedAt: string | null
-  slot: { startsAt: string; endsAt: string }
-  schedules: RoomReportSchedule[]
-  absences: RoomReportAbsence[]
-  fieldNotes: RoomReportFieldNote[]
-  auditLogs: RoomReportAudit[]
-}
+export type RoomReport = Schemas['RoomReportDto']
 
-export interface RoomReportPayload {
-  condition?: RoomExecutionCondition
-  incidentNotes?: string
-  reopen?: boolean
-}
+export type RoomReportPayload = Schemas['UpdateRoomReportDto']
 
-export interface RoomAbsencePayload {
-  studentId: string
-  scheduleId: string
-  reason: string
-  note?: string
-}
+export type RoomAbsencePayload = Schemas['RecordRoomAbsenceDto']
 
-export interface RoomFieldNotePayload {
-  studentId: string
-  sessionId?: string
-  category: string
-  note: string
-}
+export type RoomFieldNotePayload = Schemas['RecordRoomFieldNoteDto']
 
-export interface Letterhead {
-  name: string | null
-  address: string
-  nsm: string | null
-  npsn: string | null
-}
+export type Letterhead = IdentitySchemas['SchoolUnitLetterheadResponseDto']
 
-export interface SupervisorSlotRow {
-  slotId: string
-  roomId: string
-  scheduledUserId: string
-  actualUserId: string
-  startsAt: string
-  endsAt: string
-}
+export type SupervisorSlotRow = Schemas['SupervisorSlotDto']
 
 export type RecoveryAction =
   'release' | 'reopen' | 'reset' | 'extend-time' | 'allow-web' | 'allow-late'

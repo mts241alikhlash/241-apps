@@ -60,6 +60,12 @@ export class RoomMonitorQueryDto extends PaginationQueryDto {
   limit?: number = 25
 }
 
+export class RoomMonitorLastEventDto {
+  @ApiProperty() type!: string
+  @ApiProperty({ format: 'date-time' }) occurredAt!: string
+  @ApiProperty({ type: String, nullable: true }) detail!: string | null
+}
+
 export class RoomMonitorSessionDto {
   @ApiProperty({ format: 'uuid' }) sessionId!: string
   @ApiProperty({ enum: ['IN_PROGRESS', 'SUBMITTED', 'EXPIRED', 'GRADED'] })
@@ -86,8 +92,8 @@ export class RoomMonitorSessionDto {
   @ApiProperty() violationCount!: number
   @ApiProperty() lockedByViolation!: boolean
   @ApiProperty() requiresTokenReentry!: boolean
-  @ApiProperty({ type: Object, nullable: true })
-  lastEvent!: { type: string; occurredAt: string; detail: string | null } | null
+  @ApiProperty({ type: () => RoomMonitorLastEventDto, nullable: true })
+  lastEvent!: RoomMonitorLastEventDto | null
 
   static fromDomain(domain: RoomMonitorSession): RoomMonitorSessionDto {
     const dto = new RoomMonitorSessionDto()

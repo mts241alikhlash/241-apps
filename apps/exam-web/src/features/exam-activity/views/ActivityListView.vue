@@ -46,7 +46,7 @@ async function load(): Promise<void> {
     const response = await examActivityApi.list(
       category.value ? { category: category.value } : undefined,
     )
-    activities.value = response.data.data
+    activities.value = response
   } catch {
     error.value = 'Gagal memuat daftar kegiatan.'
   } finally {

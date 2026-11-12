@@ -64,7 +64,7 @@ async function load(): Promise<void> {
   error.value = null
   try {
     const response = await examActivityApi.get(activityId.value)
-    detail.value = response.data.data
+    detail.value = response
   } catch (err: unknown) {
     error.value = messageOf(err, 'Gagal memuat detail kegiatan.')
   } finally {
@@ -79,7 +79,7 @@ async function confirmRotateToken(): Promise<void> {
     const response = await examActivityApi.rotateToken(detail.value.id)
     detail.value = {
       ...detail.value,
-      tokenRotation: response.data.data.tokenRotation,
+      tokenRotation: response.tokenRotation,
     }
     confirmRotateOpen.value = false
     toast.success('Token kegiatan berhasil diganti.')
@@ -90,7 +90,7 @@ async function confirmRotateToken(): Promise<void> {
   }
 }
 
-function onPolicySaved(nextPolicy: ExamPolicy | Record<string, number>): void {
+function onPolicySaved(nextPolicy: ExamPolicy): void {
   if (!detail.value) return
   detail.value = {
     ...detail.value,

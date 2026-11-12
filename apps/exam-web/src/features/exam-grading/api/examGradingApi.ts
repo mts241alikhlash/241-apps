@@ -1,40 +1,39 @@
-import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
+import {
+  unwrap,
+  unwrapPage,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
   GradePayload,
-  GradingDetail,
-  GradingItem,
-  GradingSchedule,
   GradingScheduleQuery,
   GradingSessionQuery,
-  GradingSessionRow,
 } from '../types'
 
-const seg = encodeURIComponent
-
 export const examGradingApi = {
-  getSchedules: (params?: GradingScheduleQuery) =>
-    api.get<ApiPaginatedResponse<GradingSchedule>>('/exam-grading/schedules', {
-      params,
-    }),
+  getSchedules: (query?: GradingScheduleQuery) =>
+    unwrapPage(
+      examClient.GET('/exam-grading/schedules', { params: { query } }),
+    ),
 
-  getSessions: (scheduleId: string, params?: GradingSessionQuery) =>
-    api.get<ApiPaginatedResponse<GradingSessionRow>>(
-      `/exam-grading/schedules/${seg(scheduleId)}/sessions`,
-      { params },
+  getSessions: (scheduleId: string, query?: GradingSessionQuery) =>
+    unwrapPage(
+      examClient.GET('/exam-grading/schedules/{scheduleId}/sessions', {
+        params: { path: { scheduleId }, query },
+      }),
     ),
 
   getSession: (sessionId: string) =>
-    api.get<ApiSingleResponse<GradingDetail>>(
-      `/exam-grading/sessions/${seg(sessionId)}`,
+    unwrap(
+      examClient.GET('/exam-grading/sessions/{sessionId}', {
+        params: { path: { sessionId } },
+      }),
     ),
 
-  grade: (sessionId: string, questionId: string, payload: GradePayload) =>
-    api.patch<ApiSingleResponse<GradingItem>>(
-      `/exam-grading/sessions/${seg(sessionId)}/answers/${seg(questionId)}`,
-      payload,
+  grade: (sessionId: string, questionId: string, body: GradePayload) =>
+    unwrap(
+      examClient.PATCH(
+        '/exam-grading/sessions/{sessionId}/answers/{questionId}',
+        { params: { path: { sessionId, questionId } }, body },
+      ),
     ),
 }

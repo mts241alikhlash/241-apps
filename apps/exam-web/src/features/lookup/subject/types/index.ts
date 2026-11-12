@@ -1,3 +1,9 @@
-export type { Subject } from './subject'
-export type { SubjectQueryParams, SubjectSavePayload } from './subject-payload'
-export type { SubjectColumnActions } from './column-actions'
+import type { components } from '@mts241alikhlash/academic-api'
+
+export type Subject = components['schemas']['SubjectPageItemResponseDto']
+
+export interface SubjectQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+}

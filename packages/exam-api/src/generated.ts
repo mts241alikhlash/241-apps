@@ -1363,7 +1363,9 @@ export interface components {
         };
         AdjustPackageItemKeyDto: {
             /** @description The replacement answer key; required for KEY_OVERRIDE, ignored otherwise */
-            overrideContent?: Record<string, never>;
+            overrideContent?: {
+                [key: string]: unknown;
+            };
             reason: string;
             /** @enum {string} */
             resolution: "NORMAL" | "BONUS_ALL" | "KEY_OVERRIDE";
@@ -1403,6 +1405,14 @@ export interface components {
             roomId: string | null;
             /** Format: uuid */
             sessionId: string | null;
+        };
+        BooleanAnswerDto: {
+            value: boolean;
+        };
+        ChoiceDto: {
+            html: string;
+            /** @enum {string} */
+            key: "A" | "B" | "C" | "D" | "E";
         };
         ConfirmedAnswerDto: {
             clientId: string;
@@ -1473,11 +1483,10 @@ export interface components {
             endsAt: string;
             /**
              * Format: uuid
-             * @description The exam event this schedule belongs to; seats come from it
+             * @description The exam event this schedule belongs to; seats come from it. Null detaches it
              */
-            eventId?: string;
-            /** @default 0 */
-            minSubmitMinutes: number;
+            eventId?: string | null;
+            minSubmitMinutes?: number;
             /** Format: uuid */
             packageId: string;
             /** Format: date-time */
@@ -1494,6 +1503,9 @@ export interface components {
             participants: components["schemas"]["MakeupParticipantDto"][];
             /** Format: date-time */
             startsAt: string;
+        };
+        EssayContentDto: {
+            guideHtml: string | null;
         };
         ExamActivityDetailDto: {
             /** @enum {string} */
@@ -1515,10 +1527,12 @@ export interface components {
             semesterId: string;
             /** Format: date-time */
             startsAt: string;
-            status: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
-            tokenMode: string;
+            /** @enum {string} */
+            tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
             /** @enum {string} */
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
@@ -1542,10 +1556,12 @@ export interface components {
             semesterId: string;
             /** Format: date-time */
             startsAt: string;
-            status: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
-            tokenMode: string;
+            /** @enum {string} */
+            tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
             /** @enum {string} */
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
@@ -1716,6 +1732,13 @@ export interface components {
             /** Format: uuid */
             studentId: string;
         };
+        ExamRoomSeatResponseDto: {
+            /** Format: uuid */
+            classroomId: string;
+            seatNumber: number;
+            /** Format: uuid */
+            studentId: string;
+        };
         ExamScheduleDto: {
             /** Format: uuid */
             activityId: string | null;
@@ -1883,12 +1906,30 @@ export interface components {
         IssueParticipantNumbersResponseDto: {
             issued: boolean;
         };
+        KeyAnswerPayloadDto: {
+            /** @enum {string} */
+            key: "A" | "B" | "C" | "D" | "E";
+        };
+        KeysAnswerPayloadDto: {
+            keys: ("A" | "B" | "C" | "D" | "E")[];
+        };
         MakeupParticipantDto: {
             note?: string | null;
             /** @enum {string} */
             reason: "SICK" | "PERMITTED" | "ABSENT" | "OTHER";
             /** Format: uuid */
             studentId: string;
+        };
+        MultiKeyAnswerDto: {
+            keys: ("A" | "B" | "C" | "D" | "E")[];
+        };
+        MultipleChoiceContentDto: {
+            answer: components["schemas"]["SingleKeyAnswerDto"];
+            choices: components["schemas"]["ChoiceDto"][];
+        };
+        MultipleResponseContentDto: {
+            answer: components["schemas"]["MultiKeyAnswerDto"];
+            choices: components["schemas"]["ChoiceDto"][];
         };
         MyExamDto: {
             /**
@@ -2017,9 +2058,7 @@ export interface components {
         };
         QuestionVersionDto: {
             bodyHtml: string;
-            content: {
-                [key: string]: unknown;
-            };
+            content: components["schemas"]["MultipleChoiceContentDto"] | components["schemas"]["MultipleResponseContentDto"] | components["schemas"]["TrueFalseContentDto"] | components["schemas"]["ShortAnswerContentDto"] | components["schemas"]["EssayContentDto"];
             /** Format: date-time */
             createdAt: string;
             /** Format: uuid */
@@ -2189,6 +2228,12 @@ export interface components {
             /** @enum {string} */
             reason: "SICK" | "PERMITTED" | "ABSENT" | "OTHER";
         };
+        RoomMonitorLastEventDto: {
+            detail: string | null;
+            /** Format: date-time */
+            occurredAt: string;
+            type: string;
+        };
         RoomMonitorMetaDto: {
             limit: number;
             page: number;
@@ -2240,7 +2285,7 @@ export interface components {
             extraMinutes: number;
             isCharging: boolean | null;
             kioskMode: string;
-            lastEvent: Record<string, never> | null;
+            lastEvent: components["schemas"]["RoomMonitorLastEventDto"] | null;
             /** Format: date-time */
             lastSeenAt: string | null;
             lockedByViolation: boolean;
@@ -2318,9 +2363,7 @@ export interface components {
         };
         SaveAnswerDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
-            answer: {
-                [key: string]: unknown;
-            };
+            answer: components["schemas"]["KeyAnswerPayloadDto"] | components["schemas"]["KeysAnswerPayloadDto"] | components["schemas"]["ValueAnswerPayloadDto"] | components["schemas"]["TextAnswerPayloadDto"];
             /** @description Generated by the tablet per change; a replay is a no-op */
             clientId: string;
             /** Format: uuid */
@@ -2328,9 +2371,7 @@ export interface components {
         };
         SaveAnswerItemDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
-            answer: {
-                [key: string]: unknown;
-            };
+            answer: components["schemas"]["KeyAnswerPayloadDto"] | components["schemas"]["KeysAnswerPayloadDto"] | components["schemas"]["ValueAnswerPayloadDto"] | components["schemas"]["TextAnswerPayloadDto"];
             /** @description Generated by the tablet per change; a replay is a no-op */
             clientId: string;
             /** Format: uuid */
@@ -2367,9 +2408,7 @@ export interface components {
         };
         SavedAnswerDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
-            answer: {
-                [key: string]: unknown;
-            };
+            answer: components["schemas"]["KeyAnswerPayloadDto"] | components["schemas"]["KeysAnswerPayloadDto"] | components["schemas"]["ValueAnswerPayloadDto"] | components["schemas"]["TextAnswerPayloadDto"];
             /** Format: uuid */
             questionId: string;
         };
@@ -2483,6 +2522,18 @@ export interface components {
             reason: string | null;
             type: string | null;
         };
+        ShortAnswerAnswerDto: {
+            accepted: string[];
+            ignoreCase: boolean;
+            ignoreHarakat: boolean;
+        };
+        ShortAnswerContentDto: {
+            answer: components["schemas"]["ShortAnswerAnswerDto"];
+        };
+        SingleKeyAnswerDto: {
+            /** @enum {string} */
+            key: "A" | "B" | "C" | "D" | "E";
+        };
         StartedSessionDto: {
             /** @description End of the working time, epoch milliseconds */
             deadline: number;
@@ -2541,6 +2592,12 @@ export interface components {
             /** Format: uuid */
             sourcePackageId: string;
         };
+        TextAnswerPayloadDto: {
+            text: string;
+        };
+        TrueFalseContentDto: {
+            answer: components["schemas"]["BooleanAnswerDto"];
+        };
         UpdateActivityPolicyRequestDto: {
             focusThresholdMs?: number;
             gapRecordedMs?: number;
@@ -2582,11 +2639,10 @@ export interface components {
             endsAt: string;
             /**
              * Format: uuid
-             * @description The exam event this schedule belongs to; seats come from it
+             * @description The exam event this schedule belongs to; seats come from it. Null detaches it
              */
-            eventId?: string;
-            /** @default 0 */
-            minSubmitMinutes: number;
+            eventId?: string | null;
+            minSubmitMinutes?: number;
             /** Format: date-time */
             startsAt: string;
             /** @enum {string} */
@@ -2604,6 +2660,9 @@ export interface components {
             condition?: "SMOOTH" | "TECHNICAL_ISSUE" | "DISCIPLINARY_NOTE";
             incidentNotes?: string | null;
             reopen?: boolean;
+        };
+        ValueAnswerPayloadDto: {
+            value: boolean;
         };
         ViolationCountDto: {
             violationCount: number;
@@ -4172,7 +4231,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data?: components["schemas"]["ExamRoomSeatDto"][];
+                        data?: components["schemas"]["ExamRoomSeatResponseDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
@@ -4203,7 +4262,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data?: components["schemas"]["ExamRoomSeatDto"][];
+                        data?: components["schemas"]["ExamRoomSeatResponseDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

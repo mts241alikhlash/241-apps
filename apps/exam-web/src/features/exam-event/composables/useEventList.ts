@@ -20,15 +20,13 @@ export function useEventList(
     pageSize,
     scope: ['exam-event', 'events'],
     filters: { status: filters.status, semesterId: filters.semesterId },
-    fetchPage: async (current, limit) =>
-      (
-        await examEventApi.getEvents({
-          page: current,
-          limit,
-          status: unless(filters.status.value) as ExamEventStatus | undefined,
-          semesterId: filters.semesterId.value || undefined,
-        })
-      ).data,
+    fetchPage: (current, limit) =>
+      examEventApi.getEvents({
+        page: current,
+        limit,
+        status: unless(filters.status.value) as ExamEventStatus | undefined,
+        semesterId: filters.semesterId.value || undefined,
+      }),
     errorMessage: 'Gagal memuat kegiatan ujian.',
   })
 

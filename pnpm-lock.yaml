@@ -1181,12 +1181,21 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 3.0.3
+      '@mts241alikhlash/academic-api':
+        specifier: workspace:*
+        version: link:../../packages/academic-api
       '@mts241alikhlash/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
       '@mts241alikhlash/exam-api':
         specifier: workspace:*
         version: link:../../packages/exam-api
+      '@mts241alikhlash/identity-api':
+        specifier: workspace:*
+        version: link:../../packages/identity-api
+      '@mts241alikhlash/student-api':
+        specifier: workspace:*
+        version: link:../../packages/student-api
       '@mts241alikhlash/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -2039,6 +2048,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      openapi-fetch:
+        specifier: 'catalog:'
+        version: 0.17.0
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.7.0

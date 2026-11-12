@@ -47,8 +47,8 @@ const paper = {
       bodyHtml: '<p>x</p>',
       points: 1,
       choices: [
-        { key: 'A', html: 'A' },
-        { key: 'B', html: 'B' },
+        { key: 'A' as const, html: 'A' },
+        { key: 'B' as const, html: 'B' },
       ],
     },
   ],

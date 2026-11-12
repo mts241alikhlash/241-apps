@@ -2,6 +2,11 @@ import { ApiProperty } from '@nestjs/swagger'
 import type { PaperQuestion } from '../../../domain/policies/build-paper.policy.js'
 import type { PaperView } from '../../../application/use-cases/get-paper/get-paper.use-case.js'
 import type { SavedAnswer } from '../../../application/use-cases/list-saved-answers/list-saved-answers.use-case.js'
+import {
+  ANSWER_PAYLOAD_MODELS,
+  ANSWER_PAYLOAD_SCHEMA,
+  type AnswerPayloadDto,
+} from './answer-payload.dto.js'
 
 const QUESTION_TYPES = [
   'MULTIPLE_CHOICE',
@@ -57,14 +62,11 @@ export class SessionPaperDto {
   }
 }
 
+@ANSWER_PAYLOAD_MODELS
 export class SavedAnswerDto {
   @ApiProperty({ format: 'uuid' }) questionId!: string
-  @ApiProperty({
-    type: 'object',
-    additionalProperties: true,
-    description: 'One of { key } | { keys } | { value } | { text }',
-  })
-  answer!: Record<string, unknown>
+  @ApiProperty(ANSWER_PAYLOAD_SCHEMA)
+  answer!: AnswerPayloadDto
 
   static fromDomain(domain: SavedAnswer): SavedAnswerDto {
     const dto = new SavedAnswerDto()

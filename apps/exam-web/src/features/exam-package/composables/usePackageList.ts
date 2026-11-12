@@ -30,17 +30,15 @@ export function usePackageList(
       gradeId: filters.gradeId,
       status: filters.status,
     },
-    fetchPage: async (current, limit) =>
-      (
-        await examPackageApi.getPackages({
-          page: current,
-          limit,
-          search: debouncedSearch.value.trim() || undefined,
-          subjectId: unless(filters.subjectId.value),
-          gradeId: unless(filters.gradeId.value),
-          status: unless(filters.status.value) as ExamPackageStatus | undefined,
-        })
-      ).data,
+    fetchPage: (current, limit) =>
+      examPackageApi.getPackages({
+        page: current,
+        limit,
+        search: debouncedSearch.value.trim() || undefined,
+        subjectId: unless(filters.subjectId.value),
+        gradeId: unless(filters.gradeId.value),
+        status: unless(filters.status.value) as ExamPackageStatus | undefined,
+      }),
     errorMessage: 'Gagal memuat daftar paket.',
   })
 

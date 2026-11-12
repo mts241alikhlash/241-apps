@@ -163,13 +163,15 @@ export class ExamActivityDto {
   @ApiProperty({ format: 'uuid' }) packageId!: string
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
   @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
-  @ApiProperty() tokenMode!: string
+  @ApiProperty({ enum: ACTIVITY_TOKEN_MODES })
+  tokenMode!: ExamActivity['tokenMode']
   @ApiProperty() tokenRotation!: number
   @ApiProperty({ type: ExamPolicyDto }) policy!: ExamPolicyDto
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ format: 'date-time' }) endsAt!: string
   @ApiProperty() durationMinutes!: number
-  @ApiProperty() status!: string
+  @ApiProperty({ enum: ACTIVITY_STATUSES })
+  status!: ExamActivity['status']
 
   static of(activity: ExamActivity): ExamActivityDto {
     const dto = new ExamActivityDto()

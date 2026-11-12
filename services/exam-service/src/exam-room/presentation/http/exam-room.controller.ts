@@ -46,7 +46,7 @@ import {
 import {
   AssignSeatsDto,
   ExamRoomDto,
-  ExamRoomSeatDto,
+  ExamRoomSeatResponseDto,
   RoomAccessCodeDto,
   UpdateExamRoomDto,
 } from './dto/exam-room.dto.js'
@@ -326,14 +326,14 @@ export class ExamRoomController {
   @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
   @ApiOperation({ summary: 'The students seated in this room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
-  @ApiResponse({ status: 200, type: [ExamRoomSeatDto] })
+  @ApiResponse({ status: 200, type: [ExamRoomSeatResponseDto] })
   async seats(
     @CurrentUser() user: RoomStaffUser,
     @Param('roomId', ParseUUIDPipe) roomId: string,
-  ): Promise<ExamRoomSeatDto[]> {
+  ): Promise<ExamRoomSeatResponseDto[]> {
     await this.access.assertCanSupervise(user, roomId, new Date())
     return (await this.manageRooms.listSeats(roomId)).map((seat) => {
-      const row = new ExamRoomSeatDto()
+      const row = new ExamRoomSeatResponseDto()
       row.studentId = seat.studentId
       row.classroomId = seat.classroomId
       row.seatNumber = seat.seatNumber
@@ -360,11 +360,11 @@ export class ExamRoomController {
   @RequirePermissions('exam-events.manage')
   @ApiOperation({ summary: 'Seat one student in this room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
-  @ApiResponse({ status: 201, type: [ExamRoomSeatDto] })
+  @ApiResponse({ status: 201, type: [ExamRoomSeatResponseDto] })
   async assignSeat(
     @Param('roomId', ParseUUIDPipe) roomId: string,
     @Body() dto: AssignSeatsDto,
-  ): Promise<ExamRoomSeatDto[]> {
+  ): Promise<ExamRoomSeatResponseDto[]> {
     const room = await this.roomStore.findRoomById(roomId)
     if (room === null)
       throw new NotFoundException('Ruangan ujian tidak ditemukan')
@@ -379,7 +379,7 @@ export class ExamRoomController {
         interleaveByClassroom: dto.interleaveByClassroom ?? false,
       })
       return distributed.assigned.map((seat) => {
-        const row = new ExamRoomSeatDto()
+        const row = new ExamRoomSeatResponseDto()
         row.studentId = seat.studentId
         row.classroomId = seat.classroomId
         row.seatNumber = seat.seatNumber
@@ -396,7 +396,7 @@ export class ExamRoomController {
       })),
     )
     return created.map((seat) => {
-      const row = new ExamRoomSeatDto()
+      const row = new ExamRoomSeatResponseDto()
       row.studentId = seat.studentId
       row.classroomId = seat.classroomId
       row.seatNumber = seat.seatNumber

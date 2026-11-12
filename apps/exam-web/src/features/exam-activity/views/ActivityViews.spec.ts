@@ -122,17 +122,13 @@ describe('ActivityListView', () => {
     permissions.add('exam-schedules.manage')
     routeState.meta.category = 'NON_EXAM'
     routeState.path = '/classwork/activities'
-    list.mockResolvedValue({
-      data: {
-        data: [
-          sampleDetail({
-            id: 'act-daily',
-            type: 'DAILY',
-            category: 'NON_EXAM',
-          }),
-        ],
-      },
-    })
+    list.mockResolvedValue([
+      sampleDetail({
+        id: 'act-daily',
+        type: 'DAILY',
+        category: 'NON_EXAM',
+      }),
+    ])
   })
 
   it('calls examActivityApi.list({ category }) with route.meta.category and navigates to the section create route', async () => {
@@ -159,7 +155,7 @@ describe('ActivityDetailView', () => {
     routeState.meta.category = 'EXAM'
     routeState.params.id = 'act-1'
     routeState.path = '/exam/activities/act-1'
-    get.mockResolvedValue({ data: { data: sampleDetail() } })
+    get.mockResolvedValue(sampleDetail())
   })
 
   it('renders preset/type, token mode, and schedules per class, hiding manage-all buttons for regular teachers', async () => {
@@ -177,9 +173,7 @@ describe('ActivityDetailView', () => {
 
   it('shows Ubah kebijakan and Ganti token for manage-all and requires confirmation before rotating token', async () => {
     permissions.add('exam-schedules.manage-all')
-    rotateToken.mockResolvedValue({
-      data: { data: sampleDetail({ tokenRotation: 2 }) },
-    })
+    rotateToken.mockResolvedValue(sampleDetail({ tokenRotation: 2 }))
     const wrapper = mount(ActivityDetailView, { global: { stubs } })
     await flushPromises()
 

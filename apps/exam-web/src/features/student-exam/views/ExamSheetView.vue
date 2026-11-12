@@ -24,7 +24,7 @@ import { useExamSession } from '../composables/useExamSession'
 import { isAnswered } from '../logic/exam'
 import { API_ERROR_CODES, ExamApiError } from '../services/studentExamService'
 import { questionTypeLabel } from '../logic/questionType'
-import type { AnswerPayload, PaperQuestion } from '../types'
+import type { AnswerPayload, Choice, PaperQuestion } from '../types'
 
 interface StoredDeadline {
   deadline: number
@@ -104,7 +104,7 @@ function keyOf(question: PaperQuestion): string | null {
   return answer && 'key' in answer ? answer.key : null
 }
 
-function keysOf(question: PaperQuestion): string[] {
+function keysOf(question: PaperQuestion): Choice['key'][] {
   const answer = answerOf(question)
   return answer && 'keys' in answer ? answer.keys : []
 }
@@ -127,7 +127,7 @@ function choose(question: PaperQuestion, payload: AnswerPayload) {
   session.answer(question, payload)
 }
 
-function toggleMulti(question: PaperQuestion, key: string) {
+function toggleMulti(question: PaperQuestion, key: Choice['key']) {
   const keys = [...keysOf(question)]
   const position = keys.indexOf(key)
   if (position >= 0) keys.splice(position, 1)

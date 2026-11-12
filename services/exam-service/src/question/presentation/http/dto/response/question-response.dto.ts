@@ -1,21 +1,91 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import type {
   QuestionDetail,
   QuestionVersion,
 } from '../../../../domain/entities/question.entity.js'
 import {
+  CHOICE_KEYS,
   QUESTION_TYPES,
+  type ChoiceKey,
   type QuestionType,
 } from '../../../../domain/value-objects/question-content.js'
 import type { QuestionScopeView } from '../../../../application/use-cases/get-question-scope/get-question-scope.use-case.js'
 
+class ChoiceDto {
+  @ApiProperty({ enum: CHOICE_KEYS }) key!: ChoiceKey
+  @ApiProperty() html!: string
+}
+
+class SingleKeyAnswerDto {
+  @ApiProperty({ enum: CHOICE_KEYS }) key!: ChoiceKey
+}
+
+class MultiKeyAnswerDto {
+  @ApiProperty({ enum: CHOICE_KEYS, isArray: true }) keys!: ChoiceKey[]
+}
+
+class BooleanAnswerDto {
+  @ApiProperty() value!: boolean
+}
+
+class ShortAnswerAnswerDto {
+  @ApiProperty({ type: [String] }) accepted!: string[]
+  @ApiProperty() ignoreCase!: boolean
+  @ApiProperty() ignoreHarakat!: boolean
+}
+
+export class MultipleChoiceContentDto {
+  @ApiProperty({ type: () => [ChoiceDto] }) choices!: ChoiceDto[]
+  @ApiProperty({ type: () => SingleKeyAnswerDto }) answer!: SingleKeyAnswerDto
+}
+
+export class MultipleResponseContentDto {
+  @ApiProperty({ type: () => [ChoiceDto] }) choices!: ChoiceDto[]
+  @ApiProperty({ type: () => MultiKeyAnswerDto }) answer!: MultiKeyAnswerDto
+}
+
+export class TrueFalseContentDto {
+  @ApiProperty({ type: () => BooleanAnswerDto }) answer!: BooleanAnswerDto
+}
+
+export class ShortAnswerContentDto {
+  @ApiProperty({ type: () => ShortAnswerAnswerDto })
+  answer!: ShortAnswerAnswerDto
+}
+
+export class EssayContentDto {
+  @ApiProperty({ type: String, nullable: true }) guideHtml!: string | null
+}
+
+export type QuestionContentDto =
+  | MultipleChoiceContentDto
+  | MultipleResponseContentDto
+  | TrueFalseContentDto
+  | ShortAnswerContentDto
+  | EssayContentDto
+
+@ApiExtraModels(
+  MultipleChoiceContentDto,
+  MultipleResponseContentDto,
+  TrueFalseContentDto,
+  ShortAnswerContentDto,
+  EssayContentDto,
+)
 export class QuestionVersionDto {
   @ApiProperty({ format: 'uuid' }) id!: string
   @ApiProperty({ format: 'uuid' }) questionId!: string
   @ApiProperty() number!: number
   @ApiProperty() bodyHtml!: string
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  content!: Record<string, unknown>
+  @ApiProperty({
+    oneOf: [
+      { $ref: getSchemaPath(MultipleChoiceContentDto) },
+      { $ref: getSchemaPath(MultipleResponseContentDto) },
+      { $ref: getSchemaPath(TrueFalseContentDto) },
+      { $ref: getSchemaPath(ShortAnswerContentDto) },
+      { $ref: getSchemaPath(EssayContentDto) },
+    ],
+  })
+  content!: QuestionContentDto
   @ApiProperty() points!: number
   @ApiProperty({ format: 'uuid' }) createdById!: string
   @ApiProperty({ format: 'date-time' }) createdAt!: string
@@ -26,7 +96,7 @@ export class QuestionVersionDto {
     dto.questionId = domain.questionId
     dto.number = domain.number
     dto.bodyHtml = domain.bodyHtml
-    dto.content = domain.content as unknown as Record<string, unknown>
+    dto.content = domain.content
     dto.points = domain.points
     dto.createdById = domain.createdById
     dto.createdAt = domain.createdAt.toISOString()

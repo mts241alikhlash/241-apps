@@ -40,7 +40,7 @@ export class UpdateExamScheduleDto {
   @Max(1440)
   durationMinutes!: number
 
-  @ApiPropertyOptional({ minimum: 0, maximum: 1440, default: 0 })
+  @ApiPropertyOptional({ minimum: 0, maximum: 1440 })
   @Type(() => Number)
   @IsOptional()
   @IsInt()
@@ -54,11 +54,13 @@ export class UpdateExamScheduleDto {
 
   @ApiPropertyOptional({
     format: 'uuid',
-    description: 'The exam event this schedule belongs to; seats come from it',
+    nullable: true,
+    description:
+      'The exam event this schedule belongs to; seats come from it. Null detaches it',
   })
   @IsOptional()
   @IsUUID()
-  eventId?: string
+  eventId?: string | null
 }
 
 export class CreateExamScheduleDto extends UpdateExamScheduleDto {

@@ -1,63 +1,30 @@
-export type { AcademicYear } from '@/features/lookup/academic-year'
-export type { Curriculum } from '@/features/lookup/curriculum'
-export type { Semester } from '@/features/lookup/semester'
+import type { components as AcademicComponents } from '@mts241alikhlash/academic-api'
+import type { components as StudentComponents } from '@mts241alikhlash/student-api'
 
-export type {
-  Grade,
-  ClassroomLevel,
-  ClassroomSupervisorProfile,
-  ClassroomSupervisorUser,
-  ClassroomSupervisor,
-  Classroom,
-  ClassroomSupervisorAssignment,
-  EmployeeOption,
-  ClassroomColumnActions,
-} from './classroom'
+export type Classroom =
+  AcademicComponents['schemas']['ClassroomPageItemResponseDto']
 
-export type {
-  ClassroomSavePayload,
-  ClassroomQueryParams,
-  ClassroomSupervisorQueryParams,
-  ClassroomSupervisorSavePayload,
-} from './classroom-payload'
+export type StudentEnrollment =
+  StudentComponents['schemas']['StudentEnrollmentListItemResponseDto']
 
-export type {
-  ClassroomEnrollment,
-  AvailableStudent,
-  StudentWithEnrollments,
-  EnrollmentStatus,
-  EnrollmentStudent,
-  EnrollmentClassroom,
-  EnrollmentSemester,
-  StudentEnrollment,
-} from './enrollment'
+export type EnrollmentStatus =
+  'ACTIVE' | 'PROMOTED' | 'REPEATED' | 'TRANSFERRED' | 'DROPPED' | 'GRADUATED'
 
-export type {
-  CreateEnrollmentPayload,
-  BulkCreateEnrollmentPayload,
-  TransferPayload,
-  BulkTransferPayload,
-  BulkTransferResponse,
-  DropPayload,
-  EnrollmentQueryParams,
-  BulkEnrollResponse,
-} from './enrollment-payload'
-
-export type { ClassroomStructureStudent, ClassroomStructure } from './structure'
-
-export type {
-  ClassroomStructureQueryParams,
-  ClassroomStructureSavePayload,
-} from './structure-payload'
-
-export type {
-  StructureFormValues,
-  PopoverState,
-  PopoverStates,
-} from './structure-form'
-
-export interface CopyClassroomsResult {
-  created: number
-  skipped: number
+export interface ClassroomQueryParams {
+  page?: number
+  limit?: number
+  academicYearId?: string
+  gradeId?: string
+  search?: string
+  isActive?: boolean
 }
-export type { MyClassroom } from './my-classroom'
+
+export interface EnrollmentQueryParams {
+  page?: number
+  limit?: number
+  studentId?: string
+  classroomId?: string
+  semesterId?: string
+  academicYearId?: string
+  status?: EnrollmentStatus
+}

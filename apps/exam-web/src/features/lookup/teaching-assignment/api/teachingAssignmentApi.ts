@@ -1,49 +1,15 @@
-import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
-import type {
-  TeachingAssignment,
-  TeachingAssignmentCreatePayload,
-  TeachingAssignmentCreateResult,
-  TeachingAssignmentQueryParams,
-  TeachingAssignmentUpdatePayload,
-} from '../types'
+import { unwrapPage } from '@mts241alikhlash/web-shared/utils/service-client'
+import { academicClient } from '@/shared/api/clients'
+import type { TeachingAssignmentQueryParams } from '../types'
 
 export const teachingAssignmentApi = {
-  getTeachingAssignments: (params?: TeachingAssignmentQueryParams) => {
-    return api.get<ApiPaginatedResponse<TeachingAssignment>>(
-      '/teaching-assignments',
-      { params },
-    )
-  },
+  getTeachingAssignments: (query?: TeachingAssignmentQueryParams) =>
+    unwrapPage(
+      academicClient.GET('/teaching-assignments', { params: { query } }),
+    ),
 
-  getMyTeachingAssignments: (params?: TeachingAssignmentQueryParams) => {
-    return api.get<ApiPaginatedResponse<TeachingAssignment>>(
-      '/teaching-assignments/me',
-      { params },
-    )
-  },
-
-  createTeachingAssignment: (payload: TeachingAssignmentCreatePayload) => {
-    return api.post<ApiSingleResponse<TeachingAssignmentCreateResult>>(
-      '/teaching-assignments',
-      payload,
-    )
-  },
-
-  updateTeachingAssignment: (
-    id: string,
-    payload: Partial<TeachingAssignmentUpdatePayload>,
-  ) => {
-    return api.patch<ApiSingleResponse<TeachingAssignment>>(
-      `/teaching-assignments/${id}`,
-      payload,
-    )
-  },
-
-  deleteTeachingAssignment: (id: string) => {
-    return api.delete(`/teaching-assignments/${id}`)
-  },
+  getMyTeachingAssignments: (query?: TeachingAssignmentQueryParams) =>
+    unwrapPage(
+      academicClient.GET('/teaching-assignments/me', { params: { query } }),
+    ),
 }

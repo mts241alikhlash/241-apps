@@ -1,122 +1,194 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { GET, POST, PATCH, DELETE } = vi.hoisted(() => ({
+  GET: vi.fn(),
+  POST: vi.fn(),
+  PATCH: vi.fn(),
+  DELETE: vi.fn(),
+}))
+
+vi.mock('@/shared/api/clients', () => ({
+  examClient: { GET, POST, PATCH, DELETE },
+}))
+
 import { examScheduleApi } from './examScheduleApi'
 
-const { get, post, patch, remove } = vi.hoisted(() => ({
-  get: vi.fn(),
-  post: vi.fn(),
-  patch: vi.fn(),
-  remove: vi.fn(),
-}))
-vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get, post, patch, delete: remove },
-}))
+const ok = (data: unknown, meta?: unknown) => ({
+  data: { data, meta },
+  response: new Response(null, { status: 200 }),
+})
 
-const window = {
-  type: 'MIDTERM' as const,
-  startsAt: '2026-11-02T01:00:00.000Z',
-  endsAt: '2026-11-02T04:00:00.000Z',
-  durationMinutes: 90,
-}
+const path = (id: string) => ({ params: { path: { id } } })
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('examScheduleApi', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  it('lists schedules with the given filters', () => {
-    void examScheduleApi.getSchedules({ page: 1, limit: 10, classroomId: 'c1' })
-
-    expect(get).toHaveBeenCalledWith('/exam-schedules', {
-      params: { page: 1, limit: 10, classroomId: 'c1' },
+  it('lists schedules with the category query', async () => {
+    GET.mockResolvedValue(ok([{ id: 's' }], { total: 1, page: 1, limit: 10 }))
+    await expect(
+      examScheduleApi.getSchedules({ page: 1, limit: 10, category: 'EXAM' }),
+    ).resolves.toEqual({
+      data: [{ id: 's' }],
+      meta: { total: 1, page: 1, limit: 10 },
+    })
+    expect(GET).toHaveBeenCalledWith('/exam-schedules', {
+      params: { query: { page: 1, limit: 10, category: 'EXAM' } },
     })
   })
 
-  it('reads, creates and updates a schedule', () => {
-    void examScheduleApi.getSchedule('s1')
-    void examScheduleApi.createSchedule({
-      ...window,
-      packageId: 'p1',
-      classroomId: 'c1',
+  it('gets one schedule', async () => {
+    GET.mockResolvedValue(ok({ id: 's/1' }))
+    await expect(examScheduleApi.getSchedule('s/1')).resolves.toEqual({
+      id: 's/1',
     })
-    void examScheduleApi.updateSchedule('s1', window)
+    expect(GET).toHaveBeenCalledWith('/exam-schedules/{id}', path('s/1'))
+  })
 
-    expect(get).toHaveBeenCalledWith('/exam-schedules/s1')
-    expect(post).toHaveBeenCalledWith('/exam-schedules', {
-      ...window,
-      packageId: 'p1',
-      classroomId: 'c1',
+  it('creates a schedule', async () => {
+    POST.mockResolvedValue(ok({ id: 's' }))
+    const body = { packageId: 'p' } as never
+    await expect(examScheduleApi.createSchedule(body)).resolves.toEqual({
+      id: 's',
     })
-    expect(patch).toHaveBeenCalledWith('/exam-schedules/s1', window)
+    expect(POST).toHaveBeenCalledWith('/exam-schedules', { body })
   })
 
-  it('cancels a schedule', () => {
-    void examScheduleApi.cancelSchedule('s1')
-
-    expect(post).toHaveBeenCalledWith('/exam-schedules/s1/cancel')
-  })
-
-  it('reads and rotates the access code', () => {
-    void examScheduleApi.getAccessCode('s1')
-    void examScheduleApi.rotateAccessCode('s1')
-
-    expect(get).toHaveBeenCalledWith('/exam-schedules/s1/access-code')
-    expect(post).toHaveBeenCalledWith('/exam-schedules/s1/access-code/rotate')
-  })
-
-  it('keeps an id inside its own path segment', () => {
-    const hostile = '../../users/me?x=1#y'
-    const safe = encodeURIComponent(hostile)
-
-    void examScheduleApi.getSchedule(hostile)
-    void examScheduleApi.updateSchedule(hostile, window)
-    void examScheduleApi.cancelSchedule(hostile)
-    void examScheduleApi.getAccessCode(hostile)
-    void examScheduleApi.rotateAccessCode(hostile)
-
-    const paths = [
-      ...get.mock.calls,
-      ...post.mock.calls,
-      ...patch.mock.calls,
-    ].map((call) => String(call[0]))
-    expect(paths).toHaveLength(5)
-    for (const path of paths) expect(path).toContain(safe)
-  })
-
-  it('lists the sessions of a schedule and releases one', () => {
-    void examScheduleApi.getSessions('s 1', { page: 1, limit: 100 })
-    void examScheduleApi.releaseSession('x1', 'Siswa pindah perangkat')
-
-    expect(get).toHaveBeenCalledWith('/exam-schedules/s%201/sessions', {
-      params: { page: 1, limit: 100 },
+  it('updates a schedule', async () => {
+    PATCH.mockResolvedValue(ok({ id: 's' }))
+    const body = { durationMinutes: 90 } as never
+    await expect(examScheduleApi.updateSchedule('s', body)).resolves.toEqual({
+      id: 's',
     })
-    expect(post).toHaveBeenCalledWith('/exam-sessions/x1/release', {
-      reason: 'Siswa pindah perangkat',
+    expect(PATCH).toHaveBeenCalledWith('/exam-schedules/{id}', {
+      ...path('s'),
+      body,
     })
   })
 
-  it('lists the absentees of a schedule and the participants of a makeup', () => {
-    void examScheduleApi.getAbsentees('s 1')
-    void examScheduleApi.getParticipants('m1')
-
-    expect(get).toHaveBeenCalledWith('/exam-schedules/s%201/absentees')
-    expect(get).toHaveBeenCalledWith('/exam-schedules/m1/participants')
+  it('cancels a schedule', async () => {
+    POST.mockResolvedValue(ok({ id: 's' }))
+    await expect(examScheduleApi.cancelSchedule('s')).resolves.toEqual({
+      id: 's',
+    })
+    expect(POST).toHaveBeenCalledWith('/exam-schedules/{id}/cancel', path('s'))
   })
 
-  it('creates a makeup and changes its participants', () => {
-    const body = {
-      startsAt: '2026-11-05T01:00:00.000Z',
-      endsAt: '2026-11-05T04:00:00.000Z',
-      durationMinutes: 90,
-      participants: [{ studentId: 'st1', reason: 'SICK' as const }],
-    }
-    void examScheduleApi.createMakeup('s1', body)
-    void examScheduleApi.addParticipants('m1', body.participants)
-    void examScheduleApi.removeParticipant('m1', 'st 1')
-
-    expect(post).toHaveBeenCalledWith('/exam-schedules/s1/makeups', body)
-    expect(post).toHaveBeenCalledWith('/exam-schedules/m1/participants', {
-      participants: body.participants,
+  it('reads the access code', async () => {
+    GET.mockResolvedValue(ok({ accessCode: 'K7M2QX' }))
+    await expect(examScheduleApi.getAccessCode('s')).resolves.toEqual({
+      accessCode: 'K7M2QX',
     })
-    expect(remove).toHaveBeenCalledWith(
-      '/exam-schedules/m1/participants/st%201',
+    expect(GET).toHaveBeenCalledWith(
+      '/exam-schedules/{id}/access-code',
+      path('s'),
+    )
+  })
+
+  it('rotates the access code', async () => {
+    POST.mockResolvedValue(ok({ rotation: 2 }))
+    await expect(examScheduleApi.rotateAccessCode('s')).resolves.toEqual({
+      rotation: 2,
+    })
+    expect(POST).toHaveBeenCalledWith(
+      '/exam-schedules/{id}/access-code/rotate',
+      path('s'),
+    )
+  })
+
+  it('lists the sessions of a schedule', async () => {
+    GET.mockResolvedValue(ok([{ sessionId: 'x' }], { total: 1 }))
+    await expect(
+      examScheduleApi.getSessions('s', { page: 1, limit: 100 }),
+    ).resolves.toEqual({
+      data: [{ sessionId: 'x' }],
+      meta: { total: 1, page: 1, limit: 0 },
+    })
+    expect(GET).toHaveBeenCalledWith('/exam-schedules/{id}/sessions', {
+      params: { path: { id: 's' }, query: { page: 1, limit: 100 } },
+    })
+  })
+
+  it('releases a session', async () => {
+    POST.mockResolvedValue(ok({}))
+    await examScheduleApi.releaseSession('x', 'Pindah perangkat')
+    expect(POST).toHaveBeenCalledWith('/exam-sessions/{id}/release', {
+      ...path('x'),
+      body: { reason: 'Pindah perangkat' },
+    })
+  })
+
+  it('resets a session', async () => {
+    POST.mockResolvedValue(ok({}))
+    await examScheduleApi.resetSession('x', 'Mulai ulang')
+    expect(POST).toHaveBeenCalledWith('/exam-sessions/{id}/reset', {
+      ...path('x'),
+      body: { reason: 'Mulai ulang' },
+    })
+  })
+
+  it('reads the session audit logs', async () => {
+    GET.mockResolvedValue(ok([{ id: 'a' }]))
+    await expect(examScheduleApi.getSessionAuditLogs('x')).resolves.toEqual([
+      { id: 'a' },
+    ])
+    expect(GET).toHaveBeenCalledWith(
+      '/exam-sessions/{id}/audit-logs',
+      path('x'),
+    )
+  })
+
+  it('lists the absentees', async () => {
+    GET.mockResolvedValue(ok([{ studentId: 'st' }]))
+    await expect(examScheduleApi.getAbsentees('s')).resolves.toEqual([
+      { studentId: 'st' },
+    ])
+    expect(GET).toHaveBeenCalledWith(
+      '/exam-schedules/{id}/absentees',
+      path('s'),
+    )
+  })
+
+  it('creates a makeup', async () => {
+    POST.mockResolvedValue(ok({ id: 'm' }))
+    const body = { participants: [] } as never
+    await expect(examScheduleApi.createMakeup('s', body)).resolves.toEqual({
+      id: 'm',
+    })
+    expect(POST).toHaveBeenCalledWith('/exam-schedules/{id}/makeups', {
+      ...path('s'),
+      body,
+    })
+  })
+
+  it('lists the participants', async () => {
+    GET.mockResolvedValue(ok([{ studentId: 'st' }]))
+    await expect(examScheduleApi.getParticipants('m')).resolves.toEqual([
+      { studentId: 'st' },
+    ])
+    expect(GET).toHaveBeenCalledWith(
+      '/exam-schedules/{id}/participants',
+      path('m'),
+    )
+  })
+
+  it('adds participants', async () => {
+    POST.mockResolvedValue(ok({}))
+    const participants = [{ studentId: 'st', reason: 'SICK' as const }]
+    await examScheduleApi.addParticipants('m', participants)
+    expect(POST).toHaveBeenCalledWith('/exam-schedules/{id}/participants', {
+      ...path('m'),
+      body: { participants },
+    })
+  })
+
+  it('removes a participant', async () => {
+    DELETE.mockResolvedValue(ok({}))
+    await examScheduleApi.removeParticipant('m', 'st/1')
+    expect(DELETE).toHaveBeenCalledWith(
+      '/exam-schedules/{id}/participants/{studentId}',
+      { params: { path: { id: 'm', studentId: 'st/1' } } },
     )
   })
 })

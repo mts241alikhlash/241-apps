@@ -190,7 +190,7 @@ async function issueNumbers(): Promise<void> {
   issuingNumbers.value = true
   try {
     const response = await examActivityApi.issueParticipantNumbers(item.id)
-    emit('numbers-issued', response.data.data.issued)
+    emit('numbers-issued', response.issued)
   } catch {
     emit('numbers-issued', false)
   } finally {

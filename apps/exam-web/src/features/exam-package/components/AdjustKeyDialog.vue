@@ -46,7 +46,7 @@ const saving = ref(false)
 const error = ref<string | null>(null)
 const fieldId = useId()
 
-const overrideContent = computed<unknown>(() => {
+const overrideContent = computed<Record<string, unknown>>(() => {
   switch (props.item.type) {
     case 'TRUE_FALSE':
       return { answer: { value: answerValue.value === 'true' } }

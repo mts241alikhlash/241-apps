@@ -62,14 +62,12 @@ describe('examScheduleService', () => {
   it('offers only approved and already scheduled packages, sorted by title', async () => {
     getPackages.mockImplementation(({ status }: { status: string }) =>
       Promise.resolve({
-        data: {
-          data:
-            status === 'APPROVED'
-              ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
-              : status === 'LOCKED'
-                ? [{ id: 'l', title: 'UAS Ganjil' }]
-                : [{ id: 'd', title: 'Draf' }],
-        },
+        data:
+          status === 'APPROVED'
+            ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
+            : status === 'LOCKED'
+              ? [{ id: 'l', title: 'UAS Ganjil' }]
+              : [{ id: 'd', title: 'Draf' }],
       }),
     )
 
@@ -141,7 +139,8 @@ describe('examScheduleService sessions', () => {
 
   it('loads the sessions of a schedule', async () => {
     getSessions.mockResolvedValue({
-      data: { data: [{ sessionId: 'x1' }], meta: { total: 1 } },
+      data: [{ sessionId: 'x1' }],
+      meta: { total: 1 },
     })
 
     const result = await examScheduleService.loadSessions('s1')
@@ -180,7 +179,8 @@ describe('examScheduleService sessions', () => {
 
   it('reports the real total when more sessions exist than were loaded', async () => {
     getSessions.mockResolvedValue({
-      data: { data: [{ sessionId: 'x1' }], meta: { total: 1400 } },
+      data: [{ sessionId: 'x1' }],
+      meta: { total: 1400 },
     })
 
     const result = await examScheduleService.loadSessions('s1')
@@ -199,9 +199,7 @@ describe('examScheduleService sessions', () => {
     }
 
     it('loads the absentees', async () => {
-      getAbsentees.mockResolvedValue({
-        data: { data: [{ studentId: 'st1', eligible: true }] },
-      })
+      getAbsentees.mockResolvedValue([{ studentId: 'st1', eligible: true }])
 
       expect(await examScheduleService.loadAbsentees('s1')).toEqual({
         success: true,
@@ -221,7 +219,7 @@ describe('examScheduleService sessions', () => {
     })
 
     it('returns the created makeup', async () => {
-      createMakeup.mockResolvedValue({ data: { data: { id: 'm1' } } })
+      createMakeup.mockResolvedValue({ id: 'm1' })
 
       expect(await examScheduleService.createMakeup('s1', body)).toEqual({
         success: true,
@@ -247,9 +245,9 @@ describe('examScheduleService sessions', () => {
 
     it('adds participants and loads them', async () => {
       addParticipants.mockResolvedValue({})
-      getParticipants.mockResolvedValue({
-        data: { data: [{ studentId: 'st1', status: 'WAITING' }] },
-      })
+      getParticipants.mockResolvedValue([
+        { studentId: 'st1', status: 'WAITING' },
+      ])
 
       expect(
         await examScheduleService.addParticipants('m1', body.participants),

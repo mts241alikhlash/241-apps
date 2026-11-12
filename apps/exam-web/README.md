@@ -18,6 +18,8 @@ Dev port 5181.
 - `scripts/check-no-comments.mjs` runs in `validate`; HTML `eslint-disable` directives with a reason are allowed.
 - Specs that need a DOM declare `// @vitest-environment happy-dom`.
 
+- API calls go through `src/shared/api/clients.ts` (`examClient`, `academicClient`, `identityClient`, `studentClient`, built with `createServiceClient`); feature `api/` files use contract paths and `unwrap*`, with no URL helpers or `encodeURIComponent`. Nothing in the app imports the axios instance (`@mts241alikhlash/web-shared/utils/api`) directly; the auth and address features of `@mts241alikhlash/platform` still use it.
+
 ## Gotchas
 
 - A class used only inside a shared package needs the `@source` lines in `src/style.css`; without them the page renders unstyled with no build error.

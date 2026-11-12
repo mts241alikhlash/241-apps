@@ -22,15 +22,12 @@ export function useScheduleList(
     scope: ['exam-schedule', 'schedules'],
     filters: { status: filters.status, category: filters.category },
     fetchPage: async (current, limit) =>
-      (
-        await examScheduleApi.getSchedules({
-          page: current,
-          limit,
-          status: unless(filters.status.value) as
-            ExamScheduleStatus | undefined,
-          category: filters.category?.value,
-        })
-      ).data,
+      examScheduleApi.getSchedules({
+        page: current,
+        limit,
+        status: unless(filters.status.value) as ExamScheduleStatus | undefined,
+        category: filters.category?.value,
+      }),
     errorMessage: 'Gagal memuat daftar jadwal.',
   })
 

@@ -13,6 +13,7 @@ import type {
   AddQuestionPayload,
   ExamPackageCreatePayload,
   ExamPackageSummary,
+  ExamPackageDetail,
   ExamPackageView,
   ReturnPayload,
   TakePayload,
@@ -20,15 +21,15 @@ import type {
 } from '../types'
 
 export type ChangeResult =
-  | { success: true; data: ExamPackageView }
+  | { success: true; data: ExamPackageDetail }
   | { success: false; error: string; status?: number }
 
 async function change(
-  call: () => Promise<{ data: { data: ExamPackageView } }>,
+  call: () => Promise<ExamPackageDetail>,
   fallback: string,
 ): Promise<ChangeResult> {
   try {
-    return { success: true, data: (await call()).data.data }
+    return { success: true, data: await call() }
   } catch (err: unknown) {
     return {
       success: false,
@@ -46,8 +47,8 @@ export const examPackageService = {
         subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
         examBankApi.getGrades({ limit: PAGINATION.REFERENCE_LIMIT }),
       ])
-      store.subjects = subjectRes.data?.data ?? []
-      store.grades = gradeRes.data?.data ?? []
+      store.subjects = subjectRes.data
+      store.grades = gradeRes.data
     } catch (err: unknown) {
       toast.error(
         getIndonesianErrorMessage(err, 'Gagal memuat mapel dan tingkat.'),
@@ -55,11 +56,11 @@ export const examPackageService = {
     }
   },
 
-  async copyPackage(id: string): Promise<ExamPackageView | null> {
+  async copyPackage(id: string): Promise<ExamPackageDetail | null> {
     try {
-      const response = await examPackageApi.copyPackage(id)
+      const copy = await examPackageApi.copyPackage(id)
       toast.success('Paket disalin sebagai draf baru.')
-      return response.data.data
+      return copy
     } catch (err: unknown) {
       toast.error(messageOf(err, 'Gagal menyalin paket.'))
       return null
@@ -79,8 +80,7 @@ export const examPackageService = {
 
   async loadPackage(id: string): Promise<ExamPackageView | null> {
     try {
-      const response = await examPackageApi.getPackage(id)
-      return response.data?.data ?? null
+      return (await examPackageApi.getPackage(id)) ?? null
     } catch (err: unknown) {
       const status = statusOf(err)
       if (status === 404 || status === 400) return null
@@ -155,11 +155,11 @@ export const examPackageService = {
     { success: true; data: AdjustedKey } | { success: false; error: string }
   > {
     try {
-      const response = await examPackageApi.adjustItemKey(id, itemId, payload)
+      const adjusted = await examPackageApi.adjustItemKey(id, itemId, payload)
       toast.success(
-        `Ralat disimpan. ${response.data.data.rescoredSessions} sesi dihitung ulang.`,
+        `Ralat disimpan. ${adjusted.rescoredSessions} sesi dihitung ulang.`,
       )
-      return { success: true, data: response.data.data }
+      return { success: true, data: adjusted }
     } catch (err: unknown) {
       return {
         success: false,
@@ -173,8 +173,8 @@ export const examPackageService = {
     questionId: string,
   ): Promise<QuestionDetail | null> {
     try {
-      const response = await examPackageApi.getPackageQuestion(id, questionId)
-      return response.data?.data ?? null
+      const question = await examPackageApi.getPackageQuestion(id, questionId)
+      return question ?? null
     } catch (err: unknown) {
       if (statusOf(err) === 404) return null
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat soal.'))
@@ -197,10 +197,9 @@ export const examPackageService = {
           }),
         ),
       )
-      return [
-        ...(approved.data?.data ?? []),
-        ...(locked.data?.data ?? []),
-      ].sort((a, b) => a.title.localeCompare(b.title))
+      return [...approved.data, ...locked.data].sort((a, b) =>
+        a.title.localeCompare(b.title),
+      )
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar paket.'))
       return []

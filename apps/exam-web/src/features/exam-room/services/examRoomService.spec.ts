@@ -21,7 +21,8 @@ const row = (seatNumber: number) => ({
 })
 
 const page = (rows: ReturnType<typeof row>[], total: number) => ({
-  data: { data: rows, meta: { total } },
+  data: rows,
+  meta: { total },
 })
 
 describe('examRoomService.loadRoster', () => {
@@ -69,7 +70,8 @@ describe('examRoomService.loadRoster', () => {
 
   it('returns what it read when the backend answers an empty page', async () => {
     getMonitor.mockResolvedValueOnce(page([row(1)], 40)).mockResolvedValueOnce({
-      data: { data: [], meta: { total: 40 } },
+      data: [],
+      meta: { total: 40 },
     })
 
     const result = await examRoomService.loadRoster('r1', '')

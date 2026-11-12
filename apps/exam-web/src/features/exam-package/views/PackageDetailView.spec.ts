@@ -199,7 +199,7 @@ describe('PackageDetailView', () => {
     setActivePinia(createPinia())
     const store = useExamPackageStore()
     store.subjects = [{ id: 'math', name: 'Matematika' }]
-    store.grades = [{ id: 'g7', level: 7, name: null }]
+    store.grades = [{ id: 'g7', level: 7, name: '' }]
     vi.clearAllMocks()
     permissions.clear()
     for (const code of [

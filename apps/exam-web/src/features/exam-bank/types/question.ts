@@ -1,3 +1,7 @@
+import type { components } from '@mts241alikhlash/exam-api'
+
+type Schemas = components['schemas']
+
 export const QUESTION_TYPES = [
   'MULTIPLE_CHOICE',
   'MULTIPLE_RESPONSE',
@@ -12,59 +16,20 @@ export const CHOICE_KEYS = ['A', 'B', 'C', 'D', 'E'] as const
 
 export type ChoiceKey = (typeof CHOICE_KEYS)[number]
 
-export interface Choice {
-  key: ChoiceKey
-  html: string
-}
+export type Choice = Schemas['ChoiceDto']
 
-export interface MultipleChoiceContent {
-  choices: Choice[]
-  answer: { key: ChoiceKey }
-}
+export type MultipleChoiceContent = Schemas['MultipleChoiceContentDto']
 
-export interface MultipleResponseContent {
-  choices: Choice[]
-  answer: { keys: ChoiceKey[] }
-}
+export type MultipleResponseContent = Schemas['MultipleResponseContentDto']
 
-export interface TrueFalseContent {
-  answer: { value: boolean }
-}
+export type TrueFalseContent = Schemas['TrueFalseContentDto']
 
-export interface ShortAnswerContent {
-  answer: {
-    accepted: string[]
-    ignoreCase: boolean
-    ignoreHarakat: boolean
-  }
-}
+export type ShortAnswerContent = Schemas['ShortAnswerContentDto']
 
-export interface EssayContent {
-  guideHtml: string | null
-}
+export type EssayContent = Schemas['EssayContentDto']
 
-export type QuestionContent =
-  | MultipleChoiceContent
-  | MultipleResponseContent
-  | TrueFalseContent
-  | ShortAnswerContent
-  | EssayContent
+export type QuestionVersion = Schemas['QuestionVersionDto']
 
-export interface QuestionVersion {
-  id: string
-  questionId: string
-  number: number
-  bodyHtml: string
-  content: QuestionContent
-  points: number
-  createdById: string
-  createdAt: string
-}
+export type QuestionContent = QuestionVersion['content']
 
-export interface QuestionDetail {
-  id: string
-  packageId: string
-  type: QuestionType
-  currentVersion: number
-  current: QuestionVersion
-}
+export type QuestionDetail = Schemas['QuestionDetailDto']

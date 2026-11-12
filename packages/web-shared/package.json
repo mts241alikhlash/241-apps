@@ -18,6 +18,7 @@
     "@lucide/vue": "catalog:",
     "axios": "catalog:",
     "clsx": "catalog:",
+    "openapi-fetch": "catalog:",
     "tailwind-merge": "catalog:",
     "vue-sonner": "catalog:"
   },

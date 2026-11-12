@@ -3,12 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import ActivityForm from './ActivityForm.vue'
 
-const { patch, post } = vi.hoisted(() => ({
-  patch: vi.fn(),
-  post: vi.fn(),
+const { updateStatus, issueParticipantNumbers } = vi.hoisted(() => ({
+  updateStatus: vi.fn(),
+  issueParticipantNumbers: vi.fn(),
 }))
-vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get: vi.fn(), post, patch },
+vi.mock('../api/examActivityApi', () => ({
+  examActivityApi: { updateStatus, issueParticipantNumbers },
 }))
 
 const props = {
@@ -35,11 +35,24 @@ const pastActivity = {
   id: 'activity-1',
   semesterId: 'sem-1',
   gradeId: 'grade-7',
+  eventId: null,
+  subjectId: 'subject-inf',
+  packageId: 'package-1',
+  type: 'DAILY' as const,
+  category: 'EXAM' as const,
   status: 'DRAFT' as const,
   tokenMode: 'ROTATING' as const,
   tokenRotation: 1,
   durationMinutes: 90,
-  policy: {},
+  policy: {
+    focusThresholdMs: 1,
+    gapRecordedMs: 1,
+    gapTokenMs: 1,
+    gapViolationFrom: 1,
+    heartbeatIntervalMs: 1,
+    tokenSlotSeconds: 1,
+    violationLimit: 1,
+  },
   startsAt: '2020-11-10T01:00:00.000Z',
   endsAt: '2020-11-10T04:00:00.000Z',
 }
@@ -114,7 +127,7 @@ describe('ActivityForm', () => {
       subjectId: 'subject-inf',
       type: 'DAILY',
       presetName: 'DAILY',
-      tokenMode: 'ROTATING',
+      tokenMode: 'ROTATING' as const,
       durationMinutes: 90,
     })
   })
@@ -153,9 +166,7 @@ describe('ActivityForm', () => {
     await wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    expect(patch).toHaveBeenCalledWith('/exam-activities/activity-1', {
-      status: 'ACTIVE',
-    })
+    expect(updateStatus).toHaveBeenCalledWith('activity-1', 'ACTIVE')
   })
 
   it('confirms before leaving ACTIVE', async () => {
@@ -171,19 +182,17 @@ describe('ActivityForm', () => {
     expect(confirm).toHaveBeenCalledWith(
       expect.stringContaining('sesi yang masih berjalan'),
     )
-    expect(patch).not.toHaveBeenCalled()
+    expect(updateStatus).not.toHaveBeenCalled()
 
     await wrapper.find('form').trigger('submit')
     await flushPromises()
 
-    expect(patch).toHaveBeenCalledWith('/exam-activities/activity-1', {
-      status: 'CLOSED',
-    })
+    expect(updateStatus).toHaveBeenCalledWith('activity-1', 'CLOSED')
     vi.unstubAllGlobals()
   })
 
   it('asks the registry to issue participant numbers', async () => {
-    post.mockResolvedValueOnce({ data: { data: { issued: true } } })
+    issueParticipantNumbers.mockResolvedValueOnce({ issued: true })
     const wrapper = mount(ActivityForm, {
       props: { ...props, activity: pastActivity },
     })
@@ -194,10 +203,7 @@ describe('ActivityForm', () => {
       .trigger('click')
     await flushPromises()
 
-    expect(post).toHaveBeenCalledWith(
-      '/exam-activities/activity-1/participant-numbers/issue',
-      {},
-    )
+    expect(issueParticipantNumbers).toHaveBeenCalledWith('activity-1')
     expect(wrapper.emitted('numbers-issued')?.[0]).toEqual([true])
   })
 

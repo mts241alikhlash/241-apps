@@ -1,38 +1,61 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { GET, PATCH } = vi.hoisted(() => ({ GET: vi.fn(), PATCH: vi.fn() }))
+
+vi.mock('@/shared/api/clients', () => ({ examClient: { GET, PATCH } }))
+
 import { examGradingApi } from './examGradingApi'
 
-const { get, patch } = vi.hoisted(() => ({ get: vi.fn(), patch: vi.fn() }))
-vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get, patch },
-}))
+const ok = (body: unknown) => ({
+  data: body,
+  response: new Response(null, { status: 200 }),
+})
+
+beforeEach(() => vi.clearAllMocks())
 
 describe('examGradingApi', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  it('lists what the caller may grade', () => {
-    void examGradingApi.getSchedules({ page: 1, limit: 10, semesterId: 'sem' })
-    void examGradingApi.getSessions('s 1', {
-      page: 2,
-      limit: 10,
-      status: 'SUBMITTED',
+  it('lists the schedules the caller may grade', async () => {
+    GET.mockResolvedValue(ok({ data: [{ id: 's' }], meta: { total: 1 } }))
+    const query = { page: 1, limit: 10, semesterId: 'sem' }
+    await expect(examGradingApi.getSchedules(query)).resolves.toEqual({
+      data: [{ id: 's' }],
+      meta: { total: 1, page: 1, limit: 0 },
     })
-    void examGradingApi.getSession('x1')
-
-    expect(get).toHaveBeenCalledWith('/exam-grading/schedules', {
-      params: { page: 1, limit: 10, semesterId: 'sem' },
+    expect(GET).toHaveBeenCalledWith('/exam-grading/schedules', {
+      params: { query },
     })
-    expect(get).toHaveBeenCalledWith('/exam-grading/schedules/s%201/sessions', {
-      params: { page: 2, limit: 10, status: 'SUBMITTED' },
-    })
-    expect(get).toHaveBeenCalledWith('/exam-grading/sessions/x1')
   })
 
-  it('grades one answer', () => {
-    void examGradingApi.grade('x1', 'q1', { score: 7.5, note: 'cukup' })
+  it('lists the sessions of a schedule', async () => {
+    GET.mockResolvedValue(ok({ data: [{ sessionId: 'x' }] }))
+    const query = { page: 2, limit: 10, status: 'SUBMITTED' as const }
+    const page = await examGradingApi.getSessions('s 1', query)
+    expect(page.data).toEqual([{ sessionId: 'x' }])
+    expect(GET).toHaveBeenCalledWith(
+      '/exam-grading/schedules/{scheduleId}/sessions',
+      { params: { path: { scheduleId: 's 1' }, query } },
+    )
+  })
 
-    expect(patch).toHaveBeenCalledWith('/exam-grading/sessions/x1/answers/q1', {
-      score: 7.5,
-      note: 'cukup',
+  it('gets one session', async () => {
+    GET.mockResolvedValue(ok({ data: { items: [] } }))
+    await expect(examGradingApi.getSession('x1')).resolves.toEqual({
+      items: [],
     })
+    expect(GET).toHaveBeenCalledWith('/exam-grading/sessions/{sessionId}', {
+      params: { path: { sessionId: 'x1' } },
+    })
+  })
+
+  it('grades one answer', async () => {
+    PATCH.mockResolvedValue(ok({ data: { questionId: 'q1' } }))
+    const body = { score: 7.5, note: 'cukup' }
+    await expect(examGradingApi.grade('x1', 'q1', body)).resolves.toEqual({
+      questionId: 'q1',
+    })
+    expect(PATCH).toHaveBeenCalledWith(
+      '/exam-grading/sessions/{sessionId}/answers/{questionId}',
+      { params: { path: { sessionId: 'x1', questionId: 'q1' } }, body },
+    )
   })
 })

@@ -17,6 +17,8 @@ const existing: ExamSchedule = {
   semesterId: 'sem',
   eventId: null,
   activityId: null,
+  category: 'EXAM',
+  minSubmitMinutes: 0,
   type: 'DAILY',
   startsAt: toInstant('2026-11-02', '08:00'),
   endsAt: toInstant('2026-11-02', '11:00'),
