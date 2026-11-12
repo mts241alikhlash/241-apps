@@ -17,12 +17,12 @@ import type { ActivityPolicyPayload, ExamPolicy } from '../types'
 const props = defineProps<{
   open: boolean
   activityId: string
-  policy: ExamPolicy | Record<string, number>
+  policy: ExamPolicy
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  saved: [policy: ExamPolicy | Record<string, number>]
+  saved: [policy: ExamPolicy]
 }>()
 
 const violationLimit = ref(props.policy.violationLimit ?? 3)
@@ -67,7 +67,7 @@ async function submit(): Promise<void> {
       props.activityId,
       payload,
     )
-    emit('saved', response.data.data.policy)
+    emit('saved', response.policy)
     emit('update:open', false)
   } catch (err: unknown) {
     error.value = messageOf(err, 'Kebijakan kegiatan gagal disimpan.')

@@ -1,54 +1,51 @@
-import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
+import { unwrap } from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
   ActivityCreatePayload,
   ActivityPolicyPayload,
   ActivityStatus,
-  ExamActivityDetail,
   ExamActivityQuery,
-  ExamActivityRecord,
 } from '../types'
 
-const seg = encodeURIComponent
-
 export const examActivityApi = {
-  list: (params?: ExamActivityQuery) =>
-    api.get<ApiSingleResponse<ExamActivityRecord[]>>('/exam-activities', {
-      params,
-    }),
+  list: (query?: ExamActivityQuery) =>
+    unwrap(examClient.GET('/exam-activities', { params: { query } })),
 
   get: (id: string) =>
-    api.get<ApiSingleResponse<ExamActivityDetail>>(
-      `/exam-activities/${seg(id)}`,
+    unwrap(
+      examClient.GET('/exam-activities/{id}', { params: { path: { id } } }),
     ),
 
-  create: (payload: ActivityCreatePayload) =>
-    api.post<ApiSingleResponse<ExamActivityRecord>>(
-      '/exam-activities',
-      payload,
-    ),
+  create: (body: ActivityCreatePayload) =>
+    unwrap(examClient.POST('/exam-activities', { body })),
 
   updateStatus: (id: string, status: ActivityStatus) =>
-    api.patch<ApiSingleResponse<ExamActivityRecord>>(
-      `/exam-activities/${seg(id)}`,
-      { status },
+    unwrap(
+      examClient.PATCH('/exam-activities/{id}', {
+        params: { path: { id } },
+        body: { status },
+      }),
     ),
 
-  updatePolicy: (id: string, policy: ActivityPolicyPayload) =>
-    api.patch<ApiSingleResponse<ExamActivityRecord>>(
-      `/exam-activities/${seg(id)}/policy`,
-      policy,
+  updatePolicy: (id: string, body: ActivityPolicyPayload) =>
+    unwrap(
+      examClient.PATCH('/exam-activities/{id}/policy', {
+        params: { path: { id } },
+        body,
+      }),
     ),
 
   issueParticipantNumbers: (id: string) =>
-    api.post<ApiSingleResponse<{ issued: boolean }>>(
-      `/exam-activities/${seg(id)}/participant-numbers/issue`,
-      {},
+    unwrap(
+      examClient.POST('/exam-activities/{id}/participant-numbers/issue', {
+        params: { path: { id } },
+      }),
     ),
 
   rotateToken: (id: string) =>
-    api.post<ApiSingleResponse<ExamActivityRecord>>(
-      `/exam-activities/${seg(id)}/token/rotate`,
-      {},
+    unwrap(
+      examClient.POST('/exam-activities/{id}/token/rotate', {
+        params: { path: { id } },
+      }),
     ),
 }

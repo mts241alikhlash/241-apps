@@ -44,9 +44,7 @@ describe('ActivityCreateView in edit mode', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     permissions.clear()
-    get.mockResolvedValue({
-      data: { data: { id: 'act-1', semesterId: 'sem-1' } },
-    })
+    get.mockResolvedValue({ id: 'act-1', semesterId: 'sem-1' })
   })
 
   it('loads the one activity instead of the whole list', async () => {

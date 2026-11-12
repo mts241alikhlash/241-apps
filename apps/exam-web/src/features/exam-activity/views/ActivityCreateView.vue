@@ -109,7 +109,7 @@ async function loadActivity(): Promise<void> {
   loadingActivity.value = true
   try {
     const response = await examActivityApi.get(editingId.value)
-    activity.value = response.data.data
+    activity.value = response
   } catch {
     error.value = 'Kegiatan gagal dimuat.'
   } finally {
