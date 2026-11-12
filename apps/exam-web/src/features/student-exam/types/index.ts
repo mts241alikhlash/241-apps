@@ -1,3 +1,4 @@
+import type { components } from '@mts241alikhlash/exam-api'
 import {
   EXAM_CATEGORIES,
   EXAM_TYPES,
@@ -17,103 +18,37 @@ export const QUESTION_TYPES = [
 ] as const
 export type QuestionType = (typeof QUESTION_TYPES)[number]
 
-export type MyExamStatus = 'UPCOMING' | 'OPEN' | 'IN_PROGRESS' | 'FINISHED'
+type Schemas = components['schemas']
 
-export interface MyExam {
-  id: string
-  title: string
-  subjectId: string
-  subjectName: string | null
-  type: ExamType
-  category?: ExamCategory
-  startsAt: string
-  endsAt: string
-  durationMinutes: number
-  minSubmitMinutes: number
-  status: MyExamStatus
-  sessionId: string | null
-}
+export type MyExamStatus = Schemas['MyExamDto']['status']
 
-export interface StartedSession {
-  sessionId: string
-  deadline: number
-  serverTime: number
-}
+export type MyExam = Schemas['MyExamDto']
 
-export interface Choice {
-  key: string
-  html: string
-}
+export type StartedSession = Schemas['StartedSessionDto']
 
-export interface SessionPaper {
-  questions: PaperQuestion[]
-  startedAt: string
-  minSubmitMinutes: number
-  serverTime: string
-}
+export type Choice = Schemas['PaperChoiceDto']
 
-export interface PaperQuestion {
-  id: string
-  number: number
-  type: QuestionType
-  bodyHtml: string
-  points: number
-  choices: Choice[] | null
-}
+export type SessionPaper = Schemas['SessionPaperDto']
 
-export interface SavedAnswer {
-  questionId: string
-  answer: AnswerPayload | null
-}
+export type PaperQuestion = Schemas['PaperQuestionDto']
 
-export type AnswerPayload =
-  { key: string } | { keys: string[] } | { value: boolean } | { text: string }
+export type SavedAnswer = Schemas['SavedAnswerDto']
 
-export interface SaveAnswerItem {
-  questionId: string
-  clientId: string
-  answer: AnswerPayload
-}
+export type AnswerPayload = SaveAnswerItem['answer']
 
-export interface SaveAnswersBatchRequest {
-  answers: SaveAnswerItem[]
-  pendingLocalCount?: number
-  batteryLevel?: number
-  isCharging?: boolean
-}
+export type SaveAnswerItem = Schemas['SaveAnswerItemDto']
 
-export interface ConfirmedAnswer {
-  questionId: string
-  clientId: string
-  updatedAt: string
-  receivedAfterDeadline: boolean
-}
+export type SaveAnswersBatchRequest = Schemas['SaveAnswersBatchDto']
 
-export interface SkippedAnswer {
-  questionId: string
-  clientId: string
-}
+export type ConfirmedAnswer = Schemas['ConfirmedAnswerDto']
 
-export interface SaveAnswersBatchResult {
-  confirmed: ConfirmedAnswer[]
-  skipped: SkippedAnswer[]
-  confirmedCount: number
-  serverTime: string
-}
+export type SkippedAnswer = SaveAnswersBatchResult['skipped'][number]
 
-export interface SubmitRequest {
-  violations?: number
-  expectedAnswerCount?: number
-  pendingAnswers?: SaveAnswerItem[]
-}
+export type SaveAnswersBatchResult = Schemas['SaveAnswersBatchResultDto']
 
-export interface SubmittedSession {
-  status: 'SUBMITTED' | 'EXPIRED' | 'GRADED'
-  submittedAt: string | null
-  confirmedAnswerCount: number
-  answersStored: boolean
-  serverTime: string
-}
+export type SubmitRequest = Schemas['SubmitSessionRequestDto']
+
+export type SubmittedSession = Schemas['SubmitSessionResponseDto']
 
 export type AnswerSyncState = 'LOCAL_PENDING' | 'SYNCING' | 'SERVER_CONFIRMED'
 
