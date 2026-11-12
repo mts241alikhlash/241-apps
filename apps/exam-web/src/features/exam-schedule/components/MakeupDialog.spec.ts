@@ -84,6 +84,8 @@ const original: ExamSchedule = {
   semesterId: 'sem',
   eventId: null,
   activityId: null,
+  category: 'EXAM',
+  minSubmitMinutes: 0,
   type: 'MIDTERM',
   kind: 'REGULAR',
   makeupOfId: null,
