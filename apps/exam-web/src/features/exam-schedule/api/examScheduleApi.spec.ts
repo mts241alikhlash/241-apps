@@ -192,3 +192,63 @@ describe('examScheduleApi', () => {
     )
   })
 })
+
+const failed = () => ({
+  error: { message: 'gagal' },
+  response: new Response(null, { status: 500 }),
+})
+
+describe('examScheduleApi failures', () => {
+  it.each([
+    ['getSchedules', 'GET', () => examScheduleApi.getSchedules()],
+    ['getSchedule', 'GET', () => examScheduleApi.getSchedule('s')],
+    [
+      'createSchedule',
+      'POST',
+      () => examScheduleApi.createSchedule({} as never),
+    ],
+    [
+      'updateSchedule',
+      'PATCH',
+      () => examScheduleApi.updateSchedule('s', {} as never),
+    ],
+    ['cancelSchedule', 'POST', () => examScheduleApi.cancelSchedule('s')],
+    ['getAccessCode', 'GET', () => examScheduleApi.getAccessCode('s')],
+    ['getSessions', 'GET', () => examScheduleApi.getSessions('s')],
+    ['releaseSession', 'POST', () => examScheduleApi.releaseSession('x', 'r')],
+    ['resetSession', 'POST', () => examScheduleApi.resetSession('x', 'r')],
+    [
+      'getSessionAuditLogs',
+      'GET',
+      () => examScheduleApi.getSessionAuditLogs('x'),
+    ],
+    ['getAbsentees', 'GET', () => examScheduleApi.getAbsentees('s')],
+    [
+      'createMakeup',
+      'POST',
+      () => examScheduleApi.createMakeup('s', {} as never),
+    ],
+    ['getParticipants', 'GET', () => examScheduleApi.getParticipants('m')],
+    [
+      'addParticipants',
+      'POST',
+      () => examScheduleApi.addParticipants('m', [] as never),
+    ],
+    [
+      'removeParticipant',
+      'DELETE',
+      () => examScheduleApi.removeParticipant('m', 'st'),
+    ],
+    ['rotateAccessCode', 'POST', () => examScheduleApi.rotateAccessCode('s')],
+  ] as const)(
+    '%s rejects a failing response through %s',
+    async (_name, verb, call) => {
+      const mocks = { GET, POST, PATCH, DELETE }
+      for (const mock of Object.values(mocks)) mock.mockResolvedValue(failed())
+      await expect(call()).rejects.toBeTruthy()
+      for (const [key, mock] of Object.entries(mocks)) {
+        expect(mock).toHaveBeenCalledTimes(key === verb ? 1 : 0)
+      }
+    },
+  )
+})
