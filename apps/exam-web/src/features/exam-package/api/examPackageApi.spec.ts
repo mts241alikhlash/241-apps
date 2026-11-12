@@ -207,3 +207,59 @@ describe('examPackageApi', () => {
     )
   })
 })
+
+const failed = () => ({
+  error: { message: 'gagal' },
+  response: new Response(null, { status: 500 }),
+})
+
+describe('examPackageApi failures', () => {
+  it.each([
+    ['getPackages', 'GET', () => examPackageApi.getPackages()],
+    ['getPackage', 'GET', () => examPackageApi.getPackage('p')],
+    [
+      'getPackageQuestion',
+      'GET',
+      () => examPackageApi.getPackageQuestion('p', 'q'),
+    ],
+    ['createPackage', 'POST', () => examPackageApi.createPackage({} as never)],
+    ['renamePackage', 'PATCH', () => examPackageApi.renamePackage('p', 'n')],
+    ['deletePackage', 'DELETE', () => examPackageApi.deletePackage('p')],
+    ['copyPackage', 'POST', () => examPackageApi.copyPackage('p')],
+    ['addQuestion', 'POST', () => examPackageApi.addQuestion('p', {} as never)],
+    [
+      'updateQuestion',
+      'PATCH',
+      () => examPackageApi.updateQuestion('p', 'q', {}),
+    ],
+    ['removeQuestion', 'DELETE', () => examPackageApi.removeQuestion('p', 'q')],
+    ['reorderQuestions', 'PUT', () => examPackageApi.reorderQuestions('p', [])],
+    [
+      'takeQuestions',
+      'POST',
+      () => examPackageApi.takeQuestions('p', {} as never),
+    ],
+    ['submitPackage', 'POST', () => examPackageApi.submitPackage('p')],
+    ['approvePackage', 'POST', () => examPackageApi.approvePackage('p')],
+    [
+      'returnPackage',
+      'POST',
+      () => examPackageApi.returnPackage('p', {} as never),
+    ],
+    [
+      'adjustItemKey',
+      'POST',
+      () => examPackageApi.adjustItemKey('p', 'i', {} as never),
+    ],
+  ] as const)(
+    '%s rejects a failing response through %s',
+    async (_name, verb, call) => {
+      const mocks = { GET, POST, PATCH, PUT, DELETE }
+      for (const mock of Object.values(mocks)) mock.mockResolvedValue(failed())
+      await expect(call()).rejects.toBeTruthy()
+      for (const [key, mock] of Object.entries(mocks)) {
+        expect(mock).toHaveBeenCalledTimes(key === verb ? 1 : 0)
+      }
+    },
+  )
+})

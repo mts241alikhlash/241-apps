@@ -59,3 +59,27 @@ describe('examGradingApi', () => {
     )
   })
 })
+
+const failed = () => ({
+  error: { message: 'gagal' },
+  response: new Response(null, { status: 500 }),
+})
+
+describe('examGradingApi failures', () => {
+  it.each([
+    ['getSchedules', 'GET', () => examGradingApi.getSchedules()],
+    ['getSessions', 'GET', () => examGradingApi.getSessions('s')],
+    ['getSession', 'GET', () => examGradingApi.getSession('x')],
+    ['grade', 'PATCH', () => examGradingApi.grade('x', 'q', {} as never)],
+  ] as const)(
+    '%s rejects a failing response through %s',
+    async (_name, verb, call) => {
+      const mocks = { GET, PATCH }
+      for (const mock of Object.values(mocks)) mock.mockResolvedValue(failed())
+      await expect(call()).rejects.toBeTruthy()
+      for (const [key, mock] of Object.entries(mocks)) {
+        expect(mock).toHaveBeenCalledTimes(key === verb ? 1 : 0)
+      }
+    },
+  )
+})
