@@ -31,7 +31,9 @@ describe('examBankService.importQuestions', () => {
 
   it('sends the file with the package id', async () => {
     importQuestions.mockResolvedValue({
-      data: { data: { created: 1, questionIds: ['a'], errors: [] } },
+      created: 1,
+      questionIds: ['a'],
+      errors: [],
     })
 
     await examBankService.importQuestions({

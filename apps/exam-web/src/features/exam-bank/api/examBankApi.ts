@@ -1,21 +1,16 @@
-import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
+import type { ApiPaginatedResponse } from '@mts241alikhlash/web-shared/types/api'
 import api from '@mts241alikhlash/web-shared/utils/api'
-import type {
-  ExamFile,
-  GradeRecord,
-  ImportResult,
-  QuestionScope,
-  TemplateFormat,
-} from '../types'
+import {
+  unwrap,
+  unwrapBlob,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
+import type { GradeRecord, TemplateFormat } from '../types'
 
-const seg = encodeURIComponent
+const passThrough = (body: unknown) => body as never
 
 export const examBankApi = {
-  getScope: () =>
-    api.get<ApiSingleResponse<QuestionScope>>('/exam-questions/scope'),
+  getScope: () => unwrap(examClient.GET('/exam-questions/scope')),
 
   getGrades: (params?: { limit?: number }) =>
     api.get<ApiPaginatedResponse<GradeRecord>>('/grades', { params }),
@@ -23,22 +18,35 @@ export const examBankApi = {
   uploadImage: (file: File) => {
     const form = new FormData()
     form.append('file', file)
-    return api.post<ApiSingleResponse<ExamFile>>('/exam-files', form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    return unwrap(
+      examClient.POST('/exam-files', {
+        body: form as never,
+        bodySerializer: passThrough,
+      }),
+    )
   },
 
   getImage: (id: string) =>
-    api.get<Blob>(`/exam-files/${seg(id)}`, { responseType: 'blob' }),
+    unwrapBlob(
+      examClient.GET('/exam-files/{id}', {
+        params: { path: { id } },
+        parseAs: 'blob',
+      }),
+    ),
 
   downloadTemplate: (format: TemplateFormat) =>
-    api.get<Blob>('/exam-imports/template', {
-      params: { format },
-      responseType: 'blob',
-    }),
+    unwrapBlob(
+      examClient.GET('/exam-imports/template', {
+        params: { query: { format } },
+        parseAs: 'blob',
+      }),
+    ),
 
   importQuestions: (form: FormData) =>
-    api.post<ApiSingleResponse<ImportResult>>('/exam-imports', form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    unwrap(
+      examClient.POST('/exam-imports', {
+        body: form as never,
+        bodySerializer: passThrough,
+      }),
+    ),
 }

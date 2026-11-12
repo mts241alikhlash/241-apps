@@ -174,7 +174,7 @@ export const examPackageService = {
   ): Promise<QuestionDetail | null> {
     try {
       const question = await examPackageApi.getPackageQuestion(id, questionId)
-      return (question as unknown as QuestionDetail | undefined) ?? null
+      return question ?? null
     } catch (err: unknown) {
       if (statusOf(err) === 404) return null
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat soal.'))

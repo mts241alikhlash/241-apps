@@ -13,7 +13,7 @@ export const examBankService = {
     const store = useExamBankStore()
     try {
       const response = await examBankApi.getScope()
-      store.scope = response.data?.data ?? { all: false, pairs: [] }
+      store.scope = response ?? { all: false, pairs: [] }
       if (store.scope.all) {
         const [subjectRes, gradeRes] = await Promise.all([
           subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
@@ -54,7 +54,7 @@ export const examBankService = {
   async downloadTemplate(format: TemplateFormat): Promise<void> {
     try {
       const response = await examBankApi.downloadTemplate(format)
-      const url = URL.createObjectURL(response.data)
+      const url = URL.createObjectURL(response)
       const link = document.createElement('a')
       link.href = url
       link.download = `template-soal.${format}`
@@ -80,7 +80,7 @@ export const examBankService = {
     }
     try {
       const response = await examBankApi.importQuestions(form)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return {
         success: false,

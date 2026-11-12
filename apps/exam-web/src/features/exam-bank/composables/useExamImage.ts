@@ -11,7 +11,7 @@ export function loadExamImage(fileId: string): Promise<string> {
 
   const url = examBankApi
     .getImage(fileId)
-    .then((response) => URL.createObjectURL(response.data))
+    .then((blob) => URL.createObjectURL(blob))
   cache.set(fileId, url)
   url.catch(() => cache.delete(fileId))
   return url

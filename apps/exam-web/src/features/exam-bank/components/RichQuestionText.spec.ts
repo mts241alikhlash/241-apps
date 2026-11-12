@@ -53,15 +53,11 @@ describe('RichQuestionText', () => {
 
   it('writes an uploaded picture as an img with the file id only', async () => {
     uploadImage.mockResolvedValue({
-      data: {
-        data: {
-          id: '3d2a9b2e-6a4f-4b1c-9d0e-1f2a3b4c5d6e',
-          mimeType: 'image/png',
-          sizeBytes: 10,
-        },
-      },
+      id: '3d2a9b2e-6a4f-4b1c-9d0e-1f2a3b4c5d6e',
+      mimeType: 'image/png',
+      sizeBytes: 10,
     })
-    getImage.mockResolvedValue({ data: new Blob(['x']) })
+    getImage.mockResolvedValue(new Blob(['x']))
     const wrapper = mountEditor()
     await flushPromises()
 
