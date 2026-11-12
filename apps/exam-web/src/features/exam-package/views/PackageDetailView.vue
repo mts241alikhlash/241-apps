@@ -39,6 +39,7 @@ import ReturnedNotes from '../components/ReturnedNotes.vue'
 import TakeQuestionsDialog from '../components/TakeQuestionsDialog.vue'
 import { usePackageBuilder } from '../composables/usePackageBuilder'
 import { examPackageService } from '../services/examPackageService'
+import { categoryOf, sectionPrefixOf } from '@/features/exam-shared/examType'
 import { useExamPackageStore } from '../stores/examPackageStore'
 import {
   packageStatusLabel,
@@ -335,7 +336,9 @@ onMounted(async () => {
       :package-id="pkg.id"
       :package-grade-id="pkg.gradeId"
       :package-title="pkg.title"
-      @saved="router.push('/exam/schedules')"
+      @saved="
+        (type) => router.push(`${sectionPrefixOf(categoryOf(type))}/schedules`)
+      "
     />
 
     <TakeQuestionsDialog

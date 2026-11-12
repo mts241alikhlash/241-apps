@@ -29,7 +29,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Get one activity with its classroom schedules */
+        get: operations["ExamActivityController_findOne"];
         put?: never;
         post?: never;
         delete?: never;
@@ -470,6 +471,40 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/exam-policy-presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the default enforcement policy presets */
+        get: operations["ExamPolicyPresetController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-policy-presets/{type}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update one policy preset */
+        patch: operations["ExamPolicyPresetController_update"];
         trace?: never;
     };
     "/exam-questions/scope": {
@@ -1478,7 +1513,7 @@ export interface components {
             /** Format: uuid */
             packageId: string;
             /** @enum {string} */
-            presetName: "UJIAN_KETAT" | "ULANGAN_KELAS" | "TUGAS";
+            presetName?: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
             /** Format: uuid */
             semesterId: string;
             /** Format: date-time */
@@ -1488,7 +1523,7 @@ export interface components {
             /** @enum {string} */
             tokenMode: "ROTATING" | "STATIC";
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         CreateExamEventDto: {
             /** Format: date-time */
@@ -1502,7 +1537,7 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         CreateExamPackageDto: {
             /** Format: uuid */
@@ -1537,7 +1572,7 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         CreateMakeupDto: {
             durationMinutes: number;
@@ -1549,7 +1584,37 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
         };
+        ExamActivityDetailDto: {
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
+            durationMinutes: number;
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            eventId: string | null;
+            /** Format: uuid */
+            gradeId: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            packageId: string;
+            policy: components["schemas"]["ExamPolicyDto"];
+            schedules: components["schemas"]["ExamActivityScheduleDto"][];
+            /** Format: uuid */
+            semesterId: string;
+            /** Format: date-time */
+            startsAt: string;
+            status: string;
+            /** Format: uuid */
+            subjectId: string;
+            tokenMode: string;
+            tokenRotation: number;
+            /** @enum {string} */
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+        };
         ExamActivityDto: {
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1571,9 +1636,23 @@ export interface components {
             subjectId: string;
             tokenMode: string;
             tokenRotation: number;
-            type: string;
+            /** @enum {string} */
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+        };
+        ExamActivityScheduleDto: {
+            /** Format: uuid */
+            classroomId: string;
+            classroomName: string | null;
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            scheduleId: string;
+            /** Format: date-time */
+            startsAt: string;
         };
         ExamEventDto: {
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
             /** Format: date-time */
             endsAt: string;
             /** Format: uuid */
@@ -1589,7 +1668,7 @@ export interface components {
             /** @enum {string} */
             status: "DRAFT" | "ACTIVE" | "COMPLETED";
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         ExamEventListResponseDto: {
             data: components["schemas"]["ExamEventDto"][];
@@ -1698,6 +1777,15 @@ export interface components {
             tokenSlotSeconds: number;
             violationLimit: number;
         };
+        ExamPolicyPresetDto: {
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
+            policy: components["schemas"]["ExamPolicyDto"];
+            /** @enum {string} */
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+            /** Format: date-time */
+            updatedAt: string;
+        };
         ExamRoomDto: {
             building: string | null;
             capacity: number;
@@ -1721,6 +1809,8 @@ export interface components {
         ExamScheduleDto: {
             /** Format: uuid */
             activityId: string | null;
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
             /** Format: uuid */
             classroomId: string;
             classroomName: string | null;
@@ -1752,7 +1842,7 @@ export interface components {
             /** @enum {string} */
             status: "SCHEDULED" | "CANCELLED";
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
             /** Format: date-time */
             updatedAt: string;
         };
@@ -1797,6 +1887,8 @@ export interface components {
         };
         GradingScheduleDto: {
             awaitingGrading: number;
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
             /** Format: uuid */
             classroomId: string;
             classroomName: string | null;
@@ -1819,7 +1911,7 @@ export interface components {
             subjectId: string;
             title: string;
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         GradingScheduleListResponseDto: {
             data: components["schemas"]["GradingScheduleDto"][];
@@ -1896,6 +1988,8 @@ export interface components {
             activityId: string | null;
             /** @enum {string|null} */
             activityStatus: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED" | null;
+            /** @enum {string} */
+            category: "EXAM" | "NON_EXAM";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1930,7 +2024,7 @@ export interface components {
             subjectName: string | null;
             title: string;
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         PackageQuestionNoteDto: {
             note: string;
@@ -2586,6 +2680,8 @@ export interface components {
             startsAt?: string;
             /** @enum {string} */
             status?: "DRAFT" | "ACTIVE" | "COMPLETED";
+            /** @enum {string} */
+            type?: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         UpdateExamRoomDto: {
             building?: string | null;
@@ -2609,7 +2705,7 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
             /** @enum {string} */
-            type: "UH" | "QUIZ" | "ASSIGNMENT" | "UTS" | "UAS";
+            type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         UpdateQuestionDto: {
             bodyHtml?: string;
@@ -2638,7 +2734,9 @@ export type $defs = Record<string, never>;
 export interface operations {
     ExamActivityController_list: {
         parameters: {
-            query?: never;
+            query?: {
+                category?: "EXAM" | "NON_EXAM";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2681,6 +2779,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDetailDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
@@ -3043,6 +3168,7 @@ export interface operations {
     ExamGradingController_schedules: {
         parameters: {
             query?: {
+                category?: "EXAM" | "NON_EXAM";
                 limit?: number;
                 page?: number;
                 /** @description Defaults to the active semester */
@@ -3701,6 +3827,62 @@ export interface operations {
             };
         };
     };
+    ExamPolicyPresetController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamPolicyPresetDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamPolicyPresetController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityPolicyRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamPolicyPresetDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     QuestionController_scope: {
         parameters: {
             query?: never;
@@ -4330,6 +4512,7 @@ export interface operations {
     ExamScheduleController_findAll: {
         parameters: {
             query?: {
+                category?: "EXAM" | "NON_EXAM";
                 classroomId?: string;
                 from?: string;
                 limit?: number;

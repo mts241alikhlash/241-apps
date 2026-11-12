@@ -9,6 +9,7 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SEMESTER_ID,
   START,
   USER,
   approvedPackage,
@@ -38,7 +39,7 @@ describe('List and get exam schedules', () => {
         startsAt: START,
         endsAt: END,
         durationMinutes: 90,
-        type: 'UH',
+        type: 'DAILY',
       })
     ).id
   })
@@ -113,5 +114,60 @@ describe('List and get exam schedules', () => {
     ).execute({})
 
     expect(page.data[0].hasSessions).toBe(false)
+  })
+
+  it('filters schedules by category when requested', async () => {
+    const packages = new FakeExamPackageRepository()
+    const repo = new FakeExamScheduleRepository(packages)
+    const pkg = await approvedPackage(packages, new FakeQuestionRepository())
+    const rooms = new FakeExamRoomRepository()
+    const created = await rooms.createEvent({
+      semesterId: SEMESTER_ID,
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: START,
+      endsAt: END,
+      createdById: USER.id,
+    })
+    const event = (await rooms.updateEvent(created.id, { status: 'ACTIVE' }))!
+    const creator = new CreateExamScheduleUseCase(
+      repo,
+      packages,
+      new FakeAcademicLookup(),
+      rooms,
+    )
+    for (let i = 0; i < 3; i += 1) {
+      await creator.execute(USER, {
+        packageId: pkg.id,
+        classroomId: CLASSROOM_7A.id,
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'DAILY',
+      })
+    }
+    for (let i = 0; i < 2; i += 1) {
+      await creator.execute(
+        { ...USER, manageAll: true },
+        {
+          packageId: pkg.id,
+          classroomId: CLASSROOM_7A.id,
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'MIDTERM',
+          eventId: event.id,
+        },
+      )
+    }
+
+    const examPage = await new ListExamSchedulesUseCase(
+      repo,
+      new FakeAcademicLookup(),
+      guard,
+    ).execute({ category: 'EXAM' })
+
+    expect(examPage.total).toBe(2)
+    expect(examPage.data.every((row) => row.type === 'MIDTERM')).toBe(true)
   })
 })

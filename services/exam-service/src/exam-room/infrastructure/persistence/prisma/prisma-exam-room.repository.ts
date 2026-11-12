@@ -105,6 +105,20 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     return row ? toExamEvent(row) : null
   }
 
+  async isEventLinked(id: string): Promise<boolean> {
+    const [activity, schedule] = await Promise.all([
+      this.prisma.examActivity.findFirst({
+        where: { eventId: id },
+        select: { id: true },
+      }),
+      this.prisma.examSchedule.findFirst({
+        where: { eventId: id },
+        select: { id: true },
+      }),
+    ])
+    return activity !== null || schedule !== null
+  }
+
   async listEvents(
     query: ExamEventListQuery,
   ): Promise<PaginatedResult<ExamEvent>> {

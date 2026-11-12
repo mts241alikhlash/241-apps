@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { BackButton } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -22,13 +23,15 @@ const sessionId = computed(() => String(route.params.sessionId ?? ''))
 const scheduleId = computed(() => String(route.params.scheduleId ?? ''))
 
 const { hasPermission } = useAuthSession()
+const { sectionPrefix } = useRouteCategory()
+const gradingBaseHref = computed(() => `${sectionPrefix.value}/grading`)
 const examTitle = computed(() =>
   typeof route.query.judul === 'string' && route.query.judul !== ''
     ? route.query.judul
     : 'Daftar Siswa',
 )
 const sessionsLocation = computed(() => ({
-  path: `/exam/grading/${scheduleId.value}`,
+  path: `${gradingBaseHref.value}/${scheduleId.value}`,
   query: route.query,
 }))
 const detail = ref<GradingDetail | null>(null)
@@ -55,7 +58,7 @@ const waiting = computed(
 )
 
 useBreadcrumbs(() => [
-  { title: 'Penilaian Ujian', href: '/exam/grading' },
+  { title: 'Penilaian Ujian', href: gradingBaseHref.value },
   {
     title: examTitle.value,
     href: router.resolve(sessionsLocation.value).href,

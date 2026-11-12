@@ -14,6 +14,8 @@ Port 4100 locally; database `exam` (22 models: `ExamPackage`, `ExamPackageReview
 
 ## Rules specific to this package
 
+- `ExamType` is `DAILY | ASSIGNMENT | MIDTERM | FINAL`. `ExamCategory` (`EXAM | NON_EXAM`) is derived in `categoryOf(type)` and emitted on responses; never store `category` in the database ([ADR 0009](../../docs/adr/0009-exam-category-derives-from-type.md)).
+- `MIDTERM` and `FINAL` activities lock their policy preset to their own type, require `ROTATING` tokens, and must link to a matching `ExamEvent`. Only `exam-schedules.manage-all` may create `FINAL` activities or edit policy presets (`/exam-policy-presets`).
 - Camera proctoring snapshots are under `exam-sessions/:id/snapshots`.
 - Permissions are explicit per action (review, schedule, grade); see the seed for the codes.
 

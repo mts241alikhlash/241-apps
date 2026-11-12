@@ -104,6 +104,7 @@ export class ExamEventController {
     return ExamEventDto.fromDomain(
       await this.events.update(id, {
         name: dto.name,
+        type: dto.type,
         startsAt:
           dto.startsAt === undefined ? undefined : new Date(dto.startsAt),
         endsAt: dto.endsAt === undefined ? undefined : new Date(dto.endsAt),

@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
+import type { ExamType } from '../../../exam-schedule/domain/entities/exam-schedule.entity'
 
 export interface ExamPolicy {
   violationLimit: number
@@ -11,7 +12,7 @@ export interface ExamPolicy {
   tokenSlotSeconds: number
 }
 
-export type ExamPresetName = 'UJIAN_KETAT' | 'ULANGAN_KELAS' | 'TUGAS'
+export type ExamPresetName = ExamType
 
 const BOUNDS = {
   violationLimit: [1, 10],
@@ -26,8 +27,8 @@ const BOUNDS = {
 
 export const POLICY_KEYS = Object.keys(BOUNDS) as (keyof ExamPolicy)[]
 
-export const DEFAULT_POLICIES: Record<ExamPresetName, ExamPolicy> = {
-  UJIAN_KETAT: {
+export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
+  DAILY: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
     snapshotIntervalMs: 15_000,
@@ -37,17 +38,7 @@ export const DEFAULT_POLICIES: Record<ExamPresetName, ExamPolicy> = {
     gapViolationFrom: 2,
     tokenSlotSeconds: 600,
   },
-  ULANGAN_KELAS: {
-    violationLimit: 3,
-    focusThresholdMs: 10_000,
-    snapshotIntervalMs: 15_000,
-    heartbeatIntervalMs: 15_000,
-    gapRecordedMs: 60_000,
-    gapTokenMs: 300_000,
-    gapViolationFrom: 2,
-    tokenSlotSeconds: 600,
-  },
-  TUGAS: {
+  ASSIGNMENT: {
     violationLimit: 3,
     focusThresholdMs: 10_000,
     snapshotIntervalMs: 30_000,
@@ -55,6 +46,26 @@ export const DEFAULT_POLICIES: Record<ExamPresetName, ExamPolicy> = {
     gapRecordedMs: 300_000,
     gapTokenMs: 1_800_000,
     gapViolationFrom: 3,
+    tokenSlotSeconds: 600,
+  },
+  MIDTERM: {
+    violationLimit: 3,
+    focusThresholdMs: 10_000,
+    snapshotIntervalMs: 15_000,
+    heartbeatIntervalMs: 15_000,
+    gapRecordedMs: 60_000,
+    gapTokenMs: 300_000,
+    gapViolationFrom: 2,
+    tokenSlotSeconds: 600,
+  },
+  FINAL: {
+    violationLimit: 3,
+    focusThresholdMs: 10_000,
+    snapshotIntervalMs: 15_000,
+    heartbeatIntervalMs: 15_000,
+    gapRecordedMs: 60_000,
+    gapTokenMs: 300_000,
+    gapViolationFrom: 2,
     tokenSlotSeconds: 600,
   },
 }
@@ -81,7 +92,7 @@ function readNumber(
 
 export function parsePolicy(
   value: unknown,
-  base: ExamPolicy = DEFAULT_POLICIES.UJIAN_KETAT,
+  base: ExamPolicy = DEFAULT_POLICIES.MIDTERM,
 ): ExamPolicy {
   const source =
     value !== null && typeof value === 'object'
@@ -101,7 +112,7 @@ export function parsePolicy(
 
 export function tryParsePolicy(
   value: unknown,
-  base: ExamPolicy = DEFAULT_POLICIES.UJIAN_KETAT,
+  base: ExamPolicy = DEFAULT_POLICIES.MIDTERM,
 ): ExamPolicy | null {
   try {
     return parsePolicy(value, base)

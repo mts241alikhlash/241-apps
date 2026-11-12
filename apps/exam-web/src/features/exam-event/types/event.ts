@@ -1,14 +1,18 @@
-import type { ExamType } from '@/features/exam-schedule/types'
+import type { components } from '@mts241alikhlash/exam-api'
+import type { ExamCategory, ExamType } from '@/features/exam-shared/examType'
+
+type Schemas = components['schemas']
 
 export const EVENT_STATUSES = ['DRAFT', 'ACTIVE', 'COMPLETED'] as const
 
-export type ExamEventStatus = (typeof EVENT_STATUSES)[number]
+export type ExamEventStatus = Schemas['ExamEventDto']['status']
 
 export interface ExamEvent {
   id: string
   semesterId: string
   name: string
   type: ExamType
+  category?: ExamCategory
   startsAt: string
   endsAt: string
   lateToleranceMinutes: number
@@ -17,26 +21,9 @@ export interface ExamEvent {
   status: ExamEventStatus
 }
 
-export interface EventCreatePayload {
-  semesterId: string
-  name: string
-  type: ExamType
-  startsAt: string
-  endsAt: string
-  lateToleranceMinutes: number
-  minSubmitMinutes: number
-  requireAndroidApp: boolean
-}
+export type EventCreatePayload = Schemas['CreateExamEventDto']
 
-export interface EventUpdatePayload {
-  name?: string
-  startsAt?: string
-  endsAt?: string
-  lateToleranceMinutes?: number
-  minSubmitMinutes?: number
-  requireAndroidApp?: boolean
-  status?: ExamEventStatus
-}
+export type EventUpdatePayload = Schemas['UpdateExamEventDto']
 
 export interface EventQueryParams {
   page?: number

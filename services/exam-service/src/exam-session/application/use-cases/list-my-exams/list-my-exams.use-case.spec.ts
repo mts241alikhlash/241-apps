@@ -95,11 +95,11 @@ describe('ListMyExamsUseCase', () => {
   })
 
   it('carries the exam type and the subject name', async () => {
-    await scheduleExam(fixtures(), { type: 'UTS' })
+    await scheduleExam(fixtures(), { type: 'MIDTERM' })
 
     const [exam] = await build().execute(STUDENT_USER, NOW)
 
-    expect(exam).toMatchObject({ type: 'UTS', subjectName: 'Matematika' })
+    expect(exam).toMatchObject({ type: 'MIDTERM', subjectName: 'Matematika' })
   })
 
   it('still lists the exams when the subject names cannot be fetched', async () => {
@@ -112,7 +112,7 @@ describe('ListMyExamsUseCase', () => {
     ).execute(STUDENT_USER, NOW)
 
     expect(exam.subjectName).toBeNull()
-    expect(exam.type).toBe('UH')
+    expect(exam.type).toBe('DAILY')
   })
 
   it('leaves out the exams of another classroom and cancelled exams', async () => {
@@ -361,10 +361,10 @@ describe('ListMyExamsUseCase', () => {
           gradeId: CLASSROOM_7A.gradeId,
           subjectId: SUBJECT_ID,
           packageId: 'pkg-1',
-          type: 'UH',
+          type: 'DAILY',
           tokenMode: 'STATIC',
           presetId: null,
-          policy: DEFAULT_POLICIES.ULANGAN_KELAS,
+          policy: DEFAULT_POLICIES.DAILY,
           startsAt: STARTS,
           endsAt: ENDS,
           durationMinutes: 90,
@@ -382,7 +382,7 @@ describe('ListMyExamsUseCase', () => {
       rooms.createEvent({
         semesterId: SEMESTER_ID,
         name,
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: STARTS,
         endsAt: ENDS,
         createdById: USER.id,

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   Card,
   CardContent,
@@ -12,25 +14,31 @@ import {
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
 import { examPackageApi } from '@/features/exam-package/api/examPackageApi'
+import { messageOf } from '@/features/exam-package/utils/messageOf'
+import { examEventService } from '@/features/exam-event/services/examEventService'
 import ActivityForm from '../components/ActivityForm.vue'
 import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
   ClassroomOption,
+  EventOption,
   ExamActivityRecord,
   GradeOption,
   PackageOption,
 } from '../types'
 
 const route = useRoute()
+const { hasPermission } = useAuthSession()
 const editingId = computed(() =>
   typeof route.query.id === 'string' ? route.query.id : '',
 )
+const { category } = useRouteCategory()
 const semesterId = ref('')
 const grades = ref<GradeOption[]>([])
 const classrooms = ref<ClassroomOption[]>([])
 const packages = ref<PackageOption[]>([])
-const isAdmin = ref(false)
+const events = ref<EventOption[]>([])
+const isAdmin = computed(() => hasPermission('exam-schedules.manage-all'))
 const submitting = ref(false)
 const error = ref<string | null>(null)
 const activity = ref<ExamActivityRecord | null>(null)
@@ -46,6 +54,16 @@ async function load(): Promise<void> {
   const activeSemester =
     semesters.data.data.find((item) => item.isActive) ?? semesters.data.data[0]
   semesterId.value = activeSemester?.id ?? ''
+  if (semesterId.value !== '') {
+    const activeEvents = await examEventService.loadEventOptions(
+      semesterId.value,
+    )
+    events.value = activeEvents.map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+    }))
+  }
 
   classrooms.value = rooms.data.data.map((room) => ({
     id: room.id,
@@ -79,8 +97,8 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
   try {
     await examActivityApi.create(payload)
     toast.success('Kegiatan disimpan dan jadwal kelas dibuat')
-  } catch {
-    error.value = 'Kegiatan gagal disimpan.'
+  } catch (err: unknown) {
+    error.value = messageOf(err, 'Kegiatan gagal disimpan.')
     toast.error(error.value)
   } finally {
     submitting.value = false
@@ -90,10 +108,8 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
 async function loadActivity(): Promise<void> {
   loadingActivity.value = true
   try {
-    const response = await examActivityApi.list()
-    activity.value =
-      response.data.data.find((item) => item.id === editingId.value) ?? null
-    if (activity.value === null) error.value = 'Kegiatan tidak ditemukan.'
+    const response = await examActivityApi.get(editingId.value)
+    activity.value = response.data.data
   } catch {
     error.value = 'Kegiatan gagal dimuat.'
   } finally {
@@ -147,7 +163,7 @@ onMounted(() => {
           :grades="[]"
           :classrooms="[]"
           :packages="[]"
-          :is-admin="true"
+          :is-admin="isAdmin"
           :activity="activity"
           @status-saved="statusSaved"
           @numbers-issued="numbersIssued"
@@ -158,6 +174,8 @@ onMounted(() => {
           :grades="grades"
           :classrooms="classrooms"
           :packages="packages"
+          :events="events"
+          :category="category"
           :is-admin="isAdmin"
           :submitting="submitting"
           @submit="submit"

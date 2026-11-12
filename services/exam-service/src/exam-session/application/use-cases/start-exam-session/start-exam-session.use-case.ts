@@ -304,7 +304,7 @@ export class StartExamSessionUseCase {
       sessionId: session.id,
       deadline: session.deadline,
       serverTime: now,
-      policy: session.policy ?? DEFAULT_POLICIES.UJIAN_KETAT,
+      policy: session.policy ?? DEFAULT_POLICIES.MIDTERM,
     }
   }
 }

@@ -1,12 +1,45 @@
 import { describe, expect, it } from 'vitest'
 import { messageOf } from './messageOf'
 
-const failure = (status: number, message: unknown) => ({
+const failure = (status: number, message: unknown, code?: string) => ({
   isAxiosError: true,
-  response: { status, data: { statusCode: status, message, data: null } },
+  response: {
+    status,
+    data: { statusCode: status, message, code, data: null },
+  },
 })
 
 describe('messageOf', () => {
+  it('maps exam activity and event error codes to Indonesian messages', () => {
+    expect(
+      messageOf(failure(422, 'Preset locked', 'PRESET_LOCKED'), 'Gagal'),
+    ).toBe('Preset kebijakan untuk ujian ini dikunci oleh jenisnya.')
+    expect(
+      messageOf(
+        failure(422, 'Token mode locked', 'TOKEN_MODE_LOCKED'),
+        'Gagal',
+      ),
+    ).toBe('Ujian resmi wajib memakai token berputar.')
+    expect(
+      messageOf(failure(403, 'Final admin only', 'FINAL_ADMIN_ONLY'), 'Gagal'),
+    ).toBe('Kegiatan UAS hanya dapat dibuat oleh admin ujian.')
+    expect(
+      messageOf(
+        failure(422, 'Midterm outside event', 'MIDTERM_OUTSIDE_EVENT'),
+        'Gagal',
+      ),
+    ).toBe('Kegiatan UTS harus berada di dalam periode UTS yang sedang aktif.')
+    expect(
+      messageOf(failure(422, 'Event required', 'EVENT_REQUIRED'), 'Gagal'),
+    ).toBe('Kegiatan ujian wajib ditautkan ke periode ujian yang sesuai.')
+    expect(
+      messageOf(
+        failure(422, 'Event type not exam', 'EVENT_TYPE_NOT_EXAM'),
+        'Gagal',
+      ),
+    ).toBe('Periode ujian hanya dapat dibuat untuk UTS atau UAS.')
+  })
+
   it('shows the message the server wrote for a refused request', () => {
     expect(
       messageOf(

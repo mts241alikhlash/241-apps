@@ -13,7 +13,7 @@ const exam = (overrides: Partial<MyExam> = {}): MyExam => ({
   title: 'Latihan',
   subjectId: 's1',
   subjectName: null,
-  type: 'QUIZ',
+  type: 'DAILY',
   startsAt: '2026-10-30T14:00:00.000Z',
   endsAt: '2026-10-31T03:00:00.000Z',
   durationMinutes: 60,
@@ -67,7 +67,7 @@ describe('groupExams', () => {
 describe('displayTitle', () => {
   it('prefixes the exam type when the subject is known', () => {
     expect(displayTitle(exam({ subjectName: 'Matematika' }))).toBe(
-      'QUIZ - Matematika',
+      'DAILY - Matematika',
     )
   })
 

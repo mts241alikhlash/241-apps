@@ -7,16 +7,16 @@ import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
 import { CARDS, cardRows, rowActionProps } from '@/test/dataTableCards'
 
-const { filters, refresh, permissions, cancelSchedule, push } = vi.hoisted(
-  () => ({
-    filters: {} as Record<'classroomId' | 'status', Ref<string>> &
+const { filters, refresh, permissions, cancelSchedule, push, routeMeta } =
+  vi.hoisted(() => ({
+    filters: {} as Record<'classroomId' | 'status' | 'category', Ref<string>> &
       Record<'page' | 'pageSize', Ref<number>>,
     refresh: vi.fn(),
     permissions: new Set<string>(),
     cancelSchedule: vi.fn(),
     push: vi.fn(),
-  }),
-)
+    routeMeta: { category: 'EXAM' },
+  }))
 const listState = {
   schedules: ref<ExamSchedule[]>([]),
   totalItems: ref(0),
@@ -27,6 +27,7 @@ const listState = {
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
+  useRoute: () => ({ meta: routeMeta, path: '/exam/schedules' }),
 }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
@@ -139,7 +140,7 @@ const schedule = (overrides: Partial<ExamSchedule> = {}): ExamSchedule => ({
   semesterId: 'sem',
   eventId: null,
   activityId: null,
-  type: 'UTS',
+  type: 'MIDTERM',
   startsAt: toInstant('2030-11-02', '08:00'),
   endsAt: toInstant('2030-11-02', '11:00'),
   durationMinutes: 90,
@@ -166,7 +167,16 @@ describe('ScheduleListView', () => {
     listState.loading.value = false
     listState.listError.value = null
     listState.filtersPending.value = false
+    routeMeta.category = 'EXAM'
     vi.clearAllMocks()
+  })
+
+  it('passes route.meta.category to useScheduleList when opened under /classwork/schedules', async () => {
+    routeMeta.category = 'NON_EXAM'
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(filters.category?.value).toBe('NON_EXAM')
+    wrapper.unmount()
   })
 
   it('lists schedules with package, classroom, window, duration and phase', async () => {
@@ -311,7 +321,7 @@ describe('ScheduleListView', () => {
     wrapper.unmount()
   })
 
-  it('opens the activity status screen from the schedule row', async () => {
+  it('opens the activity status screen from the schedule row following the active section', async () => {
     listState.schedules.value = [schedule({ activityId: 'activity-1' })]
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
@@ -331,6 +341,25 @@ describe('ScheduleListView', () => {
       query: { id: 'activity-1' },
     })
     wrapper.unmount()
+
+    routeMeta.category = 'NON_EXAM'
+    const classwork = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    const classworkItems = rowActionProps(
+      classwork,
+      schedule({ activityId: 'activity-1' }),
+    ).items as unknown as {
+      label: string
+      onClick: () => void
+    }[]
+    classworkItems.find((entry) => entry.label === 'Ubah status')!.onClick()
+    await flushPromises()
+
+    expect(push).toHaveBeenCalledWith({
+      path: '/classwork/activities/new',
+      query: { id: 'activity-1' },
+    })
+    classwork.unmount()
   })
 
   it('offers no status action without exam-schedules.manage', async () => {

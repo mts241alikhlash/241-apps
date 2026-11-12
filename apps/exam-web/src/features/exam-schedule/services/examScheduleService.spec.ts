@@ -65,7 +65,7 @@ describe('examScheduleService', () => {
         data: {
           data:
             status === 'APPROVED'
-              ? [{ id: 'a', title: 'UH Bab 2' }]
+              ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
               : status === 'LOCKED'
                 ? [{ id: 'l', title: 'UAS Ganjil' }]
                 : [{ id: 'd', title: 'Draf' }],
@@ -101,7 +101,7 @@ describe('examScheduleService', () => {
       {
         packageId: 'p1',
         classroomId: 'c1',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: '2030-11-02T01:00:00.000Z',
         endsAt: '2030-11-02T04:00:00.000Z',
         durationMinutes: 90,

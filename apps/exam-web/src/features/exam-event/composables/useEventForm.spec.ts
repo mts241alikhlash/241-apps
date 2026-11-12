@@ -17,7 +17,7 @@ const existing: ExamEvent = {
   id: 'e1',
   semesterId: 'sem-1',
   name: 'UTS Ganjil',
-  type: 'UTS',
+  type: 'MIDTERM',
   startsAt: toInstant('2026-11-02', '08:00'),
   endsAt: toInstant('2026-11-06', '12:00'),
   lateToleranceMinutes: 30,
@@ -29,7 +29,7 @@ const existing: ExamEvent = {
 function filled() {
   const form = useEventForm({ mode: 'create', semesterId: 'sem-1' })
   form.name.value = 'UAS Ganjil'
-  form.type.value = 'UAS'
+  form.type.value = 'FINAL'
   form.startDate.value = '2026-12-01'
   form.startTime.value = '08:00'
   form.endDate.value = '2026-12-05'
@@ -81,7 +81,7 @@ describe('useEventForm', () => {
       {
         semesterId: 'sem-1',
         name: 'UAS Ganjil',
-        type: 'UAS',
+        type: 'FINAL',
         startsAt: toInstant('2026-12-01', '08:00'),
         endsAt: toInstant('2026-12-05', '12:00'),
         lateToleranceMinutes: 30,

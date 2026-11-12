@@ -13,7 +13,7 @@ const row = (seatNumber: number) => ({
   nis: String(seatNumber),
   classroomName: 'VII A',
   subjectName: 'Matematika',
-  packageTitle: 'PAS Ganjil',
+  packageTitle: 'UAS Ganjil',
   scheduleId: 's1',
   totalQuestions: 40,
   session: null,

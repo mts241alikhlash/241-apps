@@ -1,15 +1,23 @@
 export default {
   menu: {
     section: {
+      bank: 'Bank Soal',
       exam: 'Ujian',
-      mine: 'Milik Saya',
+      classwork: 'Non-ujian',
+      mine: 'Saya',
+      settings: 'Pengaturan',
     },
     examPackages: 'Paket Soal',
     examPackageReview: 'Persetujuan Paket',
-    examEvents: 'Kegiatan Ujian',
-    examRooms: 'Ruang Ujian',
-    examSchedules: 'Jadwal Ujian',
-    examGrading: 'Penilaian Ujian',
+    examEvents: 'Periode Ujian',
+    examActivities: 'Kegiatan',
+    examRooms: 'Ruang',
+    examSchedules: 'Jadwal',
+    examGrading: 'Penilaian',
+    classworkActivities: 'Kegiatan',
+    classworkSchedules: 'Jadwal',
+    classworkGrading: 'Penilaian',
     myExams: 'Ujian Saya',
+    examPresets: 'Preset',
   },
 }

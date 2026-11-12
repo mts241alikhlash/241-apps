@@ -88,20 +88,26 @@ export class ExamScheduleController {
   })
   @ApiResponse({ status: 201, type: ExamScheduleDto })
   async create(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: { id: string; permissions: string[] },
     @Body() dto: CreateExamScheduleDto,
   ): Promise<ExamScheduleDto> {
     return ExamScheduleDto.fromDomain(
-      await this.createSchedule.execute(user, {
-        packageId: dto.packageId,
-        classroomId: dto.classroomId,
-        startsAt: new Date(dto.startsAt),
-        endsAt: new Date(dto.endsAt),
-        durationMinutes: dto.durationMinutes,
-        minSubmitMinutes: dto.minSubmitMinutes,
-        type: dto.type,
-        eventId: dto.eventId,
-      }),
+      await this.createSchedule.execute(
+        {
+          id: user.id,
+          manageAll: user.permissions.includes('exam-schedules.manage-all'),
+        },
+        {
+          packageId: dto.packageId,
+          classroomId: dto.classroomId,
+          startsAt: new Date(dto.startsAt),
+          endsAt: new Date(dto.endsAt),
+          durationMinutes: dto.durationMinutes,
+          minSubmitMinutes: dto.minSubmitMinutes,
+          type: dto.type,
+          eventId: dto.eventId,
+        },
+      ),
     )
   }
 
@@ -112,17 +118,22 @@ export class ExamScheduleController {
   @ApiParam({ name: 'id', format: 'uuid' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: { permissions: string[] },
     @Body() dto: UpdateExamScheduleDto,
   ): Promise<ExamScheduleDto> {
     return ExamScheduleDto.fromDomain(
-      await this.updateSchedule.execute(id, {
-        startsAt: new Date(dto.startsAt),
-        endsAt: new Date(dto.endsAt),
-        durationMinutes: dto.durationMinutes,
-        minSubmitMinutes: dto.minSubmitMinutes,
-        type: dto.type,
-        eventId: dto.eventId,
-      }),
+      await this.updateSchedule.execute(
+        id,
+        {
+          startsAt: new Date(dto.startsAt),
+          endsAt: new Date(dto.endsAt),
+          durationMinutes: dto.durationMinutes,
+          minSubmitMinutes: dto.minSubmitMinutes,
+          type: dto.type,
+          eventId: dto.eventId,
+        },
+        user.permissions.includes('exam-schedules.manage-all'),
+      ),
     )
   }
 

@@ -1,14 +1,23 @@
-export const EXAM_TYPES = ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS'] as const
+import type { components } from '@mts241alikhlash/exam-api'
+import {
+  EXAM_CATEGORIES,
+  EXAM_TYPES,
+  type ExamCategory,
+  type ExamType,
+} from '@/features/exam-shared/examType'
 
-export type ExamType = (typeof EXAM_TYPES)[number]
+type Schemas = components['schemas']
+
+export { EXAM_CATEGORIES, EXAM_TYPES }
+export type { ExamCategory, ExamType }
 
 export const SCHEDULE_STATUSES = ['SCHEDULED', 'CANCELLED'] as const
 
-export type ExamScheduleStatus = (typeof SCHEDULE_STATUSES)[number]
+export type ExamScheduleStatus = Schemas['ExamScheduleDto']['status']
 
 export const SCHEDULE_KINDS = ['REGULAR', 'MAKEUP'] as const
 
-export type ExamScheduleKind = (typeof SCHEDULE_KINDS)[number]
+export type ExamScheduleKind = Schemas['ExamScheduleDto']['kind']
 
 export type SchedulePhase = 'CANCELLED' | 'UPCOMING' | 'RUNNING' | 'ENDED'
 
@@ -22,6 +31,7 @@ export interface ExamSchedule {
   eventId: string | null
   activityId: string | null
   type: ExamType
+  category?: ExamCategory
   kind: ExamScheduleKind
   makeupOfId: string | null
   startsAt: string
@@ -53,6 +63,7 @@ export interface ScheduleQueryParams {
   classroomId?: string
   packageId?: string
   status?: ExamScheduleStatus
+  category?: ExamCategory
   from?: string
   to?: string
 }

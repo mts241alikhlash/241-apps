@@ -13,13 +13,48 @@ describe('exam route tree', () => {
     '/exam/events/e1',
     '/exam/packages',
     '/exam/package-approvals',
+    '/exam/activities',
+    '/exam/activities/new',
+    '/exam/activities/a1',
     '/exam/schedules',
     '/exam/grading',
+    '/classwork/activities',
+    '/classwork/activities/new',
+    '/classwork/activities/a1',
+    '/classwork/schedules',
+    '/classwork/grading',
+    '/settings/presets',
     '/my-exams',
     '/my-exams/sessions/s1',
     '/profile',
   ])('resolves %s', (path) => {
     expect(router().resolve(path).name).not.toBe('not-found')
+  })
+
+  it('sets category meta on exam and classwork routes and keeps route names unique', () => {
+    const instance = router()
+    expect(instance.resolve('/exam/activities').meta.category).toBe('EXAM')
+    expect(instance.resolve('/exam/activities/a1').meta.category).toBe('EXAM')
+    expect(instance.resolve('/exam/schedules').meta.category).toBe('EXAM')
+    expect(instance.resolve('/exam/grading').meta.category).toBe('EXAM')
+    expect(instance.resolve('/classwork/activities').meta.category).toBe(
+      'NON_EXAM',
+    )
+    expect(instance.resolve('/classwork/activities/a1').meta.category).toBe(
+      'NON_EXAM',
+    )
+    expect(instance.resolve('/classwork/schedules').meta.category).toBe(
+      'NON_EXAM',
+    )
+    expect(instance.resolve('/classwork/grading').meta.category).toBe(
+      'NON_EXAM',
+    )
+
+    const names = instance
+      .getRoutes()
+      .map((r) => r.name)
+      .filter((name): name is string | symbol => Boolean(name))
+    expect(new Set(names).size).toBe(names.length)
   })
 
   it.each([
@@ -90,7 +125,7 @@ describe('menu', () => {
     }
   })
 
-  it('keeps the exam and mine sections in order', () => {
+  it('keeps the bank, exam, classwork, mine and settings sections in order', () => {
     expect(
       menuSections.map((section) => [
         section.key,
@@ -102,11 +137,17 @@ describe('menu', () => {
       ]),
     ).toEqual([
       [
-        'exam',
+        'bank',
         [
           ['/exam/packages', 'exam-packages.read', undefined],
           ['/exam/package-approvals', 'exam-questions.approve', undefined],
+        ],
+      ],
+      [
+        'exam',
+        [
           ['/exam/events', 'exam-events.read', undefined],
+          ['/exam/activities', 'exam-schedules.manage', undefined],
           ['/exam/schedules', 'exam-schedules.read', undefined],
           [
             '/exam/rooms',
@@ -120,7 +161,19 @@ describe('menu', () => {
           ['/exam/grading', 'exam-grading.read', undefined],
         ],
       ],
+      [
+        'classwork',
+        [
+          ['/classwork/activities', 'exam-schedules.manage', undefined],
+          ['/classwork/schedules', 'exam-schedules.read', undefined],
+          ['/classwork/grading', 'exam-grading.read', undefined],
+        ],
+      ],
       ['mine', [['/my-exams', 'exam-sessions.take', undefined]]],
+      [
+        'settings',
+        [['/settings/presets', 'exam-schedules.manage-all', undefined]],
+      ],
     ])
   })
 

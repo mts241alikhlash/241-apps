@@ -1,9 +1,11 @@
 import {
   CalendarClock,
   ClipboardPen,
+  Layers,
   ListChecks,
   Package,
   Radar,
+  SlidersHorizontal,
   SquareCheckBig,
   Users,
 } from '@lucide/vue'
@@ -17,8 +19,8 @@ import type { MenuSection } from '@mts241alikhlash/web-shared/types/menu.types'
 
 export const menuSections: MenuSection[] = [
   {
-    key: 'exam',
-    label: 'menu.section.exam',
+    key: 'bank',
+    label: 'menu.section.bank',
     items: [
       {
         key: 'exam-packages',
@@ -34,12 +36,25 @@ export const menuSections: MenuSection[] = [
         icon: SquareCheckBig,
         requiredPermission: 'exam-questions.approve',
       },
+    ],
+  },
+  {
+    key: 'exam',
+    label: 'menu.section.exam',
+    items: [
       {
         key: 'exam-events',
         title: 'menu.examEvents',
         url: '/exam/events',
         icon: Users,
         requiredPermission: 'exam-events.read',
+      },
+      {
+        key: 'exam-activities',
+        title: 'menu.examActivities',
+        url: '/exam/activities',
+        icon: Layers,
+        requiredPermission: 'exam-schedules.manage',
       },
       {
         key: 'exam-schedules',
@@ -69,6 +84,33 @@ export const menuSections: MenuSection[] = [
     ],
   },
   {
+    key: 'classwork',
+    label: 'menu.section.classwork',
+    items: [
+      {
+        key: 'classwork-activities',
+        title: 'menu.classworkActivities',
+        url: '/classwork/activities',
+        icon: Layers,
+        requiredPermission: 'exam-schedules.manage',
+      },
+      {
+        key: 'classwork-schedules',
+        title: 'menu.classworkSchedules',
+        url: '/classwork/schedules',
+        icon: CalendarClock,
+        requiredPermission: 'exam-schedules.read',
+      },
+      {
+        key: 'classwork-grading',
+        title: 'menu.classworkGrading',
+        url: '/classwork/grading',
+        icon: ClipboardPen,
+        requiredPermission: 'exam-grading.read',
+      },
+    ],
+  },
+  {
     key: 'mine',
     label: 'menu.section.mine',
     items: [
@@ -78,6 +120,19 @@ export const menuSections: MenuSection[] = [
         url: '/my-exams',
         icon: ListChecks,
         requiredPermission: 'exam-sessions.take',
+      },
+    ],
+  },
+  {
+    key: 'settings',
+    label: 'menu.section.settings',
+    items: [
+      {
+        key: 'exam-presets',
+        title: 'menu.examPresets',
+        url: '/settings/presets',
+        icon: SlidersHorizontal,
+        requiredPermission: 'exam-schedules.manage-all',
       },
     ],
   },

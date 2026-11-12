@@ -386,6 +386,25 @@ describe('PackageDetailView', () => {
     wrapper.unmount()
   })
 
+  it.each([
+    ['MIDTERM', '/exam/schedules'],
+    ['DAILY', '/classwork/schedules'],
+  ])(
+    'goes to the schedule list of the saved %s schedule',
+    async (type, path) => {
+      loadPackage.mockResolvedValue(view({ status: 'APPROVED' }))
+      const wrapper = await mountView()
+      await buttonByText(wrapper, 'Jadwalkan')!.trigger('click')
+
+      wrapper
+        .getComponent({ name: 'ScheduleFormDialogStub' })
+        .vm.$emit('saved', type)
+
+      expect(push).toHaveBeenCalledWith(path)
+      wrapper.unmount()
+    },
+  )
+
   it('copies the package and goes to the copy', async () => {
     loadPackage.mockResolvedValue(view({ status: 'LOCKED' }))
     copyPackage.mockResolvedValue({ id: 'p2' })

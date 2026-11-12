@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common'
 import { assertCanSchedule } from '../../../../exam-package/domain/policies/package-lifecycle.policy.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
-import type { ExamSchedule } from '../../../domain/entities/exam-schedule.entity.js'
+import type {
+  ExamSchedule,
+  ExamType,
+} from '../../../domain/entities/exam-schedule.entity.js'
 import type { NewParticipant } from '../../../domain/entities/schedule-participant.entity.js'
 import {
   assertWindowNotPast,
@@ -19,6 +22,7 @@ import { MakeupParticipantsService } from '../../makeup-participants.service.js'
 
 export interface CreateMakeupInput {
   packageId?: string
+  type?: ExamType
   startsAt: Date
   endsAt: Date
   durationMinutes: number

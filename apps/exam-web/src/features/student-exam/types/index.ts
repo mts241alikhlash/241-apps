@@ -1,5 +1,12 @@
-export const EXAM_TYPES = ['UH', 'QUIZ', 'ASSIGNMENT', 'UTS', 'UAS'] as const
-export type ExamType = (typeof EXAM_TYPES)[number]
+import {
+  EXAM_CATEGORIES,
+  EXAM_TYPES,
+  type ExamCategory,
+  type ExamType,
+} from '@/features/exam-shared/examType'
+
+export { EXAM_CATEGORIES, EXAM_TYPES }
+export type { ExamCategory, ExamType }
 
 export const QUESTION_TYPES = [
   'MULTIPLE_CHOICE',
@@ -18,6 +25,7 @@ export interface MyExam {
   subjectId: string
   subjectName: string | null
   type: ExamType
+  category?: ExamCategory
   startsAt: string
   endsAt: string
   durationMinutes: number

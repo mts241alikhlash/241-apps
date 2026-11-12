@@ -60,6 +60,7 @@ export abstract class IExamRoomRepository {
     edit: ExamEventEdit,
   ): Promise<ExamEvent | null>
   abstract findEventById(id: string): Promise<ExamEvent | null>
+  abstract isEventLinked(id: string): Promise<boolean>
   abstract listEvents(
     query: ExamEventListQuery,
   ): Promise<PaginatedResult<ExamEvent>>

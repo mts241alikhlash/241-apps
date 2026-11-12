@@ -87,7 +87,7 @@ const events = [
     id: 'e1',
     semesterId: 'sem',
     name: 'UTS Ganjil',
-    type: 'UTS',
+    type: 'MIDTERM',
     startsAt: toInstant('2030-11-01', '08:00'),
     endsAt: toInstant('2030-11-06', '12:00'),
     lateToleranceMinutes: 30,
@@ -124,7 +124,7 @@ const existing: ExamSchedule = {
   semesterId: 'sem',
   eventId: null,
   activityId: null,
-  type: 'UTS',
+  type: 'MIDTERM',
   startsAt: toInstant('2030-11-02', '08:00'),
   endsAt: toInstant('2030-11-02', '11:00'),
   durationMinutes: 90,
@@ -217,23 +217,23 @@ describe('ScheduleFormDialog', () => {
     wrapper.unmount()
   })
 
-  it('offers the five exam types and sends the chosen one', async () => {
+  it('offers the four exam types and sends the chosen one', async () => {
     saveSchedule.mockResolvedValue({ success: true, data: existing })
     const wrapper = open({ schedule: existing })
     await flushPromises()
 
     expect(wrapper.text()).toContain('Jenis ujian')
-    for (const label of ['Ulangan Harian', 'Quiz', 'Tugas', 'UTS', 'UAS']) {
+    for (const label of ['Ulangan Harian', 'Tugas', 'UTS', 'UAS']) {
       expect(wrapper.text()).toContain(label)
     }
 
-    await choose(wrapper, 1, 'UAS')
+    await choose(wrapper, 1, 'FINAL')
     await buttonByText(wrapper, 'Simpan')!.trigger('click')
     await flushPromises()
 
     expect(saveSchedule).toHaveBeenCalledWith(
       { mode: 'edit', id: 's1' },
-      expect.objectContaining({ type: 'UAS' }),
+      expect.objectContaining({ type: 'FINAL' }),
     )
     wrapper.unmount()
   })
@@ -262,7 +262,7 @@ describe('ScheduleFormDialog', () => {
       { mode: 'edit', id: 's1' },
       expect.objectContaining({ durationMinutes: 90 }),
     )
-    expect(wrapper.emitted('saved')).toHaveLength(1)
+    expect(wrapper.emitted('saved')).toEqual([['MIDTERM']])
     expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
     wrapper.unmount()
   })
@@ -343,5 +343,13 @@ describe('ScheduleFormDialog', () => {
       buttonByText(wrapper, 'Simpan')!.attributes('disabled'),
     ).toBeDefined()
     wrapper.unmount()
+  })
+
+  it('names the no-event options with the glossary terms', () => {
+    const html = open().html()
+
+    expect(html).toContain('Ulangan Harian')
+    expect(html).not.toMatch(/\bUH\b/)
+    expect(html.toLowerCase()).not.toContain('kuis')
   })
 })

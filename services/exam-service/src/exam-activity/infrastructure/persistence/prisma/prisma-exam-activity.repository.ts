@@ -1,13 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
-import type { Prisma } from '../../../../generated/prisma/client.js'
+import { Prisma } from '../../../../generated/prisma/client.js'
+import {
+  EXAM_TYPES,
+  type ExamCategory,
+  type ExamType,
+} from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { typesInCategory } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type {
   ActivityStatus,
   ActivityTokenMode,
   ExamActivity,
 } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
-import { parsePolicy } from '../../../domain/policies/exam-policy.policy.js'
+import {
+  DEFAULT_POLICIES,
+  parsePolicy,
+} from '../../../domain/policies/exam-policy.policy.js'
 
 interface ActivityRow {
   id: string
@@ -57,6 +66,61 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     return this.prisma.examPolicyPreset.findUnique({
       where: { name },
       select: { id: true, policy: true },
+    })
+  }
+
+  async listPresets() {
+    const rows = await this.prisma.examPolicyPreset.findMany({
+      where: { name: { in: [...EXAM_TYPES] } },
+    })
+    const byName = new Map(rows.map((row) => [row.name as ExamType, row]))
+    return EXAM_TYPES.flatMap((type) => {
+      const row = byName.get(type)
+      if (!row) return []
+      return [
+        {
+          id: row.id,
+          type,
+          policy: parsePolicy(row.policy, DEFAULT_POLICIES[type]),
+          updatedAt: row.updatedAt,
+        },
+      ]
+    })
+  }
+
+  async updatePreset(type: ExamType, policy: ExamActivity['policy']) {
+    try {
+      const updated = await this.prisma.examPolicyPreset.update({
+        where: { name: type },
+        data: { policy: policy as unknown as Prisma.InputJsonValue },
+      })
+      return {
+        id: updated.id,
+        type,
+        policy: parsePolicy(updated.policy, DEFAULT_POLICIES[type]),
+        updatedAt: updated.updatedAt,
+      }
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        return null
+      }
+      throw error
+    }
+  }
+
+  async findEventRef(eventId: string) {
+    return this.prisma.examEvent.findUnique({
+      where: { id: eventId },
+      select: {
+        semesterId: true,
+        type: true,
+        status: true,
+        startsAt: true,
+        endsAt: true,
+      },
     })
   }
 
@@ -160,13 +224,17 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   async listSchedules(activityId: string) {
     return this.prisma.examSchedule.findMany({
       where: { activityId },
-      select: { id: true, classroomId: true },
+      select: { id: true, classroomId: true, startsAt: true, endsAt: true },
+      orderBy: { startsAt: 'asc' },
     })
   }
 
-  async listBySemester(semesterId: string) {
+  async listBySemester(semesterId: string, category?: ExamCategory) {
     const rows = await this.prisma.examActivity.findMany({
-      where: { semesterId },
+      where: {
+        semesterId,
+        ...(category ? { type: { in: typesInCategory(category) } } : {}),
+      },
       orderBy: { startsAt: 'asc' },
     })
     return rows.map(toEntity)

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { DataTable } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -22,6 +23,7 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 const makeupTarget = ref<MakeupOrigin | null>(null)
 const participantsTarget = ref<GradingSchedule | null>(null)
+const { category, sectionPrefix } = useRouteCategory()
 
 function originOf(schedule: GradingSchedule): MakeupOrigin {
   return {
@@ -37,7 +39,7 @@ const page = ref(1)
 const pageSize = ref(10)
 
 const { schedules, totalItems, loading, listError, refresh } =
-  useGradingSchedules(page, pageSize)
+  useGradingSchedules(page, pageSize, category)
 
 const columns = computed(() =>
   buildGradingScheduleColumns({
@@ -51,7 +53,7 @@ const columns = computed(() =>
     },
     onOpen: (schedule) =>
       void router.push({
-        path: `/exam/grading/${schedule.id}`,
+        path: `${sectionPrefix.value}/grading/${schedule.id}`,
         query: { judul: schedule.title },
       }),
   }),

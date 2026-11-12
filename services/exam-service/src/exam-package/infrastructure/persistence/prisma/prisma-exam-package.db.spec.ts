@@ -273,7 +273,7 @@ suite('Prisma exam packages against a real database', () => {
       startsAt: new Date('2030-11-02T01:00:00.000Z'),
       endsAt: new Date('2030-11-02T04:00:00.000Z'),
       durationMinutes: 90,
-      type: 'UH' as const,
+      type: 'DAILY' as const,
       createdById: userId,
     }
 

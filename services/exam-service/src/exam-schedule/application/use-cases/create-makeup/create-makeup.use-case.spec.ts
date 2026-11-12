@@ -106,6 +106,30 @@ describe('CreateMakeupUseCase', () => {
     expect(await schedules.listParticipants(makeup.id)).toHaveLength(2)
   })
 
+  it('inherits MIDTERM type from the original schedule even if input requests DAILY', async () => {
+    const { schedule, schedules, useCase } = await setup()
+    const midtermOriginal = await schedules.updateWindow(schedule.id, {
+      startsAt: schedule.startsAt,
+      endsAt: schedule.endsAt,
+      durationMinutes: schedule.durationMinutes,
+      type: 'MIDTERM',
+    })
+    expect(midtermOriginal?.type).toBe('MIDTERM')
+
+    const makeup = await useCase.execute(
+      STAFF_USER,
+      schedule.id,
+      {
+        ...WINDOW,
+        type: 'DAILY',
+        participants: people(ids.ani),
+      },
+      NOW,
+    )
+
+    expect(makeup.type).toBe('MIDTERM')
+  })
+
   it('refuses a missing, makeup or cancelled original', async () => {
     const { schedule, schedules, useCase } = await setup()
     const input = { ...WINDOW, participants: people(ids.ani) }

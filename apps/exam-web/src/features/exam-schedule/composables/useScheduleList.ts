@@ -1,10 +1,12 @@
 import { computed, type Ref } from 'vue'
 import { usePagedList } from '@/features/exam-bank/composables/usePagedList'
+import type { ExamCategory } from '@/features/exam-shared/examType'
 import { examScheduleApi } from '../api/examScheduleApi'
 import type { ExamScheduleStatus } from '../types'
 
 export interface ScheduleFilters {
   status: Ref<string>
+  category?: Ref<ExamCategory | undefined>
 }
 
 const unless = (value: string) => (value === 'ALL' ? undefined : value)
@@ -18,7 +20,7 @@ export function useScheduleList(
     page,
     pageSize,
     scope: ['exam-schedule', 'schedules'],
-    filters: { status: filters.status },
+    filters: { status: filters.status, category: filters.category },
     fetchPage: async (current, limit) =>
       (
         await examScheduleApi.getSchedules({
@@ -26,6 +28,7 @@ export function useScheduleList(
           limit,
           status: unless(filters.status.value) as
             ExamScheduleStatus | undefined,
+          category: filters.category?.value,
         })
       ).data,
     errorMessage: 'Gagal memuat daftar jadwal.',

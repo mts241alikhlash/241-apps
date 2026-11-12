@@ -31,6 +31,7 @@ class StubRooms extends IExamRoomRepository {
   createEvent = vi.fn()
   updateEvent = vi.fn()
   findEventById = vi.fn()
+  isEventLinked = vi.fn()
   listEvents = vi.fn()
   listEventIdsSupervisedBy = vi.fn()
   createRoom = vi.fn()

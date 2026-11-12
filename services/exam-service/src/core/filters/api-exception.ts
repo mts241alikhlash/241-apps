@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common'
 import type { ApiErrorCode } from '../types/api-error-code.js'
 
@@ -24,6 +25,15 @@ export class ApiNotFoundException extends NotFoundException {
 }
 
 export class ApiForbiddenException extends ForbiddenException {
+  constructor(
+    readonly code: ApiErrorCode,
+    message: string,
+  ) {
+    super({ code, message })
+  }
+}
+
+export class ApiUnprocessableException extends UnprocessableEntityException {
   constructor(
     readonly code: ApiErrorCode,
     message: string,

@@ -17,7 +17,7 @@ const existing: ExamSchedule = {
   semesterId: 'sem',
   eventId: null,
   activityId: null,
-  type: 'UH',
+  type: 'DAILY',
   startsAt: toInstant('2026-11-02', '08:00'),
   endsAt: toInstant('2026-11-02', '11:00'),
   durationMinutes: 90,
@@ -34,7 +34,7 @@ function filled() {
   const form = useScheduleForm({ mode: 'create' })
   form.packageId.value = 'p1'
   form.classroomId.value = 'c1'
-  form.type.value = 'UTS'
+  form.type.value = 'MIDTERM'
   form.date.value = '2026-11-02'
   form.startTime.value = '08:00'
   form.endTime.value = '11:00'
@@ -91,7 +91,7 @@ describe('useScheduleForm', () => {
       {
         packageId: 'p1',
         classroomId: 'c1',
-        type: 'UTS',
+        type: 'MIDTERM',
         startsAt: toInstant('2026-11-02', '08:00'),
         endsAt: toInstant('2026-11-02', '11:00'),
         durationMinutes: 90,
@@ -107,17 +107,17 @@ describe('useScheduleForm', () => {
     expect(form.startTime.value).toBe('08:00')
     expect(form.endTime.value).toBe('11:00')
     expect(form.durationMinutes.value).toBe(90)
-    expect(form.type.value).toBe('UH')
+    expect(form.type.value).toBe('DAILY')
     expect(form.problem.value).toBeNull()
 
     form.durationMinutes.value = 120
-    form.type.value = 'UAS'
+    form.type.value = 'FINAL'
     await form.submit()
 
     expect(saveSchedule).toHaveBeenCalledWith(
       { mode: 'edit', id: 's1' },
       {
-        type: 'UAS',
+        type: 'FINAL',
         startsAt: toInstant('2026-11-02', '08:00'),
         endsAt: toInstant('2026-11-02', '11:00'),
         durationMinutes: 120,
@@ -165,12 +165,12 @@ describe('useScheduleForm', () => {
 
     expect(form.typeLocked).toBe(true)
 
-    form.type.value = 'UAS'
+    form.type.value = 'FINAL'
     await form.submit()
 
     expect(saveSchedule).toHaveBeenCalledWith(
       { mode: 'edit', id: 's1' },
-      expect.objectContaining({ type: 'UH' }),
+      expect.objectContaining({ type: 'DAILY' }),
     )
   })
 

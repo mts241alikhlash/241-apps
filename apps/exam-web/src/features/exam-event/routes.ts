@@ -6,12 +6,13 @@ export const examEventRoutes: RouteRecordRaw[] = [
     name: 'ExamEvents',
     component: () => import('./views/EventListView.vue'),
     meta: {
-      title: 'Kegiatan Ujian',
+      title: 'Periode Ujian',
+      category: 'EXAM',
       requiresAuth: true,
       requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
-        { title: 'Kegiatan Ujian', href: '/exam/events' },
+        { title: 'Periode Ujian', href: '/exam/events' },
       ],
     },
   },
@@ -20,12 +21,13 @@ export const examEventRoutes: RouteRecordRaw[] = [
     name: 'ExamEventDetail',
     component: () => import('./views/EventDetailView.vue'),
     meta: {
-      title: 'Kegiatan Ujian',
+      title: 'Periode Ujian',
+      category: 'EXAM',
       requiresAuth: true,
       requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
-        { title: 'Kegiatan Ujian', href: '/exam/events' },
+        { title: 'Periode Ujian', href: '/exam/events' },
       ],
     },
   },

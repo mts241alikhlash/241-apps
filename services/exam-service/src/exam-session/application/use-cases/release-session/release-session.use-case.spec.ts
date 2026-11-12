@@ -192,7 +192,7 @@ describe('ReleaseSessionUseCase', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: NOW,
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: STAFF.id,
@@ -239,7 +239,7 @@ describe('ReleaseSessionUseCase', () => {
     const event = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
-      type: 'UTS',
+      type: 'MIDTERM',
       startsAt: NOW,
       endsAt: new Date('2026-11-02T04:00:00.000Z'),
       createdById: STAFF.id,

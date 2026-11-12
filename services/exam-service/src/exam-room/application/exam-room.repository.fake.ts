@@ -52,6 +52,7 @@ import {
 
 export class FakeExamRoomRepository extends IExamRoomRepository {
   readonly events = new Map<string, ExamEvent>()
+  readonly linkedEventIds = new Set<string>()
   readonly rooms = new Map<string, ExamRoom>()
   readonly seats = new Map<string, ExamRoomSeat>()
   readonly supervisors = new Map<string, ExamRoomSupervisor>()
@@ -89,6 +90,10 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     const updated: ExamEvent = { ...event, ...edit, updatedAt: new Date() }
     this.events.set(id, updated)
     return Promise.resolve(updated)
+  }
+
+  isEventLinked(id: string) {
+    return Promise.resolve(this.linkedEventIds.has(id))
   }
 
   findEventById(id: string) {

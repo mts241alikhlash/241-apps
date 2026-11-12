@@ -1,4 +1,9 @@
+import type {
+  ExamCategory,
+  ExamType,
+} from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
+import type { ActivityEventRef } from '../policies/activity-rules.policy.js'
 import type {
   ActivityStatus,
   ActivityTokenMode,
@@ -12,10 +17,30 @@ export interface ActivityAuditEntry {
   after: unknown
 }
 
+export interface ActivityScheduleSummary {
+  id: string
+  classroomId: string
+  startsAt: Date
+  endsAt: Date
+}
+
+export interface PolicyPresetRecord {
+  id: string
+  type: ExamType
+  policy: ExamPolicy
+  updatedAt: Date
+}
+
 export abstract class ExamActivityRepository {
   abstract findPreset(
     name: string,
   ): Promise<{ id: string; policy: unknown } | null>
+  abstract listPresets(): Promise<PolicyPresetRecord[]>
+  abstract updatePreset(
+    type: ExamType,
+    policy: ExamPolicy,
+  ): Promise<PolicyPresetRecord | null>
+  abstract findEventRef(eventId: string): Promise<ActivityEventRef | null>
   abstract create(input: {
     activity: NewExamActivity
     classroomIds: string[]
@@ -31,10 +56,11 @@ export abstract class ExamActivityRepository {
     id: string,
     actorId: string,
   ): Promise<ExamActivity | null>
-  abstract listSchedules(
-    activityId: string,
-  ): Promise<{ id: string; classroomId: string }[]>
-  abstract listBySemester(semesterId: string): Promise<ExamActivity[]>
+  abstract listSchedules(activityId: string): Promise<ActivityScheduleSummary[]>
+  abstract listBySemester(
+    semesterId: string,
+    category?: ExamCategory,
+  ): Promise<ExamActivity[]>
   abstract updateStatus(
     id: string,
     status: ActivityStatus,

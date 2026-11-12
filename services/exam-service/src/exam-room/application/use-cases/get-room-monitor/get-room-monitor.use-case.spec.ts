@@ -245,7 +245,7 @@ describe('GetRoomMonitorUseCase', () => {
   it('keeps both overlapping schedules of one classroom', async () => {
     const { fixture, monitor } = await build()
     const second = await fixture.packages.create({
-      title: 'PAS Bahasa Arab',
+      title: 'UAS Bahasa Arab',
       subjectId: '33333333-3333-4333-8333-333333333333',
       gradeId: '22222222-2222-4222-8222-222222222222',
       createdById: 'admin-1',
@@ -259,7 +259,7 @@ describe('GetRoomMonitorUseCase', () => {
       startsAt: new Date('2026-11-02T01:30:00.000Z'),
       endsAt: new Date('2026-11-02T03:00:00.000Z'),
       durationMinutes: 90,
-      type: 'UAS',
+      type: 'FINAL',
       createdById: 'admin-1',
     })
     if (overlapping === null) throw new Error('schedule not created')
@@ -274,7 +274,7 @@ describe('GetRoomMonitorUseCase', () => {
       MONITOR_NOW,
     )
 
-    expect(result.data[1].packageTitle).toBe('PAS Bahasa Arab')
+    expect(result.data[1].packageTitle).toBe('UAS Bahasa Arab')
     expect(result.data[1].session?.status).toBe('IN_PROGRESS')
     expect(result.meta.summary.inProgressCount).toBe(1)
   })
@@ -344,7 +344,7 @@ describe('GetRoomMonitorUseCase', () => {
     expect(result.meta.room.currentSupervisorName).toBe('Ustadz Ahmad')
     expect(result.meta.token?.accessCode).toHaveLength(6)
     expect(result.data[0].totalQuestions).toBe(40)
-    expect(result.data[0].packageTitle).toBe('PAS Matematika')
+    expect(result.data[0].packageTitle).toBe('UAS Matematika')
   })
 
   it('carries the device readiness flags the app reported', async () => {

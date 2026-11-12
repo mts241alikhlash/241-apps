@@ -24,7 +24,7 @@ describe('parsePolicy', () => {
 
   it('fills the missing fields from the exam default', () => {
     expect(parsePolicy({ violationLimit: 5 })).toEqual({
-      ...DEFAULT_POLICIES.UJIAN_KETAT,
+      ...DEFAULT_POLICIES.MIDTERM,
       violationLimit: 5,
     })
   })
@@ -47,10 +47,11 @@ describe('parsePolicy', () => {
   })
 
   it('gives each preset its own values', () => {
-    expect(DEFAULT_POLICIES.UJIAN_KETAT.gapTokenMs).toBe(300_000)
-    expect(DEFAULT_POLICIES.TUGAS.gapRecordedMs).toBe(300_000)
-    expect(DEFAULT_POLICIES.TUGAS.gapViolationFrom).toBe(3)
-    expect(DEFAULT_POLICIES.ULANGAN_KELAS.violationLimit).toBe(3)
+    expect(DEFAULT_POLICIES.MIDTERM.gapTokenMs).toBe(300_000)
+    expect(DEFAULT_POLICIES.FINAL.gapTokenMs).toBe(300_000)
+    expect(DEFAULT_POLICIES.ASSIGNMENT.gapRecordedMs).toBe(300_000)
+    expect(DEFAULT_POLICIES.ASSIGNMENT.gapViolationFrom).toBe(3)
+    expect(DEFAULT_POLICIES.DAILY.violationLimit).toBe(3)
   })
 
   it('returns null instead of throwing for a corrupted stored policy', () => {

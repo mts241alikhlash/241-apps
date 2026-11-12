@@ -136,7 +136,7 @@ describe('GetRoomReportUseCase', () => {
       report.schedules.map((row) => [row.classroomName, row]),
     )
     expect(byClassroom.get('VII A')).toMatchObject({
-      packageTitle: 'PAS Matematika',
+      packageTitle: 'UAS Matematika',
       registeredCount: 2,
       startedCount: 1,
       submittedCount: 0,
@@ -639,7 +639,7 @@ describe('RoomReportService roster and slot guards', () => {
       startsAt: new Date('2026-11-02T02:30:00.000Z'),
       endsAt: new Date('2026-11-02T03:30:00.000Z'),
       durationMinutes: 60,
-      type: 'UAS',
+      type: 'FINAL',
       createdById: 'admin-1',
     })
     if (spanning === null) throw new Error('schedule not created')
@@ -659,7 +659,7 @@ describe('RoomReportService roster and slot guards', () => {
       startsAt: new Date(laterStart.getTime() + 30 * 60_000),
       endsAt: new Date(laterEnd.getTime() + 30 * 60_000),
       durationMinutes: 60,
-      type: 'UAS',
+      type: 'FINAL',
       createdById: 'admin-1',
     })
     if (laterSpanning === null) throw new Error('schedule not created')

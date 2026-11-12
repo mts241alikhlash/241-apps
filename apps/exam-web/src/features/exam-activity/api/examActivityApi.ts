@@ -2,15 +2,25 @@ import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
 import api from '@mts241alikhlash/web-shared/utils/api'
 import type {
   ActivityCreatePayload,
+  ActivityPolicyPayload,
   ActivityStatus,
+  ExamActivityDetail,
+  ExamActivityQuery,
   ExamActivityRecord,
 } from '../types'
 
 const seg = encodeURIComponent
 
 export const examActivityApi = {
-  list: () =>
-    api.get<ApiSingleResponse<ExamActivityRecord[]>>('/exam-activities'),
+  list: (params?: ExamActivityQuery) =>
+    api.get<ApiSingleResponse<ExamActivityRecord[]>>('/exam-activities', {
+      params,
+    }),
+
+  get: (id: string) =>
+    api.get<ApiSingleResponse<ExamActivityDetail>>(
+      `/exam-activities/${seg(id)}`,
+    ),
 
   create: (payload: ActivityCreatePayload) =>
     api.post<ApiSingleResponse<ExamActivityRecord>>(
@@ -24,9 +34,9 @@ export const examActivityApi = {
       { status },
     ),
 
-  updatePolicy: (id: string, policy: Record<string, number>) =>
+  updatePolicy: (id: string, policy: ActivityPolicyPayload) =>
     api.patch<ApiSingleResponse<ExamActivityRecord>>(
-      `/exam-activities/${id}/policy`,
+      `/exam-activities/${seg(id)}/policy`,
       policy,
     ),
 
@@ -38,7 +48,7 @@ export const examActivityApi = {
 
   rotateToken: (id: string) =>
     api.post<ApiSingleResponse<ExamActivityRecord>>(
-      `/exam-activities/${id}/token/rotate`,
+      `/exam-activities/${seg(id)}/token/rotate`,
       {},
     ),
 }

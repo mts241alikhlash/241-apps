@@ -43,7 +43,7 @@ describe('Access code use cases', () => {
         startsAt: START,
         endsAt: END,
         durationMinutes: 90,
-        type: 'UH',
+        type: 'DAILY',
       })
     ).id
   })

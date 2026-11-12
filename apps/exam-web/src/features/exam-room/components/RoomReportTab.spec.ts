@@ -82,7 +82,7 @@ const report = (overrides: Partial<RoomReport> = {}): RoomReport => ({
   schedules: [
     {
       scheduleId: 's1',
-      packageTitle: 'PAS Matematika',
+      packageTitle: 'UAS Matematika',
       subjectName: 'Matematika',
       classroomName: 'VII A',
       startsAt: '2026-11-02T00:30:00.000Z',

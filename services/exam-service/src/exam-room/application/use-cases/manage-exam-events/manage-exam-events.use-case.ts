@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ApiUnprocessableException } from '../../../../core/filters/api-exception.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type {
   ExamEvent,
   ExamEventEdit,
@@ -20,10 +22,16 @@ export interface EventListFilter {
 export class ManageExamEventsUseCase {
   constructor(private readonly rooms: IExamRoomRepository) {}
 
-  create(
+  async create(
     user: { id: string },
     input: Omit<NewExamEvent, 'createdById'>,
   ): Promise<ExamEvent> {
+    if (categoryOf(input.type) !== 'EXAM') {
+      throw new ApiUnprocessableException(
+        'EVENT_TYPE_NOT_EXAM',
+        'Periode ujian hanya untuk Penilaian Tengah Semester atau Penilaian Akhir Semester.',
+      )
+    }
     return this.rooms.createEvent({ ...input, createdById: user.id })
   }
 
@@ -57,6 +65,21 @@ export class ManageExamEventsUseCase {
   }
 
   async update(id: string, edit: ExamEventEdit): Promise<ExamEvent> {
+    if (edit.type !== undefined && categoryOf(edit.type) !== 'EXAM') {
+      throw new ApiUnprocessableException(
+        'EVENT_TYPE_NOT_EXAM',
+        'Periode ujian hanya untuk Penilaian Tengah Semester atau Penilaian Akhir Semester.',
+      )
+    }
+    if (edit.type !== undefined) {
+      const current = await this.get(id)
+      if (current.type !== edit.type && (await this.rooms.isEventLinked(id))) {
+        throw new ApiUnprocessableException(
+          'EVENT_TYPE_LINKED',
+          'Jenis periode tidak dapat diganti karena sudah ada kegiatan atau jadwal yang terhubung.',
+        )
+      }
+    }
     const updated = await this.rooms.updateEvent(id, edit)
     if (updated === null) {
       throw new NotFoundException('Kegiatan ujian tidak ditemukan')

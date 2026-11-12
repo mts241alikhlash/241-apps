@@ -18,7 +18,10 @@ const listState = {
   listError: ref<string | null>(null),
 }
 
-vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push }),
+  useRoute: () => ({ meta: { category: 'EXAM' } }),
+}))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),
@@ -66,7 +69,7 @@ const schedule = (
   classroomId: 'c1',
   classroomName: 'VII A',
   semesterId: 'sem',
-  type: 'UTS',
+  type: 'MIDTERM',
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-02T04:00:00.000Z',
   sessions: 0,

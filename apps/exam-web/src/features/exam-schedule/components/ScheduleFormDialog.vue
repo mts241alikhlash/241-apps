@@ -23,22 +23,34 @@ import {
 import type { ExamPackageSummary } from '@/features/exam-package/types'
 import type { Classroom } from '@/features/lookup/classroom'
 import type { ExamEvent } from '@/features/exam-event/types'
-import { EXAM_TYPES, examTypeLabel } from '../types'
+import {
+  EXAM_TYPES,
+  categoryOf,
+  examTypeLabel,
+  type ExamCategory,
+} from '@/features/exam-shared/examType'
 import { useScheduleForm } from '../composables/useScheduleForm'
 import { examScheduleService } from '../services/examScheduleService'
-import type { ExamSchedule } from '../types'
+import type { ExamSchedule, ExamType } from '../types'
 
 const props = defineProps<{
   open: boolean
   schedule?: ExamSchedule | null
+  category?: ExamCategory
   packageId?: string
   packageGradeId?: string
   packageTitle?: string
 }>()
 
+const allowedTypes = computed(() =>
+  props.category
+    ? EXAM_TYPES.filter((item) => categoryOf(item) === props.category)
+    : EXAM_TYPES,
+)
+
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  saved: []
+  saved: [type: ExamType]
 }>()
 
 const isEdit = computed(() => Boolean(props.schedule))
@@ -110,7 +122,7 @@ onMounted(async () => {
 async function save() {
   const saved = await form.submit()
   if (saved) {
-    emit('saved')
+    emit('saved', type.value as ExamType)
     emit('update:open', false)
   }
 }
@@ -229,11 +241,11 @@ async function save() {
                 :id="`${fieldId}-event`"
                 class="w-full"
               >
-                <SelectValue placeholder="Tanpa ruangan (UH harian)" />
+                <SelectValue placeholder="Tanpa ruangan (Ulangan Harian)" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem :value="NO_EVENT">
-                  Tanpa kegiatan (UH/kuis di kelas)
+                  Tanpa kegiatan (Ulangan Harian atau Tugas di kelas)
                 </SelectItem>
                 <SelectItem
                   v-for="item in events"
@@ -263,7 +275,7 @@ async function save() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
-                  v-for="option in EXAM_TYPES"
+                  v-for="option in allowedTypes"
                   :key="option"
                   :value="option"
                 >
