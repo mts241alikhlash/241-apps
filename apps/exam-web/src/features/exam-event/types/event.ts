@@ -25,7 +25,7 @@ export type RoomCreatePayload = Schemas['CreateExamRoomDto']
 
 export type RoomUpdatePayload = Schemas['UpdateExamRoomDto']
 
-export type RoomSeat = Schemas['ExamRoomSeatDto']
+export type RoomSeat = Schemas['ExamRoomSeatResponseDto']
 
 export type SeatAssignPayload = Schemas['ExamRoomSeatDto']
 
