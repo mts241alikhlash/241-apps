@@ -1,26 +1,11 @@
-export type { SemesterTypeRef, AcademicYearRef, Semester } from './semester'
+import type { components } from '@mts241alikhlash/academic-api'
 
-export type {
-  SemesterSavePayload,
-  SemesterFormState,
-  RolloverSemesterPayload,
-  PromotionStudentPayload,
-  PromotionPayload,
-  GenerateRecommendationPayload,
-} from './semester-payload'
+export type Semester = components['schemas']['SemesterResponseDto']
 
-export type { SemesterQueryParams } from './semester-query'
-
-export type {
-  RolloverCategoryResult,
-  RolloverSummary,
-  PromotionAction,
-  PromotionRecommendationItem,
-  PromotionRecommendationResponse,
-  PromotionStudentDecision,
-  PromotionPreviewResponse,
-  PromotionResult,
-  RolloverSummaryRow,
-} from './semester-response'
-
-export type { SemesterColumnActions } from './semester-table'
+export interface SemesterQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+  academicYearId?: string
+  isActive?: boolean
+}

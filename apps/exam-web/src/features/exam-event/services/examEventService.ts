@@ -48,7 +48,7 @@ const toCandidate = (row: StudentEnrollment): CandidateStudent => ({
   studentId: row.studentId,
   classroomId: row.classroomId,
   name: row.student?.user?.profile?.name ?? null,
-  nis: row.student?.nis ?? null,
+  nis: null,
   classroomName: row.classroom?.displayName ?? null,
 })
 
@@ -326,7 +326,7 @@ export const examEventService = {
         status: 'ACTIVE',
         limit: 1000,
       })
-      return (response.data?.data ?? []).map(toCandidate)
+      return response.data.map(toCandidate)
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar siswa.'))
       return []

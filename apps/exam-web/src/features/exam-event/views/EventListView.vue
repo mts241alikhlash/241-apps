@@ -79,11 +79,11 @@ onMounted(async () => {
   try {
     if (!canReadSemesters.value) return
     const response = await semesterApi.getSemesters({ limit: 100 })
-    semesters.value = (response.data?.data ?? []).map((semester) => ({
+    semesters.value = response.data.map((semester) => ({
       id: semester.id,
       label: `${semester.academicYear?.name ?? '-'} · ${semester.type?.name ?? '-'}${semester.isActive ? ' (aktif)' : ''}`,
     }))
-    const active = response.data?.data?.find((semester) => semester.isActive)
+    const active = response.data.find((semester) => semester.isActive)
     if (active) semesterId.value = active.id
   } catch {
     semesters.value = []

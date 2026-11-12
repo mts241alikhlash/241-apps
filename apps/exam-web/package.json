@@ -61,7 +61,9 @@
   "devDependencies": {
     "@changesets/cli": "catalog:",
     "@mts241alikhlash/eslint-config": "workspace:*",
+    "@mts241alikhlash/academic-api": "workspace:*",
     "@mts241alikhlash/exam-api": "workspace:*",
+    "@mts241alikhlash/student-api": "workspace:*",
     "@mts241alikhlash/typescript-config": "workspace:*",
     "@mts241alikhlash/vitest-config": "workspace:*",
     "@types/node": "catalog:",

@@ -59,7 +59,7 @@ export const examScheduleService = {
         isActive: true,
         limit: 1,
       })
-      const academicYearId = semesters.data?.data?.[0]?.academicYearId
+      const academicYearId = semesters.data[0]?.academicYearId
       if (!academicYearId) return []
       const response = await classroomApi.getClassrooms({
         gradeId,
@@ -67,7 +67,7 @@ export const examScheduleService = {
         isActive: true,
         limit: PAGINATION.REFERENCE_LIMIT,
       })
-      return response.data?.data ?? []
+      return response.data
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar kelas.'))
       return []
@@ -80,7 +80,7 @@ export const examScheduleService = {
         isActive: true,
         limit: 1,
       })
-      const semesterId = semesters.data?.data?.[0]?.id
+      const semesterId = semesters.data[0]?.id
       if (!semesterId) return []
       return await examEventService.loadEventOptions(semesterId)
     } catch {

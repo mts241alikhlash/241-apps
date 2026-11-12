@@ -19,7 +19,7 @@ export const examBankService = {
           subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
           examBankApi.getGrades({ limit: PAGINATION.REFERENCE_LIMIT }),
         ])
-        store.subjects = subjectRes.data?.data ?? []
+        store.subjects = subjectRes.data
         store.grades = gradeRes.data?.data ?? []
       }
     } catch (err: unknown) {
@@ -37,10 +37,7 @@ export const examBankService = {
       })
       const teachers = new Map<string, string>()
       for (const row of rows) {
-        teachers.set(
-          row.employeeId,
-          row.employee?.user?.profile?.name ?? row.employee?.nip ?? '-',
-        )
+        teachers.set(row.employeeId, row.employee?.user?.profile?.name ?? '-')
       }
       return [...teachers]
         .map(([id, name]) => ({ id, name }))

@@ -47,7 +47,7 @@ export const examPackageService = {
         subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
         examBankApi.getGrades({ limit: PAGINATION.REFERENCE_LIMIT }),
       ])
-      store.subjects = subjectRes.data?.data ?? []
+      store.subjects = subjectRes.data
       store.grades = gradeRes.data?.data ?? []
     } catch (err: unknown) {
       toast.error(
