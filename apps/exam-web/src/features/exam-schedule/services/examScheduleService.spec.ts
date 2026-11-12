@@ -65,7 +65,7 @@ describe('examScheduleService', () => {
         data: {
           data:
             status === 'APPROVED'
-              ? [{ id: 'a', title: 'UH Bab 2' }]
+              ? [{ id: 'a', title: 'Ulangan Harian Bab 2' }]
               : status === 'LOCKED'
                 ? [{ id: 'l', title: 'UAS Ganjil' }]
                 : [{ id: 'd', title: 'Draf' }],

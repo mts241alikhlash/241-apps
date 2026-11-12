@@ -31,7 +31,7 @@ describe('ManageExamEventsUseCase', () => {
       { id: 'admin-1' },
       {
         semesterId: 'sem-1',
-        name: 'PTS Ganjil',
+        name: 'UTS Ganjil',
         type: 'MIDTERM',
         startsAt,
         endsAt,
@@ -48,7 +48,7 @@ describe('ManageExamEventsUseCase', () => {
       { id: 'admin-1' },
       {
         semesterId: 'sem-1',
-        name: 'PTS Ganjil',
+        name: 'UTS Ganjil',
         type: 'MIDTERM',
         startsAt,
         endsAt,

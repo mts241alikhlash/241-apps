@@ -47,7 +47,7 @@ const participant = (
   nis: '2024001',
   classroomName: 'VII A',
   subjectName: 'Matematika',
-  packageTitle: 'PAS Ganjil',
+  packageTitle: 'UAS Ganjil',
   scheduleId: 's1',
   totalQuestions: 50,
   session: session(),

@@ -87,7 +87,7 @@ export async function seedMonitorRoom(
   const sessions = new FakeExamSessionRepository()
   const event = await rooms.createEvent({
     semesterId: SEMESTER_ID,
-    name: 'PAS Ganjil',
+    name: 'UAS Ganjil',
     type: 'FINAL',
     startsAt: SLOT_START,
     endsAt: SLOT_END,
@@ -128,7 +128,7 @@ export async function seedMonitorRoom(
   })
 
   const pkg = await packages.create({
-    title: 'PAS Matematika',
+    title: 'UAS Matematika',
     subjectId: CLASSROOM_7A.id,
     gradeId: CLASSROOM_7A.gradeId,
     createdById: 'admin-1',

@@ -136,7 +136,7 @@ describe('GetRoomReportUseCase', () => {
       report.schedules.map((row) => [row.classroomName, row]),
     )
     expect(byClassroom.get('VII A')).toMatchObject({
-      packageTitle: 'PAS Matematika',
+      packageTitle: 'UAS Matematika',
       registeredCount: 2,
       startedCount: 1,
       submittedCount: 0,

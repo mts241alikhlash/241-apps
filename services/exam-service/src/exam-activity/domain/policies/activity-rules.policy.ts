@@ -47,7 +47,7 @@ export function assertTypeAllowed(input: {
     ) {
       throw new ApiUnprocessableException(
         'MIDTERM_OUTSIDE_EVENT',
-        'Penilaian Tengah Semester oleh guru memerlukan periode PTS yang sedang aktif dan berada di dalam rentang waktunya.',
+        'Penilaian Tengah Semester oleh guru memerlukan periode UTS yang sedang aktif dan berada di dalam rentang waktunya.',
       )
     }
   }

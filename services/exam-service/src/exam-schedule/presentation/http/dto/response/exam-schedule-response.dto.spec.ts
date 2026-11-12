@@ -96,7 +96,7 @@ describe('exam schedule response DTOs', () => {
       ExamEventDto.fromDomain({
         id: 'evt-1',
         semesterId: 'sem-1',
-        name: 'PTS',
+        name: 'UTS',
         type: 'MIDTERM',
         startsAt: new Date('2026-11-02T01:00:00.000Z'),
         endsAt: new Date('2026-11-02T04:00:00.000Z'),
