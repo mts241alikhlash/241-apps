@@ -8,7 +8,6 @@ const EVERYTHING = [
   /^\.node-version$/,
   /^\.github\//,
   /^scripts\//,
-  /^contracts\//,
 ]
 
 export function affectedFilter(files, base) {
