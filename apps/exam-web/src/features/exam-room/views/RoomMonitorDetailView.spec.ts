@@ -61,8 +61,7 @@ const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const tabs = defineComponent({
   props: { modelValue: String },
   emits: ['update:modelValue'],
-  template:
-    '<div data-testid="tabs" @click="$emit(\'update:modelValue\', \'camera\')"><slot /></div>',
+  template: '<div data-testid="tabs"><slot /></div>',
 })
 const tabContent = defineComponent({
   props: { value: String },
@@ -88,10 +87,6 @@ const stubs = {
   CardTitle: passthrough,
   DataTable: dataTable,
   FloatingLabelField: passthrough,
-  RoomCameraGrid: defineComponent({
-    props: { seats: Array, serverTime: String },
-    template: '<div data-testid="camera-grid">{{ seats.length }}</div>',
-  }),
   RoomMonitorSummaryCards: passthrough,
   RoomReportTab: passthrough,
   RecordAbsenceDialog: passthrough,
@@ -136,6 +131,5 @@ describe('RoomMonitorDetailView', () => {
     await flushPromises()
 
     expect(wrapper.text()).not.toContain('Kamera Pengawas')
-    expect(wrapper.find('[data-testid="camera-grid"]').exists()).toBe(false)
   })
 })
