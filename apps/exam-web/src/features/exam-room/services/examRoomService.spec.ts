@@ -22,7 +22,7 @@ const row = (seatNumber: number) => ({
 
 const page = (rows: ReturnType<typeof row>[], total: number) => ({
   data: rows,
-  meta: { total },
+  meta: { total, room: { id: 'r1' } },
 })
 
 describe('examRoomService.loadRoster', () => {
@@ -71,12 +71,36 @@ describe('examRoomService.loadRoster', () => {
   it('returns what it read when the backend answers an empty page', async () => {
     getMonitor.mockResolvedValueOnce(page([row(1)], 40)).mockResolvedValueOnce({
       data: [],
-      meta: { total: 40 },
+      meta: { total: 40, room: { id: 'r1' } },
     })
 
     const result = await examRoomService.loadRoster('r1', '')
 
     expect(result.data).toHaveLength(1)
     expect(result.total).toBe(40)
+  })
+})
+
+describe('examRoomService.loadMonitor', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('returns null meta when the page carries no room', async () => {
+    getMonitor.mockResolvedValueOnce({
+      data: [row(1)],
+      meta: { total: 0, page: 1, limit: 0 },
+    })
+
+    const result = await examRoomService.loadMonitor('r1', {})
+
+    expect(result.meta).toBeNull()
+  })
+
+  it('keeps meta that carries its room', async () => {
+    const meta = { total: 1, room: { id: 'r1' } }
+    getMonitor.mockResolvedValueOnce({ data: [row(1)], meta })
+
+    const result = await examRoomService.loadMonitor('r1', {})
+
+    expect(result.meta).toBe(meta)
   })
 })

@@ -57,7 +57,7 @@ export const examRoomService = {
       const response = await examRoomApi.getMonitor(roomId, query)
       return {
         data: response.data,
-        meta: response.meta,
+        meta: response.meta.room ? response.meta : null,
       }
     } catch {
       throw new Error('monitor-failed')

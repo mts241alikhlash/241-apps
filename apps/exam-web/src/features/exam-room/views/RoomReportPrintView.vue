@@ -74,11 +74,15 @@ const totals = computed(() => {
 })
 
 const supervisorName = computed(
-  () => meta.value?.room.currentSupervisorName ?? '......................',
+  () =>
+    (meta.value ? meta.value.room.currentSupervisorName : null) ??
+    '......................',
 )
 
 const technicianName = computed(
-  () => meta.value?.room.technicianName ?? '......................',
+  () =>
+    (meta.value ? meta.value.room.technicianName : null) ??
+    '......................',
 )
 
 function print() {
@@ -216,7 +220,8 @@ onMounted(load)
               Berita Acara Pelaksanaan Ujian
             </h1>
             <p class="text-[length:var(--text-control,0.75rem)] tabular-nums">
-              {{ meta?.room.code }} · {{ meta?.room.name }} · {{ slotWindow }}
+              {{ meta ? `${meta.room.code} · ${meta.room.name} · ` : ''
+              }}{{ slotWindow }}
             </p>
             <p class="text-[length:var(--text-control,0.75rem)]">
               Status: {{ reportStatusLabel(report.status) }}
@@ -225,9 +230,10 @@ onMounted(load)
 
           <p class="text-[length:var(--text-control,0.75rem)] leading-relaxed">
             Pada hari ini, {{ slotWindow }}, telah dilaksanakan ujian di
-            {{ meta?.room.name ?? 'ruangan ini' }}. Jumlah peserta terdaftar
-            {{ totals.registered }} siswa, hadir {{ totals.started }} siswa,
-            mengumpulkan {{ totals.submitted }} siswa, dan tidak hadir
+            {{ meta ? meta.room.name : 'ruangan ini' }}. Jumlah peserta
+            terdaftar {{ totals.registered }} siswa, hadir
+            {{ totals.started }} siswa, mengumpulkan
+            {{ totals.submitted }} siswa, dan tidak hadir
             {{ totals.absent }} siswa.
           </p>
 
