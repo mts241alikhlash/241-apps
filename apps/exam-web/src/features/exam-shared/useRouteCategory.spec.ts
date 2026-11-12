@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { useRouteCategory } from './useRouteCategory'
 
 const { routeState } = vi.hoisted(() => ({
-  routeState: { meta: {} as Record<string, unknown> },
+  routeState: { meta: {} },
 }))
 vi.mock('vue-router', () => ({ useRoute: () => routeState }))
 

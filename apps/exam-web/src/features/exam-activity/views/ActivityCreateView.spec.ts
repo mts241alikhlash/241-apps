@@ -10,7 +10,7 @@ const { list, get, permissions, routeState } = vi.hoisted(() => ({
   permissions: new Set<string>(),
   routeState: {
     meta: { category: 'EXAM' },
-    query: { id: 'act-1' } as Record<string, string>,
+    query: { id: 'act-1' },
   },
 }))
 
