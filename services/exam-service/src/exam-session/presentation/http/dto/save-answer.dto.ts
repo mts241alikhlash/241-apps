@@ -7,7 +7,13 @@ import {
   MinLength,
 } from 'class-validator'
 import type { ExamAnswerRecord } from '../../../domain/entities/exam-session.entity.js'
+import {
+  ANSWER_PAYLOAD_MODELS,
+  ANSWER_PAYLOAD_SCHEMA,
+  type AnswerPayloadDto,
+} from './answer-payload.dto.js'
 
+@ANSWER_PAYLOAD_MODELS
 export class SaveAnswerDto {
   @ApiProperty({ format: 'uuid' })
   @IsUUID()
@@ -21,13 +27,9 @@ export class SaveAnswerDto {
   @MaxLength(64)
   clientId!: string
 
-  @ApiProperty({
-    type: 'object',
-    additionalProperties: true,
-    description: 'One of { key } | { keys } | { value } | { text }',
-  })
+  @ApiProperty(ANSWER_PAYLOAD_SCHEMA)
   @IsObject()
-  answer!: Record<string, unknown>
+  answer!: AnswerPayloadDto
 }
 
 export class SavedAnswerAckDto {

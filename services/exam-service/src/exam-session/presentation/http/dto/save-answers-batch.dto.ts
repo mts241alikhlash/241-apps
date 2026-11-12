@@ -19,7 +19,13 @@ import type {
   ConfirmedAnswer,
   SaveAnswersBatchResult,
 } from '../../../application/use-cases/save-answers-batch/save-answers-batch.use-case.js'
+import {
+  ANSWER_PAYLOAD_MODELS,
+  ANSWER_PAYLOAD_SCHEMA,
+  type AnswerPayloadDto,
+} from './answer-payload.dto.js'
 
+@ANSWER_PAYLOAD_MODELS
 export class SaveAnswerItemDto {
   @ApiProperty({ format: 'uuid' })
   @IsUUID()
@@ -33,13 +39,9 @@ export class SaveAnswerItemDto {
   @MaxLength(64)
   clientId!: string
 
-  @ApiProperty({
-    type: 'object',
-    additionalProperties: true,
-    description: 'One of { key } | { keys } | { value } | { text }',
-  })
+  @ApiProperty(ANSWER_PAYLOAD_SCHEMA)
   @IsObject()
-  answer!: Record<string, unknown>
+  answer!: AnswerPayloadDto
 }
 
 export class SaveAnswersBatchDto {
