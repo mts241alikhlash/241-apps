@@ -304,7 +304,7 @@ export const examEventService = {
         roleCode,
         limit: 1000,
       })
-      return (response.data?.data ?? [])
+      return response.data
         .map((row) => ({ id: row.id, identifier: row.identifier }))
         .sort((a, b) => a.identifier.localeCompare(b.identifier))
     } catch (err: unknown) {

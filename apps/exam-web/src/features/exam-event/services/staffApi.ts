@@ -1,8 +1,7 @@
-import type { ApiPaginatedResponse } from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
-import type { UserOption } from '../types'
+import { unwrapPage } from '@mts241alikhlash/web-shared/utils/service-client'
+import { identityClient } from '@/shared/api/clients'
 
 export const staffApi = {
-  getUsers: (params?: { roleCode?: string; search?: string; limit?: number }) =>
-    api.get<ApiPaginatedResponse<UserOption>>('/users', { params }),
+  getUsers: (query?: { roleCode?: string; search?: string; limit?: number }) =>
+    unwrapPage(identityClient.GET('/users', { params: { query } })),
 }

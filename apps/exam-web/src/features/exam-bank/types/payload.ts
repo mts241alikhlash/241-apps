@@ -1,6 +1,8 @@
+import type { components as AcademicComponents } from '@mts241alikhlash/academic-api'
 import type { components } from '@mts241alikhlash/exam-api'
 
 type Schemas = components['schemas']
+type AcademicSchemas = AcademicComponents['schemas']
 
 export type ScopePair = Schemas['ScopePairDto']
 
@@ -11,11 +13,7 @@ export interface NamedOption {
   name: string
 }
 
-export interface GradeRecord {
-  id: string
-  level: number
-  name: string | null
-}
+export type GradeRecord = AcademicSchemas['GradePageItemResponseDto']
 
 export type ExamFile = Schemas['ExamFileDto']
 

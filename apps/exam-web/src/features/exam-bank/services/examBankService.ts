@@ -20,7 +20,7 @@ export const examBankService = {
           examBankApi.getGrades({ limit: PAGINATION.REFERENCE_LIMIT }),
         ])
         store.subjects = subjectRes.data
-        store.grades = gradeRes.data?.data ?? []
+        store.grades = gradeRes.data
       }
     } catch (err: unknown) {
       toast.error(

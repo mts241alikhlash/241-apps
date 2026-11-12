@@ -1,19 +1,18 @@
-import type { ApiPaginatedResponse } from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
 import {
   unwrap,
   unwrapBlob,
+  unwrapPage,
 } from '@mts241alikhlash/web-shared/utils/service-client'
-import { examClient } from '@/shared/api/clients'
-import type { GradeRecord, TemplateFormat } from '../types'
+import { academicClient, examClient } from '@/shared/api/clients'
+import type { TemplateFormat } from '../types'
 
 const passThrough = (body: unknown) => body as never
 
 export const examBankApi = {
   getScope: () => unwrap(examClient.GET('/exam-questions/scope')),
 
-  getGrades: (params?: { limit?: number }) =>
-    api.get<ApiPaginatedResponse<GradeRecord>>('/grades', { params }),
+  getGrades: (query?: { limit?: number }) =>
+    unwrapPage(academicClient.GET('/grades', { params: { query } })),
 
   uploadImage: (file: File) => {
     const form = new FormData()

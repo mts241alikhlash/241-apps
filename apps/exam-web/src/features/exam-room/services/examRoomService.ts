@@ -273,16 +273,9 @@ export const examRoomService = {
   async loadLetterhead(): Promise<Letterhead> {
     try {
       const response = await examRoomApi.getLetterhead()
-      return (
-        response.data?.data ?? {
-          name: null,
-          address: '',
-          nsm: null,
-          npsn: null,
-        }
-      )
+      return response ?? { name: '', address: '', nsm: null, npsn: null }
     } catch {
-      return { name: null, address: '', nsm: null, npsn: null }
+      return { name: '', address: '', nsm: null, npsn: null }
     }
   },
 }

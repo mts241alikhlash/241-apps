@@ -1,6 +1,8 @@
+import type { components as IdentityComponents } from '@mts241alikhlash/identity-api'
 import type { components } from '@mts241alikhlash/exam-api'
 
 type Schemas = components['schemas']
+type IdentitySchemas = IdentityComponents['schemas']
 
 export const MONITOR_STATUSES = [
   'ALL',
@@ -68,12 +70,7 @@ export type RoomAbsencePayload = Schemas['RecordRoomAbsenceDto']
 
 export type RoomFieldNotePayload = Schemas['RecordRoomFieldNoteDto']
 
-export interface Letterhead {
-  name: string | null
-  address: string
-  nsm: string | null
-  npsn: string | null
-}
+export type Letterhead = IdentitySchemas['SchoolUnitLetterheadResponseDto']
 
 export type SupervisorSlotRow = Schemas['SupervisorSlotDto']
 

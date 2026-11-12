@@ -1190,6 +1190,9 @@ importers:
       '@mts241alikhlash/exam-api':
         specifier: workspace:*
         version: link:../../packages/exam-api
+      '@mts241alikhlash/identity-api':
+        specifier: workspace:*
+        version: link:../../packages/identity-api
       '@mts241alikhlash/student-api':
         specifier: workspace:*
         version: link:../../packages/student-api

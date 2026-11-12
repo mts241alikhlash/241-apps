@@ -5,13 +5,11 @@ const { GET, POST, PUT } = vi.hoisted(() => ({
   POST: vi.fn(),
   PUT: vi.fn(),
 }))
-const get = vi.hoisted(() => vi.fn())
+const identityGet = vi.hoisted(() => vi.fn())
 
 vi.mock('@/shared/api/clients', () => ({
   examClient: { GET, POST, PUT },
-}))
-vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get },
+  identityClient: { GET: identityGet },
 }))
 
 import { examRoomApi } from './examRoomApi'
@@ -159,10 +157,9 @@ describe('examRoomApi', () => {
     )
   })
 
-  it('gets the letterhead over axios', async () => {
-    get.mockResolvedValue({ data: { data: { name: 'n' } } })
-    const response = await examRoomApi.getLetterhead()
-    expect(response.data.data).toEqual({ name: 'n' })
-    expect(get).toHaveBeenCalledWith('/school-units/letterhead')
+  it('gets the letterhead from the identity contract', async () => {
+    identityGet.mockResolvedValue(ok({ name: 'n' }))
+    await expect(examRoomApi.getLetterhead()).resolves.toEqual({ name: 'n' })
+    expect(identityGet).toHaveBeenCalledWith('/school-units/letterhead')
   })
 })

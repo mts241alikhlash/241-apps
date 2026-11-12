@@ -1,12 +1,9 @@
-import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
 import {
   unwrap,
   unwrapPage,
 } from '@mts241alikhlash/web-shared/utils/service-client'
-import { examClient } from '@/shared/api/clients'
+import { examClient, identityClient } from '@/shared/api/clients'
 import type {
-  Letterhead,
   RoomAbsencePayload,
   RoomFieldNotePayload,
   RoomMonitorQuery,
@@ -142,6 +139,5 @@ export const examRoomApi = {
       ),
     ),
 
-  getLetterhead: () =>
-    api.get<ApiSingleResponse<Letterhead>>('/school-units/letterhead'),
+  getLetterhead: () => unwrap(identityClient.GET('/school-units/letterhead')),
 }

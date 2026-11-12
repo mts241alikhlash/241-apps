@@ -121,7 +121,7 @@ describe('PackageListView', () => {
     setActivePinia(createPinia())
     const store = useExamPackageStore()
     store.subjects = [{ id: 'math', name: 'Matematika' }]
-    store.grades = [{ id: 'g7', level: 7, name: null }]
+    store.grades = [{ id: 'g7', level: 7, name: '' }]
     permissions.clear()
     ;['read', 'create', 'delete'].forEach((action) =>
       permissions.add(`exam-packages.${action}`),

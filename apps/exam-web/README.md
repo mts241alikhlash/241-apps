@@ -18,9 +18,7 @@ Dev port 5181.
 - `scripts/check-no-comments.mjs` runs in `validate`; HTML `eslint-disable` directives with a reason are allowed.
 - Specs that need a DOM declare `// @vitest-environment happy-dom`.
 
-- API calls go through `src/shared/api/clients.ts` (`examClient`, `academicClient`, `studentClient`, built with `createServiceClient`); feature `api/` files use contract paths and `unwrap*`, with no URL helpers or `encodeURIComponent`.
-- Axios (`@mts241alikhlash/web-shared/utils/api`) remains in three places because the endpoint is outside the generated contracts: `GET /grades` (`exam-bank/api/examBankApi.ts`, not in the exam contract), `GET /users` (`exam-event/services/staffApi.ts`, identity service), `GET /school-units/letterhead` (`exam-room/api/examRoomApi.ts`, not in the exam contract).
-- `src/__tests__/api-calls-read-the-envelope.spec.ts` guards the remaining axios calls (threshold > 0); delete it when the last axios call is gone.
+- API calls go through `src/shared/api/clients.ts` (`examClient`, `academicClient`, `identityClient`, `studentClient`, built with `createServiceClient`); feature `api/` files use contract paths and `unwrap*`, with no URL helpers or `encodeURIComponent`. Nothing in the app imports the axios instance (`@mts241alikhlash/web-shared/utils/api`) directly; the auth and address features of `@mts241alikhlash/platform` still use it.
 
 ## Gotchas
 

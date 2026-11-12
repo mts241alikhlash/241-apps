@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { GET, POST } = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn() }))
+const { GET, POST, academicGet } = vi.hoisted(() => ({
+  GET: vi.fn(),
+  POST: vi.fn(),
+  academicGet: vi.fn(),
+}))
 
 vi.mock('@/shared/api/clients', () => ({
   examClient: { GET, POST },
+  academicClient: { GET: academicGet },
 }))
 
-vi.mock('@mts241alikhlash/web-shared/utils/api', () => ({
-  default: { get: vi.fn() },
-}))
-
-import api from '@mts241alikhlash/web-shared/utils/api'
 import { examBankApi } from './examBankApi'
 
 const ok = (data: unknown) => ({
@@ -84,9 +84,12 @@ describe('examBankApi', () => {
     expect(options.bodySerializer(form)).toBe(form)
   })
 
-  it('keeps the grades list on the legacy client', async () => {
-    vi.mocked(api.get).mockResolvedValue({ data: { data: [] } })
-    await examBankApi.getGrades({ limit: 5 })
-    expect(api.get).toHaveBeenCalledWith('/grades', { params: { limit: 5 } })
+  it('lists grades from the academic contract', async () => {
+    academicGet.mockResolvedValue(ok([{ id: 'g' }]))
+    const result = await examBankApi.getGrades({ limit: 5 })
+    expect(result.data).toEqual([{ id: 'g' }])
+    expect(academicGet).toHaveBeenCalledWith('/grades', {
+      params: { query: { limit: 5 } },
+    })
   })
 })

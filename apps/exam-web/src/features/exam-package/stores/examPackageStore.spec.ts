@@ -9,7 +9,7 @@ describe('examPackageStore', () => {
     const store = useExamPackageStore()
     store.subjects = [{ id: 'math', name: 'Matematika' }]
     store.grades = [
-      { id: 'g7', level: 7, name: null },
+      { id: 'g7', level: 7, name: '' },
       { id: 'g8', level: 8, name: 'VIII' },
     ]
 
@@ -23,7 +23,7 @@ describe('examPackageStore', () => {
   it('offers subject and grade options for the filters', () => {
     const store = useExamPackageStore()
     store.subjects = [{ id: 'math', name: 'Matematika' }]
-    store.grades = [{ id: 'g7', level: 7, name: null }]
+    store.grades = [{ id: 'g7', level: 7, name: '' }]
 
     expect(store.subjectOptions).toEqual([{ id: 'math', name: 'Matematika' }])
     expect(store.gradeOptions).toEqual([{ id: 'g7', name: 'Kelas 7' }])
