@@ -9,7 +9,6 @@ const ROOT_FILES = [
   'vitest.config.ts',
   'api-routes.config.ts',
   'eslint.config.mjs',
-  'eslint.typecheck.config.mjs',
 ]
 const EXTENSIONS = new Set(['.ts', '.vue', '.css', '.mjs'])
 const SKIPPED = [/^src\/generated\//, /^packages\/[^/]+\/src\/generated\.ts$/]

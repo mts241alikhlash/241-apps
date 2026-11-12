@@ -9,5 +9,5 @@ Read [README.md](README.md) first, then the root [AGENTS.md](../../AGENTS.md).
 
 ## Working here
 
-- Compare the JSON finding count of `lint` and `lint:strict` per package before and after a change.
-- Gate: run `lint` and `lint:strict` in one app and one service.
+- Compare the JSON finding count of `lint` per package before and after a change.
+- Gate: run `lint` in one app and one service.

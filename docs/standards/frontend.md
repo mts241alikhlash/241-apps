@@ -58,4 +58,4 @@ List paging rules are in [ui](ui.md) (the table) and [api](api.md) (the endpoint
 
 ## Gates
 
-`pnpm --filter <app> run validate` (format, lint, typecheck, strict lint, tests, build, routing manifest) must pass; a package runs its own `check` and `test`.
+`pnpm --filter <app> run validate` (format, type-aware lint, typecheck, tests, build, routing manifest) must pass; a package runs its own `check` and `test`.

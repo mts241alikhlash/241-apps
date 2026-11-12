@@ -9,7 +9,6 @@ export const GENERATED = [
   '**/coverage/',
   '**/src/generated/',
   'eslint.config.mjs',
-  'eslint.typecheck.config.mjs',
 ]
 
 export const TEST_FILES = [
@@ -39,14 +38,10 @@ export const UNUSED_VARS = [
   },
 ]
 
-export function typescript(typecheck) {
-  return typecheck
-    ? [
-        ...tseslint.configs.recommendedTypeChecked,
-        ...tseslint.configs.stylisticTypeChecked,
-      ]
-    : [...tseslint.configs.recommended, ...tseslint.configs.stylistic]
-}
+export const TYPESCRIPT = [
+  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+]
 
 export const TYPECHECK_RULES = {
   '@typescript-eslint/prefer-nullish-coalescing': [
@@ -76,13 +71,13 @@ export const COMMON_RULES = {
   '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
 }
 
-export function frame({ ignores = [], body, overrides = [], typecheck }) {
+export function frame({ ignores = [], body, overrides = [] }) {
   return [
     { ignores: [...GENERATED, ...ignores] },
     {
       linterOptions: {
-        reportUnusedDisableDirectives: typecheck ? 'error' : 'off',
-        reportUnusedInlineConfigs: typecheck ? 'error' : 'off',
+        reportUnusedDisableDirectives: 'error',
+        reportUnusedInlineConfigs: 'error',
       },
     },
     js.configs.recommended,

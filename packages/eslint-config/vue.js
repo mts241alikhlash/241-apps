@@ -7,7 +7,7 @@ import {
   TEST_RULES,
   TYPECHECK_RULES,
   frame,
-  typescript,
+  TYPESCRIPT,
 } from './shared.js'
 
 export const SINGLE_WORD_COMPONENTS = [
@@ -43,18 +43,12 @@ export const SINGLE_WORD_COMPONENTS = [
   'Tooltip',
 ]
 
-export function vue({
-  tsconfigRootDir,
-  typecheck = false,
-  ignores = [],
-  overrides = [],
-}) {
+export function vue({ tsconfigRootDir, ignores = [], overrides = [] }) {
   return frame({
-    typecheck,
     ignores: ['**/public/', ...ignores],
     overrides,
     body: [
-      ...typescript(typecheck),
+      ...TYPESCRIPT,
       ...pluginVue.configs['flat/recommended'],
       {
         files: ['**/*.{ts,vue}'],
@@ -65,10 +59,8 @@ export function vue({
           parserOptions: {
             parser: tseslint.parser,
             tsconfigRootDir,
-            ...(typecheck && {
-              projectService: true,
-              extraFileExtensions: ['.vue'],
-            }),
+            projectService: true,
+            extraFileExtensions: ['.vue'],
           },
         },
         rules: {
@@ -88,7 +80,7 @@ export function vue({
             { prefer: 'type-imports' },
           ],
           'no-console': ['error', { allow: ['warn', 'error'] }],
-          ...(typecheck && TYPECHECK_RULES),
+          ...TYPECHECK_RULES,
         },
       },
       {
