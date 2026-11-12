@@ -71,6 +71,15 @@ export class ManageExamEventsUseCase {
         'Periode ujian hanya untuk Penilaian Tengah Semester atau Penilaian Akhir Semester.',
       )
     }
+    if (edit.type !== undefined) {
+      const current = await this.get(id)
+      if (current.type !== edit.type && (await this.rooms.isEventLinked(id))) {
+        throw new ApiUnprocessableException(
+          'EVENT_TYPE_LINKED',
+          'Jenis periode tidak dapat diganti karena sudah ada kegiatan atau jadwal yang terhubung.',
+        )
+      }
+    }
     const updated = await this.rooms.updateEvent(id, edit)
     if (updated === null) {
       throw new NotFoundException('Kegiatan ujian tidak ditemukan')
