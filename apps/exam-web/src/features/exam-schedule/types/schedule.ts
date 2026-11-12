@@ -63,17 +63,9 @@ export type MakeupParticipantInput = Schemas['MakeupParticipantDto']
 
 export type MakeupCreatePayload = Schemas['CreateMakeupDto']
 
-export type ParticipantStatus =
-  'WAITING' | 'SAT_REGULAR' | 'IN_PROGRESS' | 'DONE'
+export type ParticipantStatus = MakeupParticipant['status']
 
-export interface MakeupParticipant {
-  studentId: string
-  name: string | null
-  nis: string | null
-  reason: MakeupReason
-  note: string | null
-  status: ParticipantStatus
-}
+export type MakeupParticipant = Schemas['ParticipantDto']
 
 export interface MakeupOrigin {
   id: string
