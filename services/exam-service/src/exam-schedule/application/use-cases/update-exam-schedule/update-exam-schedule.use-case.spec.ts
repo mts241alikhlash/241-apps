@@ -10,6 +10,7 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SEMESTER_ID,
   START,
   USER,
   approvedPackage,
@@ -65,7 +66,7 @@ describe('Update and cancel exam schedule', () => {
 
   const activeEvent = async (type: 'MIDTERM' | 'FINAL') => {
     const event = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: type === 'FINAL' ? 'UAS Ganjil' : 'UTS Ganjil',
       type,
       startsAt: START,
@@ -443,7 +444,7 @@ describe('Update and cancel exam schedule', () => {
 
   it('refuses to re-point a schedule that already has sessions', async () => {
     const event = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: 'UTS Ganjil',
       type: 'MIDTERM',
       startsAt: START,

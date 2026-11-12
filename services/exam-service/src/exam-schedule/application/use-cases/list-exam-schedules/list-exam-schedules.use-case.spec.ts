@@ -9,6 +9,7 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SEMESTER_ID,
   START,
   USER,
   approvedPackage,
@@ -121,7 +122,7 @@ describe('List and get exam schedules', () => {
     const pkg = await approvedPackage(packages, new FakeQuestionRepository())
     const rooms = new FakeExamRoomRepository()
     const created = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: 'UTS Ganjil',
       type: 'MIDTERM',
       startsAt: START,

@@ -68,6 +68,7 @@ export class CreateActivityUseCase {
       manageAll: command.manageAll,
       event,
       eventId: command.eventId ?? null,
+      semesterId: command.semesterId,
       startsAt: command.startsAt,
       endsAt: command.endsAt,
     })

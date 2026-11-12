@@ -181,7 +181,7 @@ export async function scheduleExam(
   let eventId: string | undefined
   if (type === 'MIDTERM' || type === 'FINAL') {
     const event = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: type,
       type,
       startsAt,

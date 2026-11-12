@@ -42,7 +42,10 @@ import { SuspendSessionUseCase } from './use-cases/suspend-session/suspend-sessi
 import { StartExamSessionUseCase } from './use-cases/start-exam-session/start-exam-session.use-case.js'
 import { CreateExamScheduleUseCase } from '../../exam-schedule/application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
 import { FakeAcademicLookup } from '../../exam-schedule/application/exam-schedule.test-support.js'
-import { CLASSROOM_7A } from '../../exam-schedule/application/exam-schedule.test-support.js'
+import {
+  CLASSROOM_7A,
+  SEMESTER_ID,
+} from '../../exam-schedule/application/exam-schedule.test-support.js'
 import { FakeExamAccessAttemptRepository } from './exam-access-attempt.repository.fake.js'
 import { FakeExamActivityRepository } from '../../exam-activity/application/exam-activity.repository.fake.js'
 import { LifecycleGate } from './lifecycle-gate.service.js'
@@ -96,7 +99,7 @@ async function setup(): Promise<Fixtures> {
     [choiceSpec('B'), choiceSpec('A')],
   )
   const event = await rooms.createEvent({
-    semesterId: 'sem-1',
+    semesterId: SEMESTER_ID,
     name: 'UTS Ganjil',
     type: 'MIDTERM',
     startsAt: new Date('2026-11-02T01:00:00.000Z'),

@@ -7,6 +7,7 @@ import { categoryOf } from '../../../exam-schedule/domain/policies/exam-category
 import type { ActivityTokenMode } from '../entities/exam-activity.entity.js'
 
 export interface ActivityEventRef {
+  semesterId: string
   type: ExamType
   status: 'DRAFT' | 'ACTIVE' | 'COMPLETED'
   startsAt: Date
@@ -18,6 +19,7 @@ export function assertTypeAllowed(input: {
   manageAll: boolean
   event: ActivityEventRef | null
   eventId: string | null
+  semesterId: string
   startsAt: Date
   endsAt: Date
 }): void {
@@ -57,6 +59,21 @@ export function assertTypeAllowed(input: {
         'Kegiatan ujian wajib memilih periode ujian yang sejenis.',
       )
     }
+    if (input.event.semesterId !== input.semesterId) {
+      throw new ApiUnprocessableException(
+        'EVENT_SEMESTER_MISMATCH',
+        'Periode ujian harus berada di semester yang sama dengan kegiatan.',
+      )
+    }
+    if (
+      input.startsAt.getTime() < input.event.startsAt.getTime() ||
+      input.endsAt.getTime() > input.event.endsAt.getTime()
+    ) {
+      throw new ApiUnprocessableException(
+        'EVENT_WINDOW_MISMATCH',
+        'Jendela kegiatan ujian harus berada di dalam rentang waktu periode ujian.',
+      )
+    }
   }
 }
 
@@ -67,6 +84,7 @@ export function assertActivityAllowed(input: {
   manageAll: boolean
   event: ActivityEventRef | null
   eventId: string | null
+  semesterId: string
   startsAt: Date
   endsAt: Date
 }): void {

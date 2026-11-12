@@ -113,7 +113,7 @@ describe('CreateExamScheduleUseCase', () => {
     type: 'MIDTERM' | 'FINAL',
   ) => {
     const event = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: type === 'FINAL' ? 'UAS Ganjil' : 'UTS Ganjil',
       type,
       startsAt: START,
@@ -157,7 +157,7 @@ describe('CreateExamScheduleUseCase', () => {
   it('refuses a midterm schedule from a teacher outside an active midterm event', async () => {
     const rooms = new FakeExamRoomRepository()
     const draft = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: 'UTS Ganjil',
       type: 'MIDTERM',
       startsAt: START,
@@ -305,7 +305,7 @@ describe('CreateExamScheduleUseCase', () => {
   it('stores the exam event it belongs to', async () => {
     const rooms = new FakeExamRoomRepository()
     const event = await rooms.createEvent({
-      semesterId: 'sem-1',
+      semesterId: SEMESTER_ID,
       name: 'UTS Ganjil',
       type: 'MIDTERM',
       startsAt: START,

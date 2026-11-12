@@ -108,7 +108,13 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   async findEventRef(eventId: string) {
     return this.prisma.examEvent.findUnique({
       where: { id: eventId },
-      select: { type: true, status: true, startsAt: true, endsAt: true },
+      select: {
+        semesterId: true,
+        type: true,
+        status: true,
+        startsAt: true,
+        endsAt: true,
+      },
     })
   }
 

@@ -81,6 +81,7 @@ export class CreateExamScheduleUseCase {
       manageAll: user.manageAll ?? false,
       event,
       eventId,
+      semesterId: semester.id,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
     })

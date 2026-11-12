@@ -192,6 +192,7 @@ describe('CreateActivityUseCase', () => {
   it('allows teacher to create MIDTERM inside an active MIDTERM event', async () => {
     const repo = new FakeActivityRepository()
     repo.events.set('event-pts', {
+      semesterId: 'sem-1',
       type: 'MIDTERM',
       status: 'ACTIVE',
       startsAt: new Date('2026-11-10T00:00:00Z'),

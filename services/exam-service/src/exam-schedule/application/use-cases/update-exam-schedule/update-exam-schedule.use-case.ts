@@ -67,6 +67,7 @@ export class UpdateExamScheduleUseCase {
       manageAll,
       event,
       eventId,
+      semesterId: existing.semesterId,
       startsAt: next.startsAt,
       endsAt: next.endsAt,
     })
