@@ -61,7 +61,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm dedupe --check
       - run: pnpm --filter @mts241alikhlash/nest-core run build
-      - run: pnpm run lint
+      - run: pnpm run format:check
+      - run: pnpm run docs:check
       - run: pnpm run openapi:check
       - run: pnpm run api:check
       - run: pnpm run version:check

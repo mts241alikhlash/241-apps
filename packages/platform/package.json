@@ -16,10 +16,9 @@
   "scripts": {
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "lint": "eslint \"src/**/*.{ts,vue}\" --max-warnings=0",
-    "lint:strict": "eslint -c eslint.typecheck.config.mjs \"src/**/*.{ts,vue}\" --max-warnings=0",
     "test": "vitest run",
     "check": "pnpm run typecheck && pnpm run lint",
-    "ci": "pnpm run typecheck && pnpm run lint && pnpm run lint:strict && pnpm run test"
+    "ci": "pnpm run typecheck && pnpm run lint && pnpm run test"
   },
   "dependencies": {
     "@mts241alikhlash/ui": "workspace:*",

@@ -25,10 +25,9 @@
     "start:prod": "node dist/src/main.js",
     "lint": "eslint \"{src,test,prisma}/**/*.ts\" --max-warnings=0",
     "lint:fix": "eslint \"{src,test,prisma}/**/*.ts\" --fix --max-warnings=0",
-    "lint:strict": "eslint -c eslint.typecheck.config.mjs \"{src,test}/**/*.ts\" --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "check": "pnpm run lint",
-    "validate": "pnpm run lint && pnpm run typecheck && pnpm run lint:strict && pnpm test && pnpm run build",
+    "validate": "pnpm run lint && pnpm run typecheck && pnpm test && pnpm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "vitest run --config vitest.e2e.config.mts",
@@ -39,7 +38,7 @@
     "seed:permissions": "tsx prisma/seed-permissions.ts",
     "seed:admin-minimal": "tsx prisma/seed-admin-minimal.ts",
     "regions:migration": "tsx prisma/region-migration.ts",
-    "ci": "pnpm run typecheck && pnpm run lint && pnpm run lint:strict && pnpm run test && pnpm run build"
+    "ci": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1129.0",

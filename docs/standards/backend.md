@@ -42,7 +42,7 @@ Applies to every NestJS service in `services/` and to `packages/nest-core`. Each
 
 **Rule.** No `any`, no `unknown` in a declared return type, no magic strings or numbers, no inline types inside use cases (types next to their port or in `types/`, constants in `constants/`).
 **Why.** Every untyped edge is a silent runtime failure.
-**Check.** ESLint `no-explicit-any` and the type-aware `no-unsafe-*` rules (`lint:strict`).
+**Check.** ESLint `no-explicit-any` and the type-aware `no-unsafe-*` rules (`lint`).
 
 **Rule.** Request-path failures throw NestJS HTTP exceptions (or a subclass of one). A plain `Error` is only for startup and configuration invariants (`AppConfigModule` validation, `SSO_APPS`, default roles), impossible states in mappers, and test fakes.
 **Why.** The shared filter maps HTTP exceptions to the response envelope; startup failures should stop the process.
@@ -120,4 +120,4 @@ The response envelope and DTO building rules are in [api](api.md).
 
 ## Gates
 
-A service is finished when `pnpm --filter <service> run validate` (format, lint, typecheck, strict lint, tests, build) passes. After `pnpm install` in a fresh checkout, run `pnpm --filter <service> run prisma:generate` first.
+A service is finished when `pnpm --filter <service> run validate` (format, type-aware lint, typecheck, tests, build) passes. After `pnpm install` in a fresh checkout, run `pnpm --filter <service> run prisma:generate` first.
