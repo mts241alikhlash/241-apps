@@ -9043,6 +9043,27 @@
           "capacity"
         ]
       },
+      "RoomMonitorLastEventDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "type",
+          "occurredAt",
+          "detail"
+        ]
+      },
       "RoomMonitorSessionDto": {
         "type": "object",
         "properties": {
@@ -9125,8 +9146,13 @@
             "type": "boolean"
           },
           "lastEvent": {
+            "nullable": true,
             "type": "object",
-            "nullable": true
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RoomMonitorLastEventDto"
+              }
+            ]
           }
         },
         "required": [

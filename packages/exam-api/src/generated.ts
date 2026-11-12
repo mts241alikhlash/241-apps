@@ -2221,6 +2221,12 @@ export interface components {
             /** @enum {string} */
             reason: "SICK" | "PERMITTED" | "ABSENT" | "OTHER";
         };
+        RoomMonitorLastEventDto: {
+            detail: string | null;
+            /** Format: date-time */
+            occurredAt: string;
+            type: string;
+        };
         RoomMonitorMetaDto: {
             limit: number;
             page: number;
@@ -2272,7 +2278,7 @@ export interface components {
             extraMinutes: number;
             isCharging: boolean | null;
             kioskMode: string;
-            lastEvent: Record<string, never> | null;
+            lastEvent: components["schemas"]["RoomMonitorLastEventDto"] | null;
             /** Format: date-time */
             lastSeenAt: string | null;
             lockedByViolation: boolean;
