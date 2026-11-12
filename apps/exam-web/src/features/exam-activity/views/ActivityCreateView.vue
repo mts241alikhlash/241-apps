@@ -112,10 +112,8 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
 async function loadActivity(): Promise<void> {
   loadingActivity.value = true
   try {
-    const response = await examActivityApi.list()
-    activity.value =
-      response.data.data.find((item) => item.id === editingId.value) ?? null
-    if (activity.value === null) error.value = 'Kegiatan tidak ditemukan.'
+    const response = await examActivityApi.get(editingId.value)
+    activity.value = response.data.data
   } catch {
     error.value = 'Kegiatan gagal dimuat.'
   } finally {
@@ -169,7 +167,7 @@ onMounted(() => {
           :grades="[]"
           :classrooms="[]"
           :packages="[]"
-          :is-admin="true"
+          :is-admin="isAdmin"
           :activity="activity"
           @status-saved="statusSaved"
           @numbers-issued="numbersIssued"
