@@ -16,7 +16,11 @@ describe('toInstant and fromInstant', () => {
         time: '08:00',
       })
     } finally {
-      process.env.TZ = previous
+      if (previous === undefined) {
+        delete process.env.TZ
+      } else {
+        process.env.TZ = previous
+      }
     }
   })
 
