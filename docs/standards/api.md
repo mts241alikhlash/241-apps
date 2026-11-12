@@ -36,6 +36,6 @@ Secret columns never appear in DTOs or responses: see [security](security.md).
 **Why.** Consumers pin on the version.
 **Check.** `pnpm run version:check`; `scripts/check-contract-compatibility.mjs` for breaking diffs.
 
-**Rule.** Web apps type responses from the generated client of the service that owns the endpoint (hr-web already uses `@mts241alikhlash/hr-api`); apps still using hand-written response types move over as they are touched.
+**Rule.** Web apps type responses from the generated client of the service that owns the endpoint (hr-web already uses `@mts241alikhlash/hr-api`); apps still using hand-written response types move over as they are touched. exam-web is the first app on full generated clients (`createServiceClient` over `exam-api`, `academic-api`, `student-api`).
 **Why.** One source of truth for response shapes.
 **Check.** review.
