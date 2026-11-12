@@ -1,3 +1,11 @@
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM "exam_events" WHERE "type"::text NOT IN ('UTS', 'UAS')) THEN
+    RAISE EXCEPTION 'exam_events holds a period that is not UTS or UAS; fix or remove those rows before this migration';
+  END IF;
+END
+$$;
+
 CREATE TYPE "ExamType_new" AS ENUM ('DAILY', 'ASSIGNMENT', 'MIDTERM', 'FINAL');
 
 ALTER TABLE "exam_schedules" ALTER COLUMN "type" DROP DEFAULT;
@@ -32,12 +40,8 @@ ALTER TABLE "exam_events"
   ALTER COLUMN "type" TYPE "ExamType_new"
   USING (
     CASE "type"::text
-      WHEN 'UH' THEN 'DAILY'::"ExamType_new"
-      WHEN 'QUIZ' THEN 'DAILY'::"ExamType_new"
-      WHEN 'ASSIGNMENT' THEN 'ASSIGNMENT'::"ExamType_new"
       WHEN 'UTS' THEN 'MIDTERM'::"ExamType_new"
       WHEN 'UAS' THEN 'FINAL'::"ExamType_new"
-      ELSE 'MIDTERM'::"ExamType_new"
     END
   );
 
