@@ -63,20 +63,89 @@ describe('Update and cancel exam schedule', () => {
     expect(updated.durationMinutes).toBe(120)
   })
 
+  const activeEvent = async (type: 'MIDTERM' | 'FINAL') => {
+    const event = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: type === 'FINAL' ? 'UAS Ganjil' : 'UTS Ganjil',
+      type,
+      startsAt: START,
+      endsAt: END,
+      createdById: USER.id,
+    })
+    return (await rooms.updateEvent(event.id, { status: 'ACTIVE' }))!
+  }
+
   it('changes the exam type while nobody has started', async () => {
+    const event = await activeEvent('FINAL')
+
     const updated = await new UpdateExamScheduleUseCase(
       schedules,
       guard,
       rooms,
-    ).execute(scheduleId, {
-      startsAt: START,
-      endsAt: END,
-      durationMinutes: 90,
-      type: 'FINAL',
-    })
+    ).execute(
+      scheduleId,
+      {
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'FINAL',
+        eventId: event.id,
+      },
+      true,
+    )
 
     expect(updated.type).toBe('FINAL')
     expect((await schedules.findById(scheduleId))?.type).toBe('FINAL')
+  })
+
+  it('refuses to turn a schedule into a final one without manage-all', async () => {
+    const event = await activeEvent('FINAL')
+
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'FINAL',
+          eventId: event.id,
+        },
+      ),
+    ).rejects.toMatchObject({ response: { code: 'FINAL_ADMIN_ONLY' } })
+    expect((await schedules.findById(scheduleId))?.type).toBe('DAILY')
+  })
+
+  it('refuses an exam type without an event even for an admin', async () => {
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'FINAL',
+        },
+        true,
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
+  })
+
+  it('refuses a teacher moving a midterm schedule outside its event', async () => {
+    const event = await activeEvent('MIDTERM')
+
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: new Date(END.getTime() + 3600_000),
+          durationMinutes: 90,
+          type: 'MIDTERM',
+          eventId: event.id,
+        },
+      ),
+    ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
   })
 
   it('refuses an invalid window without changing the schedule', async () => {

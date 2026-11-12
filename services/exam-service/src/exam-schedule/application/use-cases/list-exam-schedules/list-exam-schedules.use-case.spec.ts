@@ -119,11 +119,21 @@ describe('List and get exam schedules', () => {
     const packages = new FakeExamPackageRepository()
     const repo = new FakeExamScheduleRepository(packages)
     const pkg = await approvedPackage(packages, new FakeQuestionRepository())
+    const rooms = new FakeExamRoomRepository()
+    const created = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: START,
+      endsAt: END,
+      createdById: USER.id,
+    })
+    const event = (await rooms.updateEvent(created.id, { status: 'ACTIVE' }))!
     const creator = new CreateExamScheduleUseCase(
       repo,
       packages,
       new FakeAcademicLookup(),
-      new FakeExamRoomRepository(),
+      rooms,
     )
     for (let i = 0; i < 3; i += 1) {
       await creator.execute(USER, {
@@ -136,14 +146,18 @@ describe('List and get exam schedules', () => {
       })
     }
     for (let i = 0; i < 2; i += 1) {
-      await creator.execute(USER, {
-        packageId: pkg.id,
-        classroomId: CLASSROOM_7A.id,
-        startsAt: START,
-        endsAt: END,
-        durationMinutes: 90,
-        type: 'MIDTERM',
-      })
+      await creator.execute(
+        { ...USER, manageAll: true },
+        {
+          packageId: pkg.id,
+          classroomId: CLASSROOM_7A.id,
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'MIDTERM',
+          eventId: event.id,
+        },
+      )
     }
 
     const examPage = await new ListExamSchedulesUseCase(

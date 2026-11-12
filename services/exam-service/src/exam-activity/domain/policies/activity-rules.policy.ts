@@ -13,10 +13,8 @@ export interface ActivityEventRef {
   endsAt: Date
 }
 
-export function assertActivityAllowed(input: {
+export function assertTypeAllowed(input: {
   type: ExamType
-  presetName: ExamType
-  tokenMode: ActivityTokenMode
   manageAll: boolean
   event: ActivityEventRef | null
   startsAt: Date
@@ -51,6 +49,21 @@ export function assertActivityAllowed(input: {
         'Kegiatan ujian wajib memilih periode ujian yang sejenis.',
       )
     }
+  }
+}
+
+export function assertActivityAllowed(input: {
+  type: ExamType
+  presetName: ExamType
+  tokenMode: ActivityTokenMode
+  manageAll: boolean
+  event: ActivityEventRef | null
+  startsAt: Date
+  endsAt: Date
+}): void {
+  assertTypeAllowed(input)
+
+  if (categoryOf(input.type) === 'EXAM') {
     if (input.presetName !== input.type) {
       throw new ApiUnprocessableException(
         'PRESET_LOCKED',

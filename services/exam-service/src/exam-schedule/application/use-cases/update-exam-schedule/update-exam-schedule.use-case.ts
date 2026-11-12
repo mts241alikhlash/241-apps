@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { assertTypeAllowed } from '../../../../exam-activity/domain/policies/activity-rules.policy.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import type { ExamSchedule } from '../../../domain/entities/exam-schedule.entity.js'
 import { IScheduleSessionGuard } from '../../../domain/ports/schedule-session-guard.port.js'
@@ -28,6 +29,7 @@ export class UpdateExamScheduleUseCase {
   async execute(
     id: string,
     fields: ScheduleWindowFields,
+    manageAll = false,
   ): Promise<ExamSchedule> {
     const existing = await this.schedules.findById(id)
     if (existing === null) throw new NotFoundException('Jadwal tidak ditemukan')
@@ -37,11 +39,10 @@ export class UpdateExamScheduleUseCase {
 
     const eventId =
       fields.eventId === undefined ? existing.eventId : fields.eventId
-    if (eventId !== null && eventId !== existing.eventId) {
-      const event = await this.rooms.findEventById(eventId)
-      if (event === null) {
-        throw new NotFoundException('Kegiatan ujian tidak ditemukan')
-      }
+    const event =
+      eventId === null ? null : await this.rooms.findEventById(eventId)
+    if (eventId !== null && event === null) {
+      throw new NotFoundException('Kegiatan ujian tidak ditemukan')
     }
 
     if (await this.guard.hasSessions(id)) {
@@ -61,6 +62,13 @@ export class UpdateExamScheduleUseCase {
     }
     validateScheduleWindow(next)
     await this.assertMakeupRules(existing, next)
+    assertTypeAllowed({
+      type: next.type,
+      manageAll,
+      event,
+      startsAt: next.startsAt,
+      endsAt: next.endsAt,
+    })
     const updated = await this.schedules.updateWindow(id, next)
     if (updated === null) {
       throw new ConflictException(

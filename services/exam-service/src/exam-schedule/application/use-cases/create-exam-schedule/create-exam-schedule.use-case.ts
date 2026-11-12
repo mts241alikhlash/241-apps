@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { assertTypeAllowed } from '../../../../exam-activity/domain/policies/activity-rules.policy.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import { assertCanSchedule } from '../../../../exam-package/domain/policies/package-lifecycle.policy.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
@@ -39,7 +40,7 @@ export class CreateExamScheduleUseCase {
   ) {}
 
   async execute(
-    user: { id: string },
+    user: { id: string; manageAll?: boolean },
     input: CreateExamScheduleInput,
     now: Date = new Date(),
   ): Promise<ExamSchedule> {
@@ -70,12 +71,18 @@ export class CreateExamScheduleUseCase {
     }
 
     const eventId = input.eventId ?? null
-    if (eventId !== null) {
-      const event = await this.rooms.findEventById(eventId)
-      if (event === null) {
-        throw new NotFoundException('Kegiatan ujian tidak ditemukan')
-      }
+    const event =
+      eventId === null ? null : await this.rooms.findEventById(eventId)
+    if (eventId !== null && event === null) {
+      throw new NotFoundException('Kegiatan ujian tidak ditemukan')
     }
+    assertTypeAllowed({
+      type: input.type,
+      manageAll: user.manageAll ?? false,
+      event,
+      startsAt: input.startsAt,
+      endsAt: input.endsAt,
+    })
 
     const created = await this.schedules.createAndLockPackage({
       packageId: input.packageId,

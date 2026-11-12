@@ -40,7 +40,7 @@ describe('CreateExamScheduleUseCase', () => {
     )
     return {
       execute: (
-        user: { id: string },
+        user: { id: string; manageAll?: boolean },
         body: ReturnType<typeof input>,
         now: Date = NOW,
       ) => useCase.execute(user, body, now),
@@ -108,11 +108,81 @@ describe('CreateExamScheduleUseCase', () => {
     ).toBe(20)
   })
 
+  const activeEvent = async (
+    rooms: FakeExamRoomRepository,
+    type: 'MIDTERM' | 'FINAL',
+  ) => {
+    const event = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: type === 'FINAL' ? 'UAS Ganjil' : 'UTS Ganjil',
+      type,
+      startsAt: START,
+      endsAt: END,
+      createdById: 'admin-1',
+    })
+    return (await rooms.updateEvent(event.id, { status: 'ACTIVE' }))!
+  }
+
   it('keeps the exam type it was given', async () => {
-    const created = await build().execute(USER, input({ type: 'FINAL' }))
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'FINAL')
+
+    const created = await build(new FakeAcademicLookup(), rooms).execute(
+      { ...USER, manageAll: true },
+      input({ type: 'FINAL', eventId: event.id }),
+    )
 
     expect(created.type).toBe('FINAL')
     expect((await schedules.findById(created.id))?.type).toBe('FINAL')
+  })
+
+  it('refuses a final schedule from a teacher without manage-all', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'FINAL')
+
+    await expect(
+      build(new FakeAcademicLookup(), rooms).execute(
+        USER,
+        input({ type: 'FINAL', eventId: event.id }),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'FINAL_ADMIN_ONLY' } })
+  })
+
+  it('refuses a final schedule without an event even for an admin', async () => {
+    await expect(
+      build().execute({ ...USER, manageAll: true }, input({ type: 'FINAL' })),
+    ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
+  })
+
+  it('refuses a midterm schedule from a teacher outside an active midterm event', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const draft = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: START,
+      endsAt: END,
+      createdById: 'admin-1',
+    })
+
+    await expect(
+      build(new FakeAcademicLookup(), rooms).execute(
+        USER,
+        input({ type: 'MIDTERM', eventId: draft.id }),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
+  })
+
+  it('lets a teacher schedule a midterm inside an active midterm event', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'MIDTERM')
+
+    const created = await build(new FakeAcademicLookup(), rooms).execute(
+      USER,
+      input({ type: 'MIDTERM', eventId: event.id }),
+    )
+
+    expect(created.eventId).toBe(event.id)
   })
 
   it('refuses a classroom of another grade', async () => {

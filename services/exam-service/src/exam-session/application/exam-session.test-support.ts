@@ -174,20 +174,38 @@ export async function scheduleExam(
   } = {},
 ): Promise<ExamSchedule> {
   const pkg = await approvedPackage(fixtures.packages, fixtures.questions)
+  const rooms = new FakeExamRoomRepository()
+  const type = overrides.type ?? 'DAILY'
+  const startsAt = overrides.startsAt ?? STARTS
+  const endsAt = overrides.endsAt ?? ENDS
+  let eventId: string | undefined
+  if (type === 'MIDTERM' || type === 'FINAL') {
+    const event = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: type,
+      type,
+      startsAt,
+      endsAt,
+      createdById: USER.id,
+    })
+    eventId = event.id
+    await rooms.updateEvent(event.id, { status: 'ACTIVE' })
+  }
   return new CreateExamScheduleUseCase(
     fixtures.schedules,
     fixtures.packages,
     new FakeAcademicLookup(),
-    new FakeExamRoomRepository(),
+    rooms,
   ).execute(
-    USER,
+    { ...USER, manageAll: true },
     {
       packageId: pkg.id,
       classroomId: CLASSROOM_7A.id,
-      startsAt: overrides.startsAt ?? STARTS,
-      endsAt: overrides.endsAt ?? ENDS,
+      startsAt,
+      endsAt,
       durationMinutes: overrides.durationMinutes ?? 90,
-      type: overrides.type ?? 'DAILY',
+      type,
+      eventId,
     },
     new Date('2026-10-30T00:00:00.000Z'),
   )
