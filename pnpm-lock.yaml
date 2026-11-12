@@ -2039,6 +2039,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      openapi-fetch:
+        specifier: 'catalog:'
+        version: 0.17.0
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.7.0
