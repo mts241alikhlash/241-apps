@@ -41,8 +41,8 @@
     "ci": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1129.0",
-    "@aws-sdk/s3-request-presigner": "^3.1129.0",
+    "@aws-sdk/client-s3": "^3.1164.0",
+    "@aws-sdk/s3-request-presigner": "^3.1164.0",
     "@mts241alikhlash/nest-core": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
@@ -55,7 +55,7 @@
     "@nestjs/terminus": "catalog:",
     "@nestjs/throttler": "catalog:",
     "@prisma/adapter-pg": "catalog:",
-    "@prisma/client": "7.10.0",
+    "@prisma/client": "7.10.1",
     "bcrypt": "catalog:",
     "class-transformer": "catalog:",
     "class-validator": "catalog:",
@@ -69,7 +69,7 @@
     "passport-jwt": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
-    "prisma": "7.10.0",
+    "prisma": "7.10.1",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "tsx": "catalog:",
