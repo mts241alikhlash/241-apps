@@ -31,9 +31,6 @@ model ExamSession {
   violationCount Int             @default(0) @map("violation_count")
   lastSeenAt     DateTime?       @map("last_seen_at")
   absentSince    DateTime?       @map("absent_since")
-  lastSnapshotAt DateTime?       @map("last_snapshot_at")
-  snapshotCount  Int             @default(0) @map("snapshot_count")
-  cameraBlocked  String?         @map("camera_blocked") @db.VarChar(32)
   roomId         String?         @map("room_id") @db.Uuid
   seatNumber     Int?            @map("seat_number")
   requiresTokenReentry Boolean   @default(false) @map("requires_token_reentry")
@@ -58,7 +55,6 @@ model ExamSession {
   answers     ExamAnswer[]
   publication ScorePublication?
   events      ExamSessionEvent[]
-  snapshots   ExamProctorSnapshot[]
 
   @@unique([scheduleId, studentId])
   @@index([status, finalizeAt])
@@ -179,28 +175,4 @@ model ExamSessionAuditLog {
   @@index([sessionId, createdAt])
   @@index([roomId, createdAt])
   @@map("exam_session_audit_logs")
-}
-
-enum SnapshotKind {
-  LIVE
-  SESSION_START
-  VIOLATION_RETURN
-  PERIODIC_EVIDENCE
-}
-
-model ExamProctorSnapshot {
-  id         String       @id @default(uuid()) @db.Uuid
-  sessionId  String       @map("session_id") @db.Uuid
-  kind       SnapshotKind
-  storageKey String       @unique @map("storage_key") @db.VarChar(255)
-  sizeBytes  Int          @map("size_bytes")
-  capturedAt DateTime     @map("captured_at")
-  expiresAt  DateTime     @map("expires_at")
-  createdAt  DateTime     @default(now()) @map("created_at")
-
-  session ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId, kind, capturedAt])
-  @@index([expiresAt])
-  @@map("exam_proctor_snapshots")
 }
