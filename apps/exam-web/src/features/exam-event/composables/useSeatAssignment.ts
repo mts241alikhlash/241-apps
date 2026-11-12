@@ -27,7 +27,10 @@ export function useSeatAssignment(
 
   const nextSeatNumber = computed(
     () =>
-      seats.value.reduce((max, seat) => Math.max(max, seat.seatNumber), 0) + 1,
+      seats.value.reduce(
+        (max, seat) => Math.max(max, seat.seatNumber ?? 0),
+        0,
+      ) + 1,
   )
 
   async function load(nextRoomId = roomId.value) {

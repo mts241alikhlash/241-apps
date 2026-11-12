@@ -31,6 +31,7 @@ const event: ExamEvent = {
   semesterId: 'sem-1',
   name: 'UTS Ganjil',
   type: 'MIDTERM',
+  category: 'EXAM',
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-06T09:00:00.000Z',
   lateToleranceMinutes: 30,
@@ -68,7 +69,8 @@ describe('useEventList', () => {
       refresh: vi.fn(),
     })
     getEvents.mockResolvedValue({
-      data: { data: [event], meta: { total: 42, page: 2, limit: 25 } },
+      data: [event],
+      meta: { total: 42, page: 2, limit: 25 },
     })
   })
 

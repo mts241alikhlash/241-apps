@@ -1,134 +1,151 @@
-import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
-import api from '@mts241alikhlash/web-shared/utils/api'
+import {
+  unwrap,
+  unwrapPage,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
   EventCreatePayload,
   EventQueryParams,
   EventUpdatePayload,
-  ExamEvent,
-  ExamRoom,
-  RoomAccessCode,
   RoomCreatePayload,
-  RoomSeat,
   RoomUpdatePayload,
   SeatAssignPayload,
-  SeatFlag,
-  SupervisorSlot,
-  UserOption,
-  AuditLogEntry,
 } from '../types'
 
-const seg = encodeURIComponent
-
-const room = (roomId: string) => `/exam-rooms/${seg(roomId)}`
+const roomPath = (roomId: string) => ({ params: { path: { roomId } } })
 
 export const examEventApi = {
-  getEvents: (params?: EventQueryParams) =>
-    api.get<ApiPaginatedResponse<ExamEvent>>('/exam-events', { params }),
+  getEvents: (query?: EventQueryParams) =>
+    unwrapPage(examClient.GET('/exam-events', { params: { query } })),
 
   getEvent: (id: string) =>
-    api.get<ApiSingleResponse<ExamEvent>>(`/exam-events/${seg(id)}`),
+    unwrap(examClient.GET('/exam-events/{id}', { params: { path: { id } } })),
 
-  createEvent: (payload: EventCreatePayload) =>
-    api.post<ApiSingleResponse<ExamEvent>>('/exam-events', payload),
+  createEvent: (body: EventCreatePayload) =>
+    unwrap(examClient.POST('/exam-events', { body })),
 
-  updateEvent: (id: string, payload: EventUpdatePayload) =>
-    api.patch<ApiSingleResponse<ExamEvent>>(`/exam-events/${seg(id)}`, payload),
-
-  getRooms: (eventId: string) =>
-    api.get<ApiSingleResponse<ExamRoom[]>>(
-      `/exam-events/${seg(eventId)}/rooms`,
+  updateEvent: (id: string, body: EventUpdatePayload) =>
+    unwrap(
+      examClient.PATCH('/exam-events/{id}', {
+        params: { path: { id } },
+        body,
+      }),
     ),
 
-  createRoom: (eventId: string, payload: RoomCreatePayload) =>
-    api.post<ApiSingleResponse<ExamRoom>>(
-      `/exam-events/${seg(eventId)}/rooms`,
-      payload,
+  getRooms: (id: string) =>
+    unwrap(
+      examClient.GET('/exam-events/{id}/rooms', { params: { path: { id } } }),
     ),
 
-  updateRoom: (roomId: string, payload: RoomUpdatePayload) =>
-    api.patch<ApiSingleResponse<ExamRoom>>(room(roomId), payload),
+  createRoom: (id: string, body: RoomCreatePayload) =>
+    unwrap(
+      examClient.POST('/exam-events/{id}/rooms', {
+        params: { path: { id } },
+        body,
+      }),
+    ),
+
+  updateRoom: (roomId: string, body: RoomUpdatePayload) =>
+    unwrap(
+      examClient.PATCH('/exam-rooms/{roomId}', { ...roomPath(roomId), body }),
+    ),
 
   getSeats: (roomId: string) =>
-    api.get<ApiSingleResponse<RoomSeat[]>>(`${room(roomId)}/seats`),
+    unwrap(examClient.GET('/exam-rooms/{roomId}/seats', roomPath(roomId))),
 
   assignSeats: (roomId: string, students: SeatAssignPayload[]) =>
-    api.post<ApiSingleResponse<RoomSeat[]>>(`${room(roomId)}/seats`, {
-      students,
-    }),
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats', {
+        ...roomPath(roomId),
+        body: { students },
+      }),
+    ),
 
   distributeSeats: (
     roomId: string,
-    payload: {
+    body: {
       students: SeatAssignPayload[]
       roomIds: string[]
       interleaveByClassroom: boolean
     },
   ) =>
-    api.post<ApiSingleResponse<RoomSeat[]>>(`${room(roomId)}/seats`, payload),
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats', {
+        ...roomPath(roomId),
+        body,
+      }),
+    ),
 
   getSupervisors: (roomId: string) =>
-    api.get<ApiSingleResponse<SupervisorSlot[]>>(`${room(roomId)}/supervisors`),
+    unwrap(
+      examClient.GET('/exam-rooms/{roomId}/supervisors', roomPath(roomId)),
+    ),
 
   substituteSupervisor: (
     roomId: string,
     slotId: string,
-    payload: { actualUserId: string; reason: string },
+    body: { actualUserId: string; reason: string },
   ) =>
-    api.post<ApiSingleResponse<SupervisorSlot>>(
-      `${room(roomId)}/supervisors/${seg(slotId)}/substitute`,
-      payload,
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/supervisors/{slotId}/substitute', {
+        params: { path: { roomId, slotId } },
+        body,
+      }),
     ),
 
   getAccessCode: (roomId: string) =>
-    api.get<ApiSingleResponse<RoomAccessCode>>(`${room(roomId)}/access-code`),
+    unwrap(
+      examClient.GET('/exam-rooms/{roomId}/access-code', roomPath(roomId)),
+    ),
 
-  rotateToken: (roomId: string, payload: { reason: string }) =>
-    api.post<ApiSingleResponse<RoomAccessCode>>(
-      `${room(roomId)}/rotate-token`,
-      payload,
+  rotateToken: (roomId: string, body: { reason: string }) =>
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/rotate-token', {
+        ...roomPath(roomId),
+        body,
+      }),
     ),
 
   getAuditLogs: (roomId: string) =>
-    api.get<ApiSingleResponse<AuditLogEntry[]>>(`${room(roomId)}/audit-logs`),
+    unwrap(examClient.GET('/exam-rooms/{roomId}/audit-logs', roomPath(roomId))),
 
   assignSupervisor: (
     roomId: string,
-    payload: {
+    body: {
       scheduledUserId: string
       startsAt: string
       endsAt: string
       reason: string
     },
   ) =>
-    api.post<ApiSingleResponse<SupervisorSlot>>(
-      `${room(roomId)}/supervisors`,
-      payload,
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/supervisors', {
+        ...roomPath(roomId),
+        body,
+      }),
     ),
 
-  extendRoomTime: (
-    roomId: string,
-    payload: { minutes: number; reason: string },
-  ) =>
-    api.post<ApiSingleResponse<unknown>>(
-      `${room(roomId)}/extend-time`,
-      payload,
+  extendRoomTime: (roomId: string, body: { minutes: number; reason: string }) =>
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/extend-time', {
+        ...roomPath(roomId),
+        body,
+      }),
     ),
 
-  allowWeb: (roomId: string, studentId: string, payload: { reason: string }) =>
-    api.post<ApiSingleResponse<SeatFlag>>(
-      `${room(roomId)}/seats/${seg(studentId)}/allow-web`,
-      payload,
+  allowWeb: (roomId: string, studentId: string, body: { reason: string }) =>
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-web', {
+        params: { path: { roomId, studentId } },
+        body,
+      }),
     ),
 
-  allowLate: (roomId: string, studentId: string, payload: { reason: string }) =>
-    api.post<ApiSingleResponse<SeatFlag>>(
-      `${room(roomId)}/seats/${seg(studentId)}/allow-late`,
-      payload,
+  allowLate: (roomId: string, studentId: string, body: { reason: string }) =>
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-late', {
+        params: { path: { roomId, studentId } },
+        body,
+      }),
     ),
-
-  getUsers: (params?: { roleCode?: string; search?: string; limit?: number }) =>
-    api.get<ApiPaginatedResponse<UserOption>>('/users', { params }),
 }

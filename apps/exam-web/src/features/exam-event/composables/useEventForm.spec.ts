@@ -18,6 +18,7 @@ const existing: ExamEvent = {
   semesterId: 'sem-1',
   name: 'UTS Ganjil',
   type: 'MIDTERM',
+  category: 'EXAM',
   startsAt: toInstant('2026-11-02', '08:00'),
   endsAt: toInstant('2026-11-06', '12:00'),
   lateToleranceMinutes: 30,

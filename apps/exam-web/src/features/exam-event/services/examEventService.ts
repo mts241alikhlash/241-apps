@@ -4,6 +4,7 @@ import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { studentEnrollmentApi } from '@/features/lookup/classroom'
 import type { StudentEnrollment } from '@/features/lookup/classroom'
 import { examEventApi } from '../api/examEventApi'
+import { staffApi } from './staffApi'
 import type {
   EventCreatePayload,
   EventQueryParams,
@@ -55,7 +56,7 @@ export const examEventService = {
   async loadEvents(params?: EventQueryParams): Promise<Outcome<ExamEvent[]>> {
     try {
       const response = await examEventApi.getEvents(params)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response.data }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat kegiatan ujian.')
     }
@@ -73,7 +74,7 @@ export const examEventService = {
   async loadEvent(id: string): Promise<Outcome<ExamEvent>> {
     try {
       const response = await examEventApi.getEvent(id)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat kegiatan ujian.')
     }
@@ -88,7 +89,7 @@ export const examEventService = {
         target.mode === 'create'
           ? await examEventApi.createEvent(payload as EventCreatePayload)
           : await examEventApi.updateEvent(target.id, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyimpan kegiatan ujian.')
     }
@@ -97,7 +98,7 @@ export const examEventService = {
   async loadRooms(eventId: string): Promise<Outcome<ExamRoom[]>> {
     try {
       const response = await examEventApi.getRooms(eventId)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat daftar ruangan.')
     }
@@ -116,7 +117,7 @@ export const examEventService = {
               payload as RoomCreatePayload,
             )
           : await examEventApi.updateRoom(target.roomId, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyimpan ruangan.')
     }
@@ -136,7 +137,7 @@ export const examEventService = {
       )
       return {
         success: true,
-        data: (seats.data?.data ?? []).map((seat) => ({
+        data: seats.map((seat) => ({
           ...seat,
           name: byStudent.get(seat.studentId)?.name ?? null,
           nis: byStudent.get(seat.studentId)?.nis ?? null,
@@ -154,7 +155,7 @@ export const examEventService = {
   ): Promise<Outcome<RoomSeat[]>> {
     try {
       const response = await examEventApi.assignSeats(roomId, students)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal membagi kursi.')
     }
@@ -172,7 +173,7 @@ export const examEventService = {
         roomIds,
         interleaveByClassroom,
       })
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal membagi kursi otomatis.')
     }
@@ -181,7 +182,7 @@ export const examEventService = {
   async loadSupervisors(roomId: string): Promise<Outcome<SupervisorSlot[]>> {
     try {
       const response = await examEventApi.getSupervisors(roomId)
-      return { success: true, data: response.data?.data ?? [] }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat jadwal pengawas.')
     }
@@ -198,7 +199,7 @@ export const examEventService = {
         actualUserId,
         reason,
       })
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal mengganti pengawas.')
     }
@@ -207,7 +208,7 @@ export const examEventService = {
   async loadAccessCode(roomId: string): Promise<Outcome<RoomAccessCode>> {
     try {
       const response = await examEventApi.getAccessCode(roomId)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat token ruangan.')
     }
@@ -219,7 +220,7 @@ export const examEventService = {
   ): Promise<Outcome<RoomAccessCode>> {
     try {
       const response = await examEventApi.rotateToken(roomId, { reason })
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memutar token ruangan.')
     }
@@ -249,7 +250,7 @@ export const examEventService = {
       const response = await examEventApi.allowWeb(roomId, studentId, {
         reason,
       })
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal mengizinkan mode web.')
     }
@@ -264,7 +265,7 @@ export const examEventService = {
       const response = await examEventApi.allowLate(roomId, studentId, {
         reason,
       })
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal mengizinkan masuk terlambat.')
     }
@@ -273,7 +274,7 @@ export const examEventService = {
   async loadAuditLogs(roomId: string): Promise<AuditLogEntry[]> {
     try {
       const response = await examEventApi.getAuditLogs(roomId)
-      return response.data?.data ?? []
+      return response
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat riwayat.'))
       return []
@@ -291,7 +292,7 @@ export const examEventService = {
   ): Promise<Outcome<SupervisorSlot>> {
     try {
       const response = await examEventApi.assignSupervisor(roomId, payload)
-      return { success: true, data: response.data.data }
+      return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyimpan jadwal pengawas.')
     }
@@ -299,7 +300,7 @@ export const examEventService = {
 
   async loadStaff(roleCode: string): Promise<UserOption[]> {
     try {
-      const response = await examEventApi.getUsers({
+      const response = await staffApi.getUsers({
         roleCode,
         limit: 1000,
       })

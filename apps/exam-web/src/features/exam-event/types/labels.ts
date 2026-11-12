@@ -21,4 +21,5 @@ const EVENT_STATUS_TONES: Record<
 export const eventStatusVariant = (status: ExamEventStatus) =>
   EVENT_STATUS_TONES[status]
 
-export const seatLabel = (seatNumber: number): string => `Kursi ${seatNumber}`
+export const seatLabel = (seatNumber?: number): string =>
+  seatNumber === undefined ? '-' : `Kursi ${seatNumber}`

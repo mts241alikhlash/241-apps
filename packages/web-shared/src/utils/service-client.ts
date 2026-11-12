@@ -107,12 +107,12 @@ export async function unwrap<T>(result: Result<{ data?: T }>): Promise<T> {
 }
 
 export async function unwrapPage<T>(
-  result: Result<{ data?: T[]; meta?: PaginationMeta }>,
+  result: Result<{ data?: T[]; meta?: Partial<PaginationMeta> }>,
 ): Promise<{ data: T[]; meta: PaginationMeta }> {
   const body = await settle(result)
   return {
     data: body?.data ?? [],
-    meta: body?.meta ?? { total: 0, page: 1, limit: 0 },
+    meta: { total: 0, page: 1, limit: 0, ...body?.meta },
   }
 }
 

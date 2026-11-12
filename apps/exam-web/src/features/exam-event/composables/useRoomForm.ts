@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { examEventService } from '../services/examEventService'
-import type { ExamRoom, RoomCreatePayload, SupervisorSlot } from '../types'
+import type { ExamRoom, RoomUpdatePayload, SupervisorSlot } from '../types'
 
 export function useRoomForm(
   eventId: () => string,
@@ -24,13 +24,13 @@ export function useRoomForm(
     return null
   })
 
-  function payload(): RoomCreatePayload {
+  function payload(): RoomUpdatePayload {
     return {
       code: code.value.trim(),
       name: name.value.trim(),
       building: building.value.trim() || null,
       capacity: capacity.value ?? 0,
-      technicianUserId: technicianUserId.value || null,
+      technicianUserId: technicianUserId.value || (room?.() ? null : undefined),
     }
   }
 
