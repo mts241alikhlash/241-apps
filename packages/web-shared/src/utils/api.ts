@@ -91,8 +91,6 @@ api.interceptors.response.use(
 
       try {
         return await api(originalRequest as AxiosRequestConfig)
-      } catch (retryError) {
-        handleRefreshFailure(retryError)
       } finally {
         refreshing = false
       }

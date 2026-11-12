@@ -2,12 +2,14 @@ import axios, { AxiosError } from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import api from './api'
-import { clearSession, setAccessToken } from './auth-session'
+import { toast } from 'vue-sonner'
+import { clearSession, getAccessToken, setAccessToken } from './auth-session'
 
 vi.mock('vue-sonner', () => ({ toast: { error: vi.fn() } }))
 
 const calls: { url: string; auth?: string }[] = []
 let alwaysUnauthorized = false
+let retryStatus = 200
 
 function adapter(config: InternalAxiosRequestConfig) {
   const auth = config.headers.Authorization as string | undefined
@@ -22,7 +24,12 @@ function adapter(config: InternalAxiosRequestConfig) {
   if (config.url?.endsWith('/auth/refresh')) {
     return respond(200, { accessToken: 'new' })
   }
-  if (!alwaysUnauthorized && auth === 'Bearer new') return respond(200, 'ok')
+  if (!alwaysUnauthorized && auth === 'Bearer new') {
+    return respond(
+      retryStatus,
+      retryStatus < 400 ? 'ok' : { message: 'invalid' },
+    )
+  }
   return respond(401, {})
 }
 
@@ -31,6 +38,8 @@ const refreshCalls = () => calls.filter((c) => c.url.endsWith('/auth/refresh'))
 beforeEach(() => {
   calls.length = 0
   alwaysUnauthorized = false
+  retryStatus = 200
+  vi.mocked(toast.error).mockClear()
   api.defaults.adapter = adapter
   axios.defaults.adapter = adapter
   clearSession()
@@ -58,5 +67,15 @@ describe('api refresh interceptor', () => {
     alwaysUnauthorized = true
     await expect(api.get('/a')).rejects.toBeInstanceOf(AxiosError)
     expect(refreshCalls()).toHaveLength(1)
+  })
+
+  it('passes a failed retry to the caller without ending the session', async () => {
+    retryStatus = 422
+    const error = await api.get('/a').catch((e: AxiosError) => e)
+
+    expect(error).toBeInstanceOf(AxiosError)
+    expect((error as AxiosError).response?.status).toBe(422)
+    expect(toast.error).not.toHaveBeenCalled()
+    expect(getAccessToken()).toBe('new')
   })
 })
