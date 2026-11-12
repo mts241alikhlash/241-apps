@@ -1,103 +1,146 @@
-import type {
-  ApiPaginatedResponse,
-  ApiSingleResponse,
-} from '@mts241alikhlash/web-shared/types/api'
+import type { ApiSingleResponse } from '@mts241alikhlash/web-shared/types/api'
 import api from '@mts241alikhlash/web-shared/utils/api'
+import {
+  unwrap,
+  unwrapPage,
+} from '@mts241alikhlash/web-shared/utils/service-client'
+import { examClient } from '@/shared/api/clients'
 import type {
   Letterhead,
   RoomAbsencePayload,
   RoomFieldNotePayload,
-  RoomMonitorMeta,
-  RoomMonitorParticipant,
   RoomMonitorQuery,
-  RoomOverview,
-  RoomReport,
   RoomReportPayload,
-  SessionTimelineEntry,
-  SupervisorSlotRow,
 } from '../types'
 
-const seg = encodeURIComponent
-
-const room = (roomId: string) => `/exam-rooms/${seg(roomId)}`
-
-const report = (roomId: string, slotId: string) =>
-  `${room(roomId)}/reports/${seg(slotId)}`
+const reportPath = (roomId: string, slotId: string) => ({
+  params: { path: { roomId, slotId } },
+})
 
 export const examRoomApi = {
-  getOverview: (params?: { eventId?: string }) =>
-    api.get<ApiSingleResponse<RoomOverview[]>>('/exam-rooms/overview', {
-      params,
-    }),
+  getOverview: (query?: { eventId?: string }) =>
+    unwrap(examClient.GET('/exam-rooms/overview', { params: { query } })),
 
-  getMonitor: (roomId: string, params?: RoomMonitorQuery) =>
-    api.get<ApiPaginatedResponse<RoomMonitorParticipant, RoomMonitorMeta>>(
-      `${room(roomId)}/monitor`,
-      { params },
+  getMonitor: (roomId: string, query?: RoomMonitorQuery) =>
+    unwrapPage(
+      examClient.GET('/exam-rooms/{roomId}/monitor', {
+        params: { path: { roomId }, query },
+      }),
     ),
 
   getSupervisors: (roomId: string) =>
-    api.get<ApiSingleResponse<SupervisorSlotRow[]>>(
-      `${room(roomId)}/supervisors`,
+    unwrap(
+      examClient.GET('/exam-rooms/{roomId}/supervisors', {
+        params: { path: { roomId } },
+      }),
     ),
 
-  getTimeline: (sessionId: string) =>
-    api.get<ApiSingleResponse<SessionTimelineEntry[]>>(
-      `/exam-sessions/${seg(sessionId)}/timeline`,
+  getTimeline: (id: string) =>
+    unwrap(
+      examClient.GET('/exam-sessions/{id}/timeline', {
+        params: { path: { id } },
+      }),
     ),
 
-  releaseSession: (sessionId: string, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/release`, { reason }),
+  releaseSession: (id: string, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/release', {
+        params: { path: { id } },
+        body: { reason },
+      }),
+    ),
 
-  reopenSession: (sessionId: string, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/reopen`, { reason }),
+  reopenSession: (id: string, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/reopen', {
+        params: { path: { id } },
+        body: { reason },
+      }),
+    ),
 
-  resetSession: (sessionId: string, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/reset`, { reason }),
+  resetSession: (id: string, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/reset', {
+        params: { path: { id } },
+        body: { reason },
+      }),
+    ),
 
-  extendSessionTime: (sessionId: string, minutes: number, reason: string) =>
-    api.post(`/exam-sessions/${seg(sessionId)}/extend-time`, {
-      minutes,
-      reason,
-    }),
+  extendSessionTime: (id: string, minutes: number, reason: string) =>
+    unwrap(
+      examClient.POST('/exam-sessions/{id}/extend-time', {
+        params: { path: { id } },
+        body: { minutes, reason },
+      }),
+    ),
 
   allowWeb: (roomId: string, studentId: string, reason: string) =>
-    api.post(`${room(roomId)}/seats/${seg(studentId)}/allow-web`, { reason }),
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-web', {
+        params: { path: { roomId, studentId } },
+        body: { reason },
+      }),
+    ),
 
   allowLate: (roomId: string, studentId: string, reason: string) =>
-    api.post(`${room(roomId)}/seats/${seg(studentId)}/allow-late`, { reason }),
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-late', {
+        params: { path: { roomId, studentId } },
+        body: { reason },
+      }),
+    ),
 
   getReport: (roomId: string, slotId: string) =>
-    api.get<ApiSingleResponse<RoomReport>>(report(roomId, slotId)),
+    unwrap(
+      examClient.GET(
+        '/exam-rooms/{roomId}/reports/{slotId}',
+        reportPath(roomId, slotId),
+      ),
+    ),
 
-  saveReport: (roomId: string, slotId: string, payload: RoomReportPayload) =>
-    api.put<ApiSingleResponse<RoomReport>>(report(roomId, slotId), payload),
+  saveReport: (roomId: string, slotId: string, body: RoomReportPayload) =>
+    unwrap(
+      examClient.PUT('/exam-rooms/{roomId}/reports/{slotId}', {
+        ...reportPath(roomId, slotId),
+        body,
+      }),
+    ),
 
-  recordAbsence: (
-    roomId: string,
-    slotId: string,
-    payload: RoomAbsencePayload,
-  ) =>
-    api.post<ApiSingleResponse<RoomReport>>(
-      `${report(roomId, slotId)}/absences`,
-      payload,
+  recordAbsence: (roomId: string, slotId: string, body: RoomAbsencePayload) =>
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/reports/{slotId}/absences', {
+        ...reportPath(roomId, slotId),
+        body,
+      }),
     ),
 
   recordFieldNote: (
     roomId: string,
     slotId: string,
-    payload: RoomFieldNotePayload,
+    body: RoomFieldNotePayload,
   ) =>
-    api.post<ApiSingleResponse<RoomReport>>(
-      `${report(roomId, slotId)}/field-notes`,
-      payload,
+    unwrap(
+      examClient.POST('/exam-rooms/{roomId}/reports/{slotId}/field-notes', {
+        ...reportPath(roomId, slotId),
+        body,
+      }),
     ),
 
   submitReport: (roomId: string, slotId: string) =>
-    api.post<ApiSingleResponse<RoomReport>>(`${report(roomId, slotId)}/submit`),
+    unwrap(
+      examClient.POST(
+        '/exam-rooms/{roomId}/reports/{slotId}/submit',
+        reportPath(roomId, slotId),
+      ),
+    ),
 
   verifyReport: (roomId: string, slotId: string) =>
-    api.post<ApiSingleResponse<RoomReport>>(`${report(roomId, slotId)}/verify`),
+    unwrap(
+      examClient.POST(
+        '/exam-rooms/{roomId}/reports/{slotId}/verify',
+        reportPath(roomId, slotId),
+      ),
+    ),
 
   getLetterhead: () =>
     api.get<ApiSingleResponse<Letterhead>>('/school-units/letterhead'),

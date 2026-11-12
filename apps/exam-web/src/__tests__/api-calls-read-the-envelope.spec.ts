@@ -68,7 +68,7 @@ describe('every API call reads the envelope it is sent', () => {
 
   it('finds the call sites', () => {
     const total = files.reduce((n, f) => n + apiCallGenerics(f.text).length, 0)
-    expect(total).toBeGreaterThan(50)
+    expect(total).toBeGreaterThan(20)
   })
 
   it('never types a response body as the payload itself', () => {
