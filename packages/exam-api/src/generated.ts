@@ -1363,7 +1363,9 @@ export interface components {
         };
         AdjustPackageItemKeyDto: {
             /** @description The replacement answer key; required for KEY_OVERRIDE, ignored otherwise */
-            overrideContent?: Record<string, never>;
+            overrideContent?: {
+                [key: string]: unknown;
+            };
             reason: string;
             /** @enum {string} */
             resolution: "NORMAL" | "BONUS_ALL" | "KEY_OVERRIDE";

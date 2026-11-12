@@ -15,6 +15,8 @@ export class AdjustPackageItemKeyDto {
   resolution!: ItemResolution
 
   @ApiPropertyOptional({
+    type: 'object',
+    additionalProperties: true,
     description:
       'The replacement answer key; required for KEY_OVERRIDE, ignored otherwise',
   })
