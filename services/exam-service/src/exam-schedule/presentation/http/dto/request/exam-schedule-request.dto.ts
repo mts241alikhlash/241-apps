@@ -54,11 +54,13 @@ export class UpdateExamScheduleDto {
 
   @ApiPropertyOptional({
     format: 'uuid',
-    description: 'The exam event this schedule belongs to; seats come from it',
+    nullable: true,
+    description:
+      'The exam event this schedule belongs to; seats come from it. Null detaches it',
   })
   @IsOptional()
   @IsUUID()
-  eventId?: string
+  eventId?: string | null
 }
 
 export class CreateExamScheduleDto extends UpdateExamScheduleDto {

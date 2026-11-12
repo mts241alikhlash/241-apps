@@ -8503,8 +8503,9 @@
           },
           "eventId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it"
+            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
           },
           "packageId": {
             "type": "string",
@@ -8556,8 +8557,9 @@
           },
           "eventId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it"
+            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
           }
         },
         "required": [

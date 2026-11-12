@@ -1473,9 +1473,9 @@ export interface components {
             endsAt: string;
             /**
              * Format: uuid
-             * @description The exam event this schedule belongs to; seats come from it
+             * @description The exam event this schedule belongs to; seats come from it. Null detaches it
              */
-            eventId?: string;
+            eventId?: string | null;
             minSubmitMinutes?: number;
             /** Format: uuid */
             packageId: string;
@@ -2592,9 +2592,9 @@ export interface components {
             endsAt: string;
             /**
              * Format: uuid
-             * @description The exam event this schedule belongs to; seats come from it
+             * @description The exam event this schedule belongs to; seats come from it. Null detaches it
              */
-            eventId?: string;
+            eventId?: string | null;
             minSubmitMinutes?: number;
             /** Format: date-time */
             startsAt: string;
