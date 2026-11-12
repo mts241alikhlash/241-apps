@@ -22,12 +22,12 @@ describe('StorageService.deleteObject', () => {
   it('deletes the key from the bucket', async () => {
     const send = vi.fn().mockResolvedValue({})
 
-    await storageWith(send).deleteObject('exam-proctor/s1/latest.jpg')
+    await storageWith(send).deleteObject('exam-files/f1.png')
 
     expect(send).toHaveBeenCalledTimes(1)
     expect(
       (send.mock.calls[0][0] as { input: Record<string, string> }).input,
-    ).toEqual({ Bucket: 'bucket', Key: 'exam-proctor/s1/latest.jpg' })
+    ).toEqual({ Bucket: 'bucket', Key: 'exam-files/f1.png' })
   })
 
   it('answers 500 when the store refuses the delete', async () => {

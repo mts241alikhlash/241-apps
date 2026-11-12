@@ -25,7 +25,6 @@ Setiap jenis memiliki satu preset bawaan di tabel `exam_policy_presets`:
 | ---------------------------------------------- | ------------------ | ------------------ | ------------------------ | ------------------------- |
 | Batas pelanggaran sebelum dikumpulkan otomatis | 3                  | 3                  | 3                        | 3                         |
 | Ambang "fokus hilang"                          | 10 detik           | 10 detik           | 10 detik                 | 10 detik                  |
-| Jeda foto pengawas                             | 15 detik           | 15 detik           | 15 detik                 | 30 detik                  |
 | Detak kehadiran                                | 15 detik           | 15 detik           | 15 detik                 | 15 detik                  |
 | Hilang dicatat mulai                           | 60 detik           | 60 detik           | 60 detik                 | 5 menit                   |
 | Hilang wajib token mulai                       | 5 menit            | 5 menit            | 5 menit                  | 30 menit                  |

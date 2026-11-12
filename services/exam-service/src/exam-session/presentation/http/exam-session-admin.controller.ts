@@ -7,8 +7,6 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
-  Res,
-  StreamableFile,
   UseGuards,
 } from '@nestjs/common'
 import {
@@ -18,8 +16,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import type { Response } from 'express'
-import type { Readable } from 'node:stream'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequireAnyPermission } from '@mts241alikhlash/nest-core/access-control'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
@@ -33,8 +29,6 @@ import { ResetSessionUseCase } from '../../application/use-cases/reset-session/r
 import { ExtendSessionTimeUseCase } from '../../application/use-cases/extend-session-time/extend-session-time.use-case.js'
 import { ListSessionAuditLogsUseCase } from '../../application/use-cases/list-session-audit-logs/list-session-audit-logs.use-case.js'
 import { GetSessionTimelineUseCase } from '../../../exam-room/application/use-cases/get-session-timeline/get-session-timeline.use-case.js'
-import { GetProctorSnapshotUseCase } from '../../application/use-cases/get-proctor-snapshot/get-proctor-snapshot.use-case.js'
-import { ListSessionSnapshotsUseCase } from '../../application/use-cases/list-session-snapshots/list-session-snapshots.use-case.js'
 import { SessionTimelineEntryDto } from '../../../exam-room/presentation/http/dto/room-monitor.dto.js'
 import {
   ScheduleSessionDto,
@@ -46,21 +40,6 @@ import {
   RecoveryReasonDto,
   RecoverySessionDto,
 } from './dto/recovery.dto.js'
-import { ProctorSnapshotDto } from './dto/proctor-snapshot.dto.js'
-
-function streamJpeg(
-  sizeBytes: number,
-  stream: Readable,
-  res: Response,
-): StreamableFile {
-  res.set({
-    'Content-Type': 'image/jpeg',
-    'Content-Length': String(sizeBytes),
-    'X-Content-Type-Options': 'nosniff',
-    'Cache-Control': 'private, max-age=10',
-  })
-  return new StreamableFile(stream)
-}
 
 @ApiTags('Exam Sessions')
 @ApiBearerAuth()
@@ -75,8 +54,6 @@ export class ExamSessionAdminController {
     private readonly extendSession: ExtendSessionTimeUseCase,
     private readonly listAuditLogs: ListSessionAuditLogsUseCase,
     private readonly timeline: GetSessionTimelineUseCase,
-    private readonly listSnapshots: ListSessionSnapshotsUseCase,
-    private readonly getSnapshot: GetProctorSnapshotUseCase,
   ) {}
 
   @Get('exam-schedules/:id/sessions')
@@ -121,78 +98,6 @@ export class ExamSessionAdminController {
     return (await this.timeline.execute(user, id)).map((row) =>
       SessionTimelineEntryDto.fromDomain(row),
     )
-  }
-
-  @Get('exam-sessions/:id/snapshots')
-  @RequireAnyPermission(
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  )
-  @ApiOperation({ summary: 'The evidence snapshots kept for this session' })
-  @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiResponse({ status: 200, type: [ProctorSnapshotDto] })
-  async snapshots(
-    @CurrentUser() user: RoomStaffUser,
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ProctorSnapshotDto[]> {
-    return (await this.listSnapshots.execute(user, id)).map((row) =>
-      ProctorSnapshotDto.fromDomain(row),
-    )
-  }
-
-  @Get('exam-sessions/:id/snapshots/latest')
-  @RequireAnyPermission(
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  )
-  @ApiOperation({ summary: 'Stream the newest snapshot of this session' })
-  @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiResponse({
-    status: 200,
-    description: 'The JPEG bytes',
-    content: { 'image/jpeg': { schema: { type: 'string', format: 'binary' } } },
-  })
-  async latestSnapshot(
-    @CurrentUser() user: RoomStaffUser,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<StreamableFile> {
-    const { contentLength, stream } = await this.getSnapshot.execute(
-      user,
-      id,
-      'latest',
-    )
-    return streamJpeg(contentLength, stream, res)
-  }
-
-  @Get('exam-sessions/:id/snapshots/:snapshotId')
-  @RequireAnyPermission(
-    'exam-rooms.supervise',
-    'exam-rooms.technician',
-    'exam-rooms.manage-all',
-  )
-  @ApiOperation({ summary: 'Stream one evidence snapshot of this session' })
-  @ApiParam({ name: 'id', format: 'uuid' })
-  @ApiParam({ name: 'snapshotId', format: 'uuid' })
-  @ApiResponse({
-    status: 200,
-    description: 'The JPEG bytes',
-    content: { 'image/jpeg': { schema: { type: 'string', format: 'binary' } } },
-  })
-  async snapshot(
-    @CurrentUser() user: RoomStaffUser,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('snapshotId', ParseUUIDPipe) snapshotId: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<StreamableFile> {
-    const { contentLength, stream } = await this.getSnapshot.execute(
-      user,
-      id,
-      snapshotId,
-    )
-    return streamJpeg(contentLength, stream, res)
   }
 
   @Post('exam-sessions/:id/release')

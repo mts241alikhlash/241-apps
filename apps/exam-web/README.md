@@ -25,4 +25,4 @@ Dev port 5181.
 
 ## Open work
 
-- Camera proctoring UI and AI import are not finished.
+- AI import is not finished.

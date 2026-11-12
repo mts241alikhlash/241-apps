@@ -1,5 +1,5 @@
 import { toast } from 'vue-sonner'
-import { examRoomApi, latestSnapshotPath } from '../api/examRoomApi'
+import { examRoomApi } from '../api/examRoomApi'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import type {
   Letterhead,
@@ -10,7 +10,6 @@ import type {
   RoomOverview,
   RoomReport,
   RoomReportPayload,
-  ProctorSnapshotEvidence,
   SessionTimelineEntry,
   SupervisorSlotRow,
 } from '../types'
@@ -276,49 +275,6 @@ export const examRoomService = {
       return { success: true, data: response.data.data }
     } catch (err: unknown) {
       return failure(err, 'Gagal memverifikasi berita acara.')
-    }
-  },
-
-  async loadSnapshot(path: string): Promise<Blob | null> {
-    try {
-      const response = await examRoomApi.getLatestSnapshot(path)
-      return response.data
-    } catch {
-      return null
-    }
-  },
-
-  async loadSnapshotImage(
-    sessionId: string,
-    snapshotId: string,
-  ): Promise<Blob | null> {
-    try {
-      const response = await examRoomApi.getSnapshot(sessionId, snapshotId)
-      return response.data
-    } catch {
-      return null
-    }
-  },
-
-  async loadLatestSnapshot(sessionId: string): Promise<Blob | null> {
-    try {
-      const response = await examRoomApi.getLatestSnapshot(
-        latestSnapshotPath(sessionId),
-      )
-      return response.data
-    } catch {
-      return null
-    }
-  },
-
-  async loadEvidence(
-    sessionId: string,
-  ): Promise<Outcome<ProctorSnapshotEvidence[]>> {
-    try {
-      const response = await examRoomApi.getSessionSnapshots(sessionId)
-      return { success: true, data: response.data?.data ?? [] }
-    } catch (err: unknown) {
-      return failure(err, 'Gagal memuat galeri bukti.')
     }
   },
 

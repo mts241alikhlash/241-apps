@@ -32,9 +32,6 @@ const session = (
   lockedByViolation: false,
   requiresTokenReentry: false,
   lastEvent: null,
-  latestSnapshotUrl: null,
-  lastSnapshotAt: null,
-  cameraBlocked: null,
   ...overrides,
 })
 

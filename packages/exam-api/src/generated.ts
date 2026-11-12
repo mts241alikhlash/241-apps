@@ -1074,57 +1074,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/exam-sessions/{id}/snapshots": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The evidence snapshots kept for this session */
-        get: operations["ExamSessionAdminController_snapshots"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/exam-sessions/{id}/snapshots/{snapshotId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream one evidence snapshot of this session */
-        get: operations["ExamSessionAdminController_snapshot"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/exam-sessions/{id}/snapshots/latest": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream the newest snapshot of this session */
-        get: operations["ExamSessionAdminController_latestSnapshot"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/exam-sessions/{id}/timeline": {
         parameters: {
             query?: never;
@@ -1228,23 +1177,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/student-exams/{sessionId}/camera-blocked": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Record why the camera cannot take a snapshot */
-        post: operations["SessionExamController_cameraBlocked"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/student-exams/{sessionId}/events": {
         parameters: {
             query?: never;
@@ -1290,23 +1222,6 @@ export interface paths {
         put?: never;
         /** Keep the session seen and read its lock state */
         post: operations["SessionExamController_heartbeatNow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/student-exams/{sessionId}/proctor-snapshot": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Upload a proctoring snapshot (JPEG, 1 MB) */
-        post: operations["SessionExamController_snapshot"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1488,10 +1403,6 @@ export interface components {
             roomId: string | null;
             /** Format: uuid */
             sessionId: string | null;
-        };
-        CameraBlockedDto: {
-            /** @enum {string} */
-            reason: "network" | "permission" | "battery" | "stopped" | "hardware" | "cameraBusy";
         };
         ConfirmedAnswerDto: {
             clientId: string;
@@ -1773,7 +1684,6 @@ export interface components {
             gapTokenMs: number;
             gapViolationFrom: number;
             heartbeatIntervalMs: number;
-            snapshotIntervalMs: number;
             tokenSlotSeconds: number;
             violationLimit: number;
         };
@@ -2075,25 +1985,6 @@ export interface components {
             /** Format: uuid */
             studentId: string;
         };
-        ProctorSnapshotDto: {
-            /** Format: date-time */
-            capturedAt: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            expiresAt: string;
-            /** Format: uuid */
-            id: string;
-            /** @enum {string} */
-            kind: "LIVE" | "SESSION_START" | "VIOLATION_RETURN" | "PERIODIC_EVIDENCE";
-            /** Format: uuid */
-            sessionId: string;
-            sizeBytes: number;
-        };
-        ProctorSnapshotUploadedDto: {
-            /** Format: uuid */
-            evidenceId: string | null;
-        };
         QuestionDetailDto: {
             /** Format: uuid */
             authorEmployeeId: string;
@@ -2343,8 +2234,6 @@ export interface components {
             answeredCount: number;
             batteryLevel: number | null;
             batteryUnrestricted: boolean | null;
-            /** @enum {string|null} */
-            cameraBlocked: "network" | "permission" | "battery" | "stopped" | "hardware" | "cameraBusy" | null;
             /** Format: date-time */
             deadline: string;
             dndGranted: boolean | null;
@@ -2354,9 +2243,6 @@ export interface components {
             lastEvent: Record<string, never> | null;
             /** Format: date-time */
             lastSeenAt: string | null;
-            /** Format: date-time */
-            lastSnapshotAt: string | null;
-            latestSnapshotUrl: string | null;
             lockedByViolation: boolean;
             lockTaskActive: boolean | null;
             requiresTokenReentry: boolean;
@@ -2661,7 +2547,6 @@ export interface components {
             gapTokenMs?: number;
             gapViolationFrom?: number;
             heartbeatIntervalMs?: number;
-            snapshotIntervalMs?: number;
             tokenSlotSeconds?: number;
             violationLimit?: number;
         };
@@ -5022,78 +4907,6 @@ export interface operations {
             };
         };
     };
-    ExamSessionAdminController_snapshots: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data?: components["schemas"]["ProctorSnapshotDto"][];
-                        /** @example Success */
-                        message?: string;
-                        /** @example 200 */
-                        statusCode?: number;
-                    };
-                };
-            };
-        };
-    };
-    ExamSessionAdminController_snapshot: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-                snapshotId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The JPEG bytes */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "image/jpeg": string;
-                };
-            };
-        };
-    };
-    ExamSessionAdminController_latestSnapshot: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The JPEG bytes */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "image/jpeg": string;
-                };
-            };
-        };
-    };
     ExamSessionAdminController_sessionTimeline: {
         parameters: {
             query?: never;
@@ -5443,34 +5256,6 @@ export interface operations {
             };
         };
     };
-    SessionExamController_cameraBlocked: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
-                "X-Client-Platform"?: string;
-                /** @description The tablet the session was started on */
-                "X-Device-Id": string;
-            };
-            path: {
-                sessionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CameraBlockedDto"];
-            };
-        };
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     SessionExamController_events: {
         parameters: {
             query?: never;
@@ -5558,49 +5343,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["SessionHeartbeatDto"];
-                        /** @example Success */
-                        message?: string;
-                        /** @example 200 */
-                        statusCode?: number;
-                    };
-                };
-            };
-        };
-    };
-    SessionExamController_snapshot: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
-                "X-Client-Platform"?: string;
-                /** @description The tablet the session was started on */
-                "X-Device-Id": string;
-            };
-            path: {
-                sessionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": {
-                    /** Format: date-time */
-                    capturedAt: string;
-                    /** Format: binary */
-                    file: string;
-                    /** @enum {string} */
-                    kind: "LIVE" | "SESSION_START" | "VIOLATION_RETURN" | "PERIODIC_EVIDENCE";
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data?: components["schemas"]["ProctorSnapshotUploadedDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

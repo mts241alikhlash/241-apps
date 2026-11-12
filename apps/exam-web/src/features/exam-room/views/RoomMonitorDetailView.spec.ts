@@ -61,8 +61,7 @@ const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const tabs = defineComponent({
   props: { modelValue: String },
   emits: ['update:modelValue'],
-  template:
-    '<div data-testid="tabs" @click="$emit(\'update:modelValue\', \'camera\')"><slot /></div>',
+  template: '<div data-testid="tabs"><slot /></div>',
 })
 const tabContent = defineComponent({
   props: { value: String },
@@ -88,10 +87,6 @@ const stubs = {
   CardTitle: passthrough,
   DataTable: dataTable,
   FloatingLabelField: passthrough,
-  RoomCameraGrid: defineComponent({
-    props: { seats: Array, serverTime: String },
-    template: '<div data-testid="camera-grid">{{ seats.length }}</div>',
-  }),
   RoomMonitorSummaryCards: passthrough,
   RoomReportTab: passthrough,
   RecordAbsenceDialog: passthrough,
@@ -116,9 +111,6 @@ const row = {
   nis: '2024001',
   session: {
     sessionId: 's1',
-    lastSnapshotAt: null,
-    cameraBlocked: null,
-    latestSnapshotUrl: null,
   },
 }
 
@@ -132,34 +124,12 @@ beforeEach(() => {
   loadSupervisors.mockResolvedValue([])
 })
 
-describe('RoomMonitorDetailView camera tab', () => {
-  it('reports a failed roster fetch instead of an empty room', async () => {
-    loadRoster.mockRejectedValueOnce(new Error('monitor-failed'))
+describe('RoomMonitorDetailView', () => {
+  it('offers no camera tab', async () => {
+    loadRoster.mockResolvedValue({ data: [row], meta: null, total: 1 })
     const wrapper = mountView()
     await flushPromises()
-    await wrapper.find('[data-testid="tabs"]').trigger('click')
-    await flushPromises()
 
-    expect(wrapper.find('[data-testid="camera-error"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain(
-      'Gagal memuat daftar siswa kamera pengawas.',
-    )
-  })
-
-  it('reloads the seats from the retry button', async () => {
-    loadRoster
-      .mockRejectedValueOnce(new Error('monitor-failed'))
-      .mockResolvedValueOnce({ data: [row], meta: null, total: 1 })
-    const wrapper = mountView()
-    await flushPromises()
-    await wrapper.find('[data-testid="tabs"]').trigger('click')
-    await flushPromises()
-
-    await wrapper.find('[data-testid="camera-retry"]').trigger('click')
-    await flushPromises()
-
-    expect(loadRoster).toHaveBeenCalledTimes(2)
-    expect(wrapper.find('[data-testid="camera-error"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="camera-grid"]').text()).toBe('1')
+    expect(wrapper.text()).not.toContain('Kamera Pengawas')
   })
 })

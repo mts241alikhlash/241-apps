@@ -13,7 +13,6 @@ import type {
   RoomOverview,
   RoomReport,
   RoomReportPayload,
-  ProctorSnapshotEvidence,
   SessionTimelineEntry,
   SupervisorSlotRow,
 } from '../types'
@@ -22,8 +21,6 @@ const seg = encodeURIComponent
 
 const room = (roomId: string) => `/exam-rooms/${seg(roomId)}`
 
-export const latestSnapshotPath = (sessionId: string) =>
-  `/exam-sessions/${seg(sessionId)}/snapshots/latest`
 const report = (roomId: string, slotId: string) =>
   `${room(roomId)}/reports/${seg(slotId)}`
 
@@ -104,18 +101,4 @@ export const examRoomApi = {
 
   getLetterhead: () =>
     api.get<ApiSingleResponse<Letterhead>>('/school-units/letterhead'),
-
-  getSessionSnapshots: (sessionId: string) =>
-    api.get<ApiSingleResponse<ProctorSnapshotEvidence[]>>(
-      `/exam-sessions/${seg(sessionId)}/snapshots`,
-    ),
-
-  getLatestSnapshot: (path: string) =>
-    api.get<Blob>(path, { responseType: 'blob' }),
-
-  getSnapshot: (sessionId: string, snapshotId: string) =>
-    api.get<Blob>(
-      `/exam-sessions/${seg(sessionId)}/snapshots/${seg(snapshotId)}`,
-      { responseType: 'blob' },
-    ),
 }

@@ -11,12 +11,10 @@ const expected: Record<string, string[]> = {
   submit: ['exam-sessions.take'],
   violations: ['exam-sessions.take'],
   file: ['exam-sessions.take'],
-  cameraBlocked: ['exam-sessions.take'],
   events: ['exam-sessions.take'],
   resume: ['exam-sessions.take'],
   heartbeatNow: ['exam-sessions.take'],
   suspension: ['exam-sessions.take'],
-  snapshot: ['exam-sessions.take'],
 }
 
 const handlerOf = (method: string) =>
@@ -43,16 +41,5 @@ describe('SessionExamController permissions', () => {
 describe('SessionExamController answer routes answer with 200', () => {
   it.each(['saveBatch', 'submit'])('%s is not a 201', (method) => {
     expect(Reflect.getMetadata(HTTP_CODE_METADATA, handlerOf(method))).toBe(200)
-  })
-})
-
-describe('SessionExamController snapshot upload throttle', () => {
-  it('admits a whole classroom behind one address', () => {
-    expect(
-      Reflect.getMetadata('THROTTLER:LIMITdefault', handlerOf('snapshot')),
-    ).toBe(600)
-    expect(
-      Reflect.getMetadata('THROTTLER:TTLdefault', handlerOf('snapshot')),
-    ).toBe(60_000)
   })
 })

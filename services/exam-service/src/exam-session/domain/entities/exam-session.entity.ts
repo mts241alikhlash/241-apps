@@ -31,9 +31,6 @@ export interface ExamSession {
   violationCount: number
   lastSeenAt: Date | null
   absentSince: Date | null
-  lastSnapshotAt: Date | null
-  snapshotCount: number
-  cameraBlocked: string | null
   roomId: string | null
   seatNumber: number | null
   requiresTokenReentry: boolean

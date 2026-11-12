@@ -369,12 +369,9 @@ describe('GetRoomMonitorUseCase', () => {
     })
   })
 
-  it('exposes the snapshot stamp, the block reason, and the read path', async () => {
+  it('reports no camera fields on a running session', async () => {
     const { fixture, monitor } = await build()
-    startSession(fixture, fixture.studentIds[0], {
-      lastSnapshotAt: MONITOR_NOW,
-      cameraBlocked: 'permission',
-    })
+    startSession(fixture, fixture.studentIds[0])
 
     const result = await monitor.execute(
       ROOM_TECH,
@@ -383,31 +380,10 @@ describe('GetRoomMonitorUseCase', () => {
       MONITOR_NOW,
     )
 
-    expect(result.data[0].session).toMatchObject({
-      lastSnapshotAt: MONITOR_NOW.toISOString(),
-      cameraBlocked: 'permission',
-      latestSnapshotUrl: `/exam-sessions/${result.data[0].session?.sessionId}/snapshots/latest`,
-    })
-  })
-
-  it('reports no snapshot path for a session that never sent one', async () => {
-    const { fixture, monitor } = await build()
-    startSession(fixture, fixture.studentIds[0], {
-      lastSnapshotAt: null,
-      cameraBlocked: null,
-    })
-
-    const result = await monitor.execute(
-      ROOM_TECH,
-      fixture.room.id,
-      { page: 1, limit: 5 },
-      MONITOR_NOW,
-    )
-
-    expect(result.data[0].session).toMatchObject({
-      lastSnapshotAt: null,
-      cameraBlocked: null,
-      latestSnapshotUrl: null,
-    })
+    const session = result.data[0].session
+    expect(session).not.toBeNull()
+    expect(session).not.toHaveProperty('lastSnapshotAt')
+    expect(session).not.toHaveProperty('cameraBlocked')
+    expect(session).not.toHaveProperty('latestSnapshotUrl')
   })
 })
