@@ -747,23 +747,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/exam-rooms/{roomId}/seats/{studentId}/allow-web": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Let one student take the exam from a browser for this room */
-        post: operations["ExamRoomController_allowWebClient"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/exam-rooms/{roomId}/supervisors": {
         parameters: {
             query?: never;
@@ -1142,6 +1125,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/seb-configs/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an active .seb configuration file */
+        get: operations["SebConfigFileController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seb-configs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Safe Exam Browser configurations */
+        get: operations["SebConfigController_list"];
+        put?: never;
+        /** Store a Safe Exam Browser configuration (.seb, 1 MB) */
+        post: operations["SebConfigController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seb-configs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a configuration and its file */
+        delete: operations["SebConfigController_remove"];
+        options?: never;
+        head?: never;
+        /** Rename or activate/deactivate a configuration */
+        patch: operations["SebConfigController_update"];
+        trace?: never;
+    };
+    "/seb-configs/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active configurations for the student client */
+        get: operations["SebConfigController_listActive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seb-configs/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a Safe Exam Browser config key hash */
+        post: operations["SebConfigController_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/student-exams/{sessionId}/answers": {
         parameters: {
             query?: never;
@@ -1337,6 +1407,11 @@ export interface components {
             rotation: number;
             slotIndex: number;
         };
+        ActiveSebConfigDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
         AddPackageQuestionDto: {
             /** Format: uuid */
             authorEmployeeId?: string;
@@ -1409,6 +1484,13 @@ export interface components {
         BooleanAnswerDto: {
             value: boolean;
         };
+        CheckSebRequestDto: {
+            seb?: components["schemas"]["SebProofDto"];
+        };
+        CheckSebResponseDto: {
+            configName: string | null;
+            matched: boolean;
+        };
         ChoiceDto: {
             html: string;
             /** @enum {string} */
@@ -1452,7 +1534,6 @@ export interface components {
             lateToleranceMinutes?: number;
             minSubmitMinutes?: number;
             name: string;
-            requireAndroidApp?: boolean;
             /** Format: uuid */
             semesterId: string;
             /** Format: date-time */
@@ -1503,6 +1584,11 @@ export interface components {
             participants: components["schemas"]["MakeupParticipantDto"][];
             /** Format: date-time */
             startsAt: string;
+        };
+        CreateSebConfigDto: {
+            /** @description 64 hex characters from the SEB configuration */
+            configKey: string;
+            name: string;
         };
         EssayContentDto: {
             guideHtml: string | null;
@@ -1587,7 +1673,6 @@ export interface components {
             lateToleranceMinutes: number;
             minSubmitMinutes: number;
             name: string;
-            requireAndroidApp: boolean;
             /** Format: uuid */
             semesterId: string;
             /** Format: date-time */
@@ -2107,7 +2192,6 @@ export interface components {
         };
         RecoverySessionDto: {
             allowLateEntry: boolean;
-            allowWebClient: boolean;
             /** Format: date-time */
             deadline: string;
             extraMinutes: number;
@@ -2201,6 +2285,7 @@ export interface components {
             /** @description The room or schedule token shown now */
             accessCode: string;
             deviceId: string;
+            seb?: components["schemas"]["SebProofDto"];
         };
         ResumeSessionResponseDto: {
             /** Format: date-time */
@@ -2275,10 +2360,11 @@ export interface components {
             technicianName: string | null;
         };
         RoomMonitorSessionDto: {
-            allowWebClient: boolean;
             answeredCount: number;
             batteryLevel: number | null;
             batteryUnrestricted: boolean | null;
+            /** @enum {string} */
+            client: "ISTIQRA" | "SEB";
             /** Format: date-time */
             deadline: string;
             dndGranted: boolean | null;
@@ -2415,6 +2501,8 @@ export interface components {
             questionId: string;
         };
         ScheduleSessionDto: {
+            /** @enum {string} */
+            client: "ISTIQRA" | "SEB";
             /** @description False once a supervisor released the device */
             deviceBound: boolean;
             maxScore: number | null;
@@ -2451,9 +2539,24 @@ export interface components {
         };
         SeatFlagDto: {
             allowLateEntry: boolean;
-            allowWebClient: boolean;
             /** Format: uuid */
             studentId: string;
+        };
+        SebConfigDto: {
+            active: boolean;
+            configKey: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        SebProofDto: {
+            /** @description 64 hex characters, SHA-256 of page URL and config key */
+            configKeyHash: string;
+            pageUrl: string;
         };
         SessionEventDto: {
             clientId: string;
@@ -2550,6 +2653,7 @@ export interface components {
             accessCode: string;
             /** @description Identifier of the tablet starting the exam */
             deviceId: string;
+            seb?: components["schemas"]["SebProofDto"];
         };
         SubmitSessionRequestDto: {
             /** @description How many questions the tablet believes it answered; a shortfall keeps the session open */
@@ -2619,7 +2723,6 @@ export interface components {
             lateToleranceMinutes?: number;
             minSubmitMinutes?: number;
             name?: string;
-            requireAndroidApp?: boolean;
             /** Format: date-time */
             startsAt?: string;
             /** @enum {string} */
@@ -2662,6 +2765,10 @@ export interface components {
             condition?: "SMOOTH" | "TECHNICAL_ISSUE" | "DISCIPLINARY_NOTE";
             incidentNotes?: string | null;
             reopen?: boolean;
+        };
+        UpdateSebConfigDto: {
+            active?: boolean;
+            name?: string;
         };
         ValueAnswerPayloadDto: {
             value: boolean;
@@ -4306,38 +4413,6 @@ export interface operations {
             };
         };
     };
-    ExamRoomController_allowWebClient: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                roomId: string;
-                studentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RecoveryReasonDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data?: components["schemas"]["SeatFlagDto"];
-                        /** @example Success */
-                        message?: string;
-                        /** @example 200 */
-                        statusCode?: number;
-                    };
-                };
-            };
-        };
-    };
     ExamRoomController_supervisors: {
         parameters: {
             query?: never;
@@ -5204,6 +5279,194 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["StartedSessionDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigFileController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The .seb file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: binary */
+                        data?: string;
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["SebConfigDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CreateSebConfigDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["SebConfigDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Configuration deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SebConfigController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSebConfigDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["SebConfigDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_listActive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ActiveSebConfigDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckSebRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["CheckSebResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
