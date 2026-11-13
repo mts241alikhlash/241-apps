@@ -92,7 +92,6 @@ const events = [
     endsAt: toInstant('2030-11-06', '12:00'),
     lateToleranceMinutes: 30,
     minSubmitMinutes: 20,
-    requireAndroidApp: true,
     status: 'ACTIVE',
   },
 ]

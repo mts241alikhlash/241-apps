@@ -87,7 +87,6 @@ export class ExamEventController {
         endsAt: new Date(dto.endsAt),
         lateToleranceMinutes: dto.lateToleranceMinutes,
         minSubmitMinutes: dto.minSubmitMinutes,
-        requireAndroidApp: dto.requireAndroidApp,
       }),
     )
   }
@@ -110,7 +109,6 @@ export class ExamEventController {
         endsAt: dto.endsAt === undefined ? undefined : new Date(dto.endsAt),
         lateToleranceMinutes: dto.lateToleranceMinutes,
         minSubmitMinutes: dto.minSubmitMinutes,
-        requireAndroidApp: dto.requireAndroidApp,
         status: dto.status,
       }),
     )

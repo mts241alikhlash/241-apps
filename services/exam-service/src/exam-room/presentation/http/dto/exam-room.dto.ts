@@ -45,10 +45,6 @@ export class CreateExamEventDto {
   @IsInt()
   @Min(0)
   minSubmitMinutes?: number
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  requireAndroidApp?: boolean
 }
 
 export class UpdateExamEventDto {
@@ -81,8 +77,6 @@ export class UpdateExamEventDto {
   @Min(0)
   minSubmitMinutes?: number
 
-  @ApiPropertyOptional() @IsOptional() requireAndroidApp?: boolean
-
   @ApiPropertyOptional({ enum: EXAM_EVENT_STATUSES })
   @IsOptional()
   @IsIn(EXAM_EVENT_STATUSES)
@@ -111,7 +105,6 @@ export class ExamEventDto {
   @ApiProperty({ format: 'date-time' }) endsAt!: string
   @ApiProperty() lateToleranceMinutes!: number
   @ApiProperty() minSubmitMinutes!: number
-  @ApiProperty() requireAndroidApp!: boolean
   @ApiProperty({ enum: EXAM_EVENT_STATUSES }) status!: string
 
   static fromDomain(domain: {
@@ -123,7 +116,6 @@ export class ExamEventDto {
     endsAt: Date
     lateToleranceMinutes: number
     minSubmitMinutes: number
-    requireAndroidApp: boolean
     status: string
   }): ExamEventDto {
     const dto = new ExamEventDto()
@@ -136,7 +128,6 @@ export class ExamEventDto {
     dto.endsAt = domain.endsAt.toISOString()
     dto.lateToleranceMinutes = domain.lateToleranceMinutes
     dto.minSubmitMinutes = domain.minSubmitMinutes
-    dto.requireAndroidApp = domain.requireAndroidApp
     dto.status = domain.status
     return dto
   }

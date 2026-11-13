@@ -30,7 +30,6 @@ describe('buildSeatColumns permissions', () => {
       .props
 
     expect(props.items.map((item) => item.label)).toEqual([
-      'Izinkan mode web',
       'Izinkan masuk terlambat',
     ])
   })

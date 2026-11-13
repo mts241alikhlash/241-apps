@@ -194,10 +194,6 @@ const columns = computed(() =>
       recoveryTarget.value = row
       recoveryAction.value = 'extend-time'
     },
-    onAllowWeb: (row) => {
-      recoveryTarget.value = row
-      recoveryAction.value = 'allow-web'
-    },
     onAllowLate: (row) => {
       recoveryTarget.value = row
       recoveryAction.value = 'allow-late'
@@ -416,15 +412,14 @@ onUnmounted(() => {
                     </Select>
                   </FloatingLabelField>
                 </div>
-              
-            </template>
-            <template #header-right>
-              <SearchInput
-                                  v-model="search"
-                                  class="sm:w-40"
-                                  label="Cari nama atau NIS"
-                                />
-            </template>
+              </template>
+              <template #header-right>
+                <SearchInput
+                  v-model="search"
+                  class="sm:w-40"
+                  label="Cari nama atau NIS"
+                />
+              </template>
               <template #mobile-toolbar>
                 <div class="flex items-end gap-2">
                   <SearchInput

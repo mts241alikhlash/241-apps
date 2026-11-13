@@ -31,6 +31,7 @@ import { StudentExamController } from './presentation/http/student-exam.controll
 import { ExamRoomModule } from '../exam-room/exam-room.module.js'
 import { ExamActivityModule } from '../exam-activity/exam-activity.module.js'
 import { SessionRecoveryService } from './application/session-recovery.service.js'
+import { SebModule } from '../seb/seb.module.js'
 import { SeatFlagService } from './application/seat-flag.service.js'
 import { ISessionRecoveryRepository } from './domain/repositories/session-recovery.port.js'
 import { PrismaSessionRecoveryRepository } from './infrastructure/persistence/prisma/prisma-session-recovery.repository.js'
@@ -42,7 +43,6 @@ import { SuspendSessionUseCase } from './application/use-cases/suspend-session/s
 import { ReopenSessionUseCase } from './application/use-cases/reopen-session/reopen-session.use-case.js'
 import { ResetSessionUseCase } from './application/use-cases/reset-session/reset-session.use-case.js'
 import { ExtendSessionTimeUseCase } from './application/use-cases/extend-session-time/extend-session-time.use-case.js'
-import { AllowWebClientUseCase } from './application/use-cases/allow-web-client/allow-web-client.use-case.js'
 import { AllowLateEntryUseCase } from './application/use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ListSessionAuditLogsUseCase } from './application/use-cases/list-session-audit-logs/list-session-audit-logs.use-case.js'
 
@@ -54,6 +54,7 @@ import { ListSessionAuditLogsUseCase } from './application/use-cases/list-sessio
     QuestionModule,
     forwardRef(() => ExamRoomModule),
     forwardRef(() => ExamActivityModule),
+    SebModule,
   ],
   controllers: [
     StudentExamController,
@@ -98,7 +99,6 @@ import { ListSessionAuditLogsUseCase } from './application/use-cases/list-sessio
     ReopenSessionUseCase,
     ResetSessionUseCase,
     ExtendSessionTimeUseCase,
-    AllowWebClientUseCase,
     AllowLateEntryUseCase,
     ListSessionAuditLogsUseCase,
   ],
@@ -107,7 +107,6 @@ import { ListSessionAuditLogsUseCase } from './application/use-cases/list-sessio
     ISessionRecoveryRepository,
     SessionRecoveryService,
     SeatFlagService,
-    AllowWebClientUseCase,
     AllowLateEntryUseCase,
     CloseActivitySessionsUseCase,
   ],

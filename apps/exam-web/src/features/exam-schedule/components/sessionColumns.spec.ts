@@ -7,6 +7,7 @@ const session = (
   overrides: Partial<ScheduleSession> = {},
 ): ScheduleSession => ({
   sessionId: 'x1',
+  client: 'SEB',
   studentId: 'st1',
   studentName: 'Ahmad Fauzi',
   studentNis: '2024001',

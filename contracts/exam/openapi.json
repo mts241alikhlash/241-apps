@@ -627,7 +627,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -695,7 +695,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -764,7 +764,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -842,7 +842,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -920,7 +920,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -998,7 +998,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1076,7 +1076,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1144,7 +1144,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1222,7 +1222,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1300,7 +1300,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1378,7 +1378,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -4639,75 +4639,6 @@
         ]
       }
     },
-    "/exam-rooms/{roomId}/seats/{studentId}/allow-web": {
-      "post": {
-        "operationId": "ExamRoomController_allowWebClient",
-        "parameters": [
-          {
-            "name": "roomId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "studentId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecoveryReasonDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SeatFlagDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Let one student take the exam from a browser for this room",
-        "tags": [
-          "Exam Rooms"
-        ]
-      }
-    },
     "/exam-rooms/{roomId}/seats/{studentId}/allow-late": {
       "post": {
         "operationId": "ExamRoomController_allowLateEntry",
@@ -4987,6 +4918,321 @@
         "summary": "Stream a question image",
         "tags": [
           "Exam Files"
+        ]
+      }
+    },
+    "/seb-configs": {
+      "get": {
+        "operationId": "SebConfigController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SebConfigDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List Safe Exam Browser configurations",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      },
+      "post": {
+        "operationId": "SebConfigController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSebConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SebConfigDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Store a Safe Exam Browser configuration (.seb, 1 MB)",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      }
+    },
+    "/seb-configs/active": {
+      "get": {
+        "operationId": "SebConfigController_listActive",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ActiveSebConfigDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List active configurations for the student client",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      }
+    },
+    "/seb-configs/check": {
+      "post": {
+        "operationId": "SebConfigController_check",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckSebRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CheckSebResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check a Safe Exam Browser config key hash",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      }
+    },
+    "/seb-configs/{id}": {
+      "patch": {
+        "operationId": "SebConfigController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSebConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SebConfigDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rename or activate/deactivate a configuration",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      },
+      "delete": {
+        "operationId": "SebConfigController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Configuration deleted"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a configuration and its file",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      }
+    },
+    "/public/seb-configs/{id}/file": {
+      "get": {
+        "operationId": "SebConfigFileController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The .seb file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Download an active .seb configuration file",
+        "tags": [
+          "Safe Exam Browser"
         ]
       }
     },
@@ -6580,6 +6826,26 @@
           "makeup"
         ]
       },
+      "SebProofDto": {
+        "type": "object",
+        "properties": {
+          "configKeyHash": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64,
+            "pattern": "^[0-9a-fA-F]{64}$",
+            "description": "64 hex characters, SHA-256 of page URL and config key"
+          },
+          "pageUrl": {
+            "type": "string",
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "configKeyHash",
+          "pageUrl"
+        ]
+      },
       "StartSessionDto": {
         "type": "object",
         "properties": {
@@ -6594,6 +6860,9 @@
             "minLength": 1,
             "maxLength": 100,
             "description": "Identifier of the tablet starting the exam"
+          },
+          "seb": {
+            "$ref": "#/components/schemas/SebProofDto"
           }
         },
         "required": [
@@ -7273,6 +7542,9 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 100
+          },
+          "seb": {
+            "$ref": "#/components/schemas/SebProofDto"
           }
         },
         "required": [
@@ -7404,6 +7676,13 @@
             ],
             "type": "string"
           },
+          "client": {
+            "enum": [
+              "ISTIQRA",
+              "SEB"
+            ],
+            "type": "string"
+          },
           "startedAt": {
             "type": "string",
             "format": "date-time"
@@ -7436,6 +7715,7 @@
           "studentName",
           "studentNis",
           "status",
+          "client",
           "startedAt",
           "submittedAt",
           "rawScore",
@@ -7642,9 +7922,6 @@
           "extraMinutes": {
             "type": "number"
           },
-          "allowWebClient": {
-            "type": "boolean"
-          },
           "allowLateEntry": {
             "type": "boolean"
           },
@@ -7676,7 +7953,6 @@
           "lockedByViolation",
           "requiresTokenReentry",
           "extraMinutes",
-          "allowWebClient",
           "allowLateEntry",
           "deadline",
           "finalizeAt",
@@ -8915,9 +9191,6 @@
           "minSubmitMinutes": {
             "type": "number"
           },
-          "requireAndroidApp": {
-            "type": "boolean"
-          },
           "status": {
             "type": "string",
             "enum": [
@@ -8937,7 +9210,6 @@
           "endsAt",
           "lateToleranceMinutes",
           "minSubmitMinutes",
-          "requireAndroidApp",
           "status"
         ]
       },
@@ -9003,9 +9275,6 @@
           "minSubmitMinutes": {
             "type": "number",
             "minimum": 0
-          },
-          "requireAndroidApp": {
-            "type": "boolean"
           }
         },
         "required": [
@@ -9048,9 +9317,6 @@
           "minSubmitMinutes": {
             "type": "number",
             "minimum": 0
-          },
-          "requireAndroidApp": {
-            "type": "boolean"
           },
           "status": {
             "enum": [
@@ -9234,8 +9500,12 @@
           "kioskMode": {
             "type": "string"
           },
-          "allowWebClient": {
-            "type": "boolean"
+          "client": {
+            "type": "string",
+            "enum": [
+              "ISTIQRA",
+              "SEB"
+            ]
           },
           "violationCount": {
             "type": "number"
@@ -9274,7 +9544,7 @@
           "lockTaskActive",
           "batteryUnrestricted",
           "kioskMode",
-          "allowWebClient",
+          "client",
           "violationCount",
           "lockedByViolation",
           "requiresTokenReentry",
@@ -10112,16 +10382,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "allowWebClient": {
-            "type": "boolean"
-          },
           "allowLateEntry": {
             "type": "boolean"
           }
         },
         "required": [
           "studentId",
-          "allowWebClient",
           "allowLateEntry"
         ]
       },
@@ -10233,6 +10499,115 @@
           "mimeType",
           "sizeBytes"
         ]
+      },
+      "SebConfigDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "configKey": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "configKey",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ActiveSebConfigDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CheckSebRequestDto": {
+        "type": "object",
+        "properties": {
+          "seb": {
+            "$ref": "#/components/schemas/SebProofDto"
+          }
+        }
+      },
+      "CheckSebResponseDto": {
+        "type": "object",
+        "properties": {
+          "matched": {
+            "type": "boolean"
+          },
+          "configName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "matched",
+          "configName"
+        ]
+      },
+      "CreateSebConfigDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "configKey": {
+            "type": "string",
+            "description": "64 hex characters from the SEB configuration"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The .seb configuration file, 1 MB maximum"
+          }
+        },
+        "required": [
+          "name",
+          "configKey",
+          "file"
+        ]
+      },
+      "UpdateSebConfigDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
       },
       "AbsenteeDto": {
         "type": "object",

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import {
   ConflictException,
   ForbiddenException,
@@ -34,6 +35,26 @@ import { FinalizeSessionService } from '../../finalize-session.service.js'
 import { LifecycleGate } from '../../lifecycle-gate.service.js'
 import { StartExamSessionUseCase } from './start-exam-session.use-case.js'
 import { FakeExamRoomRepository } from '../../../../exam-room/application/exam-room.repository.fake.js'
+import { FakeSebConfigRepository } from '../../../../seb/application/seb-config.repository.fake.js'
+import { SebVerifier } from '../../../../seb/application/seb-verifier.service.js'
+import type { SebConfig } from '../../../../seb/domain/entities/seb-config.entity.js'
+
+const SEB_PAGE = 'https://exam.example/my-exams/s1/token'
+const SEB_KEY = 'a'.repeat(64)
+const sebHash = (url: string, key: string) =>
+  createHash('sha256')
+    .update(url + key)
+    .digest('hex')
+const sebConfig: SebConfig = {
+  id: '11111111-1111-4111-8111-111111111111',
+  name: 'Ujian Sekolah',
+  configKey: SEB_KEY,
+  storageKey: 'seb-configs/seb.seb',
+  active: true,
+  createdById: USER.id,
+  createdAt: NOW,
+  updatedAt: NOW,
+}
 
 const codes = new AccessCodeService(
   'unit-test-secret-of-at-least-32-characters',
@@ -47,6 +68,7 @@ describe('StartExamSessionUseCase', () => {
   let attempts: FakeExamAccessAttemptRepository
   let rooms: FakeExamRoomRepository
   let activities: FakeExamActivityRepository
+  let sebConfigs: FakeSebConfigRepository
   let schedule: ExamSchedule
 
   beforeEach(async () => {
@@ -57,6 +79,8 @@ describe('StartExamSessionUseCase', () => {
     attempts = new FakeExamAccessAttemptRepository()
     rooms = new FakeExamRoomRepository()
     activities = new FakeExamActivityRepository()
+    sebConfigs = new FakeSebConfigRepository()
+    sebConfigs.configs.set(sebConfig.id, sebConfig)
     schedule = await scheduleExam({ packages, schedules, questions })
   })
 
@@ -76,11 +100,18 @@ describe('StartExamSessionUseCase', () => {
       rooms,
       participants,
       new LifecycleGate(schedules, activities),
+      new SebVerifier(sebConfigs, ['https://exam.example']),
     )
 
   const start = (
     useCase: StartExamSessionUseCase,
-    overrides: { code?: string; device?: string; now?: Date } = {},
+    overrides: {
+      code?: string
+      device?: string
+      now?: Date
+      platform?: 'web' | 'native'
+      seb?: { configKeyHash: string; pageUrl: string }
+    } = {},
   ) =>
     useCase.execute(
       STUDENT_USER,
@@ -94,6 +125,8 @@ describe('StartExamSessionUseCase', () => {
             overrides.now ?? NOW,
           ).code,
         deviceId: overrides.device ?? 'device-1',
+        platform: overrides.platform,
+        seb: overrides.seb,
       },
       overrides.now ?? NOW,
     )
@@ -106,6 +139,62 @@ describe('StartExamSessionUseCase', () => {
     })
     return activity
   }
+
+  describe('the Safe Exam Browser client', () => {
+    const verified = {
+      configKeyHash: sebHash(SEB_PAGE, SEB_KEY),
+      pageUrl: SEB_PAGE,
+    }
+
+    it('refuses a web start without a proof and counts no failure', async () => {
+      const useCase = build()
+
+      await expect(
+        start(useCase, { platform: 'web', code: 'WRONG' }),
+      ).rejects.toMatchObject({
+        response: {
+          code: 'SEB_REQUIRED',
+          message:
+            'Buka ujian lewat Safe Exam Browser dengan konfigurasi sekolah.',
+        },
+      })
+      const state = await attempts.get(schedule.id, STUDENT_ID)
+      expect(state.failures).toBe(0)
+    })
+
+    it('starts a verified web session as SEB', async () => {
+      const started = await start(build(), {
+        platform: 'web',
+        seb: verified,
+      })
+
+      expect(await sessions.findById(started.sessionId)).toMatchObject({
+        client: 'SEB',
+      })
+    })
+
+    it('starts a native session as ISTIQRA', async () => {
+      const started = await start(build(), { platform: 'native' })
+
+      expect(await sessions.findById(started.sessionId)).toMatchObject({
+        client: 'ISTIQRA',
+      })
+    })
+
+    it('switches a session started on Istiqra to SEB when started again in SEB', async () => {
+      const first = await start(build(), { platform: 'native' })
+
+      const again = await start(build(), {
+        platform: 'web',
+        seb: verified,
+      })
+
+      expect(again.sessionId).toBe(first.sessionId)
+      expect(await sessions.findById(first.sessionId)).toMatchObject({
+        client: 'SEB',
+      })
+    })
+  })
 
   it('starts a session whose deadline follows the duration', async () => {
     const started = await start(build())
@@ -574,17 +663,7 @@ describe('StartExamSessionUseCase', () => {
       })
     })
 
-    it('applies the client gate of the parent event to the makeup', async () => {
-      const event = await rooms.createEvent({
-        semesterId: schedule.semesterId,
-        name: 'UTS Ganjil',
-        type: 'MIDTERM',
-        startsAt: MAKEUP_NOW,
-        endsAt: new Date('2026-11-05T04:00:00.000Z'),
-        requireAndroidApp: true,
-        createdById: USER.id,
-      })
-      schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
+    it('requires Safe Exam Browser for a makeup too', async () => {
       const makeup = await withMakeup()
 
       await expect(
@@ -602,7 +681,7 @@ describe('StartExamSessionUseCase', () => {
           },
           MAKEUP_NOW,
         ),
-      ).rejects.toThrow('Jadwal ini wajib dikerjakan dari aplikasi Android')
+      ).rejects.toMatchObject({ response: { code: 'SEB_REQUIRED' } })
     })
 
     it('keeps the makeup on its own window, not the window of the activity', async () => {

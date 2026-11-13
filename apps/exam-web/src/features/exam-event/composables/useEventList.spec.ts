@@ -36,7 +36,6 @@ const event: ExamEvent = {
   endsAt: '2026-11-06T09:00:00.000Z',
   lateToleranceMinutes: 30,
   minSubmitMinutes: 20,
-  requireAndroidApp: true,
   status: 'ACTIVE',
 }
 

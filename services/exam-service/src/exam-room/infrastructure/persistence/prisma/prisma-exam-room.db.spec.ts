@@ -398,7 +398,6 @@ suite('Prisma exam rooms against a real database', () => {
       lockedByViolation: false,
       requiresTokenReentry: true,
       extraMinutes: 15,
-      allowWebClient: true,
       allowLateEntry: true,
       kioskMode: 'FLOATING',
       deadline: new Date('2026-11-02T02:45:00Z'),
@@ -406,7 +405,6 @@ suite('Prisma exam rooms against a real database', () => {
     expect(reopened?.lockedByViolation).toBe(false)
     expect(reopened?.requiresTokenReentry).toBe(true)
     expect(reopened?.extraMinutes).toBe(15)
-    expect(reopened?.allowWebClient).toBe(true)
     expect(reopened?.allowLateEntry).toBe(true)
     expect(reopened?.kioskMode).toBe('FLOATING')
 

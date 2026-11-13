@@ -1,10 +1,14 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { isInSeb } from '@/shared/seb'
+
+const sebGated = (load: () => Promise<unknown>) => () =>
+  isInSeb() ? load() : import('./views/SebRequiredView.vue')
 
 export const studentExamRoutes: RouteRecordRaw[] = [
   {
     path: '/my-exams',
     name: 'student-exam-list',
-    component: () => import('./views/ExamListView.vue'),
+    component: sebGated(() => import('./views/ExamListView.vue')),
     meta: {
       requiresAuth: true,
       title: 'Daftar Ujian',
@@ -15,7 +19,7 @@ export const studentExamRoutes: RouteRecordRaw[] = [
   {
     path: '/my-exams/:scheduleId/token',
     name: 'student-exam-token',
-    component: () => import('./views/ExamTokenView.vue'),
+    component: sebGated(() => import('./views/ExamTokenView.vue')),
     meta: {
       requiresAuth: true,
       title: 'Token Ujian',
@@ -32,7 +36,7 @@ export const studentExamFocusRoutes: RouteRecordRaw[] = [
   {
     path: '/my-exams/sessions/:sessionId',
     name: 'student-exam-sheet',
-    component: () => import('./views/ExamSheetView.vue'),
+    component: sebGated(() => import('./views/ExamSheetView.vue')),
     meta: {
       requiresAuth: true,
       title: 'Lembar Ujian',

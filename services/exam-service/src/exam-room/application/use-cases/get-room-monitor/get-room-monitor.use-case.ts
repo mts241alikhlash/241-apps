@@ -79,7 +79,7 @@ export interface RoomMonitorSession {
   lockTaskActive: boolean | null
   batteryUnrestricted: boolean | null
   kioskMode: string
-  allowWebClient: boolean
+  client: string
   violationCount: number
   lockedByViolation: boolean
   requiresTokenReentry: boolean
@@ -325,7 +325,7 @@ export class GetRoomMonitorUseCase {
                   lockTaskActive: row.session.lockTaskActive,
                   batteryUnrestricted: row.session.batteryUnrestricted,
                   kioskMode: row.session.kioskMode,
-                  allowWebClient: row.session.allowWebClient,
+                  client: row.session.client,
                   violationCount: row.session.violationCount,
                   lockedByViolation: row.session.lockedByViolation,
                   requiresTokenReentry: row.session.requiresTokenReentry,

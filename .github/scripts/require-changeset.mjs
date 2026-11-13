@@ -10,6 +10,10 @@ const EXEMPT = [
   /^\.changeset\//,
 ]
 
+export function hasFrontmatter(text) {
+  return /^---\s*\r?\n[\s\S]*?\r?\n---/.test(text)
+}
+
 export function parseChangesetBumps(text) {
   const front = text.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? ''
   const bumps = {}
@@ -76,7 +80,7 @@ function pendingChangesets(root) {
   const dir = path.join(root, '.changeset')
   return readdirSync(dir)
     .filter((f) => f.endsWith('.md') && f !== 'README.md')
-    .map((f) => parseChangesetBumps(readFileSync(path.join(dir, f), 'utf8')))
+    .map((f) => ({ file: f, text: readFileSync(path.join(dir, f), 'utf8') }))
 }
 
 if (import.meta.main) {
@@ -96,12 +100,18 @@ if (import.meta.main) {
     .split('\n')
     .filter(Boolean)
   const branch = process.env.CHANGESET_BRANCH ?? ''
-  const problems = checkChangesets({
-    files,
-    packages: workspacePackages(root),
-    changesets: pendingChangesets(root),
-    branch,
-  })
+  const pending = pendingChangesets(root)
+  const problems = [
+    ...pending
+      .filter((c) => !hasFrontmatter(c.text))
+      .map((c) => `.changeset/${c.file} has no frontmatter block`),
+    ...checkChangesets({
+      files,
+      packages: workspacePackages(root),
+      changesets: pending.map((c) => parseChangesetBumps(c.text)),
+      branch,
+    }),
+  ]
   for (const p of problems) console.error(p)
   if (problems.length) process.exit(1)
   console.log('changesets ok')

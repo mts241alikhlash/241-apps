@@ -25,6 +25,7 @@ export type MyExamStatus = Schemas['MyExamDto']['status']
 export type MyExam = Schemas['MyExamDto']
 
 export type StartedSession = Schemas['StartedSessionDto']
+export type ActiveSebConfig = Schemas['ActiveSebConfigDto']
 
 export type Choice = Schemas['PaperChoiceDto']
 
@@ -49,6 +50,19 @@ export type SaveAnswersBatchResult = Schemas['SaveAnswersBatchResultDto']
 export type SubmitRequest = Schemas['SubmitSessionRequestDto']
 
 export type SubmittedSession = Schemas['SubmitSessionResponseDto']
+
+export type ResumedSession = Schemas['ResumeSessionResponseDto']
+
+export type SessionHeartbeat = Schemas['SessionHeartbeatDto']
+
+export interface StoredExamSession {
+  deadline: number
+  serverTime: number
+  scheduleId?: string | null
+  examTitle?: string | null
+  durationMinutes?: number | null
+  heartbeatIntervalMs?: number | null
+}
 
 export type AnswerSyncState = 'LOCAL_PENDING' | 'SYNCING' | 'SERVER_CONFIRMED'
 

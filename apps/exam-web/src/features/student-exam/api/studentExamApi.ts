@@ -1,5 +1,6 @@
 import { unwrap } from '@mts241alikhlash/web-shared/utils/service-client'
 import { examClient } from '@/shared/api/clients'
+import type { SebProof } from '@/shared/seb'
 import type { SaveAnswersBatchRequest, SubmitRequest } from '../types'
 
 const deviceHeaders = (deviceId: string) => ({
@@ -10,12 +11,39 @@ const deviceHeaders = (deviceId: string) => ({
 export const studentExamApi = {
   listExams: () => unwrap(examClient.GET('/me/exams')),
 
-  startSession: (scheduleId: string, accessCode: string, deviceId: string) =>
+  startSession: (
+    scheduleId: string,
+    accessCode: string,
+    deviceId: string,
+    seb?: SebProof,
+  ) =>
     unwrap(
       examClient.POST('/me/exams/{scheduleId}/sessions', {
         params: { path: { scheduleId } },
-        body: { accessCode, deviceId },
+        body: { accessCode, deviceId, seb },
         headers: { 'X-Client-Platform': 'web' },
+      }),
+    ),
+
+  activeSebConfigs: () => unwrap(examClient.GET('/seb-configs/active')),
+
+  resume: (
+    sessionId: string,
+    deviceId: string,
+    accessCode: string,
+    seb?: SebProof,
+  ) =>
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/resume', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+        body: { accessCode, deviceId, seb },
+      }),
+    ),
+
+  heartbeat: (sessionId: string, deviceId: string) =>
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/heartbeat', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
       }),
     ),
 

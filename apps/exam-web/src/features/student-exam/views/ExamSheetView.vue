@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -18,20 +18,20 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
+import { sebQuitUrl } from '@/shared/seb'
 import QuestionListDialog from '../components/QuestionListDialog.vue'
+import QuestionNavPanel from '../components/QuestionNavPanel.vue'
+import { useWideScreen } from '../composables/useWideScreen'
 import SessionQuestionHtml from '../components/SessionQuestionHtml.vue'
 import { useExamSession } from '../composables/useExamSession'
 import { isAnswered } from '../logic/exam'
 import { API_ERROR_CODES, ExamApiError } from '../services/studentExamService'
-import { questionTypeLabel } from '../logic/questionType'
-import type { AnswerPayload, Choice, PaperQuestion } from '../types'
-
-interface StoredDeadline {
-  deadline: number
-  serverTime: number
-  examTitle?: string | null
-  durationMinutes?: number | null
-}
+import type {
+  AnswerPayload,
+  Choice,
+  PaperQuestion,
+  StoredExamSession,
+} from '../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,9 +50,19 @@ const doubtful = ref(new Set<string>())
 const examTitle = ref<string | null>(null)
 const durationMinutes = ref<number | null>(null)
 
+let scheduleId: string | null = null
+
 const session = useExamSession({
   onExpired: () => {
     if (!finished.value) void submitNow()
+  },
+  onTokenReentry: () => {
+    if (!scheduleId) return
+    void router.replace({
+      name: 'student-exam-token',
+      params: { scheduleId },
+      query: { resume: sessionId },
+    })
   },
 })
 
@@ -75,9 +85,9 @@ const controlsLocked = computed(() => submitting.value || answersLocked.value)
 
 onMounted(async () => {
   const raw = window.sessionStorage.getItem(`cbt:deadline:${sessionId}`)
-  let stored: StoredDeadline | null
+  let stored: StoredExamSession | null
   try {
-    stored = raw ? (JSON.parse(raw) as StoredDeadline) : null
+    stored = raw ? (JSON.parse(raw) as StoredExamSession) : null
   } catch {
     stored = null
   }
@@ -85,6 +95,8 @@ onMounted(async () => {
     session.startClock(stored.deadline, stored.serverTime)
     examTitle.value = stored.examTitle ?? null
     durationMinutes.value = stored.durationMinutes ?? null
+    scheduleId = stored.scheduleId ?? null
+    session.startHeartbeat(sessionId, stored.heartbeatIntervalMs ?? undefined)
   }
   await session.load(sessionId)
 })
@@ -165,8 +177,13 @@ async function submitNow() {
   try {
     const result = await session.submit(sessionId)
     notStored.value = !result.answersStored
-    finished.value = true
     window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
+    const quitUrl = sebQuitUrl()
+    if (quitUrl) {
+      window.location.assign(quitUrl)
+      return
+    }
+    finished.value = true
   } catch (cause) {
     const code = cause instanceof ExamApiError ? cause.code : null
     if (code === API_ERROR_CODES.MIN_SUBMIT) {
@@ -200,6 +217,43 @@ function leaveConfirmed() {
   void router.replace({ name: 'student-exam-list' })
 }
 
+const wide = useWideScreen()
+
+const submitLabel = computed(() =>
+  submitting.value
+    ? 'Mengirim…'
+    : submitGateSeconds.value > 0
+      ? `Kumpulkan (${submitGateMinutes.value} mnt)`
+      : 'Selesai & Kumpulkan',
+)
+
+const nextLabel = computed(() =>
+  isLast.value
+    ? submitting.value
+      ? 'Mengirim…'
+      : submitGateSeconds.value > 0
+        ? `Kumpulkan (${submitGateMinutes.value} mnt)`
+        : 'Kumpulkan'
+    : 'Selanjutnya',
+)
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.defaultPrevented || showList.value) return
+  if (confirmSubmit.value || confirmLeave.value) return
+  const target = event.target as HTMLElement | null
+  if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    go(index.value + 1)
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    go(index.value - 1)
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+
 function statusOf(question: PaperQuestion | null): string {
   if (!question) return ''
   if (doubtful.value.has(question.id)) return 'Ragu-ragu'
@@ -231,15 +285,27 @@ function statusOf(question: PaperQuestion | null): string {
         decoding="async"
       />
       <span
-        v-if="!loading && !finished"
-        class="truncate rounded-md border px-2 py-1 text-[length:var(--text-control)] font-medium"
-        :class="
-          sync.pendingCount === 0
-            ? 'border-green-600 text-green-700'
-            : 'border-amber-500 text-amber-700'
-        "
+        v-if="!wide && !loading && !finished"
+        class="flex min-w-0 items-center gap-2"
       >
-        {{ syncSummaryLabel }}
+        <span
+          class="rounded-md border border-border bg-muted px-2 py-1 text-[length:var(--text-control)] font-semibold tabular-nums"
+          :class="
+            remainingLabel <= '05:00' ? 'text-destructive' : 'text-foreground'
+          "
+        >
+          {{ remainingLabel }}
+        </span>
+        <span
+          class="truncate rounded-md border px-2 py-1 text-[length:var(--text-control)] font-medium"
+          :class="
+            sync.pendingCount === 0
+              ? 'border-green-600 text-green-700'
+              : 'border-amber-500 text-amber-700'
+          "
+        >
+          {{ syncSummaryLabel }}
+        </span>
       </span>
     </header>
 
@@ -302,115 +368,31 @@ function statusOf(question: PaperQuestion | null): string {
         </Card>
 
         <div
-          class="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_auto] gap-2 lg:grid-cols-[22rem_minmax(0,1fr)] lg:grid-rows-1"
+          class="grid min-h-0 flex-1 gap-2 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-4"
         >
           <Card
             v-if="current"
             gap="none"
-            class="order-2 flex min-h-0 flex-col overflow-hidden lg:order-1"
+            class="flex min-h-0 flex-col overflow-hidden md:max-w-[46rem]"
           >
             <CardHeader standard>
-              <CardTitle>Detail Soal</CardTitle>
-            </CardHeader>
-            <CardContent
-              variant="standard"
-              class="space-y-3"
-            >
-              <div class="flex items-center justify-between gap-2">
+              <CardTitle>Soal {{ index + 1 }}</CardTitle>
+              <div class="flex items-center gap-2">
                 <span
-                  class="rounded-md border border-border bg-muted px-2 py-0.5 text-[length:var(--text-control)] font-semibold tabular-nums"
-                  :class="
-                    remainingLabel <= '05:00'
-                      ? 'text-destructive'
-                      : 'text-foreground'
-                  "
-                >
-                  {{ remainingLabel }}
-                </span>
-                <span
-                  class="text-[length:var(--text-control)] text-muted-foreground tabular-nums"
-                >
-                  {{ index + 1 }}/{{ questions.length }}
-                </span>
-              </div>
-
-              <dl
-                class="grid grid-cols-[minmax(0,6.5rem)_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[length:var(--text-control,0.75rem)] [&>dd]:min-w-0 [&>dd]:break-words [&>dt]:flex [&>dt]:justify-between [&>dt]:gap-2 [&>dt]:text-muted-foreground"
-              >
-                <template v-if="examTitle">
-                  <dt><span>Ujian</span><span>:</span></dt>
-                  <dd class="font-medium">{{ examTitle }}</dd>
-                </template>
-                <dt><span>Jenis soal</span><span>:</span></dt>
-                <dd class="font-medium">
-                  {{ questionTypeLabel(current.type) }}
-                </dd>
-                <dt><span>Status</span><span>:</span></dt>
-                <dd
-                  class="font-medium"
-                  :class="
-                    doubtful.has(current.id)
-                      ? 'text-amber-600'
-                      : isAnswered(current, answerOf(current))
-                        ? 'text-green-600'
-                        : 'text-muted-foreground'
-                  "
+                  class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
                 >
                   {{ statusOf(current) }}
-                </dd>
-                <dt><span>Terjawab</span><span>:</span></dt>
-                <dd>{{ answeredCount }} dari {{ questions.length }} soal</dd>
-                <template v-if="durationMinutes">
-                  <dt><span>Durasi</span><span>:</span></dt>
-                  <dd>{{ durationMinutes }} menit</dd>
-                </template>
-              </dl>
-
-              <div class="flex flex-col gap-2">
+                </span>
                 <Button
+                  v-if="!wide"
                   variant="outline"
                   size="sm"
-                  class="w-full"
+                  class="min-h-11"
                   @click="showList = true"
                 >
                   Daftar Soal
                 </Button>
-                <p
-                  v-if="submitGateSeconds > 0"
-                  class="text-[length:var(--text-control)] text-muted-foreground"
-                >
-                  Dapat dikumpulkan dalam {{ submitGateMinutes }} menit
-                </p>
-                <Button
-                  size="sm"
-                  class="w-full bg-green-600 text-white hover:bg-green-700"
-                  :disabled="submitting || !canSubmit"
-                  @click="confirmSubmit = true"
-                >
-                  {{
-                    submitting
-                      ? 'Mengirim…'
-                      : submitGateSeconds > 0
-                        ? `Kumpulkan (${submitGateMinutes} mnt)`
-                        : 'Selesai & Kumpulkan'
-                  }}
-                </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card
-            v-if="current"
-            gap="none"
-            class="order-1 flex min-h-0 flex-col overflow-hidden lg:order-2"
-          >
-            <CardHeader standard>
-              <CardTitle>Soal {{ index + 1 }}</CardTitle>
-              <span
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-              >
-                {{ statusOf(current) }}
-              </span>
             </CardHeader>
 
             <CardContent variant="standard">
@@ -436,7 +418,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keyOf(current) === choice.key
                       ? 'border-primary bg-primary/[0.06]'
@@ -473,7 +455,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keysOf(current).includes(choice.key)
                       ? 'border-primary bg-primary/[0.06]'
@@ -508,7 +490,7 @@ function statusOf(question: PaperQuestion | null): string {
                   ]"
                   :key="option.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11"
                   :class="
                     boolOf(current) === option.value
                       ? 'border-primary bg-primary/[0.06]'
@@ -555,7 +537,7 @@ function statusOf(question: PaperQuestion | null): string {
               <Button
                 variant="outline"
                 size="sm"
-                class="shrink-0"
+                class="min-h-11 shrink-0"
                 :disabled="index === 0 || submitting"
                 @click="go(index - 1)"
               >
@@ -564,7 +546,7 @@ function statusOf(question: PaperQuestion | null): string {
 
               <button
                 type="button"
-                class="flex h-[var(--control-h-sm)] shrink-0 items-center gap-1.5 rounded-md border px-2 text-[length:var(--text-control)] font-medium transition-colors"
+                class="flex min-h-11 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[length:var(--text-control)] font-medium transition-colors motion-reduce:transition-none"
                 :class="
                   doubtful.has(current.id)
                     ? 'border-amber-500 bg-amber-50 text-amber-700'
@@ -579,37 +561,44 @@ function statusOf(question: PaperQuestion | null): string {
                     doubtful.has(current.id) ? 'bg-amber-500' : 'bg-input'
                   "
                 />
-                {{ doubtful.has(current.id) ? 'Ragu' : 'Ragu-ragu' }}
+                Ragu-ragu
               </button>
 
               <Button
-                size="sm"
-                class="ml-auto shrink-0 font-semibold"
+                class="ml-auto min-h-11 shrink-0 font-semibold"
                 :class="
                   isLast
-                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    ? 'bg-green-700 text-white hover:bg-green-800'
                     : 'bg-primary text-primary-foreground'
                 "
                 :disabled="controlsLocked || (isLast && !canSubmit)"
                 @click="goNext"
               >
-                {{
-                  isLast
-                    ? submitting
-                      ? 'Mengirim…'
-                      : submitGateSeconds > 0
-                        ? `Kumpulkan (${submitGateMinutes} mnt)`
-                        : 'Kumpulkan'
-                    : 'Selanjutnya'
-                }}
+                {{ nextLabel }}
               </Button>
             </div>
           </Card>
+
+          <QuestionNavPanel
+            v-if="wide && current"
+            class="min-h-0"
+            :questions="questions"
+            :answers="answers"
+            :doubtful="doubtful"
+            :current-index="index"
+            :remaining-label="remainingLabel"
+            :sync-label="syncSummaryLabel"
+            :submit-label="submitLabel"
+            :submit-disabled="controlsLocked || !canSubmit"
+            @go="go"
+            @submit="confirmSubmit = true"
+          />
         </div>
       </template>
     </main>
 
     <QuestionListDialog
+      v-if="!wide"
       v-model:open="showList"
       :questions="questions"
       :answers="answers"

@@ -89,7 +89,7 @@ export class RoomMonitorSessionDto {
   @ApiProperty({ type: Boolean, nullable: true })
   batteryUnrestricted!: boolean | null
   @ApiProperty() kioskMode!: string
-  @ApiProperty() allowWebClient!: boolean
+  @ApiProperty({ enum: ['ISTIQRA', 'SEB'] }) client!: string
   @ApiProperty() violationCount!: number
   @ApiProperty() lockedByViolation!: boolean
   @ApiProperty() requiresTokenReentry!: boolean
@@ -115,7 +115,7 @@ export class RoomMonitorSessionDto {
     dto.lockTaskActive = domain.lockTaskActive
     dto.batteryUnrestricted = domain.batteryUnrestricted
     dto.kioskMode = domain.kioskMode
-    dto.allowWebClient = domain.allowWebClient
+    dto.client = domain.client
     dto.violationCount = domain.violationCount
     dto.lockedByViolation = domain.lockedByViolation
     dto.requiresTokenReentry = domain.requiresTokenReentry

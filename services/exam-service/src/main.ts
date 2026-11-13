@@ -11,6 +11,7 @@ import { ROUTE_OPTIONS } from '@mts241alikhlash/nest-core/config'
 import { AppModule } from './app.module.js'
 import { buildSwaggerConfig } from './openapi/swagger-config.js'
 import { wrapResponseEnvelope } from '@mts241alikhlash/nest-core/openapi'
+import { parseFrontendOrigins } from './shared/config/frontend-origins.js'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -54,10 +55,7 @@ async function bootstrap() {
     }),
   )
 
-  const frontendUrls = frontendUrl
-    .split(',')
-    .map((u) => u.trim())
-    .filter(Boolean)
+  const frontendUrls = parseFrontendOrigins(frontendUrl)
 
   app.enableCors({
     origin: (

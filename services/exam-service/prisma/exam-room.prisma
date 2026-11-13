@@ -13,7 +13,6 @@ model ExamEvent {
   endsAt               DateTime        @map("ends_at")
   lateToleranceMinutes Int             @default(30) @map("late_tolerance_minutes")
   minSubmitMinutes     Int             @default(20) @map("min_submit_minutes")
-  requireAndroidApp    Boolean         @default(true) @map("require_android_app")
   status               ExamEventStatus @default(DRAFT)
   createdById          String          @map("created_by_id") @db.Uuid
   createdAt            DateTime        @default(now()) @map("created_at")
@@ -56,7 +55,6 @@ model ExamRoomSeat {
   studentId   String   @map("student_id") @db.Uuid
   classroomId     String   @map("classroom_id") @db.Uuid
   seatNumber      Int      @map("seat_number")
-  allowWebClient  Boolean  @default(false) @map("allow_web_client")
   allowLateEntry  Boolean  @default(false) @map("allow_late_entry")
   createdAt       DateTime @default(now()) @map("created_at")
 

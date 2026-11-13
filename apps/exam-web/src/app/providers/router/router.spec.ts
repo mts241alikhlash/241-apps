@@ -24,6 +24,7 @@ describe('exam route tree', () => {
     '/classwork/schedules',
     '/classwork/grading',
     '/settings/presets',
+    '/settings/seb',
     '/my-exams',
     '/my-exams/sessions/s1',
     '/profile',
@@ -172,7 +173,10 @@ describe('menu', () => {
       ['mine', [['/my-exams', 'exam-sessions.take', undefined]]],
       [
         'settings',
-        [['/settings/presets', 'exam-schedules.manage-all', undefined]],
+        [
+          ['/settings/presets', 'exam-schedules.manage-all', undefined],
+          ['/settings/seb', 'exam-schedules.manage-all', undefined],
+        ],
       ],
     ])
   })

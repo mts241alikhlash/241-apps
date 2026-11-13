@@ -21,5 +21,6 @@ export default {
     examPresets: 'Preset',
     examCards: 'Kartu Peserta',
     examSeatLabels: 'Daftar Meja',
+    examSeb: 'Safe Exam Browser',
   },
 }

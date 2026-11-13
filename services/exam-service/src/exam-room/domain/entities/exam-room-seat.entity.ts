@@ -5,13 +5,11 @@ export interface ExamRoomSeat {
   studentId: string
   classroomId: string
   seatNumber: number
-  allowWebClient: boolean
   allowLateEntry: boolean
   createdAt: Date
 }
 
 export interface SeatFlagsPatch {
-  allowWebClient?: boolean
   allowLateEntry?: boolean
 }
 

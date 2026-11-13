@@ -21,5 +21,6 @@ export default {
     examPresets: 'Presets',
     examCards: 'Participant Cards',
     examSeatLabels: 'Seat Lists',
+    examSeb: 'Safe Exam Browser',
   },
 }
