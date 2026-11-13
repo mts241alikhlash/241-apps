@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { checkChangesets } from './require-changeset.mjs'
+import { hasFrontmatter, checkChangesets } from './require-changeset.mjs'
 
 const packages = [
   { name: 'hr-service', dir: 'services/hr-service', version: '0.3.1' },
@@ -89,5 +89,13 @@ test('another chore branch is not exempt', () => {
   assert.equal(
     run(['services/hr-service/src/a.ts'], [], 'chore/other').length,
     1,
+  )
+})
+
+test('a changeset without its opening frontmatter line is refused', () => {
+  assert.equal(hasFrontmatter("'exam-service': patch\n---\n\nText.\n"), false)
+  assert.equal(
+    hasFrontmatter("---\n'exam-service': patch\n---\n\nText.\n"),
+    true,
   )
 })
