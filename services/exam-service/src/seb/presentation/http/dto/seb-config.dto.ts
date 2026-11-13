@@ -2,10 +2,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   IsBoolean,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
+  Length,
+  Matches,
   MaxLength,
+  ValidateNested,
 } from 'class-validator'
+import { Type } from 'class-transformer'
 import type { SebConfig } from '../../../domain/entities/seb-config.entity.js'
 
 export class CreateSebConfigDto {
@@ -64,4 +69,34 @@ export class ActiveSebConfigDto {
     dto.name = domain.name
     return dto
   }
+}
+
+export class SebProofDto {
+  @ApiProperty({
+    description: '64 hex characters, SHA-256 of page URL and config key',
+  })
+  @IsString()
+  @Length(64, 64)
+  @Matches(/^[0-9a-fA-F]{64}$/)
+  configKeyHash!: string
+
+  @ApiProperty({ maxLength: 2048 })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(2048)
+  pageUrl!: string
+}
+
+export class CheckSebRequestDto {
+  @ApiPropertyOptional({ type: SebProofDto })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => SebProofDto)
+  seb?: SebProofDto
+}
+
+export class CheckSebResponseDto {
+  @ApiProperty() matched!: boolean
+  @ApiProperty({ nullable: true, type: String }) configName!: string | null
 }

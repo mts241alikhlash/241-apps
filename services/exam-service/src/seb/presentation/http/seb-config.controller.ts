@@ -32,8 +32,11 @@ import {
   ManageSebConfigsUseCase,
   SEB_CONFIG_MAX_BYTES,
 } from '../../application/use-cases/manage-seb-configs/manage-seb-configs.use-case.js'
+import { SebVerifier } from '../../application/seb-verifier.service.js'
 import {
   ActiveSebConfigDto,
+  CheckSebRequestDto,
+  CheckSebResponseDto,
   CreateSebConfigDto,
   SebConfigDto,
   UpdateSebConfigDto,
@@ -44,7 +47,10 @@ import {
 @UseGuards(JwtAuthGuard)
 @Controller('seb-configs')
 export class SebConfigController {
-  constructor(private readonly configs: ManageSebConfigsUseCase) {}
+  constructor(
+    private readonly configs: ManageSebConfigsUseCase,
+    private readonly verifier: SebVerifier,
+  ) {}
 
   @Get()
   @RequirePermissions('exam-schedules.manage-all')
@@ -64,6 +70,16 @@ export class SebConfigController {
     return (await this.configs.listActive()).map((c) =>
       ActiveSebConfigDto.fromDomain(c),
     )
+  }
+
+  @Post('check')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('exam-schedules.manage-all')
+  @ApiOperation({ summary: 'Check a Safe Exam Browser config key hash' })
+  @ApiResponse({ status: 200, type: CheckSebResponseDto })
+  async check(@Body() dto: CheckSebRequestDto): Promise<CheckSebResponseDto> {
+    const result = await this.verifier.verify(dto.seb)
+    return { matched: result.verified, configName: result.configName }
   }
 
   @Post()
