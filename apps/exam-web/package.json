@@ -6,7 +6,7 @@
     "node": ">=24.22.1 <25",
     "pnpm": ">=12.16.1 <13"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "241 Exam: question authoring, scheduling, grading, and the student exam sheet",
   "type": "module",
   "scripts": {

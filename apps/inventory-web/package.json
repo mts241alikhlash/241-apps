@@ -1,7 +1,7 @@
 {
   "name": "inventory-web",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "241 Inventory: asset management web app (assets, circulation, approvals)",
   "type": "module",
   "scripts": {

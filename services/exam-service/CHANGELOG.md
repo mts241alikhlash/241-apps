@@ -1,5 +1,29 @@
 # exam-service
 
+## 0.4.0
+
+### Minor Changes
+
+- ed0a2aa: Rename exam types to DAILY, ASSIGNMENT, MIDTERM, FINAL and expose server-derived category on exam contracts.
+- 774a670: Adds Safe Exam Browser configuration management and a public config file endpoint to the exam service, client, and web app.
+- 8bccfde: Camera proctoring is removed: no snapshot or camera-blocked endpoints, no camera fields on sessions and the room monitor, and no `snapshotIntervalMs` in exam policies. Deploy it together with Istiqra 0.2.0: older APKs require snapshotIntervalMs and stop loading exams.
+
+### Patch Changes
+
+- 14caf5f: Removes the unused storage delete and renames the migration spec.
+- d587566: Type the replacement answer key of an item key adjustment as a free-form object.
+- d587566: Type the content of a question version as the union of the five question content shapes.
+- 0b76217: Expose the parent schedule end on room monitor sessions as scheduleEndsAt.
+- d587566: Type the room seat response with a required seat number.
+- d587566: Type the event of an exam schedule request as nullable so it can be detached.
+- d587566: Mark the minimum submit time optional in the exam schedule requests.
+- d587566: Type the answer of a student exam session as the union of its four shapes.
+- d587566: The room monitor response types the last session event as an object.
+- 7110781: Lint runs one type-aware ESLint config; `lint:strict` and `eslint.typecheck.config.mjs` are gone.
+- d587566: The activity response types its status and token mode as enums.
+- Updated dependencies [7110781]
+  - @mts241alikhlash/nest-core@0.1.2
+
 ## 0.3.0
 
 ### Minor Changes
