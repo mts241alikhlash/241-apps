@@ -136,7 +136,6 @@ const stubs = {
   SelectValue: passthrough,
   QuestionEditor: editor,
   QuestionPreview: preview,
-  AnswerKey: passthrough,
 }
 
 const routeState = () =>

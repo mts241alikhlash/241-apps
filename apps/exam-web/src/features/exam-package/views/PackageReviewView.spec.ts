@@ -92,7 +92,6 @@ const stubs = {
   FloatingLabelField: passthrough,
   Textarea: textarea,
   QuestionPreview: preview,
-  AnswerKey: passthrough,
 }
 
 const view = (

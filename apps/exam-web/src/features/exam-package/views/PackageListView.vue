@@ -12,6 +12,15 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@mts241alikhlash/ui/alert-dialog'
+import {
   Dialog,
   DialogBody,
   DialogContent,
@@ -306,45 +315,36 @@ onMounted(() => examPackageService.loadReferences())
       v-model:open="createOpen"
       @created="router.push(`/exam/packages/${$event}`)"
     />
-    <Dialog
+    <AlertDialog
       :open="submitTarget !== null"
       @update:open="(value: boolean) => !value && (submitTarget = null)"
     >
-      <DialogContent size="md">
-        <DialogHeader standard>
-          <DialogTitle>Ajukan paket?</DialogTitle>
-        </DialogHeader>
-        <DialogBody>
-          <p class="text-[length:var(--text-control,0.75rem)]">
-            <strong>{{ submitTarget?.title }}</strong> akan dikirim ke
-            penyetuju. Selama menunggu tinjauan, paket tidak bisa diubah.
-          </p>
-          <p
-            v-if="submitError"
-            class="mt-2 text-[length:var(--text-control,0.75rem)] text-destructive"
-            role="alert"
-          >
-            {{ submitError }}
-          </p>
-        </DialogBody>
-        <DialogFooter
-          class="flex-row items-center justify-end gap-2 border-t border-border px-4 py-3"
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Ajukan paket?</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ submitTarget?.title }} akan dikirim ke penyetuju. Selama menunggu
+            tinjauan, paket tidak bisa diubah.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <p
+          v-if="submitError"
+          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          role="alert"
         >
-          <Button
-            variant="outline"
-            @click="submitTarget = null"
-          >
-            Batal
-          </Button>
+          {{ submitError }}
+        </p>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
           <Button
             :disabled="submitting"
             @click="confirmSubmit"
           >
             {{ submitting ? 'Mengajukan…' : 'Ajukan' }}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     <RenamePackageDialog
       v-if="renameTarget"
       :open="true"

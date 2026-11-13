@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BackButton } from '@mts241alikhlash/ui'
-import { Badge } from '@mts241alikhlash/ui/badge'
 import { Separator } from '@mts241alikhlash/ui/separator'
 import { Progress } from '@mts241alikhlash/ui/progress'
-import { ScrollArea } from '@mts241alikhlash/ui/scroll-area'
 import {
   Dialog,
   DialogBody,
@@ -30,12 +28,6 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { Input } from '@mts241alikhlash/ui/input'
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-} from '@mts241alikhlash/ui/item'
 import { Label } from '@mts241alikhlash/ui/label'
 import {
   Select,
@@ -45,7 +37,7 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
-import { ArrowLeft, ChevronDown, Plus, Trash2 } from '@lucide/vue'
+import { ArrowLeft, ChevronDown, Plus } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import QuestionEditor from '@/features/exam-bank/components/QuestionEditor.vue'
@@ -58,7 +50,7 @@ import type {
   QuestionDraft,
   QuestionType,
 } from '@/features/exam-bank/types'
-import { QUESTION_TYPES, typeCode, typeLabel } from '@/features/exam-bank/types'
+import { QUESTION_TYPES, typeLabel } from '@/features/exam-bank/types'
 import { plainExcerpt } from '@/features/exam-bank/utils/plainText'
 import {
   cleanContent,
@@ -66,16 +58,10 @@ import {
   validateDraft,
 } from '@/features/exam-bank/utils/questionDraft'
 import ApprovedEditNotice from '../components/ApprovedEditNotice.vue'
+import DraftCardList from '../components/DraftCardList.vue'
 import { usePackageBuilder } from '../composables/usePackageBuilder'
 import { examPackageService } from '../services/examPackageService'
-
-interface DraftCard {
-  key: string
-  type: QuestionType
-  draft: QuestionDraft
-  authorId: string
-  error: string | null
-}
+import type { DraftCard } from '../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -84,8 +70,8 @@ const { user } = useAuthSession()
 
 const ownName = computed(
   () =>
-    user.value?.profile?.name?.trim() ??
-    user.value?.name?.trim() ??
+    user.value?.profile?.name?.trim() ||
+    user.value?.name?.trim() ||
     'Saya sendiri',
 )
 
@@ -104,7 +90,6 @@ const draft = ref<QuestionDraft>({
   points: 1,
 })
 const detail = ref<QuestionDetail | null>(null)
-const authorId = ref('')
 const teachers = ref<NamedOption[]>([])
 const saving = ref(false)
 const loading = ref(true)
@@ -126,20 +111,18 @@ function newCard(): DraftCard {
   }
 }
 const cards = ref<DraftCard[]>([newCard()])
-const completedCount = computed(
-  () =>
-    cards.value.filter(
-      (card) =>
-        validateDraft(
-          card.type,
-          card.draft.bodyHtml,
-          card.draft.content,
-          card.draft.points,
-        ) === null,
-    ).length,
+const validCards = computed(() =>
+  cards.value.filter(
+    (card) =>
+      validateDraft(
+        card.type,
+        card.draft.bodyHtml,
+        card.draft.content,
+        card.draft.points,
+      ) === null,
+  ),
 )
 const activeIndex = ref(0)
-const listRef = ref<HTMLElement | null>(null)
 const sheetOpen = ref(false)
 const confirmOpen = ref(false)
 const batchAuthorId = computed({
@@ -148,35 +131,9 @@ const batchAuthorId = computed({
     for (const card of cards.value) card.authorId = value
   },
 })
-const atTop = ref(true)
-const atBottom = ref(true)
-function viewportOf(event?: Event): HTMLElement | null {
-  if (event?.target instanceof HTMLElement) return event.target
-  return (
-    listRef.value?.querySelector<HTMLElement>(
-      '[data-slot=scroll-area-viewport]',
-    ) ?? null
-  )
-}
-
-function updateScrollHints(event?: Event) {
-  const element = viewportOf(event)
-  if (element === null) {
-    atTop.value = true
-    atBottom.value = true
-    return
-  }
-  atTop.value = element.scrollTop <= 0
-  atBottom.value =
-    element.scrollTop + element.clientHeight >= element.scrollHeight - 1
-}
 const activeCard = computed(() => cards.value[activeIndex.value] ?? null)
-const draftTotalPoints = computed(() =>
-  cards.value.reduce(
-    (sum, card) =>
-      sum + (Number.isFinite(card.draft.points) ? card.draft.points : 0),
-    0,
-  ),
+const validTotalPoints = computed(() =>
+  validCards.value.reduce((sum, card) => sum + card.draft.points, 0),
 )
 
 const note = computed(() =>
@@ -230,13 +187,7 @@ async function init() {
 
 watch([packageId, questionId], init)
 
-onMounted(async () => {
-  await init()
-  await nextTick()
-  updateScrollHints()
-})
-
-watch(cards, () => void nextTick(updateScrollHints), { deep: true })
+onMounted(init)
 
 function snippetOf(card: DraftCard): string {
   const text = plainExcerpt(card.draft.bodyHtml, 60)
@@ -255,6 +206,7 @@ function addCard() {
 function removeCard(index: number) {
   if (cards.value.length === 1) return
   cards.value.splice(index, 1)
+  if (index < activeIndex.value) activeIndex.value -= 1
   activeIndex.value = Math.min(activeIndex.value, cards.value.length - 1)
 }
 
@@ -303,18 +255,12 @@ async function saveEdit() {
     content: cleanContent(type.value, draft.value.content),
     points: draft.value.points,
   }
-  const result =
-    questionId.value === null
-      ? await examPackageService.addQuestion(packageId.value, {
-          type: type.value,
-          ...body,
-          ...(authorId.value ? { authorEmployeeId: authorId.value } : {}),
-        })
-      : await examPackageService.updateQuestion(
-          packageId.value,
-          questionId.value,
-          body,
-        )
+  if (questionId.value === null) return
+  const result = await examPackageService.updateQuestion(
+    packageId.value,
+    questionId.value,
+    body,
+  )
   saving.value = false
   if (!result.success) {
     formError.value = result.error
@@ -468,7 +414,7 @@ async function confirmSave() {
                   "
                   type="number"
                   inputmode="decimal"
-                  min="1"
+                  min="0.25"
                   max="100"
                   step="0.25"
                   class="h-[var(--control-h-sm,1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -518,77 +464,17 @@ async function confirmSave() {
                   <Plus />
                 </Button>
               </CardHeader>
-              <CardContent variant="flush">
-                <div
-                  v-if="!atTop"
-                  class="text-[length:var(--text-control,0.75rem)] text-center text-muted-foreground"
-                >
-                  ⋯
-                </div>
-                <div
-                  v-if="cards.length > 0"
-                  ref="listRef"
-                >
-                  <ScrollArea
-                    class="max-h-[60vh] [&_[data-slot=scroll-area-scrollbar]]:w-1.5 [&_[data-slot=scroll-area-viewport]]:max-h-[60vh] [&_[data-slot=scroll-area-viewport]]:overflow-y-auto"
-                    @scroll.capture="updateScrollHints"
-                  >
-                    <ItemGroup class="gap-0">
-                      <Item
-                        v-for="(card, index) in cards"
-                        :key="card.key"
-                        class="min-w-0 flex-nowrap gap-1 rounded-none border-0 px-2 py-1 hover:bg-muted"
-                        :class="index === activeIndex ? 'bg-muted' : undefined"
-                      >
-                        <ItemContent class="min-w-0">
-                          <button
-                            type="button"
-                            class="flex w-full min-w-0 items-center gap-2 text-left"
-                            :aria-current="
-                              index === activeIndex ? 'true' : undefined
-                            "
-                            @click="selectCard(index)"
-                          >
-                            <span
-                              class="w-4 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
-                            >
-                              {{ index + 1 }}
-                            </span>
-                            <span
-                              class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
-                            >
-                              {{ snippetOf(card) }}
-                            </span>
-                          </button>
-                        </ItemContent>
-                        <ItemActions class="shrink-0">
-                          <span
-                            class="w-8 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-                            :title="typeLabel(card.type)"
-                          >
-                            {{ typeCode(card.type) }}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            :aria-label="`Hapus soal ${index + 1}`"
-                            :title="`Hapus soal ${index + 1}`"
-                            :disabled="cards.length === 1"
-                            @click="removeCard(index)"
-                          >
-                            <Trash2 />
-                          </Button>
-                        </ItemActions>
-                      </Item>
-                    </ItemGroup>
-                  </ScrollArea>
-                </div>
-                <div
-                  v-if="!atBottom"
-                  class="text-[length:var(--text-control,0.75rem)] text-center text-muted-foreground"
-                >
-                  ⋯
-                </div>
+              <CardContent
+                variant="flush"
+                class="max-h-[60vh] overflow-y-auto"
+              >
+                <DraftCardList
+                  :cards="cards"
+                  :active-index="activeIndex"
+                  :snippet-of="snippetOf"
+                  @select="selectCard"
+                  @remove="removeCard"
+                />
               </CardContent>
             </Card>
 
@@ -625,7 +511,6 @@ async function confirmSave() {
                       >
                         <SelectTrigger
                           :id="`${activeCard.key}-type`"
-                          size="sm"
                           :title="typeLabel(activeCard.type)"
                         >
                           <SelectValue />
@@ -657,7 +542,7 @@ async function confirmSave() {
                         "
                         type="number"
                         inputmode="decimal"
-                        min="1"
+                        min="0.25"
                         max="100"
                         step="0.25"
                         class="h-[var(--control-h-sm,1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -762,62 +647,24 @@ async function confirmSave() {
           </SheetDescription>
           <Progress
             :model-value="
-              cards.length === 0 ? 0 : (completedCount / cards.length) * 100
+              cards.length === 0 ? 0 : (validCards.length / cards.length) * 100
             "
           />
         </SheetHeader>
         <Separator />
         <div class="min-h-0 flex-1 overflow-auto">
-          <ItemGroup class="gap-0 divide-y divide-border">
-            <Item
-              v-for="(card, index) in cards"
-              :key="card.key"
-              class="min-w-0 flex-nowrap gap-1.5 rounded-none border-0 px-2 py-2 hover:bg-muted"
-              :class="index === activeIndex ? 'bg-muted' : undefined"
-            >
-              <ItemContent class="min-w-0">
-                <button
-                  type="button"
-                  class="flex w-full min-w-0 items-center gap-2 text-left"
-                  :aria-current="index === activeIndex ? 'true' : undefined"
-                  @click="
-                    () => {
-                      selectCard(index)
-                      sheetOpen = false
-                    }
-                  "
-                >
-                  <span
-                    class="grid size-5 shrink-0 place-items-center rounded-md bg-background text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
-                  >
-                    {{ index + 1 }}
-                  </span>
-                  <span
-                    class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
-                  >
-                    {{ snippetOf(card) }}
-                  </span>
-                </button>
-              </ItemContent>
-              <ItemActions class="shrink-0">
-                <Badge
-                  variant="outline"
-                  :title="typeLabel(card.type)"
-                >
-                  {{ typeCode(card.type) }}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  :aria-label="`Hapus soal ${index + 1}`"
-                  :disabled="cards.length === 1"
-                  @click="removeCard(index)"
-                >
-                  <Trash2 />
-                </Button>
-              </ItemActions>
-            </Item>
-          </ItemGroup>
+          <DraftCardList
+            :cards="cards"
+            :active-index="activeIndex"
+            :snippet-of="snippetOf"
+            @select="
+              (index) => {
+                selectCard(index)
+                sheetOpen = false
+              }
+            "
+            @remove="removeCard"
+          />
         </div>
       </SheetContent>
     </Sheet>
@@ -838,10 +685,10 @@ async function confirmSave() {
             </dd>
             <dt class="text-muted-foreground">Jumlah soal</dt>
             <dd class="text-muted-foreground">:</dd>
-            <dd class="tabular-nums">{{ cards.length }}</dd>
+            <dd class="tabular-nums">{{ validCards.length }}</dd>
             <dt class="text-muted-foreground">Total poin</dt>
             <dd class="text-muted-foreground">:</dd>
-            <dd class="tabular-nums">{{ draftTotalPoints }}</dd>
+            <dd class="tabular-nums">{{ validTotalPoints }}</dd>
             <dt class="text-muted-foreground">Penulis</dt>
             <dd class="text-muted-foreground">:</dd>
             <dd class="min-w-0">
@@ -849,10 +696,7 @@ async function confirmSave() {
                 v-if="store.manageAll"
                 v-model="batchAuthorId"
               >
-                <SelectTrigger
-                  size="sm"
-                  aria-label="Penulis soal"
-                >
+                <SelectTrigger aria-label="Penulis soal">
                   <SelectValue :placeholder="ownName" />
                 </SelectTrigger>
                 <SelectContent>
@@ -882,7 +726,8 @@ async function confirmSave() {
           </p>
         </DialogBody>
         <DialogFooter
-          class="flex-row items-center justify-end gap-2 border-t border-border px-4 py-3"
+          standard
+          class="justify-between"
         >
           <Button
             variant="outline"
@@ -894,7 +739,7 @@ async function confirmSave() {
             :disabled="saving"
             @click="confirmSave"
           >
-            {{ saving ? 'Menyimpan…' : `Simpan ${cards.length} soal` }}
+            {{ saving ? 'Menyimpan…' : `Simpan ${validCards.length} soal` }}
           </Button>
         </DialogFooter>
       </DialogContent>

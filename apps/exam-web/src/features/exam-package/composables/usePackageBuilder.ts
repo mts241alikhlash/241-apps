@@ -11,7 +11,6 @@ import type {
 } from '../types'
 
 const EDITABLE: ExamPackageStatus[] = ['DRAFT', 'RETURNED', 'APPROVED']
-const SUBMITTABLE: ExamPackageStatus[] = ['DRAFT', 'RETURNED']
 
 export function usePackageBuilder(id: MaybeRefOrGetter<string>) {
   const { user, hasPermission } = useAuthSession()
@@ -36,13 +35,6 @@ export function usePackageBuilder(id: MaybeRefOrGetter<string>) {
     }
     return EDITABLE.includes(current.status) && owns.value
   })
-
-  const canSubmit = computed(
-    () =>
-      canEdit.value &&
-      SUBMITTABLE.includes(pkg.value?.status ?? 'LOCKED') &&
-      (pkg.value?.items.length ?? 0) > 0,
-  )
 
   const lastReturn = computed<PackageReview | null>(() => {
     const current = pkg.value
@@ -107,29 +99,17 @@ export function usePackageBuilder(id: MaybeRefOrGetter<string>) {
     return run(() => examPackageService.removeQuestion(toValue(id), questionId))
   }
 
-  async function submit() {
-    if ((pkg.value?.items.length ?? 0) === 0) {
-      error.value = 'Paket belum berisi soal'
-      return
-    }
-    await run(() => examPackageService.submit(toValue(id)))
-  }
-
   return {
     pkg,
     loading,
     loadFailed,
     notFound,
-    busy,
     error,
-    owns,
     canEdit,
-    canSubmit,
     lastReturn,
     noteOf,
     load,
     move,
     remove,
-    submit,
   }
 }
