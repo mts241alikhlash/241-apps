@@ -1,5 +1,30 @@
 # exam-web
 
+## 0.3.0
+
+### Minor Changes
+
+- ed0a2aa: Rename exam types to DAILY, ASSIGNMENT, MIDTERM, FINAL and expose server-derived category on exam contracts.
+- 774a670: Adds Safe Exam Browser configuration management and a public config file endpoint to the exam service, client, and web app.
+- b816247: Reworked question bank and package screens, room roster printing (participant cards and seat lists for a whole exam period), a client column in the room monitor, and a collapsed sidebar whose menu groups open as a dropdown. Button icons are spaced by the button gap only.
+- 8bccfde: Camera proctoring is removed: no snapshot or camera-blocked endpoints, no camera fields on sessions and the room monitor, and no `snapshotIntervalMs` in exam policies. Deploy it together with Istiqra 0.2.0: older APKs require snapshotIntervalMs and stop loading exams.
+
+### Patch Changes
+
+- d587566: Use the generated service clients for API calls.
+- d587566: Load grades, staff users and the letterhead through the generated academic and identity clients.
+- 7554d11: Stops defaulting the room monitor meta and derives the activity status from the response dto.
+- 061bc87: Floating sidebar and top bar layout, card and table restyle, and exam-web views moved to the new layout.
+- 7110781: Lint runs one type-aware ESLint config; `lint:strict` and `eslint.typecheck.config.mjs` are gone.
+- Updated dependencies [b816247]
+- Updated dependencies [061bc87]
+- Updated dependencies [d587566]
+- Updated dependencies [7110781]
+- Updated dependencies [d587566]
+  - @mts241alikhlash/ui@0.1.1
+  - @mts241alikhlash/platform@0.1.2
+  - @mts241alikhlash/web-shared@0.2.0
+
 ## 0.2.0
 
 ### Minor Changes

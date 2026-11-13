@@ -1,6 +1,6 @@
 {
   "name": "@mts241alikhlash/nest-core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Infrastructure and cross-cutting code shared by the 241 Apps services",
   "private": true,
   "license": "UNLICENSED",
