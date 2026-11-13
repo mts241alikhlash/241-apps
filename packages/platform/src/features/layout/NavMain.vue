@@ -7,6 +7,13 @@ import {
   CollapsibleTrigger,
 } from '@mts241alikhlash/ui/collapsible'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@mts241alikhlash/ui/dropdown-menu'
+import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -31,7 +38,9 @@ const props = defineProps<{
 
 const route = useRoute()
 const { t } = useI18n()
-const { isMobile, setOpenMobile } = useSidebar()
+const { isMobile, setOpenMobile, state } = useSidebar()
+
+const iconOnly = computed(() => state.value === 'collapsed' && !isMobile.value)
 
 function handleLinkClick() {
   if (isMobile.value) {
@@ -86,18 +95,54 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
         <SidebarMenuItem v-if="!item.items?.length">
           <SidebarMenuButton
             as-child
-            :tooltip="t(item.title) || item.title"
+            :tooltip="t(item.title)"
             :is-active="route.path === item.url"
           >
             <RouterLink
               :to="item.url"
-              :title="t(item.title) || item.title"
               @click="handleLinkClick"
             >
               <component :is="item.icon" />
               <span>{{ t(item.title) }}</span>
             </RouterLink>
           </SidebarMenuButton>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem v-else-if="iconOnly">
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <SidebarMenuButton
+                :tooltip="t(item.title)"
+                :is-active="isItemActive(item)"
+                :aria-label="t(item.title)"
+              >
+                <component :is="item.icon" />
+                <span>{{ t(item.title) }}</span>
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="right"
+              align="start"
+              class="min-w-48"
+            >
+              <DropdownMenuLabel>{{ t(item.title) }}</DropdownMenuLabel>
+              <DropdownMenuItem
+                v-for="subItem in item.items"
+                :key="subItem.title"
+                as-child
+              >
+                <RouterLink
+                  :to="subItem.url"
+                  :aria-current="
+                    isSubActive(subItem, item) ? 'page' : undefined
+                  "
+                  @click="handleLinkClick"
+                >
+                  {{ t(subItem.title) }}
+                </RouterLink>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SidebarMenuItem>
 
         <Collapsible
@@ -109,8 +154,7 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
           <SidebarMenuItem>
             <CollapsibleTrigger as-child>
               <SidebarMenuButton
-                :tooltip="t(item.title) || item.title"
-                :title="t(item.title) || item.title"
+                :tooltip="t(item.title)"
                 :is-active="isItemActive(item)"
               >
                 <component :is="item.icon" />
