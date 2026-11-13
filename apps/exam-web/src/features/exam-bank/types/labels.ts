@@ -8,4 +8,14 @@ const TYPE_LABELS: Record<QuestionType, string> = {
   ESSAY: 'Uraian',
 }
 
+const TYPE_CODES: Record<QuestionType, string> = {
+  MULTIPLE_CHOICE: 'PG',
+  MULTIPLE_RESPONSE: 'PGK',
+  TRUE_FALSE: 'BS',
+  SHORT_ANSWER: 'IS',
+  ESSAY: 'UR',
+}
+
 export const typeLabel = (type: QuestionType): string => TYPE_LABELS[type]
+
+export const typeCode = (type: QuestionType): string => TYPE_CODES[type]

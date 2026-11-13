@@ -32,7 +32,7 @@ watch([rendered, root], () => void showImages(), { immediate: true })
   <!-- eslint-disable vue/no-v-html -- question HTML passed through sanitizeQuestionHtml, then KaTeX -->
   <div
     ref="root"
-    class="question-html max-w-none text-[length:var(--text-control,0.75rem)] [&_img]:max-h-64 [&_img]:max-w-full [&_img]:rounded-md [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_table]:border [&_td]:border [&_td]:px-2 [&_ul]:list-disc [&_ul]:pl-5"
+    class="question-html max-w-none min-w-0 break-words text-[length:var(--text-control,0.75rem)] [&_img]:max-h-64 [&_img]:max-w-full [&_img]:rounded-md [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_table]:border [&_td]:border [&_td]:px-2 [&_ul]:list-disc [&_ul]:pl-5"
     dir="auto"
     v-html="rendered"
   />

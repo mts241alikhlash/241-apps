@@ -111,7 +111,7 @@ function changePageSize(size: number) {
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
-          <template #header-right>
+          <template #filters>
             <FloatingLabelField
               label="Status"
               :for="statusFieldId"

@@ -55,77 +55,83 @@ async function save() {
           Beri judul paket, pilih mapel dan tingkat, lalu susun soalnya.
         </DialogDescription>
       </DialogHeader>
-      <DialogBody class="space-y-4">
-        <div
-          v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
-          role="alert"
+      <DialogBody>
+        <form
+          id="package-create-form"
+          class="space-y-4"
+          @submit.prevent="save"
         >
-          {{ form.error.value }}
-        </div>
-        <FloatingLabelField
-          label="Judul"
-          :for="`${fieldId}-title`"
-          floating
-        >
-          <Input
-            :id="`${fieldId}-title`"
-            v-model="form.title.value"
-            maxlength="200"
-          />
-        </FloatingLabelField>
-        <FloatingLabelField
-          label="Mapel"
-          :for="`${fieldId}-subject`"
-          floating
-        >
-          <Select v-model="form.subjectId.value">
-            <SelectTrigger
-              :id="`${fieldId}-subject`"
-              class="w-full"
-            >
-              <SelectValue placeholder="Pilih mapel" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="option in form.subjectOptions.value"
-                :key="option.id"
-                :value="option.id"
+          <div
+            v-if="form.error.value"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            role="alert"
+          >
+            {{ form.error.value }}
+          </div>
+          <FloatingLabelField
+            label="Judul"
+            :for="`${fieldId}-title`"
+            :error="form.errors.value.title ?? ''"
+            required
+            floating
+          >
+            <Input
+              :id="`${fieldId}-title`"
+              v-model="form.title.value"
+              maxlength="200"
+            />
+          </FloatingLabelField>
+          <FloatingLabelField
+            label="Mapel"
+            :for="`${fieldId}-subject`"
+            :error="form.errors.value.subjectId ?? ''"
+            required
+            floating
+          >
+            <Select v-model="form.subjectId.value">
+              <SelectTrigger
+                :id="`${fieldId}-subject`"
+                class="w-full"
               >
-                {{ option.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </FloatingLabelField>
-        <FloatingLabelField
-          label="Tingkat"
-          :for="`${fieldId}-grade`"
-          floating
-        >
-          <Select v-model="form.gradeId.value">
-            <SelectTrigger
-              :id="`${fieldId}-grade`"
-              class="w-full"
-            >
-              <SelectValue placeholder="Pilih tingkat" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="option in form.gradeOptions.value"
-                :key="option.id"
-                :value="option.id"
+                <SelectValue placeholder="Pilih mapel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="option in form.subjectOptions.value"
+                  :key="option.id"
+                  :value="option.id"
+                >
+                  {{ option.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+          <FloatingLabelField
+            label="Tingkat"
+            :for="`${fieldId}-grade`"
+            :error="form.errors.value.gradeId ?? ''"
+            required
+            floating
+          >
+            <Select v-model="form.gradeId.value">
+              <SelectTrigger
+                :id="`${fieldId}-grade`"
+                class="w-full"
               >
-                {{ option.name }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </FloatingLabelField>
-        <p
-          v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
-          {{ form.problem.value }}
-        </p>
+                <SelectValue placeholder="Pilih tingkat" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="option in form.gradeOptions.value"
+                  :key="option.id"
+                  :value="option.id"
+                >
+                  {{ option.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </form>
       </DialogBody>
       <DialogFooter
         standard
@@ -139,9 +145,9 @@ async function save() {
           Batal
         </Button>
         <Button
-          type="button"
-          :disabled="form.problem.value !== null || form.saving.value"
-          @click="save"
+          type="submit"
+          form="package-create-form"
+          :disabled="form.saving.value"
         >
           {{ form.saving.value ? 'Menyimpan…' : 'Simpan' }}
         </Button>

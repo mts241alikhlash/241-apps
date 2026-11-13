@@ -1,12 +1,16 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Button } from '@mts241alikhlash/ui/button'
+import { ActionCell } from '@mts241alikhlash/ui'
+import { Check, Undo2 } from '@lucide/vue'
 import type { ExamPackageSummary } from '../types'
 
 export interface ReviewColumnOptions {
   subjectName: (id: string) => string
   gradeName: (id: string) => string
   onOpen: (pkg: ExamPackageSummary) => void
+  canApprove?: (pkg: ExamPackageSummary) => boolean
+  onApprove?: (pkg: ExamPackageSummary) => void
+  onReturn?: (pkg: ExamPackageSummary) => void
 }
 
 const itemsLabel = (pkg: ExamPackageSummary) => `${pkg.itemCount} soal`
@@ -41,6 +45,7 @@ export function buildReviewColumns(
       id: 'grade',
       header: 'Tingkat',
       meta: {
+        align: 'center',
         mobileLabel: 'Tingkat',
         mobileValue: (row: ExamPackageSummary) =>
           options.gradeName(row.gradeId),
@@ -55,7 +60,8 @@ export function buildReviewColumns(
         mobileLabel: 'Jumlah Soal',
         mobileValue: (row: ExamPackageSummary) => itemsLabel(row),
       },
-      cell: ({ row }) => itemsLabel(row.original),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, itemsLabel(row.original)),
     },
     {
       id: 'updated',
@@ -64,22 +70,37 @@ export function buildReviewColumns(
         mobileLabel: 'Diajukan',
         mobileValue: (row: ExamPackageSummary) => updatedLabel(row),
       },
-      cell: ({ row }) => updatedLabel(row.original),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, updatedLabel(row.original)),
     },
     {
       id: 'actions',
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            variant: 'outline',
-            size: 'sm',
-            onClick: () => options.onOpen(row.original),
-          },
-          () => 'Tinjau',
-        ),
+        h(ActionCell, {
+          hideEdit: true,
+          hideDelete: true,
+          viewLabel: 'Tinjau',
+          items: [
+            ...(options.canApprove?.(row.original) === true
+              ? [
+                  {
+                    label: 'Setujui',
+                    icon: Check,
+                    onClick: () => options.onApprove?.(row.original),
+                  },
+                  {
+                    label: 'Kembalikan',
+                    icon: Undo2,
+                    destructive: true,
+                    onClick: () => options.onReturn?.(row.original),
+                  },
+                ]
+              : []),
+          ],
+          onView: () => options.onOpen(row.original),
+        }),
     },
   ]
 }

@@ -141,7 +141,7 @@ onMounted(async () => {
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
-          <template #header-right>
+          <template #filters>
             <div class="flex flex-wrap gap-2">
               <FloatingLabelField
                 label="Semester"

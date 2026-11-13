@@ -225,9 +225,9 @@ describe('PackageDetailView', () => {
     expect(text).toContain('Langit berwarna biru')
     expect(text).toContain('Baru')
     expect(text).toContain('Salinan')
-    expect(wrapper.text()).toContain('2 soal · Total 7 poin')
-    expect(wrapper.text()).toContain('Matematika')
-    expect(wrapper.text()).toContain('Draf')
+    expect(wrapper.get('dl').text()).toContain('Matematika')
+    expect(wrapper.get('dl').text()).toContain('Draf')
+    expect(wrapper.get('dl').text()).toContain('Poin7')
     wrapper.unmount()
   })
 

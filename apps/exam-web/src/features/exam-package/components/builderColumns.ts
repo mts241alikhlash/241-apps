@@ -33,7 +33,8 @@ export function buildBuilderColumns(
         mobileLabel: 'No',
         mobileValue: (row: ExamPackageItemView) => String(row.position),
       },
-      cell: ({ row }) => row.original.position,
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, String(row.original.position)),
     },
     {
       id: 'summary',
@@ -86,7 +87,8 @@ export function buildBuilderColumns(
         mobileLabel: 'Poin',
         mobileValue: (row: ExamPackageItemView) => String(row.points),
       },
-      cell: ({ row }) => String(row.original.points),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, String(row.original.points)),
     },
     {
       id: 'actions',

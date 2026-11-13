@@ -174,7 +174,7 @@ function pinClass(column: Column<TData, unknown>, part: 'header' | 'cell') {
   const side = column.getIsPinned()
   if (!side) return null
   const base =
-    part === 'header' ? 'sticky z-10 bg-muted' : 'sticky z-10 bg-inherit'
+    part === 'header' ? 'sticky z-10 bg-table-header' : 'sticky z-10 bg-inherit'
   if (side === 'right') {
     if (!column.getIsFirstColumn('right')) return base
     return part === 'header'
@@ -344,16 +344,19 @@ defineExpose({ table })
 <template>
   <div class="flex flex-col gap-2.5">
     <div
-      v-if="showFilterInput || $slots['header-left'] || $slots['header-right']"
+      v-if="
+        showFilterInput || $slots['header-left'] || $slots['header-right'] || $slots.filters
+      "
       :class="[
         'w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-between',
         mobile === 'cards' ? 'hidden md:flex' : 'flex',
       ]"
     >
       <div
-        v-if="$slots['header-left']"
+        v-if="$slots['header-left'] || $slots.filters"
         class="flex items-center gap-2"
       >
+        <slot name="filters" />
         <slot name="header-left" />
       </div>
       <div
@@ -434,12 +437,12 @@ defineExpose({ table })
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"
             :key="headerGroup.id"
-            class="bg-muted hover:bg-muted"
+            class="bg-table-header hover:bg-table-header"
           >
             <TableHead
               v-for="header in headerGroup.headers"
               :key="header.id"
-              class="px-4 text-center"
+              class="px-4"
               :style="pinStyle(header.column)"
               :class="[
                 pinClass(header.column, 'header'),
@@ -475,7 +478,7 @@ defineExpose({ table })
               v-for="i in 5"
               :key="i"
               :class="
-                i % 2 === 1 ? 'bg-card' : 'bg-blue-50/60 dark:bg-blue-950/20'
+                i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20'
               "
             >
               <TableCell
@@ -494,7 +497,7 @@ defineExpose({ table })
               :class="[
                 index % 2 === 0
                   ? 'bg-card hover:bg-muted/50'
-                  : 'bg-blue-50/60 hover:bg-blue-100/60 dark:bg-blue-950/20 dark:hover:bg-blue-900/30',
+                  : 'bg-muted/50 hover:bg-muted dark:bg-muted/20 dark:hover:bg-muted/30',
                 rowClickable && 'cursor-pointer',
               ]"
               @click="rowClickable && emit('row-click', row.original)"
@@ -566,7 +569,7 @@ defineExpose({ table })
           :key="i"
           :class="[
             'space-y-1.5 px-3 py-2.5',
-            i % 2 === 1 ? 'bg-card' : 'bg-blue-50/60 dark:bg-blue-950/20',
+            i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20',
           ]"
         >
           <Skeleton class="h-4 w-2/3" />
@@ -584,7 +587,7 @@ defineExpose({ table })
             'flex min-w-0 items-start',
             index % 2 === 0
               ? 'bg-card hover:bg-muted/50'
-              : 'bg-blue-50/60 hover:bg-blue-100/60 dark:bg-blue-950/20 dark:hover:bg-blue-900/30',
+              : 'bg-muted/50 hover:bg-muted dark:bg-muted/20 dark:hover:bg-muted/30',
           ]"
         >
           <div

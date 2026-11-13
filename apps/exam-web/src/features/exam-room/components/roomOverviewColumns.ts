@@ -15,7 +15,7 @@ export function buildRoomOverviewColumns(
     {
       id: 'code',
       header: 'Kode',
-      meta: { align: 'left', strong: true },
+      meta: { align: 'center', strong: true },
       cell: ({ row }) =>
         h('span', { class: 'tabular-nums' }, row.original.code),
     },
@@ -43,14 +43,13 @@ export function buildRoomOverviewColumns(
       meta: {
         align: 'center',
         mobileLabel: 'Peserta',
-        mobileValue: (row: RoomOverview) =>
-          `${row.registeredCount} dari ${row.capacity}`,
+        mobileValue: (row: RoomOverview) => String(row.registeredCount),
       },
       cell: ({ row }) =>
         h(
           'span',
           { class: 'tabular-nums' },
-          `${row.original.registeredCount} / ${row.original.capacity}`,
+          String(row.original.registeredCount),
         ),
     },
     {

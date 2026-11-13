@@ -76,6 +76,28 @@
     padding: 0;
   }
 
+  body.printing-stack * {
+    visibility: hidden;
+  }
+
+  body.printing-stack .print-room,
+  body.printing-stack .print-room * {
+    visibility: visible;
+  }
+
+  body.printing-stack .print-sheet {
+    display: block;
+    padding: 0;
+  }
+
+  body.printing-stack .print-room {
+    break-before: page;
+  }
+
+  body.printing-stack .print-room:first-of-type {
+    break-before: auto;
+  }
+
   @page {
     size: A4;
     margin: 15mm;

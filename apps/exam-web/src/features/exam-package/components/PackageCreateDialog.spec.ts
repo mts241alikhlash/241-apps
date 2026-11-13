@@ -29,8 +29,9 @@ const button = defineComponent({
   template: '<button :disabled="disabled" type="button"><slot /></button>',
 })
 const field = defineComponent({
-  props: { label: String, for: String, floating: Boolean },
-  template: '<div><label :for="$props.for">{{ label }}</label><slot /></div>',
+  props: { label: String, for: String, floating: Boolean, error: String },
+  template:
+    '<div><label :for="$props.for">{{ label }}</label><span>{{ error }}</span><slot /></div>',
 })
 const select = defineComponent({
   name: 'SelectStub',
@@ -103,17 +104,19 @@ describe('PackageCreateDialog', () => {
     wrapper.unmount()
   })
 
-  it('keeps Simpan disabled until the title is filled', async () => {
+  it('names the missing title on submit and saves nothing', async () => {
     const wrapper = open()
     await flushPromises()
 
     expect(
       buttonByText(wrapper, 'Simpan')!.attributes('disabled'),
-    ).toBeDefined()
-    await wrapper.find('input').setValue('UAS')
-    expect(
-      buttonByText(wrapper, 'Simpan')!.attributes('disabled'),
     ).toBeUndefined()
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Judul wajib diisi.')
+    expect(create).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
@@ -123,7 +126,7 @@ describe('PackageCreateDialog', () => {
     await flushPromises()
     await wrapper.find('input').setValue('UAS')
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
+    await wrapper.get('form').trigger('submit')
     await flushPromises()
 
     expect(wrapper.emitted('created')).toEqual([['p9']])
@@ -140,7 +143,7 @@ describe('PackageCreateDialog', () => {
     await flushPromises()
     await wrapper.find('input').setValue('UAS')
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
+    await wrapper.get('form').trigger('submit')
     await flushPromises()
 
     expect(wrapper.text()).toContain('Mapel bukan ampuan Anda')

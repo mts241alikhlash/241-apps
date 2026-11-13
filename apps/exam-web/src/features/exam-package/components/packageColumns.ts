@@ -2,7 +2,7 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Copy } from '@lucide/vue'
+import { CalendarClock, Copy, Send, SquarePen } from '@lucide/vue'
 import type { ExamPackageStatus, ExamPackageSummary } from '../types'
 import { packageStatusLabel, statusVariant } from '../types'
 
@@ -11,7 +11,13 @@ export interface PackageColumnOptions {
   gradeName: (id: string) => string
   canDelete: (pkg: ExamPackageSummary) => boolean
   canCopy: boolean
+  canRename?: (pkg: ExamPackageSummary) => boolean
+  canSubmit?: (pkg: ExamPackageSummary) => boolean
+  canSchedule?: (pkg: ExamPackageSummary) => boolean
   onOpen: (pkg: ExamPackageSummary) => void
+  onRename?: (pkg: ExamPackageSummary) => void
+  onSubmit?: (pkg: ExamPackageSummary) => void
+  onSchedule?: (pkg: ExamPackageSummary) => void
   onCopy: (pkg: ExamPackageSummary) => void | Promise<void>
   onDelete: (
     pkg: ExamPackageSummary,
@@ -21,6 +27,8 @@ export interface PackageColumnOptions {
 
 const DELETABLE: ExamPackageStatus[] = ['DRAFT', 'RETURNED', 'APPROVED']
 const COPYABLE: ExamPackageStatus[] = ['APPROVED', 'LOCKED']
+const SCHEDULABLE: ExamPackageStatus[] = ['APPROVED', 'LOCKED']
+const SUBMITTABLE: ExamPackageStatus[] = ['DRAFT', 'RETURNED']
 
 const itemsLabel = (pkg: ExamPackageSummary) => `${pkg.itemCount} soal`
 
@@ -48,6 +56,7 @@ export function buildPackageColumns(
       id: 'grade',
       header: 'Tingkat',
       meta: {
+        align: 'center',
         mobileLabel: 'Tingkat',
         mobileValue: (row: ExamPackageSummary) =>
           options.gradeName(row.gradeId),
@@ -62,7 +71,8 @@ export function buildPackageColumns(
         mobileLabel: 'Jumlah Soal',
         mobileValue: (row: ExamPackageSummary) => itemsLabel(row),
       },
-      cell: ({ row }) => itemsLabel(row.original),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, itemsLabel(row.original)),
     },
     {
       id: 'status',
@@ -92,8 +102,38 @@ export function buildPackageColumns(
           deleteTitle: 'Hapus paket?',
           deleteDescription:
             'Paket yang dihapus tidak muncul lagi. Paket yang menunggu tinjauan atau sudah dijadwalkan tidak bisa dihapus.',
-          items:
-            options.canCopy && COPYABLE.includes(row.original.status)
+          items: [
+            ...(options.canSubmit?.(row.original) === true &&
+            SUBMITTABLE.includes(row.original.status) &&
+            row.original.itemCount > 0
+              ? [
+                  {
+                    label: 'Ajukan',
+                    icon: Send,
+                    onClick: () => options.onSubmit?.(row.original),
+                  },
+                ]
+              : []),
+            ...(options.canRename?.(row.original) === true
+              ? [
+                  {
+                    label: 'Ganti judul',
+                    icon: SquarePen,
+                    onClick: () => options.onRename?.(row.original),
+                  },
+                ]
+              : []),
+            ...(options.canSchedule?.(row.original) === true &&
+            SCHEDULABLE.includes(row.original.status)
+              ? [
+                  {
+                    label: 'Jadwalkan',
+                    icon: CalendarClock,
+                    onClick: () => options.onSchedule?.(row.original),
+                  },
+                ]
+              : []),
+            ...(options.canCopy && COPYABLE.includes(row.original.status)
               ? [
                   {
                     label: 'Salin',
@@ -103,7 +143,8 @@ export function buildPackageColumns(
                     },
                   },
                 ]
-              : [],
+              : []),
+          ],
           onView: () => options.onOpen(row.original),
           onDelete: (controls: {
             closeAlert: () => void

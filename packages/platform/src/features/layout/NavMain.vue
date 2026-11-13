@@ -79,66 +79,71 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
   >
     <SidebarGroupLabel>{{ t(section.label) }}</SidebarGroupLabel>
     <SidebarMenu>
-      <Collapsible
+      <template
         v-for="item in section.items"
         :key="item.title"
-        as-child
-        :default-open="isItemActive(item)"
-        class="group/collapsible"
       >
-        <SidebarMenuItem>
-          <CollapsibleTrigger
-            v-if="item.items?.length"
-            as-child
-          >
-            <SidebarMenuButton
-              :tooltip="t(item.title)"
-              :is-active="isItemActive(item)"
-            >
-              <component :is="item.icon" />
-              <span>{{ t(item.title) }}</span>
-              <ChevronRight
-                class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
-              />
-            </SidebarMenuButton>
-          </CollapsibleTrigger>
+        <SidebarMenuItem v-if="!item.items?.length">
           <SidebarMenuButton
-            v-else
             as-child
-            :tooltip="t(item.title)"
+            :tooltip="t(item.title) || item.title"
             :is-active="route.path === item.url"
           >
             <RouterLink
               :to="item.url"
+              :title="t(item.title) || item.title"
               @click="handleLinkClick"
             >
               <component :is="item.icon" />
               <span>{{ t(item.title) }}</span>
             </RouterLink>
           </SidebarMenuButton>
-
-          <CollapsibleContent v-if="item.items?.length">
-            <SidebarMenuSub>
-              <SidebarMenuSubItem
-                v-for="subItem in item.items"
-                :key="subItem.title"
-              >
-                <SidebarMenuSubButton
-                  as-child
-                  :is-active="isSubActive(subItem, item)"
-                >
-                  <RouterLink
-                    :to="subItem.url"
-                    @click="handleLinkClick"
-                  >
-                    <span>{{ t(subItem.title) }}</span>
-                  </RouterLink>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            </SidebarMenuSub>
-          </CollapsibleContent>
         </SidebarMenuItem>
-      </Collapsible>
+
+        <Collapsible
+          v-else
+          as-child
+          :default-open="isItemActive(item)"
+          class="group/collapsible"
+        >
+          <SidebarMenuItem>
+            <CollapsibleTrigger as-child>
+              <SidebarMenuButton
+                :tooltip="t(item.title) || item.title"
+                :title="t(item.title) || item.title"
+                :is-active="isItemActive(item)"
+              >
+                <component :is="item.icon" />
+                <span>{{ t(item.title) }}</span>
+                <ChevronRight
+                  class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                <SidebarMenuSubItem
+                  v-for="subItem in item.items"
+                  :key="subItem.title"
+                >
+                  <SidebarMenuSubButton
+                    as-child
+                    :is-active="isSubActive(subItem, item)"
+                  >
+                    <RouterLink
+                      :to="subItem.url"
+                      @click="handleLinkClick"
+                    >
+                      <span>{{ t(subItem.title) }}</span>
+                    </RouterLink>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </SidebarMenuItem>
+        </Collapsible>
+      </template>
     </SidebarMenu>
   </SidebarGroup>
 </template>

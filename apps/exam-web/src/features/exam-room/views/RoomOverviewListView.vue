@@ -175,7 +175,7 @@ onMounted(load)
             @update:page-size="changePageSize"
             @row-click="openRoom"
           >
-            <template #header-right>
+            <template #filters>
               <div
                 class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
               >
@@ -199,12 +199,15 @@ onMounted(load)
                     </SelectContent>
                   </Select>
                 </FloatingLabelField>
-                <SearchInput
-                  v-model="search"
-                  class="sm:w-40"
-                  label="Cari ruangan"
-                />
               </div>
+            
+            </template>
+            <template #header-right>
+              <SearchInput
+                                v-model="search"
+                                class="sm:w-40"
+                                label="Cari ruangan"
+                              />
             </template>
 
             <template #mobile-toolbar>

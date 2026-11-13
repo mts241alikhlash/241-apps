@@ -52,8 +52,19 @@ export const statusVariant = (status: ExamPackageStatus): BadgeVariant =>
 export const markerVariant = (marker: QuestionMarker): BadgeVariant =>
   marker === 'COPIED' ? 'outline' : 'default'
 
+const STATUS_TEXT_CLASSES: Record<ExamPackageStatus, string> = {
+  DRAFT: 'text-muted-foreground',
+  SUBMITTED: 'text-primary',
+  RETURNED: 'text-destructive',
+  APPROVED: 'text-green-600 dark:text-green-500',
+  LOCKED: 'text-muted-foreground',
+}
+
 export const packageStatusLabel = (status: ExamPackageStatus): string =>
   STATUS_LABELS[status]
+
+export const statusTextClass = (status: ExamPackageStatus): string =>
+  STATUS_TEXT_CLASSES[status]
 
 export const packageStatusTone = (status: ExamPackageStatus): PackageTone =>
   STATUS_TONES[status]

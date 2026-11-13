@@ -273,7 +273,7 @@ const columns = computed<ColumnDef<PostAdminSummary>[]>(() => [
           filter-column="title"
           filter-placeholder="Cari judul atau ringkasan..."
         >
-          <template #header-right>
+          <template #filters>
             <Button
               size="sm"
               :variant="store.showDeleted ? 'default' : 'outline'"

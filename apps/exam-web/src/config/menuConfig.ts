@@ -1,6 +1,8 @@
 import {
+  Armchair,
   CalendarClock,
   ClipboardPen,
+  IdCard,
   Layers,
   ListChecks,
   Package,
@@ -80,6 +82,28 @@ export const menuSections: MenuSection[] = [
         url: '/exam/grading',
         icon: ClipboardPen,
         requiredPermission: 'exam-grading.read',
+      },
+      {
+        key: 'exam-cards',
+        title: 'menu.examCards',
+        url: '/exam/prints/cards',
+        icon: IdCard,
+        requiredAnyPermission: [
+          'exam-rooms.supervise',
+          'exam-rooms.technician',
+          'exam-rooms.manage-all',
+        ],
+      },
+      {
+        key: 'exam-seat-labels',
+        title: 'menu.examSeatLabels',
+        url: '/exam/prints/seats',
+        icon: Armchair,
+        requiredAnyPermission: [
+          'exam-rooms.supervise',
+          'exam-rooms.technician',
+          'exam-rooms.manage-all',
+        ],
       },
     ],
   },

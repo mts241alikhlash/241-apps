@@ -2,12 +2,10 @@
 import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BackButton, DataTable, SearchInput } from '@mts241alikhlash/ui'
-import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -148,12 +146,12 @@ const freshnessText = computed(() => {
   return `Diperbarui ${seconds} detik lalu${clock} (Otomatis tiap 5 dtk)`
 })
 
-const freshnessVariant = computed(() =>
+const freshnessDotClass = computed(() =>
   staleness.value === 'fresh'
-    ? 'outline'
+    ? 'bg-primary'
     : staleness.value === 'warning'
-      ? 'secondary'
-      : 'destructive',
+      ? 'bg-amber-500'
+      : 'bg-destructive',
 )
 
 const tokenMinutes = computed(() => {
@@ -209,7 +207,7 @@ const columns = computed(() =>
 
 function printRoute(kind: 'kartu' | 'meja') {
   void router.push({
-    path: `/exam/rooms/${roomId.value}/${kind}`,
+    path: `/exam/rooms/${roomId.value}/${kind === 'kartu' ? 'cards' : 'seats'}`,
     query: slotId.value === '' ? {} : { slot: slotId.value },
   })
 }
@@ -274,55 +272,19 @@ onUnmounted(() => {
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader variant="muted">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <BackButton
-              label="Kembali ke Ruang Ujian"
-              @click="router.push('/exam/rooms')"
-            />
-            <div class="flex flex-col">
-              <CardTitle class="font-semibold">{{ title }}</CardTitle>
-              <span
-                v-if="roomSubtitle"
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-              >
-                {{ roomSubtitle }}
-              </span>
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <Badge
-              v-if="token"
-              variant="outline"
-              class="tabular-nums"
+        <div class="flex items-center gap-3">
+          <BackButton
+            label="Kembali ke Ruang Ujian"
+            @click="router.push('/exam/rooms')"
+          />
+          <div class="flex min-w-0 flex-col">
+            <CardTitle class="truncate font-semibold">{{ title }}</CardTitle>
+            <span
+              v-if="roomSubtitle"
+              class="truncate text-[length:var(--text-control,0.75rem)] text-muted-foreground"
             >
-              Token {{ token.accessCode }} · {{ tokenMinutes }} mnt
-            </Badge>
-            <Button
-              v-if="token"
-              variant="outline"
-              @click="copyToken"
-            >
-              Salin Token
-            </Button>
-            <Button
-              variant="outline"
-              @click="printRoute('kartu')"
-            >
-              Kartu Peserta
-            </Button>
-            <Button
-              variant="outline"
-              @click="printRoute('meja')"
-            >
-              Daftar Meja
-            </Button>
-            <Badge
-              :variant="freshnessVariant"
-              class="tabular-nums"
-            >
-              {{ freshnessText }}
-            </Badge>
+              {{ roomSubtitle }}
+            </span>
           </div>
         </div>
       </CardHeader>
@@ -330,6 +292,62 @@ onUnmounted(() => {
       <CardContent
         class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div
+            v-if="token"
+            class="flex items-baseline gap-2"
+          >
+            <div class="flex flex-col">
+              <span
+                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                >Token masuk</span
+              >
+              <span
+                class="text-lg leading-tight font-semibold tracking-wide tabular-nums"
+                >{{ token.accessCode }}</span
+              >
+            </div>
+            <span
+              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+              >sisa {{ tokenMinutes }} mnt</span
+            >
+            <Button
+              variant="ghost"
+              size="sm"
+              @click="copyToken"
+              >Salin</Button
+            >
+          </div>
+          <div class="flex flex-col items-start gap-1.5 sm:items-end">
+            <span
+              class="flex items-center gap-1.5 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+            >
+              <span
+                class="size-1.5 rounded-full"
+                :class="freshnessDotClass"
+                aria-hidden="true"
+              />
+              {{ freshnessText }}
+            </span>
+            <div class="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                @click="printRoute('kartu')"
+              >
+                Kartu Peserta
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                @click="printRoute('meja')"
+              >
+                Daftar Meja
+              </Button>
+            </div>
+          </div>
+        </div>
+
         <RoomMonitorSummaryCards :summary="summary" />
 
         <Tabs
@@ -369,18 +387,53 @@ onUnmounted(() => {
               @update:page="page = $event"
               @update:page-size="changePageSize"
             >
-              <template #header-right>
-                <FloatingLabelField
-                  label="Status"
-                  :for="statusFieldId"
-                  class="w-fit min-w-32"
-                  floating
+              <template #filters>
+                <div
+                  class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
                 >
+                  <FloatingLabelField
+                    label="Status"
+                    :for="statusFieldId"
+                    class="w-fit min-w-28"
+                    floating
+                  >
+                    <Select v-model="status">
+                      <SelectTrigger
+                        :id="statusFieldId"
+                        class="w-full"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem
+                          v-for="option in MONITOR_STATUSES"
+                          :key="option"
+                          :value="option"
+                        >
+                          {{ monitorStatusLabel(option as MonitorStatus) }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FloatingLabelField>
+                </div>
+              
+            </template>
+            <template #header-right>
+              <SearchInput
+                                  v-model="search"
+                                  class="sm:w-40"
+                                  label="Cari nama atau NIS"
+                                />
+            </template>
+              <template #mobile-toolbar>
+                <div class="flex items-end gap-2">
+                  <SearchInput
+                    v-model="search"
+                    label="Cari nama atau NIS"
+                    class="flex-1"
+                  />
                   <Select v-model="status">
-                    <SelectTrigger
-                      :id="statusFieldId"
-                      class="w-full"
-                    >
+                    <SelectTrigger class="w-fit min-w-28">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -393,12 +446,7 @@ onUnmounted(() => {
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                </FloatingLabelField>
-                <SearchInput
-                  v-model="search"
-                  label="Cari nama atau NIS"
-                  placeholder="Cari nama atau NIS"
-                />
+                </div>
               </template>
               <template #empty>
                 <p>Tidak ada peserta yang cocok dengan filter.</p>
@@ -416,7 +464,6 @@ onUnmounted(() => {
           </TabsContent>
         </Tabs>
       </CardContent>
-      <CardFooter variant="thin" />
     </Card>
 
     <SessionTimelineDialog

@@ -11,17 +11,19 @@ export function hasContent(html: string): boolean {
   return html.replace(/<[^>]*>|&nbsp;|\s/g, '') !== ''
 }
 
-const twoChoices = () => [
+const initialChoices = () => [
   { key: 'A' as const, html: '' },
   { key: 'B' as const, html: '' },
+  { key: 'C' as const, html: '' },
+  { key: 'D' as const, html: '' },
 ]
 
 export function emptyContent(type: QuestionType): QuestionContent {
   switch (type) {
     case 'MULTIPLE_CHOICE':
-      return { choices: twoChoices(), answer: { key: 'A' } }
+      return { choices: initialChoices(), answer: { key: 'A' } }
     case 'MULTIPLE_RESPONSE':
-      return { choices: twoChoices(), answer: { keys: [] } }
+      return { choices: initialChoices(), answer: { keys: [] } }
     case 'TRUE_FALSE':
       return { answer: { value: true } }
     case 'SHORT_ANSWER':
@@ -49,7 +51,7 @@ export function cleanContent(
   }
 }
 
-export const MIN_POINTS = 0.25
+export const MIN_POINTS = 1
 export const MAX_POINTS = 100
 
 export function validateDraft(
@@ -82,7 +84,7 @@ export function validateDraft(
   }
 
   if (!Number.isFinite(points) || points < MIN_POINTS || points > MAX_POINTS) {
-    return 'Poin harus antara 0,25 dan 100'
+    return 'Poin harus antara 1 dan 100'
   }
   return null
 }

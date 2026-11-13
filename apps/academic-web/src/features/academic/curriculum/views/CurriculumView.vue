@@ -113,7 +113,7 @@ onMounted(async () => {
           filter-column="name"
           filter-placeholder="Cari kurikulum..."
         >
-          <template #header-right>
+          <template #filters>
             <Select
               :model-value="selectedAcademicYearId"
               @update:model-value="onAcademicYearChange"

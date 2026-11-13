@@ -104,7 +104,7 @@ async function init() {
   }
   await examBankService.loadReferences()
   if (store.manageAll && pkg.value) {
-    teachers.value = await examBankService.loadTeachers(pkg.value.subjectId)
+    teachers.value = await examBankService.loadTeachers()
   }
   loading.value = false
 }
@@ -142,7 +142,7 @@ onMounted(init)
         <template v-else>
           <ApprovedEditNotice v-if="pkg?.status === 'APPROVED'" />
           <FloatingLabelField
-            v-if="teachers.length > 0"
+            v-if="store.manageAll"
             label="Penulis"
             :for="authorFieldId"
             floating

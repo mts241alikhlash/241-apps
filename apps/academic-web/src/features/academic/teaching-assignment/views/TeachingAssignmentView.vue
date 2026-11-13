@@ -143,7 +143,7 @@ onMounted(async () => {
           @update:page="setPage"
           @update:page-size="setPageSize"
         >
-          <template #header-right>
+          <template #filters>
             <Select v-model="selectedClassroomId">
               <SelectTrigger class="h-8 w-[160px] text-xs">
                 <SelectValue placeholder="Semua Kelas" />

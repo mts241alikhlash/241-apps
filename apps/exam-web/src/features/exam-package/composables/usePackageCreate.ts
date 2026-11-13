@@ -9,6 +9,7 @@ export function usePackageCreate() {
   const gradeId = ref('')
   const saving = ref(false)
   const error = ref<string | null>(null)
+  const attempted = ref(false)
 
   const subjectOptions = computed(() => store.subjectOptions)
   const gradeOptions = computed(() =>
@@ -35,15 +36,29 @@ export function usePackageCreate() {
     { immediate: true, flush: 'sync' },
   )
 
-  const problem = computed<string | null>(() => {
-    if (title.value.trim() === '') return 'Judul wajib diisi'
-    if (subjectId.value === '') return 'Pilih mapel'
-    if (gradeId.value === '') return 'Pilih tingkat'
-    return null
-  })
+  const messages = computed(() => ({
+    title: title.value.trim() === '' ? 'Judul wajib diisi.' : null,
+    subjectId: subjectId.value === '' ? 'Mapel wajib dipilih.' : null,
+    gradeId: gradeId.value === '' ? 'Tingkat wajib dipilih.' : null,
+  }))
+
+  const errors = computed(() =>
+    attempted.value
+      ? messages.value
+      : { title: null, subjectId: null, gradeId: null },
+  )
 
   async function submit(): Promise<string | null> {
-    if (problem.value !== null || saving.value) return null
+    attempted.value = true
+    const fields = messages.value
+    if (
+      fields.title !== null ||
+      fields.subjectId !== null ||
+      fields.gradeId !== null ||
+      saving.value
+    ) {
+      return null
+    }
     saving.value = true
     error.value = null
     const result = await examPackageService.create({
@@ -67,7 +82,7 @@ export function usePackageCreate() {
     gradeOptions,
     saving,
     error,
-    problem,
+    errors,
     submit,
   }
 }
