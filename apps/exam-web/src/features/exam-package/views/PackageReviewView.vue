@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { BackButton } from '@mts241alikhlash/ui'
 import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -117,6 +118,10 @@ onMounted(() => {
         class="px-2"
       >
         <div class="flex items-center gap-3">
+          <BackButton
+            label="Kembali ke Persetujuan Paket"
+            @click="router.push('/exam/package-approvals')"
+          />
           <CardTitle class="truncate font-semibold">{{
             pkg?.title ?? 'Tinjau Paket'
           }}</CardTitle>

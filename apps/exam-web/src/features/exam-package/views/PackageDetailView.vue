@@ -17,7 +17,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import { Plus } from '@lucide/vue'
+import { ChevronDown, Plus } from '@lucide/vue'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@mts241alikhlash/ui/dropdown-menu'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { buildBuilderColumns } from '../components/builderColumns'
@@ -118,14 +124,34 @@ onMounted(async () => {
             pkg?.title ?? 'Paket Soal'
           }}</CardTitle>
         </div>
-        <Button
+        <div
           v-if="pkg && canEdit"
-          class="shrink-0"
-          @click="router.push(`/exam/packages/${id}/questions/new`)"
+          class="flex shrink-0 items-center gap-2"
         >
-          <Plus class="mr-1.5 size-4" />
-          Tambah
-        </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button variant="outline">
+                Ambil soal
+                <ChevronDown class="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem @select="takeOpen = true">
+                Ambil dari paket lain
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                v-if="hasPermission('exam-questions.create')"
+                @select="router.push(`/exam/packages/${id}/import`)"
+              >
+                Impor Excel/Word
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button @click="router.push(`/exam/packages/${id}/questions/new`)">
+            <Plus class="size-4" />
+            Tambah
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent
