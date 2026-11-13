@@ -3,17 +3,17 @@ import { nextTick, ref } from 'vue'
 import type { ExamPackageView } from '../types'
 import { usePackageBuilder } from './usePackageBuilder'
 
-const { loadPackage, reorder, removeQuestion, submit, permissions, user } =
-  vi.hoisted(() => ({
+const { loadPackage, reorder, removeQuestion, permissions, user } = vi.hoisted(
+  () => ({
     loadPackage: vi.fn(),
     reorder: vi.fn(),
     removeQuestion: vi.fn(),
-    submit: vi.fn(),
     permissions: new Set<string>(),
     user: { value: { id: 'u1' } },
-  }))
+  }),
+)
 vi.mock('../services/examPackageService', () => ({
-  examPackageService: { loadPackage, reorder, removeQuestion, submit },
+  examPackageService: { loadPackage, reorder, removeQuestion },
 }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
@@ -86,13 +86,6 @@ describe('usePackageBuilder', () => {
     expect((await loaded()).canEdit.value).toBe(false)
   })
 
-  it('offers Ajukan only for a draft or returned package with questions', async () => {
-    expect((await loaded()).canSubmit.value).toBe(true)
-    expect((await loaded({ status: 'RETURNED' })).canSubmit.value).toBe(true)
-    expect((await loaded({ status: 'APPROVED' })).canSubmit.value).toBe(false)
-    expect((await loaded({ items: [] })).canSubmit.value).toBe(false)
-  })
-
   it('moves a question down by sending the whole new order, then reloads', async () => {
     reorder.mockResolvedValue({ success: true, data: view() })
     const builder = await loaded()
@@ -133,25 +126,6 @@ describe('usePackageBuilder', () => {
     await builder.remove('q2')
 
     expect(removeQuestion).toHaveBeenCalledWith('p1', 'q2')
-    expect(loadPackage).toHaveBeenCalledTimes(2)
-  })
-
-  it('refuses to submit an empty package without asking the server', async () => {
-    const builder = await loaded({ items: [] })
-
-    await builder.submit()
-
-    expect(submit).not.toHaveBeenCalled()
-    expect(builder.error.value).toBe('Paket belum berisi soal')
-  })
-
-  it('submits and reloads', async () => {
-    submit.mockResolvedValue({ success: true, data: view() })
-    const builder = await loaded()
-
-    await builder.submit()
-
-    expect(submit).toHaveBeenCalledWith('p1')
     expect(loadPackage).toHaveBeenCalledTimes(2)
   })
 

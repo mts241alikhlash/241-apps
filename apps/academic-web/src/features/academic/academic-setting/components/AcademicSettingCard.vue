@@ -54,7 +54,6 @@ const { can } = useRoleGuard()
             type="button"
             variant="outline"
             size="sm"
-            class=""
             :disabled="setting.isSaving.value"
             @click="setting.reset"
           >
@@ -63,7 +62,6 @@ const { can } = useRoleGuard()
           <Button
             type="button"
             size="sm"
-            class=""
             :disabled="
               !setting.isDirty.value ||
               !setting.isValid.value ||
@@ -73,7 +71,7 @@ const { can } = useRoleGuard()
           >
             <Loader2
               v-if="setting.isSaving.value"
-              class="size-4 mr-1.5 animate-spin"
+              class="size-4 animate-spin"
             />
             {{ setting.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
           </Button>

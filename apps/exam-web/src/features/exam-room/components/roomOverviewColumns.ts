@@ -15,7 +15,7 @@ export function buildRoomOverviewColumns(
     {
       id: 'code',
       header: 'Kode',
-      meta: { align: 'left', strong: true },
+      meta: { align: 'center', strong: true },
       cell: ({ row }) =>
         h('span', { class: 'tabular-nums' }, row.original.code),
     },

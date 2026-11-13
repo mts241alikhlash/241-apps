@@ -139,36 +139,68 @@ const statusText = (row: RoomMonitorParticipant): string => {
   return session.status === 'IN_PROGRESS' ? 'Mengerjakan' : 'Terkumpul'
 }
 
+export function clientLabel(session: RoomMonitorSession | null): string {
+  if (session === null) return '-'
+  return session.client === 'SEB' ? 'Safe Exam Browser' : 'Istiqra'
+}
+
 export function buildRoomParticipantColumns(
   options: RoomParticipantColumnOptions,
 ): ColumnDef<RoomMonitorParticipant>[] {
   return [
     {
-      id: 'participant',
-      header: 'Kursi & Peserta',
-      meta: { align: 'left', strong: true },
+      id: 'seat',
+      header: 'Kursi',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kursi',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          `[${String(row.seatNumber).padStart(2, '0')}]`,
+      },
       cell: ({ row }) =>
-        h('div', { class: 'flex items-baseline gap-2' }, [
-          h(
-            'span',
-            { class: 'tabular-nums' },
-            `[${String(row.original.seatNumber).padStart(2, '0')}]`,
-          ),
-          h(
-            'span',
-            {},
-            [
-              row.original.studentName ?? 'Siswa tidak ditemukan',
-              row.original.nis,
-            ]
-              .filter(Boolean)
-              .join(' · '),
-          ),
-        ]),
+        h(
+          'span',
+          { class: 'tabular-nums' },
+          `[${String(row.original.seatNumber).padStart(2, '0')}]`,
+        ),
+    },
+    {
+      id: 'participant',
+      header: 'Peserta',
+      meta: {
+        align: 'left',
+        strong: true,
+        mobileLabel: 'Peserta',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          [row.studentName ?? 'Siswa tidak ditemukan', row.nis]
+            .filter(Boolean)
+            .join(' · '),
+      },
+      cell: ({ row }) =>
+        h(
+          'span',
+          {},
+          [
+            row.original.studentName ?? 'Siswa tidak ditemukan',
+            row.original.nis,
+          ]
+            .filter(Boolean)
+            .join(' · '),
+        ),
+    },
+    {
+      id: 'subject',
+      header: 'Mapel',
+      meta: {
+        align: 'left',
+        mobileLabel: 'Mapel',
+        mobileValue: (row: RoomMonitorParticipant) => row.subjectName ?? '-',
+      },
+      cell: ({ row }) => row.original.subjectName ?? '-',
     },
     {
       id: 'status',
-      header: 'Mapel & Status',
+      header: 'Status',
       meta: {
         align: 'center',
         mobileLabel: 'Status',
@@ -250,6 +282,16 @@ export function buildRoomParticipantColumns(
           ),
         ])
       },
+    },
+    {
+      id: 'client',
+      header: 'Aplikasi',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Aplikasi',
+        mobileValue: (row: RoomMonitorParticipant) => clientLabel(row.session),
+      },
+      cell: ({ row }) => clientLabel(row.original.session),
     },
     {
       id: 'readiness',

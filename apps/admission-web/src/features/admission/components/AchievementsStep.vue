@@ -349,7 +349,7 @@ defineExpose({ validate: validateStep })
           :disabled="achievements.length >= 20"
           @click="addAchievement"
         >
-          <Plus class="mr-1.5" />
+          <Plus />
           Tambah
         </Button>
       </CardHeader>
@@ -557,7 +557,7 @@ defineExpose({ validate: validateStep })
           :disabled="scholarships.length >= 20"
           @click="addScholarship"
         >
-          <Plus class="mr-1.5" />
+          <Plus />
           Tambah
         </Button>
       </CardHeader>

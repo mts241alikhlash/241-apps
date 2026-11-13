@@ -186,7 +186,7 @@ onMounted(async () => {
               class="h-10 px-4 bg-white"
               @click="isImportExportOpen = true"
             >
-              <ArrowLeftRight class="size-4 mr-2" />
+              <ArrowLeftRight class="size-4" />
               Import / Export
             </Button>
             <Button
@@ -195,7 +195,7 @@ onMounted(async () => {
               class="h-10 px-4"
               @click="router.push('/student/create')"
             >
-              <Plus class="size-4 mr-2" />
+              <Plus class="size-4" />
               Tambah Siswa
             </Button>
           </div>
@@ -289,7 +289,7 @@ onMounted(async () => {
               class="w-full relative justify-center"
               @click="isFilterDialogOpen = true"
             >
-              <Filter class="size-4 mr-2" />
+              <Filter class="size-4" />
               Filter Siswa
               <span
                 v-if="activeFiltersCount > 0"

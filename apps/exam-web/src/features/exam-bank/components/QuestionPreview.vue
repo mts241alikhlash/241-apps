@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
+import { Item, ItemContent, ItemGroup } from '@mts241alikhlash/ui/item'
+import { Check } from '@lucide/vue'
 import type {
+  ChoiceKey,
+  EssayContent,
   MultipleChoiceContent,
   MultipleResponseContent,
   QuestionContent,
   QuestionType,
+  ShortAnswerContent,
+  TrueFalseContent,
 } from '../types'
 import QuestionHtml from './QuestionHtml.vue'
 
@@ -20,51 +32,179 @@ const choices = computed(() =>
     ? (props.content as MultipleChoiceContent | MultipleResponseContent).choices
     : [],
 )
+
+function isCorrect(key: ChoiceKey): boolean {
+  if (props.type === 'MULTIPLE_CHOICE') {
+    return (props.content as MultipleChoiceContent).answer.key === key
+  }
+  if (props.type === 'MULTIPLE_RESPONSE') {
+    return (props.content as MultipleResponseContent).answer.keys.includes(key)
+  }
+  return false
+}
+
+const acceptedAnswers = computed(() =>
+  props.type === 'SHORT_ANSWER'
+    ? (props.content as ShortAnswerContent).answer.accepted.filter(
+        (answer) => answer.trim() !== '',
+      )
+    : [],
+)
+
+const guideHtml = computed(() =>
+  props.type === 'ESSAY'
+    ? ((props.content as EssayContent).guideHtml ?? '')
+    : '',
+)
+
+const trueValue = computed(() =>
+  props.type === 'TRUE_FALSE'
+    ? (props.content as TrueFalseContent).answer.value
+    : null,
+)
 </script>
 
 <template>
-  <div
-    class="space-y-3 rounded-md border bg-background p-4"
+  <Card
+    gap="none"
+    class="min-w-0"
     data-testid="question-preview"
   >
-    <p class="text-[length:var(--text-control,0.75rem)] text-muted-foreground">
-      Pratinjau seperti yang dilihat siswa · {{ points }} poin
-    </p>
-    <QuestionHtml :html="bodyHtml" />
-    <ol
-      v-if="choices.length > 0"
-      class="space-y-2"
+    <CardHeader
+      variant="muted"
+      class="px-2"
     >
-      <li
-        v-for="choice in choices"
-        :key="choice.key"
-        class="flex items-start gap-2 rounded-md border px-3 py-2"
+      <CardTitle>Pratinjau</CardTitle>
+      <span
+        class="shrink-0 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
       >
-        <span class="font-medium">{{ choice.key }}.</span>
+        {{ points }} poin
+      </span>
+    </CardHeader>
+
+    <CardContent class="flex min-w-0 flex-col gap-2 p-2">
+      <QuestionHtml :html="bodyHtml" />
+
+      <ItemGroup
+        v-if="choices.length > 0"
+        class="gap-2"
+      >
+        <Item
+          v-for="choice in choices"
+          :key="choice.key"
+          variant="outline"
+          class="min-h-8 min-w-0 gap-2 px-2 py-[1px]"
+          :class="isCorrect(choice.key) ? 'bg-primary/10' : undefined"
+        >
+          <span
+            class="shrink-0 text-[length:var(--text-control,0.75rem)] font-medium"
+            :class="isCorrect(choice.key) ? 'text-primary' : undefined"
+          >
+            {{ choice.key }}.
+          </span>
+          <ItemContent class="min-w-0">
+            <QuestionHtml :html="choice.html" />
+          </ItemContent>
+          <span
+            v-if="isCorrect(choice.key)"
+            class="ml-auto flex shrink-0 items-center gap-1 text-[length:var(--text-control,0.75rem)] font-medium text-primary"
+          >
+            <Check
+              class="size-4"
+              aria-hidden="true"
+            />
+            Kunci
+          </span>
+        </Item>
+      </ItemGroup>
+
+      <div
+        v-else-if="type === 'TRUE_FALSE'"
+        class="flex gap-2"
+      >
+        <span
+          class="flex items-center gap-1 rounded-md border px-4 py-2"
+          :class="
+            trueValue === true
+              ? 'bg-primary/10 font-medium text-primary'
+              : undefined
+          "
+        >
+          <Check
+            v-if="trueValue === true"
+            class="size-4"
+            aria-hidden="true"
+          />
+          Benar
+          <span
+            v-if="trueValue === true"
+            class="sr-only"
+            >(kunci)</span
+          >
+        </span>
+        <span
+          class="flex items-center gap-1 rounded-md border px-4 py-2"
+          :class="
+            trueValue === false
+              ? 'bg-primary/10 font-medium text-primary'
+              : undefined
+          "
+        >
+          <Check
+            v-if="trueValue === false"
+            class="size-4"
+            aria-hidden="true"
+          />
+          Salah
+          <span
+            v-if="trueValue === false"
+            class="sr-only"
+            >(kunci)</span
+          >
+        </span>
+      </div>
+
+      <div
+        v-else-if="type === 'SHORT_ANSWER'"
+        class="flex flex-col gap-1 text-[length:var(--text-control,0.75rem)]"
+      >
+        <span class="text-muted-foreground">Jawaban benar</span>
+        <div
+          v-if="acceptedAnswers.length > 0"
+          class="flex flex-wrap gap-1"
+        >
+          <span
+            v-for="answer in acceptedAnswers"
+            :key="answer"
+            class="rounded-md bg-primary/10 px-2 py-0.5 font-medium text-primary"
+          >
+            {{ answer }}
+          </span>
+        </div>
+        <span
+          v-else
+          class="text-muted-foreground"
+        >
+          Belum diisi.
+        </span>
+      </div>
+
+      <div
+        v-else
+        class="flex flex-col gap-1 text-[length:var(--text-control,0.75rem)]"
+      >
+        <span class="text-muted-foreground">Pedoman penilaian</span>
         <QuestionHtml
-          class="min-w-0 flex-1"
-          :html="choice.html"
+          v-if="guideHtml"
+          :html="guideHtml"
         />
-      </li>
-    </ol>
-    <div
-      v-else-if="type === 'TRUE_FALSE'"
-      class="flex gap-2"
-    >
-      <span class="rounded-md border px-4 py-2">Benar</span>
-      <span class="rounded-md border px-4 py-2">Salah</span>
-    </div>
-    <div
-      v-else-if="type === 'SHORT_ANSWER'"
-      class="rounded-md border px-3 py-2 text-muted-foreground"
-    >
-      Jawaban singkat siswa…
-    </div>
-    <div
-      v-else
-      class="min-h-20 rounded-md border px-3 py-2 text-muted-foreground"
-    >
-      Jawaban uraian siswa…
-    </div>
-  </div>
+        <span
+          v-else
+          class="text-muted-foreground"
+        >
+          Belum diisi.
+        </span>
+      </div>
+    </CardContent>
+  </Card>
 </template>

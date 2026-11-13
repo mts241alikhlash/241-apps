@@ -301,11 +301,11 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
           >
             <Loader2
               v-if="isRollingOver"
-              class="size-4 mr-1.5 animate-spin"
+              class="size-4 animate-spin"
             />
             <Copy
               v-else
-              class="size-4 mr-1.5"
+              class="size-4"
             />
             {{ isRollingOver ? 'Memproses...' : 'Mulai Salin' }}
           </Button>

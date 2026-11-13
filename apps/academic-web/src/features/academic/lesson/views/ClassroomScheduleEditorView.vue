@@ -411,7 +411,7 @@ onMounted(fetchData)
                   :disabled="!canAddRow(day.value)"
                   @click="addRow(day.value)"
                 >
-                  <Plus class="size-4 mr-1.5" />
+                  <Plus class="size-4" />
                   Tambah Baris
                 </Button>
                 <Button
@@ -437,7 +437,7 @@ onMounted(fetchData)
                 />
                 <Save
                   v-else
-                  class="size-4 mr-1.5"
+                  class="size-4"
                 />
                 {{
                   isSaving && isSaving[day.value]

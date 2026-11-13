@@ -103,6 +103,45 @@ describe('buildPackageColumns', () => {
     expect(labels('APPROVED', false)).toEqual([])
   })
 
+  it('offers Ajukan only for a draft or returned package with questions', () => {
+    const labels = (row: ExamPackageSummary) =>
+      (
+        actions({ canCopy: false, canSubmit: () => true }, row).items as {
+          label: string
+        }[]
+      ).map((entry) => entry.label)
+
+    expect(labels(pkg({ status: 'DRAFT' }))).toEqual(['Ajukan'])
+    expect(labels(pkg({ status: 'RETURNED' }))).toEqual(['Ajukan'])
+    expect(labels(pkg({ status: 'DRAFT', itemCount: 0 }))).toEqual([])
+    expect(labels(pkg({ status: 'APPROVED' }))).toEqual([])
+  })
+
+  it('offers Ganti judul and Jadwalkan when allowed, and calls back with the row', () => {
+    const onRename = vi.fn()
+    const onSchedule = vi.fn()
+    const row = pkg({ status: 'APPROVED' })
+    const items = actions(
+      {
+        canCopy: false,
+        canRename: () => true,
+        canSchedule: () => true,
+        onRename,
+        onSchedule,
+      },
+      row,
+    ).items as { label: string; onClick: () => void }[]
+
+    expect(items.map((entry) => entry.label)).toEqual([
+      'Ganti judul',
+      'Jadwalkan',
+    ])
+    items[0].onClick()
+    items[1].onClick()
+    expect(onRename).toHaveBeenCalledWith(row)
+    expect(onSchedule).toHaveBeenCalledWith(row)
+  })
+
   it('shows the status of every kind in Indonesian', () => {
     const column = columns().find((item) => item.id === 'status')!
     const mobile = (

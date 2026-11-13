@@ -244,7 +244,7 @@ const columns = computed<ColumnDef<PostAdminSummary>[]>(() => [
           {{ POST_TYPE_LABELS[postType] }}
         </CardTitle>
         <Button @click="openNew">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Tulis {{ POST_TYPE_LABELS[postType] }}
         </Button>
       </CardHeader>
@@ -273,13 +273,13 @@ const columns = computed<ColumnDef<PostAdminSummary>[]>(() => [
           filter-column="title"
           filter-placeholder="Cari judul atau ringkasan..."
         >
-          <template #header-right>
+          <template #filters>
             <Button
               size="sm"
               :variant="store.showDeleted ? 'default' : 'outline'"
               @click="store.showDeleted = !store.showDeleted"
             >
-              <Trash2 class="mr-2 size-4" />
+              <Trash2 class="size-4" />
               Tempat sampah
             </Button>
           </template>

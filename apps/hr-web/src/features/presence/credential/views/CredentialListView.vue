@@ -60,7 +60,7 @@ onMounted(() => void credentialService.fetchCredentials())
       >
         <CardTitle size="lg"> Kartu Presensi </CardTitle>
         <Button @click="issueOpen = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Terbitkan
         </Button>
       </CardHeader>

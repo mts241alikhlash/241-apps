@@ -18,6 +18,8 @@ describe('exam route tree', () => {
     '/exam/activities/a1',
     '/exam/schedules',
     '/exam/grading',
+    '/exam/prints/cards',
+    '/exam/prints/seats',
     '/classwork/activities',
     '/classwork/activities/new',
     '/classwork/activities/a1',
@@ -160,6 +162,24 @@ describe('menu', () => {
             ],
           ],
           ['/exam/grading', 'exam-grading.read', undefined],
+          [
+            '/exam/prints/cards',
+            undefined,
+            [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          ],
+          [
+            '/exam/prints/seats',
+            undefined,
+            [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          ],
         ],
       ],
       [

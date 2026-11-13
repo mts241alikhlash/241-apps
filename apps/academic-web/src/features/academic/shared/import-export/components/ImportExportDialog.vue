@@ -261,18 +261,17 @@ watch(
                 :disabled="isProcessing"
                 @click="$emit('downloadTemplate')"
               >
-                <Download class="size-3.5 mr-2" />
+                <Download class="size-3.5" />
                 Unduh Template
               </Button>
 
               <Button
-                class=""
                 :disabled="!selectedFile || isProcessing"
                 @click="handleImport"
               >
                 <Loader2
                   v-if="isProcessing"
-                  class="size-4 mr-2 animate-spin"
+                  class="size-4 animate-spin"
                 />
                 {{ isProcessing ? 'Memproses...' : 'Mulai Import' }}
               </Button>
@@ -303,7 +302,7 @@ watch(
               class="w-full mt-2"
               @click="$emit('exportData')"
             >
-              <Download class="size-4 mr-2" />
+              <Download class="size-4" />
               Export Semua Data ke .xlsx
             </Button>
           </TabsContent>

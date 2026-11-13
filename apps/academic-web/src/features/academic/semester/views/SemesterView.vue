@@ -160,11 +160,11 @@ onMounted(() => {
             variant="outline"
             @click="isRolloverModalOpen = true"
           >
-            <Copy class="size-4 mr-2" />
+            <Copy class="size-4" />
             Salin Data
           </Button>
           <Button @click="isAddModalOpen = true">
-            <Plus class="size-4 mr-2" />
+            <Plus class="size-4" />
             Tambah
           </Button>
         </div>

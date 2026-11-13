@@ -216,7 +216,7 @@ onMounted(fetchRelatedData)
             class="hidden sm:inline-flex"
             @click="weightDialogOpen = true"
           >
-            <Scale class="size-4 mr-2" />
+            <Scale class="size-4" />
             Bobot Penilaian
           </Button>
           <Button
@@ -232,7 +232,7 @@ onMounted(fetchRelatedData)
             class="hidden sm:inline-flex"
             @click="openAddForm"
           >
-            <Plus class="size-4 mr-2" />
+            <Plus class="size-4" />
             Tambah Tugas
           </Button>
         </div>

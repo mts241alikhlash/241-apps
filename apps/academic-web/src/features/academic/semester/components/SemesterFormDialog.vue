@@ -217,7 +217,7 @@ const semesterForm = useSemesterForm({
         >
           <Loader2
             v-if="semesterForm.isSaving.value"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ semesterForm.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
         </Button>

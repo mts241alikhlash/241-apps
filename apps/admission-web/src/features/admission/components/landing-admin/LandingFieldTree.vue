@@ -168,7 +168,7 @@ function itemTitle(
           @click="addLine(field.name)"
         >
           <Plus
-            class="mr-1.5 size-4"
+            class="size-4"
             aria-hidden="true"
           />
           {{ field.kind === 'lines' ? 'Tambah baris' : 'Tambah label' }}
@@ -303,7 +303,7 @@ function itemTitle(
           @click="emit('add', at(field.name), field.blank())"
         >
           <Plus
-            class="mr-1.5 size-4"
+            class="size-4"
             aria-hidden="true"
           />
           Tambah {{ field.itemNoun }}

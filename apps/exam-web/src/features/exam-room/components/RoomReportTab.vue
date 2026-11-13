@@ -230,7 +230,7 @@ watch(
             variant="outline"
             @click="print"
           >
-            <Printer class="mr-1.5 size-4" />
+            <Printer class="size-4" />
             Cetak Berita Acara &amp; Daftar Hadir
           </Button>
           <Button

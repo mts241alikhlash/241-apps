@@ -132,7 +132,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
         @click="fetchFiles()"
       >
         <RefreshCw
-          class="size-4 mr-2"
+          class="size-4"
           :class="{ 'animate-spin': isLoading }"
         />
         Refresh

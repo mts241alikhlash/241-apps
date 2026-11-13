@@ -74,7 +74,7 @@ onMounted(() => {
           class="flex flex-col sm:flex-row w-full sm:w-auto gap-2"
         >
           <Button @click="isAddOpen = true">
-            <Plus class="mr-2 h-4 w-4" /> Tambah Jabatan
+            <Plus class="h-4 w-4" /> Tambah Jabatan
           </Button>
         </div>
       </CardHeader>

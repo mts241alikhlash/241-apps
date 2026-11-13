@@ -222,7 +222,7 @@ function handleOpenChange(val: boolean) {
         >
           <ArrowRightLeft
             v-if="!loading"
-            class="h-4 w-4 mr-2"
+            class="h-4 w-4"
           />
           {{ loading ? 'Memindahkan...' : 'Pindahkan' }}
         </Button>

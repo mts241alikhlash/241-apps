@@ -90,7 +90,7 @@ onMounted(() => void deviceService.fetch())
       >
         <CardTitle size="lg"> Perangkat Gerbang </CardTitle>
         <Button @click="showForm = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Daftarkan Gerbang
         </Button>
       </CardHeader>

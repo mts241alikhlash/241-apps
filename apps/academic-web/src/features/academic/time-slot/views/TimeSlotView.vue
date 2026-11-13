@@ -22,7 +22,7 @@ const tableRef = ref<InstanceType<typeof TimeSlotManageTable> | null>(null)
           v-if="can('time-slots.create')"
           @click="tableRef?.addRow"
         >
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Tambah Baris
         </Button>
       </CardHeader>
@@ -44,11 +44,11 @@ const tableRef = ref<InstanceType<typeof TimeSlotManageTable> | null>(null)
         >
           <Loader2
             v-if="tableRef?.loading"
-            class="size-4 mr-2 animate-spin"
+            class="size-4 animate-spin"
           />
           <Save
             v-else
-            class="size-4 mr-2"
+            class="size-4"
           />
           Simpan
         </Button>

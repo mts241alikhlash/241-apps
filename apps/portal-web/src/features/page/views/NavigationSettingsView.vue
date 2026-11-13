@@ -222,7 +222,7 @@ function describe(item: NavItem): string {
             :disabled="!canAdd"
             @click="add"
           >
-            <Plus class="mr-2 size-4" />
+            <Plus class="size-4" />
             Tambah
           </Button>
         </section>

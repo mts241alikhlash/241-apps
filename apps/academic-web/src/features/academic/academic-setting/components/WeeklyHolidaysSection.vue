@@ -121,7 +121,7 @@ function handleSave() {
         >
           <Loader2
             v-if="isSaving"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ isSaving ? 'Menyimpan...' : 'Simpan' }}
         </Button>

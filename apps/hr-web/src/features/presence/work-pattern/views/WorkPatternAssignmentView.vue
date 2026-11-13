@@ -99,7 +99,7 @@ onMounted(async () => {
       >
         <CardTitle size="lg"> Penugasan Pola Kerja </CardTitle>
         <Button @click="dialogOpen = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Tugaskan
         </Button>
       </CardHeader>

@@ -97,7 +97,7 @@ onMounted(() => {
       >
         <CardTitle size="lg"> Izin & Cuti Saya </CardTitle>
         <Button @click="open = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Ajukan
         </Button>
       </CardHeader>

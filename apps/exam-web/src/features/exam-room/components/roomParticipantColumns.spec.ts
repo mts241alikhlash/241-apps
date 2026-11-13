@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { VNode } from 'vue'
 import {
   buildRoomParticipantColumns,
+  clientLabel,
   isLowBattery,
   readinessWarnings,
   syncText,
@@ -254,5 +255,13 @@ describe('status and progress cells', () => {
     expect(cellText('progress', participant({ session: null }))).toBe(
       '0 / 50 soal',
     )
+  })
+})
+
+describe('clientLabel', () => {
+  it('names the app a student takes the exam in', () => {
+    expect(clientLabel(session({ client: 'SEB' }))).toBe('Safe Exam Browser')
+    expect(clientLabel(session({ client: 'ISTIQRA' }))).toBe('Istiqra')
+    expect(clientLabel(null)).toBe('-')
   })
 })

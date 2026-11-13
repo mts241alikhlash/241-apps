@@ -225,7 +225,7 @@ function handleSave() {
         >
           <Loader2
             v-if="saving"
-            class="mr-2 h-4 w-4 animate-spin"
+            class="h-4 w-4 animate-spin"
           />
           {{
             saving

@@ -297,7 +297,7 @@ async function handleSave() {
         >
           <Loader2
             v-if="isSaving"
-            class="mr-1.5 size-3.5 animate-spin"
+            class="size-3.5 animate-spin"
           />
           Simpan
         </Button>

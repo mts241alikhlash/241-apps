@@ -27,17 +27,28 @@ describe('usePackageCreate', () => {
     vi.clearAllMocks()
   })
 
-  it('names what is missing, in order', () => {
+  it('names what is missing only after the first attempt', async () => {
     seed([pair('math', 'g7'), pair('math', 'g8'), pair('ipa', 'g8')])
     const form = usePackageCreate()
 
-    expect(form.problem.value).toBe('Judul wajib diisi')
+    expect(form.errors.value.title).toBeNull()
+
+    await form.submit()
+    expect(form.errors.value.title).toBe('Judul wajib diisi.')
+
     form.title.value = 'UAS'
-    expect(form.problem.value).toBe('Pilih mapel')
+    await form.submit()
+    expect(form.errors.value.subjectId).toBe('Mapel wajib dipilih.')
+    expect(form.errors.value.title).toBeNull()
+
     form.subjectId.value = 'math'
-    expect(form.problem.value).toBe('Pilih tingkat')
+    await form.submit()
+    expect(form.errors.value.gradeId).toBe('Tingkat wajib dipilih.')
+
+    create.mockResolvedValue({ success: true, data: { id: 'p1' } })
     form.gradeId.value = 'g7'
-    expect(form.problem.value).toBeNull()
+    await form.submit()
+    expect(form.errors.value.gradeId).toBeNull()
   })
 
   it('preselects the only subject and grade a teacher has', () => {

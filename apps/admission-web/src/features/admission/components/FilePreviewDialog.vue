@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
           type="button"
           @click="download"
         >
-          <Download class="mr-1.5 size-4" />
+          <Download class="size-4" />
           Unduh
         </Button>
       </DialogFooter>

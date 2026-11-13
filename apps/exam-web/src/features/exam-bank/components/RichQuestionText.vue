@@ -27,9 +27,10 @@ const props = withDefaults(
   defineProps<{
     label: string
     compact?: boolean
+    singleLine?: boolean
     allowImages?: boolean
   }>(),
-  { compact: false, allowImages: true },
+  { compact: false, singleLine: false, allowImages: true },
 )
 const model = defineModel<string>({ required: true })
 
@@ -50,9 +51,13 @@ const editor = useEditor({
   extensions: buildExtensions(openMath),
   editorProps: {
     attributes: {
-      class: `${props.compact ? 'min-h-10' : 'min-h-28'} px-3 py-2 text-[length:var(--text-control,0.75rem)] focus:outline-none [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5`,
+      class: `${props.compact ? 'min-h-8 py-[1px]' : 'min-h-28 py-2'} px-2 text-[length:var(--text-control,0.75rem)] focus:outline-none [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5`,
       'aria-label': props.label,
       dir: 'auto',
+    },
+    handleKeyDown: (_view: unknown, event: KeyboardEvent) => {
+      if (props.singleLine && event.key === 'Enter') return true
+      return false
     },
   },
   onUpdate: ({ editor: instance }) => {
@@ -120,10 +125,11 @@ defineExpose({ insertMath, uploadImage, openMath })
 </script>
 
 <template>
-  <div class="rounded-md border">
+  <div class="group rounded-md border">
     <div
       v-if="editor"
-      class="flex flex-wrap items-center gap-1 border-b bg-muted/30 p-1"
+      class="flex-wrap items-center gap-1 border-b bg-muted/30 p-1"
+      :class="compact ? 'hidden group-focus-within:flex' : 'flex'"
     >
       <Button
         type="button"

@@ -389,7 +389,7 @@ function onOpenChange(val: boolean) {
         >
           <Loader2
             v-if="isSaving"
-            class="w-4 h-4 mr-2 animate-spin"
+            class="w-4 h-4 animate-spin"
           />
           Simpan
         </Button>

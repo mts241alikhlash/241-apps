@@ -105,7 +105,7 @@ onMounted(async () => {
           v-if="can('classrooms.create')"
           @click="isAddModalOpen = true"
         >
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -129,7 +129,7 @@ onMounted(async () => {
           @update:page="(page) => fetchClassrooms({ page })"
           @update:page-size="(limit) => fetchClassrooms({ limit, page: 1 })"
         >
-          <template #header-right>
+          <template #filters>
             <div class="flex items-center gap-2">
               <Select
                 :model-value="selectedAcademicYearId"
@@ -148,12 +148,13 @@ onMounted(async () => {
                   </SelectItem>
                 </SelectContent>
               </Select>
-
-              <SearchInput
-                v-model="searchKeyword"
-                label="Cari kelas"
-              />
             </div>
+          </template>
+          <template #header-right>
+            <SearchInput
+              v-model="searchKeyword"
+              label="Cari kelas"
+            />
           </template>
         </DataTable>
 

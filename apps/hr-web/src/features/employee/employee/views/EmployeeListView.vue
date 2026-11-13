@@ -248,7 +248,7 @@ onMounted(() => {
               class="h-10 px-4 bg-white"
               @click="isImportExportOpen = true"
             >
-              <ArrowLeftRight class="size-4 mr-2" />
+              <ArrowLeftRight class="size-4" />
               Import / Export
             </Button>
             <Button
@@ -257,7 +257,7 @@ onMounted(() => {
               class="h-10 px-4"
               @click="router.push('/staff/create')"
             >
-              <Plus class="size-4 mr-2" />
+              <Plus class="size-4" />
               Tambah Pegawai
             </Button>
           </div>
@@ -346,7 +346,7 @@ onMounted(() => {
               class="w-full relative justify-center"
               @click="isFilterDialogOpen = true"
             >
-              <Filter class="size-4 mr-2" />
+              <Filter class="size-4" />
               Filter Pegawai
               <span
                 v-if="activeFiltersCount > 0"

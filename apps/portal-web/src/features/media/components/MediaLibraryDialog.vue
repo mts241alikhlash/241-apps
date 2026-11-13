@@ -97,7 +97,7 @@ function confirm() {
           :disabled="uploading"
           @click="fileInput?.click()"
         >
-          <Upload class="mr-2 size-4" />
+          <Upload class="size-4" />
           {{ uploading ? 'Mengunggah…' : 'Unggah gambar' }}
         </Button>
         <span class="text-xs text-muted-foreground">

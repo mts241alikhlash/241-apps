@@ -37,7 +37,7 @@ function structureOfficerName(
         size="sm"
         @click="emit('manage')"
       >
-        <Settings class="h-3.5 w-3.5 mr-1.5" />
+        <Settings class="h-3.5 w-3.5" />
         Kelola
       </Button>
     </CardHeader>

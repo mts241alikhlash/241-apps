@@ -273,7 +273,7 @@ onMounted(load)
           class="w-full sm:w-auto"
           @click="openForm(null)"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>

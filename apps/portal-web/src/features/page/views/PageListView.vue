@@ -142,7 +142,7 @@ const columns: ColumnDef<PortalPage>[] = [
           <CardTitle size="lg">Halaman</CardTitle>
         </div>
         <Button @click="openNew">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Halaman baru
         </Button>
       </CardHeader>

@@ -59,7 +59,7 @@ async function load(isOpen: boolean) {
         size="sm"
         class="text-amber-600"
       >
-        <History class="mr-1 h-3.5 w-3.5" />
+        <History class="h-3.5 w-3.5" />
         Dikoreksi
       </Button>
     </PopoverTrigger>

@@ -99,7 +99,7 @@ onMounted(async () => {
           v-if="can('curricula.create')"
           @click="isAddModalOpen = true"
         >
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -113,7 +113,7 @@ onMounted(async () => {
           filter-column="name"
           filter-placeholder="Cari kurikulum..."
         >
-          <template #header-right>
+          <template #filters>
             <Select
               :model-value="selectedAcademicYearId"
               @update:model-value="onAcademicYearChange"

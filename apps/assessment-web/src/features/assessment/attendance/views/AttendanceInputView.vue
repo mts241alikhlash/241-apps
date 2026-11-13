@@ -269,11 +269,11 @@ onMounted(async () => {
         >
           <Loader2
             v-if="isSaving"
-            class="mr-2 size-4 animate-spin"
+            class="size-4 animate-spin"
           />
           <Save
             v-else
-            class="mr-2 size-4"
+            class="size-4"
           />
           Simpan Kehadiran
         </Button>

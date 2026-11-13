@@ -10,9 +10,9 @@ defineProps<{
 <template>
   <Button
     type="button"
-    variant="outline"
+    variant="ghost"
     size="icon"
-    class="size-[var(--control-h-md,1.75rem)] shrink-0"
+    class="-ml-1 size-[var(--control-h-md,1.75rem)] shrink-0"
     :aria-label="label"
     :title="label"
   >

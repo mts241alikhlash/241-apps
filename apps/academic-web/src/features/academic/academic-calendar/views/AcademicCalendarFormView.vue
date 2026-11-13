@@ -174,7 +174,7 @@ useBreadcrumbs(() => {
                           )
                         "
                       >
-                        <CalendarIcon class="mr-2 h-4 w-4 shrink-0" />
+                        <CalendarIcon class="h-4 w-4 shrink-0" />
                         {{ dateRangeLabel || 'Pilih rentang tanggal' }}
                       </Button>
                     </FormControl>

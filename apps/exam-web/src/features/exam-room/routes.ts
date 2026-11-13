@@ -84,4 +84,36 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       breadcrumbs: crumbs('Cetak Daftar Meja', '#'),
     },
   },
+  {
+    path: '/exam/prints/cards',
+    name: 'ExamCardsPrintAll',
+    component: () => import('./views/RosterPrintAllView.vue'),
+    props: { kind: 'cards' },
+    meta: {
+      title: 'Kartu Peserta',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-rooms.supervise',
+        'exam-rooms.technician',
+        'exam-rooms.manage-all',
+      ],
+      breadcrumbs: crumbs('Kartu Peserta', '#'),
+    },
+  },
+  {
+    path: '/exam/prints/seats',
+    name: 'ExamSeatLabelsPrintAll',
+    component: () => import('./views/RosterPrintAllView.vue'),
+    props: { kind: 'labels' },
+    meta: {
+      title: 'Daftar Meja',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-rooms.supervise',
+        'exam-rooms.technician',
+        'exam-rooms.manage-all',
+      ],
+      breadcrumbs: crumbs('Daftar Meja', '#'),
+    },
+  },
 ]

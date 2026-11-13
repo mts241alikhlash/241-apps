@@ -197,7 +197,7 @@ onMounted(() => {
           <CardTitle size="lg">Transaksi Peminjaman</CardTitle>
         </div>
         <Button @click="router.push({ name: 'inventory-loans-create' })">
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Pinjam Aset
         </Button>
       </CardHeader>

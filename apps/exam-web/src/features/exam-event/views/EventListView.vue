@@ -106,7 +106,7 @@ onMounted(async () => {
           class="shrink-0"
           @click="openCreate"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -141,7 +141,7 @@ onMounted(async () => {
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
-          <template #header-right>
+          <template #filters>
             <div class="flex flex-wrap gap-2">
               <FloatingLabelField
                 label="Semester"

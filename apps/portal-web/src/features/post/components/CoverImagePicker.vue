@@ -75,7 +75,7 @@ function clear() {
           size="sm"
           @click="clear"
         >
-          <Trash2 class="mr-2 size-4" />
+          <Trash2 class="size-4" />
           Hapus gambar
         </Button>
       </div>

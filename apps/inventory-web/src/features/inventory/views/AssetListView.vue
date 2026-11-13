@@ -201,7 +201,7 @@ onMounted(async () => {
             class="sm:h-10 sm:px-4 text-xs sm:text-sm"
             @click="openAddForm"
           >
-            <Plus class="size-4 mr-1 sm:mr-2" />
+            <Plus class="size-4 sm:mr-2" />
             Tambah Aset
           </Button>
         </div>
@@ -313,7 +313,7 @@ onMounted(async () => {
                 class="relative shrink-0"
                 @click="isFilterDialogOpen = true"
               >
-                <Filter class="size-4 mr-2" />
+                <Filter class="size-4" />
                 Filter
                 <span
                   v-if="activeFiltersCount > 0"

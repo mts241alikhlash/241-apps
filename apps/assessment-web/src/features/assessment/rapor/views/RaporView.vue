@@ -227,7 +227,7 @@ onMounted(async () => {
             class="w-full sm:w-auto"
             @click="handleFilter"
           >
-            <Search class="mr-2 h-4 w-4" /> Tampilkan
+            <Search class="h-4 w-4" /> Tampilkan
           </Button>
 
           <div class="flex-1"></div>
@@ -244,7 +244,7 @@ onMounted(async () => {
           >
             <Loader2
               v-if="isGenerating"
-              class="mr-2 h-4 w-4 animate-spin"
+              class="h-4 w-4 animate-spin"
             />
             Generate Rapor Massal
           </Button>

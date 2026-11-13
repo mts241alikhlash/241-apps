@@ -1,6 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Button } from '@mts241alikhlash/ui/button'
+import { ActionCell } from '@mts241alikhlash/ui'
 import type { ExamPackageSummary } from '../types'
 
 export interface ReviewColumnOptions {
@@ -41,6 +41,7 @@ export function buildReviewColumns(
       id: 'grade',
       header: 'Tingkat',
       meta: {
+        align: 'center',
         mobileLabel: 'Tingkat',
         mobileValue: (row: ExamPackageSummary) =>
           options.gradeName(row.gradeId),
@@ -55,7 +56,8 @@ export function buildReviewColumns(
         mobileLabel: 'Jumlah Soal',
         mobileValue: (row: ExamPackageSummary) => itemsLabel(row),
       },
-      cell: ({ row }) => itemsLabel(row.original),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, itemsLabel(row.original)),
     },
     {
       id: 'updated',
@@ -64,22 +66,20 @@ export function buildReviewColumns(
         mobileLabel: 'Diajukan',
         mobileValue: (row: ExamPackageSummary) => updatedLabel(row),
       },
-      cell: ({ row }) => updatedLabel(row.original),
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, updatedLabel(row.original)),
     },
     {
       id: 'actions',
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            variant: 'outline',
-            size: 'sm',
-            onClick: () => options.onOpen(row.original),
-          },
-          () => 'Tinjau',
-        ),
+        h(ActionCell, {
+          hideEdit: true,
+          hideDelete: true,
+          viewLabel: 'Tinjau',
+          onView: () => options.onOpen(row.original),
+        }),
     },
   ]
 }

@@ -311,7 +311,7 @@ onMounted(async () => {
                   >
                     <Loader2
                       v-if="savingCurriculum[ay.id]"
-                      class="size-3 mr-1 animate-spin"
+                      class="size-3 animate-spin"
                     />
                     Simpan
                   </Button>
@@ -355,7 +355,7 @@ onMounted(async () => {
         >
           <Loader2
             v-if="levelForm.isSaving.value"
-            class="size-4 mr-2 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ levelForm.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
         </Button>

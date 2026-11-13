@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { Plus, Trash2 } from '@lucide/vue'
+import { Trash2 } from '@lucide/vue'
+import { useId } from 'vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import { Input } from '@mts241alikhlash/ui/input'
+import { Label } from '@mts241alikhlash/ui/label'
 import { Switch } from '@mts241alikhlash/ui/switch'
 import type { ShortAnswerContent } from '../../types'
 
 const content = defineModel<ShortAnswerContent>({ required: true })
+
+const ignoreCaseId = useId()
+const ignoreHarakatId = useId()
 
 function update(patch: Partial<ShortAnswerContent['answer']>) {
   content.value = { answer: { ...content.value.answer, ...patch } }
@@ -19,7 +24,7 @@ function setAccepted(index: number, text: string) {
   })
 }
 
-function addAccepted() {
+function add() {
   update({ accepted: [...content.value.answer.accepted, ''] })
 }
 
@@ -29,10 +34,12 @@ function removeAccepted(index: number) {
     accepted: content.value.answer.accepted.filter((_, at) => at !== index),
   })
 }
+
+defineExpose({ add })
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div class="flex flex-col gap-2">
     <p class="text-[length:var(--text-control,0.75rem)] text-muted-foreground">
       Tulis semua jawaban yang dianggap benar. Siswa benar bila jawabannya sama
       dengan salah satunya.
@@ -60,29 +67,29 @@ function removeAccepted(index: number) {
         <Trash2 />
       </Button>
     </div>
-    <Button
-      type="button"
-      variant="outline"
-      @click="addAccepted"
+    <Label
+      :for="ignoreCaseId"
+      class="flex items-center gap-2"
     >
-      <Plus class="mr-1.5 size-4" />
-      Tambah jawaban benar
-    </Button>
-    <label class="flex items-center gap-2">
       <Switch
+        :id="ignoreCaseId"
         :model-value="content.answer.ignoreCase"
         aria-label="Abaikan huruf besar dan kecil"
         @update:model-value="update({ ignoreCase: $event })"
       />
       Abaikan huruf besar dan kecil
-    </label>
-    <label class="flex items-center gap-2">
+    </Label>
+    <Label
+      :for="ignoreHarakatId"
+      class="flex items-center gap-2"
+    >
       <Switch
+        :id="ignoreHarakatId"
         :model-value="content.answer.ignoreHarakat"
         aria-label="Abaikan harakat"
         @update:model-value="update({ ignoreHarakat: $event })"
       />
       Abaikan harakat
-    </label>
+    </Label>
   </div>
 </template>

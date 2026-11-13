@@ -225,27 +225,36 @@ describe('PackageDetailView', () => {
     expect(text).toContain('Langit berwarna biru')
     expect(text).toContain('Baru')
     expect(text).toContain('Salinan')
-    expect(wrapper.text()).toContain('2 soal · Total 7 poin')
-    expect(wrapper.text()).toContain('Matematika')
+    expect(wrapper.get('dl').text()).toContain('Matematika')
     expect(wrapper.text()).toContain('Draf')
+    expect(wrapper.get('dl').text()).toContain('Poin7')
     wrapper.unmount()
   })
 
-  it('lets the creator add, change, rename and submit a draft', async () => {
+  it('lets the creator add, take and import questions, and leaves package actions to the list', async () => {
     const wrapper = await mountView()
 
-    expect(buttonByText(wrapper, 'Tambah soal')).toBeDefined()
-    expect(buttonByText(wrapper, 'Ganti judul')).toBeDefined()
-    expect(buttonByText(wrapper, 'Ajukan')).toBeDefined()
-    expect(buttonByText(wrapper, 'Salin')).toBeUndefined()
-    expect(buttonByText(wrapper, 'Jadwalkan')).toBeUndefined()
+    expect(buttonByText(wrapper, 'Tambah')).toBeDefined()
+    expect(buttonByText(wrapper, 'Ambil soal')).toBeDefined()
+    for (const text of ['Ganti judul', 'Ajukan', 'Salin', 'Jadwalkan']) {
+      expect(buttonByText(wrapper, text)).toBeUndefined()
+    }
+    wrapper.unmount()
+  })
+
+  it('keeps take and import reachable once the package has questions', async () => {
+    const wrapper = await mountView()
+
+    expect(cardRows(wrapper)).toHaveLength(2)
+    expect(buttonByText(wrapper, 'Ambil dari paket lain')).toBeDefined()
+    expect(buttonByText(wrapper, 'Impor Excel/Word')).toBeDefined()
     wrapper.unmount()
   })
 
   it('goes to the question form and the import from the add menu', async () => {
     const wrapper = await mountView()
 
-    await buttonByText(wrapper, 'Buat baru')!.trigger('click')
+    await buttonByText(wrapper, 'Tambah')!.trigger('click')
     await buttonByText(wrapper, 'Impor Excel/Word')!.trigger('click')
 
     expect(push).toHaveBeenCalledWith('/exam/packages/p1/questions/new')
@@ -278,7 +287,7 @@ describe('PackageDetailView', () => {
     permissions.delete('exam-packages.update')
     const wrapper = await mountView()
 
-    for (const text of ['Tambah soal', 'Ganti judul', 'Ajukan']) {
+    for (const text of ['Tambah', 'Ambil soal']) {
       expect(buttonByText(wrapper, text)).toBeUndefined()
     }
     expect(wrapper.text()).toContain('Langit berwarna biru')
@@ -288,12 +297,12 @@ describe('PackageDetailView', () => {
   it('is read-only for a colleague and open to someone who manages every package', async () => {
     user.value = { id: 'u2' }
     const colleague = await mountView()
-    expect(buttonByText(colleague, 'Tambah soal')).toBeUndefined()
+    expect(buttonByText(colleague, 'Tambah')).toBeUndefined()
     colleague.unmount()
 
     permissions.add('exam-questions.manage-all')
     const manager = await mountView()
-    expect(buttonByText(manager, 'Tambah soal')).toBeDefined()
+    expect(buttonByText(manager, 'Tambah')).toBeDefined()
     manager.unmount()
   })
 
@@ -302,22 +311,9 @@ describe('PackageDetailView', () => {
     const wrapper = await mountView()
 
     expect(wrapper.text()).toContain('Menunggu tinjauan')
-    for (const text of ['Tambah soal', 'Ganti judul', 'Ajukan', 'Hapus']) {
+    for (const text of ['Tambah', 'Ambil soal']) {
       expect(buttonByText(wrapper, text)).toBeUndefined()
     }
-    wrapper.unmount()
-  })
-
-  it('submits the package and shows it as waiting afterwards', async () => {
-    submit.mockResolvedValue({ success: true, data: view() })
-    const wrapper = await mountView()
-    loadPackage.mockResolvedValue(view({ status: 'SUBMITTED' }))
-
-    await buttonByText(wrapper, 'Ajukan')!.trigger('click')
-    await flushPromises()
-
-    expect(submit).toHaveBeenCalledWith('p1')
-    expect(wrapper.text()).toContain('Menunggu tinjauan')
     wrapper.unmount()
   })
 
@@ -360,82 +356,12 @@ describe('PackageDetailView', () => {
     wrapper.unmount()
   })
 
-  it('offers Salin and Jadwalkan only for an approved or scheduled package', async () => {
-    loadPackage.mockResolvedValue(view({ status: 'APPROVED' }))
-    const approved = await mountView()
-    expect(buttonByText(approved, 'Salin')).toBeDefined()
-    expect(buttonByText(approved, 'Jadwalkan')).toBeDefined()
-    approved.unmount()
-
-    loadPackage.mockResolvedValue(view({ status: 'DRAFT' }))
-    const draft = await mountView()
-    expect(buttonByText(draft, 'Salin')).toBeUndefined()
-    expect(buttonByText(draft, 'Jadwalkan')).toBeUndefined()
-    draft.unmount()
-  })
-
-  it('opens the schedule dialog for the package', async () => {
-    loadPackage.mockResolvedValue(view({ status: 'APPROVED' }))
-    const wrapper = await mountView()
-
-    await buttonByText(wrapper, 'Jadwalkan')!.trigger('click')
-
-    const dialog = wrapper.get('[data-test="schedule-dialog"]')
-    expect(dialog.attributes('data-package')).toBe('p1')
-    expect(dialog.attributes('data-grade')).toBe('g7')
-    wrapper.unmount()
-  })
-
-  it.each([
-    ['MIDTERM', '/exam/schedules'],
-    ['DAILY', '/classwork/schedules'],
-  ])(
-    'goes to the schedule list of the saved %s schedule',
-    async (type, path) => {
-      loadPackage.mockResolvedValue(view({ status: 'APPROVED' }))
-      const wrapper = await mountView()
-      await buttonByText(wrapper, 'Jadwalkan')!.trigger('click')
-
-      wrapper
-        .getComponent({ name: 'ScheduleFormDialogStub' })
-        .vm.$emit('saved', type)
-
-      expect(push).toHaveBeenCalledWith(path)
-      wrapper.unmount()
-    },
-  )
-
-  it('copies the package and goes to the copy', async () => {
-    loadPackage.mockResolvedValue(view({ status: 'LOCKED' }))
-    copyPackage.mockResolvedValue({ id: 'p2' })
-    const wrapper = await mountView()
-
-    await buttonByText(wrapper, 'Salin')!.trigger('click')
-    await flushPromises()
-
-    expect(push).toHaveBeenCalledWith('/exam/packages/p2')
-    wrapper.unmount()
-  })
-
-  it('deletes a draft after confirming and goes back to the list', async () => {
-    deletePackage.mockResolvedValue(true)
-    const wrapper = await mountView()
-
-    await buttonByText(wrapper, 'Hapus')!.trigger('click')
-    await buttonByText(wrapper, 'Ya, hapus')!.trigger('click')
-    await flushPromises()
-
-    expect(deletePackage).toHaveBeenCalledWith('p1')
-    expect(push).toHaveBeenCalledWith('/exam/packages')
-    wrapper.unmount()
-  })
-
   it('shows a not-found state for a missing package or another teacher’s draft', async () => {
     loadPackage.mockResolvedValue(null)
     const wrapper = await mountView()
 
     expect(wrapper.text()).toContain('Paket tidak ditemukan.')
-    expect(buttonByText(wrapper, 'Tambah soal')).toBeUndefined()
+    expect(buttonByText(wrapper, 'Tambah')).toBeUndefined()
     wrapper.unmount()
   })
 
@@ -455,7 +381,7 @@ describe('PackageDetailView', () => {
   it('loads the other package when the address changes, as after Salin from a locked package', async () => {
     loadPackage.mockResolvedValueOnce(view({ status: 'LOCKED' }))
     const wrapper = await mountView()
-    expect(buttonByText(wrapper, 'Tambah soal')).toBeUndefined()
+    expect(buttonByText(wrapper, 'Tambah')).toBeUndefined()
 
     loadPackage.mockResolvedValueOnce(
       view({ id: 'p2', title: 'Salinan UTS Matematika', status: 'DRAFT' }),
@@ -465,7 +391,7 @@ describe('PackageDetailView', () => {
 
     expect(loadPackage).toHaveBeenLastCalledWith('p2')
     expect(wrapper.text()).toContain('Salinan UTS Matematika')
-    expect(buttonByText(wrapper, 'Tambah soal')).toBeDefined()
+    expect(buttonByText(wrapper, 'Tambah')).toBeDefined()
     wrapper.unmount()
   })
 })

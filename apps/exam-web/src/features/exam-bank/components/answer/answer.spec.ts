@@ -33,6 +33,26 @@ function mountModel<T>(component: unknown, initial: T) {
   return wrapper
 }
 
+function mountChoice(initial: MultipleChoiceContent | MultipleResponseContent) {
+  const wrapper = mount(ChoiceAnswer, {
+    props: {
+      modelValue: initial,
+      'onUpdate:modelValue': (value) => wrapper.setProps({ modelValue: value }),
+    },
+  })
+  return wrapper
+}
+
+function mountShort(initial: ShortAnswerContent) {
+  const wrapper = mount(ShortAnswer, {
+    props: {
+      modelValue: initial,
+      'onUpdate:modelValue': (value) => wrapper.setProps({ modelValue: value }),
+    },
+  })
+  return wrapper
+}
+
 const five = (): MultipleChoiceContent => ({
   choices: (['A', 'B', 'C', 'D', 'E'] as const).map((key) => ({
     key,
@@ -43,27 +63,24 @@ const five = (): MultipleChoiceContent => ({
 
 describe('ChoiceAnswer', () => {
   it('refuses a sixth choice', async () => {
-    const wrapper = mountModel(ChoiceAnswer, five())
-    const add = wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tambah pilihan')!
+    const wrapper = mountChoice(five())
 
     expect(wrapper.findAll('[data-testid="choice-row"]')).toHaveLength(5)
-    expect(add.attributes('disabled')).toBeDefined()
-    await add.trigger('click')
+    wrapper.vm.add()
+    await flushPromises()
     expect(wrapper.findAll('[data-testid="choice-row"]')).toHaveLength(5)
   })
 
   it('adds a lettered choice below five', async () => {
-    const wrapper = mountModel(ChoiceAnswer, emptyContent('MULTIPLE_CHOICE'))
+    const wrapper = mountChoice(
+      emptyContent('MULTIPLE_CHOICE') as MultipleChoiceContent,
+    )
 
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tambah pilihan')!
-      .trigger('click')
+    wrapper.vm.add()
+    await flushPromises()
 
-    expect(wrapper.findAll('[data-testid="choice-row"]')).toHaveLength(3)
-    expect(wrapper.text()).toContain('C')
+    expect(wrapper.findAll('[data-testid="choice-row"]')).toHaveLength(5)
+    expect(wrapper.text()).toContain('E')
   })
 
   it('marks the chosen key for multiple choice', async () => {
@@ -113,16 +130,13 @@ describe('TrueFalseAnswer', () => {
 
 describe('ShortAnswer', () => {
   it('sends the accepted answers and the harakat switch as content.answer', async () => {
-    const wrapper = mountModel<ShortAnswerContent>(
-      ShortAnswer,
+    const wrapper = mountShort(
       emptyContent('SHORT_ANSWER') as ShortAnswerContent,
     )
 
     await wrapper.get('[aria-label="Jawaban benar 1"]').setValue('كِتَابٌ')
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Tambah jawaban benar')!
-      .trigger('click')
+    wrapper.vm.add()
+    await flushPromises()
     await wrapper.get('[aria-label="Jawaban benar 2"]').setValue('buku')
     await wrapper.get('[aria-label="Abaikan harakat"]').trigger('click')
     await flushPromises()

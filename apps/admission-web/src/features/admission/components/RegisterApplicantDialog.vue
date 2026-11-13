@@ -300,7 +300,7 @@ function handleOpenChange(open: boolean) {
         >
           <Loader2
             v-if="isSubmitting"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
         </Button>

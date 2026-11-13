@@ -92,7 +92,6 @@ const stubs = {
   FloatingLabelField: passthrough,
   Textarea: textarea,
   QuestionPreview: preview,
-  AnswerKey: passthrough,
 }
 
 const view = (
@@ -128,6 +127,12 @@ async function mountView() {
   return wrapper
 }
 
+const questionButtons = (wrapper: ReturnType<typeof mount>) =>
+  wrapper
+    .findAll('button')
+    .filter((button) => button.attributes('type') === 'button')
+    .filter((button) => /^\d/.test(button.text().trim()))
+
 describe('PackageReviewView', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -150,17 +155,21 @@ describe('PackageReviewView', () => {
   it('reads every question of the package with its origin', async () => {
     const wrapper = await mountView()
 
-    const previews = wrapper
-      .findAll('[data-test="preview"]')
-      .map((p) => p.text())
+    const previews: string[] = []
+    let markers = ''
+    for (const index of [0, 1, 2]) {
+      await questionButtons(wrapper)[index].trigger('click')
+      previews.push(wrapper.get('[data-test="preview"]').text())
+      markers += wrapper.text()
+    }
     expect(previews).toEqual([
       '<p>Isi q1</p>',
       '<p>Isi q2</p>',
       '<p>Isi q3</p>',
     ])
-    expect(wrapper.text()).toContain('Baru')
-    expect(wrapper.text()).toContain('Salinan')
-    expect(wrapper.text()).toContain('Diubah')
+    expect(markers).toContain('Baru')
+    expect(markers).toContain('Salinan')
+    expect(markers).toContain('Diubah')
     wrapper.unmount()
   })
 
@@ -220,7 +229,8 @@ describe('PackageReviewView', () => {
   it('returns the package with the notes typed on questions', async () => {
     returnPackage.mockResolvedValue({ success: true, data: view() })
     const wrapper = await mountView()
-    await wrapper.findAll('[data-test="note"]')[1].setValue('Kunci salah')
+    await questionButtons(wrapper)[1].trigger('click')
+    await wrapper.get('[data-test="note"]').setValue('Kunci salah')
 
     await buttonByText(wrapper, 'Kembalikan')!.trigger('click')
     expect(

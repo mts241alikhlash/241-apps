@@ -250,11 +250,11 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                 class="shrink-0"
                 @click="openCreateForm"
               >
-                <Plus class="mr-1.5 size-4" />
+                <Plus class="size-4" />
                 Tambah
               </Button>
             </template>
-            <template #header-right>
+            <template #filters>
               <div
                 class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
               >
@@ -307,12 +307,14 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                     </Select>
                   </FloatingLabelField>
                 </div>
-                <SearchInput
-                  v-model="search"
-                  class="sm:w-40"
-                  label="Cari gelombang"
-                />
               </div>
+            </template>
+            <template #header-right>
+              <SearchInput
+                v-model="search"
+                class="sm:w-40"
+                label="Cari gelombang"
+              />
             </template>
             <template #mobile-toolbar>
               <SearchInput
@@ -327,7 +329,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                 class="relative shrink-0"
                 @click="filterOpen = true"
               >
-                <Filter class="mr-1.5 size-4" />
+                <Filter class="size-4" />
                 Filter
                 <span
                   v-if="activeFiltersCount"

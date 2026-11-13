@@ -180,7 +180,7 @@ const academicYearForm = useAcademicYearForm({
         >
           <Loader2
             v-if="academicYearForm.isSaving.value"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ academicYearForm.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
         </Button>
