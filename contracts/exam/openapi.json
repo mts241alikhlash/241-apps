@@ -627,7 +627,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -695,7 +695,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -764,7 +764,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -842,7 +842,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -920,7 +920,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -998,7 +998,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1076,7 +1076,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1144,7 +1144,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1222,7 +1222,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1300,7 +1300,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"
@@ -1378,7 +1378,7 @@
           {
             "name": "X-Client-Platform",
             "in": "header",
-            "description": "Send 'web' from a browser; the Android app omits it",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
             "required": false,
             "schema": {
               "type": "string"

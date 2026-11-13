@@ -5485,7 +5485,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5517,7 +5517,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5553,7 +5553,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5589,7 +5589,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5625,7 +5625,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5653,7 +5653,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5685,7 +5685,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5717,7 +5717,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5753,7 +5753,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5789,7 +5789,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;
@@ -5825,7 +5825,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description Send 'web' from a browser; the Android app omits it */
+                /** @description Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya. */
                 "X-Client-Platform"?: string;
                 /** @description The tablet the session was started on */
                 "X-Device-Id": string;

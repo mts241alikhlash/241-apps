@@ -71,7 +71,8 @@ import {
 @ApiHeader({
   name: 'X-Client-Platform',
   required: false,
-  description: "Send 'web' from a browser; the Android app omits it",
+  description:
+    "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
 })
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
