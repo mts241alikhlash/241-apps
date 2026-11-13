@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { Item, ItemContent, ItemGroup } from '@mts241alikhlash/ui/item'
+import { Check } from '@lucide/vue'
 import type {
   ChoiceKey,
   EssayContent,
@@ -104,6 +105,16 @@ const trueValue = computed(() =>
           <ItemContent class="min-w-0">
             <QuestionHtml :html="choice.html" />
           </ItemContent>
+          <span
+            v-if="isCorrect(choice.key)"
+            class="ml-auto flex shrink-0 items-center gap-1 text-[length:var(--text-control,0.75rem)] font-medium text-primary"
+          >
+            <Check
+              class="size-4"
+              aria-hidden="true"
+            />
+            Kunci
+          </span>
         </Item>
       </ItemGroup>
 
@@ -112,24 +123,44 @@ const trueValue = computed(() =>
         class="flex gap-2"
       >
         <span
-          class="rounded-md border px-4 py-2"
+          class="flex items-center gap-1 rounded-md border px-4 py-2"
           :class="
             trueValue === true
               ? 'bg-primary/10 font-medium text-primary'
               : undefined
           "
         >
+          <Check
+            v-if="trueValue === true"
+            class="size-4"
+            aria-hidden="true"
+          />
           Benar
+          <span
+            v-if="trueValue === true"
+            class="sr-only"
+            >(kunci)</span
+          >
         </span>
         <span
-          class="rounded-md border px-4 py-2"
+          class="flex items-center gap-1 rounded-md border px-4 py-2"
           :class="
             trueValue === false
               ? 'bg-primary/10 font-medium text-primary'
               : undefined
           "
         >
+          <Check
+            v-if="trueValue === false"
+            class="size-4"
+            aria-hidden="true"
+          />
           Salah
+          <span
+            v-if="trueValue === false"
+            class="sr-only"
+            >(kunci)</span
+          >
         </span>
       </div>
 

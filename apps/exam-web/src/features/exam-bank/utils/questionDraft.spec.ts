@@ -26,6 +26,8 @@ describe('emptyContent', () => {
       choices: [
         { key: 'A', html: '' },
         { key: 'B', html: '' },
+        { key: 'C', html: '' },
+        { key: 'D', html: '' },
       ],
       answer: { key: 'A' },
     })
@@ -52,7 +54,7 @@ describe('validateDraft', () => {
   it('asks for filled choices and a key', () => {
     const content = emptyContent('MULTIPLE_CHOICE')
     expect(validateDraft('MULTIPLE_CHOICE', body, content, 1)).toBe(
-      'Isi semua pilihan jawaban',
+      'Isi minimal dua pilihan jawaban',
     )
     expect(
       validateDraft(
@@ -68,6 +70,61 @@ describe('validateDraft', () => {
         1,
       ),
     ).toBe('Pilih minimal satu kunci jawaban')
+  })
+
+  it('accepts two filled choices and ignores empty trailing ones', () => {
+    expect(
+      validateDraft(
+        'MULTIPLE_CHOICE',
+        body,
+        {
+          choices: [
+            { key: 'A', html: '<p>Ya</p>' },
+            { key: 'B', html: '<p>Tidak</p>' },
+            { key: 'C', html: '' },
+            { key: 'D', html: '<p></p>' },
+          ],
+          answer: { key: 'B' },
+        },
+        1,
+      ),
+    ).toBeNull()
+  })
+
+  it('refuses a gap between filled choices', () => {
+    expect(
+      validateDraft(
+        'MULTIPLE_CHOICE',
+        body,
+        {
+          choices: [
+            { key: 'A', html: '<p>1</p>' },
+            { key: 'B', html: '' },
+            { key: 'C', html: '<p>3</p>' },
+          ],
+          answer: { key: 'A' },
+        },
+        1,
+      ),
+    ).toBe('Isi semua pilihan jawaban')
+  })
+
+  it('refuses a key on an empty choice', () => {
+    expect(
+      validateDraft(
+        'MULTIPLE_CHOICE',
+        body,
+        {
+          choices: [
+            { key: 'A', html: '<p>1</p>' },
+            { key: 'B', html: '<p>2</p>' },
+            { key: 'C', html: '' },
+          ],
+          answer: { key: 'C' },
+        },
+        1,
+      ),
+    ).toBe('Kunci jawaban harus pada pilihan yang terisi')
   })
 
   it('asks for an accepted answer on a short answer', () => {
@@ -107,9 +164,29 @@ describe('cleanContent', () => {
     })
   })
 
-  it('leaves the other types as they are', () => {
-    const content = emptyContent('MULTIPLE_CHOICE')
+  it('drops empty trailing choices of a choice question', () => {
+    expect(
+      cleanContent('MULTIPLE_RESPONSE', {
+        choices: [
+          { key: 'A', html: '<p>1</p>' },
+          { key: 'B', html: '<p>2</p>' },
+          { key: 'C', html: '' },
+          { key: 'D', html: '' },
+        ],
+        answer: { keys: ['A'] },
+      }),
+    ).toEqual({
+      choices: [
+        { key: 'A', html: '<p>1</p>' },
+        { key: 'B', html: '<p>2</p>' },
+      ],
+      answer: { keys: ['A'] },
+    })
+  })
 
-    expect(cleanContent('MULTIPLE_CHOICE', content)).toBe(content)
+  it('leaves the other types as they are', () => {
+    const content = emptyContent('ESSAY')
+
+    expect(cleanContent('ESSAY', content)).toBe(content)
   })
 })

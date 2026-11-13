@@ -1,4 +1,5 @@
 import type {
+  ChoiceKey,
   MultipleChoiceContent,
   MultipleResponseContent,
   QuestionContent,
@@ -35,10 +36,29 @@ export function emptyContent(type: QuestionType): QuestionContent {
   }
 }
 
+type ChoiceContent = MultipleChoiceContent | MultipleResponseContent
+
+function withoutTrailingEmpty<T extends { html: string }>(choices: T[]): T[] {
+  let end = choices.length
+  while (end > 0 && !hasContent(choices[end - 1].html)) end -= 1
+  return choices.slice(0, end)
+}
+
+function keysOf(content: ChoiceContent): ChoiceKey[] {
+  return 'keys' in content.answer ? content.answer.keys : [content.answer.key]
+}
+
 export function cleanContent(
   type: QuestionType,
   content: QuestionContent,
 ): QuestionContent {
+  if (type === 'MULTIPLE_CHOICE' || type === 'MULTIPLE_RESPONSE') {
+    const choiceContent = content as ChoiceContent
+    return {
+      ...choiceContent,
+      choices: withoutTrailingEmpty(choiceContent.choices),
+    }
+  }
   if (type !== 'SHORT_ANSWER') return content
   const short = content as ShortAnswerContent
   return {
@@ -51,7 +71,7 @@ export function cleanContent(
   }
 }
 
-export const MIN_POINTS = 1
+export const MIN_POINTS = 0.25
 export const MAX_POINTS = 100
 
 export function validateDraft(
@@ -63,10 +83,15 @@ export function validateDraft(
   if (!hasContent(bodyHtml)) return 'Isi soal wajib diisi'
 
   if (type === 'MULTIPLE_CHOICE' || type === 'MULTIPLE_RESPONSE') {
-    const choiceContent = content as
-      MultipleChoiceContent | MultipleResponseContent
-    if (choiceContent.choices.some((choice) => !hasContent(choice.html))) {
+    const choiceContent = content as ChoiceContent
+    const filled = withoutTrailingEmpty(choiceContent.choices)
+    if (filled.some((choice) => !hasContent(choice.html))) {
       return 'Isi semua pilihan jawaban'
+    }
+    if (filled.length < 2) return 'Isi minimal dua pilihan jawaban'
+    const filledKeys = new Set(filled.map((choice) => choice.key))
+    if (keysOf(choiceContent).some((key) => !filledKeys.has(key))) {
+      return 'Kunci jawaban harus pada pilihan yang terisi'
     }
     if (
       type === 'MULTIPLE_RESPONSE' &&
@@ -84,7 +109,7 @@ export function validateDraft(
   }
 
   if (!Number.isFinite(points) || points < MIN_POINTS || points > MAX_POINTS) {
-    return 'Poin harus antara 1 dan 100'
+    return 'Poin harus antara 0,25 dan 100'
   }
   return null
 }

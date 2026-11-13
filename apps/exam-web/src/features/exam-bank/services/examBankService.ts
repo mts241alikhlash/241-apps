@@ -29,9 +29,10 @@ export const examBankService = {
     }
   },
 
-  async loadTeachers(): Promise<NamedOption[]> {
+  async loadTeachers(subjectId: string): Promise<NamedOption[]> {
     try {
       const { rows } = await loadAssignments({
+        subjectId,
         limit: PAGINATION.REFERENCE_LIMIT,
       })
       const teachers = new Map<string, string>()

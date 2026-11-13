@@ -222,7 +222,7 @@ async function init() {
   } else if (pkg.value) {
     await examBankService.loadReferences()
     if (store.manageAll) {
-      teachers.value = await examBankService.loadTeachers()
+      teachers.value = await examBankService.loadTeachers(pkg.value.subjectId)
     }
   }
   loading.value = false

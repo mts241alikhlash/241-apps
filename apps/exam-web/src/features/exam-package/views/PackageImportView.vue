@@ -104,7 +104,7 @@ async function init() {
   }
   await examBankService.loadReferences()
   if (store.manageAll && pkg.value) {
-    teachers.value = await examBankService.loadTeachers()
+    teachers.value = await examBankService.loadTeachers(pkg.value.subjectId)
   }
   loading.value = false
 }
