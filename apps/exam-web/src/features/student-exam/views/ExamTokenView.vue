@@ -18,7 +18,7 @@ import {
   studentExamService,
 } from '../services/studentExamService'
 import { displayTitle } from '../logic/exam'
-import type { MyExam } from '../types'
+import type { MyExam, StoredExamSession } from '../types'
 import SebRequiredView from './SebRequiredView.vue'
 
 const route = useRoute()
@@ -26,6 +26,8 @@ const router = useRouter()
 const fieldId = useId()
 
 const scheduleId = String(route.params.scheduleId ?? '')
+const resumeSessionId =
+  typeof route.query.resume === 'string' ? route.query.resume : null
 const exam = ref<MyExam | null>(null)
 const code = ref('')
 const loading = ref(true)
@@ -46,24 +48,47 @@ onMounted(async () => {
   }
 })
 
+function storeSession(sessionId: string, fields: Partial<StoredExamSession>) {
+  const key = `cbt:deadline:${sessionId}`
+  const previous = JSON.parse(
+    window.sessionStorage.getItem(key) ?? 'null',
+  ) as StoredExamSession | null
+  window.sessionStorage.setItem(key, JSON.stringify({ ...previous, ...fields }))
+}
+
 async function start() {
   if (code.value.trim().length === 0 || submitting.value) return
   submitting.value = true
   error.value = null
   try {
+    if (resumeSessionId) {
+      const resumed = await studentExamService.resume(
+        resumeSessionId,
+        code.value,
+      )
+      storeSession(resumeSessionId, {
+        deadline: Date.parse(resumed.deadline),
+        serverTime: Date.parse(resumed.serverTime),
+        scheduleId,
+      })
+      await router.replace({
+        name: 'student-exam-sheet',
+        params: { sessionId: resumeSessionId },
+      })
+      return
+    }
     const session = await studentExamService.startSession(
       scheduleId,
       code.value,
     )
-    window.sessionStorage.setItem(
-      `cbt:deadline:${session.sessionId}`,
-      JSON.stringify({
-        deadline: session.deadline,
-        serverTime: session.serverTime,
-        examTitle: exam.value ? displayTitle(exam.value) : null,
-        durationMinutes: exam.value?.durationMinutes ?? null,
-      }),
-    )
+    storeSession(session.sessionId, {
+      deadline: session.deadline,
+      serverTime: session.serverTime,
+      scheduleId,
+      examTitle: exam.value ? displayTitle(exam.value) : null,
+      durationMinutes: exam.value?.durationMinutes ?? null,
+      heartbeatIntervalMs: session.policy.heartbeatIntervalMs,
+    })
     await router.replace({
       name: 'student-exam-sheet',
       params: { sessionId: session.sessionId },

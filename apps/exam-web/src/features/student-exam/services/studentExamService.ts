@@ -5,9 +5,11 @@ import { deviceId } from './deviceId'
 import type {
   ActiveSebConfig,
   MyExam,
+  ResumedSession,
   SaveAnswerItem,
   SaveAnswersBatchResult,
   SavedAnswer,
+  SessionHeartbeat,
   SessionPaper,
   StartedSession,
   SubmitRequest,
@@ -84,6 +86,34 @@ export const studentExamService = {
         codeOf(error),
         { cause: error },
       )
+    }
+  },
+
+  async resume(sessionId: string, accessCode: string): Promise<ResumedSession> {
+    const seb = await readSebProof()
+    try {
+      return await studentExamApi.resume(
+        sessionId,
+        deviceId(),
+        accessCode.trim(),
+        seb ?? undefined,
+      )
+    } catch (error) {
+      throw new ExamApiError(
+        examErrorMessage(error, 'Sesi ujian gagal dilanjutkan.'),
+        codeOf(error),
+        { cause: error },
+      )
+    }
+  },
+
+  async heartbeat(sessionId: string): Promise<SessionHeartbeat> {
+    try {
+      return await studentExamApi.heartbeat(sessionId, deviceId())
+    } catch (error) {
+      throw new Error(examErrorMessage(error, 'Sesi gagal diperbarui.'), {
+        cause: error,
+      })
     }
   },
 

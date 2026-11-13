@@ -81,4 +81,24 @@ describe('studentExamApi', () => {
       body: {},
     })
   })
+
+  it('beats the heartbeat with the device headers', async () => {
+    POST.mockResolvedValue(ok({ requiresTokenReentry: false }))
+    await expect(studentExamApi.heartbeat('s', 'dev')).resolves.toEqual({
+      requiresTokenReentry: false,
+    })
+    expect(POST).toHaveBeenCalledWith('/student-exams/{sessionId}/heartbeat', {
+      params: { path: { sessionId: 's' }, header: headers },
+    })
+  })
+
+  it('resumes with the token and the seb proof', async () => {
+    const seb = { configKeyHash: 'k', pageUrl: 'https://exam.example/p' }
+    POST.mockResolvedValue(ok({ requiresTokenReentry: false }))
+    await studentExamApi.resume('s', 'dev', 'ABC123', seb)
+    expect(POST).toHaveBeenCalledWith('/student-exams/{sessionId}/resume', {
+      params: { path: { sessionId: 's' }, header: headers },
+      body: { accessCode: 'ABC123', deviceId: 'dev', seb },
+    })
+  })
 })

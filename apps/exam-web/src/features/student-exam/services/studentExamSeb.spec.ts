@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 
-const { startSession, activeSebConfigs, readSebProof } = vi.hoisted(() => ({
-  startSession: vi.fn(),
-  activeSebConfigs: vi.fn(),
-  readSebProof: vi.fn(),
-}))
+const { startSession, activeSebConfigs, readSebProof, resume } = vi.hoisted(
+  () => ({
+    startSession: vi.fn(),
+    activeSebConfigs: vi.fn(),
+    readSebProof: vi.fn(),
+    resume: vi.fn(),
+  }),
+)
 
 vi.mock('../api/studentExamApi', () => ({
-  studentExamApi: { startSession, activeSebConfigs },
+  studentExamApi: { startSession, activeSebConfigs, resume },
 }))
 vi.mock('./deviceId', () => ({ deviceId: () => 'dev' }))
 vi.mock('@/shared/seb', async (importOriginal) => ({
@@ -29,6 +32,15 @@ beforeEach(() => {
 })
 
 describe('studentExamService Safe Exam Browser', () => {
+  it('resumes with the token and the seb proof', async () => {
+    readSebProof.mockResolvedValue(proof)
+    resume.mockResolvedValue({ requiresTokenReentry: false })
+
+    await studentExamService.resume('s1', ' ABC123 ')
+
+    expect(resume).toHaveBeenCalledWith('s1', 'dev', 'ABC123', proof)
+  })
+
   it('posts the seb proof when started inside SEB', async () => {
     readSebProof.mockResolvedValue(proof)
     startSession.mockResolvedValue({ sessionId: 'x' })

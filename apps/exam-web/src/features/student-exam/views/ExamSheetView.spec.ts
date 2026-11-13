@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
 import { computed, ref } from 'vue'
 import type { AnswerPayload, PaperQuestion } from '../types'
 
@@ -19,15 +19,21 @@ const question: PaperQuestion = {
 const state = vi.hoisted(() => ({
   answersLocked: { value: false },
   answer: vi.fn(),
+  startHeartbeat: vi.fn(),
+  submit: vi.fn(),
+  options: null as null | Record<string, () => unknown>,
 }))
+
+const router = vi.hoisted(() => ({ replace: vi.fn() }))
 
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { sessionId: 's1' } }),
-  useRouter: () => ({ replace: vi.fn() }),
+  useRouter: () => router,
 }))
 
 vi.mock('../composables/useExamSession', () => ({
-  useExamSession: () => {
+  useExamSession: (options: Record<string, () => unknown>) => {
+    state.options = options
     const answers = ref(new Map<string, AnswerPayload>())
     const submitting = ref(false)
     return {
@@ -55,7 +61,8 @@ vi.mock('../composables/useExamSession', () => ({
       stopClock: vi.fn(),
       load: vi.fn(() => Promise.resolve()),
       answer: state.answer,
-      submit: vi.fn(),
+      submit: state.submit,
+      startHeartbeat: state.startHeartbeat,
       syncNow: vi.fn(),
       onConnectivityChanged: vi.fn(),
       isAnswered: () => false,
@@ -64,6 +71,19 @@ vi.mock('../composables/useExamSession', () => ({
 }))
 
 import ExamSheetView from './ExamSheetView.vue'
+
+function storeSession(extra: Record<string, unknown> = {}) {
+  window.sessionStorage.setItem(
+    'cbt:deadline:s1',
+    JSON.stringify({
+      deadline: 2_000_000_000_000,
+      serverTime: 1_999_999_000_000,
+      scheduleId: 'sch1',
+      heartbeatIntervalMs: 30_000,
+      ...extra,
+    }),
+  )
+}
 
 function mountView() {
   return mount(ExamSheetView, {
@@ -108,5 +128,61 @@ describe('ExamSheetView answer controls', () => {
     ).toBe(true)
 
     state.answersLocked.value = false
+  })
+})
+
+describe('ExamSheetView keeps the session alive', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    window.sessionStorage.clear()
+    vi.unstubAllEnvs()
+  })
+
+  it('starts the heartbeat at the policy interval', async () => {
+    storeSession()
+    mountView()
+    await flushPromises()
+
+    expect(state.startHeartbeat).toHaveBeenCalledWith('s1', 30_000)
+  })
+
+  it('sends the student to the token resume mode on token re-entry', () => {
+    storeSession()
+    mountView()
+
+    state.options!.onTokenReentry()
+
+    expect(router.replace).toHaveBeenCalledWith({
+      name: 'student-exam-token',
+      params: { scheduleId: 'sch1' },
+      query: { resume: 's1' },
+    })
+  })
+
+  it('navigates to the quit URL after submit when it is set', async () => {
+    vi.stubEnv('VITE_SEB_QUIT_URL', 'https://quit.example/done')
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, assign })
+    storeSession()
+    state.submit.mockResolvedValue({ answersStored: true })
+    mountView()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(assign).toHaveBeenCalledWith('https://quit.example/done')
+    vi.unstubAllGlobals()
+  })
+
+  it('shows the finished state after submit when the quit URL is empty', async () => {
+    vi.stubEnv('VITE_SEB_QUIT_URL', '')
+    storeSession()
+    state.submit.mockResolvedValue({ answersStored: true })
+    const wrapper = mountView()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Ujian sudah dikumpulkan')
   })
 })

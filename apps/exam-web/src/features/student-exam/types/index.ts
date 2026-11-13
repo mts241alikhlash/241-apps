@@ -51,6 +51,19 @@ export type SubmitRequest = Schemas['SubmitSessionRequestDto']
 
 export type SubmittedSession = Schemas['SubmitSessionResponseDto']
 
+export type ResumedSession = Schemas['ResumeSessionResponseDto']
+
+export type SessionHeartbeat = Schemas['SessionHeartbeatDto']
+
+export interface StoredExamSession {
+  deadline: number
+  serverTime: number
+  scheduleId?: string | null
+  examTitle?: string | null
+  durationMinutes?: number | null
+  heartbeatIntervalMs?: number | null
+}
+
 export type AnswerSyncState = 'LOCAL_PENDING' | 'SYNCING' | 'SERVER_CONFIRMED'
 
 export interface AnswerSyncSummary {

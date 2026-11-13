@@ -6,7 +6,10 @@ interface SafeExamBrowserGlobal {
   }
 }
 
-export interface SebProof { configKeyHash: string; pageUrl: string }
+export interface SebProof {
+  configKeyHash: string
+  pageUrl: string
+}
 
 export class SebOutdatedError extends Error {
   constructor() {
@@ -20,6 +23,11 @@ const UPDATE_KEYS_TIMEOUT_MS = 2000
 function sebGlobal(): SafeExamBrowserGlobal | undefined {
   return (window as Window & { SafeExamBrowser?: SafeExamBrowserGlobal })
     .SafeExamBrowser
+}
+
+export function sebQuitUrl(): string | null {
+  const url = import.meta.env.VITE_SEB_QUIT_URL.trim()
+  return url ? url : null
 }
 
 export function isInSeb(): boolean {

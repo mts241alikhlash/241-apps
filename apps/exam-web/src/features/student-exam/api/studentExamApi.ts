@@ -27,6 +27,26 @@ export const studentExamApi = {
 
   activeSebConfigs: () => unwrap(examClient.GET('/seb-configs/active')),
 
+  resume: (
+    sessionId: string,
+    deviceId: string,
+    accessCode: string,
+    seb?: SebProof,
+  ) =>
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/resume', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+        body: { accessCode, deviceId, seb },
+      }),
+    ),
+
+  heartbeat: (sessionId: string, deviceId: string) =>
+    unwrap(
+      examClient.POST('/student-exams/{sessionId}/heartbeat', {
+        params: { path: { sessionId }, header: deviceHeaders(deviceId) },
+      }),
+    ),
+
   getQuestions: (sessionId: string, deviceId: string) =>
     unwrap(
       examClient.GET('/student-exams/{sessionId}/questions', {

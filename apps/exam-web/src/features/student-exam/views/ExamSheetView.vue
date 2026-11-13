@@ -18,20 +18,19 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
+import { sebQuitUrl } from '@/shared/seb'
 import QuestionListDialog from '../components/QuestionListDialog.vue'
 import SessionQuestionHtml from '../components/SessionQuestionHtml.vue'
 import { useExamSession } from '../composables/useExamSession'
 import { isAnswered } from '../logic/exam'
 import { API_ERROR_CODES, ExamApiError } from '../services/studentExamService'
 import { questionTypeLabel } from '../logic/questionType'
-import type { AnswerPayload, Choice, PaperQuestion } from '../types'
-
-interface StoredDeadline {
-  deadline: number
-  serverTime: number
-  examTitle?: string | null
-  durationMinutes?: number | null
-}
+import type {
+  AnswerPayload,
+  Choice,
+  PaperQuestion,
+  StoredExamSession,
+} from '../types'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,9 +49,19 @@ const doubtful = ref(new Set<string>())
 const examTitle = ref<string | null>(null)
 const durationMinutes = ref<number | null>(null)
 
+let scheduleId: string | null = null
+
 const session = useExamSession({
   onExpired: () => {
     if (!finished.value) void submitNow()
+  },
+  onTokenReentry: () => {
+    if (!scheduleId) return
+    void router.replace({
+      name: 'student-exam-token',
+      params: { scheduleId },
+      query: { resume: sessionId },
+    })
   },
 })
 
@@ -75,9 +84,9 @@ const controlsLocked = computed(() => submitting.value || answersLocked.value)
 
 onMounted(async () => {
   const raw = window.sessionStorage.getItem(`cbt:deadline:${sessionId}`)
-  let stored: StoredDeadline | null
+  let stored: StoredExamSession | null
   try {
-    stored = raw ? (JSON.parse(raw) as StoredDeadline) : null
+    stored = raw ? (JSON.parse(raw) as StoredExamSession) : null
   } catch {
     stored = null
   }
@@ -85,6 +94,10 @@ onMounted(async () => {
     session.startClock(stored.deadline, stored.serverTime)
     examTitle.value = stored.examTitle ?? null
     durationMinutes.value = stored.durationMinutes ?? null
+    scheduleId = stored.scheduleId ?? null
+    if (stored.heartbeatIntervalMs) {
+      session.startHeartbeat(sessionId, stored.heartbeatIntervalMs)
+    }
   }
   await session.load(sessionId)
 })
@@ -165,8 +178,13 @@ async function submitNow() {
   try {
     const result = await session.submit(sessionId)
     notStored.value = !result.answersStored
-    finished.value = true
     window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
+    const quitUrl = sebQuitUrl()
+    if (quitUrl) {
+      window.location.assign(quitUrl)
+      return
+    }
+    finished.value = true
   } catch (cause) {
     const code = cause instanceof ExamApiError ? cause.code : null
     if (code === API_ERROR_CODES.MIN_SUBMIT) {
