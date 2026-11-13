@@ -10,6 +10,12 @@ interface SebGlobal {
   }
 }
 
+declare global {
+  interface Window {
+    SafeExamBrowser?: SebGlobal
+  }
+}
+
 function stubSeb(value: SebGlobal | undefined) {
   Object.defineProperty(window, 'SafeExamBrowser', {
     value,
@@ -26,7 +32,7 @@ describe('seb', () => {
 
   afterEach(() => {
     stubSeb(undefined)
-    delete (window as Window & { SafeExamBrowser?: unknown }).SafeExamBrowser
+    delete window.SafeExamBrowser
     vi.useRealTimers()
   })
 
