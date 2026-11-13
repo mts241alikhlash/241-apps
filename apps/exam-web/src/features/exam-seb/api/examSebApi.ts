@@ -13,6 +13,8 @@ export interface CreateSebConfigPayload {
   file: File
 }
 
+const passThrough = (body: unknown) => body as never
+
 export const examSebApi = {
   list: () => unwrap(examClient.GET('/seb-configs')),
 
@@ -23,7 +25,8 @@ export const examSebApi = {
     form.append('file', payload.file)
     return unwrap(
       examClient.POST('/seb-configs', {
-        body: form as unknown as Schemas['CreateSebConfigDto'],
+        body: form as never,
+        bodySerializer: passThrough,
       }),
     )
   },
