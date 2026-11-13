@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Classroom } from '../types'
@@ -53,7 +54,7 @@ watchDebounced(
 
 const selectedAcademicYearId = ref('')
 
-function onAcademicYearChange(value: unknown) {
+function onAcademicYearChange(value: AcceptableValue) {
   const academicYearId = typeof value === 'string' ? value : ''
   selectedAcademicYearId.value = academicYearId
   void fetchClassrooms({ academicYearId: academicYearId || undefined, page: 1 })

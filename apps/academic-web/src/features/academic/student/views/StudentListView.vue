@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { createColumns } from '../components/columns'
 import { ImportPreviewDialog } from '@/features/academic/shared/import-preview'
 import { studentImportColumns } from '../importPreviewColumns'
@@ -64,7 +65,10 @@ function resetAllFilters() {
   filters.value.classroomId = 'all'
 }
 
-function handleFilterChange(key: 'gradeId' | 'classroomId', value: unknown) {
+function handleFilterChange(
+  key: 'gradeId' | 'classroomId',
+  value: AcceptableValue,
+) {
   filters.value[key] = typeof value === 'string' ? value : 'all'
 }
 const {

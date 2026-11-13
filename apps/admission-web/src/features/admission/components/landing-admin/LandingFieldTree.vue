@@ -29,7 +29,8 @@ const emit = defineEmits<{
 
 const at = (name: string) => (props.path ? `${props.path}.${name}` : name)
 const text = (name: string) => (props.model[name] as string | null) ?? ''
-const list = (name: string) => (props.model[name] as unknown[]) ?? []
+const list = (name: string) =>
+  (props.model[name] as Record<string, unknown>[] | undefined) ?? []
 const strings = (name: string) => (props.model[name] as string[]) ?? []
 const record = (name: string) => props.model[name] as Record<string, unknown>
 
@@ -53,9 +54,9 @@ function removeLine(name: string, index: number) {
 
 function itemTitle(
   field: Extract<LandingField, { kind: 'list' }>,
-  item: unknown,
+  item: Record<string, unknown>,
 ) {
-  const value = (item as Record<string, unknown>)[field.titleField]
+  const value = item[field.titleField]
   return typeof value === 'string' && value.trim() ? value : 'Belum diisi'
 }
 </script>

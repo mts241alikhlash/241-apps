@@ -17,6 +17,7 @@ The generic list view for admin-managed reference data: `ReferenceDataListView` 
 ## Gotchas
 
 - Apps need an `@source` line for this package in `src/style.css`.
+- `ReferenceDataListView.vue` casts the form payload (`Record<string, unknown>`, built from `config.fields` at runtime) to the generic `TCreate`/`TUpdate`. vue-tsc needs the cast, while typed lint sees the SFC generic as unconstrained and calls it unnecessary, so `eslint.config.mjs` turns `no-unnecessary-type-assertion` off for that one file instead of an inline disable.
 
 ## Open work
 

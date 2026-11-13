@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { useStudent } from '../composables/useStudent'
 import { createAccountColumns } from '../components/columns'
 import { DataTable, SearchInput } from '@mts241alikhlash/ui'
@@ -107,7 +108,10 @@ function resetAllFilters() {
   filters.value.classroomId = 'all'
 }
 
-function handleFilterChange(key: 'gradeId' | 'classroomId', value: unknown) {
+function handleFilterChange(
+  key: 'gradeId' | 'classroomId',
+  value: AcceptableValue,
+) {
   filters.value[key] = typeof value === 'string' ? value : 'all'
 }
 

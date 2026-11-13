@@ -55,7 +55,7 @@ const editor = useEditor({
       'aria-label': props.label,
       dir: 'auto',
     },
-    handleKeyDown: (_view: unknown, event: KeyboardEvent) => {
+    handleKeyDown: (_view, event) => {
       if (props.singleLine && event.key === 'Enter') return true
       return false
     },

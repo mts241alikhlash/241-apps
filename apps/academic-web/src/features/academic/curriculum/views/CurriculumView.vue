@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import type { Curriculum } from '../types'
 import CurriculumFormDialog from '../components/CurriculumFormDialog.vue'
 import { createCurriculumColumns } from '../components/columns'
@@ -67,7 +68,7 @@ watch(isAddModalOpen, (isOpen) => {
 
 const selectedAcademicYearId = ref('')
 
-function onAcademicYearChange(value: unknown) {
+function onAcademicYearChange(value: AcceptableValue) {
   const academicYearId = typeof value === 'string' ? value : ''
   selectedAcademicYearId.value = academicYearId
   void fetchCurricula(academicYearId || undefined)

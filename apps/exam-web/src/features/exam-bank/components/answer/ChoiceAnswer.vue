@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { computed } from 'vue'
 import { Trash2 } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -15,6 +16,7 @@ import type {
   MultipleChoiceContent,
   MultipleResponseContent,
 } from '../../types'
+import { CHOICE_KEYS } from '../../types'
 import {
   MIN_CHOICES,
   addChoice,
@@ -49,9 +51,10 @@ function setHtml(key: ChoiceKey, html: string) {
   }
 }
 
-function pickSingle(key: unknown) {
-  if (!isMultiple(content.value)) {
-    content.value = setSingleKey(content.value, key as ChoiceKey)
+function pickSingle(next: AcceptableValue) {
+  const key = CHOICE_KEYS.find((candidate) => candidate === next)
+  if (key !== undefined && !isMultiple(content.value)) {
+    content.value = setSingleKey(content.value, key)
   }
 }
 

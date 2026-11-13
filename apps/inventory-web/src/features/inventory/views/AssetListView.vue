@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { watchDebounced } from '@vueuse/core'
@@ -80,7 +81,7 @@ function resetAllFilters() {
 
 function handleFilterChange(
   key: 'categoryId' | 'locationId' | 'statusId' | 'conditionId',
-  value: unknown,
+  value: AcceptableValue,
 ) {
   filters.value[key] = typeof value === 'string' ? value : 'all'
 }

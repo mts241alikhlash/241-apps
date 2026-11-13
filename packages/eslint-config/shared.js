@@ -69,6 +69,28 @@ export const COMMON_RULES = {
   'no-restricted-imports': ['error', { patterns: BOUNDARY_PATTERNS }],
   '@eslint-community/eslint-comments/require-description': 'error',
   '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
+  '@eslint-community/eslint-comments/no-restricted-disable': [
+    'error',
+    '*',
+    '!vue/no-v-html',
+  ],
+  '@typescript-eslint/ban-ts-comment': [
+    'error',
+    { 'ts-expect-error': true, 'ts-ignore': true, 'ts-nocheck': true },
+  ],
+}
+
+const PARSER_NAME = '/^(parse|is|has|assert|read|normalize|to)[A-Z]/'
+
+export const UI_RULES = {
+  'no-restricted-syntax': [
+    'error',
+    {
+      selector: `:function:not([returnType.typeAnnotation.type='TSTypePredicate']):not(FunctionDeclaration[id.name=${PARSER_NAME}]):not(VariableDeclarator[id.name=${PARSER_NAME}] > ArrowFunctionExpression) > Identifier[name!=/^(err|error|cause|reason)$/][typeAnnotation.typeAnnotation.type='TSUnknownKeyword']`,
+      message:
+        'Type this parameter with the value it really receives (for a Select: AcceptableValue from @mts241alikhlash/ui/select; for an Input: string | number). unknown is for catch, type guards and parsers (docs/standards/frontend.md).',
+    },
+  ],
 }
 
 export function frame({ ignores = [], body, overrides = [] }) {
@@ -89,6 +111,15 @@ export function frame({ ignores = [], body, overrides = [] }) {
 }
 
 export const TEST_RULES = {
+  '@typescript-eslint/ban-ts-comment': [
+    'error',
+    {
+      'ts-expect-error': 'allow-with-description',
+      'ts-ignore': true,
+      'ts-nocheck': true,
+    },
+  ],
+  'no-restricted-syntax': 'off',
   '@typescript-eslint/unbound-method': 'off',
   '@typescript-eslint/no-explicit-any': 'off',
   '@typescript-eslint/no-unsafe-argument': 'off',

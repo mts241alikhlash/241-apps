@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { DataTable, SearchInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -185,7 +186,7 @@ function resetAllFilters() {
 
 function handleFilterChange(
   key: 'positionCategoryId' | 'statusFilter',
-  value: unknown,
+  value: AcceptableValue,
 ) {
   if (key === 'positionCategoryId') {
     filters.value[key] =

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { useEmployee } from '../composables/useEmployee'
 import { createAccountColumns } from '../components/columns'
 import { DataTable, SearchInput } from '@mts241alikhlash/ui'
@@ -103,7 +104,7 @@ function resetAllFilters() {
 
 function handleFilterChange(
   key: 'categoryFilter' | 'positionFilter' | 'statusFilter',
-  value: unknown,
+  value: AcceptableValue,
 ) {
   filters.value[key] = typeof value === 'string' ? value : 'all'
   currentPage.value = 1
