@@ -31,6 +31,8 @@ export interface UseExamSessionOptions {
   onTokenReentry?: () => void
 }
 
+const DEFAULT_HEARTBEAT_INTERVAL_MS = 15_000
+
 export function useExamSession(options: UseExamSessionOptions = {}) {
   const questions = ref<PaperQuestion[]>([])
   const answers = ref(new Map<string, AnswerPayload>())
@@ -177,7 +179,10 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     scheduleSync()
   }
 
-  function startHeartbeat(targetSessionId: string, intervalMs: number) {
+  function startHeartbeat(
+    targetSessionId: string,
+    intervalMs = DEFAULT_HEARTBEAT_INTERVAL_MS,
+  ) {
     stopHeartbeat()
     heartbeatTicker = setInterval(() => void beat(targetSessionId), intervalMs)
   }

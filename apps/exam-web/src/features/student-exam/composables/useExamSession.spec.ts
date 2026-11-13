@@ -224,6 +224,17 @@ describe('useExamSession heartbeat', () => {
     session.stopHeartbeat()
   })
 
+  it('falls back to the default interval when none is given', async () => {
+    const { session } = setup()
+    session.startHeartbeat('s1')
+
+    await vi.advanceTimersByTimeAsync(14_999)
+    expect(service.heartbeat).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(service.heartbeat).toHaveBeenCalledTimes(1)
+    session.stopHeartbeat()
+  })
+
   it('stops after submit', async () => {
     const { session } = setup()
     session.startHeartbeat('s1', 30_000)

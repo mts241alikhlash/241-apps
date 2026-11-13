@@ -96,9 +96,7 @@ onMounted(async () => {
     examTitle.value = stored.examTitle ?? null
     durationMinutes.value = stored.durationMinutes ?? null
     scheduleId = stored.scheduleId ?? null
-    if (stored.heartbeatIntervalMs) {
-      session.startHeartbeat(sessionId, stored.heartbeatIntervalMs)
-    }
+    session.startHeartbeat(sessionId, stored.heartbeatIntervalMs ?? undefined)
   }
   await session.load(sessionId)
 })
