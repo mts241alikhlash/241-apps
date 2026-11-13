@@ -1,7 +1,9 @@
 import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 import { studentExamApi } from '../api/studentExamApi'
+import { readSebProof } from '@/shared/seb'
 import { deviceId } from './deviceId'
 import type {
+  ActiveSebConfig,
   MyExam,
   SaveAnswerItem,
   SaveAnswersBatchResult,
@@ -68,16 +70,31 @@ export const studentExamService = {
     scheduleId: string,
     accessCode: string,
   ): Promise<StartedSession> {
+    const seb = await readSebProof()
     try {
       return await studentExamApi.startSession(
         scheduleId,
         accessCode.trim(),
         deviceId(),
+        seb ?? undefined,
       )
     } catch (error) {
-      throw new Error(examErrorMessage(error, 'Ujian gagal dimulai.'), {
-        cause: error,
-      })
+      throw new ExamApiError(
+        examErrorMessage(error, 'Ujian gagal dimulai.'),
+        codeOf(error),
+        { cause: error },
+      )
+    }
+  },
+
+  async activeSebConfigs(): Promise<ActiveSebConfig[]> {
+    try {
+      return await studentExamApi.activeSebConfigs()
+    } catch (error) {
+      throw new Error(
+        examErrorMessage(error, 'Konfigurasi Safe Exam Browser gagal dimuat.'),
+        { cause: error },
+      )
     }
   },
 

@@ -12,9 +12,14 @@ import {
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
-import { studentExamService } from '../services/studentExamService'
+import { SebOutdatedError } from '@/shared/seb'
+import {
+  ExamApiError,
+  studentExamService,
+} from '../services/studentExamService'
 import { displayTitle } from '../logic/exam'
 import type { MyExam } from '../types'
+import SebRequiredView from './SebRequiredView.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,6 +31,8 @@ const code = ref('')
 const loading = ref(true)
 const submitting = ref(false)
 const error = ref<string | null>(null)
+const sebRequired = ref(false)
+const showSebGuide = ref(false)
 
 onMounted(async () => {
   try {
@@ -62,8 +69,14 @@ async function start() {
       params: { sessionId: session.sessionId },
     })
   } catch (cause) {
-    error.value =
-      cause instanceof Error ? cause.message : 'Ujian gagal dimulai.'
+    if (cause instanceof SebOutdatedError) {
+      error.value = 'Perbarui Safe Exam Browser ke versi terbaru.'
+    } else {
+      sebRequired.value =
+        cause instanceof ExamApiError && cause.code === 'SEB_REQUIRED'
+      error.value =
+        cause instanceof Error ? cause.message : 'Ujian gagal dimulai.'
+    }
   } finally {
     submitting.value = false
   }
@@ -71,7 +84,11 @@ async function start() {
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col items-center justify-center p-4">
+  <SebRequiredView v-if="showSebGuide" />
+  <div
+    v-else
+    class="flex min-h-0 flex-1 flex-col items-center justify-center p-4"
+  >
     <Card
       gap="none"
       class="w-full max-w-md overflow-hidden"
@@ -136,6 +153,15 @@ async function start() {
         >
           {{ error }}
         </p>
+
+        <Button
+          v-if="sebRequired"
+          variant="outline"
+          class="w-full"
+          @click="showSebGuide = true"
+        >
+          Panduan Safe Exam Browser
+        </Button>
 
         <Button
           v-if="!error || exam"

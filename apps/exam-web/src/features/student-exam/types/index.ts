@@ -25,6 +25,7 @@ export type MyExamStatus = Schemas['MyExamDto']['status']
 export type MyExam = Schemas['MyExamDto']
 
 export type StartedSession = Schemas['StartedSessionDto']
+export type ActiveSebConfig = Schemas['ActiveSebConfigDto']
 
 export type Choice = Schemas['PaperChoiceDto']
 
