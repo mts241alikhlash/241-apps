@@ -213,7 +213,7 @@ onMounted(async () => {
           v-if="canManage && event"
           @click="openCreateRoom"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah Ruangan
         </Button>
       </CardHeader>

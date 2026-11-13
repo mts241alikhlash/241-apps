@@ -210,7 +210,7 @@ onMounted(() => {
               class="w-full relative justify-center"
               @click="isFilterDialogOpen = true"
             >
-              <Filter class="size-4 mr-2" />
+              <Filter class="size-4" />
               Filter Pegawai
               <span
                 v-if="activeFiltersCount > 0"

@@ -75,7 +75,7 @@ onMounted(() => {
             @click="handleSync"
           >
             <RefreshCw
-              class="mr-2 h-4 w-4"
+              class="h-4 w-4"
               :class="{ 'animate-spin': isSyncing }"
             />
             {{ isSyncing ? 'Menyinkronkan...' : 'Sinkronkan' }}

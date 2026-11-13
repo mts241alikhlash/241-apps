@@ -114,7 +114,7 @@ onMounted(async () => {
             variant="outline"
             @click="isAddModalOpen = true"
           >
-            <Plus class="size-4 mr-2" />
+            <Plus class="size-4" />
             Tambah
           </Button>
         </div>

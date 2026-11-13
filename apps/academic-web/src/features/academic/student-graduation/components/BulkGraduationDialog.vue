@@ -203,7 +203,7 @@ async function handleSubmit() {
           >
             <Loader2
               v-if="isGraduating"
-              class="h-4 w-4 mr-2 animate-spin"
+              class="h-4 w-4 animate-spin"
             />
             Luluskan {{ selectedIds.size }} Siswa
           </Button>

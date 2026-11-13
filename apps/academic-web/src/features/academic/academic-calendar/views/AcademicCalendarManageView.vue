@@ -56,7 +56,7 @@ onMounted(() => {
         </div>
         <div class="flex gap-2">
           <Button @click="navigateToCreate">
-            <Plus class="size-4 mr-2" />
+            <Plus class="size-4" />
             Tambah Agenda
           </Button>
         </div>

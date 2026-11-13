@@ -222,7 +222,7 @@ useBreadcrumbs(() => {
               size="sm"
               @click="libraryOpen = true"
             >
-              <ImagePlus class="mr-2 size-4" />
+              <ImagePlus class="size-4" />
               Tambah foto
             </Button>
           </div>
@@ -306,7 +306,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving || !form.title.trim() || !form.eventDate"
             @click="save"
           >
-            <Save class="mr-2 size-4" />
+            <Save class="size-4" />
             Simpan
           </Button>
 

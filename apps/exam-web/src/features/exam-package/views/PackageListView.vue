@@ -180,7 +180,7 @@ onMounted(() => examPackageService.loadReferences())
           class="shrink-0"
           @click="createOpen = true"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -217,7 +217,7 @@ onMounted(() => examPackageService.loadReferences())
           @update:page-size="changePageSize"
           @row-click="openPackage"
         >
-          <template #header-left>
+          <template #filters>
             <PackageFilterFields
               v-model:subject-id="subjectId"
               v-model:grade-id="gradeId"
@@ -246,7 +246,7 @@ onMounted(() => examPackageService.loadReferences())
               class="relative shrink-0"
               @click="filterOpen = true"
             >
-              <Filter class="mr-1.5 size-4" />
+              <Filter class="size-4" />
               Filter
               <span
                 v-if="activeFiltersCount"

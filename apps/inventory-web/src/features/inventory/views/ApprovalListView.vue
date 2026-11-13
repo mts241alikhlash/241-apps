@@ -316,7 +316,7 @@ onMounted(() => {
               :disabled="isSubmitting"
               @click="processApproval('REJECT')"
             >
-              <X class="size-4 mr-1.5" />
+              <X class="size-4" />
               Tolak
             </Button>
             <Button
@@ -325,7 +325,7 @@ onMounted(() => {
               :disabled="isSubmitting"
               @click="processApproval('APPROVE')"
             >
-              <Check class="size-4 mr-1.5" />
+              <Check class="size-4" />
               Setujui
             </Button>
           </div>

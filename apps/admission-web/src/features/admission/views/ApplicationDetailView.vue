@@ -671,7 +671,7 @@ useBreadcrumbs(() => {
               })
             "
           >
-            <SquarePen class="mr-1.5 size-4" />
+            <SquarePen class="size-4" />
             Lengkapi Data
           </Button>
         </div>

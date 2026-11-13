@@ -31,7 +31,7 @@ const emit = defineEmits<{
         size="sm"
         @click="emit('manage')"
       >
-        <Pencil class="h-3.5 w-3.5 mr-1.5" />
+        <Pencil class="h-3.5 w-3.5" />
         Edit
       </Button>
     </CardHeader>

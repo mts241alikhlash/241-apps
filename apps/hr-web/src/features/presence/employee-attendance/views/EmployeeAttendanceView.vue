@@ -48,7 +48,7 @@ onMounted(() => void employeeAttendanceService.fetchDay())
       >
         <CardTitle size="lg"> Kehadiran Pegawai </CardTitle>
         <Button @click="manualOpen = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Catat Manual
         </Button>
       </CardHeader>

@@ -85,7 +85,7 @@ onMounted(fetchTypes)
           v-if="can('time-slots.create')"
           @click="isAddOpen = true"
         >
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Tambah Tipe
         </Button>
       </CardHeader>

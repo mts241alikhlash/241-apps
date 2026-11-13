@@ -77,7 +77,7 @@ onMounted(() => void salaryComponentService.fetch())
       >
         <CardTitle size="lg"> Komponen Gaji </CardTitle>
         <Button @click="startNew">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Tambah Komponen
         </Button>
       </CardHeader>

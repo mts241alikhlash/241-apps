@@ -212,7 +212,7 @@ onMounted(async () => {
               class="w-full relative justify-center"
               @click="isFilterDialogOpen = true"
             >
-              <Filter class="size-4 mr-2" />
+              <Filter class="size-4" />
               Filter Siswa
               <span
                 v-if="activeFiltersCount > 0"

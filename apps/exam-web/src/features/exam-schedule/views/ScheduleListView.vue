@@ -162,7 +162,7 @@ const columns = computed(() =>
           class="shrink-0"
           @click="openCreate"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -230,7 +230,7 @@ const columns = computed(() =>
               class="relative shrink-0"
               @click="filterOpen = true"
             >
-              <Filter class="mr-1.5 size-4" />
+              <Filter class="size-4" />
               Filter
               <span
                 v-if="status !== 'ALL'"

@@ -325,7 +325,7 @@ onMounted(async () => {
             class="h-8 text-xs font-medium shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = true"
           >
-            <Pencil class="size-3.5 mr-1.5 text-muted-foreground" />
+            <Pencil class="size-3.5 text-muted-foreground" />
             Ubah Tahun
           </Button>
         </div>
@@ -386,7 +386,7 @@ onMounted(async () => {
             class="h-8 text-xs font-medium px-3 shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = false"
           >
-            <Check class="size-3.5 mr-1" />
+            <Check class="size-3.5" />
             Selesai
           </Button>
         </div>
@@ -416,7 +416,7 @@ onMounted(async () => {
           >
             <Loader2
               v-if="isCopyingClassrooms"
-              class="size-4 mr-2 animate-spin"
+              class="size-4 animate-spin"
             />
             Salin Kelas
           </Button>
@@ -495,7 +495,7 @@ onMounted(async () => {
           >
             <Loader2
               v-if="isPromoting"
-              class="size-4 mr-2 animate-spin"
+              class="size-4 animate-spin"
             />
             Proses Kenaikan
           </Button>
@@ -643,7 +643,7 @@ onMounted(async () => {
           >
             <Loader2
               v-if="isPromoting"
-              class="size-4 mr-2 animate-spin"
+              class="size-4 animate-spin"
             />
             Ya, Proses Sekarang
           </Button>

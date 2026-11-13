@@ -210,7 +210,7 @@ onMounted(async () => {
             variant="outline"
             class="shrink-0"
             @click="filterOpen = true"
-            ><Filter class="mr-1.5 size-4" />Filter</Button
+            ><Filter class="size-4" />Filter</Button
           >
         </div>
 

@@ -105,7 +105,7 @@ onMounted(async () => {
           v-if="can('classrooms.create')"
           @click="isAddModalOpen = true"
         >
-          <Plus class="size-4 mr-2" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>

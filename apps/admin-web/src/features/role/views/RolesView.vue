@@ -99,7 +99,7 @@ onMounted(() => {
         </div>
         <div class="flex gap-2">
           <Button @click="handleAddClick">
-            <Plus class="mr-2 h-4 w-4" /> Tambah Role
+            <Plus class="h-4 w-4" /> Tambah Role
           </Button>
         </div>
       </CardHeader>

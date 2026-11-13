@@ -77,7 +77,7 @@ onMounted(() => {
         v-if="config.permissions.canCreate"
         @click="isAddOpen = true"
       >
-        <Plus class="mr-2 h-4 w-4" /> Tambah {{ config.entityLabel.singular }}
+        <Plus class="h-4 w-4" /> Tambah {{ config.entityLabel.singular }}
       </Button>
     </CardHeader>
 

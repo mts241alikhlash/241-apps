@@ -141,7 +141,7 @@ function handleEdit() {
           size="sm"
           @click="handleEdit"
         >
-          <Pencil class="size-3.5 mr-1.5" />
+          <Pencil class="size-3.5" />
           Edit Agenda
         </Button>
       </DialogFooter>

@@ -52,6 +52,10 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 **Rule.** `DialogContent size="md"` (one column, 448 px, up to about 5 fields) or `size="xl"` (two columns, 672 px, 6 fields or more); no other widths for forms. `DialogHeader standard`, `DialogBody` and `DialogFooter standard` carry the spacing; a plain body element uses `class="dialog-body"`, never `px-6 py-5`, borders or hand padding.
 **Why.** Dialog spacing is defined once in `theme.css`.
+
+**Rule.** Dialogs sit on `bg-card`; header and footer carry no tint of their own. `BackButton` is the ghost variant. An icon inside `Button` takes no margin class: the button's `gap` spaces it. Table headers use the `table-header` token and rows stripe with `muted`.
+**Why.** One surface colour per layer and one spacing source keep the nine apps alike; a margin on the icon doubles the gap.
+**Check.** review; `pnpm --filter @mts241alikhlash/ui run test`.
 **Check.** `packages/ui` dialog specs; review.
 
 **Rule.** Every footer is `<DialogFooter standard class="justify-between">`: cancel or secondary (outline) on the left, primary on the right, in one row on phones too; one button uses the default `justify-end`. No `flex-1`, `w-full`, `flex-row`, `sm:justify-*` or `mt-auto` on a footer or its buttons; a filter dialog's footer is the same ("Atur Ulang" left, "Tutup" right).
@@ -64,7 +68,7 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 ## Tables
 
-**Rule.** `DataTable` top row is `header-left` (the add button, labelled just "Tambah") and `header-right` (filters joined in one frame, then search at 160 px). The footer has `[n] baris per halaman` and "Menampilkan x dari y" left and pagination centered. Do not put `block` on `DataTable` (use `md:flex`). Server lists pass `:page`, `:page-size`, `:total-items` and `@update:page` (5 to 100 rows, default 10), page back to 1 when a filter or page size changes, and bulk selection applies to the shown page; small fixed lists stay client-side with `hide-pagination`.
+**Rule.** `DataTable` top row is, from the left, `filters` (the list's filters joined in one frame) and `header-left` (the add button, labelled just "Tambah"), then `header-right` on the right (search at 160 px). Filters never go in `header-left` or `header-right`. The footer has `[n] baris per halaman` and "Menampilkan x dari y" left and pagination centered. Do not put `block` on `DataTable` (use `md:flex`). Server lists pass `:page`, `:page-size`, `:total-items` and `@update:page` (5 to 100 rows, default 10), page back to 1 when a filter or page size changes, and bulk selection applies to the shown page; small fixed lists stay client-side with `hide-pagination`.
 **Why.** Same table everywhere; the server owns paging (see [frontend](frontend.md)).
 **Check.** `packages/ui` table specs; review.
 

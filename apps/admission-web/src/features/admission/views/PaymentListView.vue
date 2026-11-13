@@ -275,7 +275,7 @@ onMounted(async () => {
           class="w-full sm:w-auto"
           @click="openAdd(null)"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>

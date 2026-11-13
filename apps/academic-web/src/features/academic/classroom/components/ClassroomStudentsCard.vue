@@ -92,7 +92,7 @@ defineExpose({
             class="flex-1 sm:flex-initial"
             @click="openBulkTransfer"
           >
-            <ArrowRightLeft class="h-4 w-4 mr-2" />
+            <ArrowRightLeft class="h-4 w-4" />
             Pindah Kelas ({{ selectedEnrollments.length }})
           </Button>
           <Button
@@ -102,7 +102,7 @@ defineExpose({
             class="flex-1 sm:flex-initial"
             @click="handleBulkUnenroll"
           >
-            <Trash2 class="h-4 w-4 mr-2" />
+            <Trash2 class="h-4 w-4" />
             Keluarkan ({{ selectedEnrollments.length }})
           </Button>
           <Button
@@ -111,7 +111,7 @@ defineExpose({
             class="flex-1 sm:flex-initial"
             @click="toggleManageMode"
           >
-            <X class="h-4 w-4 mr-2" />
+            <X class="h-4 w-4" />
             Selesai
           </Button>
         </template>
@@ -122,7 +122,7 @@ defineExpose({
             class="flex-1 sm:flex-initial"
             @click="toggleManageMode"
           >
-            <Settings class="h-4 w-4 mr-2" />
+            <Settings class="h-4 w-4" />
             Kelola Siswa
           </Button>
           <Button
@@ -130,7 +130,7 @@ defineExpose({
             class="flex-1 sm:flex-initial"
             @click="emit('add-student')"
           >
-            <Plus class="h-4 w-4 mr-2" />
+            <Plus class="h-4 w-4" />
             Tambah Siswa
           </Button>
         </template>

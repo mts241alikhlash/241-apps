@@ -102,7 +102,7 @@ const content = computed({
             :disabled="!canAdd"
             @click="addAnswer()"
           >
-            <Plus class="mr-1.5 size-4" />
+            <Plus class="size-4" />
             Tambah
           </Button>
         </div>

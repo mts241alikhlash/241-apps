@@ -322,7 +322,7 @@ onMounted(() => {
         variant="ghost"
         @click="router.push('/exam/package-approvals')"
       >
-        <ArrowLeft class="mr-1.5 size-4" />
+        <ArrowLeft class="size-4" />
         Kembali
       </Button>
       <div class="flex flex-wrap items-center gap-2">

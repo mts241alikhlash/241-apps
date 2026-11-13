@@ -134,7 +134,7 @@ onMounted(() => {
           size="sm"
           @click="handleOpenCreateForm"
         >
-          <Plus class="w-4 h-4 mr-2" />
+          <Plus class="w-4 h-4" />
           Tambah Kondisi
         </Button>
       </CardHeader>

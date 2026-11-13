@@ -182,7 +182,7 @@ const curriculumForm = useCurriculumForm({
         >
           <Loader2
             v-if="curriculumForm.isSaving.value"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ curriculumForm.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
         </Button>

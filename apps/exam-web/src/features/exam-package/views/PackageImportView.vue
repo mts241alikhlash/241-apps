@@ -179,7 +179,7 @@ onMounted(init)
                 variant="outline"
                 @click="examBankService.downloadTemplate('xlsx')"
               >
-                <Download class="mr-1.5 size-4" />
+                <Download class="size-4" />
                 Template Excel
               </Button>
               <Button
@@ -187,7 +187,7 @@ onMounted(init)
                 variant="outline"
                 @click="examBankService.downloadTemplate('docx')"
               >
-                <Download class="mr-1.5 size-4" />
+                <Download class="size-4" />
                 Template Word
               </Button>
             </div>

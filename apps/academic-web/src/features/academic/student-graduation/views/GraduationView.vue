@@ -307,7 +307,7 @@ async function handleConfirmGraduate() {
           >
             <Loader2
               v-if="isGraduating"
-              class="size-4 mr-2 animate-spin"
+              class="size-4 animate-spin"
             />
             Proses Kelulusan
           </Button>
@@ -431,7 +431,7 @@ async function handleConfirmGraduate() {
           >
             <Loader2
               v-if="isGraduating"
-              class="size-4 mr-2 animate-spin"
+              class="size-4 animate-spin"
             />
             Ya, Proses Sekarang
           </Button>

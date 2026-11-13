@@ -102,7 +102,7 @@ onMounted(() => void payrollRunService.fetch())
       >
         <CardTitle size="lg"> Perhitungan Gaji </CardTitle>
         <Button @click="dialogOpen = true">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Hitung Bulan
         </Button>
       </CardHeader>

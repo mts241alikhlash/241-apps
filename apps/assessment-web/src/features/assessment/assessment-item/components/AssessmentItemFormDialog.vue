@@ -198,7 +198,7 @@ const itemForm = useAssessmentItemForm({
         >
           <Loader2
             v-if="itemForm.isSaving.value"
-            class="size-4 mr-1.5 animate-spin"
+            class="size-4 animate-spin"
           />
           {{ itemForm.isSaving.value ? 'Menyimpan...' : 'Simpan' }}
         </Button>

@@ -302,7 +302,7 @@ useBreadcrumbs(() => {
             variant="outline"
             @click="printSelectedUnits"
           >
-            <Printer class="h-4 w-4 mr-2" /> Cetak Terpilih ({{
+            <Printer class="h-4 w-4" /> Cetak Terpilih ({{
               selectedUnits.length
             }})
           </Button>
@@ -311,14 +311,14 @@ useBreadcrumbs(() => {
             :disabled="!asset.units || asset.units.length === 0"
             @click="printLabels(asset.units ?? [])"
           >
-            <Printer class="h-4 w-4 mr-2" /> Cetak Semua
+            <Printer class="h-4 w-4" /> Cetak Semua
           </Button>
           <Button
             variant="outline"
             :disabled="isUnitSaving"
             @click="addOneUnit"
           >
-            <Plus class="h-4 w-4 mr-2" /> Tambah Unit
+            <Plus class="h-4 w-4" /> Tambah Unit
           </Button>
         </div>
       </CardHeader>

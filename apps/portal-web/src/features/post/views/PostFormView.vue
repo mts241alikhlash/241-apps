@@ -407,7 +407,7 @@ useBreadcrumbs(() => {
                 size="sm"
                 @click="attachmentOpen = true"
               >
-                <Paperclip class="mr-2 size-4" />
+                <Paperclip class="size-4" />
                 {{
                   form.attachmentFileId ? 'Ganti lampiran' : 'Pilih lampiran'
                 }}
@@ -507,7 +507,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving || !form.title.trim()"
             @click="saveDraft"
           >
-            <Save class="mr-2 size-4" />
+            <Save class="size-4" />
             Simpan draf
           </Button>
 
@@ -515,7 +515,7 @@ useBreadcrumbs(() => {
             variant="ghost"
             @click="showSchedule = !showSchedule"
           >
-            <CalendarClock class="mr-2 size-4" />
+            <CalendarClock class="size-4" />
             {{ showSchedule ? 'Terbitkan sekarang' : 'Jadwalkan' }}
           </Button>
 
@@ -542,7 +542,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving"
             @click="transition('unpublish')"
           >
-            <EyeOff class="mr-2 size-4" />
+            <EyeOff class="size-4" />
             Tarik dari publikasi
           </Button>
 
@@ -552,7 +552,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving"
             @click="transition('archive')"
           >
-            <Archive class="mr-2 size-4" />
+            <Archive class="size-4" />
             Arsipkan
           </Button>
 
@@ -561,7 +561,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving"
             @click="publish"
           >
-            <Send class="mr-2 size-4" />
+            <Send class="size-4" />
             {{ showSchedule ? 'Jadwalkan terbit' : 'Terbitkan' }}
           </Button>
         </div>

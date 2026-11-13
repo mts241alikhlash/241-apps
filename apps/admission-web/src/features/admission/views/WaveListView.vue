@@ -250,7 +250,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                 class="shrink-0"
                 @click="openCreateForm"
               >
-                <Plus class="mr-1.5 size-4" />
+                <Plus class="size-4" />
                 Tambah
               </Button>
             </template>
@@ -329,7 +329,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                 class="relative shrink-0"
                 @click="filterOpen = true"
               >
-                <Filter class="mr-1.5 size-4" />
+                <Filter class="size-4" />
                 Filter
                 <span
                   v-if="activeFiltersCount"

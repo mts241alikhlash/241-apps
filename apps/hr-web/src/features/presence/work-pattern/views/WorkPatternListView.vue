@@ -58,7 +58,7 @@ onMounted(() => void workPatternService.fetchPatterns())
       >
         <CardTitle size="lg"> Pola Kerja </CardTitle>
         <Button @click="startNew">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Pola Baru
         </Button>
       </CardHeader>

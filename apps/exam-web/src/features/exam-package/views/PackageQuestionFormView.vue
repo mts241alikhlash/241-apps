@@ -344,7 +344,7 @@ async function confirmSave() {
           :disabled="saving"
           @click="addCard"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
@@ -606,7 +606,7 @@ async function confirmSave() {
           variant="ghost"
           @click="router.push(`/exam/packages/${packageId}`)"
         >
-          <ArrowLeft class="mr-1.5 size-4" />
+          <ArrowLeft class="size-4" />
           Kembali
         </Button>
         <div

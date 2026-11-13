@@ -69,7 +69,7 @@ const deleteSelected = () => {
           :disabled="isDeletingBulk"
           @click="deleteSelected"
         >
-          <Trash class="w-4 h-4 mr-2" />
+          <Trash class="w-4 h-4" />
           {{ isDeletingBulk ? 'Menghapus...' : 'Hapus Terpilih' }}
         </Button>
       </div>

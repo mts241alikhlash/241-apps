@@ -625,7 +625,7 @@ onMounted(() => fetchReview(true))
                       :disabled="acting"
                       @click="openReject(activeSlot)"
                     >
-                      <X class="mr-1 size-3.5" />
+                      <X class="size-3.5" />
                       Tolak
                     </Button>
                     <Button
@@ -635,7 +635,7 @@ onMounted(() => fetchReview(true))
                       :disabled="acting"
                       @click="approve(activeSlot)"
                     >
-                      <Check class="mr-1 size-3.5" />
+                      <Check class="size-3.5" />
                       Setujui
                     </Button>
                   </template>

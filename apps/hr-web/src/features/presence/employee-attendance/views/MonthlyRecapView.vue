@@ -78,7 +78,7 @@ onMounted(() => void employeeAttendanceService.fetchRecap())
           variant="outline"
           @click="employeeAttendanceService.exportRecap()"
         >
-          <Download class="mr-2 h-4 w-4" />
+          <Download class="h-4 w-4" />
           Ekspor
         </Button>
       </CardHeader>

@@ -216,7 +216,7 @@ onMounted(load)
                 class="shrink-0"
                 @click="openForm(null)"
               >
-                <Plus class="mr-1.5 size-4" />
+                <Plus class="size-4" />
                 Tambah
               </Button>
             </template>

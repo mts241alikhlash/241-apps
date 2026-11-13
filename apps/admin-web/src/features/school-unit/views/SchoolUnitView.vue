@@ -40,7 +40,7 @@ onMounted(() => {
           :disabled="isLoading || (Boolean(loadError) && !isNotSetUp)"
           @click="router.push('/school-unit/edit')"
         >
-          <PencilLine class="size-4 mr-2" />
+          <PencilLine class="size-4" />
           Ubah Data
         </Button>
       </CardHeader>

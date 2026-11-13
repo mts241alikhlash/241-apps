@@ -140,7 +140,7 @@ onMounted(() => {
               v-if="can('inventory-approvals.create')"
               @click="openForm"
             >
-              <Plus class="size-4 mr-1.5" />
+              <Plus class="size-4" />
               Susun Alur
             </Button>
           </div>
@@ -236,7 +236,7 @@ onMounted(() => {
               class="mt-4"
               @click="openForm"
             >
-              <Plus class="size-4 mr-1.5" />
+              <Plus class="size-4" />
               Susun Alur
             </Button>
           </div>
@@ -336,7 +336,7 @@ onMounted(() => {
             size="sm"
             @click="addStep"
           >
-            <Plus class="size-4 mr-1.5" />
+            <Plus class="size-4" />
             Tambah Tahap
           </Button>
         </div>

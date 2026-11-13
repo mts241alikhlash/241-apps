@@ -95,7 +95,7 @@ onMounted(load)
             :disabled="loading || roster.length === 0"
             @click="print"
           >
-            <Printer class="mr-1.5 size-4" />
+            <Printer class="size-4" />
             Cetak A4
           </Button>
         </div>

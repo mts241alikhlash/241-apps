@@ -200,7 +200,7 @@ onMounted(async () => {
             :disabled="selectedUnitCount === 0"
             @click="printSelectedLabels"
           >
-            <Printer class="size-4 mr-2" />
+            <Printer class="size-4" />
             Cetak Label ({{ selectedUnitCount }} unit)
           </Button>
         </div>

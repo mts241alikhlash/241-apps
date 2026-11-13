@@ -229,7 +229,7 @@ async function confirmPendingAction() {
                 class="shrink-0"
                 @click="openCreateForm"
               >
-                <Plus class="mr-1.5 size-4" />
+                <Plus class="size-4" />
                 Tambah
               </Button>
             </template>
@@ -307,7 +307,7 @@ async function confirmPendingAction() {
                 variant="outline"
                 class="shrink-0"
                 @click="filterOpen = true"
-                ><Filter class="mr-1.5 size-4" />Filter</Button
+                ><Filter class="size-4" />Filter</Button
               >
             </template>
             <template #mobile-chips>

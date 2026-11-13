@@ -153,7 +153,6 @@ function updateRowNote(index: number, note: string) {
               <Input
                 :model-value="row.note ?? ''"
                 placeholder="Catatan..."
-                class=""
                 @update:model-value="
                   (val) => updateRowNote(index, val as string)
                 "
@@ -201,11 +200,11 @@ function updateRowNote(index: number, note: string) {
       >
         <Loader2
           v-if="isSaving"
-          class="size-4 mr-2 animate-spin"
+          class="size-4 animate-spin"
         />
         <Save
           v-else
-          class="size-4 mr-2"
+          class="size-4"
         />
         {{ isSaving ? 'Menyimpan...' : 'Simpan Semua' }}
       </Button>

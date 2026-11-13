@@ -135,7 +135,7 @@ const columns: ColumnDef<GalleryAlbum>[] = [
           <CardTitle size="lg">Galeri</CardTitle>
         </div>
         <Button @click="router.push({ name: 'admin-album-new' })">
-          <Plus class="mr-2 h-4 w-4" />
+          <Plus class="h-4 w-4" />
           Album baru
         </Button>
       </CardHeader>

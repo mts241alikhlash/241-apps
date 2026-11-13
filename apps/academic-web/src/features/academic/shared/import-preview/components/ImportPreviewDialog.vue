@@ -213,7 +213,7 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
             >
               <Loader2
                 v-if="loading"
-                class="size-4 mr-2 animate-spin"
+                class="size-4 animate-spin"
               />
               {{ loading ? 'Memproses...' : 'Proses Impor' }}
             </Button>

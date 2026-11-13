@@ -186,7 +186,7 @@ onMounted(async () => {
               :disabled="loading || !hasRows"
               @click="print"
             >
-              <Printer class="mr-1.5 size-4" />
+              <Printer class="size-4" />
               Cetak A4
             </Button>
           </div>

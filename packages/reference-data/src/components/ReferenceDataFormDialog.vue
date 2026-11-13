@@ -209,7 +209,7 @@ const onSubmit = handleSubmit((values) => {
         >
           <Loader2
             v-if="isSubmitting"
-            class="mr-2 h-4 w-4 animate-spin"
+            class="h-4 w-4 animate-spin"
           />
           {{ isEditing ? 'Simpan' : 'Tambah' }}
         </Button>

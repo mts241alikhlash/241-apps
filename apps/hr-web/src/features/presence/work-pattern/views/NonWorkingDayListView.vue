@@ -133,7 +133,7 @@ onMounted(() => {
           :disabled="!activeAcademicYearId"
           @click="syncDialogOpen = true"
         >
-          <CalendarPlus class="mr-2 h-4 w-4" />
+          <CalendarPlus class="h-4 w-4" />
           Sinkron Kalender
         </Button>
       </CardHeader>
@@ -233,14 +233,14 @@ onMounted(() => {
           :disabled="!selectedTypeId"
           @click="handlePreview"
         >
-          <CalendarPlus class="mr-2 h-4 w-4" />
+          <CalendarPlus class="h-4 w-4" />
           Lihat Pratinjau
         </Button>
         <Button
           v-else
           @click="handleConfirmImport"
         >
-          <Check class="mr-2 h-4 w-4" />
+          <Check class="h-4 w-4" />
           Konfirmasi Impor
         </Button>
       </DialogFooter>

@@ -355,7 +355,7 @@ function handleSubmit() {
         >
           <Loader2
             v-if="isSaving"
-            class="mr-2 h-4 w-4 animate-spin"
+            class="h-4 w-4 animate-spin"
           />
           {{ isSaving ? 'Menyimpan...' : 'Simpan Perubahan' }}
         </Button>

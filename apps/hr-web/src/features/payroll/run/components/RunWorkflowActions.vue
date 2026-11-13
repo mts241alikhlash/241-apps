@@ -62,7 +62,7 @@ async function confirmApprove() {
       :disabled="isWorking"
       @click="recalculate"
     >
-      <RefreshCw class="mr-2 h-4 w-4" />
+      <RefreshCw class="h-4 w-4" />
       Hitung ulang
     </Button>
 
@@ -71,7 +71,7 @@ async function confirmApprove() {
       :disabled="isWorking"
       @click="submit"
     >
-      <Send class="mr-2 h-4 w-4" />
+      <Send class="h-4 w-4" />
       Ajukan
     </Button>
 
@@ -80,7 +80,7 @@ async function confirmApprove() {
       :disabled="isWorking"
       @click="approveDialogOpen = true"
     >
-      <CheckCircle2 class="mr-2 h-4 w-4" />
+      <CheckCircle2 class="h-4 w-4" />
       Setujui
     </Button>
 

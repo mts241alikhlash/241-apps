@@ -266,7 +266,7 @@ useBreadcrumbs(() => {
             :disabled="store.isSaving || !canSave"
             @click="save"
           >
-            <Save class="mr-2 size-4" />
+            <Save class="size-4" />
             Simpan
           </Button>
 

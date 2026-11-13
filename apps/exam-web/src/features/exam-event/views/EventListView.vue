@@ -106,7 +106,7 @@ onMounted(async () => {
           class="shrink-0"
           @click="openCreate"
         >
-          <Plus class="mr-1.5 size-4" />
+          <Plus class="size-4" />
           Tambah
         </Button>
       </CardHeader>
