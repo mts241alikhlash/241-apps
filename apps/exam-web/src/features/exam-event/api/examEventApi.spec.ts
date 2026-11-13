@@ -211,20 +211,6 @@ describe('examEventApi', () => {
     })
   })
 
-  it('allows web for one seat', async () => {
-    POST.mockResolvedValue(ok({ studentId: 's1' }))
-    await expect(
-      examEventApi.allowWeb('r1', 's1', { reason: 'HP rusak' }),
-    ).resolves.toEqual({ studentId: 's1' })
-    expect(POST).toHaveBeenCalledWith(
-      '/exam-rooms/{roomId}/seats/{studentId}/allow-web',
-      {
-        params: { path: { roomId: 'r1', studentId: 's1' } },
-        body: { reason: 'HP rusak' },
-      },
-    )
-  })
-
   it('allows late entry for one seat', async () => {
     POST.mockResolvedValue(ok({ studentId: 's1' }))
     await expect(

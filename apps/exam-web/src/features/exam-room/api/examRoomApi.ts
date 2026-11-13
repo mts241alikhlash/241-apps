@@ -71,14 +71,6 @@ export const examRoomApi = {
       }),
     ),
 
-  allowWeb: (roomId: string, studentId: string, reason: string) =>
-    unwrap(
-      examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-web', {
-        params: { path: { roomId, studentId } },
-        body: { reason },
-      }),
-    ),
-
   allowLate: (roomId: string, studentId: string, reason: string) =>
     unwrap(
       examClient.POST('/exam-rooms/{roomId}/seats/{studentId}/allow-late', {

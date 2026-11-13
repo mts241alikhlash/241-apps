@@ -86,14 +86,11 @@ describe('examRoomApi', () => {
     })
   })
 
-  it.each([
-    ['allowWeb', 'allow-web'],
-    ['allowLate', 'allow-late'],
-  ] as const)('%s posts the reason', async (method, action) => {
+  it('allowLate posts the reason', async () => {
     POST.mockResolvedValue(ok({ id: 's' }))
-    await examRoomApi[method]('r', 'st', 'why')
+    await examRoomApi.allowLate('r', 'st', 'why')
     expect(POST).toHaveBeenCalledWith(
-      `/exam-rooms/{roomId}/seats/{studentId}/${action}`,
+      '/exam-rooms/{roomId}/seats/{studentId}/allow-late',
       {
         params: { path: { roomId: 'r', studentId: 'st' } },
         body: { reason: 'why' },

@@ -5,28 +5,20 @@ import { defineComponent } from 'vue'
 import SessionRecoveryDialog from './SessionRecoveryDialog.vue'
 import type { RecoveryAction } from '../types'
 
-const {
-  releaseSession,
-  reopenSession,
-  resetSession,
-  extendTime,
-  allowWeb,
-  allowLate,
-} = vi.hoisted(() => ({
-  releaseSession: vi.fn(),
-  reopenSession: vi.fn(),
-  resetSession: vi.fn(),
-  extendTime: vi.fn(),
-  allowWeb: vi.fn(),
-  allowLate: vi.fn(),
-}))
+const { releaseSession, reopenSession, resetSession, extendTime, allowLate } =
+  vi.hoisted(() => ({
+    releaseSession: vi.fn(),
+    reopenSession: vi.fn(),
+    resetSession: vi.fn(),
+    extendTime: vi.fn(),
+    allowLate: vi.fn(),
+  }))
 vi.mock('../services/examRoomService', () => ({
   examRoomService: {
     releaseSession,
     reopenSession,
     resetSession,
     extendTime,
-    allowWeb,
     allowLate,
   },
 }))
@@ -101,7 +93,6 @@ describe('SessionRecoveryDialog', () => {
     reopenSession.mockResolvedValue(true)
     resetSession.mockResolvedValue(true)
     extendTime.mockResolvedValue(true)
-    allowWeb.mockResolvedValue(true)
     allowLate.mockResolvedValue(true)
   })
 
@@ -145,16 +136,7 @@ describe('SessionRecoveryDialog', () => {
     wrapper.unmount()
   })
 
-  it('allows the web client and the late entry against the room', async () => {
-    const web = open('allow-web')
-    await confirm(web, 'iPhone tidak mendukung aplikasi')
-    expect(allowWeb).toHaveBeenCalledWith(
-      'r1',
-      'st1',
-      'iPhone tidak mendukung aplikasi',
-    )
-    web.unmount()
-
+  it('allows the late entry against the room', async () => {
     const late = open('allow-late')
     await confirm(late, 'Terjebak banjir di jalan')
     expect(allowLate).toHaveBeenCalledWith(

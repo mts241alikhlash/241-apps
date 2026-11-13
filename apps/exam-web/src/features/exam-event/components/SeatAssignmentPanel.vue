@@ -25,7 +25,6 @@ import { buildSeatColumns } from './seatColumns'
 import { useSeatAssignment } from '../composables/useSeatAssignment'
 import type { ExamRoom } from '../types'
 import type { SeatedStudent } from '../services/examEventService'
-import type { SeatFlagKind } from './seatColumns'
 import { examEventService } from '../services/examEventService'
 
 const props = defineProps<{
@@ -44,7 +43,6 @@ const seat = useSeatAssignment(
 const picked = ref<Set<string>>(new Set())
 const interleave = ref(true)
 const flagTarget = ref<SeatedStudent | null>(null)
-const flagKind = ref<SeatFlagKind>('web')
 const flagReason = ref('')
 const flagSaving = ref(false)
 const flagError = ref<string | null>(null)
@@ -60,9 +58,8 @@ const canPickRoom = computed(
 const columns = buildSeatColumns({
   canFlag: () =>
     selectedRoom.value !== null && props.canActOnRoom(selectedRoom.value),
-  onFlag: (row, kind) => {
+  onFlag: (row) => {
     flagTarget.value = row
-    flagKind.value = kind
     flagReason.value = ''
     flagError.value = null
   },
@@ -73,18 +70,11 @@ async function submitFlag() {
   if (!row || flagReason.value.trim().length < 5) return
   flagSaving.value = true
   const reason = flagReason.value.trim()
-  const result =
-    flagKind.value === 'web'
-      ? await examEventService.allowWeb(
-          seat.roomId.value,
-          row.studentId,
-          reason,
-        )
-      : await examEventService.allowLate(
-          seat.roomId.value,
-          row.studentId,
-          reason,
-        )
+  const result = await examEventService.allowLate(
+    seat.roomId.value,
+    row.studentId,
+    reason,
+  )
   flagSaving.value = false
   if (result.success) {
     flagTarget.value = null
@@ -292,9 +282,7 @@ onMounted(() => {
     >
       <DialogContent size="md">
         <DialogHeader standard>
-          <DialogTitle>{{
-            flagKind === 'web' ? 'Izinkan Mode Web' : 'Izinkan Masuk Terlambat'
-          }}</DialogTitle>
+          <DialogTitle>Izinkan Masuk Terlambat</DialogTitle>
           <DialogDescription>
             {{ flagTarget?.name ?? 'Siswa' }} ·
             {{ flagTarget?.classroomName ?? '-' }}

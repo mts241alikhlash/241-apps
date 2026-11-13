@@ -28,7 +28,6 @@ export interface RoomParticipantColumnOptions extends MonitorAbilities {
   onReopen: (row: RoomMonitorParticipant) => void
   onReset: (row: RoomMonitorParticipant) => void
   onExtendTime: (row: RoomMonitorParticipant) => void
-  onAllowWeb: (row: RoomMonitorParticipant) => void
   onAllowLate: (row: RoomMonitorParticipant) => void
 }
 
@@ -330,11 +329,6 @@ export function buildRoomParticipantColumns(
               label: 'Tambah Waktu',
               icon: Timer,
               onClick: () => options.onExtendTime(target),
-            },
-            {
-              label: 'Izinkan Mode Web',
-              icon: Laptop,
-              onClick: () => options.onAllowWeb(target),
             },
             {
               label: 'Izinkan Masuk Terlambat',
