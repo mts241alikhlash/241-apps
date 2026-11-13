@@ -110,4 +110,33 @@ describe('ExamTokenView Safe Exam Browser', () => {
       params: { sessionId: 's1' },
     })
   })
+  it('ignores corrupt stored session data and still resumes', async () => {
+    routeQuery.resume = 's1'
+    sessionStorage.setItem('cbt:deadline:s1', '{not json')
+    listExams.mockResolvedValue([exam])
+    resume.mockResolvedValue({
+      deadline: '2026-11-01T02:00:00.000Z',
+      serverTime: '2026-11-01T01:05:00.000Z',
+      requiresTokenReentry: false,
+    })
+    const wrapper = mount(ExamTokenView)
+    await flushPromises()
+    await wrapper.find('input').setValue('ABC123')
+    await wrapper
+      .findAll('button')
+      .find((node) => node.text() === 'Lanjutkan Ujian')!
+      .trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('input').exists()).toBe(true)
+    expect(replace).toHaveBeenCalledWith({
+      name: 'student-exam-sheet',
+      params: { sessionId: 's1' },
+    })
+    expect(JSON.parse(sessionStorage.getItem('cbt:deadline:s1')!)).toEqual({
+      deadline: Date.parse('2026-11-01T02:00:00.000Z'),
+      serverTime: Date.parse('2026-11-01T01:05:00.000Z'),
+      scheduleId: 'sch1',
+    })
+  })
 })

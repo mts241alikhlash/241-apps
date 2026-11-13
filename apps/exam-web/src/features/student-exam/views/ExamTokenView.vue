@@ -53,11 +53,19 @@ onMounted(async () => {
   }
 })
 
+function readStoredSession(key: string): StoredExamSession | null {
+  try {
+    return JSON.parse(
+      window.sessionStorage.getItem(key) ?? 'null',
+    ) as StoredExamSession | null
+  } catch {
+    return null
+  }
+}
+
 function storeSession(sessionId: string, fields: Partial<StoredExamSession>) {
   const key = `cbt:deadline:${sessionId}`
-  const previous = JSON.parse(
-    window.sessionStorage.getItem(key) ?? 'null',
-  ) as StoredExamSession | null
+  const previous = readStoredSession(key)
   window.sessionStorage.setItem(key, JSON.stringify({ ...previous, ...fields }))
 }
 
