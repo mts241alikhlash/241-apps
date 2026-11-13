@@ -43,13 +43,14 @@ export function buildRoomOverviewColumns(
       meta: {
         align: 'center',
         mobileLabel: 'Peserta',
-        mobileValue: (row: RoomOverview) => String(row.registeredCount),
+        mobileValue: (row: RoomOverview) =>
+          `${row.registeredCount} dari ${row.capacity}`,
       },
       cell: ({ row }) =>
         h(
           'span',
           { class: 'tabular-nums' },
-          String(row.original.registeredCount),
+          `${row.original.registeredCount} / ${row.original.capacity}`,
         ),
     },
     {

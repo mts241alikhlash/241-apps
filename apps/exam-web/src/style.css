@@ -85,6 +85,24 @@
     visibility: visible;
   }
 
+  body.printing-stack *:has(.print-stack) {
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.printing-stack .print-stack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    padding: 0;
+  }
+
   body.printing-stack .print-sheet {
     display: block;
     padding: 0;

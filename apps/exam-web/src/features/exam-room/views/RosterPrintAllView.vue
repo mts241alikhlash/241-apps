@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useId } from 'vue'
-import { useRouter } from 'vue-router'
-import { BackButton } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -17,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
+import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 import { Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
 import { examEventService } from '../../exam-event/services/examEventService'
@@ -33,7 +33,6 @@ interface RoomSheet {
 
 const props = defineProps<{ kind: 'cards' | 'labels' }>()
 
-const router = useRouter()
 const eventFieldId = useId()
 
 const events = ref<{ id: string; name: string }[]>([])
@@ -52,6 +51,9 @@ const participantCount = computed(() =>
   sheets.value.reduce((sum, sheet) => sum + sheet.rows.length, 0),
 )
 const hasRows = computed(() => participantCount.value > 0)
+const printableSheets = computed(() =>
+  sheets.value.filter((sheet) => sheet.rows.length > 0),
+)
 
 function print() {
   document.body.classList.add('printing-stack')
@@ -86,7 +88,9 @@ async function loadAll(target: string) {
           loaded: roster.data.length,
           total: roster.total,
         })
-      } catch {
+      } catch (err: unknown) {
+        if (!(err instanceof ServiceRequestError)) throw err
+        if (err.response.status !== 403) throw err
         skipped += 1
       }
     }
@@ -131,7 +135,7 @@ async function loadLetterhead() {
   }
 }
 
-async function changeEvent(value: unknown) {
+async function changeEvent(value: AcceptableValue) {
   eventId.value = typeof value === 'string' ? value : ''
   await loadAll(eventId.value)
 }
@@ -149,13 +153,7 @@ onMounted(async () => {
     >
       <CardHeader variant="muted">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <BackButton
-              label="Kembali ke Ruang Ujian"
-              @click="router.push('/exam/rooms')"
-            />
-            <CardTitle class="font-semibold">{{ title }}</CardTitle>
-          </div>
+          <CardTitle class="font-semibold">{{ title }}</CardTitle>
           <div class="flex items-end gap-2">
             <FloatingLabelField
               label="Periode Ujian"
@@ -196,11 +194,11 @@ onMounted(async () => {
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="print-stack flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
       >
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive print:hidden"
           role="alert"
         >
           <p>{{ error }}</p>
@@ -242,14 +240,14 @@ onMounted(async () => {
         <template v-else>
           <p
             v-if="skippedRooms > 0"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive print:hidden"
             role="alert"
           >
             {{ skippedRooms }} ruangan dilewati karena Anda tidak bertugas di
             sana.
           </p>
           <section
-            v-for="sheet in sheets.filter((row) => row.rows.length > 0)"
+            v-for="sheet in printableSheets"
             :key="sheet.roomId"
             class="print-room space-y-3"
           >

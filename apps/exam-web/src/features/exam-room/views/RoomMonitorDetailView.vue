@@ -428,7 +428,10 @@ onUnmounted(() => {
                     class="flex-1"
                   />
                   <Select v-model="status">
-                    <SelectTrigger class="w-fit min-w-28">
+                    <SelectTrigger
+                      class="w-fit min-w-28"
+                      aria-label="Filter status"
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

@@ -139,6 +139,11 @@ const statusText = (row: RoomMonitorParticipant): string => {
   return session.status === 'IN_PROGRESS' ? 'Mengerjakan' : 'Terkumpul'
 }
 
+export function clientLabel(session: RoomMonitorSession | null): string {
+  if (session === null) return '-'
+  return session.client === 'SEB' ? 'Safe Exam Browser' : 'Istiqra'
+}
+
 export function buildRoomParticipantColumns(
   options: RoomParticipantColumnOptions,
 ): ColumnDef<RoomMonitorParticipant>[] {
@@ -277,6 +282,16 @@ export function buildRoomParticipantColumns(
           ),
         ])
       },
+    },
+    {
+      id: 'client',
+      header: 'Aplikasi',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Aplikasi',
+        mobileValue: (row: RoomMonitorParticipant) => clientLabel(row.session),
+      },
+      cell: ({ row }) => clientLabel(row.original.session),
     },
     {
       id: 'readiness',
