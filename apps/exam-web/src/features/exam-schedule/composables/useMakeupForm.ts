@@ -18,7 +18,8 @@ export function useMakeupForm(original: MakeupOrigin) {
   const overrides = ref<Record<string, MakeupReason>>({})
   const notes = ref<Record<string, string>>({})
   const packageId = ref(original.packageId)
-  const date = ref('')
+  const startDate = ref('')
+  const endDate = ref('')
   const startTime = ref('')
   const endTime = ref('')
   const durationMinutes = ref<number | null>(original.durationMinutes)
@@ -97,14 +98,15 @@ export function useMakeupForm(original: MakeupOrigin) {
   const problem = computed<string | null>(() => {
     if (selected.value.size === 0) return 'Pilih minimal satu siswa'
     const invalid = validateSchedule({
-      date: date.value,
+      startDate: startDate.value,
       startTime: startTime.value,
+      endDate: endDate.value,
       endTime: endTime.value,
       durationMinutes: durationMinutes.value,
     })
     if (invalid !== null) return invalid
     if (
-      new Date(toInstant(date.value, startTime.value)).getTime() <
+      new Date(toInstant(startDate.value, startTime.value)).getTime() <
       new Date(original.endsAt).getTime()
     ) {
       return 'Susulan harus dimulai setelah ujian utama berakhir'
@@ -118,8 +120,8 @@ export function useMakeupForm(original: MakeupOrigin) {
     error.value = null
     const result = await examScheduleService.createMakeup(original.id, {
       packageId: packageId.value,
-      startsAt: toInstant(date.value, startTime.value),
-      endsAt: toInstant(date.value, endTime.value),
+      startsAt: toInstant(startDate.value, startTime.value),
+      endsAt: toInstant(endDate.value, endTime.value),
       durationMinutes: durationMinutes.value ?? 0,
       participants: [...selected.value].map((studentId) => {
         const note = (notes.value[studentId] ?? '').trim()
@@ -149,8 +151,9 @@ export function useMakeupForm(original: MakeupOrigin) {
     setReason,
     setNote,
     packageId,
-    date,
+    startDate,
     startTime,
+    endDate,
     endTime,
     durationMinutes,
     saving,

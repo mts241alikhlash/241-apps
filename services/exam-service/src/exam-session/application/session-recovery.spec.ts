@@ -341,12 +341,10 @@ describe('extend time', () => {
     const deadline = session.deadline.getTime()
     const finalizeAt = session.finalizeAt.getTime()
 
-    const extended = await new ExtendSessionTimeUseCase(f.recovery).execute(
-      ADMIN,
-      session.id,
-      15,
-      'Server lambat',
-    )
+    const extended = await new ExtendSessionTimeUseCase(
+      f.recovery,
+      f.schedules,
+    ).execute(ADMIN, session.id, 15, 'Server lambat')
 
     expect(extended.extraMinutes).toBe(15)
     expect(extended.deadline.getTime()).toBe(deadline + 15 * 60_000)
@@ -358,7 +356,7 @@ describe('extend time', () => {
     const session = seed(f.sessions, f.schedule.id, { extraMinutes: 150 })
 
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery).execute(
+      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
         ADMIN,
         session.id,
         60,
@@ -366,7 +364,7 @@ describe('extend time', () => {
       ),
     ).rejects.toThrow(BadRequestException)
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery).execute(
+      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
         ADMIN,
         session.id,
         30,
@@ -378,7 +376,7 @@ describe('extend time', () => {
   it('refuses a finished session and out-of-range minutes', async () => {
     const f = await setup()
     const done = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
-    const extend = new ExtendSessionTimeUseCase(f.recovery)
+    const extend = new ExtendSessionTimeUseCase(f.recovery, f.schedules)
 
     await expect(
       extend.execute(ADMIN, done.id, 10, 'Server lambat'),
@@ -417,7 +415,7 @@ describe('authorization matrix', () => {
       ),
     ).rejects.toThrow(ForbiddenException)
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery).execute(
+      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
         TECH_A,
         session.id,
         10,

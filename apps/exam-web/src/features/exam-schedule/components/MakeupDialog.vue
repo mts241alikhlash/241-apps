@@ -225,13 +225,24 @@ async function create() {
             </Select>
           </FloatingLabelField>
           <FloatingLabelField
-            label="Tanggal"
-            :for="`${fieldId}-date`"
+            label="Tanggal mulai"
+            :for="`${fieldId}-start-date`"
             floating
           >
             <DatePicker
-              :id="`${fieldId}-date`"
-              v-model="form.date.value"
+              :id="`${fieldId}-start-date`"
+              v-model="form.startDate.value"
+              allow-future-dates
+            />
+          </FloatingLabelField>
+          <FloatingLabelField
+            label="Tanggal selesai"
+            :for="`${fieldId}-end-date`"
+            floating
+          >
+            <DatePicker
+              :id="`${fieldId}-end-date`"
+              v-model="form.endDate.value"
               allow-future-dates
             />
           </FloatingLabelField>

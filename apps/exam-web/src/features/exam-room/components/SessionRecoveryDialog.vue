@@ -16,14 +16,19 @@ import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { examRoomService } from '../services/examRoomService'
 import type { RecoveryAction } from '../types'
 
-const props = defineProps<{
-  open: boolean
-  roomId: string
-  studentId: string | null
-  studentName: string | null
-  sessionId: string | null
-  action: RecoveryAction
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    roomId: string
+    studentId: string | null
+    studentName: string | null
+    sessionId: string | null
+    action: RecoveryAction
+    maxExtendMinutes?: number | null
+    windowOpen?: boolean
+  }>(),
+  { maxExtendMinutes: null, windowOpen: true },
+)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -61,11 +66,17 @@ const descriptions = {
 const title = computed(() => titles[props.action])
 const description = computed(() => descriptions[props.action])
 const destructive = computed(() => props.action === 'reset')
+const extendLimit = computed(() => Math.min(props.maxExtendMinutes ?? 120, 120))
+const windowClosed = computed(
+  () =>
+    (props.action === 'extend-time' && extendLimit.value === 0) ||
+    (props.action === 'reopen' && !props.windowOpen),
+)
 const valid = computed(
   () =>
     reason.value.trim().length >= 5 &&
     (props.action !== 'extend-time' ||
-      (minutes.value >= 1 && minutes.value <= 120)),
+      (minutes.value >= 1 && minutes.value <= extendLimit.value)),
 )
 
 const subject = computed(() => props.studentName ?? 'Siswa')
@@ -77,7 +88,8 @@ const canAct = computed(
     valid.value &&
     (!needsSession.value ||
       (props.sessionId !== null && props.sessionId !== '')) &&
-    (!props.action.startsWith('allow-') || props.studentId !== null),
+    (!props.action.startsWith('allow-') || props.studentId !== null) &&
+    !windowClosed.value,
 )
 
 async function dispatch(
@@ -162,10 +174,17 @@ watch(
             v-model.number="minutes"
             type="number"
             min="1"
-            max="120"
+            :max="extendLimit"
+            :disabled="extendLimit === 0"
             class="tabular-nums"
           />
         </FloatingLabelField>
+        <p
+          v-if="windowClosed"
+          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+        >
+          Jendela ujian sudah habis
+        </p>
         <FloatingLabelField
           label="Alasan"
           :for="'recovery-reason'"

@@ -108,7 +108,8 @@ describe('useMakeupForm', () => {
   it('wants a window that opens after the regular exam ends', async () => {
     const form = await ready()
     form.toggle('a')
-    form.date.value = '2026-11-02'
+    form.startDate.value = '2026-11-02'
+    form.endDate.value = '2026-11-02'
     form.startTime.value = '10:00'
     form.endTime.value = '12:00'
 
@@ -116,7 +117,8 @@ describe('useMakeupForm', () => {
       'Susulan harus dimulai setelah ujian utama berakhir',
     )
 
-    form.date.value = '2026-11-04'
+    form.startDate.value = '2026-11-04'
+    form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'
     form.endTime.value = '11:00'
     expect(form.problem.value).toBeNull()
@@ -127,7 +129,8 @@ describe('useMakeupForm', () => {
     form.toggle('a')
     form.toggle('b')
     form.reason.value = 'PERMITTED'
-    form.date.value = '2026-11-04'
+    form.startDate.value = '2026-11-04'
+    form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'
     form.endTime.value = '11:00'
     createMakeup.mockResolvedValue({ success: true, data: { id: 'm1' } })
@@ -150,7 +153,8 @@ describe('useMakeupForm', () => {
   it('keeps the server message and does not close when the makeup is refused', async () => {
     const form = await ready()
     form.toggle('a')
-    form.date.value = '2026-11-04'
+    form.startDate.value = '2026-11-04'
+    form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'
     form.endTime.value = '11:00'
     createMakeup.mockResolvedValue({
@@ -181,7 +185,8 @@ describe('useMakeupForm', () => {
     form.setReason('a', 'SICK')
     form.setNote('a', '  Demam  ')
     form.setNote('b', '   ')
-    form.date.value = '2026-11-04'
+    form.startDate.value = '2026-11-04'
+    form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'
     form.endTime.value = '11:00'
     createMakeup.mockResolvedValue({ success: true, data: { id: 'm1' } })
@@ -229,7 +234,8 @@ describe('useMakeupForm', () => {
     expect(form.notes.value.a).toBe('Demam tinggi')
 
     form.toggle('a')
-    form.date.value = '2026-11-04'
+    form.startDate.value = '2026-11-04'
+    form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'
     form.endTime.value = '11:00'
     createMakeup.mockResolvedValue({ success: true, data: { id: 'm1' } })

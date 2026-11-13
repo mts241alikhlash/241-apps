@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common'
+import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import type { RoomStaffUser } from '../../../../exam-room/application/room-access.service.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { SessionRecoveryService } from '../../session-recovery.service.js'
@@ -47,7 +48,10 @@ export function shiftBy(session: ExamSession, minutes: number) {
 
 @Injectable()
 export class ExtendSessionTimeUseCase {
-  constructor(private readonly recovery: SessionRecoveryService) {}
+  constructor(
+    private readonly recovery: SessionRecoveryService,
+    private readonly schedules: IExamScheduleRepository,
+  ) {}
 
   async execute(
     user: RoomStaffUser,
@@ -64,6 +68,13 @@ export class ExtendSessionTimeUseCase {
       )
     }
     assertTotalExtraMinutes(session.extraMinutes + added)
+    const schedule = await this.schedules.findById(session.scheduleId)
+    if (schedule === null) {
+      throw new ConflictException('Jadwal ujian tidak ditemukan')
+    }
+    if (shiftBy(session, added).deadline > schedule.endsAt) {
+      throw new ConflictException('Tambahan waktu melewati jendela ujian')
+    }
     return this.recovery.apply(
       user,
       sessionId,

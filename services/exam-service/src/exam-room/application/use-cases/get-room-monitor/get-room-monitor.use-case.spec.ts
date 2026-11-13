@@ -369,6 +369,22 @@ describe('GetRoomMonitorUseCase', () => {
     })
   })
 
+  it('exposes the parent schedule end on a session row', async () => {
+    const { fixture, monitor } = await build()
+    startSession(fixture, fixture.studentIds[0])
+
+    const result = await monitor.execute(
+      ROOM_TECH,
+      fixture.room.id,
+      { page: 1, limit: 5 },
+      MONITOR_NOW,
+    )
+
+    expect(result.data[0].session?.scheduleEndsAt).toBe(
+      scheduleOf(fixture, fixture.studentIds[0]).endsAt.toISOString(),
+    )
+  })
+
   it('reports no camera fields on a running session', async () => {
     const { fixture, monitor } = await build()
     startSession(fixture, fixture.studentIds[0])
