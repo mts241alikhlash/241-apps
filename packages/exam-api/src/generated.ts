@@ -1588,6 +1588,11 @@ export interface components {
         CreateSebConfigDto: {
             /** @description 64 hex characters from the SEB configuration */
             configKey: string;
+            /**
+             * Format: binary
+             * @description The .seb configuration file, 1 MB maximum
+             */
+            file: string;
             name: string;
         };
         EssayContentDto: {

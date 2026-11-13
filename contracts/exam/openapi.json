@@ -10584,11 +10584,17 @@
           "configKey": {
             "type": "string",
             "description": "64 hex characters from the SEB configuration"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The .seb configuration file, 1 MB maximum"
           }
         },
         "required": [
           "name",
-          "configKey"
+          "configKey",
+          "file"
         ]
       },
       "UpdateSebConfigDto": {

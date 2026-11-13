@@ -23,6 +23,13 @@ export class CreateSebConfigDto {
   @ApiProperty({ description: '64 hex characters from the SEB configuration' })
   @IsString()
   configKey!: string
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'The .seb configuration file, 1 MB maximum',
+  })
+  file!: unknown
 }
 
 export class UpdateSebConfigDto {
