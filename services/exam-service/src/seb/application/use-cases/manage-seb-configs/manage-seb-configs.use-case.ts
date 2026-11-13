@@ -76,8 +76,8 @@ export class ManageSebConfigsUseCase {
 
   async remove(id: string): Promise<void> {
     const config = await this.require(id)
-    await this.storage.delete(config.storageKey)
     await this.configs.delete(id)
+    await this.storage.delete(config.storageKey)
   }
 
   async file(id: string): Promise<{ config: SebConfig; stream: Readable }> {

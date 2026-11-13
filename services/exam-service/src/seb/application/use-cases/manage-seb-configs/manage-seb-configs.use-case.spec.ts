@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   BadRequestException,
   ConflictException,
@@ -86,6 +87,17 @@ describe('ManageSebConfigsUseCase', () => {
 
     expect(config.id).toBe(created.id)
     expect(stream).toBeDefined()
+  })
+
+  it('keeps the storage object when deleting the row fails', async () => {
+    const { configs, storage, useCase } = build()
+    const created = await useCase.create('user-1', input())
+    vi.spyOn(configs, 'delete').mockRejectedValueOnce(new Error('db down'))
+
+    await expect(useCase.remove(created.id)).rejects.toThrow('db down')
+
+    expect(storage.objects.has(created.storageKey)).toBe(true)
+    expect(configs.configs.has(created.id)).toBe(true)
   })
 
   it('refuses the file of an unknown id', async () => {
