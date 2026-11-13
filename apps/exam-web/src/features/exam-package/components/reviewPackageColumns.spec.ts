@@ -54,9 +54,7 @@ describe('buildReviewColumns', () => {
     const cell = columns(onOpen).find((column) => column.id === 'actions')!
       .cell as (ctx: { row: { original: ExamPackageSummary } }) => VNode
 
-    ;(
-      cell({ row: { original: pkg } }).props as { onClick: () => void }
-    ).onClick()
+    ;(cell({ row: { original: pkg } }).props as { onView: () => void }).onView()
 
     expect(onOpen).toHaveBeenCalledWith(pkg)
   })

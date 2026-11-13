@@ -61,7 +61,12 @@ describe('PackageReviewListView', () => {
   it('asks for the submitted packages only', async () => {
     const wrapper = mount(PackageReviewListView, {
       global: {
-        stubs: { Card: passthrough, Button: button, SearchInput: searchInput },
+        stubs: {
+          Card: passthrough,
+          Button: button,
+          SearchInput: searchInput,
+          ActionCell: passthrough,
+        },
       },
     })
     await flushPromises()
@@ -75,7 +80,12 @@ describe('PackageReviewListView', () => {
   it('opens the review page of a package from its row', async () => {
     const wrapper = mount(PackageReviewListView, {
       global: {
-        stubs: { Card: passthrough, Button: button, SearchInput: searchInput },
+        stubs: {
+          Card: passthrough,
+          Button: button,
+          SearchInput: searchInput,
+          ActionCell: passthrough,
+        },
       },
     })
     await flushPromises()

@@ -136,6 +136,17 @@ const stubs = {
   SelectValue: passthrough,
   QuestionEditor: editor,
   QuestionPreview: preview,
+  Dialog: passthrough,
+  DialogContent: passthrough,
+  DialogHeader: passthrough,
+  DialogTitle: passthrough,
+  DialogBody: passthrough,
+  DialogFooter: passthrough,
+  Sheet: passthrough,
+  SheetContent: passthrough,
+  SheetHeader: passthrough,
+  SheetTitle: passthrough,
+  SheetDescription: passthrough,
 }
 
 const routeState = () =>
@@ -173,6 +184,18 @@ const question = {
 const buttonByText = (host: Wrapper, text: string) =>
   host.findAll('button').find((candidate) => candidate.text() === text)
 
+const confirmButton = (host: Wrapper, text: string) =>
+  host
+    .findAll('button')
+    .filter((candidate) => candidate.text() === text)
+    .at(-1)
+
+async function saveThroughDialog(host: Wrapper, count: number) {
+  await buttonByText(host, 'Simpan 1 soal')!.trigger('click')
+  await confirmButton(host, `Simpan ${count} soal`)!.trigger('click')
+  await flushPromises()
+}
+
 async function mountView() {
   const wrapper = mount(PackageQuestionFormView, { global: { stubs } })
   await flushPromises()
@@ -194,9 +217,10 @@ describe('PackageQuestionFormView', () => {
   it('refuses an empty question with the reason and does not call the server', async () => {
     const wrapper = await mountView()
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
+    await saveThroughDialog(wrapper, 0)
 
     expect(wrapper.text()).toContain('Isi soal wajib diisi')
+    expect(wrapper.text()).toContain('Isi dulu minimal satu soal.')
     expect(addQuestion).not.toHaveBeenCalled()
     wrapper.unmount()
   })
@@ -206,8 +230,7 @@ describe('PackageQuestionFormView', () => {
     const wrapper = await mountView()
     await wrapper.get('[data-test="fill"]').trigger('click')
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
-    await flushPromises()
+    await saveThroughDialog(wrapper, 1)
 
     expect(addQuestion).toHaveBeenCalledWith(
       'p1',
@@ -232,7 +255,44 @@ describe('PackageQuestionFormView', () => {
     const wrapper = await mountView()
 
     expect(loadTeachers).toHaveBeenCalledWith('math')
-    expect(wrapper.text()).toContain('Penulis')
+    expect(wrapper.find('[aria-label="Penulis soal"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('saves only the valid cards and counts only them', async () => {
+    addQuestion.mockResolvedValue({ success: true, data: view() })
+    const wrapper = await mountView()
+    await wrapper.get('[data-test="fill"]').trigger('click')
+    await wrapper.get('[aria-label="Tambah soal"]').trigger('click')
+
+    await buttonByText(wrapper, 'Simpan 2 soal')!.trigger('click')
+    expect(confirmButton(wrapper, 'Simpan 1 soal')).toBeDefined()
+    await confirmButton(wrapper, 'Simpan 1 soal')!.trigger('click')
+    await flushPromises()
+
+    expect(addQuestion).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
+  it('keeps the same card selected when a card above it is removed', async () => {
+    const wrapper = await mountView()
+    for (const _ of [1, 2, 3]) {
+      await wrapper.get('[aria-label="Tambah soal"]').trigger('click')
+    }
+    const activeTitle = () =>
+      wrapper
+        .findAll('div')
+        .map((node) => node.text())
+        .find((text) => /^Soal \d+$/.test(text))
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().startsWith('3'))!
+      .trigger('click')
+    expect(activeTitle()).toBe('Soal 3')
+
+    await wrapper.get('[aria-label="Hapus soal 1"]').trigger('click')
+
+    expect(activeTitle()).toBe('Soal 2')
     wrapper.unmount()
   })
 
@@ -252,8 +312,7 @@ describe('PackageQuestionFormView', () => {
     const wrapper = await mountView()
     await wrapper.get('[data-test="fill"]').trigger('click')
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
-    await flushPromises()
+    await saveThroughDialog(wrapper, 1)
 
     expect(wrapper.text()).toContain('Paket ini disusun guru lain')
     expect(push).not.toHaveBeenCalled()
