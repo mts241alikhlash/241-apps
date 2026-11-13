@@ -37,6 +37,7 @@ import { EmployeeIdentityModule } from './platform/employee-identity/employee-id
 import { EnrollmentLookupModule } from './platform/enrollment-lookup/enrollment-lookup.module.js'
 import { StudentIdentityModule } from './platform/student-identity/student-identity.module.js'
 import { ParticipantNumberModule } from './platform/participant-number/participant-number.module.js'
+import { SebModule } from './seb/seb.module.js'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
 
@@ -60,6 +61,7 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
     StudentDirectoryModule,
     ExamFileModule,
     QuestionImportModule,
+    SebModule,
     LoggerModule.forRoot(pinoLoggerConfig),
     ScheduleModule.forRoot(),
     AppCacheModule,

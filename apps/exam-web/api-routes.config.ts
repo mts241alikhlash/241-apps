@@ -25,6 +25,8 @@ export const SERVICE_PREFIXES = {
     '/exam-schedules',
     '/exam-sessions',
     '/me/exams',
+    '/seb-configs',
+    '/public/seb-configs',
     '/student-exams',
   ],
 
