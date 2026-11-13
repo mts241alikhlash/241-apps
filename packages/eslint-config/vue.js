@@ -6,6 +6,7 @@ import {
   TEST_FILES,
   TEST_RULES,
   TYPECHECK_RULES,
+  UI_RULES,
   frame,
   TYPESCRIPT,
 } from './shared.js'
@@ -82,6 +83,11 @@ export function vue({ tsconfigRootDir, ignores = [], overrides = [] }) {
           'no-console': ['error', { allow: ['warn', 'error'] }],
           ...TYPECHECK_RULES,
         },
+      },
+      {
+        files: ['**/*.vue'],
+        ignores: TEST_FILES,
+        rules: UI_RULES,
       },
       {
         files: TEST_FILES,

@@ -59,3 +59,6 @@ List paging rules are in [ui](ui.md) (the table) and [api](api.md) (the endpoint
 ## Gates
 
 `pnpm --filter <app> run validate` (format, type-aware lint, typecheck, tests, build, routing manifest) must pass; a package runs its own `check` and `test`.
+
+**Rule.** Type values with what they really are: a Select handler takes `AcceptableValue` (`@mts241alikhlash/ui/select`), an Input handler `string | number`; `unknown` belongs to caught errors, type guards and parsers of untrusted data. No `any`, no inline lint disables (only `vue/no-v-html` for sanitized HTML).
+**Check.** ESLint (`@mts241alikhlash/eslint-config`): `no-restricted-syntax` on `unknown` parameters in `.vue`, `no-restricted-disable`, `ban-ts-comment`.
