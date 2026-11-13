@@ -39,11 +39,11 @@ export const routes: RouteRecordRaw[] = [
       ...examGradingRoutes,
       ...examPresetRoutes,
       ...examSebRoutes,
-      ...studentExamRoutes,
       ...profileRoutes,
     ],
   },
   ...ssoAuthRoutes,
+  ...studentExamRoutes,
   ...studentExamFocusRoutes,
   {
     path: '/:pathMatch(.*)*',

@@ -43,7 +43,7 @@ async function mountAndStart(error: unknown) {
   await wrapper.find('input').setValue('ABC123')
   await wrapper
     .findAll('button')
-    .find((node) => node.text() === 'Mulai ujian')!
+    .find((node) => node.text() === 'Mulai Ujian')!
     .trigger('click')
   await flushPromises()
   return wrapper
@@ -99,7 +99,7 @@ describe('ExamTokenView Safe Exam Browser', () => {
     await wrapper.find('input').setValue('ABC123')
     await wrapper
       .findAll('button')
-      .find((node) => node.text() === 'Mulai ujian')!
+      .find((node) => node.text() === 'Lanjutkan Ujian')!
       .trigger('click')
     await flushPromises()
 
