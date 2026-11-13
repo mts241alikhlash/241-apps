@@ -19,5 +19,6 @@ export default {
     classworkGrading: 'Grading',
     myExams: 'My Exams',
     examPresets: 'Presets',
+    examSeb: 'Safe Exam Browser',
   },
 }

@@ -1,4 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+// @vitest-environment happy-dom
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
+import { mount } from '@vue/test-utils'
 import { useExamSession } from './useExamSession'
 import type { AnswerRow } from '../logic/answerSync'
 
@@ -7,6 +10,7 @@ const service = vi.hoisted(() => ({
   getAnswers: vi.fn(),
   saveAnswersBatch: vi.fn(),
   submit: vi.fn(),
+  heartbeat: vi.fn(),
 }))
 
 vi.mock('../services/studentExamService', () => ({
@@ -183,5 +187,99 @@ describe('useExamSession submit', () => {
 
     expect(session.answers.value.get('q1')).toEqual({ key: 'A' })
     expect(session.answersLocked.value).toBe(true)
+  })
+})
+
+describe('useExamSession heartbeat', () => {
+  const alive = {
+    requiresTokenReentry: false,
+    lockedByViolation: false,
+    absentSince: null,
+    serverTime: '2026-11-01T01:05:00.000Z',
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    service.heartbeat.mockReset()
+    service.heartbeat.mockResolvedValue(alive)
+    service.submit.mockReset()
+    service.submit.mockResolvedValue({ answersStored: true })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('beats at the interval while open', async () => {
+    const { session } = setup()
+    session.startHeartbeat('s1', 30_000)
+
+    await vi.advanceTimersByTimeAsync(29_999)
+    expect(service.heartbeat).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(service.heartbeat).toHaveBeenCalledTimes(1)
+    expect(service.heartbeat).toHaveBeenCalledWith('s1')
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(service.heartbeat).toHaveBeenCalledTimes(2)
+    session.stopHeartbeat()
+  })
+
+  it('falls back to the default interval when none is given', async () => {
+    const { session } = setup()
+    session.startHeartbeat('s1')
+
+    await vi.advanceTimersByTimeAsync(14_999)
+    expect(service.heartbeat).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(service.heartbeat).toHaveBeenCalledTimes(1)
+    session.stopHeartbeat()
+  })
+
+  it('stops after submit', async () => {
+    const { session } = setup()
+    session.startHeartbeat('s1', 30_000)
+    await session.submit('s1')
+    service.heartbeat.mockClear()
+
+    await vi.advanceTimersByTimeAsync(90_000)
+    expect(service.heartbeat).not.toHaveBeenCalled()
+  })
+
+  it('stops on unmount', async () => {
+    let session!: ReturnType<typeof setup>['session']
+    const host = defineComponent({
+      setup() {
+        session = setup().session
+        session.startHeartbeat('s1', 30_000)
+        return () => h('div')
+      },
+    })
+    const wrapper = mount(host)
+    wrapper.unmount()
+    service.heartbeat.mockClear()
+
+    await vi.advanceTimersByTimeAsync(90_000)
+    expect(service.heartbeat).not.toHaveBeenCalled()
+  })
+
+  it('reports token re-entry and stops beating', async () => {
+    const onTokenReentry = vi.fn()
+    const session = useExamSession({
+      storage: () => memoryStorage(),
+      isOnline: () => true,
+      newClientId: () => 'client-1',
+      onTokenReentry,
+    })
+    service.heartbeat.mockResolvedValue({
+      ...alive,
+      requiresTokenReentry: true,
+    })
+
+    session.startHeartbeat('s1', 30_000)
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(onTokenReentry).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(90_000)
+    expect(service.heartbeat).toHaveBeenCalledTimes(1)
   })
 })

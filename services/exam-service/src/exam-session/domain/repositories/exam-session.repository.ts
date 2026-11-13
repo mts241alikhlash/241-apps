@@ -7,6 +7,7 @@ import type {
 } from '../policies/validate-answer-shape.policy.js'
 import type {
   ExamAnswerRecord,
+  ExamClient,
   ExamSession,
   ExamSessionStatus,
 } from '../entities/exam-session.entity.js'
@@ -91,7 +92,7 @@ export interface SessionRecoveryPatch {
   releasedAt?: Date | null
   releasedById?: string | null
   lockedByViolation?: boolean
-  allowWebClient?: boolean
+  client?: ExamClient
   allowLateEntry?: boolean
   extraMinutes?: number
   kioskMode?: string
@@ -123,7 +124,7 @@ export interface NewExamSession {
   finalizeAt: Date
   roomId?: string | null
   seatNumber?: number | null
-  allowWebClient?: boolean
+  client?: ExamClient
   allowLateEntry?: boolean
   policy?: ExamPolicy | null
 }

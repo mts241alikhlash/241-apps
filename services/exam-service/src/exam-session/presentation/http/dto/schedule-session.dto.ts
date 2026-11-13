@@ -10,6 +10,7 @@ export class ScheduleSessionDto {
   @ApiProperty({ type: String, nullable: true }) studentNis!: string | null
   @ApiProperty({ enum: ['IN_PROGRESS', 'SUBMITTED', 'EXPIRED', 'GRADED'] })
   status!: ExamSession['status']
+  @ApiProperty({ enum: ['ISTIQRA', 'SEB'] }) client!: ExamSession['client']
   @ApiProperty({ format: 'date-time' }) startedAt!: string
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   submittedAt!: string | null
@@ -34,6 +35,7 @@ export class ScheduleSessionDto {
     dto.studentName = domain.studentName ?? null
     dto.studentNis = domain.studentNis ?? null
     dto.status = domain.status
+    dto.client = domain.client
     dto.startedAt = domain.startedAt.toISOString()
     dto.submittedAt = domain.submittedAt?.toISOString() ?? null
     dto.rawScore = domain.rawScore

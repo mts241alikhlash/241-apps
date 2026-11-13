@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -81,6 +82,12 @@ export class StorageService {
 
     this.logger.log(`Uploaded file successfully: ${filePath}`)
     return filePath
+  }
+
+  async deleteObject(filePath: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({ Bucket: this.bucket, Key: filePath }),
+    )
   }
 
   async getSignedUrl(filePath: string): Promise<string> {

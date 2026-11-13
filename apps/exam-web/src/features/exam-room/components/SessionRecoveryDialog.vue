@@ -45,7 +45,6 @@ const titles = {
   reopen: 'Buka Kembali Sesi',
   reset: 'Reset Ulang Sesi',
   'extend-time': 'Tambah Waktu Ujian',
-  'allow-web': 'Izinkan Mode Web',
   'allow-late': 'Izinkan Masuk Terlambat',
 } as const
 
@@ -57,8 +56,6 @@ const descriptions = {
   reset:
     'Semua jawaban siswa dihapus dan sesi dimulai dari awal. Tindakan ini permanen.',
   'extend-time': 'Tambahan waktu hanya berlaku untuk sesi siswa ini.',
-  'allow-web':
-    'Siswa boleh melanjutkan ujian lewat peramban di iPhone atau laptop.',
   'allow-late':
     'Siswa boleh memulai ujian melewati batas toleransi keterlambatan.',
 } as const
@@ -80,9 +77,7 @@ const valid = computed(
 )
 
 const subject = computed(() => props.studentName ?? 'Siswa')
-const needsSession = computed(
-  () => props.action !== 'allow-web' && props.action !== 'allow-late',
-)
+const needsSession = computed(() => props.action !== 'allow-late')
 const canAct = computed(
   () =>
     valid.value &&
@@ -108,9 +103,6 @@ async function dispatch(
   }
   if (props.action === 'extend-time') {
     return examRoomService.extendTime(sessionId, minutes.value, text)
-  }
-  if (props.action === 'allow-web') {
-    return examRoomService.allowWeb(props.roomId, studentId, text)
   }
   return examRoomService.allowLate(props.roomId, studentId, text)
 }

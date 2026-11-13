@@ -28,7 +28,10 @@ export interface UseExamSessionOptions {
   newClientId?: () => string
   storage?: () => Storage
   monotonic?: () => number
+  onTokenReentry?: () => void
 }
+
+const DEFAULT_HEARTBEAT_INTERVAL_MS = 15_000
 
 export function useExamSession(options: UseExamSessionOptions = {}) {
   const questions = ref<PaperQuestion[]>([])
@@ -54,6 +57,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   let minSubmitMinutes = 0
   let ticker: ReturnType<typeof setInterval> | null = null
   let syncTicker: ReturnType<typeof setInterval> | null = null
+  let heartbeatTicker: ReturnType<typeof setInterval> | null = null
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   let syncing = false
 
@@ -175,6 +179,32 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     scheduleSync()
   }
 
+  function startHeartbeat(
+    targetSessionId: string,
+    intervalMs = DEFAULT_HEARTBEAT_INTERVAL_MS,
+  ) {
+    stopHeartbeat()
+    heartbeatTicker = setInterval(() => void beat(targetSessionId), intervalMs)
+  }
+
+  function stopHeartbeat() {
+    clearInterval(heartbeatTicker ?? undefined)
+    heartbeatTicker = null
+  }
+
+  async function beat(targetSessionId: string) {
+    if (submitted.value) return
+    try {
+      const result = await studentExamService.heartbeat(targetSessionId)
+      if (result.requiresTokenReentry) {
+        stopHeartbeat()
+        options.onTokenReentry?.()
+      }
+    } catch {
+      return
+    }
+  }
+
   async function syncNow() {
     if (syncing || submitted.value || !sessionId) return
     if (pendingRows(rows.value).length === 0) return
@@ -240,6 +270,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
       submitted.value = true
       stopClock()
       stopAutoSync()
+      stopHeartbeat()
       return result
     } finally {
       submitting.value = false
@@ -249,6 +280,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   onUnmounted(() => {
     stopClock()
     stopAutoSync()
+    stopHeartbeat()
   })
 
   return {
@@ -274,6 +306,8 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     answer,
     submit,
     syncNow,
+    startHeartbeat,
+    stopHeartbeat,
     onConnectivityChanged,
     isAnswered,
   }

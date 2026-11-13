@@ -58,7 +58,6 @@ describe('FakeExamSessionRepository recovery columns', () => {
       lockedByViolation: false,
       requiresTokenReentry: true,
       extraMinutes: 10,
-      allowWebClient: true,
       allowLateEntry: true,
       kioskMode: 'FLOATING',
       deadline: new Date('2026-11-02T03:40:00.000Z'),
@@ -66,7 +65,6 @@ describe('FakeExamSessionRepository recovery columns', () => {
     expect(reopened?.lockedByViolation).toBe(false)
     expect(reopened?.requiresTokenReentry).toBe(true)
     expect(reopened?.extraMinutes).toBe(10)
-    expect(reopened?.allowWebClient).toBe(true)
     expect(reopened?.allowLateEntry).toBe(true)
     expect(reopened?.kioskMode).toBe('FLOATING')
     expect(reopened?.deadline).toEqual(new Date('2026-11-02T03:40:00.000Z'))
@@ -99,7 +97,7 @@ describe('FakeExamSessionRepository recovery columns', () => {
     expect(created?.seatNumber).toBeNull()
     expect(created?.requiresTokenReentry).toBe(false)
     expect(created?.lockedByViolation).toBe(false)
-    expect(created?.allowWebClient).toBe(false)
+    expect(created?.client).toBe('ISTIQRA')
     expect(created?.allowLateEntry).toBe(false)
     expect(created?.extraMinutes).toBe(0)
     expect(created?.kioskMode).toBe('PINNED')

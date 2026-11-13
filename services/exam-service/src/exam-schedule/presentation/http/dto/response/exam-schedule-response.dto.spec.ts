@@ -102,7 +102,6 @@ describe('exam schedule response DTOs', () => {
         endsAt: new Date('2026-11-02T04:00:00.000Z'),
         lateToleranceMinutes: 30,
         minSubmitMinutes: 20,
-        requireAndroidApp: true,
         status: 'ACTIVE',
       }).category,
     ).toBe('EXAM')

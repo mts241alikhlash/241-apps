@@ -1,38 +1,34 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@mts241alikhlash/ui/card'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
-import { RefreshCw } from '@lucide/vue'
-import { categoryOf, examCategoryLabel } from '@/features/exam-shared/examType'
+import { categoryOf, type ExamCategory } from '@/features/exam-shared/examType'
 import { studentExamService } from '../services/studentExamService'
-import {
-  GROUP_LABEL,
-  displayTitle,
-  groupExams,
-  type ExamGroup,
-} from '../logic/exam'
+import { displayTitle } from '../logic/exam'
 import type { MyExam } from '../types'
+
+const SECTION_LABEL: Record<ExamCategory, string> = {
+  EXAM: 'Ujian',
+  NON_EXAM: 'Tugas & Ulangan',
+}
 
 const router = useRouter()
 const exams = ref<MyExam[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-const groups = computed(() => {
-  const grouped = groupExams(exams.value)
-  return (Object.keys(grouped) as ExamGroup[])
-    .map((key) => ({ key, label: GROUP_LABEL[key], items: grouped[key] }))
-    .filter((group) => group.items.length > 0)
-})
+const sections = computed(() =>
+  (Object.keys(SECTION_LABEL) as ExamCategory[])
+    .map((category) => ({
+      category,
+      label: SECTION_LABEL[category],
+      items: exams.value.filter(
+        (exam) => (exam.category ?? categoryOf(exam.type)) === category,
+      ),
+    }))
+    .filter((section) => section.items.length > 0),
+)
 
 function windowLabel(exam: MyExam): string {
   const format = new Intl.DateTimeFormat('id-ID', {
@@ -48,14 +44,18 @@ function windowLabel(exam: MyExam): string {
 function statusLabel(exam: MyExam): string {
   switch (exam.status) {
     case 'OPEN':
-      return 'Dibuka · Mulai'
+      return 'Sedang dibuka'
     case 'IN_PROGRESS':
-      return 'Sedang berlangsung · Lanjutkan'
+      return 'Sedang berlangsung'
     case 'UPCOMING':
       return 'Belum dibuka'
     default:
       return 'Selesai'
   }
+}
+
+function actionLabel(exam: MyExam): string {
+  return exam.status === 'IN_PROGRESS' ? 'Lanjutkan Ujian' : 'Mulai Ujian'
 }
 
 function canStart(exam: MyExam): boolean {
@@ -87,118 +87,95 @@ onMounted(load)
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 flex-col">
-    <Card
-      gap="none"
-      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+  <div class="flex min-h-0 flex-1 flex-col bg-background">
+    <header
+      class="flex h-[54px] shrink-0 items-center border-b border-border bg-card px-4"
     >
-      <CardHeader variant="muted">
-        <CardTitle class="font-semibold">Daftar Ujian</CardTitle>
-        <Button
-          variant="outline"
-          size="sm"
-          :disabled="loading"
-          @click="load"
-        >
-          <RefreshCw class="mr-1 size-4" />
-          Muat ulang
-        </Button>
-      </CardHeader>
+      <img
+        src="/logo-name.webp"
+        alt="241 Exam"
+        class="h-7 w-auto"
+        decoding="async"
+      />
+    </header>
 
-      <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+    <main
+      class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 overflow-y-auto p-4 md:p-6"
+    >
+      <h1 class="text-lg font-semibold">Daftar Ujian</h1>
+
+      <div
+        v-if="loading"
+        class="space-y-3"
       >
-        <p class="text-[length:var(--text-control)] text-muted-foreground">
-          Ujian yang tersedia untuk kelas Anda.
-        </p>
+        <Skeleton class="h-24 w-full" />
+        <Skeleton class="h-24 w-full" />
+      </div>
 
-        <div
-          v-if="loading"
+      <div
+        v-else-if="error"
+        class="space-y-3"
+      >
+        <p class="text-[length:var(--text-control)] text-destructive">
+          {{ error }}
+        </p>
+        <Button
+          class="min-h-11"
+          @click="load"
+          >Coba Lagi</Button
+        >
+      </div>
+
+      <p
+        v-else-if="exams.length === 0"
+        class="py-10 text-center text-[length:var(--text-control)] text-muted-foreground"
+      >
+        Belum ada ujian. Ujian muncul di sini setelah guru menjadwalkannya.
+      </p>
+
+      <template v-else>
+        <section
+          v-for="section in sections"
+          :key="section.category"
           class="space-y-2"
         >
-          <Skeleton class="h-20 w-full" />
-          <Skeleton class="h-20 w-full" />
-        </div>
-
-        <div
-          v-else-if="error"
-          class="space-y-3"
-        >
-          <p class="text-[length:var(--text-control)] text-destructive">
-            {{ error }}
-          </p>
-          <Button
-            size="sm"
-            @click="load"
-            >Coba lagi</Button
+          <h2
+            class="text-[length:var(--text-control)] font-semibold text-muted-foreground"
           >
-        </div>
-
-        <p
-          v-else-if="exams.length === 0"
-          class="py-10 text-center text-[length:var(--text-control)] text-muted-foreground"
-        >
-          Belum ada ujian. Ujian muncul di sini setelah guru menjadwalkannya.
-        </p>
-
-        <div
-          v-else
-          class="space-y-4"
-        >
-          <section
-            v-for="group in groups"
-            :key="group.key"
-            class="space-y-2"
-          >
-            <h2
-              class="text-[length:var(--text-control,0.75rem)] font-semibold text-muted-foreground"
+            {{ section.label }}
+          </h2>
+          <ul class="space-y-3">
+            <li
+              v-for="exam in section.items"
+              :key="exam.id"
             >
-              {{ group.label }}
-            </h2>
-
-            <ul class="divide-y rounded-md border">
-              <li
-                v-for="exam in group.items"
-                :key="exam.id"
-                class="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
+              <article
+                class="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div class="min-w-0">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <p class="truncate font-medium">{{ displayTitle(exam) }}</p>
-                    <Badge variant="outline">
-                      {{
-                        examCategoryLabel(
-                          exam.category ?? categoryOf(exam.type),
-                        )
-                      }}
-                    </Badge>
-                  </div>
+                <div class="min-w-0 space-y-1">
+                  <h3 class="font-semibold">{{ displayTitle(exam) }}</h3>
                   <p
                     class="text-[length:var(--text-control)] text-muted-foreground"
                   >
-                    {{ windowLabel(exam) }}
+                    {{ windowLabel(exam) }} · {{ exam.durationMinutes }} menit
                   </p>
-                  <p
-                    class="text-[length:var(--text-control)] text-muted-foreground"
-                  >
-                    {{ exam.durationMinutes }} menit ·
+                  <p class="text-[length:var(--text-control)] font-medium">
+                    <span class="text-muted-foreground">Status</span>
                     {{ statusLabel(exam) }}
                   </p>
                 </div>
                 <Button
-                  v-if="canStart(exam)"
-                  size="sm"
-                  class="shrink-0 self-start sm:self-auto"
+                  class="min-h-11 shrink-0"
+                  :disabled="!canStart(exam)"
                   @click="open(exam)"
                 >
-                  {{ exam.status === 'IN_PROGRESS' ? 'Lanjutkan' : 'Mulai' }}
+                  {{ canStart(exam) ? actionLabel(exam) : 'Belum Dibuka' }}
                 </Button>
-              </li>
-            </ul>
-          </section>
-        </div>
-      </CardContent>
-      <CardFooter variant="thin" />
-    </Card>
+              </article>
+            </li>
+          </ul>
+        </section>
+      </template>
+    </main>
   </div>
 </template>

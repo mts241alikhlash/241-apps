@@ -1,6 +1,14 @@
 import { ExamPolicyDto } from '../../../../exam-activity/presentation/http/dto/exam-activity.dto.js'
-import { ApiProperty } from '@nestjs/swagger'
-import { IsString, MaxLength, MinLength } from 'class-validator'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Type } from 'class-transformer'
+import {
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator'
+import { SebProofDto } from '../../../../seb/presentation/http/dto/seb-config.dto.js'
 import type { StartedSession } from '../../../application/use-cases/start-exam-session/start-exam-session.use-case.js'
 
 export class StartSessionDto {
@@ -15,6 +23,12 @@ export class StartSessionDto {
   @MinLength(1)
   @MaxLength(100)
   deviceId!: string
+
+  @ApiPropertyOptional({ type: SebProofDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SebProofDto)
+  seb?: SebProofDto
 }
 
 export class StartedSessionDto {

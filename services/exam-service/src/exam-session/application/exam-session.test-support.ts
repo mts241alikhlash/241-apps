@@ -240,7 +240,7 @@ export function sessionFor(
     seatNumber: null,
     requiresTokenReentry: false,
     lockedByViolation: false,
-    allowWebClient: false,
+    client: 'ISTIQRA',
     allowLateEntry: false,
     extraMinutes: 0,
     kioskMode: 'PINNED',

@@ -3,7 +3,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Globe, TimerReset } from '@lucide/vue'
+import { TimerReset } from '@lucide/vue'
 import type { SeatedStudent } from '../services/examEventService'
 import type { SupervisorSlot } from '../types'
 import { seatLabel } from '../types'
@@ -15,11 +15,9 @@ const windowFormat = new Intl.DateTimeFormat('id-ID', {
   minute: '2-digit',
 })
 
-export type SeatFlagKind = 'web' | 'late'
-
 export interface SeatColumnOptions {
   canFlag: (seat: SeatedStudent) => boolean
-  onFlag: (seat: SeatedStudent, kind: SeatFlagKind) => void
+  onFlag: (seat: SeatedStudent) => void
 }
 
 export function buildSeatColumns(
@@ -74,14 +72,9 @@ export function buildSeatColumns(
               hideDelete: true,
               items: [
                 {
-                  label: 'Izinkan mode web',
-                  icon: Globe,
-                  onClick: () => options.onFlag(row.original, 'web'),
-                },
-                {
                   label: 'Izinkan masuk terlambat',
                   icon: TimerReset,
-                  onClick: () => options.onFlag(row.original, 'late'),
+                  onClick: () => options.onFlag(row.original),
                 },
               ],
             })

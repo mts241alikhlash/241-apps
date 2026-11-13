@@ -196,10 +196,6 @@ const columns = computed(() =>
       recoveryTarget.value = row
       recoveryAction.value = 'extend-time'
     },
-    onAllowWeb: (row) => {
-      recoveryTarget.value = row
-      recoveryAction.value = 'allow-web'
-    },
     onAllowLate: (row) => {
       recoveryTarget.value = row
       recoveryAction.value = 'allow-late'

@@ -31,9 +31,6 @@ export function useEventForm(options: EventFormOptions) {
   const minSubmitMinutes = ref<number | null>(
     options.mode === 'edit' ? options.event.minSubmitMinutes : 20,
   )
-  const requireAndroidApp = ref(
-    options.mode === 'edit' ? options.event.requireAndroidApp : true,
-  )
   const status = ref<ExamEventStatus>(
     options.mode === 'edit' ? options.event.status : 'DRAFT',
   )
@@ -72,7 +69,6 @@ export function useEventForm(options: EventFormOptions) {
       endsAt: toInstant(endDate.value, endTime.value),
       lateToleranceMinutes: lateToleranceMinutes.value ?? 0,
       minSubmitMinutes: minSubmitMinutes.value ?? 0,
-      requireAndroidApp: requireAndroidApp.value,
     }
   }
 
@@ -115,7 +111,6 @@ export function useEventForm(options: EventFormOptions) {
     endTime,
     lateToleranceMinutes,
     minSubmitMinutes,
-    requireAndroidApp,
     status,
     saving,
     error,

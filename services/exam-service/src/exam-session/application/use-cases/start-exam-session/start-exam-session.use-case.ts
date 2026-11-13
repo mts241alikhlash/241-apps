@@ -22,10 +22,14 @@ import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/e
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
-import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
+import type {
+  ExamClient,
+  ExamSession,
+} from '../../../domain/entities/exam-session.entity.js'
 import { isLocked } from '../../../domain/policies/access-attempt.policy.js'
 import {
-  assertClientAllowed,
+  assertClientVerified,
+  assertNotLate,
   type ClientPlatform,
 } from '../../../domain/policies/client-gate.policy.js'
 import { computeTimes } from '../../../domain/policies/session-times.policy.js'
@@ -36,6 +40,10 @@ import {
   LifecycleGate,
   type WindowClosedPlace,
 } from '../../lifecycle-gate.service.js'
+import {
+  SebVerifier,
+  type SebProof,
+} from '../../../../seb/application/seb-verifier.service.js'
 
 export interface StartedSession {
   sessionId: string
@@ -57,6 +65,7 @@ export class StartExamSessionUseCase {
     private readonly rooms: IExamRoomRepository,
     private readonly participants: IParticipantNumberPort,
     private readonly lifecycle: LifecycleGate,
+    private readonly seb: SebVerifier,
   ) {}
 
   async execute(
@@ -66,6 +75,7 @@ export class StartExamSessionUseCase {
       accessCode: string
       deviceId: string
       platform?: ClientPlatform
+      seb?: SebProof
     },
     now: Date = new Date(),
   ): Promise<StartedSession> {
@@ -102,6 +112,12 @@ export class StartExamSessionUseCase {
       this.whereabouts(eventId, studentId, enrollment.semesterId),
     )
 
+    const platform = input.platform ?? 'native'
+    const sebVerified =
+      platform === 'web' && (await this.seb.verify(input.seb)).verified
+    assertClientVerified({ platform, sebVerified })
+    const client: ExamClient = platform === 'web' ? 'SEB' : 'ISTIQRA'
+
     const state = await this.attempts.get(schedule.id, studentId)
     if (isLocked(state, now)) {
       throw new HttpException(
@@ -128,16 +144,13 @@ export class StartExamSessionUseCase {
       schedule.id,
       studentId,
     )
-    await this.assertClientGate(
-      eventId,
-      existing ?? seat,
-      input.platform,
-      now,
-      existing?.startedAt,
-    )
+    await this.assertLate(eventId, existing ?? seat, now, existing?.startedAt)
     if (existing !== null) {
       return this.resume(
-        await this.finalizer.finalizeIfDue(existing, now),
+        await this.withClient(
+          await this.finalizer.finalizeIfDue(existing, now),
+          client,
+        ),
         input.deviceId,
         now,
       )
@@ -160,7 +173,7 @@ export class StartExamSessionUseCase {
       finalizeAt,
       roomId: seat?.roomId ?? null,
       seatNumber: seat?.seatNumber ?? null,
-      allowWebClient: seat?.allowWebClient ?? false,
+      client,
       allowLateEntry: seat?.allowLateEntry ?? false,
       policy: tryParsePolicy(schedule.activityPolicy),
     })
@@ -174,7 +187,10 @@ export class StartExamSessionUseCase {
       throw new ConflictException('Sesi ujian tidak dapat dibuat. Coba lagi')
     }
     return this.resume(
-      await this.finalizer.finalizeIfDue(raced, now),
+      await this.withClient(
+        await this.finalizer.finalizeIfDue(raced, now),
+        client,
+      ),
       input.deviceId,
       now,
     )
@@ -198,29 +214,32 @@ export class StartExamSessionUseCase {
     }
   }
 
-  private async assertClientGate(
+  private async assertLate(
     eventId: string | null,
-    seat: {
-      allowWebClient: boolean
-      allowLateEntry: boolean
-    } | null,
-    platform: ClientPlatform | undefined,
+    seat: { allowLateEntry: boolean } | null,
     now: Date,
     startedAt?: Date,
   ): Promise<void> {
     if (eventId === null) return
     const event = await this.rooms.findEventById(eventId)
     if (event === null) return
-    assertClientAllowed({
-      platform: platform ?? 'native',
-      requireAndroidApp: event.requireAndroidApp,
-      allowWebClient: seat?.allowWebClient ?? false,
+    assertNotLate({
       now,
       eventStartsAt: event.startsAt,
       lateToleranceMinutes: event.lateToleranceMinutes,
       allowLateEntry: seat?.allowLateEntry ?? false,
       startedAt,
     })
+  }
+
+  private async withClient(
+    session: ExamSession,
+    client: ExamClient,
+  ): Promise<ExamSession> {
+    if (session.client === client) return session
+    return (
+      (await this.sessions.applyRecovery(session.id, { client })) ?? session
+    )
   }
 
   private async assertMakeupAccess(

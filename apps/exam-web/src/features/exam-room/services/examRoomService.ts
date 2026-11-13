@@ -159,21 +159,6 @@ export const examRoomService = {
     }
   },
 
-  async allowWeb(
-    roomId: string,
-    studentId: string,
-    reason: string,
-  ): Promise<boolean> {
-    try {
-      await examRoomApi.allowWeb(roomId, studentId, reason)
-      toast.success('Mode web diizinkan untuk siswa ini.')
-      return true
-    } catch (err: unknown) {
-      toast.error(messageOf(err, 'Gagal mengizinkan mode web.'))
-      return false
-    }
-  },
-
   async allowLate(
     roomId: string,
     studentId: string,

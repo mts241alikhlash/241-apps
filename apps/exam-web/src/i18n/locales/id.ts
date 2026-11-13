@@ -19,5 +19,6 @@ export default {
     classworkGrading: 'Penilaian',
     myExams: 'Ujian Saya',
     examPresets: 'Preset',
+    examSeb: 'Safe Exam Browser',
   },
 }

@@ -5,10 +5,7 @@ export const WEB_CLIENT_VALUE = 'web'
 
 export type ClientPlatform = 'web' | 'native'
 
-export interface ClientGateInput {
-  platform: ClientPlatform
-  requireAndroidApp: boolean
-  allowWebClient: boolean
+export interface LateGateInput {
   now: Date
   eventStartsAt: Date
   lateToleranceMinutes: number
@@ -16,24 +13,27 @@ export interface ClientGateInput {
   startedAt?: Date
 }
 
+export interface ClientGateInput extends LateGateInput {
+  platform: ClientPlatform
+  sebVerified: boolean
+}
+
 function refuse(code: string, message: string): never {
   throw new ForbiddenException({ code, message })
 }
 
-export function assertWebClientAllowed(input: ClientGateInput): void {
-  if (
-    input.platform === 'web' &&
-    input.requireAndroidApp &&
-    !input.allowWebClient
-  ) {
+export function assertClientVerified(
+  input: Pick<ClientGateInput, 'platform' | 'sebVerified'>,
+): void {
+  if (input.platform === 'web' && !input.sebVerified) {
     refuse(
-      'WEB_CLIENT_FORBIDDEN',
-      'Jadwal ini wajib dikerjakan dari aplikasi Android. Hubungi Teknisi Ruangan',
+      'SEB_REQUIRED',
+      'Buka ujian lewat Safe Exam Browser dengan konfigurasi sekolah.',
     )
   }
 }
 
-export function assertNotLate(input: ClientGateInput): void {
+export function assertNotLate(input: LateGateInput): void {
   const lateFrom =
     input.eventStartsAt.getTime() + input.lateToleranceMinutes * 60_000
   const reference = input.startedAt ?? input.now
@@ -43,9 +43,4 @@ export function assertNotLate(input: ClientGateInput): void {
       'Anda melewati batas toleransi keterlambatan, hubungi Pengawas/Teknisi Ruangan',
     )
   }
-}
-
-export function assertClientAllowed(input: ClientGateInput): void {
-  assertWebClientAllowed(input)
-  assertNotLate(input)
 }

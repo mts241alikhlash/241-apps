@@ -110,3 +110,6 @@ Indonesian domain terms, the name used in code, and what they mean. One heading 
 - **Sesi Ujian** — `ExamSession` — one participant's sitting, with answers (`ExamAnswer`).
 - **Nilai Ujian** — an exam score from grading a session; it may or may not be taken into a **Nilai Rapor**.
 - **Penilaian Ujian** — grading — scoring answers; results are released as a `ScorePublication`.
+- **Safe Exam Browser (SEB)** — the locked browser that runs web exams with a school configuration; a web client is verified only inside it.
+- **Config Key** — `configKey` — the 64-character hex key of a SEB configuration (`SebConfig`), read by the page through the SEB JavaScript API and hashed by the server.
+- **Klien ujian** — `ExamClient` (`ISTIQRA` or `SEB`) — the client a session started with, recorded on `ExamSession.client`.

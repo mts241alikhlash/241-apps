@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import {
   BadRequestException,
   ConflictException,
@@ -6,6 +7,8 @@ import {
 import { FakeExamPackageRepository } from '../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../exam-schedule/application/exam-schedule.repository.fake.js'
 import { FakeExamRoomRepository } from '../../exam-room/application/exam-room.repository.fake.js'
+import { FakeSebConfigRepository } from '../../seb/application/seb-config.repository.fake.js'
+import { SebVerifier } from '../../seb/application/seb-verifier.service.js'
 import {
   MANAGE_ALL,
   RoomAccessService,
@@ -33,7 +36,6 @@ import { FakeSessionFinalizer } from './session-finalizer.fake.js'
 import { ReopenSessionUseCase } from './use-cases/reopen-session/reopen-session.use-case.js'
 import { ResetSessionUseCase } from './use-cases/reset-session/reset-session.use-case.js'
 import { ExtendSessionTimeUseCase } from './use-cases/extend-session-time/extend-session-time.use-case.js'
-import { AllowWebClientUseCase } from './use-cases/allow-web-client/allow-web-client.use-case.js'
 import { AllowLateEntryUseCase } from './use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ResumeExamSessionUseCase } from './use-cases/resume-exam-session/resume-exam-session.use-case.js'
 import { RecordSessionEventsUseCase } from './use-cases/record-session-events/record-session-events.use-case.js'
@@ -65,6 +67,28 @@ const SECRET = 'unit-test-secret-of-at-least-32-characters'
 const TECH_A: RoomStaffUser = { id: 'tech-a', permissions: [TECHNICIAN] }
 const SUP_A: RoomStaffUser = { id: 'sup-a', permissions: [SUPERVISE] }
 const ADMIN: RoomStaffUser = { id: 'admin-1', permissions: [MANAGE_ALL] }
+const SEB_PAGE = 'https://exam.example/my-exams/s1/token'
+const SEB_KEY = 'a'.repeat(64)
+const seb = {
+  configKeyHash: createHash('sha256')
+    .update(SEB_PAGE + SEB_KEY)
+    .digest('hex'),
+  pageUrl: SEB_PAGE,
+}
+function sebVerifier() {
+  const configs = new FakeSebConfigRepository()
+  configs.configs.set('11111111-1111-4111-8111-111111111111', {
+    id: '11111111-1111-4111-8111-111111111111',
+    name: 'Ujian Sekolah',
+    configKey: SEB_KEY,
+    storageKey: 'seb-configs/seb.seb',
+    active: true,
+    createdById: ADMIN.id,
+    createdAt: NOW,
+    updatedAt: NOW,
+  })
+  return new SebVerifier(configs, ['https://exam.example'])
+}
 
 interface Fixtures {
   packages: FakeExamPackageRepository
@@ -524,7 +548,7 @@ describe('audit transaction guarantee', () => {
   })
 })
 
-describe('allow web and allow late', () => {
+describe('allow late', () => {
   async function seatStudent(f: Fixtures): Promise<ExamSession> {
     await f.rooms.assignSeat({
       roomId: f.roomA.id,
@@ -539,31 +563,6 @@ describe('allow web and allow late', () => {
       studentId: STUDENT_USER.id,
     })
   }
-
-  it('flags one student for the web client and audits the room', async () => {
-    const f = await setup()
-    const session = await seatStudent(f)
-    const flags = new SeatFlagService(
-      f.sessions,
-      f.rooms,
-      new FakeSessionRecoveryRepository(f.sessions, f.rooms, f.packages),
-      f.access,
-    )
-
-    const allowed = await new AllowWebClientUseCase(flags).execute(TECH_A, {
-      roomId: f.roomA.id,
-      studentId: STUDENT_USER.id,
-      reason: 'HP siswa rusak, pakai laptop ruangan',
-    })
-
-    expect(allowed.allowWebClient).toBe(true)
-    expect(allowed.allowLateEntry).toBe(false)
-    expect(f.sessions.sessions.get(session.id)?.allowWebClient).toBe(true)
-    expect((await f.rooms.listAuditLogsByRoom(f.roomA.id))[0]).toMatchObject({
-      action: 'ALLOW_WEB_CLIENT',
-      roomId: f.roomA.id,
-    })
-  })
 
   it('flags a late entry and refuses another room technician', async () => {
     const f = await setup()
@@ -649,50 +648,9 @@ describe('allow flags before the session starts', () => {
       f.rooms,
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
+      sebVerifier(),
     )
   }
-
-  it('grants the web flag to a student who has not started, then lets them start', async () => {
-    const f = await setup()
-    const row = await eventSchedule(f, new Date('2026-11-02T01:45:00.000Z'))
-    await seatOnly(f)
-
-    const allowed = await new AllowWebClientUseCase(flagsOf(f)).execute(
-      TECH_A,
-      {
-        roomId: f.roomA.id,
-        studentId: STUDENT_ID,
-        reason: 'HP siswa rusak, pakai laptop ruangan',
-      },
-    )
-
-    expect(allowed).toMatchObject({ allowWebClient: true })
-    expect(f.sessions.sessions.size).toBe(0)
-    expect((await f.rooms.listAuditLogsByRoom(f.roomA.id))[0]).toMatchObject({
-      action: 'ALLOW_WEB_CLIENT',
-      sessionId: null,
-      roomId: f.roomA.id,
-    })
-
-    const started = await startUseCase(f).execute(
-      STUDENT_USER,
-      row.id,
-      {
-        accessCode: new AccessCodeService(SECRET).codeFor(
-          row.id,
-          row.tokenRotation,
-          NOW,
-        ).code,
-        deviceId: 'device-1',
-        platform: 'web',
-      },
-      NOW,
-    )
-
-    expect(f.sessions.sessions.get(started.sessionId)?.allowWebClient).toBe(
-      true,
-    )
-  })
 
   it('grants the late flag to a student who has not started, then lets them start', async () => {
     const f = await setup()
@@ -1078,6 +1036,7 @@ describe('resume', () => {
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       new LifecycleGate(f.schedules, f.activities),
+      sebVerifier(),
     )
   }
 
@@ -1342,6 +1301,7 @@ describe('seated sessions in production', () => {
       f.rooms,
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
+      sebVerifier(),
     ).execute(
       STUDENT_USER,
       scheduled.id,
@@ -1386,6 +1346,7 @@ describe('seated sessions in production', () => {
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       new LifecycleGate(f.schedules, f.activities),
+      sebVerifier(),
     ).execute(
       { id: STUDENT_USER.id },
       stored.id,
@@ -1418,6 +1379,7 @@ describe('client gates', () => {
       f.rooms,
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
+      sebVerifier(),
     )
   }
 
@@ -1450,6 +1412,7 @@ describe('client gates', () => {
     scheduleId: string,
     rotation: number,
     platform?: 'web' | 'native',
+    proof?: typeof seb,
   ) =>
     startUseCase(f).execute(
       STUDENT_USER,
@@ -1462,39 +1425,32 @@ describe('client gates', () => {
         ).code,
         deviceId: 'device-1',
         platform,
+        seb: proof,
       },
       NOW,
     )
 
-  it('refuses a browser when the event demands the Android app', async () => {
+  it('refuses a browser without a verified Safe Exam Browser', async () => {
     const f = await setup()
     const row = await eventSchedule(f, new Date('2026-11-02T01:45:00.000Z'))
 
     await expect(
       start(f, row.id, row.tokenRotation, 'web'),
-    ).rejects.toMatchObject({ response: { code: 'WEB_CLIENT_FORBIDDEN' } })
+    ).rejects.toMatchObject({ response: { code: 'SEB_REQUIRED' } })
     await expect(
       start(f, row.id, row.tokenRotation, 'native'),
     ).resolves.toMatchObject({ sessionId: expect.any(String) })
   })
 
-  it('lets a browser in once the seat carries allowWebClient', async () => {
+  it('starts a verified browser session as SEB', async () => {
     const f = await setup()
     const row = await eventSchedule(f, new Date('2026-11-02T01:45:00.000Z'))
-    await f.rooms.assignSeat({
-      roomId: f.roomA.id,
-      eventId: f.roomA.eventId,
-      studentId: STUDENT_ID,
-      classroomId: 'class-1',
-      seatNumber: 1,
-    })
-    await f.rooms.setSeatFlags(f.roomA.eventId, STUDENT_ID, {
-      allowWebClient: true,
-    })
 
-    await expect(
-      start(f, row.id, row.tokenRotation, 'web'),
-    ).resolves.toMatchObject({ sessionId: expect.any(String) })
+    const started = await start(f, row.id, row.tokenRotation, 'web', seb)
+
+    expect(await f.sessions.findById(started.sessionId)).toMatchObject({
+      client: 'SEB',
+    })
   })
 
   it('holds a late student until allowLateEntry is set', async () => {
@@ -1521,7 +1477,7 @@ describe('client gates', () => {
     })
   })
 
-  it('refuses a browser on resume too', async () => {
+  it('refuses a browser on resume without a verified Safe Exam Browser and switches a verified one to SEB', async () => {
     const f = await setup()
     const row = await eventSchedule(f, new Date('2026-11-02T01:45:00.000Z'))
     const session = seed(f.sessions, row.id, {
@@ -1537,9 +1493,9 @@ describe('client gates', () => {
       new RoomAccessCodeService(SECRET),
       new FakeSessionFinalizer(),
       new LifecycleGate(f.schedules, f.activities),
+      sebVerifier(),
     )
-
-    await expect(
+    const resume = (platform: 'web' | 'native', proof?: typeof seb) =>
       useCase.execute(
         { id: STUDENT_USER.id },
         session.id,
@@ -1550,46 +1506,16 @@ describe('client gates', () => {
             NOW,
           ).code,
           deviceId: 'device-1',
-          platform: 'web',
+          platform,
+          seb: proof,
         },
         NOW,
-      ),
-    ).rejects.toMatchObject({ response: { code: 'WEB_CLIENT_FORBIDDEN' } })
-  })
-})
+      )
 
-describe('allow flags without a session stay atomic', () => {
-  it('writes the seat flag and its audit row in one call', async () => {
-    const f = await setup()
-    await f.rooms.assignSeat({
-      roomId: f.roomA.id,
-      eventId: f.roomA.eventId,
-      studentId: STUDENT_ID,
-      classroomId: 'class-1',
-      seatNumber: 3,
+    await expect(resume('web')).rejects.toMatchObject({
+      response: { code: 'SEB_REQUIRED' },
     })
-    const flags = new SeatFlagService(
-      f.sessions,
-      f.rooms,
-      new FakeSessionRecoveryRepository(f.sessions, f.rooms, f.packages),
-      f.access,
-    )
-    const seen: string[] = []
-    const original = f.rooms.setSeatFlagsWithAudit.bind(f.rooms)
-    f.rooms.setSeatFlagsWithAudit = (eventId, studentId, patch, audit) => {
-      seen.push(audit.action)
-      return original(eventId, studentId, patch, audit)
-    }
-
-    await new AllowWebClientUseCase(flags).execute(TECH_A, {
-      roomId: f.roomA.id,
-      studentId: STUDENT_ID,
-      reason: 'HP siswa rusak, pakai laptop ruangan',
-    })
-
-    expect(seen).toEqual(['ALLOW_WEB_CLIENT'])
-    expect(await f.rooms.listAuditLogsByRoom(f.roomA.id)).toHaveLength(1)
-    const seat = await f.rooms.findSeat(f.roomA.eventId, STUDENT_ID)
-    expect(seat?.allowWebClient).toBe(true)
+    const resumed = await resume('web', seb)
+    expect(resumed.session.client).toBe('SEB')
   })
 })

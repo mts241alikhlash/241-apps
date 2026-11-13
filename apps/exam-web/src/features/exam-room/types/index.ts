@@ -75,7 +75,7 @@ export type Letterhead = IdentitySchemas['SchoolUnitLetterheadResponseDto']
 export type SupervisorSlotRow = Schemas['SupervisorSlotDto']
 
 export type RecoveryAction =
-  'release' | 'reopen' | 'reset' | 'extend-time' | 'allow-web' | 'allow-late'
+  'release' | 'reopen' | 'reset' | 'extend-time' | 'allow-late'
 
 export interface MonitorAbilities {
   supervise: boolean

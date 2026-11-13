@@ -241,21 +241,6 @@ export const examEventService = {
     }
   },
 
-  async allowWeb(
-    roomId: string,
-    studentId: string,
-    reason: string,
-  ): Promise<Outcome<SeatFlag>> {
-    try {
-      const response = await examEventApi.allowWeb(roomId, studentId, {
-        reason,
-      })
-      return { success: true, data: response }
-    } catch (err: unknown) {
-      return failure(err, 'Gagal mengizinkan mode web.')
-    }
-  },
-
   async allowLate(
     roomId: string,
     studentId: string,

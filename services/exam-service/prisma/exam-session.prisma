@@ -5,6 +5,11 @@ enum ExamSessionStatus {
   GRADED
 }
 
+enum ExamClient {
+  ISTIQRA
+  SEB
+}
+
 enum ScorePublicationStatus {
   PENDING
   SENT
@@ -35,7 +40,7 @@ model ExamSession {
   seatNumber     Int?            @map("seat_number")
   requiresTokenReentry Boolean   @default(false) @map("requires_token_reentry")
   lockedByViolation    Boolean   @default(false) @map("locked_by_violation")
-  allowWebClient       Boolean   @default(false) @map("allow_web_client")
+  client               ExamClient @default(ISTIQRA)
   allowLateEntry       Boolean   @default(false) @map("allow_late_entry")
   extraMinutes         Int       @default(0) @map("extra_minutes")
   kioskMode            String    @default("PINNED") @map("kiosk_mode") @db.VarChar(32)

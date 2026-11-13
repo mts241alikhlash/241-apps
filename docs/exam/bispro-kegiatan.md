@@ -70,3 +70,9 @@ Di `exam-android`, tab/menu siswa memisahkan daftar berdasarkan field `category`
 - Kode bocor → admin menjalankan **Ganti token** pada halaman detail kegiatan; kode lama langsung tidak berlaku.
 - Keluar aplikasi = wajib memasukkan kode lagi. Aplikasi mati sendiri, HP restart, atau jaringan putus bukan pelanggaran dan tidak meminta kode, tetapi waktu ujian tetap berjalan.
 - Panggilan masuk menjeda ujian sementara dan mengembalikan waktu saat panggilan selesai.
+
+## 6. Ujian lewat web (Safe Exam Browser)
+
+- Siswa yang memakai browser hanya boleh mulai dan melanjutkan sesi di **Safe Exam Browser (SEB)** dengan konfigurasi sekolah yang aktif; server menolak sebaliknya dengan `SEB_REQUIRED`. Istiqra (Android) tidak diperiksa SEB dan tidak berubah.
+- Konfigurasi dibuat admin di **Pengaturan → Safe Exam Browser** (`/settings/seb`). Cara membuat dan mengganti berkas `.seb` ada di [panduan Safe Exam Browser](../guides/safe-exam-browser.md); keputusan ada di [ADR 0011](../adr/0011-web-exams-run-in-safe-exam-browser.md).
+- Kolom `requireAndroidApp` (periode ujian) dan `allowWebClient` (ruang dan sesi) sudah dihapus.

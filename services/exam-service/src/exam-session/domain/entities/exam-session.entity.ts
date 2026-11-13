@@ -10,6 +10,10 @@ export const EXAM_SESSION_STATUSES = [
 
 export type ExamSessionStatus = (typeof EXAM_SESSION_STATUSES)[number]
 
+export const EXAM_CLIENTS = ['ISTIQRA', 'SEB'] as const
+
+export type ExamClient = (typeof EXAM_CLIENTS)[number]
+
 export interface ExamSession {
   id: string
   scheduleId: string
@@ -36,7 +40,7 @@ export interface ExamSession {
   requiresTokenReentry: boolean
   policy?: ExamPolicy | null
   lockedByViolation: boolean
-  allowWebClient: boolean
+  client: ExamClient
   allowLateEntry: boolean
   extraMinutes: number
   kioskMode: string

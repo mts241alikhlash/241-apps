@@ -13,7 +13,6 @@ export interface ExamEvent {
   endsAt: Date
   lateToleranceMinutes: number
   minSubmitMinutes: number
-  requireAndroidApp: boolean
   status: ExamEventStatus
   createdById: string
   createdAt: Date
@@ -28,7 +27,6 @@ export interface NewExamEvent {
   endsAt: Date
   lateToleranceMinutes?: number
   minSubmitMinutes?: number
-  requireAndroidApp?: boolean
   createdById: string
 }
 
@@ -39,6 +37,5 @@ export interface ExamEventEdit {
   endsAt?: Date
   lateToleranceMinutes?: number
   minSubmitMinutes?: number
-  requireAndroidApp?: boolean
   status?: ExamEventStatus
 }

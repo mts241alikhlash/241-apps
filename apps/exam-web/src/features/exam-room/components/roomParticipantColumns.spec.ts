@@ -12,6 +12,7 @@ const session = (
   overrides: Partial<RoomMonitorSession> = {},
 ): RoomMonitorSession => ({
   sessionId: 'x1',
+  client: 'SEB',
   status: 'IN_PROGRESS',
   startedAt: '2026-11-02T01:00:00.000Z',
   deadline: '2026-11-02T02:30:00.000Z',
@@ -28,7 +29,6 @@ const session = (
   lockTaskActive: true,
   batteryUnrestricted: true,
   kioskMode: 'STRICT',
-  allowWebClient: false,
   violationCount: 0,
   lockedByViolation: false,
   requiresTokenReentry: false,
@@ -63,7 +63,6 @@ const base = {
   onReopen: vi.fn(),
   onReset: vi.fn(),
   onExtendTime: vi.fn(),
-  onAllowWeb: vi.fn(),
   onAllowLate: vi.fn(),
 }
 
@@ -221,7 +220,6 @@ describe('action cell permissions', () => {
     expect(labels).toContain('Buka Kembali Sesi')
     expect(labels).toContain('Reset Ulang Sesi')
     expect(labels).toContain('Tambah Waktu')
-    expect(labels).toContain('Izinkan Mode Web')
     expect(labels).toContain('Izinkan Masuk Terlambat')
   })
 
