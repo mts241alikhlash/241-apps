@@ -26,7 +26,7 @@ describe('seb', () => {
 
   afterEach(() => {
     stubSeb(undefined)
-    delete (window as Partial<Window>).SafeExamBrowser
+    delete (window as Window & { SafeExamBrowser?: unknown }).SafeExamBrowser
     vi.useRealTimers()
   })
 
