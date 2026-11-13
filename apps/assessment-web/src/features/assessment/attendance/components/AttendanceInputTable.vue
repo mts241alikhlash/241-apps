@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { computed, ref } from 'vue'
 import { DataTable } from '@mts241alikhlash/ui'
 import {
@@ -50,7 +51,7 @@ function handleNoteChange(enrollmentId: string, note: string) {
   emit('update:rows', updated)
 }
 
-function applyBulkStatus(value: unknown) {
+function applyBulkStatus(value: AcceptableValue) {
   const status = toAttendanceStatus(value)
   if (!status || selectedRows.value.length === 0) return
   const selectedIds = new Set(selectedRows.value.map((r) => r.enrollmentId))
