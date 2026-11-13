@@ -308,14 +308,13 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
                   </FloatingLabelField>
                 </div>
               </div>
-            
             </template>
             <template #header-right>
               <SearchInput
-                                v-model="search"
-                                class="sm:w-40"
-                                label="Cari gelombang"
-                              />
+                v-model="search"
+                class="sm:w-40"
+                label="Cari gelombang"
+              />
             </template>
             <template #mobile-toolbar>
               <SearchInput

@@ -166,7 +166,9 @@ onMounted(async () => {
           <ReturnedNotes :review="builder.lastReturn.value" />
           <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
             <div class="flex flex-col gap-1">
-              <span class="text-[length:var(--text-control,0.75rem)] text-muted-foreground">
+              <span
+                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              >
                 Status
               </span>
               <Badge

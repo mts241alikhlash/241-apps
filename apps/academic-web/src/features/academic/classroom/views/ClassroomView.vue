@@ -149,14 +149,13 @@ onMounted(async () => {
                 </SelectContent>
               </Select>
             </div>
-          
-            </template>
-            <template #header-right>
-              <SearchInput
-                              v-model="searchKeyword"
-                              label="Cari kelas"
-                            />
-            </template>
+          </template>
+          <template #header-right>
+            <SearchInput
+              v-model="searchKeyword"
+              label="Cari kelas"
+            />
+          </template>
         </DataTable>
 
         <ClassroomFormDialog

@@ -34,12 +34,11 @@ import { typeCode, typeLabel } from '@/features/exam-bank/types'
 import ReturnPackageDialog from '../components/ReturnPackageDialog.vue'
 import { usePackageReview } from '../composables/usePackageReview'
 import { examPackageService } from '../services/examPackageService'
-import { useExamPackageStore } from '../stores/examPackageStore'
 import { markerLabel, markerVariant } from '../types'
 
 const route = useRoute()
 const router = useRouter()
-const store = useExamPackageStore()
+
 const queryClient = useQueryClient()
 const { user } = useAuthSession()
 
@@ -124,9 +123,7 @@ onMounted(() => {
         </div>
       </CardHeader>
 
-      <CardContent
-        class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto p-2"
-      >
+      <CardContent class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto p-2">
         <div
           v-if="review.loadFailed.value"
           class="flex flex-wrap items-center gap-3 rounded-md border p-4 text-[length:var(--text-control,0.75rem)]"
@@ -235,9 +232,7 @@ onMounted(() => {
               <div class="flex flex-wrap items-center gap-2 lg:hidden">
                 <Select
                   :model-value="String(activeIndex)"
-                  @update:model-value="
-                    (value) => selectItem(Number(value))
-                  "
+                  @update:model-value="(value) => selectItem(Number(value))"
                 >
                   <SelectTrigger
                     class="w-40"
@@ -312,7 +307,6 @@ onMounted(() => {
           </div>
         </template>
       </CardContent>
-
     </Card>
 
     <div

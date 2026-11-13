@@ -38,9 +38,8 @@ const canAdd = computed(
   () =>
     isShortAnswer.value ||
     (isChoice.value &&
-      (
-        content.value as MultipleChoiceContent | MultipleResponseContent
-      ).choices.length < MAX_CHOICES),
+      (content.value as MultipleChoiceContent | MultipleResponseContent).choices
+        .length < MAX_CHOICES),
 )
 
 function addAnswer() {

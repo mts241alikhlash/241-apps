@@ -200,14 +200,13 @@ onMounted(load)
                   </Select>
                 </FloatingLabelField>
               </div>
-            
             </template>
             <template #header-right>
               <SearchInput
-                                v-model="search"
-                                class="sm:w-40"
-                                label="Cari ruangan"
-                              />
+                v-model="search"
+                class="sm:w-40"
+                label="Cari ruangan"
+              />
             </template>
 
             <template #mobile-toolbar>

@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { ArrowLeft, ChevronDown, Plus, Trash2 } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
@@ -57,11 +58,7 @@ import type {
   QuestionDraft,
   QuestionType,
 } from '@/features/exam-bank/types'
-import {
-  QUESTION_TYPES,
-  typeCode,
-  typeLabel,
-} from '@/features/exam-bank/types'
+import { QUESTION_TYPES, typeCode, typeLabel } from '@/features/exam-bank/types'
 import { plainExcerpt } from '@/features/exam-bank/utils/plainText'
 import {
   cleanContent,
@@ -182,7 +179,6 @@ const draftTotalPoints = computed(() =>
   ),
 )
 
-
 const note = computed(() =>
   questionId.value === null ? undefined : builder.noteOf(questionId.value),
 )
@@ -240,11 +236,7 @@ onMounted(async () => {
   updateScrollHints()
 })
 
-watch(
-  cards,
-  () => void nextTick(updateScrollHints),
-  { deep: true },
-)
+watch(cards, () => void nextTick(updateScrollHints), { deep: true })
 
 function snippetOf(card: DraftCard): string {
   const text = plainExcerpt(card.draft.bodyHtml, 60)
@@ -271,21 +263,21 @@ function setDraft(card: DraftCard, next: QuestionDraft) {
   card.error = null
 }
 
-function parsePoints(value: unknown): number {
-  const text = String(value ?? '').replace(',', '.')
+function parsePoints(value: string | number): number {
+  const text = String(value).replace(',', '.')
   return text === '' ? Number.NaN : Number(text)
 }
 
-function setCardPoints(card: DraftCard, value: unknown) {
+function setCardPoints(card: DraftCard, value: string | number) {
   card.draft = { ...card.draft, points: parsePoints(value) }
   card.error = null
 }
 
-function setEditPoints(value: unknown) {
+function setEditPoints(value: string | number) {
   draft.value = { ...draft.value, points: parsePoints(value) }
 }
 
-function changeType(card: DraftCard, value: unknown) {
+function changeType(card: DraftCard, value: AcceptableValue) {
   const next = QUESTION_TYPES.find((option) => option === value)
   if (next === undefined) return
   card.type = next
@@ -537,59 +529,59 @@ async function confirmSave() {
                   v-if="cards.length > 0"
                   ref="listRef"
                 >
-                <ScrollArea
-                  class="max-h-[60vh] [&_[data-slot=scroll-area-scrollbar]]:w-1.5 [&_[data-slot=scroll-area-viewport]]:max-h-[60vh] [&_[data-slot=scroll-area-viewport]]:overflow-y-auto"
-                  @scroll.capture="updateScrollHints"
-                >
-                <ItemGroup class="gap-0">
-                  <Item
-                    v-for="(card, index) in cards"
-                    :key="card.key"
-                    class="min-w-0 flex-nowrap gap-1 rounded-none border-0 px-2 py-1 hover:bg-muted"
-                    :class="index === activeIndex ? 'bg-muted' : undefined"
+                  <ScrollArea
+                    class="max-h-[60vh] [&_[data-slot=scroll-area-scrollbar]]:w-1.5 [&_[data-slot=scroll-area-viewport]]:max-h-[60vh] [&_[data-slot=scroll-area-viewport]]:overflow-y-auto"
+                    @scroll.capture="updateScrollHints"
                   >
-                    <ItemContent class="min-w-0">
-                      <button
-                        type="button"
-                        class="flex w-full min-w-0 items-center gap-2 text-left"
-                        :aria-current="
-                          index === activeIndex ? 'true' : undefined
-                        "
-                        @click="selectCard(index)"
+                    <ItemGroup class="gap-0">
+                      <Item
+                        v-for="(card, index) in cards"
+                        :key="card.key"
+                        class="min-w-0 flex-nowrap gap-1 rounded-none border-0 px-2 py-1 hover:bg-muted"
+                        :class="index === activeIndex ? 'bg-muted' : undefined"
                       >
-                        <span
-                          class="w-4 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
-                        >
-                          {{ index + 1 }}
-                        </span>
-                        <span
-                          class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
-                        >
-                          {{ snippetOf(card) }}
-                        </span>
-                      </button>
-                    </ItemContent>
-                    <ItemActions class="shrink-0">
-                      <span
-                        class="w-8 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-                        :title="typeLabel(card.type)"
-                      >
-                        {{ typeCode(card.type) }}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        :aria-label="`Hapus soal ${index + 1}`"
-                        :title="`Hapus soal ${index + 1}`"
-                        :disabled="cards.length === 1"
-                        @click="removeCard(index)"
-                      >
-                        <Trash2 />
-                      </Button>
-                    </ItemActions>
-                  </Item>
-                </ItemGroup>
-                </ScrollArea>
+                        <ItemContent class="min-w-0">
+                          <button
+                            type="button"
+                            class="flex w-full min-w-0 items-center gap-2 text-left"
+                            :aria-current="
+                              index === activeIndex ? 'true' : undefined
+                            "
+                            @click="selectCard(index)"
+                          >
+                            <span
+                              class="w-4 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+                            >
+                              {{ index + 1 }}
+                            </span>
+                            <span
+                              class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
+                            >
+                              {{ snippetOf(card) }}
+                            </span>
+                          </button>
+                        </ItemContent>
+                        <ItemActions class="shrink-0">
+                          <span
+                            class="w-8 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                            :title="typeLabel(card.type)"
+                          >
+                            {{ typeCode(card.type) }}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            :aria-label="`Hapus soal ${index + 1}`"
+                            :title="`Hapus soal ${index + 1}`"
+                            :disabled="cards.length === 1"
+                            @click="removeCard(index)"
+                          >
+                            <Trash2 />
+                          </Button>
+                        </ItemActions>
+                      </Item>
+                    </ItemGroup>
+                  </ScrollArea>
                 </div>
                 <div
                   v-if="!atBottom"
@@ -757,7 +749,6 @@ async function confirmSave() {
         {{ saving ? 'Menyimpan…' : `Simpan ${cards.length} soal` }}
       </Button>
     </div>
-
 
     <Sheet v-model:open="sheetOpen">
       <SheetContent

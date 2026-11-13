@@ -428,14 +428,13 @@ function fillForm() {
                   </FloatingLabelField>
                 </div>
               </div>
-            
             </template>
             <template #header-right>
               <SearchInput
-                                v-model="searchQuery"
-                                class="sm:w-40"
-                                label="Cari pendaftar"
-                              />
+                v-model="searchQuery"
+                class="sm:w-40"
+                label="Cari pendaftar"
+              />
             </template>
 
             <template #mobile-toolbar>

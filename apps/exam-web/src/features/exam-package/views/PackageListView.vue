@@ -316,8 +316,8 @@ onMounted(() => examPackageService.loadReferences())
         </DialogHeader>
         <DialogBody>
           <p class="text-[length:var(--text-control,0.75rem)]">
-            <strong>{{ submitTarget?.title }}</strong> akan dikirim ke penyetuju.
-            Selama menunggu tinjauan, paket tidak bisa diubah.
+            <strong>{{ submitTarget?.title }}</strong> akan dikirim ke
+            penyetuju. Selama menunggu tinjauan, paket tidak bisa diubah.
           </p>
           <p
             v-if="submitError"

@@ -6,11 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import {
-  Item,
-  ItemContent,
-  ItemGroup,
-} from '@mts241alikhlash/ui/item'
+import { Item, ItemContent, ItemGroup } from '@mts241alikhlash/ui/item'
 import type {
   ChoiceKey,
   EssayContent,
@@ -74,9 +70,9 @@ const trueValue = computed(() =>
     data-testid="question-preview"
   >
     <CardHeader
-        variant="muted"
-        class="px-2"
-      >
+      variant="muted"
+      class="px-2"
+    >
       <CardTitle>Pratinjau</CardTitle>
       <span
         class="shrink-0 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
@@ -97,9 +93,7 @@ const trueValue = computed(() =>
           :key="choice.key"
           variant="outline"
           class="min-h-8 min-w-0 gap-2 px-2 py-[1px]"
-          :class="
-            isCorrect(choice.key) ? 'bg-primary/10' : undefined
-          "
+          :class="isCorrect(choice.key) ? 'bg-primary/10' : undefined"
         >
           <span
             class="shrink-0 text-[length:var(--text-control,0.75rem)] font-medium"

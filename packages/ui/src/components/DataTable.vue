@@ -345,7 +345,10 @@ defineExpose({ table })
   <div class="flex flex-col gap-2.5">
     <div
       v-if="
-        showFilterInput || $slots['header-left'] || $slots['header-right'] || $slots.filters
+        showFilterInput ||
+        $slots['header-left'] ||
+        $slots['header-right'] ||
+        $slots.filters
       "
       :class="[
         'w-full flex-col gap-3 sm:flex-row sm:items-end sm:justify-between',
@@ -477,9 +480,7 @@ defineExpose({ table })
             <TableRow
               v-for="i in 5"
               :key="i"
-              :class="
-                i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20'
-              "
+              :class="i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20'"
             >
               <TableCell
                 v-for="j in columns.length"

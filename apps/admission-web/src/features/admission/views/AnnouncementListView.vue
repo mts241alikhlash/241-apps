@@ -287,14 +287,13 @@ async function confirmPendingAction() {
                   </FloatingLabelField>
                 </div>
               </div>
-            
             </template>
             <template #header-right>
               <SearchInput
-                                v-model="search"
-                                class="sm:w-40"
-                                label="Cari pengumuman"
-                              />
+                v-model="search"
+                class="sm:w-40"
+                label="Cari pengumuman"
+              />
             </template>
             <template #mobile-toolbar>
               <SearchInput
