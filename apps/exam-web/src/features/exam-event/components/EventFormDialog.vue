@@ -3,7 +3,6 @@ import { computed, onMounted } from 'vue'
 import { useId } from 'vue'
 import { DatePicker, FormattedNumberInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
   DialogBody,
@@ -225,18 +224,6 @@ onMounted(() => {
               </SelectContent>
             </Select>
           </FloatingLabelField>
-
-          <label
-            class="flex items-center gap-2 self-center text-[length:var(--text-control,0.75rem)] sm:col-span-2"
-          >
-            <Checkbox
-              :model-value="form.requireAndroidApp.value"
-              @update:model-value="
-                form.requireAndroidApp.value = Boolean($event)
-              "
-            />
-            Wajib aplikasi Android (kecuali diizinkan mode web)
-          </label>
         </div>
 
         <p

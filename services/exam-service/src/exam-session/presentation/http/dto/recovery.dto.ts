@@ -19,6 +19,7 @@ import { SESSION_AUDIT_ACTIONS } from '../../../../exam-room/domain/entities/exa
 import { SESSION_EVENT_TYPES } from '../../../../exam-room/domain/entities/exam-session-event.entity.js'
 import type { RecordedSessionEvents } from '../../../application/use-cases/record-session-events/record-session-events.use-case.js'
 import type { ResumedSession } from '../../../application/use-cases/resume-exam-session/resume-exam-session.use-case.js'
+import { SebProofDto } from '../../../../seb/presentation/http/dto/seb-config.dto.js'
 
 export class SessionEventItemDto {
   @ApiProperty({ description: 'Stable id of the event on the tablet' })
@@ -100,6 +101,12 @@ export class ResumeSessionRequestDto {
   @IsString()
   @Length(1, 100)
   deviceId!: string
+
+  @ApiPropertyOptional({ type: SebProofDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SebProofDto)
+  seb?: SebProofDto
 }
 
 export class ResumeSessionResponseDto {
@@ -149,7 +156,6 @@ export class RecoverySessionDto {
   @ApiProperty() lockedByViolation!: boolean
   @ApiProperty() requiresTokenReentry!: boolean
   @ApiProperty() extraMinutes!: number
-  @ApiProperty() allowWebClient!: boolean
   @ApiProperty() allowLateEntry!: boolean
   @ApiProperty({ format: 'date-time' }) deadline!: string
   @ApiProperty({ format: 'date-time' }) finalizeAt!: string
@@ -167,7 +173,6 @@ export class RecoverySessionDto {
     lockedByViolation: boolean
     requiresTokenReentry: boolean
     extraMinutes: number
-    allowWebClient: boolean
     allowLateEntry: boolean
     deadline: Date
     finalizeAt: Date
@@ -183,7 +188,6 @@ export class RecoverySessionDto {
     dto.lockedByViolation = domain.lockedByViolation
     dto.requiresTokenReentry = domain.requiresTokenReentry
     dto.extraMinutes = domain.extraMinutes
-    dto.allowWebClient = domain.allowWebClient
     dto.allowLateEntry = domain.allowLateEntry
     dto.deadline = domain.deadline.toISOString()
     dto.finalizeAt = domain.finalizeAt.toISOString()
@@ -208,7 +212,6 @@ export class RecoverySessionListDto {
 
 export class SeatFlagDto {
   @ApiProperty({ format: 'uuid' }) studentId!: string
-  @ApiProperty() allowWebClient!: boolean
   @ApiProperty() allowLateEntry!: boolean
 }
 

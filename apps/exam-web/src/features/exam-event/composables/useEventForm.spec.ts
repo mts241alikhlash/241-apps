@@ -87,7 +87,6 @@ describe('useEventForm', () => {
         endsAt: toInstant('2026-12-05', '12:00'),
         lateToleranceMinutes: 30,
         minSubmitMinutes: 20,
-        requireAndroidApp: true,
       },
     )
   })
@@ -109,7 +108,6 @@ describe('useEventForm', () => {
       'lateToleranceMinutes',
       'minSubmitMinutes',
       'name',
-      'requireAndroidApp',
       'startsAt',
       'status',
     ])

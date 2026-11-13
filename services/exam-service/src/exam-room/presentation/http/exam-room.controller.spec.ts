@@ -26,7 +26,6 @@ const roomRoutes: Record<string, string[]> = {
   supervisors: ['exam-rooms.supervise'],
   assignSupervisor: ['exam-events.manage'],
   substitute: ['exam-rooms.technician'],
-  allowWebClient: ['exam-rooms.technician'],
   allowLateEntry: ['exam-rooms.technician'],
   extendTime: ['exam-rooms.technician'],
   roomMonitor: [
@@ -65,7 +64,6 @@ const roomAnyRoutes: Record<string, string[]> = {
   seats: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   supervisors: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   substitute: ['exam-rooms.technician', 'exam-rooms.manage-all'],
-  allowWebClient: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   allowLateEntry: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   extendTime: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   roomMonitor: [
@@ -199,7 +197,6 @@ describe('ExamRoomController seat batch', () => {
       undefined as never,
       undefined as never,
       undefined as never,
-      undefined as never,
       manage,
       undefined as never,
       rooms,
@@ -241,7 +238,6 @@ describe('ExamRoomController seat batch', () => {
       capacity: 30,
     })
     const controller = new ExamRoomController(
-      undefined as never,
       undefined as never,
       undefined as never,
       undefined as never,
@@ -339,7 +335,6 @@ describe('ExamRoomController capacity and bulk distribution', () => {
       undefined as never,
       undefined as never,
       undefined as never,
-      undefined as never,
       manage,
       undefined as never,
       rooms,
@@ -420,7 +415,6 @@ describe('ExamRoomController supervisor slots', () => {
     const controller = new ExamRoomController(
       undefined as never,
       assign,
-      undefined as never,
       undefined as never,
       undefined as never,
       undefined as never,

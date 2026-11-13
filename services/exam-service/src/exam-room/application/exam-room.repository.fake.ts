@@ -74,7 +74,6 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       endsAt: input.endsAt,
       lateToleranceMinutes: input.lateToleranceMinutes ?? 30,
       minSubmitMinutes: input.minSubmitMinutes ?? 20,
-      requireAndroidApp: input.requireAndroidApp ?? true,
       status: 'DRAFT',
       createdById: input.createdById,
       createdAt: now,
@@ -260,7 +259,6 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       studentId: input.studentId,
       classroomId: input.classroomId,
       seatNumber: input.seatNumber,
-      allowWebClient: false,
       allowLateEntry: false,
       createdAt: new Date(),
     }
@@ -301,7 +299,6 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
         studentId: input.studentId,
         classroomId: input.classroomId,
         seatNumber: input.seatNumber,
-        allowWebClient: false,
         allowLateEntry: false,
         createdAt: new Date(),
       }

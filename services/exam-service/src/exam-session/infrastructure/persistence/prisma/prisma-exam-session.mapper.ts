@@ -35,7 +35,7 @@ export function toSession(row: SessionRow): ExamSession {
     seatNumber: row.seatNumber,
     requiresTokenReentry: row.requiresTokenReentry,
     lockedByViolation: row.lockedByViolation,
-    allowWebClient: row.allowWebClient,
+    client: row.client,
     allowLateEntry: row.allowLateEntry,
     extraMinutes: row.extraMinutes,
     kioskMode: row.kioskMode,

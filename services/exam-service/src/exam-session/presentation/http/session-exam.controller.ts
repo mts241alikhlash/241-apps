@@ -292,6 +292,7 @@ export class SessionExamController {
           accessCode: body.accessCode,
           deviceId: body.deviceId,
           platform,
+          seb: body.seb,
         },
         new Date(),
       ),

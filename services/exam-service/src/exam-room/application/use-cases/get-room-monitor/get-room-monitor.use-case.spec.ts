@@ -369,6 +369,20 @@ describe('GetRoomMonitorUseCase', () => {
     })
   })
 
+  it('carries the client the session runs in', async () => {
+    const { fixture, monitor } = await build()
+    startSession(fixture, fixture.studentIds[0], { client: 'SEB' })
+
+    const result = await monitor.execute(
+      ROOM_TECH,
+      fixture.room.id,
+      { page: 1, limit: 5 },
+      MONITOR_NOW,
+    )
+
+    expect(result.data[0].session).toMatchObject({ client: 'SEB' })
+  })
+
   it('exposes the parent schedule end on a session row', async () => {
     const { fixture, monitor } = await build()
     startSession(fixture, fixture.studentIds[0])

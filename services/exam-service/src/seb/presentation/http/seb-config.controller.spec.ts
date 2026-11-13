@@ -6,6 +6,7 @@ import {
   FakeSebConfigRepository,
   FakeSebConfigStorage,
 } from '../../application/seb-config.repository.fake.js'
+import { SebVerifier } from '../../application/seb-verifier.service.js'
 import { ManageSebConfigsUseCase } from '../../application/use-cases/manage-seb-configs/manage-seb-configs.use-case.js'
 import {
   SebConfigController,
@@ -17,13 +18,11 @@ const KEY = 'b'.repeat(64)
 const UNKNOWN = '00000000-0000-4000-8000-000000000000'
 
 function build() {
-  const useCase = new ManageSebConfigsUseCase(
-    new FakeSebConfigRepository(),
-    new FakeSebConfigStorage(),
-  )
+  const repo = new FakeSebConfigRepository()
+  const useCase = new ManageSebConfigsUseCase(repo, new FakeSebConfigStorage())
   return {
     useCase,
-    controller: new SebConfigController(useCase),
+    controller: new SebConfigController(useCase, new SebVerifier(repo, [])),
     files: new SebConfigFileController(useCase),
   }
 }

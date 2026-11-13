@@ -70,7 +70,7 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
       seatNumber: input.seatNumber ?? null,
       requiresTokenReentry: false,
       lockedByViolation: false,
-      allowWebClient: input.allowWebClient ?? false,
+      client: input.client ?? 'ISTIQRA',
       allowLateEntry: input.allowLateEntry ?? false,
       extraMinutes: 0,
       kioskMode: 'PINNED',

@@ -9,10 +9,7 @@ import { assertRecoveryReason } from '../domain/policies/recovery-reason.policy.
 import { IExamSessionRepository } from '../domain/repositories/exam-session.repository.js'
 import { ISessionRecoveryRepository } from '../domain/repositories/session-recovery.port.js'
 
-export type SeatFlagAction = Extract<
-  SessionAuditAction,
-  'ALLOW_WEB_CLIENT' | 'ALLOW_LATE_ENTRY'
->
+export type SeatFlagAction = Extract<SessionAuditAction, 'ALLOW_LATE_ENTRY'>
 
 export interface SeatFlagRequest {
   roomId: string
@@ -22,7 +19,6 @@ export interface SeatFlagRequest {
 
 export interface SeatFlagResult {
   studentId: string
-  allowWebClient: boolean
   allowLateEntry: boolean
 }
 
@@ -49,10 +45,7 @@ export class SeatFlagService {
     if (seat?.roomId !== room.id) {
       throw new NotFoundException('Siswa tidak terdaftar di ruangan ini')
     }
-    const patch =
-      action === 'ALLOW_WEB_CLIENT'
-        ? { allowWebClient: true }
-        : { allowLateEntry: true }
+    const patch = { allowLateEntry: true }
     const session = (await this.sessions.listByRoom(room.id)).find(
       (row) => row.studentId === request.studentId,
     )
@@ -75,7 +68,6 @@ export class SeatFlagService {
       )
       return {
         studentId: request.studentId,
-        allowWebClient: flagged?.allowWebClient ?? seat.allowWebClient,
         allowLateEntry: flagged?.allowLateEntry ?? seat.allowLateEntry,
       }
     }
@@ -92,7 +84,6 @@ export class SeatFlagService {
     )
     return {
       studentId: request.studentId,
-      allowWebClient: flagged?.allowWebClient ?? seat.allowWebClient,
       allowLateEntry: flagged?.allowLateEntry ?? seat.allowLateEntry,
     }
   }

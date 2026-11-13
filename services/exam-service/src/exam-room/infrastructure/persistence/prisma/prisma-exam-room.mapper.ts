@@ -31,7 +31,6 @@ export function toExamEvent(row: EventRow): ExamEvent {
     endsAt: row.endsAt,
     lateToleranceMinutes: row.lateToleranceMinutes,
     minSubmitMinutes: row.minSubmitMinutes,
-    requireAndroidApp: row.requireAndroidApp,
     status: row.status,
     createdById: row.createdById,
     createdAt: row.createdAt,
@@ -62,7 +61,6 @@ export function toExamRoomSeat(row: SeatRow): ExamRoomSeat {
     studentId: row.studentId,
     classroomId: row.classroomId,
     seatNumber: row.seatNumber,
-    allowWebClient: row.allowWebClient,
     allowLateEntry: row.allowLateEntry,
     createdAt: row.createdAt,
   }

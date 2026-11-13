@@ -27,6 +27,8 @@ import { StartExamSessionUseCase } from '../start-exam-session/start-exam-sessio
 import { ListScheduleSessionsUseCase } from '../list-schedule-sessions/list-schedule-sessions.use-case.js'
 import { ReleaseSessionUseCase } from './release-session.use-case.js'
 import { FakeExamRoomRepository } from '../../../../exam-room/application/exam-room.repository.fake.js'
+import { FakeSebConfigRepository } from '../../../../seb/application/seb-config.repository.fake.js'
+import { SebVerifier } from '../../../../seb/application/seb-verifier.service.js'
 import { FakeSessionRecoveryRepository } from '../../session-recovery.repository.fake.js'
 import {
   MANAGE_ALL,
@@ -120,6 +122,7 @@ describe('ReleaseSessionUseCase', () => {
       rooms,
       new FakeParticipantNumber(),
       new LifecycleGate(schedules, new FakeExamActivityRepository()),
+      new SebVerifier(new FakeSebConfigRepository(), []),
     )
     const input = (deviceId: string) => ({
       accessCode: codes.codeFor(schedule.id, schedule.tokenRotation, NOW).code,

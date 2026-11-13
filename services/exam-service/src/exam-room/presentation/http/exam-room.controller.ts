@@ -30,7 +30,6 @@ import { RoomAccessCodeService } from '../../application/room-access-code.servic
 import { IExamRoomRepository } from '../../domain/repositories/exam-room.repository.js'
 import type { MakeupReason } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { SubstituteSupervisorUseCase } from '../../application/use-cases/substitute-supervisor/substitute-supervisor.use-case.js'
-import { AllowWebClientUseCase } from '../../../exam-session/application/use-cases/allow-web-client/allow-web-client.use-case.js'
 import { AllowLateEntryUseCase } from '../../../exam-session/application/use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ExtendRoomTimeUseCase } from '../../application/use-cases/extend-room-time/extend-room-time.use-case.js'
 import { GetRoomMonitorUseCase } from '../../application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
@@ -80,7 +79,6 @@ export class ExamRoomController {
     private readonly listSupervisors: ListSupervisorsUseCase,
     private readonly assignSupervisorSlot: AssignSupervisorUseCase,
     private readonly substituteSupervisor: SubstituteSupervisorUseCase,
-    private readonly allowWeb: AllowWebClientUseCase,
     private readonly allowLate: AllowLateEntryUseCase,
     private readonly extendRoom: ExtendRoomTimeUseCase,
     private readonly manageRooms: ManageExamRoomsUseCase,
@@ -463,32 +461,6 @@ export class ExamRoomController {
     )
   }
 
-  @Post('seats/:studentId/allow-web')
-  @RequireAnyPermission('exam-rooms.technician', 'exam-rooms.manage-all')
-  @ApiOperation({
-    summary: 'Let one student take the exam from a browser for this room',
-  })
-  @ApiParam({ name: 'roomId', format: 'uuid' })
-  @ApiParam({ name: 'studentId', format: 'uuid' })
-  @ApiResponse({ status: 201, type: SeatFlagDto })
-  async allowWebClient(
-    @CurrentUser() user: RoomStaffUser,
-    @Param('roomId', ParseUUIDPipe) roomId: string,
-    @Param('studentId', ParseUUIDPipe) studentId: string,
-    @Body() dto: RecoveryReasonDto,
-  ): Promise<SeatFlagDto> {
-    const flagged = await this.allowWeb.execute(user, {
-      roomId,
-      studentId,
-      reason: dto.reason,
-    })
-    const row = new SeatFlagDto()
-    row.studentId = flagged.studentId
-    row.allowWebClient = flagged.allowWebClient
-    row.allowLateEntry = flagged.allowLateEntry
-    return row
-  }
-
   @Post('seats/:studentId/allow-late')
   @RequireAnyPermission('exam-rooms.technician', 'exam-rooms.manage-all')
   @ApiOperation({
@@ -510,7 +482,6 @@ export class ExamRoomController {
     })
     const row = new SeatFlagDto()
     row.studentId = flagged.studentId
-    row.allowWebClient = flagged.allowWebClient
     row.allowLateEntry = flagged.allowLateEntry
     return row
   }

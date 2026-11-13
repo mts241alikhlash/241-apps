@@ -12,11 +12,18 @@ import {
 } from '../../../../core/filters/api-exception.js'
 import { RoomAccessCodeService } from '../../../../exam-room/application/room-access-code.service.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
-import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
+import type {
+  ExamClient,
+  ExamSession,
+} from '../../../domain/entities/exam-session.entity.js'
 import {
-  assertWebClientAllowed,
+  assertClientVerified,
   type ClientPlatform,
 } from '../../../domain/policies/client-gate.policy.js'
+import {
+  SebVerifier,
+  type SebProof,
+} from '../../../../seb/application/seb-verifier.service.js'
 import { ISessionFinalizer } from '../../../domain/repositories/session-finalizer.port.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { ABSENCE_LOCK_MS } from '../record-session-events/record-session-events.use-case.js'
@@ -26,6 +33,7 @@ export interface ResumeExamSessionInput {
   accessCode: string
   deviceId: string
   platform?: ClientPlatform
+  seb?: SebProof
 }
 
 export interface ResumedSession {
@@ -43,6 +51,7 @@ export class ResumeExamSessionUseCase {
     private readonly roomCodes: RoomAccessCodeService,
     private readonly finalizer: ISessionFinalizer,
     private readonly lifecycle: LifecycleGate,
+    private readonly seb: SebVerifier,
   ) {}
 
   async execute(
@@ -86,7 +95,11 @@ export class ResumeExamSessionUseCase {
         'Sesi aktif di perangkat lain. Minta pengawas melepas sesi',
       )
     }
-    await this.assertClientGate(session, input.platform, now)
+    const platform = input.platform ?? 'native'
+    const sebVerified =
+      platform === 'web' && (await this.seb.verify(input.seb)).verified
+    assertClientVerified({ platform, sebVerified })
+    const client: ExamClient = platform === 'web' ? 'SEB' : 'ISTIQRA'
     if (!(await this.codeMatches(session, input.accessCode, now))) {
       throw new ForbiddenException({
         code: 'TOKEN_REENTRY_REQUIRED',
@@ -98,29 +111,9 @@ export class ResumeExamSessionUseCase {
       requiresTokenReentry: false,
       absentSince: null,
       lastSeenAt: now,
+      client,
     })
     return { session: resumed ?? session, serverTime: now }
-  }
-
-  private async assertClientGate(
-    session: ExamSession,
-    platform: ClientPlatform | undefined,
-    now: Date,
-  ): Promise<void> {
-    const schedule = await this.schedules.findById(session.scheduleId)
-    if (schedule?.eventId == null) return
-    const event = await this.rooms.findEventById(schedule.eventId)
-    if (event === null) return
-    assertWebClientAllowed({
-      platform: platform ?? 'native',
-      requireAndroidApp: event.requireAndroidApp,
-      allowWebClient: session.allowWebClient,
-      now,
-      eventStartsAt: event.startsAt,
-      lateToleranceMinutes: event.lateToleranceMinutes,
-      allowLateEntry: session.allowLateEntry,
-      startedAt: session.startedAt,
-    })
   }
 
   private async codeMatches(
