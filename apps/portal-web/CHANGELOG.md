@@ -1,5 +1,11 @@
 # portal-web
 
+## 0.1.4
+
+### Patch Changes
+
+- 0d58a39: The identity catalog now has `exam-schedules.manage`, which exam-service and exam-web already checked, so the Kegiatan menu and pages open for the roles that schedule exams. The admin-web school unit type menu checks `school-units.read`, the permission its endpoints use. Every web app opens in Indonesian whatever the browser language, as admission-web already did.
+
 ## 0.1.3
 
 ### Patch Changes
