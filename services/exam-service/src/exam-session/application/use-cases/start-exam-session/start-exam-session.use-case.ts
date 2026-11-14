@@ -303,7 +303,15 @@ export class StartExamSessionUseCase {
     if (session.status !== 'IN_PROGRESS') {
       throw new ConflictException('Ujian sudah dikumpulkan')
     }
-    if (session.deviceId === deviceId) return this.result(session, now)
+    if (session.deviceId === deviceId) {
+      if (!session.requiresTokenReentry) return this.result(session, now)
+      const cleared = await this.sessions.applyRecovery(session.id, {
+        requiresTokenReentry: false,
+        absentSince: null,
+        lastSeenAt: now,
+      })
+      return this.result(cleared ?? session, now)
+    }
     if (session.deviceId !== null) {
       throw new ConflictException(
         'Sesi aktif di perangkat lain. Minta pengawas melepas sesi',
