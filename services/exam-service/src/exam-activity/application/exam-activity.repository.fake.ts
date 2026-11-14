@@ -37,6 +37,12 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     ]),
   )
 
+  readonly packageStatuses = new Map<string, string>()
+
+  findPackageStatus(packageId: string) {
+    return Promise.resolve(this.packageStatuses.get(packageId) ?? 'APPROVED')
+  }
+
   findPreset(name: string) {
     const preset = this.presets.get(name as ExamType)
     return Promise.resolve(

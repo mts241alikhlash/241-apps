@@ -79,6 +79,12 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve(this.events.get(eventId) ?? null)
   }
 
+  packageStatus: string | null = 'APPROVED'
+
+  findPackageStatus() {
+    return Promise.resolve(this.packageStatus)
+  }
+
   create(input: Parameters<ExamActivityRepository['create']>[0]) {
     this.lastCreatedActivity = input.activity
     this.created.push({
@@ -285,6 +291,38 @@ describe('CreateActivityUseCase', () => {
       }),
     ).rejects.toBeInstanceOf(BadRequestException)
     expect(repo.created).toEqual([])
+  })
+
+  it.each(['DRAFT', 'SUBMITTED', 'RETURNED'])(
+    'refuses a package that is %s',
+    async (status) => {
+      const repo = new FakeActivityRepository()
+      repo.packageStatus = status
+      await expect(
+        new CreateActivityUseCase(repo, new FakeParticipants()).execute(
+          command,
+        ),
+      ).rejects.toBeInstanceOf(UnprocessableEntityException)
+      expect(repo.created).toEqual([])
+    },
+  )
+
+  it('refuses a package that does not exist', async () => {
+    const repo = new FakeActivityRepository()
+    repo.packageStatus = null
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute(command),
+    ).rejects.toBeInstanceOf(NotFoundException)
+    expect(repo.created).toEqual([])
+  })
+
+  it('accepts a locked package', async () => {
+    const repo = new FakeActivityRepository()
+    repo.packageStatus = 'LOCKED'
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute(
+      command,
+    )
+    expect(repo.created).toHaveLength(1)
   })
 
   it('refuses an unknown preset', async () => {
