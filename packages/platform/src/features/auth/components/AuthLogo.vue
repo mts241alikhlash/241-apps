@@ -15,7 +15,7 @@ const props = withDefaults(
 )
 
 const logoSrc = computed(() =>
-  props.wordmark ? '/logo-name.webp' : '/logo.webp',
+  props.wordmark ? '/logo-name.webp' : authConfig.value.logoSrc,
 )
 
 const sizeClasses = computed(() => {

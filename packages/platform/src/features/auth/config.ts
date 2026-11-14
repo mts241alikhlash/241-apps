@@ -5,6 +5,7 @@ interface AuthConfig {
   appTitle: string
   appSubtitle: string
   logoAlt: string
+  logoSrc: string
   loginTitle: string
   loginSubtitle: string
   identifierLabel: string
@@ -20,6 +21,7 @@ export const authConfig = ref<AuthConfig>({
   appTitle: '241 Apps',
   appSubtitle: 'Sistem Informasi Akademik',
   logoAlt: '241 Apps Logo',
+  logoSrc: '/logo.webp',
   loginTitle: 'Masuk ke 241 Apps',
   loginSubtitle: 'Masukkan kredensial Anda untuk melanjutkan',
   identifierLabel: 'ID Pengguna',

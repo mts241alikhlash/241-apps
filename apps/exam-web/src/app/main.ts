@@ -11,10 +11,11 @@ import { i18n, initialLocale, setLocale } from '@/i18n'
 
 configureAuth({
   appKey: 'EXAM',
-  appTitle: '241 Exam',
+  appTitle: 'Istiqra',
   appSubtitle: 'Sistem Ujian Berbasis Komputer',
-  logoAlt: 'Logo 241 Exam',
-  loginTitle: 'Masuk ke 241 Exam',
+  logoAlt: 'Logo Istiqra',
+  logoSrc: '/istiqra.webp',
+  loginTitle: 'Masuk ke Istiqra',
   loginSubtitle: 'Masuk untuk melanjutkan ke ujian.',
   identifierLabel: 'ID Pengguna',
   homeRoute: '/',

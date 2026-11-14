@@ -10,7 +10,8 @@ interface SwitcherApp {
 }
 
 const LOGO = '/logo.webp'
-const FALLBACK_NAME = '241 Exam'
+const APP_LOGO = '/istiqra.webp'
+const FALLBACK_NAME = 'Istiqra'
 
 const { apps, load } = useSsoApps()
 const currentKey = computed(() => authConfig.value.ssoApp)
@@ -19,11 +20,14 @@ const items = computed<SwitcherApp[]>(() => {
   const listed = apps.value.map((app) => ({
     key: app.key,
     name: app.label,
-    logo: LOGO,
+    logo: app.key === currentKey.value ? APP_LOGO : LOGO,
   }))
   return listed.some((app) => app.key === currentKey.value)
     ? listed
-    : [{ key: currentKey.value, name: FALLBACK_NAME, logo: LOGO }, ...listed]
+    : [
+        { key: currentKey.value, name: FALLBACK_NAME, logo: APP_LOGO },
+        ...listed,
+      ]
 })
 
 function open(app: SwitcherApp) {
