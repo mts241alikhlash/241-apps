@@ -1,5 +1,12 @@
 # exam-service
 
+## 0.4.1
+
+### Patch Changes
+
+- adbca23: An activity can only be created with an approved or locked package, the same rule a single schedule already had, and a session's raw score is rounded to two decimals so partial multiple-response thirds add up to whole numbers (23, not 23.0001).
+- 718e942: Starting an exam again with the right token now clears the token re-entry a proctor reset set, so the student gets the questions instead of "Masukkan token ujian untuk melanjutkan".
+
 ## 0.4.0
 
 ### Minor Changes

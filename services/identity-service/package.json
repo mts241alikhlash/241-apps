@@ -1,6 +1,6 @@
 {
   "name": "identity-service",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "241 Console — identity and access: users, roles, permissions, sessions, audit, school profile",
   "author": "mhrmnvl",
   "private": true,
