@@ -90,42 +90,42 @@ services:
 
   academic-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/academic-web@sha256:98f6b8d017f02fcfdb694659c47f3ff8b16ef9aa9ad9f746acc271978db6ddba
+    image: ghcr.io/mts241alikhlash/academic-web@sha256:bf5c1c6c79df7d69a292fa7589532d356c9eef9ce9a7909f39c9fec7b68176f5
 
   admission-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/admission-web@sha256:54d137d32b9e061e6315af58840a85af6a1ba00a2fbb11644c7770312f205183
+    image: ghcr.io/mts241alikhlash/admission-web@sha256:a2e22047734bf0bf598a8abb7e161d39019271c9e3d1b998bbc48755cc0d1c23
 
   admin-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/admin-web@sha256:84d683231681ff61ca8f20a870205d5fb7046a35e7290c21635e10868452188e
+    image: ghcr.io/mts241alikhlash/admin-web@sha256:1715546f1503286cbdb7d260e77164f80fa16d948a6af979ea06867b0be5fb85
 
   assessment-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/assessment-web@sha256:11791d589cfaf3e3ab62db3cad5dd8588f77679a35ccc7f3a7dd253d3084230a
+    image: ghcr.io/mts241alikhlash/assessment-web@sha256:e6332b434ce986a9dc0b129e79651e26822d3f5380da09725e0d80bada361e73
 
   hr-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/hr-web@sha256:c883be975bf3081b8566987371dd3569164beaedef585bc25ae8a6f4f34f638c
+    image: ghcr.io/mts241alikhlash/hr-web@sha256:d151ae32151ac9502bc1593a8e6b873c5fd449262c784d63fff00314d25c9bd0
 
   account-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/account-web@sha256:02da2302d38bc8b6b70f6c472018960a19f97ad3bc186c47c43fabd838e8d74e
+    image: ghcr.io/mts241alikhlash/account-web@sha256:6317d4a9e65372006ebd68d5e555b69b76c758d7862fe76a93f5819178ff3542
 
   inventory-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/inventory-web@sha256:9c2044f77681a707549e81e9916bf43b4a309d650349362cf64960a1ca619b8d
+    image: ghcr.io/mts241alikhlash/inventory-web@sha256:d41ecb133688ac988a8ff036e1ea83d5fd6b651a9f827eab219e6bb9be7664c3
 
   portal-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/portal-web@sha256:9bd5b78d4fa7ea9086a0f3ba210c6d78d9d942039ef7531dc921eed77eb60e10
+    image: ghcr.io/mts241alikhlash/portal-web@sha256:42222c2088bc52f29c237548086239e0befcd52982968632ed00394e80ecaa09
 
   exam-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/exam-web@sha256:7133e2136bdd2701f0daf540ffaa17e524fb100fff5152074329b0ffe9f84a2f
+    image: ghcr.io/mts241alikhlash/exam-web@sha256:98346fda7557fba41e79ba3e6916cb812ed23cb2acb369b3b2c96d9b839c8275
   identity-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:1d1c164d8edb7509ddbc9107899f3afee4551bf847f9ae47108a5a41b63477ee
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:ea4aef1ec1410366d8a488a9b119cde4d099d7c1d5c44d914f0c645eb079b14a
     env_file:
       - path: env/identity-service.env
     expose:
@@ -251,7 +251,7 @@ services:
 
   exam-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:5966c9fbb79ea47338c955eebc58983be6b86982b7911e1c060a8b2758ae9e1a
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:4a11675ed597b30b9318b755a443efd3cd92efb4531a3fea6121c92495499857
     env_file:
       - path: env/exam-service.env
     expose:
@@ -265,7 +265,7 @@ services:
 
   identity-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:1d1c164d8edb7509ddbc9107899f3afee4551bf847f9ae47108a5a41b63477ee
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:ea4aef1ec1410366d8a488a9b119cde4d099d7c1d5c44d914f0c645eb079b14a
     profiles: ['migrate']
     env_file:
       - path: env/identity-service.env
@@ -328,7 +328,7 @@ services:
 
   exam-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:5966c9fbb79ea47338c955eebc58983be6b86982b7911e1c060a8b2758ae9e1a
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:4a11675ed597b30b9318b755a443efd3cd92efb4531a3fea6121c92495499857
     profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
