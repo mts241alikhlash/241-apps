@@ -90,7 +90,7 @@ services:
 
   academic-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/academic-web@sha256:bf5c1c6c79df7d69a292fa7589532d356c9eef9ce9a7909f39c9fec7b68176f5
+    image: ghcr.io/mts241alikhlash/academic-web@sha256:7a7dbd422dacf1c5ebf76b8489ce20a21426c254fef5b2e9589b20fedd8429b5
 
   admission-web:
     <<: *web-defaults
@@ -98,34 +98,34 @@ services:
 
   admin-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/admin-web@sha256:1715546f1503286cbdb7d260e77164f80fa16d948a6af979ea06867b0be5fb85
+    image: ghcr.io/mts241alikhlash/admin-web@sha256:70fa5ce0f8bb09334f18db1c08f0d5b4f1fcd5a256ca111f2e80160235330bda
 
   assessment-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/assessment-web@sha256:e6332b434ce986a9dc0b129e79651e26822d3f5380da09725e0d80bada361e73
+    image: ghcr.io/mts241alikhlash/assessment-web@sha256:202775b7857864ce319d51e8907308c526c62e598909971510b3cef92eef72d2
 
   hr-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/hr-web@sha256:d151ae32151ac9502bc1593a8e6b873c5fd449262c784d63fff00314d25c9bd0
+    image: ghcr.io/mts241alikhlash/hr-web@sha256:a2955f3632bf91d6d0320f2f667461ad3ced8346f419bd1038e2d1d75e05e2ae
 
   account-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/account-web@sha256:6317d4a9e65372006ebd68d5e555b69b76c758d7862fe76a93f5819178ff3542
+    image: ghcr.io/mts241alikhlash/account-web@sha256:ed43cdb5fb034c4aa79c3b4ed2b353bc17f2be1f940d6f221e1eac9f19e7e5f4
 
   inventory-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/inventory-web@sha256:d41ecb133688ac988a8ff036e1ea83d5fd6b651a9f827eab219e6bb9be7664c3
+    image: ghcr.io/mts241alikhlash/inventory-web@sha256:d7179a765de2f574c75409a1760cef3b6e83112e82d978c0d18bb193f360f3a5
 
   portal-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/portal-web@sha256:42222c2088bc52f29c237548086239e0befcd52982968632ed00394e80ecaa09
+    image: ghcr.io/mts241alikhlash/portal-web@sha256:ffb8efa663694a2a57ab28932ad4c39277d3ff13b94eea08a53f9c06106dcdfe
 
   exam-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/exam-web@sha256:98346fda7557fba41e79ba3e6916cb812ed23cb2acb369b3b2c96d9b839c8275
+    image: ghcr.io/mts241alikhlash/exam-web@sha256:5cb0bbe9dd028361e14d585c7046dfc598e9a939041bafc023c108c8ad82607b
   identity-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:ea4aef1ec1410366d8a488a9b119cde4d099d7c1d5c44d914f0c645eb079b14a
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:f79217a269c0bf07a57f77b4cf8e43aa8790fec3d98a440f5dbab94144a6ae7a
     env_file:
       - path: env/identity-service.env
     expose:
@@ -265,7 +265,7 @@ services:
 
   identity-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:ea4aef1ec1410366d8a488a9b119cde4d099d7c1d5c44d914f0c645eb079b14a
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:f79217a269c0bf07a57f77b4cf8e43aa8790fec3d98a440f5dbab94144a6ae7a
     profiles: ['migrate']
     env_file:
       - path: env/identity-service.env
