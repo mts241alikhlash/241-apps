@@ -112,7 +112,7 @@ describe('computeSessionResult', () => {
     })
   })
 
-  it('rounds the raw score to four decimals', () => {
+  it('rounds the raw score to two decimals', () => {
     const third: PaperSource = { ...mr, points: 1 }
     const result = computeSessionResult(
       [third],
@@ -120,6 +120,24 @@ describe('computeSessionResult', () => {
     )
 
     expect(result.rawScore).toBe(0.5)
+  })
+
+  it('sums thirds of a partial multiple response to a whole raw score', () => {
+    const three: PaperSource = {
+      ...mr,
+      points: 2,
+      content: { choices, answer: { keys: ['A', 'B', 'C'] } },
+    }
+    const sources = ['r1', 'r2', 'r3'].map((questionId) => ({
+      ...three,
+      questionId,
+    }))
+    const result = computeSessionResult(
+      sources,
+      ['r1', 'r2', 'r3'].map((id) => answer(id, { keys: ['A'] })),
+    )
+
+    expect(result.rawScore).toBe(2)
   })
 
   it('awards full points to every session for a BONUS_ALL item', () => {

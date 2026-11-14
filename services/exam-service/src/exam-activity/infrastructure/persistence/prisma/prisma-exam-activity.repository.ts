@@ -111,6 +111,14 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     }
   }
 
+  async findPackageStatus(packageId: string) {
+    const found = await this.prisma.examPackage.findFirst({
+      where: { id: packageId, deletedAt: null },
+      select: { status: true },
+    })
+    return found?.status ?? null
+  }
+
   async findEventRef(eventId: string) {
     return this.prisma.examEvent.findUnique({
       where: { id: eventId },

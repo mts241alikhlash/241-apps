@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common'
 import type { ExamType } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ActivityTokenMode } from '../../../domain/entities/exam-activity.entity.js'
@@ -17,6 +18,7 @@ import {
 import { assertActivityAllowed } from '../../../domain/policies/activity-rules.policy.js'
 
 const MAX_DURATION_MINUTES = 24 * 60
+const READY_PACKAGE_STATUSES = new Set(['APPROVED', 'LOCKED'])
 
 export interface CreateActivityCommand {
   actorId: string
@@ -56,6 +58,17 @@ export class CreateActivityUseCase {
     }
     if (command.endsAt.getTime() <= command.startsAt.getTime()) {
       throw new BadRequestException('Jendela kegiatan tidak masuk akal')
+    }
+    const packageStatus = await this.activities.findPackageStatus(
+      command.packageId,
+    )
+    if (packageStatus === null) {
+      throw new NotFoundException('Paket soal tidak ditemukan')
+    }
+    if (!READY_PACKAGE_STATUSES.has(packageStatus)) {
+      throw new UnprocessableEntityException(
+        'Paket soal belum disetujui. Ajukan dan minta persetujuan dulu',
+      )
     }
     const presetName = command.presetName ?? command.type
     const event = command.eventId

@@ -41,6 +41,7 @@ export abstract class ExamActivityRepository {
     policy: ExamPolicy,
   ): Promise<PolicyPresetRecord | null>
   abstract findEventRef(eventId: string): Promise<ActivityEventRef | null>
+  abstract findPackageStatus(packageId: string): Promise<string | null>
   abstract create(input: {
     activity: NewExamActivity
     classroomIds: string[]

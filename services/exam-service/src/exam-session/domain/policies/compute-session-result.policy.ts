@@ -55,7 +55,7 @@ export function computeSessionResult(
 
   return {
     scores,
-    rawScore: Math.round(rawScore * 10000) / 10000,
+    rawScore: Math.round(rawScore * 100) / 100,
     maxScore,
     pendingManual,
   }

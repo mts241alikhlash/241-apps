@@ -8,6 +8,7 @@ import { LoggerModule } from 'nestjs-pino'
 import { AppConfigModule } from '@mts241alikhlash/nest-core/config'
 import { envSchema } from './core/config/env.validation.js'
 import { PrismaService } from './core/database/prisma.service.js'
+import { authTracker } from './core/throttle/auth-tracker.js'
 import { StorageModule } from './core/storage/storage.module.js'
 import { PrismaModule } from './core/database/prisma.module.js'
 import { HttpExceptionFilter } from '@mts241alikhlash/nest-core/filters'
@@ -47,6 +48,7 @@ import { BloodTypeModule } from './reference-data/blood-type/blood-type.module.j
         {
           name: 'auth',
           skipIf: onlyWhereDeclared('auth'),
+          getTracker: authTracker,
           ttl: configService.get<number>('AUTH_THROTTLE_TTL', 60000),
           limit: configService.get<number>('AUTH_THROTTLE_LIMIT', 20),
         },
