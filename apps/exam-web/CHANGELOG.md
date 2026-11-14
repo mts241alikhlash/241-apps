@@ -1,5 +1,14 @@
 # exam-web
 
+## 0.3.1
+
+### Patch Changes
+
+- fa71065: DataTable shows every row when pagination is hidden instead of only the first ten, so the schedule session list, seat and supervisor panels and package question list are no longer cut off.
+- Updated dependencies [fa71065]
+  - @mts241alikhlash/ui@0.1.2
+  - @mts241alikhlash/platform@0.1.3
+
 ## 0.3.0
 
 ### Minor Changes
