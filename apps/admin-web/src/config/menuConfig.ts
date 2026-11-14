@@ -67,7 +67,7 @@ export const menuSections: MenuSection[] = [
         title: 'menu.schoolUnitTypes',
         url: '/setting/school-unit-type',
         icon: ListChecks,
-        requiredPermission: 'school-unit-types.read',
+        requiredPermission: 'school-units.read',
       },
     ],
   },
