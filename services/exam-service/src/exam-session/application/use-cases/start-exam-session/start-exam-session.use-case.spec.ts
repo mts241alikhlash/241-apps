@@ -295,6 +295,34 @@ describe('StartExamSessionUseCase', () => {
     )
   })
 
+  it('clears the token re-entry of a reset session once the code is right', async () => {
+    const first = await start(build())
+    await sessions.applyRecovery(first.sessionId, {
+      requiresTokenReentry: true,
+      absentSince: NOW,
+    })
+
+    await start(build())
+
+    const resumed = await sessions.findById(first.sessionId)
+    expect(resumed?.requiresTokenReentry).toBe(false)
+    expect(resumed?.absentSince).toBeNull()
+  })
+
+  it('keeps the token re-entry when the code is wrong', async () => {
+    const first = await start(build())
+    await sessions.applyRecovery(first.sessionId, {
+      requiresTokenReentry: true,
+    })
+
+    await expect(start(build(), { code: 'AAAAAA' })).rejects.toThrow(
+      ForbiddenException,
+    )
+    expect(
+      (await sessions.findById(first.sessionId))?.requiresTokenReentry,
+    ).toBe(true)
+  })
+
   it('refuses another device with 409 while the session is bound', async () => {
     await start(build())
 
