@@ -19,6 +19,10 @@ describe('theme.css', () => {
     expect(css).toContain('--icon-control: 0.875rem')
   })
 
+  it('declares a light colour scheme so a dark phone does not darken the pages', () => {
+    expect(css).toMatch(/:root \{\s*color-scheme: light;/)
+  })
+
   it('raises the size tokens below md', () => {
     expect(mobile).toContain('--control-h-xs: 1.5rem')
     expect(mobile).toContain('--control-h-sm: 2rem')
