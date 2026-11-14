@@ -139,7 +139,6 @@ const { target, visible } = useInView()
           </p>
         </div>
 
-        <!-- Desktop navigation controls -->
         <div class="hidden items-center gap-2 md:flex">
           <button
             type="button"
@@ -168,7 +167,6 @@ const { target, visible } = useInView()
         </div>
       </div>
 
-      <!-- Peeking Card Carousel -->
       <div class="relative mt-8 sm:mt-12">
         <div
           ref="track"
@@ -202,7 +200,6 @@ const { target, visible } = useInView()
                 class="size-full object-cover transition duration-300 group-hover:scale-[1.02]"
               />
 
-              <!-- Overlay Hint -->
               <div
                 class="absolute inset-0 flex items-center justify-center bg-[#162d53]/30 opacity-0 backdrop-blur-[2px] transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
               >
@@ -218,7 +215,6 @@ const { target, visible } = useInView()
               </div>
             </button>
 
-            <!-- Card Label -->
             <div class="mt-3 flex items-center justify-between px-1">
               <span class="text-xs font-semibold text-[#836d29]">
                 Bagian {{ index + 1 }} dari {{ total }}
@@ -235,7 +231,6 @@ const { target, visible } = useInView()
           </article>
         </div>
 
-        <!-- Mobile Indicator dots -->
         <div class="mt-6 flex items-center justify-center gap-1.5 md:hidden">
           <button
             v-for="(_, index) in slides"
@@ -254,7 +249,6 @@ const { target, visible } = useInView()
       </div>
     </div>
 
-    <!-- Lightbox Zoom Dialog -->
     <Dialog v-model:open="open">
       <DialogContent
         class="max-h-[95vh] max-w-2xl overflow-hidden bg-black/95 p-2 text-white border-none sm:p-4"

@@ -47,6 +47,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
   --brand-gold: oklch(0.694 0.072 97);
   --control-h-xs: 1.25rem;
