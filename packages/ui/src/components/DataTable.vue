@@ -112,7 +112,7 @@ const table = useVueTable({
     (row as { id?: string }).id ?? String(index),
   enableRowSelection: true,
   get manualPagination() {
-    return props.totalItems !== undefined
+    return props.totalItems !== undefined || props.hidePagination
   },
   get pageCount(): number | undefined {
     if (props.totalItems !== undefined) {
