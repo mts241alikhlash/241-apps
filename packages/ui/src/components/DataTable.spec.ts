@@ -218,3 +218,22 @@ describe('DataTable mobile cards', () => {
     expect(right!.className).toContain('justify-self-end')
   })
 })
+
+describe('DataTable hidden pagination', () => {
+  const many: Row[] = Array.from({ length: 25 }, (_, i) => ({
+    id: String(i),
+    name: `Siswa ${i + 1}`,
+  }))
+
+  it('shows every row when pagination is hidden', () => {
+    const w = mount(DataTable, {
+      props: { columns, data: many, hidePagination: true },
+    })
+    expect(w.findAll('tbody tr')).toHaveLength(25)
+  })
+
+  it('still pages rows when pagination is shown', () => {
+    const w = mount(DataTable, { props: { columns, data: many } })
+    expect(w.findAll('tbody tr')).toHaveLength(10)
+  })
+})
