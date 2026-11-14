@@ -122,7 +122,7 @@ services:
 
   exam-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/exam-web@sha256:5cb0bbe9dd028361e14d585c7046dfc598e9a939041bafc023c108c8ad82607b
+    image: ghcr.io/mts241alikhlash/exam-web@sha256:580db88d5e5c289b38a1cbb3f145cd15c2eb32aba1df01030a55a4ff00607b5d
   identity-service:
     <<: *service-defaults
     image: ghcr.io/mts241alikhlash/identity-service@sha256:f79217a269c0bf07a57f77b4cf8e43aa8790fec3d98a440f5dbab94144a6ae7a
@@ -251,7 +251,7 @@ services:
 
   exam-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:4a11675ed597b30b9318b755a443efd3cd92efb4531a3fea6121c92495499857
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:5408c26d4212893355228b5ab72e97f450ef619be5aeecd702356b8c5bb7eb3f
     env_file:
       - path: env/exam-service.env
     expose:
@@ -328,7 +328,7 @@ services:
 
   exam-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/exam-service@sha256:4a11675ed597b30b9318b755a443efd3cd92efb4531a3fea6121c92495499857
+    image: ghcr.io/mts241alikhlash/exam-service@sha256:5408c26d4212893355228b5ab72e97f450ef619be5aeecd702356b8c5bb7eb3f
     profiles: ['migrate']
     env_file:
       - path: env/exam-service.env
