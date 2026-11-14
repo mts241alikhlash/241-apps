@@ -922,6 +922,12 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
   },
   {
     module: 'exam-schedules',
+    action: 'manage',
+    code: 'exam-schedules.manage',
+    description: 'Create and run exam activities with their schedules',
+  },
+  {
+    module: 'exam-schedules',
     action: 'manage-all',
     code: 'exam-schedules.manage-all',
     description:
