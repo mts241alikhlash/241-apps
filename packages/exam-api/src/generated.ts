@@ -1212,6 +1212,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/seb-configs/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build a .seb that starts on the student exam list of the calling app and register its Config Key */
+        post: operations["SebConfigController_generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/student-exams/{sessionId}/answers": {
         parameters: {
             query?: never;
@@ -1882,6 +1899,11 @@ export interface components {
         ExtendSessionTimeDto: {
             minutes: number;
             reason: string;
+        };
+        GenerateSebConfigDto: {
+            name: string;
+            /** @description Password a proctor types to quit SEB; stored only as its hash */
+            quitPassword?: string;
         };
         GradeAnswerDto: {
             note?: string;
@@ -5472,6 +5494,35 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["CheckSebResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    SebConfigController_generate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateSebConfigDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["SebConfigDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

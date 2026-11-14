@@ -32,6 +32,25 @@ export class CreateSebConfigDto {
   file!: unknown
 }
 
+export class GenerateSebConfigDto {
+  @ApiProperty({ maxLength: 100 })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  name!: string
+
+  @ApiPropertyOptional({
+    minLength: 6,
+    maxLength: 100,
+    description:
+      'Password a proctor types to quit SEB; stored only as its hash',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(6, 100)
+  quitPassword?: string
+}
+
 export class UpdateSebConfigDto {
   @ApiPropertyOptional({ maxLength: 100 })
   @IsOptional()

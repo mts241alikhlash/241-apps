@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
-import { Plus, Trash2 } from '@lucide/vue'
+import { Download, Plus, Trash2, Wand2 } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -31,7 +31,7 @@ import {
 import { Switch } from '@mts241alikhlash/ui/switch'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { isInSeb, readSebProof, SebOutdatedError } from '@/shared/seb'
-import { examSebApi, type SebConfig } from '../api/examSebApi'
+import { examSebApi, sebFileUrl, type SebConfig } from '../api/examSebApi'
 
 const OUTSIDE_SEB = 'Buka halaman ini dari Safe Exam Browser.'
 const NO_MATCH = 'Tidak cocok dengan konfigurasi aktif mana pun.'
@@ -47,6 +47,12 @@ const formName = ref('')
 const formKey = ref('')
 const formFile = ref<File | null>(null)
 const formError = ref<string | null>(null)
+
+const generateOpen = ref(false)
+const generating = ref(false)
+const generateName = ref('')
+const generatePassword = ref('')
+const generateError = ref<string | null>(null)
 
 const deleteTarget = ref<SebConfig | null>(null)
 const deleting = ref(false)
@@ -99,6 +105,41 @@ async function submitAdd(): Promise<void> {
     formError.value = messageOf(err, 'Konfigurasi gagal disimpan.')
   } finally {
     saving.value = false
+  }
+}
+
+function openGenerate(): void {
+  generateName.value = ''
+  generatePassword.value = ''
+  generateError.value = null
+  generateOpen.value = true
+}
+
+async function submitGenerate(): Promise<void> {
+  if (generating.value) return
+  const name = generateName.value.trim()
+  const quitPassword = generatePassword.value
+  if (!name) {
+    generateError.value = 'Isi nama konfigurasi.'
+    return
+  }
+  if (quitPassword && quitPassword.length < 6) {
+    generateError.value = 'Sandi keluar minimal 6 karakter, atau kosongkan.'
+    return
+  }
+  generating.value = true
+  generateError.value = null
+  try {
+    const created = await examSebApi.generate(
+      quitPassword ? { name, quitPassword } : { name },
+    )
+    configs.value = [...configs.value, created]
+    generateOpen.value = false
+    toast.success(`Konfigurasi ${created.name} dibuat.`)
+  } catch (err: unknown) {
+    generateError.value = messageOf(err, 'Konfigurasi gagal dibuat.')
+  } finally {
+    generating.value = false
   }
 }
 
@@ -174,14 +215,25 @@ onMounted(load)
         <CardTitle class="min-w-0 truncate text-sm font-semibold">
           Konfigurasi Safe Exam Browser
         </CardTitle>
-        <Button
-          size="sm"
-          data-test="seb-add"
-          @click="openAdd"
-        >
-          <Plus aria-hidden="true" />
-          Tambah
-        </Button>
+        <div class="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            data-test="seb-generate"
+            @click="openGenerate"
+          >
+            <Wand2 aria-hidden="true" />
+            Buat konfigurasi
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            data-test="seb-add"
+            @click="openAdd"
+          >
+            <Plus aria-hidden="true" />
+            Unggah .seb
+          </Button>
+        </div>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 sm:p-6"
@@ -216,8 +268,8 @@ onMounted(load)
           v-else-if="configs.length === 0"
           class="text-sm text-muted-foreground"
         >
-          Belum ada konfigurasi. Buat berkas .seb dengan SEB Config Tool, lalu
-          tambahkan di sini.
+          Belum ada konfigurasi. Klik Buat konfigurasi, atau unggah berkas .seb
+          dari SEB Config Tool.
         </p>
 
         <ul
@@ -243,6 +295,15 @@ onMounted(load)
                 (value: boolean) => toggleActive(item, value)
               "
             />
+            <a
+              :href="sebFileUrl(item.id)"
+              download
+              :aria-label="`Unduh ${item.name}`"
+              :data-test="`seb-download-${item.id}`"
+              class="inline-flex size-9 items-center justify-center rounded-md hover:bg-muted"
+            >
+              <Download aria-hidden="true" />
+            </a>
             <Button
               variant="ghost"
               size="icon"
@@ -352,6 +413,77 @@ onMounted(load)
             @click="submitAdd"
           >
             Simpan
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog
+      :open="generateOpen"
+      @update:open="(value: boolean) => (generateOpen = value)"
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Buat konfigurasi</DialogTitle>
+          <DialogDescription>
+            Server membuat berkas .seb yang membuka daftar ujian siswa dan
+            mencatat kuncinya. Tidak perlu SEB Config Tool.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <div class="space-y-1">
+            <label
+              for="seb-generate-name"
+              class="text-sm font-medium"
+              >Nama konfigurasi</label
+            >
+            <input
+              id="seb-generate-name"
+              v-model="generateName"
+              data-test="seb-generate-name"
+              type="text"
+              class="w-full rounded-md border px-3 py-2 text-sm"
+            />
+          </div>
+          <div class="space-y-1">
+            <label
+              for="seb-generate-password"
+              class="text-sm font-medium"
+              >Sandi keluar (opsional, minimal 6 karakter)</label
+            >
+            <input
+              id="seb-generate-password"
+              v-model="generatePassword"
+              data-test="seb-generate-password"
+              type="password"
+              autocomplete="new-password"
+              class="w-full rounded-md border px-3 py-2 text-sm"
+            />
+            <p class="text-xs text-muted-foreground">
+              Kosongkan agar siswa bisa keluar dari SEB setelah selesai.
+            </p>
+          </div>
+          <p
+            v-if="generateError !== null"
+            role="alert"
+            class="text-sm"
+          >
+            {{ generateError }}
+          </p>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            @click="generateOpen = false"
+          >
+            Batal
+          </Button>
+          <Button
+            :disabled="generating"
+            data-test="seb-generate-submit"
+            @click="submitGenerate"
+          >
+            Buat
           </Button>
         </DialogFooter>
       </DialogContent>

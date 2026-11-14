@@ -12,9 +12,20 @@ import {
   type SebConfigPatch,
 } from '../../../domain/repositories/seb-config.repository.js'
 import { ISebConfigStorage } from '../../../domain/repositories/seb-config-storage.js'
+import {
+  buildSebSettings,
+  sebConfigKey,
+  sebFile,
+} from '../../../domain/policies/seb-config-builder.policy.js'
 
 export const SEB_CONFIG_MAX_BYTES = 1024 * 1024
 const CONFIG_KEY_PATTERN = /^[0-9a-f]{64}$/
+
+export interface GenerateSebConfigInput {
+  name: string
+  startUrl: string
+  quitPassword?: string
+}
 
 export interface CreateSebConfigInput {
   name: string
@@ -66,6 +77,19 @@ export class ManageSebConfigsUseCase {
       storageKey,
       active: true,
       createdById: userId,
+    })
+  }
+
+  generate(userId: string, input: GenerateSebConfigInput): Promise<SebConfig> {
+    const settings = buildSebSettings({
+      startUrl: input.startUrl,
+      quitPassword: input.quitPassword,
+    })
+    return this.create(userId, {
+      name: input.name,
+      configKey: sebConfigKey(settings),
+      originalName: 'ujian.seb',
+      file: sebFile(settings),
     })
   }
 

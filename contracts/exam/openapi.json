@@ -5105,6 +5105,56 @@
         ]
       }
     },
+    "/seb-configs/generate": {
+      "post": {
+        "operationId": "SebConfigController_generate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSebConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SebConfigDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Build a .seb that starts on the student exam list of the calling app and register its Config Key",
+        "tags": [
+          "Safe Exam Browser"
+        ]
+      }
+    },
     "/seb-configs/{id}": {
       "patch": {
         "operationId": "SebConfigController_update",
@@ -10595,6 +10645,24 @@
           "name",
           "configKey",
           "file"
+        ]
+      },
+      "GenerateSebConfigDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "quitPassword": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 100,
+            "description": "Password a proctor types to quit SEB; stored only as its hash"
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "UpdateSebConfigDto": {
