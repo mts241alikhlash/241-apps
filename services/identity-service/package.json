@@ -73,7 +73,7 @@
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "tsx": "catalog:",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@mts241alikhlash/eslint-config": "workspace:*",
