@@ -4,8 +4,10 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -32,12 +34,16 @@ import {
   ManageSebConfigsUseCase,
   SEB_CONFIG_MAX_BYTES,
 } from '../../application/use-cases/manage-seb-configs/manage-seb-configs.use-case.js'
-import { SebVerifier } from '../../application/seb-verifier.service.js'
+import {
+  SEB_ALLOWED_ORIGINS,
+  SebVerifier,
+} from '../../application/seb-verifier.service.js'
 import {
   ActiveSebConfigDto,
   CheckSebRequestDto,
   CheckSebResponseDto,
   CreateSebConfigDto,
+  GenerateSebConfigDto,
   SebConfigDto,
   UpdateSebConfigDto,
 } from './dto/seb-config.dto.js'
@@ -50,6 +56,7 @@ export class SebConfigController {
   constructor(
     private readonly configs: ManageSebConfigsUseCase,
     private readonly verifier: SebVerifier,
+    @Inject(SEB_ALLOWED_ORIGINS) private readonly allowedOrigins: string[],
   ) {}
 
   @Get()
@@ -108,6 +115,31 @@ export class SebConfigController {
         configKey: dto.configKey,
         originalName: file.originalname,
         file: file.buffer,
+      }),
+    )
+  }
+
+  @Post('generate')
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions('exam-schedules.manage-all')
+  @ApiOperation({
+    summary:
+      'Build a .seb that starts on the student exam list of the calling app and register its Config Key',
+  })
+  @ApiResponse({ status: 201, type: SebConfigDto })
+  async generate(
+    @CurrentUser() user: { id: string },
+    @Headers('origin') origin: string | undefined,
+    @Body() dto: GenerateSebConfigDto,
+  ): Promise<SebConfigDto> {
+    if (!origin || !this.allowedOrigins.includes(origin)) {
+      throw new BadRequestException('Buat konfigurasi dari aplikasi ujian')
+    }
+    return SebConfigDto.fromDomain(
+      await this.configs.generate(user.id, {
+        name: dto.name,
+        startUrl: `${origin}/my-exams`,
+        quitPassword: dto.quitPassword,
       }),
     )
   }

@@ -6,10 +6,11 @@ import SebSettingsView from './SebSettingsView.vue'
 import type * as SebModule from '@/shared/seb'
 import type { SebProof } from '@/shared/seb'
 
-const { list, create, update, remove, check, isInSeb, readSebProof } =
+const { list, create, generate, update, remove, check, isInSeb, readSebProof } =
   vi.hoisted(() => ({
     list: vi.fn(),
     create: vi.fn(),
+    generate: vi.fn(),
     update: vi.fn(),
     remove: vi.fn(),
     check: vi.fn(),
@@ -18,7 +19,8 @@ const { list, create, update, remove, check, isInSeb, readSebProof } =
   }))
 
 vi.mock('../api/examSebApi', () => ({
-  examSebApi: { list, create, update, remove, check },
+  examSebApi: { list, create, generate, update, remove, check },
+  sebFileUrl: (id: string) => `/public/seb-configs/${id}/file`,
 }))
 
 vi.mock('@/shared/seb', async (importOriginal) => ({
@@ -126,6 +128,51 @@ describe('SebSettingsView', () => {
       configKey: 'k'.repeat(64),
       file,
     })
+    wrapper.unmount()
+  })
+
+  it('builds a configuration on the server from a name and an optional quit password', async () => {
+    generate.mockResolvedValue({ ...sample[0], id: 'id-2', name: 'Ujian Web' })
+    const wrapper = mount(SebSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    await wrapper.get('[data-test="seb-generate"]').trigger('click')
+    await wrapper.get('[data-test="seb-generate-name"]').setValue('Ujian Web')
+    await wrapper
+      .get('[data-test="seb-generate-password"]')
+      .setValue('rahasia123')
+    await wrapper.get('[data-test="seb-generate-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(generate).toHaveBeenCalledWith({
+      name: 'Ujian Web',
+      quitPassword: 'rahasia123',
+    })
+    expect(wrapper.text()).toContain('Ujian Web')
+    wrapper.unmount()
+  })
+
+  it('leaves the quit password out when it is empty', async () => {
+    generate.mockResolvedValue(sample[0])
+    const wrapper = mount(SebSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    await wrapper.get('[data-test="seb-generate"]').trigger('click')
+    await wrapper.get('[data-test="seb-generate-name"]').setValue('Ujian Web')
+    await wrapper.get('[data-test="seb-generate-submit"]').trigger('click')
+    await flushPromises()
+
+    expect(generate).toHaveBeenCalledWith({ name: 'Ujian Web' })
+    wrapper.unmount()
+  })
+
+  it('offers each configuration file for download', async () => {
+    const wrapper = mount(SebSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    expect(
+      wrapper.get('[data-test="seb-download-id-1"]').attributes('href'),
+    ).toBe('/public/seb-configs/id-1/file')
     wrapper.unmount()
   })
 

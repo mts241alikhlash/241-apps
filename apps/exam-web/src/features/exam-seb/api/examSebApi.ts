@@ -31,6 +31,9 @@ export const examSebApi = {
     )
   },
 
+  generate: (body: Schemas['GenerateSebConfigDto']) =>
+    unwrap(examClient.POST('/seb-configs/generate', { body })),
+
   update: (id: string, body: Schemas['UpdateSebConfigDto']) =>
     unwrap(
       examClient.PATCH('/seb-configs/{id}', {
@@ -49,3 +52,5 @@ export const examSebApi = {
   check: (body: Schemas['CheckSebRequestDto']): Promise<CheckSebResult> =>
     unwrap(examClient.POST('/seb-configs/check', { body })),
 }
+
+export const sebFileUrl = (id: string) => `/public/seb-configs/${id}/file`

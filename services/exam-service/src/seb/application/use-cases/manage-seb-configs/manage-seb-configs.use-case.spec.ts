@@ -9,6 +9,11 @@ import {
   FakeSebConfigStorage,
 } from '../../seb-config.repository.fake.js'
 import { ManageSebConfigsUseCase } from './manage-seb-configs.use-case.js'
+import {
+  buildSebSettings,
+  sebConfigKey,
+  sebFile,
+} from '../../../domain/policies/seb-config-builder.policy.js'
 
 const KEY = 'a'.repeat(64)
 const file = Buffer.from('<seb:Settings/>')
@@ -104,5 +109,36 @@ describe('ManageSebConfigsUseCase', () => {
     await expect(
       build().useCase.file('00000000-0000-4000-8000-000000000000'),
     ).rejects.toThrow(NotFoundException)
+  })
+
+  it('generates a .seb whose key is the SEB Config Key of its settings', async () => {
+    const { useCase, storage } = build()
+    const config = await useCase.generate('user-1', {
+      name: 'Ujian sekolah',
+      startUrl: 'https://exam.example/my-exams',
+    })
+
+    const expected = sebConfigKey(
+      buildSebSettings({ startUrl: 'https://exam.example/my-exams' }),
+    )
+    expect(config.configKey).toBe(expected)
+    expect(storage.objects.get(config.storageKey)).toEqual(
+      sebFile(buildSebSettings({ startUrl: 'https://exam.example/my-exams' })),
+    )
+  })
+
+  it('refuses a generated config identical to one already registered', async () => {
+    const { useCase } = build()
+    await useCase.generate('user-1', {
+      name: 'A',
+      startUrl: 'https://exam.example/my-exams',
+    })
+
+    await expect(
+      useCase.generate('user-1', {
+        name: 'B',
+        startUrl: 'https://exam.example/my-exams',
+      }),
+    ).rejects.toThrow(ConflictException)
   })
 })

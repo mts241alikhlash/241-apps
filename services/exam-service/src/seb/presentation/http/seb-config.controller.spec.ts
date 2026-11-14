@@ -1,4 +1,8 @@
-import { NotFoundException, StreamableFile } from '@nestjs/common'
+import {
+  BadRequestException,
+  NotFoundException,
+  StreamableFile,
+} from '@nestjs/common'
 import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { IS_PUBLIC_KEY } from '@mts241alikhlash/nest-core/decorators'
 import type { Response } from 'express'
@@ -16,13 +20,16 @@ import {
 const user = { id: 'user-1', roles: [], permissions: [] }
 const KEY = 'b'.repeat(64)
 const UNKNOWN = '00000000-0000-4000-8000-000000000000'
+const EXAM_ORIGIN = 'https://exam.example'
 
 function build() {
   const repo = new FakeSebConfigRepository()
   const useCase = new ManageSebConfigsUseCase(repo, new FakeSebConfigStorage())
   return {
     useCase,
-    controller: new SebConfigController(useCase, new SebVerifier(repo, [])),
+    controller: new SebConfigController(useCase, new SebVerifier(repo, []), [
+      EXAM_ORIGIN,
+    ]),
     files: new SebConfigFileController(useCase),
   }
 }
@@ -40,6 +47,7 @@ describe('SebConfigController', () => {
     for (const handler of [
       SebConfigController.prototype.list,
       SebConfigController.prototype.create,
+      SebConfigController.prototype.generate,
       SebConfigController.prototype.update,
       SebConfigController.prototype.remove,
     ]) {
@@ -102,5 +110,27 @@ describe('SebConfigController', () => {
     await expect(
       files.download(UNKNOWN, { set: vi.fn() } as unknown as Response),
     ).rejects.toThrow(NotFoundException)
+  })
+
+  it('generates a config that starts on the exam list of the calling app', async () => {
+    const { controller } = build()
+
+    const config = await controller.generate(user, EXAM_ORIGIN, {
+      name: 'Ujian sekolah',
+    })
+
+    expect(config.name).toBe('Ujian sekolah')
+    expect(config.configKey).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('refuses to generate for an origin the server does not serve', async () => {
+    const { controller } = build()
+
+    await expect(
+      controller.generate(user, 'https://evil.example', { name: 'X' }),
+    ).rejects.toThrow(BadRequestException)
+    await expect(
+      controller.generate(user, undefined, { name: 'X' }),
+    ).rejects.toThrow(BadRequestException)
   })
 })
