@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.4.0
+
+### Minor Changes
+
+- a13680d: Safe Exam Browser configurations can be built in exam-web without SEB Config Tool: the server writes a plain .seb (gzip of plnd plus the gzipped plist) that opens the student exam list of the calling app, computes its Config Key with the SEB-JSON rules, stores it, and each configuration can be downloaded from the settings page.
+
 ## 0.3.2
 
 ### Patch Changes
