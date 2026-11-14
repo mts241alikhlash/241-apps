@@ -1,5 +1,11 @@
 # @mts241alikhlash/ui
 
+## 0.1.3
+
+### Patch Changes
+
+- b96d6ad: Every web app declares a light colour scheme (meta tag and `color-scheme: light` on `:root`), so a phone in dark mode no longer darkens form controls and scrollbars; dark mode is left for a later phase. The admission landing drops its template comments.
+
 ## 0.1.2
 
 ### Patch Changes

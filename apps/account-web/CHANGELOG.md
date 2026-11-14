@@ -1,5 +1,14 @@
 # account-web
 
+## 0.1.5
+
+### Patch Changes
+
+- b96d6ad: Every web app declares a light colour scheme (meta tag and `color-scheme: light` on `:root`), so a phone in dark mode no longer darkens form controls and scrollbars; dark mode is left for a later phase. The admission landing drops its template comments.
+- Updated dependencies [b96d6ad]
+  - @mts241alikhlash/ui@0.1.3
+  - @mts241alikhlash/platform@0.1.4
+
 ## 0.1.4
 
 ### Patch Changes
