@@ -1,7 +1,7 @@
 {
   "name": "portal-web",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "241 Portal: the public website and its content management area",
   "type": "module",
   "scripts": {
