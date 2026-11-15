@@ -1,11 +1,10 @@
-import { BadRequestException, HttpException } from '@nestjs/common'
+import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
-import { Readable } from 'node:stream'
 import type { Choice } from '../../../question/domain/value-objects/question-content.js'
+import type { ImportSheet, SheetIdentity } from '../../domain/import-sheet.js'
 import { IMPORT_MAX_QUESTIONS } from '../../domain/import-limits.js'
 import {
   JENIS_TYPES,
-  type ParseResult,
   type ParsedQuestion,
 } from '../../domain/parsed-question.js'
 import {
@@ -14,6 +13,7 @@ import {
   parsePoints,
 } from '../../domain/policies/import-content.policy.js'
 import { textToHtml } from '../../domain/policies/inline-latex.policy.js'
+import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
 
 const CHOICE_COLUMNS = ['A', 'B', 'C', 'D', 'E'] as const
 
@@ -60,62 +60,66 @@ function parseRow(
   }
 }
 
-export async function parseExcelQuestions(
-  buffer: Buffer,
-): Promise<ParseResult> {
-  const reader = new ExcelJS.stream.xlsx.WorkbookReader(Readable.from(buffer), {
-    worksheets: 'emit',
-    sharedStrings: 'cache',
-    hyperlinks: 'ignore',
-    styles: 'ignore',
-    entries: 'ignore',
+function readIdentity(book: ExcelJS.Workbook): SheetIdentity {
+  const sheet = book.getWorksheet('Identitas')
+  const values = new Map<string, string>()
+  sheet?.eachRow((row) => {
+    values.set(
+      row.getCell(1).text.trim().toLowerCase(),
+      row.getCell(2).text.trim(),
+    )
   })
+  const version = values.get('versi template') ?? ''
+  return {
+    version: /^\d+$/.test(version) ? Number(version) : null,
+    teacherName: values.get('nama guru') ?? '',
+    nik: values.get('nik') ?? '',
+    subjectName: values.get('mapel') ?? '',
+    gradeLevel: parseGradeLevel(values.get('tingkat') ?? ''),
+  }
+}
 
-  const result: ParseResult = { questions: [], errors: [] }
-  let columns: Map<string, number> | null = null
-  let counted = 0
-  let sawSheet = false
-
+export async function parseExcelSheet(buffer: Buffer): Promise<ImportSheet> {
+  const book = new ExcelJS.Workbook()
   try {
-    for await (const sheet of reader) {
-      sawSheet = true
-      for await (const row of sheet as AsyncIterable<ExcelJS.Row>) {
-        if (row.number === 1) {
-          columns = readColumns(row)
-          if (!columns.has('jenis') || !columns.has('soal')) {
-            throw new BadRequestException(
-              'Kolom Jenis dan Soal tidak ditemukan',
-            )
-          }
-          continue
-        }
-        if (columns === null) continue
-
-        try {
-          const question = parseRow(row, columns)
-          if (question === null) continue
-          counted += 1
-          result.questions.push(question)
-        } catch (error) {
-          if (!(error instanceof ImportRowError)) throw error
-          counted += 1
-          result.errors.push({ row: row.number, reason: error.message })
-        }
-        if (counted > IMPORT_MAX_QUESTIONS) {
-          throw new BadRequestException('Maksimal 500 soal per berkas')
-        }
-      }
-      break
-    }
-  } catch (error) {
-    if (error instanceof HttpException) throw error
+    await book.xlsx.load(buffer as unknown as ExcelJS.Buffer)
+  } catch {
     throw new BadRequestException('Berkas Excel tidak bisa dibaca')
   }
 
-  if (!sawSheet)
-    throw new BadRequestException('Berkas Excel tidak punya lembar')
-  if (columns === null) {
+  const result: ImportSheet = {
+    identity: readIdentity(book),
+    questions: [],
+    errors: [],
+    warnings: [],
+  }
+  const sheet = book.getWorksheet('Soal')
+  if (sheet === undefined) {
+    result.errors.push({ row: 0, reason: 'Lembar Soal tidak ditemukan' })
+    return result
+  }
+
+  const columns = readColumns(sheet.getRow(1))
+  if (!columns.has('jenis') || !columns.has('soal')) {
     throw new BadRequestException('Kolom Jenis dan Soal tidak ditemukan')
+  }
+
+  let counted = 0
+  for (let number = 2; number <= sheet.rowCount; number += 1) {
+    const row = sheet.getRow(number)
+    try {
+      const question = parseRow(row, columns)
+      if (question === null) continue
+      counted += 1
+      result.questions.push(question)
+    } catch (error) {
+      if (!(error instanceof ImportRowError)) throw error
+      counted += 1
+      result.errors.push({ row: row.number, reason: error.message })
+    }
+    if (counted > IMPORT_MAX_QUESTIONS) {
+      throw new BadRequestException('Maksimal 500 soal per berkas')
+    }
   }
   return result
 }

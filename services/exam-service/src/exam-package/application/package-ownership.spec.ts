@@ -114,6 +114,9 @@ describe('a package can be changed only by the teacher who started it, or a mana
             new FakeExamFileRepository(),
             new FakeExamFileStorage(),
           ),
+          {} as never,
+          {} as never,
+          {} as never,
         ).execute(COLLEAGUE, {
           buffer: Buffer.from([0x50, 0x4b, 0x03, 0x04, 0]),
           size: 5,

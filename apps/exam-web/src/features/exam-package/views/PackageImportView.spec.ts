@@ -5,6 +5,7 @@ import { defineComponent } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import PackageImportView from './PackageImportView.vue'
 import type { ExamPackageView } from '../types'
+import type { ImportPreview } from '@/features/exam-bank/types'
 
 type Wrapper = Pick<VueWrapper, 'findAll' | 'get'>
 
@@ -12,20 +13,20 @@ const {
   push,
   replace,
   loadPackage,
+  previewImport,
   importQuestions,
   downloadTemplate,
   loadReferences,
-  loadTeachers,
   permissions,
   user,
 } = vi.hoisted(() => ({
   push: vi.fn(),
   replace: vi.fn(),
   loadPackage: vi.fn(),
+  previewImport: vi.fn(),
   importQuestions: vi.fn(),
   downloadTemplate: vi.fn(),
   loadReferences: vi.fn(),
-  loadTeachers: vi.fn(),
   permissions: new Set<string>(),
   user: { value: { id: 'u1' } },
 }))
@@ -53,9 +54,9 @@ vi.mock('../services/examPackageService', () => ({
 vi.mock('@/features/exam-bank/services/examBankService', () => ({
   examBankService: {
     loadReferences,
+    previewImport,
     importQuestions,
     downloadTemplate,
-    loadTeachers,
   },
 }))
 
@@ -78,13 +79,7 @@ const stubs = {
   CardTitle: passthrough,
   CardContent: passthrough,
   CardFooter: passthrough,
-  FloatingLabelField: passthrough,
   FileDropzone: dropzone,
-  Select: passthrough,
-  SelectContent: passthrough,
-  SelectItem: passthrough,
-  SelectTrigger: passthrough,
-  SelectValue: passthrough,
 }
 
 const view = (overrides: Partial<ExamPackageView> = {}): ExamPackageView => ({
@@ -102,6 +97,31 @@ const view = (overrides: Partial<ExamPackageView> = {}): ExamPackageView => ({
   ...overrides,
 })
 
+const preview = (overrides: Partial<ImportPreview> = {}): ImportPreview => ({
+  authorName: 'Siti Aminah',
+  canSave: true,
+  counts: {
+    MULTIPLE_CHOICE: 2,
+    MULTIPLE_RESPONSE: 0,
+    TRUE_FALSE: 0,
+    SHORT_ANSWER: 0,
+    ESSAY: 0,
+  },
+  duplicateRows: [],
+  errors: [],
+  identity: {
+    version: 2,
+    teacherName: 'Siti Aminah',
+    nik: '3201010101010001',
+    subjectName: 'Matematika',
+    gradeLevel: 7,
+  },
+  total: 2,
+  totalPoints: 4,
+  warnings: [],
+  ...overrides,
+})
+
 async function choose(host: Wrapper, file: File) {
   const input = host.get('[data-testid="dropzone"]')
   Object.defineProperty(input.element, 'files', {
@@ -109,10 +129,13 @@ async function choose(host: Wrapper, file: File) {
     configurable: true,
   })
   await input.trigger('change')
+  await flushPromises()
 }
 
 const findButton = (wrapper: Wrapper, text: string) =>
   wrapper.findAll('button').find((node) => node.text().includes(text))
+
+const saveButton = (wrapper: Wrapper) => findButton(wrapper, 'Impor')!
 
 async function mountView() {
   const wrapper = mount(PackageImportView, { global: { stubs } })
@@ -129,9 +152,48 @@ describe('PackageImportView', () => {
     user.value = { id: 'u1' }
     loadPackage.mockResolvedValue(view())
     loadReferences.mockResolvedValue(undefined)
+    previewImport.mockResolvedValue({ success: true, data: preview() })
   })
 
-  it('posts the chosen file with the id of the package, and no subject or grade', async () => {
+  it('previews the chosen file and does not import it yet', async () => {
+    const wrapper = await mountView()
+    const file = new File(['x'], 'soal.xlsx')
+
+    await choose(wrapper, file)
+
+    expect(previewImport).toHaveBeenCalledWith({ file, packageId: 'p1' })
+    expect(importQuestions).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('shows the preview of the file', async () => {
+    const wrapper = await mountView()
+
+    await choose(wrapper, new File(['x'], 'soal.xlsx'))
+
+    expect(wrapper.text()).toContain('Siti Aminah')
+    expect(wrapper.text()).toContain('Total soal 2')
+    wrapper.unmount()
+  })
+
+  it('keeps Impor disabled while the preview says it cannot be saved', async () => {
+    previewImport.mockResolvedValue({
+      success: true,
+      data: preview({
+        canSave: false,
+        errors: [{ row: 2, reason: 'Isi soal wajib diisi' }],
+      }),
+    })
+    const wrapper = await mountView()
+
+    await choose(wrapper, new File(['x'], 'soal.xlsx'))
+
+    expect(wrapper.text()).toContain('Baris 2: Isi soal wajib diisi')
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('enables Impor when the preview can be saved, and saves with no duplicate confirmation', async () => {
     importQuestions.mockResolvedValue({
       success: true,
       data: { created: 2, questionIds: ['a', 'b'], errors: [] },
@@ -140,14 +202,61 @@ describe('PackageImportView', () => {
     const file = new File(['x'], 'soal.xlsx')
 
     await choose(wrapper, file)
-    await findButton(wrapper, 'Impor')!.trigger('click')
+    expect(saveButton(wrapper).attributes('disabled')).toBeUndefined()
+    await saveButton(wrapper).trigger('click')
     await flushPromises()
 
     expect(importQuestions).toHaveBeenCalledWith({
       file,
       packageId: 'p1',
-      authorEmployeeId: undefined,
+      confirmDuplicates: false,
     })
+    wrapper.unmount()
+  })
+
+  it('needs the duplicate checkbox before saving a file with duplicates', async () => {
+    previewImport.mockResolvedValue({
+      success: true,
+      data: preview({ canSave: false, duplicateRows: [3, 5] }),
+    })
+    importQuestions.mockResolvedValue({
+      success: true,
+      data: { created: 2, questionIds: ['a', 'b'], errors: [] },
+    })
+    const wrapper = await mountView()
+    const file = new File(['x'], 'soal.xlsx')
+
+    await choose(wrapper, file)
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
+
+    await wrapper.get('[role="checkbox"]').trigger('click')
+    expect(saveButton(wrapper).attributes('disabled')).toBeUndefined()
+    await saveButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(importQuestions).toHaveBeenCalledWith({
+      file,
+      packageId: 'p1',
+      confirmDuplicates: true,
+    })
+    wrapper.unmount()
+  })
+
+  it('keeps Impor disabled when the preview has errors even with duplicates ticked', async () => {
+    previewImport.mockResolvedValue({
+      success: true,
+      data: preview({
+        canSave: false,
+        duplicateRows: [3],
+        errors: [{ row: 1, reason: 'Poin tidak valid' }],
+      }),
+    })
+    const wrapper = await mountView()
+
+    await choose(wrapper, new File(['x'], 'soal.xlsx'))
+    await wrapper.get('[role="checkbox"]').trigger('click')
+
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
     wrapper.unmount()
   })
 
@@ -166,7 +275,7 @@ describe('PackageImportView', () => {
     const wrapper = await mountView()
     await choose(wrapper, new File(['x'], 'soal.xlsx'))
 
-    await findButton(wrapper, 'Impor')!.trigger('click')
+    await saveButton(wrapper).trigger('click')
     await flushPromises()
 
     const result = wrapper.get('[data-testid="import-result"]').text()
@@ -194,7 +303,7 @@ describe('PackageImportView', () => {
     const wrapper = await mountView()
     await choose(wrapper, new File(['x'], 'soal.xlsx'))
 
-    await findButton(wrapper, 'Impor')!.trigger('click')
+    await saveButton(wrapper).trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('Baris 2: Isi soal wajib diisi')
@@ -202,7 +311,7 @@ describe('PackageImportView', () => {
     wrapper.unmount()
   })
 
-  it('shows the server message when the package refuses the file', async () => {
+  it('shows the server message when the package refuses the save', async () => {
     importQuestions.mockResolvedValue({
       success: false,
       error: 'Paket berstatus SUBMITTED dan tidak bisa diubah',
@@ -210,10 +319,31 @@ describe('PackageImportView', () => {
     const wrapper = await mountView()
     await choose(wrapper, new File(['x'], 'soal.xlsx'))
 
-    await findButton(wrapper, 'Impor')!.trigger('click')
+    await saveButton(wrapper).trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('Paket berstatus SUBMITTED')
+    wrapper.unmount()
+  })
+
+  it('shows the server message when the file cannot be previewed', async () => {
+    previewImport.mockResolvedValue({
+      success: false,
+      error: 'Versi template tidak sesuai',
+    })
+    const wrapper = await mountView()
+
+    await choose(wrapper, new File(['x'], 'soal.xlsx'))
+
+    expect(wrapper.text()).toContain('Versi template tidak sesuai')
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('has no author select', async () => {
+    const wrapper = await mountView()
+
+    expect(wrapper.text()).not.toContain('Penulis')
     wrapper.unmount()
   })
 
@@ -227,7 +357,8 @@ describe('PackageImportView', () => {
     Object.defineProperty(big, 'size', { value: 11 * 1024 * 1024 })
     await choose(wrapper, big)
     expect(wrapper.text()).toContain('Ukuran berkas maksimal 10 MB.')
-    expect(findButton(wrapper, 'Impor')!.attributes('disabled')).toBeDefined()
+    expect(previewImport).not.toHaveBeenCalled()
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
     wrapper.unmount()
   })
 

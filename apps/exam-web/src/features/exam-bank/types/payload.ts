@@ -21,4 +21,6 @@ export type ImportRowError = Schemas['ImportErrorDto']
 
 export type ImportResult = Schemas['ImportResultDto']
 
+export type ImportPreview = Schemas['ImportPreviewDto']
+
 export type TemplateFormat = 'xlsx' | 'docx'

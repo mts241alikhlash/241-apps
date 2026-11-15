@@ -1,37 +1,39 @@
-import { prepareQuestion } from '../../../../question/domain/policies/prepare-question.policy.js'
-import { parseExcelQuestions } from '../../parsers/excel-question.parser.js'
-import { parseWordQuestions } from '../../parsers/word-question.parser.js'
+import JSZip from 'jszip'
+import { describe, expect, it } from 'vitest'
+import { parseExcelSheet } from '../../parsers/excel-sheet.parser.js'
+import { parseWordSheet } from '../../parsers/word-sheet.parser.js'
 import { GetImportTemplateUseCase } from './get-import-template.use-case.js'
+
+const QUESTION_TYPES = [
+  'MULTIPLE_CHOICE',
+  'MULTIPLE_RESPONSE',
+  'TRUE_FALSE',
+  'SHORT_ANSWER',
+  'ESSAY',
+]
 
 describe('GetImportTemplateUseCase', () => {
   it('gives an Excel template whose examples all import cleanly', async () => {
     const template = await new GetImportTemplateUseCase().execute('xlsx')
 
-    const parsed = await parseExcelQuestions(template.buffer)
+    const sheet = await parseExcelSheet(template.buffer)
 
     expect(template.fileName).toBe('template-soal.xlsx')
     expect(template.contentType).toBe(
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
-    expect(parsed.errors).toEqual([])
-    expect(parsed.questions.map((q) => q.type)).toEqual([
-      'MULTIPLE_CHOICE',
-      'MULTIPLE_RESPONSE',
-      'TRUE_FALSE',
-      'SHORT_ANSWER',
-      'ESSAY',
-    ])
-    for (const question of parsed.questions) {
-      expect(() =>
-        prepareQuestion(question.type, question.bodyHtml, question.content),
-      ).not.toThrow()
-    }
+    expect(sheet.identity.version).toBe(2)
+    expect(sheet.errors).toEqual([])
+    expect(sheet.questions.map((q) => q.type)).toEqual(QUESTION_TYPES)
   })
 
-  it('gives a Word template whose examples all import cleanly', async () => {
+  it('gives a Word template with two tables whose examples all import cleanly', async () => {
     const template = await new GetImportTemplateUseCase().execute('docx')
 
-    const parsed = await parseWordQuestions(template.buffer, () =>
+    const xml = await JSZip.loadAsync(template.buffer).then((zip) =>
+      zip.file('word/document.xml')!.async('string'),
+    )
+    const sheet = await parseWordSheet(template.buffer, () =>
       Promise.resolve('unused'),
     )
 
@@ -39,18 +41,10 @@ describe('GetImportTemplateUseCase', () => {
     expect(template.contentType).toBe(
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     )
-    expect(parsed.errors).toEqual([])
-    expect(parsed.questions.map((q) => q.type)).toEqual([
-      'MULTIPLE_CHOICE',
-      'MULTIPLE_RESPONSE',
-      'TRUE_FALSE',
-      'SHORT_ANSWER',
-      'ESSAY',
-    ])
-    for (const question of parsed.questions) {
-      expect(() =>
-        prepareQuestion(question.type, question.bodyHtml, question.content),
-      ).not.toThrow()
-    }
+    expect(xml.match(/<w:tbl>/gu)).toHaveLength(2)
+    expect(xml).toContain('Versi Template')
+    expect(sheet.identity.version).toBe(2)
+    expect(sheet.errors).toEqual([])
+    expect(sheet.questions.map((q) => q.type)).toEqual(QUESTION_TYPES)
   })
 })

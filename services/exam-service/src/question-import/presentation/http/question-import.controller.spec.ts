@@ -1,5 +1,6 @@
 import { BadRequestException, StreamableFile } from '@nestjs/common'
 import type { Response } from 'express'
+import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import {
   FakeExamFileRepository,
   FakeExamFileStorage,
@@ -34,7 +35,7 @@ function build() {
     deletedAt: null,
     items: [],
   })
-  const { scope, employees } = buildTeacherScope({
+  const { scope, employees, academic } = buildTeacherScope({
     employeeId: 'emp-1',
     pairs: [MATH_7],
   })
@@ -50,6 +51,9 @@ function build() {
           new FakeExamFileRepository(),
           new FakeExamFileStorage(),
         ),
+        academic,
+        { findEmployeeIdByNik: () => Promise.resolve(null) },
+        questions,
       ),
       template,
     ),
@@ -57,23 +61,13 @@ function build() {
 }
 
 describe('QuestionImportController', () => {
-  it('serves the template as an attachment and imports it back', async () => {
-    const { controller, template } = build()
+  it('serves the template as an attachment', async () => {
+    const { controller } = build()
     const set = vi.fn()
 
     const streamed = await controller.template({ format: 'xlsx' }, {
       set,
     } as unknown as Response)
-    const { buffer } = await template.execute('xlsx')
-    const result = await controller.import(
-      TEACHER,
-      {
-        buffer,
-        size: buffer.length,
-        originalname: 'template-soal.xlsx',
-      } as Express.Multer.File,
-      { packageId: PACKAGE_ID },
-    )
 
     expect(streamed).toBeInstanceOf(StreamableFile)
     expect(set).toHaveBeenCalledWith(
@@ -81,13 +75,43 @@ describe('QuestionImportController', () => {
         'Content-Disposition': 'attachment; filename="template-soal.xlsx"',
       }),
     )
-    expect(result).toMatchObject({ created: 5, errors: [] })
-    expect(result.questionIds).toHaveLength(5)
   })
 
   it('refuses a request with no file', async () => {
     await expect(
       build().controller.import(TEACHER, undefined, { packageId: PACKAGE_ID }),
     ).rejects.toThrow(BadRequestException)
+  })
+
+  it('guards the preview with exam-questions.create', () => {
+    expect(
+      Reflect.getMetadata(
+        PERMISSIONS_KEY,
+        QuestionImportController.prototype.preview,
+      ),
+    ).toEqual(['exam-questions.create'])
+  })
+
+  it('rejects the unmodified template when its subject and grade match no package', async () => {
+    const { controller, template } = build()
+    const { buffer } = await template.execute('xlsx')
+
+    await expect(
+      controller.preview(
+        TEACHER,
+        {
+          buffer,
+          size: buffer.length,
+          originalname: 'template-soal.xlsx',
+        } as Express.Multer.File,
+        { packageId: PACKAGE_ID },
+      ),
+    ).rejects.toThrow(BadRequestException)
+  })
+
+  it('refuses a preview with no file', async () => {
+    await expect(
+      build().controller.preview(TEACHER, undefined, { packageId: PACKAGE_ID }),
+    ).rejects.toThrow(new BadRequestException('Berkas wajib dilampirkan'))
   })
 })

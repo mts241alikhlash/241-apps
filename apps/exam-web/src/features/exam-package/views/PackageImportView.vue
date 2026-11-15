@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useId, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Download } from '@lucide/vue'
 import { BackButton, FileDropzone } from '@mts241alikhlash/ui'
@@ -11,40 +11,38 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@mts241alikhlash/ui/select'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examBankService } from '@/features/exam-bank/services/examBankService'
-import { useExamBankStore } from '@/features/exam-bank/stores/examBankStore'
-import type { ImportResult, NamedOption } from '@/features/exam-bank/types'
+import type { ImportPreview, ImportResult } from '@/features/exam-bank/types'
 import ApprovedEditNotice from '../components/ApprovedEditNotice.vue'
+import ImportPreviewPanel from '../components/ImportPreviewPanel.vue'
 import { usePackageBuilder } from '../composables/usePackageBuilder'
 
 const MAX_BYTES = 10 * 1024 * 1024
 
 const route = useRoute()
 const router = useRouter()
-const store = useExamBankStore()
 
 const packageId = computed(() => String(route.params.id ?? ''))
 const builder = usePackageBuilder(packageId)
 const { pkg, canEdit } = builder
 
-const authorId = ref('')
 const file = ref<File | null>(null)
-const teachers = ref<NamedOption[]>([])
+const preview = ref<ImportPreview | null>(null)
+const confirmDuplicates = ref(false)
+const previewing = ref(false)
+let picks = 0
 const importing = ref(false)
 const problem = ref<string | null>(null)
 const result = ref<ImportResult | null>(null)
 const loading = ref(true)
 
-const authorFieldId = useId()
+const canSubmit = computed(
+  () =>
+    preview.value !== null &&
+    (preview.value.canSave ||
+      (preview.value.errors.length === 0 && confirmDuplicates.value)),
+)
 
 useBreadcrumbs(() => [
   { title: 'Paket Soal', href: '/exam/packages' },
@@ -55,11 +53,15 @@ useBreadcrumbs(() => [
   { title: 'Impor Soal' },
 ])
 
-function pickFile(event: Event) {
+async function pickFile(event: Event) {
   const chosen = (event.target as HTMLInputElement).files?.[0] ?? null
+  const pick = ++picks
   problem.value = null
   result.value = null
   file.value = null
+  preview.value = null
+  previewing.value = false
+  confirmDuplicates.value = false
   if (!chosen) return
   if (!/\.(xlsx|docx)$/i.test(chosen.name)) {
     problem.value = 'Berkas harus .xlsx atau .docx.'
@@ -70,6 +72,27 @@ function pickFile(event: Event) {
     return
   }
   file.value = chosen
+  previewing.value = true
+  const response = await examBankService.previewImport({
+    file: chosen,
+    packageId: packageId.value,
+  })
+  if (pick !== picks) return
+  previewing.value = false
+  if (response.success) {
+    preview.value = response.data
+  } else {
+    file.value = null
+    problem.value = response.error
+  }
+}
+
+function clearFile() {
+  picks++
+  previewing.value = false
+  file.value = null
+  preview.value = null
+  confirmDuplicates.value = false
 }
 
 async function submit() {
@@ -83,12 +106,14 @@ async function submit() {
   const response = await examBankService.importQuestions({
     file: file.value,
     packageId: packageId.value,
-    authorEmployeeId: authorId.value || undefined,
+    confirmDuplicates: confirmDuplicates.value,
   })
   importing.value = false
   if (response.success) {
     result.value = response.data
     file.value = null
+    preview.value = null
+    confirmDuplicates.value = false
   } else {
     problem.value = response.error
   }
@@ -103,9 +128,6 @@ async function init() {
     return
   }
   await examBankService.loadReferences()
-  if (store.manageAll && pkg.value) {
-    teachers.value = await examBankService.loadTeachers(pkg.value.subjectId)
-  }
   loading.value = false
 }
 
@@ -141,30 +163,6 @@ onMounted(init)
         </div>
         <template v-else>
           <ApprovedEditNotice v-if="pkg?.status === 'APPROVED'" />
-          <FloatingLabelField
-            v-if="store.manageAll"
-            label="Penulis"
-            :for="authorFieldId"
-            floating
-          >
-            <Select v-model="authorId">
-              <SelectTrigger
-                :id="authorFieldId"
-                class="w-full"
-              >
-                <SelectValue placeholder="Saya sendiri" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="teacher in teachers"
-                  :key="teacher.id"
-                  :value="teacher.id"
-                >
-                  {{ teacher.name }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
 
           <div class="space-y-2">
             <p
@@ -201,7 +199,7 @@ onMounted(init)
             aria-label="Pilih berkas soal"
             hint="Excel (.xlsx) atau Word (.docx), maks. 10 MB"
             @change="pickFile"
-            @clear="file = null"
+            @clear="clearFile"
           />
           <p
             v-if="problem"
@@ -210,6 +208,12 @@ onMounted(init)
           >
             {{ problem }}
           </p>
+
+          <ImportPreviewPanel
+            v-if="preview"
+            v-model:confirm-duplicates="confirmDuplicates"
+            :preview="preview"
+          />
 
           <div
             v-if="result"
@@ -253,7 +257,7 @@ onMounted(init)
       >
         <Button
           type="button"
-          :disabled="importing || !file"
+          :disabled="importing || previewing || !canSubmit"
           @click="submit"
         >
           {{ importing ? 'Mengimpor…' : 'Impor' }}

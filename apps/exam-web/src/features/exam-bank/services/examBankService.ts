@@ -6,7 +6,12 @@ import { loadAssignments } from '@/features/lookup/teaching-assignment'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examBankApi } from '../api/examBankApi'
 import { useExamBankStore } from '../stores/examBankStore'
-import type { ImportResult, NamedOption, TemplateFormat } from '../types'
+import type {
+  ImportPreview,
+  ImportResult,
+  NamedOption,
+  TemplateFormat,
+} from '../types'
 
 export const examBankService = {
   async loadReferences() {
@@ -62,18 +67,38 @@ export const examBankService = {
     }
   },
 
+  async previewImport(input: {
+    file: File
+    packageId: string
+  }): Promise<
+    { success: true; data: ImportPreview } | { success: false; error: string }
+  > {
+    const form = new FormData()
+    form.append('file', input.file)
+    form.append('packageId', input.packageId)
+    try {
+      const response = await examBankApi.previewImport(form)
+      return { success: true, data: response }
+    } catch (err: unknown) {
+      return {
+        success: false,
+        error: messageOf(err, 'Gagal membaca berkas soal.'),
+      }
+    }
+  },
+
   async importQuestions(input: {
     file: File
     packageId: string
-    authorEmployeeId?: string
+    confirmDuplicates?: boolean
   }): Promise<
     { success: true; data: ImportResult } | { success: false; error: string }
   > {
     const form = new FormData()
     form.append('file', input.file)
     form.append('packageId', input.packageId)
-    if (input.authorEmployeeId) {
-      form.append('authorEmployeeId', input.authorEmployeeId)
+    if (input.confirmDuplicates) {
+      form.append('confirmDuplicates', 'true')
     }
     try {
       const response = await examBankApi.importQuestions(form)
