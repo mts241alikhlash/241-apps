@@ -1,5 +1,19 @@
 # exam-web
 
+## 0.5.0
+
+### Minor Changes
+
+- 2c689bc: exam-web is presented as Istiqra: tab title, login, header, app switcher, exam sheet and favicon carry the Istiqra name and symbol, and the SSO launcher lists it as Istiqra. The auth config takes a logoSrc so an app can show its own logo while the school wordmark stays. Every app drops the leftover Vite favicon for the school logo.
+
+### Patch Changes
+
+- b96d6ad: Every web app declares a light colour scheme (meta tag and `color-scheme: light` on `:root`), so a phone in dark mode no longer darkens form controls and scrollbars; dark mode is left for a later phase. The admission landing drops its template comments.
+- Updated dependencies [2c689bc]
+- Updated dependencies [b96d6ad]
+  - @mts241alikhlash/platform@0.2.0
+  - @mts241alikhlash/ui@0.1.3
+
 ## 0.4.0
 
 ### Minor Changes
