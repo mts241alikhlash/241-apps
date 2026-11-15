@@ -84,6 +84,17 @@ describe('examBankApi', () => {
     expect(options.bodySerializer(form)).toBe(form)
   })
 
+  it('previews an import as multipart form data', async () => {
+    const preview = { canSave: true, errors: [], duplicateRows: [] }
+    POST.mockResolvedValue(ok(preview))
+    const form = new FormData()
+    await expect(examBankApi.previewImport(form)).resolves.toEqual(preview)
+    const [path, options] = POST.mock.calls[0]
+    expect(path).toBe('/exam-imports/preview')
+    expect(options.body).toBe(form)
+    expect(options.bodySerializer(form)).toBe(form)
+  })
+
   it('lists grades from the academic contract', async () => {
     academicGet.mockResolvedValue(ok([{ id: 'g' }]))
     const result = await examBankApi.getGrades({ limit: 5 })

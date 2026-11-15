@@ -41,6 +41,14 @@ export const examBankApi = {
       }),
     ),
 
+  previewImport: (form: FormData) =>
+    unwrap(
+      examClient.POST('/exam-imports/preview', {
+        body: form as never,
+        bodySerializer: passThrough,
+      }),
+    ),
+
   importQuestions: (form: FormData) =>
     unwrap(
       examClient.POST('/exam-imports', {
