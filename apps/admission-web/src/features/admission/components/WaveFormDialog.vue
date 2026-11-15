@@ -339,7 +339,7 @@ const onSubmit = handleSubmit((formValues) => {
                   />
                 </FormControl>
                 <span
-                  class="text-[length:var(--text-control,0.75rem)] font-medium"
+                  class="text-[length:var(--text-control,0.875rem)] font-medium"
                   >Aktifkan</span
                 >
               </div>

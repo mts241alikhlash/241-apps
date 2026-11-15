@@ -153,7 +153,7 @@ onMounted(() => {
         <p
           v-if="error !== null"
           role="alert"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-[length:var(--text-control,0.875rem)] text-destructive"
         >
           {{ error }}
         </p>

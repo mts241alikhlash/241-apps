@@ -86,7 +86,7 @@ async function upload() {
 
 <template>
   <div class="space-y-4">
-    <section class="space-y-3 text-[length:var(--text-control,0.75rem)]">
+    <section class="space-y-3 text-[length:var(--text-control,0.875rem)]">
       <p
         v-if="GUIDANCE[status]"
         class="text-muted-foreground"
@@ -199,12 +199,14 @@ async function upload() {
         name="bankAccountId"
       >
         <fieldset class="space-y-2">
-          <legend class="text-[length:var(--text-control,0.75rem)] font-medium">
+          <legend
+            class="text-[length:var(--text-control,0.875rem)] font-medium"
+          >
             Rekening tujuan <span class="text-destructive">*</span>
           </legend>
           <p
             v-if="accounts.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Rekening tujuan belum tersedia. Hubungi panitia PSB.
           </p>
@@ -220,7 +222,7 @@ async function upload() {
               class="flex min-w-0 items-start gap-2"
             >
               <label
-                class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-md border p-3 text-[length:var(--text-control,0.75rem)] has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-md border p-3 text-[length:var(--text-control,0.875rem)] has-[:checked]:border-primary has-[:checked]:bg-primary/5"
               >
                 <input
                   type="radio"
@@ -253,7 +255,7 @@ async function upload() {
           </div>
           <p
             v-if="errorMessage"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-[length:var(--text-control,0.875rem)] text-destructive"
           >
             {{ errorMessage }}
           </p>
@@ -305,7 +307,7 @@ async function upload() {
           </FormControl>
         </FloatingField>
         <div class="space-y-2 sm:col-span-2">
-          <p class="text-[length:var(--text-control,0.75rem)] font-medium">
+          <p class="text-[length:var(--text-control,0.875rem)] font-medium">
             Bukti Transfer <span class="text-destructive">*</span>
           </p>
           <FileDropzone
@@ -318,7 +320,7 @@ async function upload() {
           />
           <p
             v-if="fileError"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-[length:var(--text-control,0.875rem)] text-destructive"
           >
             {{ fileError }}
           </p>
@@ -328,7 +330,7 @@ async function upload() {
         <p
           v-if="uploadingPayment"
           role="status"
-          class="text-[length:var(--text-control,0.75rem)]"
+          class="text-[length:var(--text-control,0.875rem)]"
         >
           Mengunggah bukti pembayaran…
         </p>

@@ -68,7 +68,7 @@ onUnmounted(() => {
     data-slot="command-item"
     :class="
       cn(
-        'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg:not([class*=\'text-\'])]:text-muted-foreground relative flex cursor-default items-center gap-2 min-h-[var(--control-h-md,1.75rem)] rounded-md px-2.5 py-1.5 text-[length:var(--text-control,0.75rem)] outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-[var(--icon-control,0.875rem)]',
+        'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground [&_svg:not([class*=\'text-\'])]:text-muted-foreground relative flex cursor-default items-center gap-2 min-h-[var(--control-h-md,2rem)] rounded-md px-2.5 py-1.5 text-[length:var(--text-control,0.875rem)] outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-[var(--icon-control,1rem)]',
         props.class,
       )
     "

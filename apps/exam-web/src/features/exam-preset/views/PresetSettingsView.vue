@@ -85,7 +85,7 @@ onMounted(load)
         class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
       >
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Berlaku untuk kegiatan baru. Kegiatan yang sudah berjalan tetap
           memakai salinan kebijakannya sendiri.
@@ -96,7 +96,7 @@ onMounted(load)
           role="alert"
           class="space-y-3 rounded-md border p-4"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -107,7 +107,7 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Memuat preset kebijakan…
         </p>

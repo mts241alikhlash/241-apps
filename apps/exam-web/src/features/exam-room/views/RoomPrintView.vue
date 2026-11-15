@@ -106,7 +106,7 @@ onMounted(load)
       >
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
           role="alert"
         >
           <p>{{ error }}</p>
@@ -122,14 +122,14 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Menyiapkan dokumen...
         </p>
 
         <p
           v-else-if="roster.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Ruangan ini belum memiliki kursi peserta.
         </p>

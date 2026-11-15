@@ -39,7 +39,7 @@ const content = computed(() => {
     data-slot="field-error"
     :class="
       cn(
-        'text-destructive text-[length:var(--text-control,0.75rem)] font-normal',
+        'text-destructive text-[length:var(--text-control,0.875rem)] font-normal',
         props.class,
       )
     "

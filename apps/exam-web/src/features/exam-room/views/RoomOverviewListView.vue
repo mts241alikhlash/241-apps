@@ -152,7 +152,7 @@ onMounted(load)
           class="m-4 space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -237,7 +237,7 @@ onMounted(load)
             <template #mobile-chips>
               <div
                 v-if="activeFiltersCount"
-                class="flex flex-wrap gap-2 text-[length:var(--text-control,0.75rem)]"
+                class="flex flex-wrap gap-2 text-[length:var(--text-control,0.875rem)]"
               >
                 <Button
                   v-if="statusFilter !== 'ALL'"

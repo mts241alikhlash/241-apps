@@ -202,7 +202,7 @@ async function upload() {
       <CardContent class="px-4 pt-4 pb-4">
         <p
           v-if="!documentTypes.length"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Belum ada jenis berkas yang tersedia.
         </p>

@@ -76,7 +76,7 @@ const trueValue = computed(() =>
     >
       <CardTitle>Pratinjau</CardTitle>
       <span
-        class="shrink-0 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+        class="shrink-0 text-[length:var(--text-control,0.875rem)] text-muted-foreground tabular-nums"
       >
         {{ points }} poin
       </span>
@@ -97,7 +97,7 @@ const trueValue = computed(() =>
           :class="isCorrect(choice.key) ? 'bg-primary/10' : undefined"
         >
           <span
-            class="shrink-0 text-[length:var(--text-control,0.75rem)] font-medium"
+            class="shrink-0 text-[length:var(--text-control,0.875rem)] font-medium"
             :class="isCorrect(choice.key) ? 'text-primary' : undefined"
           >
             {{ choice.key }}.
@@ -107,7 +107,7 @@ const trueValue = computed(() =>
           </ItemContent>
           <span
             v-if="isCorrect(choice.key)"
-            class="ml-auto flex shrink-0 items-center gap-1 text-[length:var(--text-control,0.75rem)] font-medium text-primary"
+            class="ml-auto flex shrink-0 items-center gap-1 text-[length:var(--text-control,0.875rem)] font-medium text-primary"
           >
             <Check
               class="size-4"
@@ -166,7 +166,7 @@ const trueValue = computed(() =>
 
       <div
         v-else-if="type === 'SHORT_ANSWER'"
-        class="flex flex-col gap-1 text-[length:var(--text-control,0.75rem)]"
+        class="flex flex-col gap-1 text-[length:var(--text-control,0.875rem)]"
       >
         <span class="text-muted-foreground">Jawaban benar</span>
         <div
@@ -191,7 +191,7 @@ const trueValue = computed(() =>
 
       <div
         v-else
-        class="flex flex-col gap-1 text-[length:var(--text-control,0.75rem)]"
+        class="flex flex-col gap-1 text-[length:var(--text-control,0.875rem)]"
       >
         <span class="text-muted-foreground">Pedoman penilaian</span>
         <QuestionHtml

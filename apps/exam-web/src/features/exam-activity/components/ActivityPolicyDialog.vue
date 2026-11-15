@@ -97,13 +97,15 @@ async function submit(): Promise<void> {
           <div
             v-if="error !== null"
             role="alert"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
           >
             {{ error }}
           </div>
 
           <div class="grid gap-4 sm:grid-cols-2">
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Batas pelanggaran (1–10)</span>
               <input
                 v-model.number="violationLimit"
@@ -113,7 +115,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Ambang hilang fokus (ms)</span>
               <input
                 v-model.number="focusThresholdMs"
@@ -123,7 +127,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Interval detak sesi (ms)</span>
               <input
                 v-model.number="heartbeatIntervalMs"
@@ -133,7 +139,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Jeda tercatat putus (ms)</span>
               <input
                 v-model.number="gapRecordedMs"
@@ -143,7 +151,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Jeda wajib token ulang (ms)</span>
               <input
                 v-model.number="gapTokenMs"
@@ -153,7 +163,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Putus ke-berapa jadi pelanggaran</span>
               <input
                 v-model.number="gapViolationFrom"
@@ -163,7 +175,9 @@ async function submit(): Promise<void> {
                 class="rounded-md border px-3 py-2"
               />
             </label>
-            <label class="grid gap-1 text-[length:var(--text-control,0.75rem)]">
+            <label
+              class="grid gap-1 text-[length:var(--text-control,0.875rem)]"
+            >
               <span>Masa berlaku slot token (detik)</span>
               <input
                 v-model.number="tokenSlotSeconds"

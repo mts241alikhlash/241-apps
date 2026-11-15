@@ -45,7 +45,7 @@ function onDrop(event: DragEvent) {
     data-slot="file-dropzone-selected"
     :class="
       cn(
-        'flex min-w-0 items-center gap-3 rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.75rem)]',
+        'flex min-w-0 items-center gap-3 rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]',
         props.class,
       )
     "
@@ -72,7 +72,7 @@ function onDrop(event: DragEvent) {
     :data-invalid="invalid || undefined"
     :class="
       cn(
-        'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/25 p-5 text-center text-[length:var(--text-control,0.75rem)] transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring data-[invalid]:border-destructive/60',
+        'flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/25 p-5 text-center text-[length:var(--text-control,0.875rem)] transition-colors hover:bg-muted/50 focus-within:ring-2 focus-within:ring-ring data-[invalid]:border-destructive/60',
         dragging && 'border-primary bg-primary/5',
         disabled && 'pointer-events-none opacity-60',
         props.class,

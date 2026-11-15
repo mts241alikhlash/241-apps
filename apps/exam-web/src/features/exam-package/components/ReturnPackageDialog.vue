@@ -44,7 +44,7 @@ const fieldId = useId()
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
           role="alert"
         >
           {{ error }}
@@ -62,7 +62,7 @@ const fieldId = useId()
           />
         </FloatingLabelField>
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{
             noteCount > 0

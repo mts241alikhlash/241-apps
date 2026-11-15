@@ -68,7 +68,7 @@ async function handleLogout() {
             alt="241 Akun"
             class="size-6 object-contain"
           />
-          <span class="text-[length:var(--text-control,0.75rem)]"
+          <span class="text-[length:var(--text-control,0.875rem)]"
             >241 Akun</span
           >
         </RouterLink>

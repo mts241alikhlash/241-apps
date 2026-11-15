@@ -185,7 +185,7 @@ watch(
   <div class="space-y-4">
     <div
       v-if="error"
-      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
       role="alert"
     >
       {{ error }}
@@ -193,14 +193,14 @@ watch(
 
     <p
       v-else-if="slotId === ''"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
     >
       Pilih sesi pengawasan untuk membuka berita acara.
     </p>
 
     <p
       v-else-if="loading && report === null"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
     >
       Memuat berita acara...
     </p>
@@ -212,14 +212,14 @@ watch(
             {{ reportStatusLabel(report.status) }}
           </Badge>
           <span
-            class="tabular-nums text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="tabular-nums text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Sesi {{ timeFormat.format(new Date(report.slot.startsAt)) }}–{{
               timeFormat.format(new Date(report.slot.endsAt))
             }}
           </span>
           <span
-            class="tabular-nums text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="tabular-nums text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Hadir {{ totals.started }} dari {{ totals.registered }} · Terkumpul
             {{ totals.submitted }} · Tidak hadir {{ totals.absent }}
@@ -298,12 +298,12 @@ watch(
 
       <div class="grid gap-4 lg:grid-cols-2">
         <div class="space-y-2">
-          <h3 class="text-[length:var(--text-control,0.75rem)] font-medium">
+          <h3 class="text-[length:var(--text-control,0.875rem)] font-medium">
             Ketidakhadiran
           </h3>
           <p
             v-if="report.absences.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Semua peserta hadir.
           </p>
@@ -314,7 +314,7 @@ watch(
             <li
               v-for="absence in report.absences"
               :key="absence.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <span>{{ absence.studentName ?? 'Siswa tidak ditemukan' }}</span>
               <span class="tabular-nums text-muted-foreground">
@@ -329,12 +329,12 @@ watch(
         </div>
 
         <div class="space-y-2">
-          <h3 class="text-[length:var(--text-control,0.75rem)] font-medium">
+          <h3 class="text-[length:var(--text-control,0.875rem)] font-medium">
             Insiden &amp; Tindakan Teknis
           </h3>
           <p
             v-if="report.auditLogs.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Tidak ada tindakan teknis pada jam ujian ini.
           </p>
@@ -345,7 +345,7 @@ watch(
             <li
               v-for="entry in report.auditLogs"
               :key="entry.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <span>{{ eventLabel(entry.action) }}</span>
               <span class="tabular-nums text-muted-foreground">
@@ -355,13 +355,13 @@ watch(
             </li>
           </ul>
           <h3
-            class="pt-2 text-[length:var(--text-control,0.75rem)] font-medium"
+            class="pt-2 text-[length:var(--text-control,0.875rem)] font-medium"
           >
             Catatan Pelanggaran Fisik
           </h3>
           <p
             v-if="report.fieldNotes.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Belum ada pelanggaran fisik yang dicatat.
           </p>
@@ -372,7 +372,7 @@ watch(
             <li
               v-for="note in report.fieldNotes"
               :key="note.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <span>{{ note.studentName ?? 'Siswa' }}</span>
               <Badge variant="outline">{{ note.category }}</Badge>

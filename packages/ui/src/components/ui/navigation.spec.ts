@@ -5,14 +5,14 @@ import { Calendar } from './calendar'
 import { FieldDescription, FieldError } from './field'
 import { PaginationEllipsis } from './pagination'
 
-const text = 'text-[length:var(--text-control,0.75rem)]'
+const text = 'text-[length:var(--text-control,0.875rem)]'
 
 describe('navigation and data components', () => {
   it('calendar day cells and heading follow the control tokens', async () => {
     const w = mount(Calendar, { attachTo: document.body })
     await flushPromises()
     const cell = w.get('[data-slot=calendar-cell-trigger]').classes()
-    expect(cell).toContain('size-[var(--control-h-sm,1.5rem)]')
+    expect(cell).toContain('size-[var(--control-h-sm,1.75rem)]')
     expect(w.get('[data-slot=calendar-heading]').classes()).toContain(text)
     w.unmount()
   })
@@ -20,7 +20,7 @@ describe('navigation and data components', () => {
   it('pagination ellipsis is as big as a md control', () => {
     const w = mount(PaginationEllipsis)
     expect(w.get('[data-slot=pagination-ellipsis]').classes()).toContain(
-      'size-[var(--control-h-md,1.75rem)]',
+      'size-[var(--control-h-md,2rem)]',
     )
   })
 

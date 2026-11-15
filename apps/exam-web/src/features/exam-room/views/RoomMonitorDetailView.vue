@@ -277,7 +277,7 @@ onUnmounted(() => {
             <CardTitle class="truncate font-semibold">{{ title }}</CardTitle>
             <span
               v-if="roomSubtitle"
-              class="truncate text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="truncate text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               {{ roomSubtitle }}
             </span>
@@ -295,7 +295,7 @@ onUnmounted(() => {
           >
             <div class="flex flex-col">
               <span
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >Token masuk</span
               >
               <span
@@ -304,7 +304,7 @@ onUnmounted(() => {
               >
             </div>
             <span
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground tabular-nums"
               >sisa {{ tokenMinutes }} mnt</span
             >
             <Button
@@ -316,7 +316,7 @@ onUnmounted(() => {
           </div>
           <div class="flex flex-col items-start gap-1.5 sm:items-end">
             <span
-              class="flex items-center gap-1.5 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+              class="flex items-center gap-1.5 text-[length:var(--text-control,0.875rem)] text-muted-foreground tabular-nums"
             >
               <span
                 class="size-1.5 rounded-full"
@@ -360,13 +360,13 @@ onUnmounted(() => {
           <TabsContent value="participants">
             <p
               v-if="noSlotAssigned"
-              class="mb-4 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="mb-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               Anda tidak bertugas pada jam ini.
             </p>
             <div
               v-if="failed && error"
-              class="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
               role="alert"
             >
               {{ error }}

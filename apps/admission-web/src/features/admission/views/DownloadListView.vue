@@ -280,7 +280,7 @@ onMounted(load)
 
       <div class="space-y-4 p-0 sm:px-0">
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Berkas PDF yang bisa diunduh calon pendaftar dari halaman depan,
           misalnya brosur dan formulir kosong. Hanya berkas yang aktif yang
@@ -291,7 +291,7 @@ onMounted(load)
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-[length:var(--text-control,0.875rem)]">
             {{ listError }}
           </p>
           <Button
@@ -360,7 +360,7 @@ onMounted(load)
             <div class="space-y-1.5">
               <label
                 :for="fileInputId"
-                class="text-[length:var(--text-control,0.75rem)] font-medium"
+                class="text-[length:var(--text-control,0.875rem)] font-medium"
                 >Berkas PDF<span
                   v-if="!editing"
                   class="text-destructive"
@@ -374,7 +374,7 @@ onMounted(load)
                 type="file"
                 accept="application/pdf,.pdf"
                 :aria-describedby="fileHintId"
-                class="block min-h-11 w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-[length:var(--text-control,0.75rem)] file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-[length:var(--text-control,0.75rem)] file:font-medium"
+                class="block min-h-11 w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-[length:var(--text-control,0.875rem)] file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-[length:var(--text-control,0.875rem)] file:font-medium"
                 @change="onFileChange"
               />
               <p

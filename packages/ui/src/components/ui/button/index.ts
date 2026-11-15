@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority'
 export { default as Button } from './Button.vue'
 
 export const buttonVariants = cva(
-  'focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-[length:var(--text-control,0.75rem)] leading-relaxed font-medium focus-visible:ring-2 aria-invalid:ring-2 active:not-aria-[haspopup]:translate-y-px group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'focus-visible:border-ring focus-visible:ring-ring/30 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-md border border-transparent bg-clip-padding text-[length:var(--text-control,0.875rem)] leading-relaxed font-medium focus-visible:ring-2 aria-invalid:ring-2 active:not-aria-[haspopup]:translate-y-px group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -21,17 +21,17 @@ export const buttonVariants = cva(
       },
       size: {
         default:
-          'h-[var(--control-h-md,1.75rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
-        xs: 'h-[var(--control-h-xs,1.25rem)] gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-2.5',
-        sm: 'h-[var(--control-h-sm,1.5rem)] gap-1 px-2 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
-        lg: 'h-[var(--control-h-lg,2rem)] gap-1 px-2.5 text-[length:var(--text-control,0.75rem)] leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
-        icon: 'size-[var(--control-h-md,1.75rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+          'h-[var(--control-h-md,2rem)] gap-1 px-2 text-[length:var(--text-control,0.875rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,1rem)]',
+        xs: 'h-[var(--control-h-xs,1.5rem)] gap-1 rounded-sm px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-2.5',
+        sm: 'h-[var(--control-h-sm,1.75rem)] gap-1 px-2 text-[length:var(--text-control,0.875rem)] leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
+        lg: 'h-[var(--control-h-lg,2.25rem)] gap-1 px-2.5 text-[length:var(--text-control,0.875rem)] leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
+        icon: 'size-[var(--control-h-md,2rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,1rem)]',
         'icon-xs':
-          'size-[var(--control-h-xs,1.25rem)] rounded-sm [&_svg:not([class*=size-])]:size-2.5',
+          'size-[var(--control-h-xs,1.5rem)] rounded-sm [&_svg:not([class*=size-])]:size-2.5',
         'icon-sm':
-          'size-[var(--control-h-sm,1.5rem)] [&_svg:not([class*=size-])]:size-3',
+          'size-[var(--control-h-sm,1.75rem)] [&_svg:not([class*=size-])]:size-3',
         'icon-lg':
-          'size-[var(--control-h-lg,2rem)] [&_svg:not([class*=size-])]:size-4',
+          'size-[var(--control-h-lg,2.25rem)] [&_svg:not([class*=size-])]:size-4',
       },
     },
     defaultVariants: {

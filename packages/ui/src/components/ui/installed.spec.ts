@@ -77,6 +77,6 @@ describe('installed shadcn-vue components', () => {
 
   it('new button controls read the control tokens', async () => {
     const { toggleVariants } = await import('./toggle')
-    expect(toggleVariants()).toContain('h-[var(--control-h-md,1.75rem)]')
+    expect(toggleVariants()).toContain('h-[var(--control-h-md,2rem)]')
   })
 })

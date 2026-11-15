@@ -150,7 +150,7 @@ watch(
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
           role="alert"
         >
           {{ error }}
@@ -173,7 +173,7 @@ watch(
         </FloatingLabelField>
         <p
           v-if="windowClosed"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-[length:var(--text-control,0.875rem)] text-destructive"
         >
           Jendela ujian sudah habis
         </p>

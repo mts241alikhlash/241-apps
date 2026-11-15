@@ -282,7 +282,7 @@ onMounted(() => fetchReview(true))
   <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
     <p
       v-if="loading"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
     >
       Memuat berkas pendaftar…
     </p>
@@ -292,7 +292,7 @@ onMounted(() => fetchReview(true))
       role="alert"
       class="space-y-3 rounded-md border p-4"
     >
-      <p class="text-[length:var(--text-control,0.75rem)]">
+      <p class="text-[length:var(--text-control,0.875rem)]">
         {{
           error === 'not-found'
             ? 'Pendaftar tidak ditemukan.'
@@ -344,7 +344,7 @@ onMounted(() => fetchReview(true))
             <div class="border-b bg-muted/10 p-4 shrink-0 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <h2
-                  class="truncate font-semibold text-[length:var(--text-control,0.75rem)] text-foreground"
+                  class="truncate font-semibold text-[length:var(--text-control,0.875rem)] text-foreground"
                 >
                   {{ review.applicantName }}
                 </h2>
@@ -426,7 +426,7 @@ onMounted(() => fetchReview(true))
                   v-for="item in review.slots"
                   :key="item.documentTypeId"
                   data-test="slot"
-                  class="group relative flex cursor-pointer flex-col gap-2 border-l-4 p-3.5 text-[length:var(--text-control,0.75rem)] transition-colors sm:p-4"
+                  class="group relative flex cursor-pointer flex-col gap-2 border-l-4 p-3.5 text-[length:var(--text-control,0.875rem)] transition-colors sm:p-4"
                   :class="[
                     activeSlot?.documentTypeId === item.documentTypeId
                       ? 'border-l-primary bg-primary/[0.04]'
@@ -454,7 +454,7 @@ onMounted(() => fetchReview(true))
                       >
                         <div class="flex min-w-0 items-center gap-1">
                           <p
-                            class="truncate font-medium text-[length:var(--text-control,0.75rem)]"
+                            class="truncate font-medium text-[length:var(--text-control,0.875rem)]"
                             :class="[
                               activeSlot?.documentTypeId === item.documentTypeId
                                 ? 'text-primary'
@@ -656,7 +656,7 @@ onMounted(() => fetchReview(true))
               >
                 <div
                   v-if="inlineLoading"
-                  class="py-16 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="py-16 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Memuat pratinjau…
                 </div>
@@ -665,7 +665,7 @@ onMounted(() => fetchReview(true))
                   class="space-y-2 p-6 text-center"
                 >
                   <p
-                    class="text-[length:var(--text-control,0.75rem)] text-destructive"
+                    class="text-[length:var(--text-control,0.875rem)] text-destructive"
                   >
                     {{ inlineError }}
                   </p>
@@ -692,14 +692,14 @@ onMounted(() => fetchReview(true))
                   />
                   <div
                     v-else
-                    class="p-6 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                    class="p-6 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                   >
                     Format berkas tidak dapat ditampilkan langsung.
                   </div>
                 </template>
                 <div
                   v-else
-                  class="p-12 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="p-12 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Dokumen ini belum diunggah oleh calon santri.
                 </div>
@@ -716,7 +716,7 @@ onMounted(() => fetchReview(true))
       >
         <p
           v-if="undecided > 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{ undecided }} berkas belum diputuskan atau belum diunggah.
         </p>
@@ -818,7 +818,7 @@ onMounted(() => fetchReview(true))
         </DialogHeader>
         <div
           data-test="send-confirm"
-          class="dialog-body text-[length:var(--text-control,0.75rem)] leading-relaxed"
+          class="dialog-body text-[length:var(--text-control,0.875rem)] leading-relaxed"
         >
           Pendaftar diberi tahu satu kali dan keputusan berkas tidak bisa diubah
           lagi.

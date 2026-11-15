@@ -150,7 +150,7 @@ onMounted(load)
           role="alert"
           class="space-y-3 rounded-md border p-4"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -161,7 +161,7 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Memuat detail kegiatan…
         </p>
@@ -233,7 +233,7 @@ onMounted(load)
             <h2 class="text-sm font-semibold">Jadwal per Kelas</h2>
             <p
               v-if="detail.schedules.length === 0"
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               Belum ada jadwal kelas pada kegiatan ini.
             </p>
@@ -250,7 +250,7 @@ onMounted(load)
                   {{ item.classroomName ?? item.classroomId }}
                 </span>
                 <span
-                  class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   {{ formatWindow(item.startsAt, item.endsAt) }}
                 </span>

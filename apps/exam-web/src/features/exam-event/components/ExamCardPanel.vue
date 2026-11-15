@@ -110,7 +110,7 @@ watch(
 
     <div
       v-if="error"
-      class="rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+      class="rounded-md border p-3 text-[length:var(--text-control,0.875rem)]"
       role="alert"
     >
       {{ error }}
@@ -118,7 +118,7 @@ watch(
 
     <p
       v-else-if="!loading && seats.length === 0"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
     >
       Pilih ruangan yang sudah memiliki kursi untuk mencetak kartu.
     </p>
@@ -133,19 +133,19 @@ watch(
         class="space-y-1 rounded-md border p-4"
       >
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{ event.name }}
         </p>
         <p class="font-medium">
           {{ seat.name ?? 'Siswa tidak ditemukan' }}
         </p>
-        <p class="tabular-nums text-[length:var(--text-control,0.75rem)]">
+        <p class="tabular-nums text-[length:var(--text-control,0.875rem)]">
           NIS {{ seat.nis ?? '-' }} · {{ seat.classroomName ?? '-' }}
         </p>
         <div class="flex items-baseline justify-between pt-2">
           <span
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{ room?.name ?? '-' }}
           </span>

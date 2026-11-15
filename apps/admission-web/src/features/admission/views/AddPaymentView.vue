@@ -275,7 +275,7 @@ watch(debouncedSearch, loadApplicants)
 
       <CardContent class="border-t bg-muted/10 p-4 sm:p-6">
         <div
-          class="grid gap-3 sm:grid-cols-2 text-[length:var(--text-control,0.75rem)]"
+          class="grid gap-3 sm:grid-cols-2 text-[length:var(--text-control,0.875rem)]"
         >
           <div>
             <p class="text-xs text-muted-foreground">Nomor Pendaftaran</p>

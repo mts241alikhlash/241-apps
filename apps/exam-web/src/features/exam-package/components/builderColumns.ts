@@ -49,7 +49,7 @@ export function buildBuilderColumns(
                 'p',
                 {
                   class:
-                    'text-[length:var(--text-control,0.75rem)] font-normal text-destructive',
+                    'text-[length:var(--text-control,0.875rem)] font-normal text-destructive',
                 },
                 `Catatan: ${note}`,
               )

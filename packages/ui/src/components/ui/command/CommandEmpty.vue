@@ -26,7 +26,7 @@ const isRender = computed(
     v-bind="delegatedProps"
     :class="
       cn(
-        'py-6 text-center text-[length:var(--text-control,0.75rem)]',
+        'py-6 text-center text-[length:var(--text-control,0.875rem)]',
         props.class,
       )
     "

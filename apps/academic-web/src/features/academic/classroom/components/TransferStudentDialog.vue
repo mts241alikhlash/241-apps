@@ -151,7 +151,7 @@ function handleOpenChange(val: boolean) {
               <Command>
                 <CommandInput
                   placeholder="Cari kelas..."
-                  class="text-[length:var(--text-control,0.75rem)]"
+                  class="text-[length:var(--text-control,0.875rem)]"
                 />
                 <CommandEmpty>Kelas tidak ditemukan.</CommandEmpty>
                 <CommandList class="max-h-[200px]">

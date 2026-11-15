@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './index'
 const classes = (w: ReturnType<typeof mount>) => w.classes()
 
 describe('Card family', () => {
-  it('uses the Mira spacing without props', () => {
+  it('uses the Nova spacing without props', () => {
     expect(classes(mount(Card))).toEqual(
       expect.arrayContaining([
         'gap-4',
@@ -29,7 +29,7 @@ describe('Card family', () => {
     expect(classes(mount(CardTitle, { props: { size: 'lg' } }))).toEqual(
       expect.arrayContaining(['text-xl', 'font-semibold']),
     )
-    expect(classes(mount(CardTitle))).not.toContain('text-base')
+    expect(classes(mount(CardTitle))).toContain('text-base')
     expect(classes(mount(CardContent))).toContain('px-4')
   })
 
@@ -58,7 +58,7 @@ describe('Card family', () => {
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[var(--control-h-lg,2rem)]',
+        'min-h-[var(--control-h-lg,2.25rem)]',
         'items-center',
         'justify-between',
         'border-b',
@@ -81,7 +81,7 @@ describe('Card family', () => {
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[var(--control-h-lg,2rem)]',
+        'min-h-[var(--control-h-lg,2.25rem)]',
         'items-center',
         'justify-end',
         'gap-2',
@@ -96,13 +96,13 @@ describe('Card family', () => {
   it('gives the standard header and footer the same 32px height token', () => {
     const header = classes(mount(CardHeader, { props: { standard: true } }))
     const footer = classes(mount(CardFooter, { props: { standard: true } }))
-    expect(header).toContain('min-h-[var(--control-h-lg,2rem)]')
-    expect(footer).toContain('min-h-[var(--control-h-lg,2rem)]')
+    expect(header).toContain('min-h-[var(--control-h-lg,2.25rem)]')
+    expect(footer).toContain('min-h-[var(--control-h-lg,2.25rem)]')
   })
 
   it('sizes the title', () => {
     expect(classes(mount(CardTitle, { props: { size: 'md' } }))).toContain(
-      'text-[length:var(--text-control,0.75rem)]',
+      'text-[length:var(--text-control,0.875rem)]',
     )
     expect(classes(mount(CardTitle, { props: { size: 'lg' } }))).toContain(
       'text-xl',

@@ -75,7 +75,7 @@ async function create() {
       <DialogBody class="min-h-0 flex-1 space-y-4 overflow-y-auto">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
           role="alert"
         >
           {{ form.error.value }}
@@ -83,14 +83,14 @@ async function create() {
 
         <div
           v-if="form.loadError.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
           role="alert"
         >
           {{ form.loadError.value }}
         </div>
         <p
           v-else-if="!form.loading.value && form.absentees.value.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Tidak ada siswa di kelas ini.
         </p>
@@ -111,7 +111,7 @@ async function create() {
               Kosongkan
             </Button>
             <span
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               {{ form.selected.value.size }} siswa dipilih
             </span>
@@ -120,7 +120,7 @@ async function create() {
             <li
               v-for="row in form.absentees.value"
               :key="row.studentId"
-              class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <Checkbox
                 :model-value="form.selected.value.has(row.studentId)"
@@ -283,14 +283,14 @@ async function create() {
           </FloatingLabelField>
         </div>
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Untuk UTS dan UAS, salin paketnya dan ganti sebagian soal agar soal
           susulan berbeda dari ujian utama.
         </p>
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

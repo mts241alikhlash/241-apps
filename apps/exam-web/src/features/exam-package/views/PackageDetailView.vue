@@ -175,7 +175,7 @@ onMounted(async () => {
         </Alert>
         <p
           v-else-if="!loading && !pkg"
-          class="text-[length:var(--text-control,0.75rem)]"
+          class="text-[length:var(--text-control,0.875rem)]"
           role="status"
         >
           Paket tidak ditemukan.
@@ -193,7 +193,7 @@ onMounted(async () => {
           <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
             <div class="flex flex-col gap-1">
               <span
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
               >
                 Status
               </span>
@@ -205,7 +205,7 @@ onMounted(async () => {
               </Badge>
             </div>
             <dl
-              class="flex flex-wrap items-start gap-x-6 gap-y-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-start gap-x-6 gap-y-3 text-[length:var(--text-control,0.875rem)]"
             >
               <div class="flex flex-col gap-1">
                 <dt class="text-muted-foreground">Mapel</dt>
@@ -249,7 +249,7 @@ onMounted(async () => {
             <template #empty>
               <div class="space-y-3 py-2">
                 <p
-                  class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   {{
                     canEdit
@@ -288,7 +288,7 @@ onMounted(async () => {
           </DataTable>
           <Collapsible
             v-if="pkg.reviews.length > 0"
-            class="text-[length:var(--text-control,0.75rem)]"
+            class="text-[length:var(--text-control,0.875rem)]"
           >
             <CollapsibleTrigger as-child>
               <Button

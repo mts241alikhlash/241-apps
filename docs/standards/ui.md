@@ -1,12 +1,12 @@
 # UI standard
 
-Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `mira` style with the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
+Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `nova` style with the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
 
 ## Pages and navigation
 
-**Rule.** The sidebar (`collapsible: 'icon'`, `variant: 'sidebar'`) sits flush under the top bar with a right border and the content has no inset card. A list page is not wrapped in another card (no ring, border or shadow); the page wrapper is `px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2`. A title that repeats the last breadcrumb is dropped; detail and form pages keep theirs next to `BackButton`.
+**Rule.** The sidebar (`collapsible: 'icon'`, `variant: 'sidebar'`) sits flush under the top bar with a right border and the content has no inset card. Its width is `SIDEBAR_WIDTH` (17rem) from `packages/ui`; an app never overrides `--sidebar-width`. A menu label is at most 26 characters so it fits one line, and a longer one truncates with its full text in `title`. A list page is not wrapped in another card (no ring, border or shadow); the page wrapper is `px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2`. A title that repeats the last breadcrumb is dropped; detail and form pages keep theirs next to `BackButton`.
 **Why.** One layout in every app, owned by `packages/platform`.
-**Check.** `packages/platform` `AppLayout.spec.ts`; review for page wrappers.
+**Check.** `packages/platform` `AppLayout.spec.ts`; `pnpm run runtime:check` (`scripts/check-menu-labels.spec.mjs`); review for page wrappers.
 
 **Rule.** A page below a list (detail, form, manage, create or edit) puts `BackButton` (`label="Kembali ke ..."`, pushing to its parent) left of the card title; a page reached from many places uses `router.back()`; top-level pages have none. Text buttons "Kembali ke ..." appear only inside empty or error states and auth screens, and never in a form footer, which belongs to step navigation.
 **Why.** Predictable way back.
@@ -36,7 +36,7 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 ## Sizes and type
 
-**Rule.** Controls use tokens, never fixed classes: `--control-h-xs|sm|md|lg` (20/24/28/32 px; 24/32/36/40 px on phones), text `--text-control` (12 px), icons `--icon-control` (14 px). No `h-9`, `h-10`, `min-h-11` or `text-sm` on Button, Input, SelectTrigger or Badge; filters and selects are `md`, not `size="sm"`.
+**Rule.** Controls use tokens, never fixed classes: `--control-h-xs|sm|md|lg` (24/28/32/36 px; 28/36/40/44 px on phones), text `--text-control` (14 px; 15 px on phones), icons `--icon-control` (16 px). The type scale starts at `--text-xs` 13 px, then `--text-sm` 14 px. No `h-9`, `h-10`, `min-h-11` or `text-sm` on Button, Input, SelectTrigger or Badge; filters and selects are `md`, not `size="sm"`.
 **Why.** Density follows the viewport from one place (`theme.css`).
 **Check.** `packages/ui` `theme.spec.ts` and `standards.spec.ts`; review for pages.
 
@@ -44,8 +44,8 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 **Why.** One type scale.
 **Check.** `packages/ui` `standards.spec.ts`; review.
 
-**Rule.** Every radius step above `md` maps to `md` in `theme.css` (an 8 px corner for cards, dialogs, popovers, badges and controls; `xs` buttons keep `sm`, circles keep `full`).
-**Why.** Owner decision that differs from `mira`.
+**Rule.** Radius follows the `nova` scale in `theme.css` from `--radius: 0.625rem`: `sm` 6 px, `md` 8 px, `lg` 10 px, `xl` 14 px, `2xl` 18 px. Controls, badges, popovers and dialogs use `md`; cards use `lg`; `xs` buttons keep `sm`, circles keep `full`. A page never writes a pixel radius.
+**Why.** One corner per layer, owned by the style.
 **Check.** `packages/ui` `theme.spec.ts`.
 
 ## Dialogs

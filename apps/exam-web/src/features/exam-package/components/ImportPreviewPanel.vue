@@ -40,7 +40,7 @@ const identity = computed(() => [
 
 <template>
   <div
-    class="space-y-3 rounded-md border p-4 text-[length:var(--text-control,0.75rem)]"
+    class="space-y-3 rounded-md border p-4 text-[length:var(--text-control,0.875rem)]"
     role="status"
     data-testid="import-preview"
   >

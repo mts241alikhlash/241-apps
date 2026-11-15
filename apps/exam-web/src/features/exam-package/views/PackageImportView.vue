@@ -156,7 +156,7 @@ onMounted(init)
       >
         <div
           v-if="!canEdit"
-          class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
           role="status"
         >
           Paket ini tidak bisa diubah, jadi soal tidak bisa diimpor ke dalamnya.
@@ -166,7 +166,7 @@ onMounted(init)
 
           <div class="space-y-2">
             <p
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               Soal masuk ke paket {{ pkg?.title }}. Unduh template, isi soalnya,
               lalu unggah.
@@ -203,7 +203,7 @@ onMounted(init)
           />
           <p
             v-if="problem"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-[length:var(--text-control,0.875rem)] text-destructive"
             role="alert"
           >
             {{ problem }}
@@ -229,7 +229,7 @@ onMounted(init)
             </p>
             <ul
               v-if="result.errors.length > 0"
-              class="space-y-1 text-[length:var(--text-control,0.75rem)]"
+              class="space-y-1 text-[length:var(--text-control,0.875rem)]"
             >
               <li
                 v-for="error in result.errors"

@@ -406,7 +406,7 @@ defineExpose({ table })
               @update:model-value="(val) => setPageSize(Number(val))"
             >
               <SelectTrigger
-                class="h-[var(--control-h-md,1.75rem)] data-[size=default]:h-[var(--control-h-md,1.75rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
+                class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
               >
                 <SelectValue :placeholder="String(pagination.pageSize)" />
               </SelectTrigger>
@@ -624,7 +624,7 @@ defineExpose({ table })
             </div>
             <dl
               v-if="cardParts(row).details.length"
-              class="grid grid-cols-[max-content_auto_minmax(0,1fr)] gap-x-1.5 gap-y-0.5 text-[length:var(--text-control,0.75rem)]"
+              class="grid grid-cols-[max-content_auto_minmax(0,1fr)] gap-x-1.5 gap-y-0.5 text-[length:var(--text-control,0.875rem)]"
             >
               <template
                 v-for="detail in cardParts(row).details"
@@ -662,7 +662,7 @@ defineExpose({ table })
       </ul>
       <div
         v-else
-        class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
       >
         <slot name="empty">Tidak ada data.</slot>
       </div>
@@ -671,7 +671,7 @@ defineExpose({ table })
         class="mt-2.5 flex items-center justify-between gap-2"
       >
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{ countText }}
         </p>
@@ -689,7 +689,7 @@ defineExpose({ table })
             <ChevronLeft />
           </Button>
           <span
-            class="px-1 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="px-1 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{ pageNumber }} / {{ pageTotal }}
           </span>
@@ -722,7 +722,7 @@ defineExpose({ table })
           @update:model-value="(val) => setPageSize(Number(val))"
         >
           <SelectTrigger
-            class="h-[var(--control-h-md,1.75rem)] data-[size=default]:h-[var(--control-h-md,1.75rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
+            class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
           >
             <SelectValue :placeholder="String(pagination.pageSize)" />
           </SelectTrigger>
@@ -741,7 +741,7 @@ defineExpose({ table })
         >
       </div>
       <div
-        class="text-center lg:col-start-3 lg:row-start-1 lg:text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-center lg:col-start-3 lg:row-start-1 lg:text-right text-[length:var(--text-control,0.875rem)] text-muted-foreground"
       >
         Menampilkan {{ countText }}
       </div>
@@ -764,15 +764,15 @@ defineExpose({ table })
           >
             <PaginationFirst
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
-              <ChevronsLeft class="size-[var(--icon-control,0.875rem)]" />
+              <ChevronsLeft class="size-[var(--icon-control,1rem)]" />
             </PaginationFirst>
             <PaginationPrevious
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
-              <ChevronLeft class="size-[var(--icon-control,0.875rem)]" />
+              <ChevronLeft class="size-[var(--icon-control,1rem)]" />
             </PaginationPrevious>
 
             <template
@@ -783,28 +783,28 @@ defineExpose({ table })
                 v-if="item.type === 'page'"
                 :value="item.value"
                 :is-active="item.value === pagination.pageIndex + 1"
-                class="size-[var(--control-h-md,1.75rem)]"
+                class="size-[var(--control-h-md,2rem)]"
               >
                 {{ item.value }}
               </PaginationItem>
               <PaginationEllipsis
                 v-else
                 :index="index"
-                class="size-[var(--control-h-md,1.75rem)]"
+                class="size-[var(--control-h-md,2rem)]"
               />
             </template>
 
             <PaginationNext
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
-              <ChevronRight class="size-[var(--icon-control,0.875rem)]" />
+              <ChevronRight class="size-[var(--icon-control,1rem)]" />
             </PaginationNext>
             <PaginationLast
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
-              <ChevronsRight class="size-[var(--icon-control,0.875rem)]" />
+              <ChevronsRight class="size-[var(--icon-control,1rem)]" />
             </PaginationLast>
           </PaginationContent>
         </Pagination>

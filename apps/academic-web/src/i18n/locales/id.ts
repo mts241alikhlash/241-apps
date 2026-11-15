@@ -19,7 +19,7 @@ export default {
     mySubjects: 'Mata Pelajaran Saya',
     parent: 'Data Orang Tua',
     parentRelation: 'Relasi Orang Tua',
-    passingScore: 'Nilai Ketuntasan Minimum (KKM)',
+    passingScore: 'Nilai KKM',
     referenceList: {
       occupations: 'Pekerjaan',
       educations: 'Pendidikan',

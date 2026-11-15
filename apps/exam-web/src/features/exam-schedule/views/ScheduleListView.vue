@@ -174,7 +174,7 @@ const columns = computed(() =>
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-[length:var(--text-control,0.875rem)]">
             {{ listError }}
           </p>
           <Button

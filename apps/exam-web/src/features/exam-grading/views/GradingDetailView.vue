@@ -115,7 +115,7 @@ onMounted(load)
           </div>
           <span
             v-if="detail"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{
               waiting > 0

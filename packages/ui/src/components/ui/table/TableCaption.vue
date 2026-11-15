@@ -12,7 +12,7 @@ const props = defineProps<{
     data-slot="table-caption"
     :class="
       cn(
-        'text-muted-foreground mt-4 text-[length:var(--text-control,0.75rem)]',
+        'text-muted-foreground mt-4 text-[length:var(--text-control,0.875rem)]',
         props.class,
       )
     "

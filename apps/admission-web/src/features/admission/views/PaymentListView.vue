@@ -347,7 +347,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.75rem)]">
+                <p class="text-[length:var(--text-control,0.875rem)]">
                   {{ listError }}
                 </p>
                 <Button
@@ -360,13 +360,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Memuat pembayaran…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Tidak ada pembayaran.
                 </p>

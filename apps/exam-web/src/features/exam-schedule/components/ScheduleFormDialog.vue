@@ -146,7 +146,7 @@ async function save() {
       <DialogBody class="space-y-4">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
           role="alert"
         >
           {{ form.error.value }}
@@ -154,7 +154,7 @@ async function save() {
 
         <p
           v-if="isEdit"
-          class="text-[length:var(--text-control,0.75rem)]"
+          class="text-[length:var(--text-control,0.875rem)]"
         >
           {{ schedule?.packageTitle }} · {{ schedule?.classroomName ?? '-' }}
         </p>
@@ -163,7 +163,7 @@ async function save() {
           <template v-if="!isEdit">
             <p
               v-if="props.packageId"
-              class="self-center text-[length:var(--text-control,0.75rem)] sm:col-span-2"
+              class="self-center text-[length:var(--text-control,0.875rem)] sm:col-span-2"
             >
               {{ packageName }}
             </p>
@@ -219,7 +219,7 @@ async function save() {
             </FloatingLabelField>
             <p
               v-if="classroomsLoaded && classrooms.length === 0"
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground sm:col-span-2"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground sm:col-span-2"
             >
               Tidak ada kelas aktif untuk tingkat ini. Pastikan semester aktif
               sudah diatur.
@@ -346,7 +346,7 @@ async function save() {
 
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

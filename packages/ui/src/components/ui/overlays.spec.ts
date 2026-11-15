@@ -17,8 +17,8 @@ import {
   TooltipTrigger,
 } from './tooltip'
 
-const text = 'text-[length:var(--text-control,0.75rem)]'
-const md = 'min-h-[var(--control-h-md,1.75rem)]'
+const text = 'text-[length:var(--text-control,0.875rem)]'
+const md = 'min-h-[var(--control-h-md,2rem)]'
 
 function classOf(selector: string) {
   const el = document.body.querySelector(selector)

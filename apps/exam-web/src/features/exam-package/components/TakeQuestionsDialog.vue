@@ -67,14 +67,14 @@ async function copy() {
       <DialogBody class="flex min-h-0 flex-col gap-4">
         <div
           v-if="take.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
           role="alert"
         >
           {{ take.error.value }}
         </div>
         <p
           v-if="!take.loading.value && take.sources.value.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Belum ada paket lain yang disetujui untuk mapel dan tingkat ini.
         </p>
@@ -120,7 +120,7 @@ async function copy() {
               Kosongkan
             </Button>
             <span
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
             >
               {{ take.selected.value.size }} dari
               {{ take.questions.value.length }} soal dipilih
@@ -130,7 +130,7 @@ async function copy() {
             <li
               v-for="item in take.questions.value"
               :key="item.questionId"
-              class="flex items-start gap-3 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex items-start gap-3 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <Checkbox
                 :model-value="take.selected.value.has(item.questionId)"

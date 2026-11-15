@@ -226,7 +226,7 @@ onMounted(async () => {
           class="space-y-3"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-[length:var(--text-control,0.875rem)]">
             Kegiatan ujian tidak dapat dimuat.
           </p>
           <Button
@@ -239,7 +239,7 @@ onMounted(async () => {
 
         <template v-else-if="event">
           <div
-            class="flex flex-wrap items-center gap-2 text-[length:var(--text-control,0.75rem)]"
+            class="flex flex-wrap items-center gap-2 text-[length:var(--text-control,0.875rem)]"
           >
             <Badge :variant="eventStatusVariant(event.status)">
               {{ eventStatusLabel(event.status) }}
@@ -346,7 +346,7 @@ onMounted(async () => {
         <DialogBody class="space-y-4">
           <div
             v-if="extendError"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
             role="alert"
           >
             {{ extendError }}

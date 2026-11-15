@@ -112,14 +112,14 @@ onBeforeUnmount(() => {
       <div class="min-h-0 flex-1 overflow-auto p-4">
         <p
           v-if="loading"
-          class="py-10 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="py-10 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Memuat berkas…
         </p>
         <div
           v-else-if="error"
           role="alert"
-          class="space-y-3 rounded-md border border-destructive/40 p-4 text-[length:var(--text-control,0.75rem)]"
+          class="space-y-3 rounded-md border border-destructive/40 p-4 text-[length:var(--text-control,0.875rem)]"
         >
           <p>{{ error }}</p>
           <Button
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
         />
         <p
           v-else-if="kind === 'other'"
-          class="py-10 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="py-10 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Pratinjau tidak tersedia untuk jenis berkas ini. Unduh untuk
           membukanya.

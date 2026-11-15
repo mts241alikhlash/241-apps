@@ -97,7 +97,7 @@ onMounted(load)
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
           role="alert"
         >
           {{ error }}
@@ -107,7 +107,7 @@ onMounted(load)
           class="space-y-2 rounded-md border p-4 text-center"
         >
           <p
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{
               action === 'rotate'
@@ -119,14 +119,14 @@ onMounted(load)
             {{ code?.accessCode ?? '······' }}
           </p>
           <p
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Berlaku sampai {{ expiresText() }} · rotasi
             {{ code?.rotation ?? 0 }}
           </p>
         </div>
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Token berganti otomatis setiap 10 menit. Putar sekarang untuk
           membatalkan token lama seketika.

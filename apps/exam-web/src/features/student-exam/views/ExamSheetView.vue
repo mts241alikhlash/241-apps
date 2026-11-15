@@ -379,7 +379,7 @@ function statusOf(question: PaperQuestion | null): string {
               <CardTitle>Soal {{ index + 1 }}</CardTitle>
               <div class="flex items-center gap-2">
                 <span
-                  class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   {{ statusOf(current) }}
                 </span>
@@ -408,7 +408,7 @@ function statusOf(question: PaperQuestion | null): string {
             >
               <p
                 v-if="current.type === 'MULTIPLE_RESPONSE'"
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
               >
                 Pilih semua jawaban yang benar
               </p>

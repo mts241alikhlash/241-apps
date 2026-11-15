@@ -233,7 +233,7 @@ onMounted(() => {
               <Input
                 v-model="filters.resource"
                 placeholder="Contoh: students, roles"
-                class="text-[length:var(--text-control,0.75rem)]"
+                class="text-[length:var(--text-control,0.875rem)]"
               />
             </div>
             <div class="space-y-1.5">
@@ -243,7 +243,7 @@ onMounted(() => {
               <Input
                 v-model="filters.action"
                 placeholder="Contoh: create, update"
-                class="text-[length:var(--text-control,0.75rem)]"
+                class="text-[length:var(--text-control,0.875rem)]"
               />
             </div>
           </div>

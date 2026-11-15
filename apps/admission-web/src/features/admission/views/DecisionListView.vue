@@ -419,7 +419,7 @@ onMounted(async () => {
               <div
                 v-if="manyResult"
                 data-test="many-result"
-                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.875rem)]"
               >
                 <p class="font-medium">
                   {{ manyResult.accepted }} diterima,
@@ -445,7 +445,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.75rem)] sm:min-h-0"
+                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -461,7 +461,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.75rem)]">
+                <p class="text-[length:var(--text-control,0.875rem)]">
                   {{ listError }}
                 </p>
                 <Button
@@ -474,13 +474,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Memuat antrean keputusan…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   {{ emptyText }}
                 </p>
@@ -504,7 +504,7 @@ onMounted(async () => {
                     class="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3 sm:px-4"
                   >
                     <span
-                      class="text-[length:var(--text-control,0.75rem)] font-medium"
+                      class="text-[length:var(--text-control,0.875rem)] font-medium"
                       >{{ selected.length }} dipilih</span
                     >
                     <Button

@@ -158,7 +158,7 @@ onMounted(() => {
       </FloatingLabelField>
       <p
         v-if="chosenRoom"
-        class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
       >
         {{ seat.seats.value.length }} dari {{ chosenRoom.capacity }} kursi
         terisi
@@ -167,7 +167,7 @@ onMounted(() => {
 
     <div
       v-if="seat.error.value"
-      class="space-y-3 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+      class="space-y-3 rounded-md border p-3 text-[length:var(--text-control,0.875rem)]"
       role="alert"
     >
       <p>{{ seat.error.value }}</p>
@@ -204,7 +204,7 @@ onMounted(() => {
       class="flex flex-wrap items-center justify-between gap-3 rounded-md border p-4"
     >
       <label
-        class="flex items-center gap-2 text-[length:var(--text-control,0.75rem)]"
+        class="flex items-center gap-2 text-[length:var(--text-control,0.875rem)]"
       >
         <Checkbox
           :model-value="interleave"
@@ -225,12 +225,12 @@ onMounted(() => {
       v-if="canAssign && seat.roomId.value"
       class="space-y-3 rounded-md border p-4"
     >
-      <p class="text-[length:var(--text-control,0.75rem)] font-medium">
+      <p class="text-[length:var(--text-control,0.875rem)] font-medium">
         Siswa belum berkursi
       </p>
       <p
         v-if="seat.available.value.length === 0"
-        class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
       >
         Semua siswa semester ini sudah mendapat kursi.
       </p>
@@ -239,7 +239,7 @@ onMounted(() => {
           <li
             v-for="row in seat.available.value"
             :key="row.studentId"
-            class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.875rem)]"
           >
             <Checkbox
               :model-value="picked.has(row.studentId)"
@@ -262,7 +262,7 @@ onMounted(() => {
         </ul>
         <div class="flex items-center justify-between gap-2">
           <span
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{ picked.size }} siswa dipilih
           </span>
@@ -291,7 +291,7 @@ onMounted(() => {
         <DialogBody class="space-y-4">
           <div
             v-if="flagError"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
             role="alert"
           >
             {{ flagError }}

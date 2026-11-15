@@ -202,7 +202,7 @@ onMounted(async () => {
         </div>
         <div class="flex items-center justify-between gap-3 md:hidden">
           <p
-            class="min-w-0 truncate text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="min-w-0 truncate text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             {{ scopeLabel }}
           </p>
@@ -228,7 +228,7 @@ onMounted(async () => {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
           <Button
             variant="outline"
             @click="loadStats()"
@@ -244,7 +244,7 @@ onMounted(async () => {
               class="border-primary bg-primary p-6 text-primary-foreground lg:col-span-2"
             >
               <p
-                class="text-[length:var(--text-control,0.75rem)] font-medium text-primary-foreground"
+                class="text-[length:var(--text-control,0.875rem)] font-medium text-primary-foreground"
               >
                 Total pendaftar
               </p>
@@ -254,7 +254,7 @@ onMounted(async () => {
                 {{ stats.total }}
               </p>
               <p
-                class="mt-2 text-[length:var(--text-control,0.75rem)] text-primary-foreground"
+                class="mt-2 text-[length:var(--text-control,0.875rem)] text-primary-foreground"
               >
                 {{ scopeLabel }}
               </p>
@@ -265,7 +265,7 @@ onMounted(async () => {
               class="p-6"
             >
               <p
-                class="text-[length:var(--text-control,0.75rem)] font-medium text-muted-foreground"
+                class="text-[length:var(--text-control,0.875rem)] font-medium text-muted-foreground"
               >
                 Perlu tindakan
               </p>
@@ -276,7 +276,7 @@ onMounted(async () => {
                 {{ needsAction }}
               </p>
               <p
-                class="mt-2 text-[length:var(--text-control,0.75rem)]"
+                class="mt-2 text-[length:var(--text-control,0.875rem)]"
                 :class="
                   needsAction > 0 ? 'text-amber-700' : 'text-muted-foreground'
                 "
@@ -333,7 +333,7 @@ onMounted(async () => {
               <RouterLink
                 v-if="hasWaves"
                 :to="{ name: 'admin-applications' }"
-                class="inline-flex items-center gap-1 text-[length:var(--text-control,0.75rem)] font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                class="inline-flex items-center gap-1 text-[length:var(--text-control,0.875rem)] font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Lihat semua pendaftar
                 <ArrowRight class="size-3.5" />
@@ -342,7 +342,7 @@ onMounted(async () => {
             <CardContent class="pb-6">
               <p
                 v-if="!hasWaves"
-                class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
               >
                 Tidak ada data.
               </p>
@@ -374,7 +374,7 @@ onMounted(async () => {
                         >
                           {{ wave.filled }}
                           <span
-                            class="text-[length:var(--text-control,0.75rem)] font-normal text-muted-foreground"
+                            class="text-[length:var(--text-control,0.875rem)] font-normal text-muted-foreground"
                             >/ {{ wave.quota }} terisi</span
                           >
                         </p>

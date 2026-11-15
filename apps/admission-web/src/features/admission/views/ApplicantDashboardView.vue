@@ -357,7 +357,7 @@ onMounted(() => {
         <section
           v-if="reminders.length"
           data-test="late-reminders"
-          class="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-4 text-[length:var(--text-control,0.75rem)] text-amber-950 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-100"
+          class="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-4 text-[length:var(--text-control,0.875rem)] text-amber-950 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-100"
         >
           <h2 class="font-medium">Berkas yang masih harus diserahkan</h2>
           <ul class="list-disc space-y-1 pl-5">
@@ -384,7 +384,7 @@ onMounted(() => {
               <li
                 v-for="task in tasks"
                 :key="task.key"
-                class="flex items-start gap-3 rounded-lg border p-3 text-[length:var(--text-control,0.75rem)]"
+                class="flex items-start gap-3 rounded-lg border p-3 text-[length:var(--text-control,0.875rem)]"
               >
                 <component
                   :is="task.icon"
@@ -424,7 +424,7 @@ onMounted(() => {
             Tahapan pendaftaran
           </summary>
           <ol
-            class="space-y-3 border-l-2 border-muted pl-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-3 border-l-2 border-muted pl-4 text-[length:var(--text-control,0.875rem)]"
           >
             <li
               v-for="(step, index) in TIMELINE"
@@ -469,7 +469,7 @@ onMounted(() => {
             </StepperIndicator>
             <div>
               <StepperTitle
-                class="text-xs font-medium sm:text-[length:var(--text-control,0.75rem)]"
+                class="text-xs font-medium sm:text-[length:var(--text-control,0.875rem)]"
               >
                 {{ step.label }}
               </StepperTitle>
@@ -484,7 +484,7 @@ onMounted(() => {
 
         <div class="grid gap-3 sm:grid-cols-3">
           <div
-            class="space-y-2 rounded-lg border p-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-2 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
           >
             <p class="text-muted-foreground">Kelengkapan Berkas</p>
             <p class="font-medium">
@@ -497,7 +497,7 @@ onMounted(() => {
             />
           </div>
           <div
-            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
           >
             <p class="text-muted-foreground">Pembayaran</p>
             <p
@@ -524,7 +524,7 @@ onMounted(() => {
             </p>
           </div>
           <div
-            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
           >
             <p class="text-muted-foreground">Tanggal Pengiriman</p>
             <p class="font-medium">
@@ -570,7 +570,7 @@ onMounted(() => {
         <CardContent class="p-0">
           <div
             v-if="notificationsError"
-            class="space-y-2 p-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-2 p-4 text-[length:var(--text-control,0.875rem)]"
           >
             <p>Notifikasi gagal dimuat.</p>
             <Button
@@ -581,7 +581,7 @@ onMounted(() => {
           </div>
           <p
             v-else-if="notifications.length === 0"
-            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             <CircleDashed class="size-4" />
             Belum ada notifikasi.
@@ -594,7 +594,7 @@ onMounted(() => {
               <li
                 v-for="notification in notifications"
                 :key="notification.id"
-                class="space-y-1 p-4 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 p-4 text-[length:var(--text-control,0.875rem)]"
                 :class="notification.readAt ? 'opacity-70' : 'bg-primary/5'"
               >
                 <p class="flex items-center gap-2 font-medium">
@@ -635,7 +635,7 @@ onMounted(() => {
         <CardContent class="p-0">
           <div
             v-if="announcementsError"
-            class="space-y-2 p-4 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-2 p-4 text-[length:var(--text-control,0.875rem)]"
           >
             <p>Pengumuman gagal dimuat.</p>
             <Button
@@ -646,7 +646,7 @@ onMounted(() => {
           </div>
           <p
             v-else-if="announcements.length === 0"
-            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             <CircleDashed class="size-4" />
             Belum ada pengumuman dari panitia.
@@ -659,7 +659,7 @@ onMounted(() => {
               <li
                 v-for="announcement in announcements"
                 :key="announcement.id"
-                class="space-y-1 p-4 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 p-4 text-[length:var(--text-control,0.875rem)]"
               >
                 <p class="font-medium">{{ announcement.title }}</p>
                 <p class="whitespace-pre-line text-muted-foreground">
@@ -690,7 +690,7 @@ onMounted(() => {
           Belum ada data pendaftaran
         </h2>
         <p
-          class="text-[length:var(--text-control,0.75rem)] text-balance text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-balance text-muted-foreground"
         >
           {{
             isAdmin

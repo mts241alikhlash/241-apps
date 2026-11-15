@@ -54,7 +54,7 @@ function pick(event: Event) {
       >
         <div class="min-h-0 flex-1 overflow-y-auto space-y-2 dialog-body">
           <label
-            class="text-[length:var(--text-control,0.75rem)] font-medium"
+            class="text-[length:var(--text-control,0.875rem)] font-medium"
             for="late-document-file"
           >
             Berkas (JPG, PNG atau PDF)
@@ -63,7 +63,7 @@ function pick(event: Event) {
             id="late-document-file"
             type="file"
             accept=".jpg,.jpeg,.png,.pdf"
-            class="block w-full text-[length:var(--text-control,0.75rem)]"
+            class="block w-full text-[length:var(--text-control,0.875rem)]"
             :disabled="saving"
             @change="pick"
           />

@@ -476,7 +476,7 @@ defineExpose({ validate: validateStep })
                   </FloatingField>
                 </div>
                 <div
-                  class="space-y-2 text-[length:var(--text-control,0.75rem)]"
+                  class="space-y-2 text-[length:var(--text-control,0.875rem)]"
                 >
                   <p class="font-medium">Lampiran</p>
                   <FileDropzone
@@ -719,7 +719,7 @@ defineExpose({ validate: validateStep })
                   </FloatingField>
                 </div>
                 <div
-                  class="space-y-2 text-[length:var(--text-control,0.75rem)]"
+                  class="space-y-2 text-[length:var(--text-control,0.875rem)]"
                 >
                   <p class="font-medium">Lampiran</p>
                   <FileDropzone

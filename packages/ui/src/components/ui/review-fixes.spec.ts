@@ -22,7 +22,7 @@ describe('review fixes', () => {
     for (const w of [mount(Input), mount(Textarea)]) {
       const c = w.classes()
       expect(c).toContain('text-sm')
-      expect(c).toContain('md:text-[length:var(--text-control,0.75rem)]')
+      expect(c).toContain('md:text-[length:var(--text-control,0.875rem)]')
       expect(c).not.toContain('text-base')
     }
   })
@@ -63,7 +63,7 @@ describe('review fixes', () => {
     expect(viewport?.getAttribute('class')).toContain('p-1')
     const item = document.body.querySelector('[data-slot=select-item]')
     expect(item?.getAttribute('class')).toContain(
-      'min-h-[var(--control-h-md,1.75rem)]',
+      'min-h-[var(--control-h-md,2rem)]',
     )
   })
 

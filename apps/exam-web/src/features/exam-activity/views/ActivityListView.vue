@@ -83,7 +83,7 @@ onMounted(load)
           role="alert"
           class="space-y-3 rounded-md border p-4"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -94,14 +94,14 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Memuat daftar kegiatan…
         </p>
 
         <p
           v-else-if="activities.length === 0"
-          class="py-8 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="py-8 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
         >
           Belum ada kegiatan pada seksi ini.
         </p>
@@ -127,7 +127,7 @@ onMounted(load)
                 </span>
               </div>
               <p
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
               >
                 {{ formatWindow(item) }} · {{ item.durationMinutes }} menit ·
                 {{

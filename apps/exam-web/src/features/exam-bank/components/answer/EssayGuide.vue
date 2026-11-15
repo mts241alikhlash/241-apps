@@ -14,7 +14,7 @@ function setGuide(next: string) {
 
 <template>
   <div class="flex flex-col gap-2">
-    <p class="text-[length:var(--text-control,0.75rem)] text-muted-foreground">
+    <p class="text-[length:var(--text-control,0.875rem)] text-muted-foreground">
       Pedoman penilaian untuk pemeriksa (boleh dikosongkan). Siswa tidak
       melihatnya.
     </p>

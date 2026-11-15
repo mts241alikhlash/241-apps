@@ -20,7 +20,7 @@ const forwarded = useForwardProps(delegatedProps)
     v-bind="forwarded"
     :class="
       cn(
-        '[&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+        '[&_svg:not([class*=size-])]:size-[var(--icon-control,1rem)]',
         props.class,
       )
     "

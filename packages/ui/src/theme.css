@@ -6,11 +6,12 @@
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius-md);
-  --radius-xl: var(--radius-md);
-  --radius-2xl: var(--radius-md);
-  --radius-3xl: var(--radius-md);
-  --radius-4xl: var(--radius-md);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --text-xs: 0.8125rem;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -50,12 +51,12 @@
   color-scheme: light;
   --radius: 0.625rem;
   --brand-gold: oklch(0.694 0.072 97);
-  --control-h-xs: 1.25rem;
-  --control-h-sm: 1.5rem;
-  --control-h-md: 1.75rem;
-  --control-h-lg: 2rem;
-  --text-control: 0.75rem;
-  --icon-control: 0.875rem;
+  --control-h-xs: 1.5rem;
+  --control-h-sm: 1.75rem;
+  --control-h-md: 2rem;
+  --control-h-lg: 2.25rem;
+  --text-control: 0.875rem;
+  --icon-control: 1rem;
   --background: oklch(0.96 0.005 260);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
@@ -92,11 +93,11 @@
 
 @media (max-width: 767px) {
   :root {
-    --control-h-xs: 1.5rem;
-    --control-h-sm: 2rem;
-    --control-h-md: 2.25rem;
-    --control-h-lg: 2.5rem;
-    --text-control: 0.8125rem;
+    --control-h-xs: 1.75rem;
+    --control-h-sm: 2.25rem;
+    --control-h-md: 2.5rem;
+    --control-h-lg: 2.75rem;
+    --text-control: 0.9375rem;
     --icon-control: 1rem;
   }
 }

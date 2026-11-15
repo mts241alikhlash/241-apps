@@ -603,7 +603,7 @@ onMounted(async () => {
               <div
                 v-if="processResult"
                 data-test="process-result"
-                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.875rem)]"
               >
                 <p class="font-medium">
                   {{ processResult.enrolled }} diproses,
@@ -628,7 +628,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.75rem)] sm:min-h-0"
+                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -644,7 +644,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.75rem)]">
+                <p class="text-[length:var(--text-control,0.875rem)]">
                   {{ listError }}
                 </p>
                 <Button
@@ -657,13 +657,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   Memuat antrean daftar ulang…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
                 >
                   {{ emptyText }}
                 </p>
@@ -689,12 +689,12 @@ onMounted(async () => {
                   >
                     <div class="flex items-center gap-2">
                       <span
-                        class="text-[length:var(--text-control,0.75rem)] font-medium"
+                        class="text-[length:var(--text-control,0.875rem)] font-medium"
                         >{{ selected.length }} dipilih</span
                       >
                       <span
                         v-if="selected.length > MAX_PROCESS"
-                        class="text-[length:var(--text-control,0.75rem)] text-destructive"
+                        class="text-[length:var(--text-control,0.875rem)] text-destructive"
                       >
                         Maksimal {{ MAX_PROCESS }} pendaftar sekali proses
                       </span>
@@ -733,7 +733,7 @@ onMounted(async () => {
           </DialogHeader>
           <div class="space-y-4 px-6 py-5">
             <div
-              class="space-y-1 rounded-lg border bg-muted/10 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="space-y-1 rounded-lg border bg-muted/10 p-3 text-[length:var(--text-control,0.875rem)]"
             >
               <p class="font-medium text-foreground">
                 {{ selected.length }} pendaftar dipilih
@@ -746,7 +746,7 @@ onMounted(async () => {
             <p
               v-if="nisnError"
               role="alert"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-[length:var(--text-control,0.875rem)] text-destructive"
             >
               {{ nisnError }}
             </p>
@@ -822,7 +822,7 @@ onMounted(async () => {
             </Select>
             <p
               v-if="placementError"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-[length:var(--text-control,0.875rem)] text-destructive"
             >
               {{ placementError }}
             </p>
@@ -868,20 +868,20 @@ onMounted(async () => {
         <DialogBody>
           <p
             v-if="nisLoading"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           >
             Memuat pratinjau…
           </p>
           <p
             v-else-if="nisError"
             role="alert"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-[length:var(--text-control,0.875rem)] text-destructive"
           >
             {{ nisError }}
           </p>
           <div
             v-else-if="nisPreview"
-            class="space-y-3 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-3 text-[length:var(--text-control,0.875rem)]"
           >
             <p>
               <strong>{{ nisPreview.changes }} NIS berubah</strong>,
@@ -1004,7 +1004,7 @@ onMounted(async () => {
         </DialogHeader>
 
         <div
-          class="space-y-4 px-6 py-5 text-[length:var(--text-control,0.75rem)]"
+          class="space-y-4 px-6 py-5 text-[length:var(--text-control,0.875rem)]"
         >
           <div class="space-y-1.5">
             <p class="font-medium text-foreground">

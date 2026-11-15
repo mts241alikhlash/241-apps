@@ -16,7 +16,7 @@ const props = defineProps<{
       cn(
         'mb-2 font-medium',
         'data-[variant=legend]:text-sm',
-        'data-[variant=label]:text-[length:var(--text-control,0.75rem)]',
+        'data-[variant=label]:text-[length:var(--text-control,0.875rem)]',
         props.class,
       )
     "

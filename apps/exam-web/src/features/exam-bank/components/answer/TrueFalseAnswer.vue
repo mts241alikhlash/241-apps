@@ -29,7 +29,7 @@ function pick(next: AcceptableValue) {
     <label
       v-for="option in options"
       :key="option.value"
-      class="flex min-h-[var(--control-h,2.25rem)] cursor-pointer items-center gap-2 rounded-md border px-3 text-[length:var(--text-control,0.75rem)] font-medium has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10 has-data-[state=checked]:text-primary"
+      class="flex min-h-[var(--control-h,2.25rem)] cursor-pointer items-center gap-2 rounded-md border px-3 text-[length:var(--text-control,0.875rem)] font-medium has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/10 has-data-[state=checked]:text-primary"
     >
       <RadioGroupItem
         :value="option.value"

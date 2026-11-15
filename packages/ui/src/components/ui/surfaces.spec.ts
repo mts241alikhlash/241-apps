@@ -9,7 +9,7 @@ import { Table } from './table'
 import { Tabs, TabsList, TabsTrigger } from './tabs'
 import { h } from 'vue'
 
-const text = 'text-[length:var(--text-control,0.75rem)]'
+const text = 'text-[length:var(--text-control,0.875rem)]'
 
 function tabs(variant?: 'line') {
   return mount(Tabs, {
@@ -35,7 +35,7 @@ describe('tabs', () => {
 
   it('line trigger follows the control height token, the underline and the control text token', () => {
     const c = tabs('line').get('[data-slot=tabs-trigger]').classes()
-    expect(c).toContain('min-h-[var(--control-h-lg,2rem)]')
+    expect(c).toContain('min-h-[var(--control-h-lg,2.25rem)]')
     expect(c).not.toContain('min-h-11')
     expect(c).toContain('data-[state=active]:border-primary')
     expect(c).toContain(text)

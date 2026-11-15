@@ -192,7 +192,7 @@ onMounted(() => examPackageService.loadReferences())
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-[length:var(--text-control,0.875rem)]">
             {{ listError }}
           </p>
           <Button
@@ -329,7 +329,7 @@ onMounted(() => examPackageService.loadReferences())
         </AlertDialogHeader>
         <p
           v-if="submitError"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-[length:var(--text-control,0.875rem)] text-destructive"
           role="alert"
         >
           {{ submitError }}

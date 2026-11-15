@@ -173,7 +173,7 @@ async function start() {
             </div>
             <div
               v-else-if="error && !exam"
-              class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
               role="alert"
             >
               {{ error }}

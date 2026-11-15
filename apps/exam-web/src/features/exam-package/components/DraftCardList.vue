@@ -38,12 +38,12 @@ const emit = defineEmits<{
           @click="emit('select', index)"
         >
           <span
-            class="w-5 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+            class="w-5 shrink-0 text-right text-[length:var(--text-control,0.875rem)] text-muted-foreground tabular-nums"
           >
             {{ index + 1 }}
           </span>
           <span
-            class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
+            class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.875rem)]"
           >
             {{ snippetOf(card) }}
           </span>
@@ -56,7 +56,7 @@ const emit = defineEmits<{
       </ItemContent>
       <ItemActions class="shrink-0">
         <span
-          class="w-8 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="w-8 shrink-0 text-right text-[length:var(--text-control,0.875rem)] text-muted-foreground"
           :title="typeLabel(card.type)"
         >
           {{ typeCode(card.type) }}
