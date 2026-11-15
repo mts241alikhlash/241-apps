@@ -184,6 +184,36 @@ describe('parseWordSheet', () => {
     expect(sheet.questions[0].bodyHtml).toContain('data-file-id="file-1"')
   })
 
+  it('keeps Arabic harakat and reads several accepted answers', async () => {
+    const sheet = await parseWordSheet(
+      await docx(
+        table(IDENTITY) +
+          table([
+            HEADERS,
+            [
+              '1',
+              'Isian',
+              'مَا مَعْنَى كِتَابٌ؟',
+              '',
+              '',
+              '',
+              '',
+              '',
+              'كِتَابٌ|buku',
+              'Ya',
+              '1',
+            ],
+          ]),
+      ),
+      noImages,
+    )
+
+    expect(sheet.questions[0].bodyHtml).toBe('<p>مَا مَعْنَى كِتَابٌ؟</p>')
+    expect(sheet.questions[0].content).toMatchObject({
+      answer: { accepted: ['كِتَابٌ', 'buku'], ignoreHarakat: true },
+    })
+  })
+
   it('reports a document without a table', async () => {
     const sheet = await parseWordSheet(
       await docx('<w:p><w:r><w:t>Tanpa tabel</w:t></w:r></w:p>'),

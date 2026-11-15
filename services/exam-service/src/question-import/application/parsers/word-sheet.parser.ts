@@ -14,7 +14,11 @@ import {
 } from '../../domain/policies/import-content.policy.js'
 import { inlineToHtml } from '../../domain/policies/inline-latex.policy.js'
 import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
-import type { ImageSaver } from './word-question.parser.js'
+
+export type ImageSaver = (
+  content: Buffer,
+  contentType: string,
+) => Promise<string>
 
 const TABLE = /<table\b[^>]*>([\s\S]*?)<\/table>/gu
 const ROW = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gu

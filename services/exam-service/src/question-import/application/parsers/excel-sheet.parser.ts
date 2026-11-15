@@ -1,10 +1,64 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
+import type { Choice } from '../../../question/domain/value-objects/question-content.js'
 import type { ImportSheet, SheetIdentity } from '../../domain/import-sheet.js'
 import { IMPORT_MAX_QUESTIONS } from '../../domain/import-limits.js'
-import { ImportRowError } from '../../domain/policies/import-content.policy.js'
+import {
+  JENIS_TYPES,
+  type ParsedQuestion,
+} from '../../domain/parsed-question.js'
+import {
+  buildImportContent,
+  ImportRowError,
+  parsePoints,
+} from '../../domain/policies/import-content.policy.js'
+import { textToHtml } from '../../domain/policies/inline-latex.policy.js'
 import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
-import { parseRow, readColumns } from './excel-question.parser.js'
+
+const CHOICE_COLUMNS = ['A', 'B', 'C', 'D', 'E'] as const
+
+function readColumns(row: ExcelJS.Row): Map<string, number> {
+  const columns = new Map<string, number>()
+  row.eachCell((cell, column) => {
+    columns.set(cell.text.trim().toLowerCase(), column)
+  })
+  return columns
+}
+
+function parseRow(
+  row: ExcelJS.Row,
+  columns: Map<string, number>,
+): ParsedQuestion | null {
+  const text = (column: string): string => {
+    const index = columns.get(column)
+    return index === undefined ? '' : row.getCell(index).text.trim()
+  }
+
+  const typeName = text('jenis')
+  const body = text('soal')
+  if (typeName === '' && body === '') return null
+
+  const type = Object.hasOwn(JENIS_TYPES, typeName.toLowerCase())
+    ? JENIS_TYPES[typeName.toLowerCase() as keyof typeof JENIS_TYPES]
+    : undefined
+  if (type === undefined) throw new ImportRowError('Jenis soal tidak dikenal')
+
+  const choices: Choice[] = CHOICE_COLUMNS.flatMap((key) => {
+    const value = text(key.toLowerCase())
+    return value === '' ? [] : [{ key, html: textToHtml(value) }]
+  })
+  return {
+    row: row.number,
+    type,
+    bodyHtml: textToHtml(body),
+    content: buildImportContent(type, {
+      choices,
+      key: text('kunci'),
+      ignoreHarakat: text('abaikan harakat').toLowerCase() === 'ya',
+    }),
+    points: parsePoints(text('poin')),
+  }
+}
 
 function readIdentity(book: ExcelJS.Workbook): SheetIdentity {
   const sheet = book.getWorksheet('Identitas')

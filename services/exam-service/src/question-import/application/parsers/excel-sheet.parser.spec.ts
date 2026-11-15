@@ -179,6 +179,69 @@ describe('parseExcelSheet', () => {
     })
   })
 
+  it('keeps Arabic harakat byte for byte and reads Abaikan harakat', async () => {
+    const arabic = 'مَا مَعْنَى كِتَابٌ؟'
+    const sheet = await parseExcelSheet(
+      await workbook({
+        rows: [
+          [
+            1,
+            'Isian',
+            arabic,
+            null,
+            null,
+            null,
+            null,
+            null,
+            'كِتَابٌ',
+            'Ya',
+            null,
+          ],
+        ],
+      }),
+    )
+
+    expect(sheet.questions[0].bodyHtml).toBe(`<p dir="auto">${arabic}</p>`)
+    expect(sheet.questions[0].content).toMatchObject({
+      answer: { accepted: ['كِتَابٌ'], ignoreHarakat: true },
+    })
+  })
+
+  it('skips blank rows, asks for Jenis and Soal, and refuses a non-workbook', async () => {
+    const sheet = await parseExcelSheet(
+      await workbook({
+        rows: [
+          [null, null, null, null, null, null, null, null, null, null, null],
+          [
+            1,
+            'Uraian',
+            'Jelaskan',
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+          ],
+        ],
+      }),
+    )
+    expect(sheet.questions.map((q) => q.row)).toEqual([3])
+
+    const book = new ExcelJS.Workbook()
+    book.addWorksheet('Soal').addRow(['No', 'Pertanyaan'])
+    await expect(
+      parseExcelSheet(Buffer.from(await book.xlsx.writeBuffer())),
+    ).rejects.toThrow(
+      new BadRequestException('Kolom Jenis dan Soal tidak ditemukan'),
+    )
+    await expect(parseExcelSheet(Buffer.from('bukan xlsx'))).rejects.toThrow(
+      new BadRequestException('Berkas Excel tidak bisa dibaca'),
+    )
+  })
+
   it('throws when more than 500 questions are present', async () => {
     const rows = Array.from({ length: 501 }, (_, index) => [
       index + 1,

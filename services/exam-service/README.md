@@ -22,9 +22,20 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - SEB endpoints: `GET/POST /seb-configs`, `PATCH/DELETE /seb-configs/:id` (`exam-schedules.manage-all`); `GET /seb-configs/active` and `GET /seb-configs/:id/file` (`exam-sessions.take`); `GET /public/seb-configs/:id/file` serves only active configurations without auth; `POST /seb-configs/check` (`exam-schedules.manage-all`). The Config Key is a weak barrier, derivable from the `.seb` file ([ADR 0011](../../docs/adr/0011-web-exams-run-in-safe-exam-browser.md)).
 - Permissions are explicit per action (review, schedule, grade); see the seed for the codes.
 
+### Question import
+
+- One table template, version 2, for Word (`.docx`) and Excel (`.xlsx`) alike. Sheet `Identitas` (Word: the first table) holds the identity: Versi Template, Nama Guru, NIK, Mapel, Tingkat. Sheet `Soal` (Word: the second table) holds the questions with the columns Jenis, Soal, A to E, Kunci, Abaikan harakat, Poin. A Word file with a third table gets a warning and that table is ignored.
+- `GET /exam-imports/template` returns the template. `POST /exam-imports/preview` reads the file and returns the questions and row errors without saving. `POST /exam-imports` saves; it takes `confirmDuplicates` when a question's text already exists in the bank.
+- The identity must match the package: Mapel, Tingkat, and a NIK of a staff account. A mismatch is refused.
+- One bad row cancels the whole import; nothing is saved. Duplicates need `confirmDuplicates`.
+- Limits: 500 questions per file, 10 MB.
+
 ## Gotchas
 
 - A default `test` run reports skipped specs; they are not failures.
+- Images are uploaded before the database write, so a failed save can leave orphan image files. Accepted debt.
+- Nested Word tables are not supported.
+- Old v1 Excel files and paragraph-style Word files are rejected with "Unduh template baru".
 
 ## Open work
 
