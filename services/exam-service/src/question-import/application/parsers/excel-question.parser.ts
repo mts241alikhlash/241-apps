@@ -17,7 +17,7 @@ import { textToHtml } from '../../domain/policies/inline-latex.policy.js'
 
 const CHOICE_COLUMNS = ['A', 'B', 'C', 'D', 'E'] as const
 
-function readColumns(row: ExcelJS.Row): Map<string, number> {
+export function readColumns(row: ExcelJS.Row): Map<string, number> {
   const columns = new Map<string, number>()
   row.eachCell((cell, column) => {
     columns.set(cell.text.trim().toLowerCase(), column)
@@ -25,7 +25,7 @@ function readColumns(row: ExcelJS.Row): Map<string, number> {
   return columns
 }
 
-function parseRow(
+export function parseRow(
   row: ExcelJS.Row,
   columns: Map<string, number>,
 ): ParsedQuestion | null {
