@@ -256,8 +256,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Import questions from an Excel or Word file */
+        /** Import questions from the version 2 table template (xlsx or docx) */
         post: operations["QuestionImportController_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-imports/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview a version 2 table template file without saving anything */
+        post: operations["QuestionImportController_preview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2006,9 +2023,27 @@ export interface components {
             studentName: string | null;
             studentNis: string | null;
         };
+        ImportCountsDto: {
+            ESSAY: number;
+            MULTIPLE_CHOICE: number;
+            MULTIPLE_RESPONSE: number;
+            SHORT_ANSWER: number;
+            TRUE_FALSE: number;
+        };
         ImportErrorDto: {
             reason: string;
             row: number;
+        };
+        ImportPreviewDto: {
+            authorName: string | null;
+            canSave: boolean;
+            counts: components["schemas"]["ImportCountsDto"];
+            duplicateRows: number[];
+            errors: components["schemas"]["ImportErrorDto"][];
+            identity: components["schemas"]["SheetIdentityDto"];
+            total: number;
+            totalPoints: number;
+            warnings: string[];
         };
         ImportResultDto: {
             created: number;
@@ -2653,6 +2688,13 @@ export interface components {
             occurredAt: string;
             reason: string | null;
             type: string | null;
+        };
+        SheetIdentityDto: {
+            gradeLevel: number | null;
+            nik: string;
+            subjectName: string;
+            teacherName: string;
+            version: number | null;
         };
         ShortAnswerAnswerDto: {
             accepted: string[];
@@ -3386,8 +3428,7 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": {
-                    /** Format: uuid */
-                    authorEmployeeId?: string;
+                    confirmDuplicates?: boolean;
                     /** Format: binary */
                     file: string;
                     /** Format: uuid */
@@ -3403,6 +3444,40 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ImportResultDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    QuestionImportController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    packageId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ImportPreviewDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

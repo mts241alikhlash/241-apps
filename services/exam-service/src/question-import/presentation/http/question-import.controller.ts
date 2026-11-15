@@ -31,6 +31,7 @@ import { GetImportTemplateUseCase } from '../../application/use-cases/get-import
 import { ImportQuestionsUseCase } from '../../application/use-cases/import-questions/import-questions.use-case.js'
 import { IMPORT_MAX_BYTES } from '../../domain/import-limits.js'
 import {
+  ImportPreviewDto,
   ImportQuestionsDto,
   ImportResultDto,
   ImportTemplateQueryDto,
@@ -78,7 +79,10 @@ export class QuestionImportController {
   @HttpCode(HttpStatus.OK)
   @RequirePermissions('exam-questions.create')
   @UseInterceptors(FileInterceptor('file', { limits: UPLOAD_LIMITS }))
-  @ApiOperation({ summary: 'Import questions from an Excel or Word file' })
+  @ApiOperation({
+    summary:
+      'Import questions from the version 2 table template (xlsx or docx)',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -87,7 +91,7 @@ export class QuestionImportController {
       properties: {
         file: { type: 'string', format: 'binary' },
         packageId: { type: 'string', format: 'uuid' },
-        authorEmployeeId: { type: 'string', format: 'uuid' },
+        confirmDuplicates: { type: 'boolean' },
       },
     },
   })
@@ -100,6 +104,42 @@ export class QuestionImportController {
     if (!file) throw new BadRequestException('Berkas wajib dilampirkan')
     return ImportResultDto.fromDomain(
       await this.importQuestions.execute(user, {
+        buffer: file.buffer,
+        size: file.size,
+        fileName: file.originalname,
+        packageId: dto.packageId,
+        confirmDuplicates: dto.confirmDuplicates,
+      }),
+    )
+  }
+
+  @Post('preview')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('exam-questions.create')
+  @UseInterceptors(FileInterceptor('file', { limits: UPLOAD_LIMITS }))
+  @ApiOperation({
+    summary: 'Preview a version 2 table template file without saving anything',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file', 'packageId'],
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        packageId: { type: 'string', format: 'uuid' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, type: ImportPreviewDto })
+  async preview(
+    @CurrentUser() user: ScopeUser,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Body() dto: ImportQuestionsDto,
+  ): Promise<ImportPreviewDto> {
+    if (!file) throw new BadRequestException('Berkas wajib dilampirkan')
+    return ImportPreviewDto.fromDomain(
+      await this.importQuestions.preview(user, {
         buffer: file.buffer,
         size: file.size,
         fileName: file.originalname,
