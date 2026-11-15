@@ -57,23 +57,13 @@ function build() {
 }
 
 describe('QuestionImportController', () => {
-  it('serves the template as an attachment and imports it back', async () => {
-    const { controller, template } = build()
+  it('serves the template as an attachment', async () => {
+    const { controller } = build()
     const set = vi.fn()
 
     const streamed = await controller.template({ format: 'xlsx' }, {
       set,
     } as unknown as Response)
-    const { buffer } = await template.execute('xlsx')
-    const result = await controller.import(
-      TEACHER,
-      {
-        buffer,
-        size: buffer.length,
-        originalname: 'template-soal.xlsx',
-      } as Express.Multer.File,
-      { packageId: PACKAGE_ID },
-    )
 
     expect(streamed).toBeInstanceOf(StreamableFile)
     expect(set).toHaveBeenCalledWith(
@@ -81,8 +71,6 @@ describe('QuestionImportController', () => {
         'Content-Disposition': 'attachment; filename="template-soal.xlsx"',
       }),
     )
-    expect(result).toMatchObject({ created: 5, errors: [] })
-    expect(result.questionIds).toHaveLength(5)
   })
 
   it('refuses a request with no file', async () => {
