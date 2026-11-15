@@ -19,6 +19,7 @@ import { ServiceClientModule } from '@mts241alikhlash/nest-core/service-client'
 import { AuthModule } from '@mts241alikhlash/nest-core/auth'
 import { AuthorLookupModule } from './platform/author-lookup/author-lookup.module.js'
 import { AcademicLookupModule } from './platform/academic-lookup/academic-lookup.module.js'
+import { NikEmployeeModule } from './platform/nik-employee/nik-employee.module.js'
 import { ExamFileModule } from './exam-file/exam-file.module.js'
 import { ExamActivityModule } from './exam-activity/exam-activity.module.js'
 import { ExamPackageModule } from './exam-package/exam-package.module.js'
@@ -80,6 +81,7 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
     AuthModule,
     PermissionModule,
     EmployeeIdentityModule,
+    NikEmployeeModule,
     StudentIdentityModule,
     EnrollmentLookupModule,
     ParticipantNumberModule,
