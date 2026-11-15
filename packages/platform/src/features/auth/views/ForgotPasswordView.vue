@@ -119,7 +119,8 @@ const onSubmit = handleSubmit(async (values) => {
 
             <Button
               variant="outline"
-              class="w-full h-10 rounded-xl"
+              size="lg"
+              class="w-full"
               @click="router.push('/login')"
             >
               <ArrowLeft class="h-4 w-4" /> Kembali ke Login
@@ -159,7 +160,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="submit"
               :disabled="isSubmitting"
-              class="w-full cursor-pointer h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full cursor-pointer font-semibold"
             >
               <Loader2
                 v-if="isSubmitting"
@@ -171,7 +173,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="button"
               variant="ghost"
-              class="w-full h-10 rounded-xl text-muted-foreground"
+              size="lg"
+              class="w-full text-muted-foreground"
               @click="router.push('/login')"
             >
               Kembali ke Login

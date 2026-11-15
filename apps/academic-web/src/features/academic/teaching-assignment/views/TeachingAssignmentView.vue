@@ -145,7 +145,7 @@ onMounted(async () => {
         >
           <template #filters>
             <Select v-model="selectedClassroomId">
-              <SelectTrigger class="h-8 w-[160px] text-xs">
+              <SelectTrigger class="w-[160px]">
                 <SelectValue placeholder="Semua Kelas" />
               </SelectTrigger>
               <SelectContent>

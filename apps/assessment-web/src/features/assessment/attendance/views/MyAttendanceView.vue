@@ -456,7 +456,7 @@ onMounted(() => void load())
 
                 <span
                   v-if="day.attendances.length > 1"
-                  class="text-[10px] text-muted-foreground font-medium"
+                  class="text-xs text-muted-foreground font-medium"
                 >
                   {{ day.attendances.length }} sesi
                 </span>
@@ -468,7 +468,7 @@ onMounted(() => void load())
                   :key="att.id ?? aIdx"
                 >
                   <div
-                    class="rounded-md px-1.5 py-0.5 border text-center text-[10px] sm:text-xs font-semibold leading-tight flex items-center justify-center gap-1 truncate"
+                    class="rounded-md px-1.5 py-0.5 border text-center text-xs sm:text-xs font-semibold leading-tight flex items-center justify-center gap-1 truncate"
                     :class="
                       STATUS_CONFIG[att.status]?.badgeClass ??
                       'bg-muted border-border'
@@ -481,14 +481,14 @@ onMounted(() => void load())
 
                   <p
                     v-if="att.note"
-                    class="text-[10px] text-muted-foreground truncate italic text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground truncate italic text-center px-0.5 leading-tight"
                     :title="att.note"
                   >
                     {{ att.note }}
                   </p>
                   <p
                     v-else-if="att.schedule?.timeSlot?.name"
-                    class="text-[10px] text-muted-foreground/80 truncate text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground/80 truncate text-center px-0.5 leading-tight"
                   >
                     {{ att.schedule.timeSlot.name }}
                   </p>
@@ -496,7 +496,7 @@ onMounted(() => void load())
 
                 <p
                   v-if="day.attendances.length > 2"
-                  class="text-[9px] text-muted-foreground text-center font-medium"
+                  class="text-xs text-muted-foreground text-center font-medium"
                 >
                   +{{ day.attendances.length - 2 }} lainnya
                 </p>

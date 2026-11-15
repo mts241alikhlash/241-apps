@@ -322,7 +322,7 @@ onMounted(async () => {
           <Button
             variant="outline"
             size="sm"
-            class="h-8 text-xs font-medium shrink-0 self-center sm:self-auto"
+            class="font-medium shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = true"
           >
             <Pencil class="size-3.5 text-muted-foreground" />
@@ -342,7 +342,7 @@ onMounted(async () => {
             >
             <div class="flex items-center gap-2 sm:gap-2.5">
               <Select v-model="sourceAcademicYearId">
-                <SelectTrigger class="h-8 w-36 sm:w-40 text-xs bg-background">
+                <SelectTrigger class="w-36 sm:w-40 bg-background">
                   <SelectValue placeholder="Tahun Asal" />
                 </SelectTrigger>
                 <SelectContent>
@@ -363,7 +363,7 @@ onMounted(async () => {
                 v-model="targetAcademicYearId"
                 :disabled="!sourceAcademicYearId"
               >
-                <SelectTrigger class="h-8 w-36 sm:w-40 text-xs bg-background">
+                <SelectTrigger class="w-36 sm:w-40 bg-background">
                   <SelectValue placeholder="Tahun Tujuan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -383,7 +383,7 @@ onMounted(async () => {
           <Button
             variant="secondary"
             size="sm"
-            class="h-8 text-xs font-medium px-3 shrink-0 self-center sm:self-auto"
+            class="font-medium px-3 shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = false"
           >
             <Check class="size-3.5" />
@@ -561,7 +561,7 @@ onMounted(async () => {
                     </div>
                     <div
                       v-if="row.declineReason"
-                      class="text-[11px] text-destructive italic mt-0.5"
+                      class="text-xs text-destructive italic mt-0.5"
                     >
                       Alasan: {{ row.declineReason }}
                     </div>

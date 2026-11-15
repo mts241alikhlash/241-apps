@@ -209,7 +209,7 @@ useBreadcrumbs(() => {
             >
               <TabsTrigger
                 value="personal"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Data Diri
               </TabsTrigger>
@@ -220,20 +220,20 @@ useBreadcrumbs(() => {
                 <TabsTrigger
                   v-if="!tab.show || tab.show(profileData.roles ?? [])"
                   :value="tab.value"
-                  class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                  class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
                 >
                   {{ tab.label }}
                 </TabsTrigger>
               </template>
               <TabsTrigger
                 value="address"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Alamat
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Keamanan
               </TabsTrigger>
@@ -250,7 +250,7 @@ useBreadcrumbs(() => {
               <Button
                 v-if="isEditable"
                 size="sm"
-                class="h-8 gap-1.5 cursor-pointer text-xs"
+                class="gap-1.5 cursor-pointer"
                 @click="handleActionClick(activeTab)"
               >
                 <component

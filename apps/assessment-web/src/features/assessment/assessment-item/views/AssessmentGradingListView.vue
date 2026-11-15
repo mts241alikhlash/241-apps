@@ -227,13 +227,13 @@ onMounted(fetchRelatedData)
             class="flex items-center justify-center gap-2"
           >
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 h-8 text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 h-8 text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -241,7 +241,7 @@ onMounted(fetchRelatedData)
           </div>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 h-8 text-xs text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
           >
             Belum ada semester aktif
           </div>

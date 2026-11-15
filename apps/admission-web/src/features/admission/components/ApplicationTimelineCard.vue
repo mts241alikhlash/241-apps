@@ -245,12 +245,12 @@ function circleClass(state: TimelineEvent['state']) {
                 </h4>
                 <time
                   v-if="event.time"
-                  class="mt-1 block text-[11px] text-muted-foreground tabular-nums"
+                  class="mt-1 block text-xs text-muted-foreground tabular-nums"
                 >
                   {{ event.time }}
                 </time>
                 <p
-                  class="mt-1 text-[11px] text-muted-foreground line-clamp-2 leading-tight"
+                  class="mt-1 text-xs text-muted-foreground line-clamp-2 leading-tight"
                 >
                   {{ event.description }}
                 </p>

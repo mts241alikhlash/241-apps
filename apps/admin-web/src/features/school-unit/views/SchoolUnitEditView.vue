@@ -110,7 +110,7 @@ const handleSaveAddress = async () => {
 
           <div class="mt-3 text-center">
             <span
-              class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider"
+              class="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
             >
               Langkah {{ activeStep }} dari {{ steps.length }}
             </span>

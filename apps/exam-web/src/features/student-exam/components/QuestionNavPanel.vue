@@ -44,7 +44,7 @@ const emit = defineEmits<{
     />
 
     <Button
-      class="min-h-11 w-full bg-green-700 font-semibold text-white hover:bg-green-800"
+      class="min-h-[var(--control-h-lg,2.25rem)] w-full bg-green-700 font-semibold text-white hover:bg-green-800"
       :disabled="submitDisabled"
       @click="emit('submit')"
     >

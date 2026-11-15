@@ -198,8 +198,7 @@ onMounted(async () => {
         <div class="flex items-center gap-2">
           <Button
             v-if="can('inventory-assets.create')"
-            size="sm"
-            class="sm:h-10 sm:px-4 text-xs sm:text-sm"
+            size="lg"
             @click="openAddForm"
           >
             <Plus class="size-4 sm:mr-2" />
@@ -318,7 +317,7 @@ onMounted(async () => {
                 Filter
                 <span
                   v-if="activeFiltersCount > 0"
-                  class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                  class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
                 >
                   {{ activeFiltersCount }}
                 </span>

@@ -286,7 +286,7 @@ onMounted(async () => {
                       (v) => (pendingCurriculum[ay.id] = String(v ?? ''))
                     "
                   >
-                    <SelectTrigger class="h-8 flex-1 text-xs">
+                    <SelectTrigger class="flex-1">
                       <SelectValue placeholder="Pilih kurikulum..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -305,7 +305,7 @@ onMounted(async () => {
                   <Button
                     v-if="hasPending(ay.id)"
                     size="sm"
-                    class="h-8 text-xs shrink-0"
+                    class="shrink-0"
                     :disabled="savingCurriculum[ay.id]"
                     @click="saveCurriculum(ay.id)"
                   >
@@ -319,7 +319,7 @@ onMounted(async () => {
                     v-if="hasPending(ay.id)"
                     variant="ghost"
                     size="icon"
-                    class="h-8 w-8 shrink-0"
+                    class="shrink-0"
                     @click="delete pendingCurriculum[ay.id]"
                   >
                     ✕

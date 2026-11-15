@@ -78,7 +78,7 @@ onMounted(init)
               <span class="text-xs font-semibold text-primary">{{
                 row.timeSlot.startTime
               }}</span>
-              <span class="text-[10px] text-muted-foreground">{{
+              <span class="text-xs text-muted-foreground">{{
                 row.timeSlot.endTime
               }}</span>
             </div>

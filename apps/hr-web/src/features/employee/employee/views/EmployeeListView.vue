@@ -245,8 +245,8 @@ onMounted(() => {
             <Button
               v-if="canImport"
               variant="outline"
-              size="sm"
-              class="h-10 px-4 bg-white"
+              size="lg"
+              class="bg-white"
               @click="isImportExportOpen = true"
             >
               <ArrowLeftRight class="size-4" />
@@ -254,8 +254,7 @@ onMounted(() => {
             </Button>
             <Button
               v-if="can('employees.create')"
-              size="sm"
-              class="h-10 px-4"
+              size="lg"
               @click="router.push('/staff/create')"
             >
               <Plus class="size-4" />
@@ -271,7 +270,7 @@ onMounted(() => {
               <DropdownMenuTrigger as-child>
                 <Button
                   size="sm"
-                  class="h-9 px-3 gap-1"
+                  class="px-3 gap-1"
                 >
                   <Plus class="size-4" />
                   Tambah
@@ -351,7 +350,7 @@ onMounted(() => {
               Filter Pegawai
               <span
                 v-if="activeFiltersCount > 0"
-                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
               >
                 {{ activeFiltersCount }}
               </span>

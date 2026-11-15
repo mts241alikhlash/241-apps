@@ -329,7 +329,9 @@ const onSubmit = handleSubmit((formValues) => {
               label="Status"
               hide-label
             >
-              <div class="flex min-h-11 items-center gap-2">
+              <div
+                class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2"
+              >
                 <FormControl>
                   <Checkbox
                     :model-value="Boolean(value)"

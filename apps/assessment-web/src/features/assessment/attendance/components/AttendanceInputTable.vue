@@ -102,7 +102,7 @@ const tableData = computed(() =>
         :model-value="undefined"
         @update:model-value="applyBulkStatus"
       >
-        <SelectTrigger class="h-8 w-44 text-xs">
+        <SelectTrigger class="w-44">
           <SelectValue
             :placeholder="`Ubah status (${selectedRows.length}) ke...`"
           />

@@ -57,7 +57,7 @@ async function handleLogout() {
     <div class="flex min-h-svh w-full flex-col">
       <header
         data-app-topbar
-        class="sticky top-0 z-20 flex h-12 items-center gap-2 border-b bg-background px-3"
+        class="sticky top-0 z-20 flex h-[var(--control-h-lg,2.25rem)] items-center gap-2 border-b bg-background px-3"
       >
         <RouterLink
           to="/"

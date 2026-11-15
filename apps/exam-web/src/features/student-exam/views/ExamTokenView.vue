@@ -196,7 +196,7 @@ async function start() {
               <Input
                 :id="fieldId"
                 v-model="code"
-                class="min-h-11"
+                class="min-h-[var(--control-h-lg,2.25rem)]"
                 :disabled="submitting || loading"
                 autocomplete="off"
                 autocapitalize="characters"
@@ -215,7 +215,7 @@ async function start() {
             <Button
               v-if="sebRequired"
               variant="outline"
-              class="min-h-11 w-full"
+              class="min-h-[var(--control-h-lg,2.25rem)] w-full"
               @click="showSebGuide = true"
             >
               Panduan Safe Exam Browser
@@ -223,7 +223,7 @@ async function start() {
 
             <Button
               v-if="!error || exam"
-              class="min-h-11 w-full"
+              class="min-h-[var(--control-h-lg,2.25rem)] w-full"
               :disabled="submitting || loading || !code.trim()"
               @click="start"
             >

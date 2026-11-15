@@ -90,7 +90,7 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
           <Skeleton
             v-for="i in 6"
             :key="i"
-            class="h-9 w-full rounded-lg"
+            class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
           />
         </div>
       </div>

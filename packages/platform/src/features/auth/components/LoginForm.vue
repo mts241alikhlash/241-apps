@@ -43,7 +43,8 @@ function startGoogleSignIn() {
       <Button
         type="button"
         variant="outline"
-        class="h-10 w-full cursor-pointer bg-background"
+        size="lg"
+        class="w-full cursor-pointer bg-background"
         :disabled="isSubmitting"
         @click="startGoogleSignIn"
       >
@@ -87,7 +88,7 @@ function startGoogleSignIn() {
           <Input
             v-bind="componentField"
             type="text"
-            class="h-10 scroll-my-28 bg-transparent"
+            class="scroll-my-28 bg-transparent"
             autocapitalize="none"
             autocomplete="username"
             spellcheck="false"
@@ -104,7 +105,7 @@ function startGoogleSignIn() {
             <FormControl>
               <Input
                 :type="showPassword ? 'text' : 'password'"
-                class="h-10 scroll-my-28 bg-transparent pr-10"
+                class="scroll-my-28 bg-transparent pr-10"
                 autocomplete="current-password"
                 v-bind="componentField"
               />
@@ -137,7 +138,8 @@ function startGoogleSignIn() {
       <Button
         type="submit"
         :disabled="isSubmitting"
-        class="h-10 w-full cursor-pointer"
+        size="lg"
+        class="w-full cursor-pointer"
       >
         {{ isSubmitting ? 'Sedang masuk...' : 'Masuk' }}
       </Button>

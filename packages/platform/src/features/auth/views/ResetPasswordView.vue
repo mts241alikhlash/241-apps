@@ -108,7 +108,8 @@ const onSubmit = handleSubmit(async (values) => {
               kembali melalui halaman Lupa Password.
             </p>
             <Button
-              class="w-full h-10 rounded-xl"
+              size="lg"
+              class="w-full"
               @click="router.push('/forgot-password')"
             >
               Ke Halaman Lupa Password
@@ -130,7 +131,8 @@ const onSubmit = handleSubmit(async (values) => {
               menggunakan password baru Anda.
             </p>
             <Button
-              class="w-full h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full font-semibold"
               @click="router.push('/login')"
             >
               Masuk Sekarang
@@ -182,7 +184,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="submit"
               :disabled="isSubmitting"
-              class="w-full cursor-pointer h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full cursor-pointer font-semibold"
             >
               <Loader2
                 v-if="isSubmitting"

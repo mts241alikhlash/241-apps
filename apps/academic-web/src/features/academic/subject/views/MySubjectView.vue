@@ -82,7 +82,7 @@ onMounted(async () => {
         <Skeleton
           v-for="i in 8"
           :key="i"
-          class="h-10 w-full rounded-lg"
+          class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
         />
       </div>
     </div>

@@ -75,7 +75,7 @@ const hiddenUngraded = computed(
               <p class="mt-1 text-2xl font-bold tabular-nums">
                 {{ data.load.classroomCount }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Kelas aktif semester ini
               </p>
             </div>
@@ -108,7 +108,7 @@ const hiddenUngraded = computed(
               <p class="mt-1 text-2xl font-bold tabular-nums">
                 {{ data.load.subjectCount }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Mapel yang diajar
               </p>
             </div>
@@ -141,7 +141,7 @@ const hiddenUngraded = computed(
               <p class="mt-1 text-2xl font-bold tabular-nums">
                 {{ data.ungradedTotal }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Penilaian perlu diselesaikan
               </p>
             </div>

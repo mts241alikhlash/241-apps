@@ -374,7 +374,7 @@ onMounted(load)
                 type="file"
                 accept="application/pdf,.pdf"
                 :aria-describedby="fileHintId"
-                class="block min-h-11 w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-[length:var(--text-control,0.875rem)] file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-[length:var(--text-control,0.875rem)] file:font-medium"
+                class="block min-h-[var(--control-h-lg,2.25rem)] w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-[length:var(--text-control,0.875rem)] file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-[length:var(--text-control,0.875rem)] file:font-medium"
                 @change="onFileChange"
               />
               <p

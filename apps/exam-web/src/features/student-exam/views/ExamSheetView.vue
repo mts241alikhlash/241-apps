@@ -387,7 +387,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-if="!wide"
                   variant="outline"
                   size="sm"
-                  class="min-h-11"
+                  class="min-h-[var(--control-h-lg,2.25rem)]"
                   @click="showList = true"
                 >
                   Daftar Soal
@@ -418,7 +418,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keyOf(current) === choice.key
                       ? 'border-primary bg-primary/[0.06]'
@@ -455,7 +455,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keysOf(current).includes(choice.key)
                       ? 'border-primary bg-primary/[0.06]'
@@ -490,7 +490,7 @@ function statusOf(question: PaperQuestion | null): string {
                   ]"
                   :key="option.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)]"
                   :class="
                     boolOf(current) === option.value
                       ? 'border-primary bg-primary/[0.06]'
@@ -537,7 +537,7 @@ function statusOf(question: PaperQuestion | null): string {
               <Button
                 variant="outline"
                 size="sm"
-                class="min-h-11 shrink-0"
+                class="min-h-[var(--control-h-lg,2.25rem)] shrink-0"
                 :disabled="index === 0 || submitting"
                 @click="go(index - 1)"
               >
@@ -546,7 +546,7 @@ function statusOf(question: PaperQuestion | null): string {
 
               <button
                 type="button"
-                class="flex min-h-11 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[length:var(--text-control)] font-medium transition-colors motion-reduce:transition-none"
+                class="flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1.5 rounded-md border px-3 text-[length:var(--text-control)] font-medium transition-colors motion-reduce:transition-none"
                 :class="
                   doubtful.has(current.id)
                     ? 'border-amber-500 bg-amber-50 text-amber-700'
@@ -565,7 +565,7 @@ function statusOf(question: PaperQuestion | null): string {
               </button>
 
               <Button
-                class="ml-auto min-h-11 shrink-0 font-semibold"
+                class="ml-auto min-h-[var(--control-h-lg,2.25rem)] shrink-0 font-semibold"
                 :class="
                   isLast
                     ? 'bg-green-700 text-white hover:bg-green-800'

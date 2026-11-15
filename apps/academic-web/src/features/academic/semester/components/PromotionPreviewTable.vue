@@ -172,7 +172,7 @@ const summary = computed(() => {
         />
 
         <Select v-model="filterTargetClass">
-          <SelectTrigger class="h-8 text-xs">
+          <SelectTrigger>
             <Filter class="size-3 mr-1 text-muted-foreground" />
             <SelectValue placeholder="Semua Kelas Tujuan" />
           </SelectTrigger>
@@ -201,7 +201,7 @@ const summary = computed(() => {
         </Select>
 
         <Select v-model="filterStatus">
-          <SelectTrigger class="h-8 text-xs">
+          <SelectTrigger>
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
@@ -281,7 +281,7 @@ const summary = computed(() => {
               <div class="font-semibold text-xs text-foreground">
                 {{ row.studentName }}
               </div>
-              <div class="text-[11px] text-muted-foreground mt-0.5">
+              <div class="text-xs text-muted-foreground mt-0.5">
                 NIS: {{ row.nis }}
               </div>
             </TableCell>
@@ -289,14 +289,14 @@ const summary = computed(() => {
               <div class="inline-flex items-center gap-1.5 font-medium">
                 <Badge
                   variant="outline"
-                  class="font-medium bg-background text-[11px] px-2 py-0.5"
+                  class="font-medium bg-background text-xs px-2 py-0.5"
                 >
                   {{ row.sourceClassroomName }}
                 </Badge>
                 <ArrowRight class="size-3 text-muted-foreground" />
                 <Badge
                   :variant="row.isApproved ? 'default' : 'secondary'"
-                  class="font-medium text-[11px] px-2 py-0.5 shadow-none"
+                  class="font-medium text-xs px-2 py-0.5 shadow-none"
                   :class="{
                     'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20':
                       !row.isApproved,
@@ -309,7 +309,7 @@ const summary = computed(() => {
             <TableCell class="text-center py-2.5">
               <Badge
                 :variant="row.isApproved ? 'default' : 'destructive'"
-                class="font-medium text-[10px] px-2 py-0.5 shadow-none"
+                class="font-medium text-xs px-2 py-0.5 shadow-none"
               >
                 {{ row.isApproved ? 'Naik Kelas' : 'Tinggal Kelas' }}
               </Badge>
@@ -317,13 +317,13 @@ const summary = computed(() => {
             <TableCell class="py-2.5">
               <span
                 v-if="row.declineReason"
-                class="text-[11px] text-destructive italic font-medium"
+                class="text-xs text-destructive italic font-medium"
               >
                 {{ row.declineReason }}
               </span>
               <span
                 v-else
-                class="text-[11px] text-muted-foreground"
+                class="text-xs text-muted-foreground"
               >
                 -
               </span>
@@ -345,7 +345,7 @@ const summary = computed(() => {
                       : 'Tidak ada siswa ditemukan'
                   }}
                 </p>
-                <p class="text-[11px]">
+                <p class="text-xs">
                   {{
                     !activeClass
                       ? 'Pilih kelas di panel kiri untuk melihat hasil penempatan kelas tujuan.'

@@ -220,7 +220,7 @@ onMounted(async () => {
               Filter Siswa
               <span
                 v-if="activeFiltersCount > 0"
-                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
               >
                 {{ activeFiltersCount }}
               </span>

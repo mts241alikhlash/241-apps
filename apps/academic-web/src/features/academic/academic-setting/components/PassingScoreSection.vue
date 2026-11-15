@@ -48,7 +48,7 @@ function onInput(value: string | number) {
         id="default-passing-score"
         type="text"
         inputmode="numeric"
-        class="h-10 w-28"
+        class="w-28"
         :model-value="String(score)"
         :disabled="isSaving || !canEdit"
         :aria-invalid="Boolean(error)"

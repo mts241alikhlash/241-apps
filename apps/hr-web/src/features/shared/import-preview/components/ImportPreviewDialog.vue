@@ -178,19 +178,19 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
           class="flex flex-wrap items-center gap-2 text-xs justify-center sm:justify-start"
         >
           <div
-            class="flex items-center gap-1.5 px-3 h-9 bg-emerald-50/30 border border-emerald-200 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-emerald-50/30 border border-emerald-200 rounded-md text-foreground font-medium select-none"
           >
             <CheckCircle2 class="h-4 w-4 text-emerald-600 shrink-0" />
             <span>{{ summary.willProcess }} akan diproses</span>
           </div>
           <div
-            class="flex items-center gap-1.5 px-3 h-9 bg-amber-50/30 border border-amber-200 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-amber-50/30 border border-amber-200 rounded-md text-foreground font-medium select-none"
           >
             <AlertTriangle class="h-4 w-4 text-amber-500 shrink-0" />
             <span>{{ summary.skipConflicts }} akan dilewati</span>
           </div>
           <div
-            class="flex items-center gap-1.5 px-3 h-9 bg-red-50/30 border border-red-200 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-red-50/30 border border-red-200 rounded-md text-foreground font-medium select-none"
           >
             <AlertCircle class="h-4 w-4 text-red-600 shrink-0" />
             <span>{{ summary.failedRows }} gagal</span>
@@ -215,7 +215,7 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
               >
                 <Button
                   variant="outline"
-                  class="gap-1.5 h-9 text-xs"
+                  class="gap-1.5"
                 >
                   Pilihan Cepat
                   <ChevronDown class="h-4 w-4" />

@@ -62,7 +62,7 @@ export const createTimeSlotTypeColumns = (
         'div',
         { class: 'flex flex-wrap justify-center gap-1' },
         days.map((d) =>
-          h(Badge, { variant: 'outline', class: 'text-[11px]' }, () =>
+          h(Badge, { variant: 'outline', class: 'text-xs' }, () =>
             dayShortLabel(d),
           ),
         ),

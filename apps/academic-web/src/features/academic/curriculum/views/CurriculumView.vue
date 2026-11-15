@@ -119,7 +119,7 @@ onMounted(async () => {
               :model-value="selectedAcademicYearId"
               @update:model-value="onAcademicYearChange"
             >
-              <SelectTrigger class="h-8 w-[150px] text-xs">
+              <SelectTrigger class="w-[150px]">
                 <SelectValue placeholder="Tahun Ajaran" />
               </SelectTrigger>
               <SelectContent>

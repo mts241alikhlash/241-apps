@@ -507,7 +507,7 @@ onMounted(() => fetchReview(true))
                           v-if="item.document"
                           type="button"
                           data-test="open-file"
-                          class="ml-auto inline-flex min-h-11 shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
+                          class="ml-auto inline-flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
                           @click.stop="handleOpenFile(item)"
                         >
                           <Eye class="size-3.5" />
@@ -591,7 +591,9 @@ onMounted(() => fetchReview(true))
                 </p>
               </div>
 
-              <div class="flex h-8 shrink-0 items-center gap-1.5">
+              <div
+                class="flex h-[var(--control-h-md,2rem)] shrink-0 items-center gap-1.5"
+              >
                 <template v-if="activeSlot?.document?.file">
                   <Button
                     variant="outline"

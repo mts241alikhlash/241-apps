@@ -215,8 +215,8 @@ async function handleConfirmGraduate() {
                 <PopoverTrigger as-child>
                   <Button
                     variant="outline"
-                    size="sm"
-                    class="h-6 text-[11px] px-2 gap-1 font-normal text-muted-foreground hover:text-foreground"
+                    size="xs"
+                    class="px-2 gap-1 font-normal text-muted-foreground hover:text-foreground"
                   >
                     <Pencil class="size-3" />
                     {{ graduationDate ? 'Ubah' : 'Atur' }}
@@ -234,23 +234,23 @@ async function handleConfirmGraduate() {
                       v-model="graduationDate"
                       placeholder="Pilih Tanggal Lulus"
                       :allow-future-dates="true"
-                      class="h-8 text-xs w-44"
+                      class="w-44"
                     />
                   </div>
                   <div class="flex items-center justify-between gap-2 pt-1">
                     <Button
                       v-if="graduationDate"
                       variant="ghost"
-                      size="sm"
-                      class="h-6 text-[11px] px-2 text-muted-foreground"
+                      size="xs"
+                      class="px-2 text-muted-foreground"
                       @click="clearGraduationDate"
                     >
                       Hapus
                     </Button>
                     <div v-else />
                     <Button
-                      size="sm"
-                      class="h-6 text-[11px] px-2.5"
+                      size="xs"
+                      class="px-2.5"
                       @click="isDatePopoverOpen = false"
                     >
                       Selesai
@@ -361,7 +361,7 @@ async function handleConfirmGraduate() {
                   </div>
                   <div
                     v-if="row.declineReason"
-                    class="text-[11px] text-destructive italic mt-0.5"
+                    class="text-xs text-destructive italic mt-0.5"
                   >
                     Alasan: {{ row.declineReason }}
                   </div>

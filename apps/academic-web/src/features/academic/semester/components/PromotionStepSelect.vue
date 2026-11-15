@@ -76,7 +76,7 @@ function formatSemesterLabel(s: Semester) {
           Semester siswa saat ini berada
         </p>
         <Select v-model="sourceSemesterIdVal">
-          <SelectTrigger class="h-12 bg-background">
+          <SelectTrigger class="h-[var(--control-h-lg,2.25rem)] bg-background">
             <SelectValue placeholder="Pilih semester asal" />
           </SelectTrigger>
           <SelectContent>
@@ -89,7 +89,7 @@ function formatSemesterLabel(s: Semester) {
               <Badge
                 v-if="s.isActive"
                 variant="default"
-                class="ml-2 text-[10px]"
+                class="ml-2 text-xs"
               >
                 Aktif
               </Badge>
@@ -115,7 +115,7 @@ function formatSemesterLabel(s: Semester) {
           Semester tujuan kenaikan kelas
         </p>
         <Select v-model="targetSemesterIdVal">
-          <SelectTrigger class="h-12 bg-background">
+          <SelectTrigger class="h-[var(--control-h-lg,2.25rem)] bg-background">
             <SelectValue placeholder="Pilih semester tujuan" />
           </SelectTrigger>
           <SelectContent>
@@ -128,7 +128,7 @@ function formatSemesterLabel(s: Semester) {
               <Badge
                 v-if="s.isActive"
                 variant="default"
-                class="ml-2 text-[10px]"
+                class="ml-2 text-xs"
               >
                 Aktif
               </Badge>

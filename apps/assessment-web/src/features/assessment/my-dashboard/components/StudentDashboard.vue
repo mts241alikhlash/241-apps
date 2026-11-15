@@ -202,7 +202,7 @@ const totalAttendance = computed(() =>
                 >
                   {{ item.value }}
                 </p>
-                <p class="text-[10px] font-medium text-muted-foreground">
+                <p class="text-xs font-medium text-muted-foreground">
                   {{ item.label }}
                 </p>
               </div>
@@ -243,7 +243,7 @@ const totalAttendance = computed(() =>
               <Skeleton
                 v-for="i in 3"
                 :key="i"
-                class="h-12 w-full rounded-lg"
+                class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
               />
             </div>
             <p

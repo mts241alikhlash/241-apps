@@ -65,7 +65,7 @@ function handleSave() {
       v-if="canEdit"
       variant="outline"
       size="sm"
-      class="h-8 text-xs shrink-0"
+      class="shrink-0"
       @click="openDialog"
     >
       Edit

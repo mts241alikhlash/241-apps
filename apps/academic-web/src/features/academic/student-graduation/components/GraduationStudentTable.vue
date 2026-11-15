@@ -243,7 +243,7 @@ function toggleAllVisible() {
         v-model="filterClass"
         :disabled="uniqueClasses.length === 0"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-36">
+        <SelectTrigger class="bg-background w-36">
           <Filter class="size-3 mr-1 text-muted-foreground" />
           <SelectValue placeholder="Pilih Kelas..." />
         </SelectTrigger>
@@ -263,7 +263,7 @@ function toggleAllVisible() {
         v-model="filterStatus"
         :disabled="!filterClass"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-32">
+        <SelectTrigger class="bg-background w-32">
           <SelectValue placeholder="Semua Status" />
         </SelectTrigger>
         <SelectContent>
@@ -299,7 +299,7 @@ function toggleAllVisible() {
             }
           "
         >
-          <SelectTrigger class="h-8 text-xs bg-background w-36">
+          <SelectTrigger class="bg-background w-36">
             <SelectValue
               :placeholder="
                 selectedIds.size > 0
@@ -398,7 +398,7 @@ function toggleAllVisible() {
                   <p class="text-xs font-medium text-foreground">
                     Pilih kelas terlebih dahulu
                   </p>
-                  <p class="text-[11px] max-w-sm">
+                  <p class="text-xs max-w-sm">
                     Silakan pilih salah satu kelas tingkat akhir pada filter di
                     atas untuk menampilkan dan memproses kelulusan siswa.
                   </p>
@@ -453,13 +453,13 @@ function toggleAllVisible() {
                 </div>
                 <div
                   v-if="getDecision(candidate.studentId)?.declineReason"
-                  class="text-[11px] text-destructive mt-0.5 italic"
+                  class="text-xs text-destructive mt-0.5 italic"
                 >
                   Alasan: {{ getDecision(candidate.studentId)?.declineReason }}
                 </div>
                 <div
                   v-if="candidate.previousHold"
-                  class="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5"
+                  class="text-xs text-amber-600 dark:text-amber-400 mt-0.5"
                 >
                   Ditahan {{ candidate.previousHold.academicYearName }}:
                   {{ candidate.previousHold.reason }}
@@ -481,7 +481,8 @@ function toggleAllVisible() {
                   "
                 >
                   <SelectTrigger
-                    class="h-7 w-full text-[11px]"
+                    size="sm"
+                    class="w-full"
                     :class="
                       getDecision(candidate.studentId)?.approved === false
                         ? 'text-destructive border-destructive/50'
@@ -537,7 +538,7 @@ function toggleAllVisible() {
             v-model="declineReason"
             placeholder="Contoh: Nilai belum lengkap / tidak memenuhi syarat..."
             rows="3"
-            class="text-xs resize-none"
+            class="resize-none"
           />
         </div>
       </div>

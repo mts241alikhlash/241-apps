@@ -445,7 +445,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"

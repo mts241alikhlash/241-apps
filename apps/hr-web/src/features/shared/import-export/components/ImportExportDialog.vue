@@ -257,7 +257,6 @@ watch(
             <div class="flex items-center justify-between pt-2">
               <Button
                 variant="outline"
-                class="text-xs h-9"
                 :disabled="isProcessing"
                 @click="$emit('downloadTemplate')"
               >
@@ -266,7 +265,6 @@ watch(
               </Button>
 
               <Button
-                class="h-9"
                 :disabled="!selectedFile || isProcessing"
                 @click="handleImport"
               >

@@ -117,7 +117,7 @@ onMounted(() => {
                 {{ balance.name }}
               </span>
               <span
-                class="rounded-md bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground shrink-0"
+                class="rounded-md bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground shrink-0"
               >
                 Tahun {{ balance.year }}
               </span>

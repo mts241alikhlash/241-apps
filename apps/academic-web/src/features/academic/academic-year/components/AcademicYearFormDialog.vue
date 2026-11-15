@@ -125,7 +125,7 @@ const academicYearForm = useAcademicYearForm({
                 <div
                   role="button"
                   tabindex="0"
-                  class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors hover:bg-accent/50 cursor-pointer select-none"
+                  class="flex min-h-[var(--control-h-md,2rem)] w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-[length:var(--text-control,0.875rem)] shadow-xs transition-colors hover:bg-accent/50 cursor-pointer select-none"
                   :class="{
                     'opacity-50 pointer-events-none':
                       academicYearForm.isSaving.value,

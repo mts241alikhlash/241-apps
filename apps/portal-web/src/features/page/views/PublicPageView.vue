@@ -32,7 +32,7 @@ watch(
       <Loader2 class="size-4 animate-spin" />
       Memuat…
     </div>
-    <Skeleton class="h-9 w-2/3" />
+    <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-2/3" />
     <Skeleton class="h-px w-full" />
     <div class="space-y-2">
       <Skeleton class="h-4 w-full" />

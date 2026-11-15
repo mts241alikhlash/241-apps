@@ -592,7 +592,7 @@ onMounted(async () => {
                     <Badge
                       v-else-if="syncPending > 0"
                       variant="destructive"
-                      class="ml-1.5 text-[10px]"
+                      class="ml-1.5 text-xs"
                     >
                       {{ syncPending }} tertunda
                     </Badge>
@@ -628,7 +628,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-[length:var(--text-control,0.875rem)] sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -1078,7 +1078,7 @@ onMounted(async () => {
             <Button
               v-if="counts.done > 0 || syncPending > 0"
               variant="outline"
-              class="min-h-11 sm:min-h-0"
+              class="min-h-[var(--control-h-lg,2.25rem)] sm:min-h-0"
               :disabled="acting"
               @click="syncStudents"
             >

@@ -201,7 +201,7 @@ const copyToClipboard = () => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  class="h-7 text-xs gap-1.5"
+                  class="gap-1.5"
                   @click="copyToClipboard"
                 >
                   <Clipboard class="size-3" />
@@ -212,7 +212,7 @@ const copyToClipboard = () => {
               <div class="rounded-xl border bg-muted/40 overflow-hidden">
                 <pre
                   v-if="formattedMetadata"
-                  class="p-4 text-[11px] font-mono overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
+                  class="p-4 text-xs font-mono overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
                   >{{ formattedMetadata }}</pre>
                 <div
                   v-else

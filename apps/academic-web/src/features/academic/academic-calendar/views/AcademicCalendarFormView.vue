@@ -169,7 +169,7 @@ useBreadcrumbs(() => {
                         variant="outline"
                         :class="
                           cn(
-                            'w-full justify-start text-left font-normal h-10',
+                            'w-full justify-start text-left font-normal',
                             !dateRangeLabel && 'text-muted-foreground',
                           )
                         "

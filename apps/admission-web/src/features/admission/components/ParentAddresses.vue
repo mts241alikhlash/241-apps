@@ -114,7 +114,7 @@ defineExpose({ validate: validateAll })
           >
             <label
               :for="`${checkboxId}-${index}`"
-              class="flex min-h-11 items-center gap-3 rounded-md border border-input bg-transparent px-3 py-2 text-[length:var(--text-control,0.875rem)] sm:col-span-2"
+              class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-3 rounded-md border border-input bg-transparent px-3 py-2 text-[length:var(--text-control,0.875rem)] sm:col-span-2"
               :class="
                 editable ? 'cursor-pointer hover:border-primary' : 'opacity-60'
               "

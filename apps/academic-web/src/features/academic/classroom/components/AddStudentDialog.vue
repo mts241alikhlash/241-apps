@@ -140,7 +140,7 @@ function handleEnroll() {
         <Input
           v-model="searchQuery"
           placeholder="Cari nama / NIS / NISN..."
-          class="h-8 w-full sm:max-w-xs text-sm"
+          class="w-full sm:max-w-xs"
         />
       </div>
 

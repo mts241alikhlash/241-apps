@@ -171,7 +171,7 @@ const popoverStates = reactive<PopoverStates>({
                   :disabled="isSaving"
                   :class="
                     cn(
-                      'h-10 w-full justify-between',
+                      'w-full justify-between',
                       !formValues.supervisorId && 'text-muted-foreground',
                     )
                   "
@@ -272,7 +272,7 @@ const popoverStates = reactive<PopoverStates>({
                   :disabled="isSaving"
                   :class="
                     cn(
-                      'h-10 w-full justify-between',
+                      'w-full justify-between',
                       !formValues[field.name] && 'text-muted-foreground',
                     )
                   "

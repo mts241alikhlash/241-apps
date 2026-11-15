@@ -135,7 +135,7 @@ function handleSave() {
         <Input
           v-model="searchQuery"
           placeholder="Cari nama / kode mata pelajaran..."
-          class="h-8 w-full sm:max-w-xs text-sm"
+          class="w-full sm:max-w-xs"
         />
       </div>
 

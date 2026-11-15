@@ -186,7 +186,7 @@ function toHHMM(val: string): string {
           >
             <template v-if="overlayMap[ts.id]?.[day.value]">
               <span
-                class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 italic"
+                class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic"
               >
                 {{ formatEntityName(overlayMap[ts.id][day.value].name) }}
               </span>
@@ -201,7 +201,7 @@ function toHHMM(val: string): string {
                   isStudent &&
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
                 "
-                class="text-[10px] text-muted-foreground mt-0.5 truncate"
+                class="text-xs text-muted-foreground mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
@@ -213,7 +213,7 @@ function toHHMM(val: string): string {
                   !isStudent &&
                   lessonMap[ts.id]?.[day.value]?.classroom?.name
                 "
-                class="text-[10px] text-primary/80 font-medium mt-0.5 truncate"
+                class="text-xs text-primary/80 font-medium mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.classroom?.code ??
@@ -226,7 +226,7 @@ function toHHMM(val: string): string {
                   !isPersonal &&
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
                 "
-                class="text-[10px] text-muted-foreground mt-0.5 truncate"
+                class="text-xs text-muted-foreground mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
@@ -254,7 +254,7 @@ function toHHMM(val: string): string {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  font-size: 0.6875rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   color: var(--muted-foreground);
   border-bottom: 1px solid var(--border);
@@ -265,7 +265,7 @@ function toHHMM(val: string): string {
   background: var(--muted);
   color: var(--muted-foreground);
   font-weight: 700;
-  font-size: 0.6875rem;
+  font-size: var(--text-xs);
   padding: 0.375rem;
 }
 

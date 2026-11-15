@@ -202,19 +202,21 @@ onMounted(fetchData)
         v-if="isLoading"
         class="p-6 space-y-6"
       >
-        <Skeleton class="h-10 w-full max-w-md rounded-lg" />
+        <Skeleton
+          class="h-[var(--control-h-lg,2.25rem)] w-full max-w-md rounded-lg"
+        />
         <div class="rounded-md border bg-card p-4 space-y-4">
           <div class="flex gap-4 border-b pb-4">
             <Skeleton
               v-for="i in 4"
               :key="i"
-              class="h-8 flex-1"
+              class="h-[var(--control-h-md,2rem)] flex-1"
             />
           </div>
           <Skeleton
             v-for="i in 5"
             :key="i"
-            class="h-12 w-full"
+            class="h-[var(--control-h-lg,2.25rem)] w-full"
           />
         </div>
       </div>
@@ -271,11 +273,11 @@ onMounted(fetchData)
                       v-if="item.kind === 'locked'"
                       class="bg-muted/30 hover:bg-muted/30 text-muted-foreground"
                     >
-                      <TableCell class="text-center py-3 text-[13px]">
+                      <TableCell class="text-center py-3 text-xs">
                         <Lock class="size-3 mx-auto text-muted-foreground/50" />
                       </TableCell>
 
-                      <TableCell class="py-3 px-4 text-[13px]">
+                      <TableCell class="py-3 px-4 text-xs">
                         <span class="font-medium">
                           {{ formatEntityName(item.slot.name ?? '') }}
                         </span>
@@ -289,7 +291,7 @@ onMounted(fetchData)
                       <TableCell class="py-3 px-4">
                         <Badge
                           :variant="slotTypeBadgeVariant(item.slot.type)"
-                          class="text-[11px]"
+                          class="text-xs"
                         >
                           {{ slotTypeLabel(item.slot.type) }}
                         </Badge>
@@ -304,7 +306,7 @@ onMounted(fetchData)
                       "
                     >
                       <TableCell
-                        class="text-center font-medium text-muted-foreground py-3 text-[13px]"
+                        class="text-center font-medium text-muted-foreground py-3 text-xs"
                       >
                         {{ getLessonRowNumber(item.rowIndex) }}
                       </TableCell>
@@ -316,7 +318,7 @@ onMounted(fetchData)
                           "
                         >
                           <SelectTrigger
-                            class="w-full bg-background text-[13px] h-9"
+                            class="w-full bg-background"
                             aria-label="Pilih Jam Pelajaran"
                           >
                             <SelectValue placeholder="Pilih Jam Pelajaran..." />
@@ -344,7 +346,7 @@ onMounted(fetchData)
                           "
                         >
                           <SelectTrigger
-                            class="w-full bg-background text-[13px] h-9"
+                            class="w-full bg-background"
                             aria-label="Pilih Mata Pelajaran"
                           >
                             <SelectValue
@@ -371,7 +373,7 @@ onMounted(fetchData)
                                 variant="ghost"
                                 size="icon"
                                 aria-label="Hapus baris"
-                                class="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                class="text-destructive hover:text-destructive hover:bg-destructive/10"
                                 @click="removeRow(day.value, item.rowIndex)"
                               >
                                 <Trash2 class="size-4" />
@@ -391,7 +393,7 @@ onMounted(fetchData)
                   >
                     <TableCell
                       colspan="4"
-                      class="h-20 text-center text-muted-foreground text-[13px]"
+                      class="h-20 text-center text-muted-foreground text-xs"
                     >
                       Belum ada jadwal pelajaran untuk hari {{ day.label }}.
                     </TableCell>

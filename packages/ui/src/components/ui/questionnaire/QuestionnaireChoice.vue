@@ -221,7 +221,7 @@ onBeforeUnmount(() => {
       v-if="shortcut"
       aria-hidden="true"
       data-slot="questionnaire-choice-shortcut"
-      class="border-input bg-background/80 text-muted-foreground size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 items-center justify-center rounded-md border font-mono text-[0.5625rem] font-medium leading-none pointer-events-none ms-auto hidden shrink-0 group-data-[shortcut]/questionnaire-choice:inline-flex"
+      class="border-input bg-background/80 text-muted-foreground size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 items-center justify-center rounded-md border font-mono text-xs font-medium leading-none pointer-events-none ms-auto hidden shrink-0 group-data-[shortcut]/questionnaire-choice:inline-flex"
     >
       {{ shortcut }}
     </span>

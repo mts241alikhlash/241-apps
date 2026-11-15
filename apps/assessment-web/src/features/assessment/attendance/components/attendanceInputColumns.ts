@@ -85,7 +85,7 @@ export function createAttendanceInputColumns(
             {
               variant: 'outline',
               class:
-                'border-amber-500/40 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-medium text-[11px] px-2 py-0.5',
+                'border-amber-500/40 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-medium text-xs px-2 py-0.5',
             },
             () => 'Perlu Keputusan',
           )
@@ -101,7 +101,7 @@ export function createAttendanceInputColumns(
                 {
                   variant: 'outline',
                   class:
-                    'border-sky-500/40 bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 font-medium text-[11px] px-2 py-0.5',
+                    'border-sky-500/40 bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 font-medium text-xs px-2 py-0.5',
                 },
                 () => 'Gerbang',
               ),
@@ -144,9 +144,7 @@ export function createAttendanceInputColumns(
               },
             },
             () => [
-              h(SelectTrigger, { class: 'h-8 w-[130px] text-xs' }, () => [
-                h(SelectValue),
-              ]),
+              h(SelectTrigger, { class: 'w-[130px]' }, () => [h(SelectValue)]),
               h(SelectContent, () =>
                 ATTENDANCE_STATUS_OPTIONS.map((option) =>
                   h(

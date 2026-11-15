@@ -29,7 +29,7 @@ const emit = defineEmits<{
       <Button
         size="sm"
         variant="outline"
-        class="h-8 shadow-xs gap-1.5"
+        class="shadow-xs gap-1.5"
         @click="emit('add-position')"
       >
         <Plus class="size-3.5" />
@@ -57,7 +57,7 @@ const emit = defineEmits<{
             <Button
               size="icon"
               variant="ghost"
-              class="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 rounded-lg transition-colors"
+              class="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
               @click="emit('remove-position', index)"
             >
               <Trash2 class="size-4" />

@@ -147,7 +147,7 @@ async function handleSave() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                class="text-xs gap-1.5 h-7 text-muted-foreground"
+                class="gap-1.5 text-muted-foreground"
                 @click="applyDefault"
               >
                 <RotateCcw class="size-3" />
@@ -161,7 +161,7 @@ async function handleSave() {
             >
               <Badge
                 variant="outline"
-                class="w-[4.5rem] justify-center shrink-0 text-[11px] font-medium py-0.5"
+                class="w-[4.5rem] justify-center shrink-0 text-xs font-medium py-0.5"
                 :class="TYPE_BADGE_CLASSES[type]"
               >
                 {{ ASSESSMENT_TYPE_LABELS[type] }}
@@ -181,12 +181,12 @@ async function handleSave() {
                   type="number"
                   min="0"
                   max="100"
-                  class="h-7 pr-6 text-right text-xs"
+                  class="pr-6 text-right text-xs"
                   :model-value="weights[type]"
                   @update:model-value="(val) => setWeight(type, val)"
                 />
                 <span
-                  class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground pointer-events-none"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none"
                 >
                   %
                 </span>

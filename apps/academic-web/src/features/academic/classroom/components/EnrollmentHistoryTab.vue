@@ -80,9 +80,9 @@ function formatDate(value?: string | null) {
       v-if="isLoading"
       class="space-y-2"
     >
-      <Skeleton class="h-10 w-full" />
-      <Skeleton class="h-10 w-full" />
-      <Skeleton class="h-10 w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
     </div>
 
     <ServiceUnavailable
@@ -131,7 +131,7 @@ function formatDate(value?: string | null) {
           >
             <TableCell class="py-2.5 text-xs font-medium">
               {{ row.semester?.academicYear?.name ?? '-' }}
-              <span class="block text-[11px] text-muted-foreground">
+              <span class="block text-xs text-muted-foreground">
                 {{ semesterLabel(row.semester?.type?.name) }}
               </span>
             </TableCell>
@@ -141,7 +141,7 @@ function formatDate(value?: string | null) {
             <TableCell class="text-center py-2.5">
               <Badge
                 :variant="enrollmentOutcome(row.status).variant"
-                class="text-[11px] shadow-none"
+                class="text-xs shadow-none"
               >
                 {{ enrollmentOutcome(row.status).label }}
               </Badge>
