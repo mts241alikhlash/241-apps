@@ -34,7 +34,7 @@ function build() {
     deletedAt: null,
     items: [],
   })
-  const { scope, employees } = buildTeacherScope({
+  const { scope, employees, academic } = buildTeacherScope({
     employeeId: 'emp-1',
     pairs: [MATH_7],
   })
@@ -50,6 +50,9 @@ function build() {
           new FakeExamFileRepository(),
           new FakeExamFileStorage(),
         ),
+        academic,
+        { findEmployeeIdByNik: () => Promise.resolve(null) },
+        questions,
       ),
       template,
     ),

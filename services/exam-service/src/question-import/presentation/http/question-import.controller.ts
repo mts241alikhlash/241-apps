@@ -104,7 +104,6 @@ export class QuestionImportController {
         size: file.size,
         fileName: file.originalname,
         packageId: dto.packageId,
-        authorEmployeeId: dto.authorEmployeeId,
       }),
     )
   }
