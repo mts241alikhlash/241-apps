@@ -34,7 +34,7 @@ export function validateIdentity(
   const gradeMatches = identity.gradeLevel === target.gradeLevel
   if (!subjectMatches || (identity.gradeLevel !== null && !gradeMatches)) {
     messages.push(
-      `File untuk ${identity.subjectName.trim()} tingkat ${identity.gradeLevel}, paket tujuan ${target.subjectName} tingkat ${target.gradeLevel}`,
+      `File untuk ${identity.subjectName.trim()} tingkat ${identity.gradeLevel ?? '-'}, paket tujuan ${target.subjectName} tingkat ${target.gradeLevel}`,
     )
   }
   return messages
