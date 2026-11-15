@@ -28,7 +28,7 @@ function readIdentity(book: ExcelJS.Workbook): SheetIdentity {
 export async function parseExcelSheet(buffer: Buffer): Promise<ImportSheet> {
   const book = new ExcelJS.Workbook()
   try {
-    await book.xlsx.load(buffer)
+    await book.xlsx.load(buffer as unknown as ExcelJS.Buffer)
   } catch {
     throw new BadRequestException('Berkas Excel tidak bisa dibaca')
   }
