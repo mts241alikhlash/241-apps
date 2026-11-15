@@ -93,7 +93,7 @@ onMounted(load)
     >
       <img
         src="/logo-name.webp"
-        alt="241 Exam"
+        alt="MTs Persis 241 Al-Ikhlash"
         class="h-7 w-auto"
         decoding="async"
       />

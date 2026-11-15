@@ -270,7 +270,7 @@ function statusOf(question: PaperQuestion | null): string {
     @offline="session.onConnectivityChanged(false)"
   >
     <img
-      src="/logo.webp"
+      src="/istiqra.webp"
       alt=""
       aria-hidden="true"
       class="pointer-events-none fixed -right-16 bottom-0 w-80 select-none opacity-[0.045]"
@@ -280,7 +280,7 @@ function statusOf(question: PaperQuestion | null): string {
     >
       <img
         src="/logo-name.webp"
-        alt="241 Exam"
+        alt="MTs Persis 241 Al-Ikhlash"
         class="h-7 w-auto"
         decoding="async"
       />

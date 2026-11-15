@@ -23,7 +23,7 @@ export const SSO_APP_LABELS: Record<SsoAppKey, string> = {
   admin: 'Administrasi',
   admission: 'PPDB',
   assessment: 'Penilaian',
-  exam: 'Ujian',
+  exam: 'Istiqra',
   hr: 'Kepegawaian',
   inventory: 'Inventaris',
   portal: 'Portal',

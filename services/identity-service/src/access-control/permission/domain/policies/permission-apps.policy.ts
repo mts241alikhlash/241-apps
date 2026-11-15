@@ -14,7 +14,7 @@ export type PermissionApp = (typeof PERMISSION_APP_KEYS)[number]
 
 export const PERMISSION_APPS: { key: PermissionApp; label: string }[] = [
   { key: 'academic', label: 'Akademik' },
-  { key: 'exam', label: 'Ujian' },
+  { key: 'exam', label: 'Istiqra' },
   { key: 'presence', label: 'Presensi' },
   { key: 'hr', label: 'Kepegawaian' },
   { key: 'payroll', label: 'Penggajian' },

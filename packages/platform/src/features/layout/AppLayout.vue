@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppSidebar from './AppSidebar.vue'
+import { authConfig } from '../auth/config'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -192,8 +193,8 @@ const searchGroups = computed(() => {
             <slot name="mobile-logo">
               <slot name="app-switcher">
                 <img
-                  :src="'/logo.webp'"
-                  alt="Logo"
+                  :src="authConfig.logoSrc"
+                  :alt="authConfig.logoAlt"
                   class="size-7 rounded-md object-contain"
                 />
               </slot>
