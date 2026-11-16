@@ -158,17 +158,21 @@ export function readVerticalQuestions(html: string): ParseResult {
         key: CHOICE_KEYS[index] ?? 'E',
         html: inlineToHtml(stripChoiceMarker(choice)),
       }))
+      let key = current.key
       if (hasChoices(current.type)) {
         const available = new Set<string>(choices.map((choice) => choice.key))
-        for (const part of current.key.split(/[\s,;]+/u)) {
-          if (part === '') continue
-          const letter = part.toUpperCase()
+        const letters = key
+          .split(/[\s,;]+/u)
+          .filter((part) => part !== '')
+          .map((part) => part.replace(/[.)]+$/u, '').toUpperCase())
+        for (const letter of letters) {
           if (!available.has(letter)) {
             throw new ImportRowError(
               `Kunci ${letter} tidak ada di antara pilihan soal ini`,
             )
           }
         }
+        key = letters.join(', ')
       }
       result.questions.push({
         row: current.order,
@@ -176,7 +180,7 @@ export function readVerticalQuestions(html: string): ParseResult {
         bodyHtml,
         content: buildImportContent(current.type, {
           choices,
-          key: current.key,
+          key,
           ignoreHarakat: current.ignoreHarakat,
         }),
         points: parsePoints(points),

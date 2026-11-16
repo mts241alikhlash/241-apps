@@ -508,4 +508,20 @@ describe('vertical Word layout', () => {
       },
     ])
   })
+
+  it('accepts a Kunci letter written with a trailing dot', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Soal'),
+        para('A. satu'),
+        para('B. dua'),
+        para('Kunci: B.'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([])
+    expect(sheet.questions[0]?.content).toMatchObject({ answer: { key: 'B' } })
+  })
 })
