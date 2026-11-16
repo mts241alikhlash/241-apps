@@ -61,6 +61,19 @@ vi.mock('@/features/exam-bank/services/examBankService', () => ({
 }))
 
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
+const dialog = defineComponent({
+  props: { open: Boolean },
+  template: '<div v-if="open"><slot /></div>',
+})
+const field = defineComponent({
+  template: '<div><slot /></div>',
+})
+const input = defineComponent({
+  props: { modelValue: String },
+  emits: ['update:modelValue'],
+  template:
+    '<input type="number" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+})
 const button = defineComponent({
   props: { disabled: Boolean },
   template: '<button :disabled="disabled" type="button"><slot /></button>',
@@ -80,6 +93,15 @@ const stubs = {
   CardContent: passthrough,
   CardFooter: passthrough,
   FileDropzone: dropzone,
+  Dialog: dialog,
+  DialogContent: passthrough,
+  DialogHeader: passthrough,
+  DialogTitle: passthrough,
+  DialogDescription: passthrough,
+  DialogBody: passthrough,
+  DialogFooter: passthrough,
+  FloatingLabelField: field,
+  Input: input,
 }
 
 const view = (overrides: Partial<ExamPackageView> = {}): ExamPackageView => ({
@@ -370,6 +392,58 @@ describe('PackageImportView', () => {
 
     expect(downloadTemplate).toHaveBeenCalledWith('xlsx')
     expect(downloadTemplate).toHaveBeenCalledWith('docx')
+    wrapper.unmount()
+  })
+
+  it('opens the vertical template dialog with the standard counts', async () => {
+    const wrapper = await mountView()
+
+    await findButton(wrapper, 'Template Word (vertikal)')!.trigger('click')
+
+    const values = wrapper
+      .findAll('input[type="number"]')
+      .map((node) => (node.element as HTMLInputElement).value)
+    expect(values).toEqual(['20', '10', '10', '0', '5'])
+    wrapper.unmount()
+  })
+
+  it('downloads the vertical template with the counts typed in the dialog', async () => {
+    const wrapper = await mountView()
+    await findButton(wrapper, 'Template Word (vertikal)')!.trigger('click')
+
+    await wrapper.findAll('input[type="number"]')[0].setValue('18')
+    await findButton(wrapper, 'Unduh')!.trigger('click')
+
+    expect(downloadTemplate).toHaveBeenCalledWith('docx', {
+      layout: 'vertical',
+      counts: { pg: 18, pgKompleks: 10, benarSalah: 10, isian: 0, uraian: 5 },
+    })
+    wrapper.unmount()
+  })
+
+  it('disables the vertical template download for a count outside 0 to 100', async () => {
+    const wrapper = await mountView()
+    await findButton(wrapper, 'Template Word (vertikal)')!.trigger('click')
+
+    await wrapper.findAll('input[type="number"]')[1].setValue('101')
+
+    expect(findButton(wrapper, 'Unduh')!.attributes('disabled')).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('shows a count warning as a note and keeps Impor enabled', async () => {
+    previewImport.mockResolvedValue({
+      success: true,
+      data: preview({ canSave: true, warnings: ['PG 18 dari 20'] }),
+    })
+    const wrapper = await mountView()
+
+    await choose(wrapper, new File(['x'], 'soal.docx'))
+
+    expect(wrapper.get('[data-testid="import-preview"]').text()).toContain(
+      'PG 18 dari 20',
+    )
+    expect(saveButton(wrapper).attributes('disabled')).toBeUndefined()
     wrapper.unmount()
   })
 

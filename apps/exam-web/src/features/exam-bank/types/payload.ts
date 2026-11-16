@@ -24,3 +24,16 @@ export type ImportResult = Schemas['ImportResultDto']
 export type ImportPreview = Schemas['ImportPreviewDto']
 
 export type TemplateFormat = 'xlsx' | 'docx'
+
+export interface TemplateCounts {
+  pg: number
+  pgKompleks: number
+  benarSalah: number
+  isian: number
+  uraian: number
+}
+
+export interface TemplateOptions {
+  layout?: 'table' | 'vertical'
+  counts?: TemplateCounts
+}

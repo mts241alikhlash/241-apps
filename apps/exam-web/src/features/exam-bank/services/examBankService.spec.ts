@@ -1,12 +1,14 @@
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { examBankService } from './examBankService'
 
-const { importQuestions, previewImport } = vi.hoisted(() => ({
+const { importQuestions, previewImport, downloadTemplate } = vi.hoisted(() => ({
   importQuestions: vi.fn(),
   previewImport: vi.fn(),
+  downloadTemplate: vi.fn(),
 }))
 vi.mock('../api/examBankApi', () => ({
-  examBankApi: { importQuestions, previewImport },
+  examBankApi: { importQuestions, previewImport, downloadTemplate },
 }))
 vi.mock('vue-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
@@ -99,5 +101,42 @@ describe('examBankService.previewImport', () => {
       success: false,
       error: 'Berkas tidak bisa dibaca',
     })
+  })
+})
+
+describe('examBankService.downloadTemplate', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    URL.createObjectURL = vi.fn(() => 'blob:template')
+    URL.revokeObjectURL = vi.fn()
+  })
+
+  it('downloads the vertical template under its own file name with the counts', async () => {
+    const blob = new Blob(['x'])
+    downloadTemplate.mockResolvedValue(blob)
+    const counts = {
+      pg: 18,
+      pgKompleks: 10,
+      benarSalah: 10,
+      isian: 0,
+      uraian: 5,
+    }
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        expect(this.download).toBe('template-soal-vertikal.docx')
+      })
+
+    await examBankService.downloadTemplate('docx', {
+      layout: 'vertical',
+      counts,
+    })
+
+    expect(downloadTemplate).toHaveBeenCalledWith('docx', {
+      layout: 'vertical',
+      counts,
+    })
+    expect(click).toHaveBeenCalledTimes(1)
+    click.mockRestore()
   })
 })
