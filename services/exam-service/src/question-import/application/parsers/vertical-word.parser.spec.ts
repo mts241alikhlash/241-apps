@@ -357,4 +357,70 @@ describe('vertical Word layout', () => {
     expect(sheet.questions).toHaveLength(1)
     expect(sheet.questions[0]?.content).toMatchObject({ answer: { key: 'B' } })
   })
+
+  it('ignores marker-only choices so two filled choices import cleanly', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Berapa $2+3$?'),
+        para('A. 4'),
+        para('B. 5'),
+        para('C.'),
+        para('D.'),
+        para('Kunci: B'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([])
+    expect(sheet.questions).toHaveLength(1)
+    expect(sheet.questions[0]?.content).toMatchObject({
+      choices: [{ key: 'A' }, { key: 'B' }],
+      answer: { key: 'B' },
+    })
+  })
+
+  it('reports fewer than two filled choices when the rest are marker-only', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Berapa $2+3$?'),
+        para('A. 4'),
+        para('B.'),
+        para('C.'),
+        para('D.'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason: 'Bagian PG, soal 1: Pilihan jawaban harus 2 sampai 5',
+      },
+    ])
+  })
+
+  it('ignores a blank E choice in PG Kompleks', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG KOMPLEKS'),
+        para('1. Pilih bilangan genap'),
+        para('A. 2'),
+        para('B. 3'),
+        para('C. 4'),
+        para('E.'),
+        para('Kunci: A, C'),
+        para('Poin: 2'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([])
+    expect(sheet.questions[0]?.content).toMatchObject({
+      choices: [{ key: 'A' }, { key: 'B' }, { key: 'C' }],
+      answer: { keys: ['A', 'C'] },
+    })
+  })
 })

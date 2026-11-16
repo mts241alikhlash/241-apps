@@ -126,7 +126,9 @@ export function readVerticalQuestions(html: string): ParseResult {
         stripQuestionNumber(current.body.join('<br>')),
       )
       if (isBlank(bodyHtml)) throw new ImportRowError('soal kosong')
-      const filled = current.choices.filter((choice) => !isBlank(choice))
+      const filled = current.choices.filter(
+        (choice) => !isBlank(stripChoiceMarker(choice)),
+      )
       if (
         hasChoices(current.type) &&
         (filled.length < 2 || filled.length > CHOICE_KEYS.length)
