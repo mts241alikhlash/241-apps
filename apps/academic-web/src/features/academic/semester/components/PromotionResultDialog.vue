@@ -17,10 +17,7 @@ const props = defineProps<{
   result: PromotionResult | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  done: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; done: [] }>()
 
 const open = computed({
   get: () => props.open,
@@ -33,12 +30,12 @@ const stats = computed(() => {
     {
       label: 'Naik Kelas',
       value: props.result.promoted,
-      color: 'text-green-600',
+      color: 'text-success',
     },
     {
       label: 'Tinggal Kelas',
       value: props.result.repeated,
-      color: 'text-amber-600',
+      color: 'text-warning',
     },
     {
       label: 'Dilewati',
@@ -60,9 +57,9 @@ function handleDone() {
       <DialogHeader>
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100"
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-success/10"
           >
-            <CheckCircle2 class="h-5 w-5 text-green-600" />
+            <CheckCircle2 class="h-5 w-5 text-success" />
           </div>
           <div>
             <DialogTitle>Kenaikan Kelas Berhasil</DialogTitle>
@@ -80,7 +77,7 @@ function handleDone() {
           class="rounded-lg border p-4 text-center"
         >
           <p
-            class="text-2xl font-bold"
+            class="text-2xl font-semibold"
             :class="stat.color"
           >
             {{ stat.value }}

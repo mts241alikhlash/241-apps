@@ -151,7 +151,7 @@ onMounted(async () => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <CardTitle class="font-semibold">{{ title }}</CardTitle>
           <div class="flex items-end gap-2">
@@ -194,11 +194,11 @@ onMounted(async () => {
       </CardHeader>
 
       <CardContent
-        class="print-stack flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="print-stack flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-6"
       >
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive print:hidden"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive print:hidden"
           role="alert"
         >
           <p>{{ error }}</p>
@@ -214,21 +214,21 @@ onMounted(async () => {
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Menyiapkan dokumen...
         </p>
 
         <p
           v-else-if="events.length === 0"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Belum ada periode ujian.
         </p>
 
         <p
           v-else-if="!hasRows"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{
             skippedRooms > 0
@@ -240,7 +240,7 @@ onMounted(async () => {
         <template v-else>
           <p
             v-if="skippedRooms > 0"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive print:hidden"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive print:hidden"
             role="alert"
           >
             {{ skippedRooms }} ruangan dilewati karena Anda tidak bertugas di
@@ -254,7 +254,7 @@ onMounted(async () => {
             <h2 class="text-base font-semibold">
               {{ sheet.label }}
               <span
-                class="ml-1 text-[length:var(--text-control,0.875rem)] font-normal text-muted-foreground tabular-nums"
+                class="ml-1 text-control font-normal text-muted-foreground tabular-nums"
                 >{{ sheet.rows.length }} peserta</span
               >
             </h2>

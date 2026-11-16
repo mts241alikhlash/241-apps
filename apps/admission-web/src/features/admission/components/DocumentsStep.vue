@@ -87,13 +87,7 @@ const columns = computed<ColumnDef<AdmissionDocumentType>[]>(() => [
               )
             : null,
         ]),
-        note
-          ? h(
-              'p',
-              { class: 'text-xs text-amber-700 dark:text-amber-400' },
-              note,
-            )
-          : null,
+        note ? h('p', { class: 'text-xs text-warning' }, note) : null,
       ])
     },
   },
@@ -202,7 +196,7 @@ async function upload() {
       <CardContent class="px-4 pt-4 pb-4">
         <p
           v-if="!documentTypes.length"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Belum ada jenis berkas yang tersedia.
         </p>

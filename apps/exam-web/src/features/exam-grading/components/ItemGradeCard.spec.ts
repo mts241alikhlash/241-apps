@@ -71,7 +71,7 @@ describe('ItemGradeCard', () => {
     const wrapper = mountCard(item())
 
     await wrapper.find('input[type="number"]').setValue('7.5')
-    await wrapper.find('input[maxlength="500"]').setValue('  cukup  ')
+    await wrapper.find('input[maxlength="500"]').setValue('  cukup ')
     await saveButton(wrapper).trigger('click')
     await flushPromises()
 
@@ -84,7 +84,7 @@ describe('ItemGradeCard', () => {
 
   it('does not ask for a grade when the student left the answer blank', () => {
     const wrapper = mountCard(
-      item({ answer: { text: '  ' }, needsGrading: false }),
+      item({ answer: { text: ' ' }, needsGrading: false }),
     )
 
     expect(wrapper.text()).toContain('Tidak dijawab')
@@ -137,7 +137,7 @@ describe('ItemGradeCard', () => {
       item({ score: 7, note: 'cukup', needsGrading: false }),
     )
 
-    await wrapper.find('input[maxlength="500"]').setValue('cukup   ')
+    await wrapper.find('input[maxlength="500"]').setValue('cukup ')
 
     expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
   })

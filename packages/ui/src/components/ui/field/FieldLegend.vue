@@ -4,22 +4,13 @@ import { cn } from '@mts241alikhlash/ui/utils'
 
 const props = defineProps<{
   class?: HTMLAttributes['class']
-  variant?: 'legend' | 'label'
 }>()
 </script>
 
 <template>
   <legend
     data-slot="field-legend"
-    :data-variant="variant"
-    :class="
-      cn(
-        'mb-2 font-medium',
-        'data-[variant=legend]:text-sm',
-        'data-[variant=label]:text-[length:var(--text-control,0.875rem)]',
-        props.class,
-      )
-    "
+    :class="cn('mb-2 font-medium text-control', props.class)"
   >
     <slot />
   </legend>

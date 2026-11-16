@@ -206,7 +206,7 @@ async function handleConfirmGraduate() {
                 :class="
                   graduationDate
                     ? 'text-foreground'
-                    : 'text-amber-600 dark:text-amber-400 font-medium italic'
+                    : 'text-warning font-medium italic'
                 "
               >
                 {{ formattedGraduationDate }}
@@ -223,7 +223,7 @@ async function handleConfirmGraduate() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  class="w-auto p-3 space-y-2.5"
+                  class="w-auto p-3 space-y-3"
                   align="start"
                 >
                   <div class="space-y-1">
@@ -275,7 +275,7 @@ async function handleConfirmGraduate() {
         >
           <div class="flex items-center gap-4 text-xs">
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-green-500" />
+              <div class="size-2.5 rounded-full bg-success" />
               <span class="text-muted-foreground">
                 Lulus:
                 <strong class="text-foreground">{{
@@ -284,7 +284,7 @@ async function handleConfirmGraduate() {
               </span>
             </div>
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-amber-500" />
+              <div class="size-2.5 rounded-full bg-warning" />
               <span class="text-muted-foreground">
                 Tidak Lulus:
                 <strong class="text-foreground">{{
@@ -327,18 +327,16 @@ async function handleConfirmGraduate() {
       <div class="overflow-y-auto px-6 py-4 space-y-4">
         <div class="overflow-x-auto rounded-xl border bg-background shadow-xs">
           <Table class="min-w-[500px]">
-            <TableHeader class="bg-muted/50">
+            <TableHeader>
               <TableRow>
-                <TableHead class="text-center text-xs font-semibold w-[120px]">
+                <TableHead class="text-center text-xs w-[120px]">
                   NIS
                 </TableHead>
-                <TableHead class="text-xs font-semibold">
-                  Nama Siswa
-                </TableHead>
-                <TableHead class="text-center text-xs font-semibold w-[110px]">
+                <TableHead class="text-xs"> Nama Siswa </TableHead>
+                <TableHead class="text-center text-xs w-[110px]">
                   Kelas
                 </TableHead>
-                <TableHead class="text-center text-xs font-semibold w-[120px]">
+                <TableHead class="text-center text-xs w-[120px]">
                   Status
                 </TableHead>
               </TableRow>
@@ -371,11 +369,7 @@ async function handleConfirmGraduate() {
                 </TableCell>
                 <TableCell
                   class="text-center py-2 text-xs font-medium"
-                  :class="
-                    row.approved
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-destructive'
-                  "
+                  :class="row.approved ? 'text-success' : 'text-destructive'"
                 >
                   {{ row.approved ? 'Lulus' : 'Tidak Lulus' }}
                 </TableCell>
@@ -391,16 +385,16 @@ async function handleConfirmGraduate() {
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="summaryStats.approved > 0"
-            class="flex items-center gap-1.5 font-medium text-green-600 dark:text-green-400"
+            class="flex items-center gap-1.5 font-medium text-success"
           >
-            <div class="size-2 rounded-full bg-green-500" />
+            <div class="size-2 rounded-full bg-success" />
             {{ summaryStats.approved }} Lulus
           </div>
           <div
             v-if="summaryStats.declined > 0"
-            class="flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400"
+            class="flex items-center gap-1.5 font-medium text-warning"
           >
-            <div class="size-2 rounded-full bg-amber-500" />
+            <div class="size-2 rounded-full bg-warning" />
             {{ summaryStats.declined }} Tidak Lulus
           </div>
           <div class="text-muted-foreground">

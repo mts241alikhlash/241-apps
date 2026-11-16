@@ -84,10 +84,7 @@ onMounted(() => void leaveService.fetchRequests())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Persetujuan Izin & Cuti </CardTitle>
       </CardHeader>
 
@@ -122,7 +119,7 @@ onMounted(() => void leaveService.fetchRequests())
             <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div class="space-y-1">
                 <Label for="reject-reason">
-                  Alasan Penolakan <span class="text-red-500">*</span>
+                  Alasan Penolakan <span class="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="reject-reason"

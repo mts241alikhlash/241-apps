@@ -22,7 +22,7 @@ describe('review fixes', () => {
     for (const w of [mount(Input), mount(Textarea)]) {
       const c = w.classes()
       expect(c).toContain('text-sm')
-      expect(c).toContain('md:text-[length:var(--text-control,0.875rem)]')
+      expect(c).toContain('md:text-control')
       expect(c).not.toContain('text-base')
     }
   })
@@ -31,12 +31,12 @@ describe('review fixes', () => {
     expect(mount(Textarea).classes()).not.toContain('resize-none')
   })
 
-  it('destructive button and badge stay solid red', () => {
+  it('the destructive button stays solid red while the badge is red text', () => {
     expect(buttonVariants({ variant: 'destructive' })).toContain(
       'bg-destructive text-white',
     )
     expect(badgeVariants({ variant: 'destructive' })).toContain(
-      'bg-destructive text-white',
+      'text-destructive',
     )
   })
 
@@ -63,7 +63,7 @@ describe('review fixes', () => {
     expect(viewport?.getAttribute('class')).toContain('p-1')
     const item = document.body.querySelector('[data-slot=select-item]')
     expect(item?.getAttribute('class')).toContain(
-      'min-h-[var(--control-h-md,2rem)]',
+      'min-h-[var(--control-h-md,1.75rem)]',
     )
   })
 
@@ -78,7 +78,7 @@ describe('review fixes', () => {
       'left: calc(0.375rem + 1px)',
     )
     expect(base.slice(0, base.indexOf('}'))).toContain('left 150ms ease')
-    expect(base.slice(0, base.indexOf('}'))).toContain('line-height: 0.5rem')
+    expect(base.slice(0, base.indexOf('}'))).toContain('line-height: 0.5625rem')
     expect(base.slice(0, base.indexOf('}'))).toContain(
       'padding-inline: 0.125rem',
     )

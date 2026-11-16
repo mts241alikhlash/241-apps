@@ -277,7 +277,7 @@ onMounted(() => {
         </div>
       </CardHeader>
 
-      <CardContent class="space-y-6 px-4 py-5 sm:px-6">
+      <CardContent class="space-y-6 px-4 py-5 sm: px-4">
         <StatusBadge :status="application.status" />
         <p class="text-base font-medium">{{ nextAction }}</p>
 
@@ -344,7 +344,7 @@ onMounted(() => {
           v-else-if="tasks.some((task) => task.key === 'payment')"
           as-child
           variant="outline"
-          class="min-h-[var(--control-h-lg,2.25rem)]"
+          class="min-h-[var(--control-h-lg,2rem)]"
         >
           <RouterLink
             :to="{ path: '/registration/form', query: { step: 'payment' } }"
@@ -357,7 +357,7 @@ onMounted(() => {
         <section
           v-if="reminders.length"
           data-test="late-reminders"
-          class="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-4 text-[length:var(--text-control,0.875rem)] text-amber-950 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-100"
+          class="space-y-2 rounded-lg border border-warning/30 bg-warning/10 p-4 text-control text-warning"
         >
           <h2 class="font-medium">Berkas yang masih harus diserahkan</h2>
           <ul class="list-disc space-y-1 pl-5">
@@ -384,7 +384,7 @@ onMounted(() => {
               <li
                 v-for="task in tasks"
                 :key="task.key"
-                class="flex items-start gap-3 rounded-lg border p-3 text-[length:var(--text-control,0.875rem)]"
+                class="flex items-start gap-3 rounded-lg border p-3 text-control"
               >
                 <component
                   :is="task.icon"
@@ -401,7 +401,7 @@ onMounted(() => {
                           }
                         : '/registration/form'
                     "
-                    class="inline-flex min-h-[var(--control-h-lg,2.25rem)] items-center font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                    class="inline-flex min-h-[var(--control-h-lg,2rem)] items-center font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
                     {{ task.title }}
                   </RouterLink>
@@ -419,13 +419,11 @@ onMounted(() => {
 
         <details class="sm:hidden">
           <summary
-            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer items-center font-medium"
+            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer items-center font-medium"
           >
             Tahapan pendaftaran
           </summary>
-          <ol
-            class="space-y-3 border-l-2 border-muted pl-4 text-[length:var(--text-control,0.875rem)]"
-          >
+          <ol class="space-y-3 border-l-2 border-muted pl-4 text-control">
             <li
               v-for="(step, index) in TIMELINE"
               :key="step.status"
@@ -468,9 +466,7 @@ onMounted(() => {
               <span v-else>{{ index + 1 }}</span>
             </StepperIndicator>
             <div>
-              <StepperTitle
-                class="text-xs font-medium sm:text-[length:var(--text-control,0.875rem)]"
-              >
+              <StepperTitle class="text-xs font-medium sm:text-control">
                 {{ step.label }}
               </StepperTitle>
               <StepperDescription
@@ -483,9 +479,7 @@ onMounted(() => {
         </Stepper>
 
         <div class="grid gap-3 sm:grid-cols-3">
-          <div
-            class="space-y-2 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
-          >
+          <div class="space-y-2 rounded-lg border p-4 text-control">
             <p class="text-muted-foreground">Kelengkapan Berkas</p>
             <p class="font-medium">
               {{ requiredDocs.done }} dari {{ requiredDocs.total }} berkas
@@ -496,9 +490,7 @@ onMounted(() => {
               aria-label="Kelengkapan berkas"
             />
           </div>
-          <div
-            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
-          >
+          <div class="space-y-1 rounded-lg border p-4 text-control">
             <p class="text-muted-foreground">Pembayaran</p>
             <p
               v-if="application.payment && application.payment.amount === 0"
@@ -523,9 +515,7 @@ onMounted(() => {
               {{ formatIDR(application.payment.amount) }}
             </p>
           </div>
-          <div
-            class="space-y-1 rounded-lg border p-4 text-[length:var(--text-control,0.875rem)]"
-          >
+          <div class="space-y-1 rounded-lg border p-4 text-control">
             <p class="text-muted-foreground">Tanggal Pengiriman</p>
             <p class="font-medium">
               {{
@@ -570,7 +560,7 @@ onMounted(() => {
         <CardContent class="p-0">
           <div
             v-if="notificationsError"
-            class="space-y-2 p-4 text-[length:var(--text-control,0.875rem)]"
+            class="space-y-2 p-4 text-control"
           >
             <p>Notifikasi gagal dimuat.</p>
             <Button
@@ -581,7 +571,7 @@ onMounted(() => {
           </div>
           <p
             v-else-if="notifications.length === 0"
-            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+            class="flex items-center gap-2 p-4 text-control text-muted-foreground"
           >
             <CircleDashed class="size-4" />
             Belum ada notifikasi.
@@ -594,7 +584,7 @@ onMounted(() => {
               <li
                 v-for="notification in notifications"
                 :key="notification.id"
-                class="space-y-1 p-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-1 p-4 text-control"
                 :class="notification.readAt ? 'opacity-70' : 'bg-primary/5'"
               >
                 <p class="flex items-center gap-2 font-medium">
@@ -635,7 +625,7 @@ onMounted(() => {
         <CardContent class="p-0">
           <div
             v-if="announcementsError"
-            class="space-y-2 p-4 text-[length:var(--text-control,0.875rem)]"
+            class="space-y-2 p-4 text-control"
           >
             <p>Pengumuman gagal dimuat.</p>
             <Button
@@ -646,7 +636,7 @@ onMounted(() => {
           </div>
           <p
             v-else-if="announcements.length === 0"
-            class="flex items-center gap-2 p-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+            class="flex items-center gap-2 p-4 text-control text-muted-foreground"
           >
             <CircleDashed class="size-4" />
             Belum ada pengumuman dari panitia.
@@ -659,7 +649,7 @@ onMounted(() => {
               <li
                 v-for="announcement in announcements"
                 :key="announcement.id"
-                class="space-y-1 p-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-1 p-4 text-control"
               >
                 <p class="font-medium">{{ announcement.title }}</p>
                 <p class="whitespace-pre-line text-muted-foreground">
@@ -684,14 +674,12 @@ onMounted(() => {
     class="flex min-h-[60vh] items-center justify-center p-6"
   >
     <Card class="w-full max-w-md text-center">
-      <CardContent class="space-y-4 p-8">
+      <CardContent class="space-y-4 p-4">
         <CircleDashed class="mx-auto size-8 text-muted-foreground" />
         <h2 class="text-lg font-medium tracking-tight">
           Belum ada data pendaftaran
         </h2>
-        <p
-          class="text-[length:var(--text-control,0.875rem)] text-balance text-muted-foreground"
-        >
+        <p class="text-control text-balance text-muted-foreground">
           {{
             isAdmin
               ? 'Akun ini adalah akun admin, sehingga tidak memiliki formulir pendaftaran pribadi.'

@@ -34,10 +34,7 @@ const props = defineProps<{
   event?: ExamEvent | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  saved: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
 const isEdit = computed(() => Boolean(props.event))
 
@@ -80,13 +77,13 @@ onMounted(() => {
       <DialogBody class="space-y-4">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ form.error.value }}
         </div>
 
-        <div class="grid gap-5 sm:grid-cols-2">
+        <div class="grid gap-4 sm:grid-cols-2">
           <FloatingLabelField
             label="Nama kegiatan"
             :for="`${fieldId}-name`"
@@ -228,7 +225,7 @@ onMounted(() => {
 
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

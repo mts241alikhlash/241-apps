@@ -94,7 +94,7 @@ defineExpose({
     <div class="overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow class="bg-muted/50 hover:bg-muted/50">
+          <TableRow>
             <TableHead class="text-center font-medium w-20"> Urutan </TableHead>
             <TableHead class="text-center font-medium min-w-[160px]">
               Nama Jam
@@ -166,7 +166,7 @@ defineExpose({
               />
               <p
                 v-if="gapLabel(index)"
-                class="mt-1 flex items-center justify-center gap-1 text-xs text-amber-600 dark:text-amber-500"
+                class="mt-1 flex items-center justify-center gap-1 text-xs text-warning"
               >
                 <AlertTriangle class="size-3 shrink-0" />
                 {{ gapLabel(index) }}
@@ -214,6 +214,7 @@ defineExpose({
                   size="icon"
                   variant="ghost"
                   class="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  aria-label="Hapus jam pelajaran"
                   :disabled="row.saving"
                   @click="requestDelete(row, index)"
                 >

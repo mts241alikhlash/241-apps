@@ -275,7 +275,7 @@ onMounted(async () => {
                   }}</span>
                   <span
                     v-if="ay.isActive"
-                    class="text-xs text-emerald-600 font-medium"
+                    class="text-xs text-success font-medium"
                     >(Aktif)</span
                   >
                 </div>
@@ -320,6 +320,7 @@ onMounted(async () => {
                     variant="ghost"
                     size="icon"
                     class="shrink-0"
+                    aria-label="Hapus mata pelajaran"
                     @click="delete pendingCurriculum[ay.id]"
                   >
                     ✕

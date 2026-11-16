@@ -27,9 +27,9 @@ const sections = computed(() =>
 </script>
 
 <template>
-  <div class="space-y-12">
+  <div class="space-y-6">
     <section class="space-y-4 text-center">
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
+      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">
         MTs Persis 241
         <span class="block text-primary">Al-Ikhlash</span>
       </h1>

@@ -11,12 +11,12 @@ const mobile = css.slice(css.indexOf('@media (max-width: 767px)'))
 
 describe('theme.css', () => {
   it('defines every size token for desktop', () => {
-    expect(css).toContain('--control-h-xs: 1.5rem')
-    expect(css).toContain('--control-h-sm: 1.75rem')
-    expect(css).toContain('--control-h-md: 2rem')
-    expect(css).toContain('--control-h-lg: 2.25rem')
-    expect(css).toContain('--text-control: 0.875rem')
-    expect(css).toContain('--icon-control: 1rem')
+    expect(css).toContain('--control-h-xs: 1.25rem')
+    expect(css).toContain('--control-h-sm: 1.5rem')
+    expect(css).toContain('--control-h-md: 1.75rem')
+    expect(css).toContain('--control-h-lg: 2rem')
+    expect(css).toContain('--text-control: 0.75rem')
+    expect(css).toContain('--icon-control: 0.875rem')
   })
 
   it('declares a light colour scheme so a dark phone does not darken the pages', () => {
@@ -24,11 +24,11 @@ describe('theme.css', () => {
   })
 
   it('raises the size tokens below md', () => {
-    expect(mobile).toContain('--control-h-xs: 1.75rem')
-    expect(mobile).toContain('--control-h-sm: 2.25rem')
-    expect(mobile).toContain('--control-h-md: 2.5rem')
-    expect(mobile).toContain('--control-h-lg: 2.75rem')
-    expect(mobile).toContain('--text-control: 0.9375rem')
+    expect(mobile).toContain('--control-h-xs: 1.5rem')
+    expect(mobile).toContain('--control-h-sm: 2rem')
+    expect(mobile).toContain('--control-h-md: 2.25rem')
+    expect(mobile).toContain('--control-h-lg: 2.5rem')
+    expect(mobile).toContain('--text-control: 0.8125rem')
     expect(mobile).toContain('--icon-control: 1rem')
   })
 
@@ -41,6 +41,14 @@ describe('theme.css', () => {
 
   it('uses a deep red for destructive that sits next to the navy primary', () => {
     expect(css).toContain('--destructive: oklch(0.48 0.17 27)')
+  })
+
+  it('carries a status colour per meaning, each readable on white', () => {
+    for (const token of ['success', 'warning', 'info']) {
+      expect(css).toContain(`--${token}: oklch(`)
+      expect(css).toContain(`--${token}-foreground: oklch(`)
+      expect(css).toContain(`--color-${token}: var(--${token})`)
+    }
   })
 
   it('lets the sidebar use the card background', () => {

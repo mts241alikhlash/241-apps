@@ -142,7 +142,7 @@ const summary = computed(() => {
           </h3>
           <Badge
             variant="secondary"
-            class="font-medium text-xs"
+            class="font-medium"
           >
             {{ filteredRows.length }} / {{ summary.total }} Siswa
           </Badge>
@@ -150,13 +150,13 @@ const summary = computed(() => {
 
         <div class="flex items-center gap-2">
           <div
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-500/10 text-green-700 dark:text-green-400 text-xs font-semibold"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-success text-success-foreground text-xs font-semibold"
           >
             <CheckCircle2 class="size-3.5" />
             <span>Naik: {{ summary.promoted }}</span>
           </div>
           <div
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-semibold"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-warning text-warning-foreground text-xs font-semibold"
           >
             <RotateCcw class="size-3.5" />
             <span>Tinggal: {{ summary.repeated }}</span>
@@ -164,7 +164,7 @@ const summary = computed(() => {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <SearchInput
           v-model="searchQuery"
           label="Cari nama / NIS"
@@ -193,7 +193,7 @@ const summary = computed(() => {
             </SelectItem>
             <SelectItem
               value="__repeat__"
-              class="text-xs text-amber-600"
+              class="text-xs text-warning"
             >
               Siswa Tinggal Kelas
             </SelectItem>
@@ -230,20 +230,12 @@ const summary = computed(() => {
 
     <div class="overflow-hidden rounded-xl border bg-background shadow-xs">
       <Table>
-        <TableHeader class="bg-muted/50">
+        <TableHeader>
           <TableRow>
-            <TableHead class="text-left font-semibold text-xs">
-              Nama Siswa
-            </TableHead>
-            <TableHead class="text-center font-semibold text-xs">
-              Alur Kelas
-            </TableHead>
-            <TableHead class="text-center font-semibold text-xs">
-              Status
-            </TableHead>
-            <TableHead class="text-left font-semibold text-xs">
-              Keterangan
-            </TableHead>
+            <TableHead class="text-left text-xs"> Nama Siswa </TableHead>
+            <TableHead class="text-center text-xs"> Alur Kelas </TableHead>
+            <TableHead class="text-center text-xs"> Status </TableHead>
+            <TableHead class="text-left text-xs"> Keterangan </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -274,7 +266,7 @@ const summary = computed(() => {
             :key="row.studentId"
             class="transition-colors hover:bg-muted/30"
             :class="{
-              'bg-amber-500/5': !row.isApproved || row.action === 'REPEAT',
+              'bg-warning': !row.isApproved || row.action === 'REPEAT',
             }"
           >
             <TableCell class="py-2.5">
@@ -287,21 +279,11 @@ const summary = computed(() => {
             </TableCell>
             <TableCell class="text-center py-2.5">
               <div class="inline-flex items-center gap-1.5 font-medium">
-                <Badge
-                  variant="outline"
-                  class="font-medium bg-background text-xs px-2 py-0.5"
-                >
+                <Badge variant="outline">
                   {{ row.sourceClassroomName }}
                 </Badge>
                 <ArrowRight class="size-3 text-muted-foreground" />
-                <Badge
-                  :variant="row.isApproved ? 'default' : 'secondary'"
-                  class="font-medium text-xs px-2 py-0.5 shadow-none"
-                  :class="{
-                    'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20':
-                      !row.isApproved,
-                  }"
-                >
+                <Badge :variant="row.isApproved ? 'default' : 'warning'">
                   {{ row.targetClassroomName }}
                 </Badge>
               </div>
@@ -309,7 +291,7 @@ const summary = computed(() => {
             <TableCell class="text-center py-2.5">
               <Badge
                 :variant="row.isApproved ? 'default' : 'destructive'"
-                class="font-medium text-xs px-2 py-0.5 shadow-none"
+                class="font-medium"
               >
                 {{ row.isApproved ? 'Naik Kelas' : 'Tinggal Kelas' }}
               </Badge>

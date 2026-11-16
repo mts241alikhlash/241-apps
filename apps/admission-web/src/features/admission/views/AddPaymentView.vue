@@ -155,10 +155,7 @@ watch(debouncedSearch, loadApplicants)
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke pembayaran"
@@ -168,7 +165,7 @@ watch(debouncedSearch, loadApplicants)
         </div>
       </CardHeader>
 
-      <CardContent class="grid gap-5 p-4 sm:grid-cols-2 sm:p-6">
+      <CardContent class="grid gap-4 p-4 sm:grid-cols-2 sm: p-4">
         <FloatingLabelField
           label="Pendaftar"
           :error="errors.applicationId"
@@ -273,10 +270,11 @@ watch(debouncedSearch, loadApplicants)
         </FloatingLabelField>
       </CardContent>
 
-      <CardContent class="border-t bg-muted/10 p-4 sm:p-6">
-        <div
-          class="grid gap-3 sm:grid-cols-2 text-[length:var(--text-control,0.875rem)]"
-        >
+      <CardContent
+        variant="standard"
+        class="border-t bg-muted/10"
+      >
+        <div class="grid gap-3 sm:grid-cols-2 text-control">
           <div>
             <p class="text-xs text-muted-foreground">Nomor Pendaftaran</p>
             <p class="mt-1 font-medium">
@@ -291,15 +289,12 @@ watch(debouncedSearch, loadApplicants)
           </div>
           <div>
             <p class="text-xs text-muted-foreground">Status Setelah Disimpan</p>
-            <p class="mt-1 font-medium text-emerald-600">Terverifikasi</p>
+            <p class="mt-1 font-medium text-success">Terverifikasi</p>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter
-        standard
-        class="flex-wrap"
-      >
+      <CardFooter class="flex-wrap">
         <Button
           type="button"
           variant="outline"

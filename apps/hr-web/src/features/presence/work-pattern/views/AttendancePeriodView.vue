@@ -80,10 +80,7 @@ onMounted(() => void workPatternService.fetchPeriods(year.value))
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Periode Kehadiran </CardTitle>
       </CardHeader>
 
@@ -107,7 +104,7 @@ onMounted(() => void workPatternService.fetchPeriods(year.value))
 
         <div
           v-if="blockingRecords.length > 0"
-          class="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+          class="space-y-2 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-warning"
         >
           <div class="flex items-start gap-2 font-medium">
             <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0" />

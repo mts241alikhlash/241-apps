@@ -311,7 +311,7 @@ function toggleAllVisible() {
           <SelectContent>
             <SelectItem
               value="approve"
-              class="text-xs text-green-600 focus:text-green-600"
+              class="text-xs text-success focus:text-success"
             >
               Luluskan
             </SelectItem>
@@ -459,7 +459,7 @@ function toggleAllVisible() {
                 </div>
                 <div
                   v-if="candidate.previousHold"
-                  class="text-xs text-amber-600 dark:text-amber-400 mt-0.5"
+                  class="text-xs text-warning mt-0.5"
                 >
                   Ditahan {{ candidate.previousHold.academicYearName }}:
                   {{ candidate.previousHold.reason }}

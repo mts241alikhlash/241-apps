@@ -23,7 +23,7 @@ const to = computed(() => Math.min(props.page * props.pageSize, props.total))
 
 <template>
   <div
-    class="flex flex-wrap items-center justify-between gap-2 text-[length:var(--text-control,0.875rem)]"
+    class="flex flex-wrap items-center justify-between gap-2 text-control"
     data-test="server-pager"
   >
     <span class="text-muted-foreground">

@@ -145,7 +145,7 @@ it('refuses a blank name and shows the reason', async () => {
     .findAll('button')
     .find((b) => b.text() === 'Tambah')!
     .trigger('click')
-  await wrapper.get('input[name="name"]').setValue('   ')
+  await wrapper.get('input[name="name"]').setValue(' ')
   await wrapper.get('form').trigger('submit')
   await flushPromises()
 

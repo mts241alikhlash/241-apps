@@ -382,7 +382,7 @@ useBreadcrumbs(() => {
 <template>
   <div
     v-if="loading"
-    class="p-6 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+    class="p-6 text-control text-muted-foreground"
   >
     Memuat formulir…
   </div>
@@ -450,7 +450,7 @@ useBreadcrumbs(() => {
               v-if="
                 application.status === 'REVISION_NEEDED' && currentStep === 5
               "
-              class="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-[length:var(--text-control,0.875rem)] text-destructive"
+              class="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-control text-destructive"
               :class="stepStartsFlush ? 'mb-1' : 'mb-4'"
             >
               <TriangleAlert class="mt-0.5 size-3.5 shrink-0" />
@@ -460,7 +460,7 @@ useBreadcrumbs(() => {
             </div>
             <div
               v-else-if="!editable"
-              class="rounded-md border p-3 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+              class="rounded-md border p-3 text-control text-muted-foreground"
               :class="stepStartsFlush ? 'mb-1' : 'mb-4'"
             >
               {{
@@ -554,7 +554,7 @@ useBreadcrumbs(() => {
             <p
               v-if="saveMessage"
               :role="saveFailed ? 'alert' : 'status'"
-              class="mt-4 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+              class="mt-4 text-control text-muted-foreground"
             >
               {{ saveMessage }}
             </p>
@@ -562,7 +562,6 @@ useBreadcrumbs(() => {
         </Card>
       </CardContent>
       <CardFooter
-        standard
         :class="currentStep === 0 ? 'justify-end' : 'justify-between'"
       >
         <Button
@@ -584,7 +583,7 @@ useBreadcrumbs(() => {
         </Button>
         <span
           v-else-if="editable && waveClosed"
-          class="text-[length:var(--text-control,0.875rem)] text-destructive"
+          class="text-control text-destructive"
         >
           Gelombang ini sudah ditutup; formulir tidak dapat dikirim.
         </span>
@@ -638,9 +637,7 @@ useBreadcrumbs(() => {
       <h2 class="mt-4 text-lg font-medium tracking-tight">
         Formulir belum tersedia
       </h2>
-      <p
-        class="mt-2 text-[length:var(--text-control,0.875rem)] text-muted-foreground text-balance"
-      >
+      <p class="mt-2 text-control text-muted-foreground text-balance">
         {{
           isAdminForm
             ? 'Data pendaftar tidak ditemukan.'

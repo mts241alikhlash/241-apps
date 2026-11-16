@@ -32,8 +32,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      class:
-        'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none dark:prose-invert',
+      class: 'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none',
     },
   },
   onUpdate: ({ editor: instance }) => {

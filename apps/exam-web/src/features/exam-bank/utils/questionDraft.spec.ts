@@ -150,7 +150,7 @@ describe('cleanContent', () => {
     expect(
       cleanContent('SHORT_ANSWER', {
         answer: {
-          accepted: [' Jakarta ', '', '  '],
+          accepted: [' Jakarta ', '', ' '],
           ignoreCase: true,
           ignoreHarakat: false,
         },

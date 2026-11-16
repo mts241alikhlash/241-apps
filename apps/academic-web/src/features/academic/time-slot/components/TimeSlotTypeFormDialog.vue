@@ -28,10 +28,7 @@ const props = defineProps<{
   initialData?: TimeSlotType | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  success: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; success: [] }>()
 
 const isSubmitting = ref(false)
 const isLesson = ref(true)
@@ -130,7 +127,7 @@ const onSubmit = handleSubmit(async (values) => {
       <ScrollArea class="flex-1 min-h-0">
         <form
           id="time-slot-type-form"
-          class="space-y-5 px-6 py-4"
+          class="space-y-4 px-6 py-4"
           @submit.prevent="onSubmit"
         >
           <FloatingField

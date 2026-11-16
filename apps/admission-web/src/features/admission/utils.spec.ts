@@ -15,7 +15,7 @@ import {
 } from './utils'
 
 it('keeps zero but names absent and placeholder values', () => {
-  expect([null, undefined, '', '   ', '-'].map(presentValue)).toEqual(
+  expect([null, undefined, '', ' ', '-'].map(presentValue)).toEqual(
     Array(5).fill('Belum diisi'),
   )
   expect(presentValue(0)).toBe('0')

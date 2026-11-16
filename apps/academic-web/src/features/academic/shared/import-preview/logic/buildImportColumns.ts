@@ -50,7 +50,7 @@ export function buildImportColumns<TData>(
       return h('span', { class: 'truncate' }, toDisplayText(displayValue))
     }
 
-    const iconColor = isFailed ? 'text-destructive' : 'text-amber-500'
+    const iconColor = isFailed ? 'text-destructive' : 'text-warning'
 
     if (!displayValue) {
       return h(
@@ -165,7 +165,7 @@ export function buildImportColumns<TData>(
                   [
                     h('span', { class: 'text-muted-foreground' }, '******'),
                     h(AlertTriangle, {
-                      class: 'h-4 w-4 text-amber-500 shrink-0',
+                      class: 'h-4 w-4 text-warning shrink-0',
                     }),
                   ],
                 ),
@@ -224,7 +224,7 @@ export function buildImportColumns<TData>(
           h(
             'div',
             { class: 'flex items-center justify-center w-full cursor-help' },
-            [h(CheckCircle2, { class: 'h-5 w-5 text-emerald-600 shrink-0' })],
+            [h(CheckCircle2, { class: 'h-5 w-5 text-success shrink-0' })],
           ),
           'Data baru',
         )

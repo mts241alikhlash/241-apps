@@ -42,10 +42,7 @@ onMounted(() => void employeeAttendanceService.fetchDay())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Kehadiran Pegawai </CardTitle>
         <Button @click="manualOpen = true">
           <Plus class="h-4 w-4" />
@@ -63,7 +60,7 @@ onMounted(() => void employeeAttendanceService.fetchDay())
 
         <div
           v-if="store.anomalies.length > 0"
-          class="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+          class="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-warning"
         >
           <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0" />
           <p>

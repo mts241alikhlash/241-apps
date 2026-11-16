@@ -282,7 +282,7 @@ onMounted(() => fetchReview(true))
   <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
     <p
       v-if="loading"
-      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+      class="text-control text-muted-foreground"
     >
       Memuat berkas pendaftar…
     </p>
@@ -292,7 +292,7 @@ onMounted(() => fetchReview(true))
       role="alert"
       class="space-y-3 rounded-md border p-4"
     >
-      <p class="text-[length:var(--text-control,0.875rem)]">
+      <p class="text-control">
         {{
           error === 'not-found'
             ? 'Pendaftar tidak ditemukan.'
@@ -320,10 +320,7 @@ onMounted(() => fetchReview(true))
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div class="flex items-center gap-3">
           <div class="flex min-w-0 items-center gap-3">
             <BackButton
@@ -343,9 +340,7 @@ onMounted(() => fetchReview(true))
           >
             <div class="border-b bg-muted/10 p-4 shrink-0 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <h2
-                  class="truncate font-semibold text-[length:var(--text-control,0.875rem)] text-foreground"
-                >
+                <h2 class="truncate font-semibold text-control text-foreground">
                   {{ review.applicantName }}
                 </h2>
                 <button
@@ -375,7 +370,7 @@ onMounted(() => fetchReview(true))
 
             <div
               v-if="review.readOnly || review.revisionNote"
-              class="border-b bg-muted/5 p-3 space-y-2.5 shrink-0"
+              class="border-b bg-muted/5 p-3 space-y-3 shrink-0"
             >
               <Alert
                 v-if="review.readOnly"
@@ -426,7 +421,7 @@ onMounted(() => fetchReview(true))
                   v-for="item in review.slots"
                   :key="item.documentTypeId"
                   data-test="slot"
-                  class="group relative flex cursor-pointer flex-col gap-2 border-l-4 p-3.5 text-[length:var(--text-control,0.875rem)] transition-colors sm:p-4"
+                  class="group relative flex cursor-pointer flex-col gap-2 border-l-4 p-3.5 text-control transition-colors sm:p-4"
                   :class="[
                     activeSlot?.documentTypeId === item.documentTypeId
                       ? 'border-l-primary bg-primary/[0.04]'
@@ -454,7 +449,7 @@ onMounted(() => fetchReview(true))
                       >
                         <div class="flex min-w-0 items-center gap-1">
                           <p
-                            class="truncate font-medium text-[length:var(--text-control,0.875rem)]"
+                            class="truncate font-medium text-control"
                             :class="[
                               activeSlot?.documentTypeId === item.documentTypeId
                                 ? 'text-primary'
@@ -507,7 +502,7 @@ onMounted(() => fetchReview(true))
                           v-if="item.document"
                           type="button"
                           data-test="open-file"
-                          class="ml-auto inline-flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
+                          class="ml-auto inline-flex min-h-[var(--control-h-lg,2rem)] shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
                           @click.stop="handleOpenFile(item)"
                         >
                           <Eye class="size-3.5" />
@@ -592,7 +587,7 @@ onMounted(() => fetchReview(true))
               </div>
 
               <div
-                class="flex h-[var(--control-h-md,2rem)] shrink-0 items-center gap-1.5"
+                class="flex h-[var(--control-h-md,1.75rem)] shrink-0 items-center gap-1.5"
               >
                 <template v-if="activeSlot?.document?.file">
                   <Button
@@ -633,7 +628,7 @@ onMounted(() => fetchReview(true))
                     <Button
                       v-if="activeSlot.document.status !== 'APPROVED'"
                       size="sm"
-                      class="bg-emerald-600 px-2.5 text-white hover:bg-emerald-700"
+                      class="bg-success px-2.5 text-white hover:bg-success"
                       :disabled="acting"
                       @click="approve(activeSlot)"
                     >
@@ -658,7 +653,7 @@ onMounted(() => fetchReview(true))
               >
                 <div
                   v-if="inlineLoading"
-                  class="py-16 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                  class="py-16 text-center text-control text-muted-foreground"
                 >
                   Memuat pratinjau…
                 </div>
@@ -666,9 +661,7 @@ onMounted(() => fetchReview(true))
                   v-else-if="inlineError"
                   class="space-y-2 p-6 text-center"
                 >
-                  <p
-                    class="text-[length:var(--text-control,0.875rem)] text-destructive"
-                  >
+                  <p class="text-control text-destructive">
                     {{ inlineError }}
                   </p>
                   <Button
@@ -694,14 +687,14 @@ onMounted(() => fetchReview(true))
                   />
                   <div
                     v-else
-                    class="p-6 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                    class="p-6 text-center text-control text-muted-foreground"
                   >
                     Format berkas tidak dapat ditampilkan langsung.
                   </div>
                 </template>
                 <div
                   v-else
-                  class="p-12 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                  class="p-12 text-center text-control text-muted-foreground"
                 >
                   Dokumen ini belum diunggah oleh calon santri.
                 </div>
@@ -718,7 +711,7 @@ onMounted(() => fetchReview(true))
       >
         <p
           v-if="undecided > 0"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ undecided }} berkas belum diputuskan atau belum diunggah.
         </p>
@@ -820,7 +813,7 @@ onMounted(() => fetchReview(true))
         </DialogHeader>
         <div
           data-test="send-confirm"
-          class="dialog-body text-[length:var(--text-control,0.875rem)] leading-relaxed"
+          class="dialog-body text-control leading-relaxed"
         >
           Pendaftar diberi tahu satu kali dan keputusan berkas tidak bisa diubah
           lagi.

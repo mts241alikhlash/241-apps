@@ -140,7 +140,7 @@ it('adds a file with its PDF and reloads the list', async () => {
   await flushPromises()
 
   await openAdd(wrapper)
-  await wrapper.get('input[name="title"]').setValue('  Brosur PPDB  ')
+  await wrapper.get('input[name="title"]').setValue('  Brosur PPDB ')
   const file = pdf()
   await pick(wrapper, file)
   await submit(wrapper)
@@ -174,7 +174,7 @@ it('refuses a blank title', async () => {
   await flushPromises()
 
   await openAdd(wrapper)
-  await wrapper.get('input[name="title"]').setValue('   ')
+  await wrapper.get('input[name="title"]').setValue(' ')
   await pick(wrapper, pdf())
   await submit(wrapper)
 

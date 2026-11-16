@@ -63,8 +63,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   transform: translateY(-50%);
   padding-inline: 0.125rem;
   background-color: var(--ff-label-bg, var(--background));
-  font-size: 0.625rem;
-  line-height: 0.5rem;
+  font-size: var(--text-label, 0.6875rem);
+  line-height: 0.5625rem;
   font-weight: 400;
   color: color-mix(in oklab, var(--foreground) 70%, transparent);
   pointer-events: none;

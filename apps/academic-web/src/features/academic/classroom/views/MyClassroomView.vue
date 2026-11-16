@@ -50,14 +50,14 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
   <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
     <div
       v-if="loading"
-      class="space-y-5"
+      class="space-y-4"
     >
       <Skeleton class="h-[72px] w-full rounded-2xl" />
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="rounded-2xl border p-5 space-y-3">
           <Skeleton class="h-4 w-32" />
           <Skeleton class="h-px w-full" />
-          <div class="space-y-2.5">
+          <div class="space-y-3">
             <div
               v-for="i in 4"
               :key="i"
@@ -71,7 +71,7 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
         <div class="rounded-2xl border p-5 space-y-3">
           <Skeleton class="h-4 w-32" />
           <Skeleton class="h-px w-full" />
-          <div class="space-y-2.5">
+          <div class="space-y-3">
             <div
               v-for="i in 4"
               :key="i"
@@ -90,7 +90,7 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
           <Skeleton
             v-for="i in 6"
             :key="i"
-            class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
+            class="h-[var(--control-h-lg,2rem)] w-full rounded-lg"
           />
         </div>
       </div>
@@ -115,31 +115,25 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
         gap="none"
         class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
       >
-        <CardHeader
-          standard
-          class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-        >
+        <CardHeader plain>
           <CardTitle size="lg"> Kelas {{ data.classroom.code }} </CardTitle>
         </CardHeader>
 
         <CardContent
           variant="standard"
-          class="space-y-5"
+          class="space-y-4"
         >
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card
               gap="none"
               class="shadow-none"
             >
-              <CardHeader
-                standard
-                class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-              >
+              <CardHeader plain>
                 <div class="flex items-center gap-3">
                   <CardTitle size="md"> Informasi Kelas </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent class="px-5 py-4 space-y-2.5 text-sm">
+              <CardContent class="px-4 py-4 space-y-3">
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-muted-foreground shrink-0">Nama</span>
                   <span class="font-medium text-right">
@@ -188,15 +182,12 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
               gap="none"
               class="shadow-none"
             >
-              <CardHeader
-                standard
-                class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-              >
+              <CardHeader plain>
                 <div class="flex items-center gap-3">
                   <CardTitle size="md"> Struktur Kelas </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent class="px-5 py-4 text-sm">
+              <CardContent class="px-4 py-4">
                 <p
                   v-if="committee(data.structure).length === 0"
                   class="text-muted-foreground"
@@ -205,7 +196,7 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
                 </p>
                 <div
                   v-else
-                  class="space-y-2.5"
+                  class="space-y-3"
                 >
                   <div
                     v-for="seat in committee(data.structure)"
@@ -232,10 +223,7 @@ function supervisorName(supervisor: MyClassroom['supervisor']) {
             gap="none"
             class="shadow-none"
           >
-            <CardHeader
-              standard
-              class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-            >
+            <CardHeader plain>
               <div class="flex items-center gap-3">
                 <div class="flex items-center gap-2">
                   <CardTitle size="md"> Teman Sekelas </CardTitle>

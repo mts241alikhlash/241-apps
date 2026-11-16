@@ -22,7 +22,7 @@ const sorted = computed(() =>
   >
     <p
       v-if="shortWarning"
-      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
       role="alert"
     >
       {{ shortWarning }}
@@ -34,18 +34,18 @@ const sorted = computed(() =>
     >
       <p
         v-if="schoolName"
-        class="text-[length:var(--text-control,0.875rem)] uppercase"
+        class="text-control uppercase"
       >
         {{ schoolName }}
       </p>
       <p class="font-medium">
         {{ row.studentName ?? 'Siswa tidak ditemukan' }}
       </p>
-      <p class="tabular-nums text-[length:var(--text-control,0.875rem)]">
+      <p class="tabular-nums text-control">
         NIS {{ row.nis ?? '-' }} · {{ row.classroomName ?? '-' }}
       </p>
       <div class="flex items-baseline justify-between pt-2">
-        <span class="text-[length:var(--text-control,0.875rem)]">
+        <span class="text-control">
           {{ roomLabel }}
         </span>
         <span class="text-xl font-semibold tabular-nums">
@@ -61,7 +61,7 @@ const sorted = computed(() =>
   >
     <p
       v-if="shortWarning"
-      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
       role="alert"
     >
       {{ shortWarning }}
@@ -73,13 +73,9 @@ const sorted = computed(() =>
       >
         {{ schoolName }}
       </p>
-      <p class="text-[length:var(--text-control,0.875rem)]">
-        Daftar Meja {{ roomLabel }}
-      </p>
+      <p class="text-control">Daftar Meja {{ roomLabel }}</p>
     </div>
-    <table
-      class="w-full border-collapse text-[length:var(--text-control,0.875rem)]"
-    >
+    <table class="w-full border-collapse text-control">
       <thead>
         <tr class="border-y border-black">
           <th class="py-1 text-center">Kursi</th>

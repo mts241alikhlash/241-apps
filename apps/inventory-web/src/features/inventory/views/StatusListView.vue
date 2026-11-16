@@ -140,7 +140,7 @@ onMounted(() => {
 
 <template>
   <div class="p-6 space-y-6">
-    <Card class="border-slate-200 shadow-sm">
+    <Card class="border-border shadow-sm">
       <CardHeader
         class="flex flex-row items-center justify-between pb-4 border-b"
       >

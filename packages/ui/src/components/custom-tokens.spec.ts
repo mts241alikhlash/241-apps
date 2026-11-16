@@ -8,7 +8,7 @@ import BackButton from './BackButton.vue'
 import DatePicker from './DatePicker.vue'
 import SearchInput from './SearchInput.vue'
 
-const md = 'h-[var(--control-h-md,2rem)]'
+const md = 'h-[var(--control-h-md,1.75rem)]'
 
 const source = (name: string) =>
   readFileSync(fileURLToPath(new URL(name, import.meta.url)), 'utf8')
@@ -78,7 +78,7 @@ describe('custom components on the control tokens', () => {
 
   it('back button is a md square', () => {
     const w = mount(BackButton, { props: { label: 'Kembali' } })
-    expect(w.classes()).toContain('size-[var(--control-h-md,2rem)]')
+    expect(w.classes()).toContain('size-[var(--control-h-md,1.75rem)]')
   })
 
   it('floating field hides the placeholder text of a date trigger while it is empty', () => {
@@ -109,19 +109,19 @@ describe('custom components on the control tokens', () => {
     )
   })
 
-  it('floating field label rests in the middle of a md control and floats at 10px', () => {
+  it('floating field label rests in the middle of a md control and floats at 11px', () => {
     const css = source('./ui/form/FloatingLabelField.vue')
     expect(css).toContain(
       'top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px)',
     )
     expect(css).toContain('font-size: var(--text-control, 0.75rem)')
-    expect(css).toContain('font-size: 0.625rem')
+    expect(css).toContain('font-size: var(--text-label, 0.6875rem)')
   })
 
   it('the command input uses the control height token and the number and tags inputs keep the Mira text-sm', () => {
     const command = source('ui/command/CommandInput.vue')
     expect(command).not.toMatch(/\bh-9\b/)
-    expect(command).toContain('h-[var(--control-h-lg,2.25rem)]')
+    expect(command).toContain('h-[var(--control-h-lg,2rem)]')
     for (const file of [
       'ui/number-field/NumberFieldInput.vue',
       'ui/tags-input/TagsInputInput.vue',

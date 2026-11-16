@@ -82,7 +82,7 @@ onMounted(async () => {
         <Skeleton
           v-for="i in 8"
           :key="i"
-          class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
+          class="h-[var(--control-h-lg,2rem)] w-full rounded-lg"
         />
       </div>
     </div>
@@ -92,10 +92,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Mata Pelajaran Saya </CardTitle>
       </CardHeader>
 
@@ -104,7 +101,7 @@ onMounted(async () => {
           v-if="!classroomCode"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             Anda belum terdaftar di kelas pada semester ini. Mata pelajaran akan
             muncul setelah Anda terdaftar di sebuah kelas.
           </CardContent>

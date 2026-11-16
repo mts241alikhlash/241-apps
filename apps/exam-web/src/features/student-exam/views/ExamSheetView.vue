@@ -289,7 +289,7 @@ function statusOf(question: PaperQuestion | null): string {
         class="flex min-w-0 items-center gap-2"
       >
         <span
-          class="rounded-md border border-border bg-muted px-2 py-1 text-[length:var(--text-control)] font-semibold tabular-nums"
+          class="rounded-md border border-border bg-muted px-2 py-1 text-control font-semibold tabular-nums"
           :class="
             remainingLabel <= '05:00' ? 'text-destructive' : 'text-foreground'
           "
@@ -297,11 +297,11 @@ function statusOf(question: PaperQuestion | null): string {
           {{ remainingLabel }}
         </span>
         <span
-          class="truncate rounded-md border px-2 py-1 text-[length:var(--text-control)] font-medium"
+          class="truncate rounded-md border px-2 py-1 text-control font-medium"
           :class="
             sync.pendingCount === 0
-              ? 'border-green-600 text-green-700'
-              : 'border-amber-500 text-amber-700'
+              ? 'border-success text-success'
+              : 'border-warning text-warning'
           "
         >
           {{ syncSummaryLabel }}
@@ -334,14 +334,14 @@ function statusOf(question: PaperQuestion | null): string {
         >
           <p
             v-if="notStored"
-            class="text-[length:var(--text-control)] text-amber-700"
+            class="text-control text-warning"
           >
             Ujian sudah berakhir di server. Jawaban terakhir belum tersimpan dan
             masih menunggu koneksi.
           </p>
           <p
             v-else
-            class="text-[length:var(--text-control)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Jawaban Anda tersimpan. Menunggu penilaian guru bila ada soal
             uraian.
@@ -361,7 +361,7 @@ function statusOf(question: PaperQuestion | null): string {
           class="shrink-0 overflow-hidden"
         >
           <CardContent variant="standard">
-            <p class="text-[length:var(--text-control)] text-destructive">
+            <p class="text-control text-destructive">
               {{ error }}
             </p>
           </CardContent>
@@ -378,16 +378,14 @@ function statusOf(question: PaperQuestion | null): string {
             <CardHeader standard>
               <CardTitle>Soal {{ index + 1 }}</CardTitle>
               <div class="flex items-center gap-2">
-                <span
-                  class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-                >
+                <span class="text-control text-muted-foreground">
                   {{ statusOf(current) }}
                 </span>
                 <Button
                   v-if="!wide"
                   variant="outline"
                   size="sm"
-                  class="min-h-[var(--control-h-lg,2.25rem)]"
+                  class="min-h-[var(--control-h-lg,2rem)]"
                   @click="showList = true"
                 >
                   Daftar Soal
@@ -408,7 +406,7 @@ function statusOf(question: PaperQuestion | null): string {
             >
               <p
                 v-if="current.type === 'MULTIPLE_RESPONSE'"
-                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                class="text-control text-muted-foreground"
               >
                 Pilih semua jawaban yang benar
               </p>
@@ -418,7 +416,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keyOf(current) === choice.key
                       ? 'border-primary bg-primary/[0.06]'
@@ -428,7 +426,7 @@ function statusOf(question: PaperQuestion | null): string {
                   @click="choose(current, { key: choice.key })"
                 >
                   <span
-                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-control font-semibold"
                     :class="
                       keyOf(current) === choice.key
                         ? 'border-primary bg-primary text-primary-foreground'
@@ -446,16 +444,14 @@ function statusOf(question: PaperQuestion | null): string {
               </template>
 
               <template v-else-if="current.type === 'MULTIPLE_RESPONSE'">
-                <p
-                  class="text-[length:var(--text-control)] text-muted-foreground"
-                >
+                <p class="text-control text-muted-foreground">
                   Pilih semua jawaban yang benar
                 </p>
                 <button
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keysOf(current).includes(choice.key)
                       ? 'border-primary bg-primary/[0.06]'
@@ -465,7 +461,7 @@ function statusOf(question: PaperQuestion | null): string {
                   @click="toggleMulti(current, choice.key)"
                 >
                   <span
-                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-control font-semibold"
                     :class="
                       keysOf(current).includes(choice.key)
                         ? 'border-primary bg-primary text-primary-foreground'
@@ -490,7 +486,7 @@ function statusOf(question: PaperQuestion | null): string {
                   ]"
                   :key="option.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)]"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)]"
                   :class="
                     boolOf(current) === option.value
                       ? 'border-primary bg-primary/[0.06]'
@@ -500,7 +496,7 @@ function statusOf(question: PaperQuestion | null): string {
                   @click="choose(current, { value: option.value })"
                 >
                   <span
-                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-[length:var(--text-control)] font-semibold"
+                    class="flex w-[var(--control-h-md)] shrink-0 items-center justify-center self-stretch border-r text-control font-semibold"
                     :class="
                       boolOf(current) === option.value
                         ? 'border-primary bg-primary text-primary-foreground'
@@ -509,9 +505,7 @@ function statusOf(question: PaperQuestion | null): string {
                   >
                     {{ option.key }}
                   </span>
-                  <span
-                    class="min-w-0 flex-1 px-2.5 py-1.5 text-[length:var(--text-control)]"
-                  >
+                  <span class="min-w-0 flex-1 px-2.5 py-1.5 text-control">
                     {{ option.label }}
                   </span>
                 </button>
@@ -537,7 +531,7 @@ function statusOf(question: PaperQuestion | null): string {
               <Button
                 variant="outline"
                 size="sm"
-                class="min-h-[var(--control-h-lg,2.25rem)] shrink-0"
+                class="min-h-[var(--control-h-lg,2rem)] shrink-0"
                 :disabled="index === 0 || submitting"
                 @click="go(index - 1)"
               >
@@ -546,10 +540,10 @@ function statusOf(question: PaperQuestion | null): string {
 
               <button
                 type="button"
-                class="flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1.5 rounded-md border px-3 text-[length:var(--text-control)] font-medium transition-colors motion-reduce:transition-none"
+                class="flex min-h-[var(--control-h-lg,2rem)] shrink-0 items-center gap-1.5 rounded-md border px-3 text-control font-medium transition-colors motion-reduce:transition-none"
                 :class="
                   doubtful.has(current.id)
-                    ? 'border-amber-500 bg-amber-50 text-amber-700'
+                    ? 'border-warning bg-warning/10 text-warning'
                     : 'border-input bg-card text-muted-foreground'
                 "
                 :disabled="controlsLocked"
@@ -557,18 +551,16 @@ function statusOf(question: PaperQuestion | null): string {
               >
                 <span
                   class="size-2.5 rounded-sm"
-                  :class="
-                    doubtful.has(current.id) ? 'bg-amber-500' : 'bg-input'
-                  "
+                  :class="doubtful.has(current.id) ? 'bg-warning' : 'bg-input'"
                 />
                 Ragu-ragu
               </button>
 
               <Button
-                class="ml-auto min-h-[var(--control-h-lg,2.25rem)] shrink-0 font-semibold"
+                class="ml-auto min-h-[var(--control-h-lg,2rem)] shrink-0 font-semibold"
                 :class="
                   isLast
-                    ? 'bg-green-700 text-white hover:bg-green-800'
+                    ? 'bg-success text-white hover:bg-success'
                     : 'bg-primary text-primary-foreground'
                 "
                 :disabled="controlsLocked || (isLast && !canSubmit)"
@@ -619,13 +611,13 @@ function statusOf(question: PaperQuestion | null): string {
           </DialogDescription>
           <p
             v-if="gateNotice"
-            class="text-[length:var(--text-control)] text-amber-700"
+            class="text-control text-warning"
           >
             {{ gateNotice }}
           </p>
           <p
             v-if="submitError"
-            class="text-[length:var(--text-control)] text-destructive"
+            class="text-control text-destructive"
           >
             {{ submitError }}
           </p>

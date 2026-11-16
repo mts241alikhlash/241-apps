@@ -83,7 +83,7 @@ h2 {
   padding-inline: 1.5rem;
   background: #e5cc87;
   color: #162d53;
-  font-weight: 700;
+  font-weight: 600;
 }
 .closing-button:hover {
   background: #f0db9f;

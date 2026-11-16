@@ -146,9 +146,9 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
         >
           <Alert
             variant="default"
-            class="border-emerald-200 bg-emerald-50 text-emerald-800"
+            class="border-success/30 bg-success/10 text-success"
           >
-            <CheckCircle2 class="size-4 text-emerald-600" />
+            <CheckCircle2 class="size-4 text-success" />
             <AlertDescription class="font-medium">
               Penyalinan berhasil! {{ totalCreated }} data disalin,
               {{ totalSkipped }} data dilewati.
@@ -158,7 +158,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
           <div class="rounded-lg border overflow-hidden">
             <table class="w-full text-sm">
               <thead>
-                <tr class="border-b bg-muted/50">
+                <tr class="border-b bg-table-header">
                   <th
                     class="px-4 py-2.5 text-left font-medium text-muted-foreground"
                   >
@@ -186,8 +186,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                   <td class="px-4 py-3 text-center">
                     <Badge
                       v-if="row.created > 0"
-                      variant="default"
-                      class="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                      variant="success"
                     >
                       +{{ row.created }}
                     </Badge>
@@ -200,8 +199,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                   <td class="px-4 py-3 text-center">
                     <Badge
                       v-if="row.skipped > 0"
-                      variant="secondary"
-                      class="bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200"
+                      variant="warning"
                     >
                       {{ row.skipped }}
                     </Badge>
@@ -238,7 +236,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
             <div class="flex items-center justify-between gap-3">
               <Badge
                 variant="outline"
-                class="px-3 py-1.5 text-sm bg-background flex-1 justify-center truncate"
+                class="flex-1 justify-center truncate"
               >
                 {{
                   sourceSemester
@@ -252,8 +250,8 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                 <ArrowRight class="size-4" />
               </div>
               <Badge
-                variant="outline"
-                class="px-3 py-1.5 text-sm bg-background border-primary/20 text-primary flex-1 justify-center truncate"
+                variant="default"
+                class="flex-1 justify-center truncate"
               >
                 {{
                   targetSemester
@@ -266,7 +264,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
 
           <p
             v-if="sourceSemester && !targetSemester"
-            class="text-xs text-amber-600 dark:text-amber-400 text-center"
+            class="text-xs text-warning text-center"
           >
             Semester Genap untuk tahun ajaran ini belum dibuat.
           </p>

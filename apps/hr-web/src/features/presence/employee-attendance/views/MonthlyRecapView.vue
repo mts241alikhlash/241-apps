@@ -69,10 +69,7 @@ onMounted(() => void employeeAttendanceService.fetchRecap())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Rekap Kehadiran Bulanan </CardTitle>
         <Button
           variant="outline"
@@ -117,7 +114,7 @@ onMounted(() => void employeeAttendanceService.fetchRecap())
 
           <div
             v-if="store.recap"
-            class="flex flex-wrap items-center gap-2.5 md:ml-auto"
+            class="flex flex-wrap items-center gap-3 md:ml-auto"
           >
             <div
               class="inline-flex items-center gap-1.5 rounded-md border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground"
@@ -132,12 +129,8 @@ onMounted(() => void employeeAttendanceService.fetchRecap())
             </div>
 
             <Badge
-              variant="outline"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium shadow-none"
-              :class="
-                store.recap.period.status === 'CLOSED'
-                  ? 'border-amber-300/80 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
-                  : 'border-emerald-300/80 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+              :variant="
+                store.recap.period.status === 'CLOSED' ? 'warning' : 'success'
               "
             >
               <component

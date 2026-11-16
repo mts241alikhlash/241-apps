@@ -131,7 +131,7 @@ async function submit() {
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ error }}
@@ -242,9 +242,7 @@ async function submit() {
           />
         </FloatingLabelField>
 
-        <p
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           Sesi yang sudah selesai dihitung ulang dan nilainya dikirim ulang.
         </p>
       </DialogBody>

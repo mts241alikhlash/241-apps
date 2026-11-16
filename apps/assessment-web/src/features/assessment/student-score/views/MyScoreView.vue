@@ -139,7 +139,7 @@ onMounted(() => void load())
           v-if="!loading && sortedRows.length === 0"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             Belum ada penilaian untuk Anda pada semester ini. Nilai muncul di
             sini setelah guru membuat penilaian dan mengisinya.
           </CardContent>

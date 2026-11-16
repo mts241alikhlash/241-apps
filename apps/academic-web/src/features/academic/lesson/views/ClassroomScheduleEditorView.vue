@@ -203,20 +203,20 @@ onMounted(fetchData)
         class="p-6 space-y-6"
       >
         <Skeleton
-          class="h-[var(--control-h-lg,2.25rem)] w-full max-w-md rounded-lg"
+          class="h-[var(--control-h-lg,2rem)] w-full max-w-md rounded-lg"
         />
         <div class="rounded-md border bg-card p-4 space-y-4">
           <div class="flex gap-4 border-b pb-4">
             <Skeleton
               v-for="i in 4"
               :key="i"
-              class="h-[var(--control-h-md,2rem)] flex-1"
+              class="h-[var(--control-h-md,1.75rem)] flex-1"
             />
           </div>
           <Skeleton
             v-for="i in 5"
             :key="i"
-            class="h-[var(--control-h-lg,2.25rem)] w-full"
+            class="h-[var(--control-h-lg,2rem)] w-full"
           />
         </div>
       </div>
@@ -245,7 +245,7 @@ onMounted(fetchData)
             <div class="rounded-md border bg-card">
               <Table>
                 <TableHeader>
-                  <TableRow class="bg-muted/50 hover:bg-muted/50">
+                  <TableRow>
                     <TableHead
                       class="w-[50px] text-center px-4 font-semibold text-foreground"
                     >
@@ -289,10 +289,7 @@ onMounted(fetchData)
                       </TableCell>
 
                       <TableCell class="py-3 px-4">
-                        <Badge
-                          :variant="slotTypeBadgeVariant(item.slot.type)"
-                          class="text-xs"
-                        >
+                        <Badge :variant="slotTypeBadgeVariant(item.slot.type)">
                           {{ slotTypeLabel(item.slot.type) }}
                         </Badge>
                       </TableCell>

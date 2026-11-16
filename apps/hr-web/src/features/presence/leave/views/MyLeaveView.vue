@@ -91,10 +91,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Izin & Cuti Saya </CardTitle>
         <Button @click="open = true">
           <Plus class="h-4 w-4" />
@@ -124,7 +121,7 @@ onMounted(() => {
             </div>
 
             <div>
-              <p class="text-2xl font-bold tracking-tight text-foreground">
+              <p class="text-2xl font-semibold tracking-tight text-foreground">
                 {{ balance.remaining }}
                 <span class="text-xs font-normal text-muted-foreground">
                   sisa hari
@@ -170,7 +167,7 @@ onMounted(() => {
             <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div class="space-y-1">
                 <Label for="leave-type">
-                  Jenis <span class="text-red-500">*</span>
+                  Jenis <span class="text-destructive">*</span>
                 </Label>
                 <Select v-model="leaveTypeId">
                   <SelectTrigger
@@ -191,7 +188,7 @@ onMounted(() => {
                 </Select>
                 <p
                   v-if="selectedType?.requiresDocument"
-                  class="pt-1 text-xs font-medium text-amber-600"
+                  class="pt-1 text-xs font-medium text-warning"
                 >
                   Jenis ini memerlukan surat pendukung.
                 </p>
@@ -199,18 +196,18 @@ onMounted(() => {
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="space-y-1">
-                  <Label>Mulai <span class="text-red-500">*</span></Label>
+                  <Label>Mulai <span class="text-destructive">*</span></Label>
                   <DatePicker v-model="startDate" />
                 </div>
                 <div class="space-y-1">
-                  <Label>Sampai <span class="text-red-500">*</span></Label>
+                  <Label>Sampai <span class="text-destructive">*</span></Label>
                   <DatePicker v-model="endDate" />
                 </div>
               </div>
 
               <div class="space-y-1">
                 <Label for="leave-reason">
-                  Alasan <span class="text-red-500">*</span>
+                  Alasan <span class="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="leave-reason"

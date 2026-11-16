@@ -41,7 +41,7 @@ describe('MathPreview', () => {
         .exists(),
     ).toBe(true)
     expect(
-      mount(MathPreview, { props: { latex: '  ' } })
+      mount(MathPreview, { props: { latex: ' ' } })
         .find('.katex')
         .exists(),
     ).toBe(false)

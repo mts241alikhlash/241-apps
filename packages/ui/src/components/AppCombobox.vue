@@ -66,7 +66,7 @@ function onSelect(val: string) {
         :disabled="disabled"
         :class="
           cn(
-            'h-[var(--control-h-md,2rem)] w-full justify-between border-input bg-transparent hover:bg-transparent aria-expanded:bg-transparent aria-expanded:border-ring font-normal',
+            'h-[var(--control-h-md,1.75rem)] w-full justify-between border-input bg-transparent hover:bg-transparent aria-expanded:bg-transparent aria-expanded:border-ring font-normal',
             !modelValue && 'text-muted-foreground',
             props.class,
           )
@@ -74,7 +74,7 @@ function onSelect(val: string) {
       >
         <span class="truncate">{{ selectedLabel || placeholder }}</span>
         <ChevronsUpDown
-          class="ml-2 size-[var(--icon-control,1rem)] shrink-0 opacity-50"
+          class="ml-2 size-[var(--icon-control,0.875rem)] shrink-0 opacity-50"
         />
       </Button>
     </PopoverTrigger>
@@ -96,7 +96,7 @@ function onSelect(val: string) {
               <Check
                 :class="
                   cn(
-                    'size-[var(--icon-control,1rem)]',
+                    'size-[var(--icon-control,0.875rem)]',
                     modelValue === opt.value ? 'opacity-100' : 'opacity-0',
                   )
                 "

@@ -144,13 +144,13 @@ onMounted(async () => {
         <div class="hidden lg:flex lg:flex-row lg:items-center gap-3">
           <template v-if="academicYearLabel">
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)]"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)]"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -158,7 +158,7 @@ onMounted(async () => {
           </template>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)] text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -190,13 +190,13 @@ onMounted(async () => {
             class="flex items-center justify-center gap-2"
           >
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -204,7 +204,7 @@ onMounted(async () => {
           </div>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -236,7 +236,7 @@ onMounted(async () => {
           v-if="!isFilterReady"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             {{
               !selectedSemesterId
                 ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
@@ -258,7 +258,7 @@ onMounted(async () => {
       >
         <p
           v-if="undecidedCount > 0"
-          class="mr-auto text-sm text-amber-600 dark:text-amber-400"
+          class="mr-auto text-sm text-warning"
         >
           {{ undecidedCount }} siswa belum dipastikan kehadirannya
         </p>

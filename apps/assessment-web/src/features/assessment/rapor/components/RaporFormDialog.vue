@@ -21,9 +21,7 @@ const props = defineProps<{
   rapor: RaporData | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
 const { updateRapor, isSaving } = useRapor()
 

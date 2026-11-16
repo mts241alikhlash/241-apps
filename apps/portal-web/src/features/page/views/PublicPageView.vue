@@ -32,7 +32,7 @@ watch(
       <Loader2 class="size-4 animate-spin" />
       Memuat…
     </div>
-    <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-2/3" />
+    <Skeleton class="h-[var(--control-h-lg,2rem)] w-2/3" />
     <Skeleton class="h-px w-full" />
     <div class="space-y-2">
       <Skeleton class="h-4 w-full" />
@@ -52,16 +52,16 @@ watch(
 
   <article
     v-else-if="store.publicPage"
-    class="space-y-8"
+    class="space-y-6"
   >
-    <h1 class="text-3xl font-bold leading-tight tracking-tight">
+    <h1 class="text-3xl font-semibold leading-tight tracking-tight">
       {{ store.publicPage.title }}
     </h1>
 
     <Separator />
 
     <SafeHtml
-      class="prose prose-neutral max-w-none dark:prose-invert"
+      class="prose prose-neutral max-w-none"
       :html="store.publicPage.body"
     />
   </article>

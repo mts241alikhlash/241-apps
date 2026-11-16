@@ -142,7 +142,7 @@ const {
                 moduleName
               }}</span>
               <span
-                class="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold whitespace-nowrap shrink-0"
+                class="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold whitespace-nowrap shrink-0"
               >
                 {{
                   modulePerms.filter((p) => permissionIds?.includes(p.id))
@@ -157,6 +157,9 @@ const {
               variant="ghost"
               size="icon"
               class="size-8 text-muted-foreground hover:text-foreground"
+              :aria-label="
+                expandedGroups[moduleName] ? 'Tutup modul' : 'Buka modul'
+              "
               @click="toggleGroup(moduleName)"
             >
               <ChevronUp

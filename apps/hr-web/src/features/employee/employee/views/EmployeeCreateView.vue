@@ -108,7 +108,7 @@ const {
           >
             Langkah {{ activeStep }} dari {{ steps.length }}
           </span>
-          <p class="text-sm font-bold text-foreground">
+          <p class="text-sm font-semibold text-foreground">
             {{ steps.find((s) => s.value === activeStep)?.title }}
           </p>
         </div>

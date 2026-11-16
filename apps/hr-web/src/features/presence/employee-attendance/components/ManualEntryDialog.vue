@@ -116,7 +116,7 @@ async function submit() {
       <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
         <div class="space-y-1">
           <Label for="manual-user">
-            Pegawai <span class="text-red-500">*</span>
+            Pegawai <span class="text-destructive">*</span>
           </Label>
           <AppCombobox
             v-model="userId"
@@ -177,7 +177,7 @@ async function submit() {
 
         <div class="space-y-1">
           <Label for="manual-reason">
-            Alasan <span class="text-red-500">*</span>
+            Alasan <span class="text-destructive">*</span>
           </Label>
           <Textarea
             id="manual-reason"

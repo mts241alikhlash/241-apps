@@ -30,10 +30,7 @@ const props = defineProps<{
   room?: ExamRoom | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  saved: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
 const form = useRoomForm(
   () => props.eventId,
@@ -73,7 +70,7 @@ onMounted(async () => {
       <DialogBody class="space-y-4">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ form.error.value }}
@@ -162,7 +159,7 @@ onMounted(async () => {
 
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

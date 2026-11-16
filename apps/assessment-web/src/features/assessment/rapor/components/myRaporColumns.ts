@@ -64,8 +64,7 @@ export const createMyRaporColumns = (
         Badge,
         {
           variant: 'outline',
-          class:
-            'border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+          class: 'border-success bg-success/10 text-success',
         },
         () => 'Terbit',
       ),

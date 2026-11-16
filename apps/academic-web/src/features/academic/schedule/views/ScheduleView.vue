@@ -40,7 +40,7 @@ onMounted(init)
 </script>
 
 <template>
-  <div class="p-2 pt-0 md:p-6 md:pt-4 lg:p-8 space-y-5">
+  <div class="p-2 pt-0 md:p-6 md:pt-4 lg:p-8 space-y-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <ScheduleHeader
         class="flex-1"

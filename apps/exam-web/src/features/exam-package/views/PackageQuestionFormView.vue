@@ -358,7 +358,7 @@ async function confirmSave() {
         <template v-if="isEdit">
           <dl
             v-if="detail"
-            class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[length:var(--text-control,0.875rem)]"
+            class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-control"
           >
             <div class="flex items-baseline gap-1.5">
               <dt class="text-muted-foreground">Jenis</dt>
@@ -374,7 +374,7 @@ async function confirmSave() {
 
           <div
             v-if="note"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="status"
           >
             Catatan penyetuju: {{ note }}
@@ -382,7 +382,7 @@ async function confirmSave() {
 
           <template v-if="!canEdit">
             <div
-              class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
+              class="rounded-md border bg-muted/30 p-3 text-control"
               role="status"
             >
               Paket ini tidak bisa diubah. Anda hanya bisa melihat soalnya.
@@ -417,7 +417,7 @@ async function confirmSave() {
                   min="0.25"
                   max="100"
                   step="0.25"
-                  class="h-[var(--control-h-sm,1.75rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  class="h-[var(--control-h-sm, 1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   @update:model-value="setEditPoints"
                 />
               </template>
@@ -434,7 +434,7 @@ async function confirmSave() {
         <template v-else>
           <div
             v-if="!canEdit"
-            class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border bg-muted/30 p-3 text-control"
             role="status"
           >
             Paket ini tidak bisa diubah, jadi soal baru tidak bisa ditambahkan.
@@ -545,7 +545,7 @@ async function confirmSave() {
                         min="0.25"
                         max="100"
                         step="0.25"
-                        class="h-[var(--control-h-sm,1.75rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        class="h-[var(--control-h-sm, 1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         @update:model-value="
                           (value) => setCardPoints(activeCard, value)
                         "
@@ -562,7 +562,7 @@ async function confirmSave() {
 
                   <p
                     v-if="activeCard.error"
-                    class="text-[length:var(--text-control,0.875rem)] text-destructive"
+                    class="text-control text-destructive"
                     role="alert"
                   >
                     {{ activeCard.error }}
@@ -575,7 +575,7 @@ async function confirmSave() {
 
         <p
           v-if="formError"
-          class="text-[length:var(--text-control,0.875rem)] text-destructive"
+          class="text-control text-destructive"
           role="alert"
         >
           {{ formError }}
@@ -599,7 +599,7 @@ async function confirmSave() {
 
     <div
       v-if="!loading && canEdit && !isEdit"
-      class="mt-2 flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
+      class="mt-2 flex min-h-[var(--control-h-lg, 2rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
     >
       <div class="flex flex-wrap items-center gap-2">
         <Button
@@ -676,7 +676,7 @@ async function confirmSave() {
         </DialogHeader>
         <DialogBody class="space-y-3">
           <dl
-            class="grid grid-cols-[6rem_auto_1fr] items-center gap-x-2 gap-y-2 text-[length:var(--text-control,0.875rem)]"
+            class="grid grid-cols-[6rem_auto_1fr] items-center gap-x-2 gap-y-2 text-control"
           >
             <dt class="text-muted-foreground">Paket</dt>
             <dd class="text-muted-foreground">:</dd>
@@ -719,7 +719,7 @@ async function confirmSave() {
           </dl>
           <p
             v-if="formError"
-            class="text-[length:var(--text-control,0.875rem)] text-destructive"
+            class="text-control text-destructive"
             role="alert"
           >
             {{ formError }}

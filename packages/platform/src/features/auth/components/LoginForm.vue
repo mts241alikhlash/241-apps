@@ -34,7 +34,7 @@ function startGoogleSignIn() {
     @submit.prevent="onSubmit"
   >
     <div class="flex flex-col items-center gap-1 text-center">
-      <h1 class="text-2xl font-bold">{{ loginTitle }}</h1>
+      <h1 class="text-2xl font-semibold">{{ loginTitle }}</h1>
       <p class="text-muted-foreground text-sm text-balance">
         {{ loginSubtitle }}
       </p>
@@ -157,7 +157,7 @@ function startGoogleSignIn() {
         <router-link
           data-testid="login-signup-link"
           :to="signUpUrl"
-          class="text-primary font-bold underline underline-offset-4"
+          class="text-primary font-semibold underline underline-offset-4"
         >
           Daftar sekarang
         </router-link>

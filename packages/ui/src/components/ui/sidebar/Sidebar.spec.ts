@@ -12,19 +12,19 @@ describe('sidebar items', () => {
   it('menu button is muted until active', () => {
     const c = sidebarMenuButtonVariants()
     expect(c).toContain('text-muted-foreground')
-    expect(c).toContain('data-[active=true]:text-sidebar-accent-foreground')
+    expect(c).toContain('data-[active=true]:text-primary')
     expect(c).toContain('data-[active=true]:bg-sidebar-accent')
-    expect(c).toContain('data-[active=true]:font-medium')
+    expect(c).not.toContain('data-[active=true]:font-medium')
     expect(c).toContain('hover:text-sidebar-accent-foreground')
     expect(c).not.toMatch(/(^| )text-sidebar-foreground/)
   })
 
   it('menu buttons use the Mira sizes and a visible focus outline', () => {
     expect(sidebarMenuButtonVariants()).toContain(
-      'h-[var(--control-h-md,2rem)]',
+      'h-[var(--control-h-md,1.75rem)]',
     )
     expect(sidebarMenuButtonVariants({ size: 'sm' })).toContain(
-      'h-[var(--control-h-sm,1.75rem)]',
+      'h-[var(--control-h-sm,1.5rem)]',
     )
     expect(sidebarMenuButtonVariants({ size: 'lg' })).toContain('h-12')
     const c = sidebarMenuButtonVariants()
@@ -47,11 +47,14 @@ describe('sidebar items', () => {
     expect(w.classes()).toEqual(
       expect.arrayContaining([
         'text-muted-foreground',
-        'h-[var(--control-h-sm,1.75rem)]',
+        'h-[var(--control-h-sm,1.5rem)]',
         'rounded-md',
       ]),
     )
-    expect(w.classes().join(' ')).toContain('data-[active=true]:font-medium')
+    expect(w.classes().join(' ')).toContain('data-[active=true]:text-primary')
+    expect(w.classes().join(' ')).not.toContain(
+      'data-[active=true]:font-medium',
+    )
     const active = mount(SidebarMenuSubButton, { props: { isActive: true } })
     expect(active.attributes('data-active')).toBe('true')
   })

@@ -138,7 +138,7 @@ onUnmounted(() => {
 
     <div
       v-if="queue.pendingCount.value > 0"
-      class="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-amber-950"
+      class="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-warning px-4 py-2 text-sm font-semibold text-warning-foreground"
     >
       <CloudOff class="h-4 w-4" />
       {{ queue.pendingCount.value }} scan menunggu koneksi
@@ -155,9 +155,9 @@ onUnmounted(() => {
       v-else-if="lastResult"
       class="flex w-full max-w-2xl flex-col items-center gap-6 rounded-2xl p-12 text-center"
       :class="{
-        'bg-emerald-500/10 ring-4 ring-emerald-500': accepted,
+        'bg-success ring-4 ring-success': accepted,
         'bg-slate-800 ring-4 ring-slate-600': duplicate || lastQueued,
-        'bg-red-500/10 ring-4 ring-red-500': rejected,
+        'bg-destructive ring-4 ring-destructive': rejected,
       }"
     >
       <img
@@ -170,16 +170,16 @@ onUnmounted(() => {
       <div class="space-y-2">
         <p
           v-if="lastResult.person"
-          class="text-5xl font-bold text-white"
+          class="text-5xl font-semibold text-white"
         >
           {{ lastResult.person.displayName ?? 'Tanpa nama' }}
         </p>
         <p
           class="text-3xl font-semibold"
           :class="{
-            'text-emerald-400': accepted,
+            'text-success': accepted,
             'text-slate-300': duplicate || lastQueued,
-            'text-red-400': rejected,
+            'text-destructive': rejected,
           }"
         >
           {{ headline }}

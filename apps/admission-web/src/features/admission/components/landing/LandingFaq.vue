@@ -25,7 +25,7 @@ const { target, visible } = useInView()
     class="scroll-mt-14 bg-white py-14 sm:py-20 lg:flex lg:min-h-[calc(100svh-3.5rem)] lg:items-center lg:py-8"
   >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-6">
         <h2
           class="max-w-xl font-[Georgia,serif] text-4xl font-normal leading-[1.1] tracking-tight text-[#203f73] sm:text-5xl"
         >
@@ -52,7 +52,7 @@ const { target, visible } = useInView()
             :style="{ transitionDelay: `${(index * 2 + columnIndex) * 70}ms` }"
           >
             <summary
-              class="flex min-h-16 cursor-pointer list-none items-center justify-between gap-5 py-4 text-left text-sm font-semibold text-[#203f73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#203f73] marker:content-none sm:text-base"
+              class="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-semibold text-[#203f73] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#203f73] marker:content-none sm:text-base"
             >
               {{ item.question }}
               <ChevronDown

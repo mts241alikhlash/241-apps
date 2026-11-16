@@ -45,7 +45,7 @@ const { target, visible } = useInView()
     class="scroll-mt-14 bg-white py-14 sm:py-20 lg:flex lg:min-h-[calc(100svh-3.5rem)] lg:items-center lg:py-8"
   >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-6">
         <h2
           class="max-w-xl font-[Georgia,serif] text-4xl font-normal leading-[1.1] tracking-tight text-[#203f73] sm:text-5xl"
         >
@@ -79,7 +79,7 @@ const { target, visible } = useInView()
           class="size-7 text-[#203f73]"
           aria-hidden="true"
         />
-        <h3 class="mt-4 text-lg font-bold text-[#203f73]">
+        <h3 class="mt-4 text-lg font-semibold text-[#203f73]">
           Belum ada gelombang yang dibuka
         </h3>
         <p class="mt-2 max-w-md text-sm leading-6 text-slate-700">
@@ -104,7 +104,7 @@ const { target, visible } = useInView()
           <div class="flex flex-wrap items-start justify-between gap-6">
             <div>
               <p
-                class="flex items-center gap-2 text-xs font-bold text-[#203f73]"
+                class="flex items-center gap-2 text-xs font-semibold text-[#203f73]"
               >
                 <span class="relative flex size-2.5">
                   <span
@@ -134,7 +134,7 @@ const { target, visible } = useInView()
           </div>
 
           <dl
-            class="mt-8 grid gap-8 border-t border-[#203f73]/20 pt-8 lg:grid-cols-3"
+            class="mt-8 grid gap-6 border-t border-[#203f73]/20 pt-8 lg:grid-cols-3"
           >
             <div>
               <dt class="text-sm text-slate-600">Periode pendaftaran</dt>

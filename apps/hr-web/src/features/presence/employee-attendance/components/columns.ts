@@ -66,8 +66,7 @@ export function createColumns(
               Badge,
               {
                 variant: 'outline',
-                class:
-                  'border-amber-400 text-amber-700 dark:border-amber-800 dark:text-amber-300',
+                class: 'border-warning text-warning',
               },
               () => 'Anomali',
             ),
@@ -79,8 +78,7 @@ export function createColumns(
               Badge,
               {
                 variant: 'outline',
-                class:
-                  'border-purple-400 text-purple-700 dark:border-purple-800 dark:text-purple-300',
+                class: 'border-border text-muted-foreground',
               },
               () => 'Cuti Bersamaan',
             ),

@@ -14,7 +14,7 @@ import { Loader2 } from '@lucide/vue'
         </div>
       </div>
       <div class="space-y-2">
-        <h3 class="text-xl font-bold tracking-tight">
+        <h3 class="text-xl font-semibold tracking-tight">
           Memproses Kenaikan Kelas
         </h3>
         <p class="text-muted-foreground max-w-[400px]">

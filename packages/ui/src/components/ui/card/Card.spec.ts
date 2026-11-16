@@ -39,12 +39,10 @@ describe('Card family', () => {
   })
 
   it('removes the gap and the padding on request', () => {
-    const c = classes(mount(Card, { props: { gap: 'none', variant: 'flat' } }))
+    const c = classes(mount(Card, { props: { gap: 'none' } }))
     expect(c).toEqual(expect.arrayContaining(['gap-0', 'py-0']))
     expect(c).not.toContain('gap-4')
-    expect(c).not.toContain('shadow-sm')
-    expect(c).toContain('bg-muted')
-    expect(c).not.toContain('bg-card')
+    expect(c).toContain('bg-card')
   })
 
   it('lets a caller class win over the gap prop without duplicates', () => {
@@ -58,7 +56,7 @@ describe('Card family', () => {
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[var(--control-h-lg,2.25rem)]',
+        'min-h-[2.5rem]',
         'items-center',
         'justify-between',
         'border-b',
@@ -70,18 +68,12 @@ describe('Card family', () => {
     expect(c).not.toContain('grid')
   })
 
-  it('uses the Mira footer without props', () => {
+  it('uses the footer with the same tint as the header', () => {
     const c = classes(mount(CardFooter))
-    expect(c).toEqual(expect.arrayContaining(['flex', 'items-center', 'px-4']))
-    expect(c).not.toContain('bg-muted/30')
-  })
-
-  it('uses the standard footer with the same tint as the header', () => {
-    const c = classes(mount(CardFooter, { props: { standard: true } }))
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[var(--control-h-lg,2.25rem)]',
+        'min-h-[2.5rem]',
         'items-center',
         'justify-end',
         'gap-2',
@@ -93,16 +85,16 @@ describe('Card family', () => {
     )
   })
 
-  it('gives the standard header and footer the same 32px height token', () => {
+  it('gives the standard header and footer the same 40px height', () => {
     const header = classes(mount(CardHeader, { props: { standard: true } }))
-    const footer = classes(mount(CardFooter, { props: { standard: true } }))
-    expect(header).toContain('min-h-[var(--control-h-lg,2.25rem)]')
-    expect(footer).toContain('min-h-[var(--control-h-lg,2.25rem)]')
+    const footer = classes(mount(CardFooter))
+    expect(header).toContain('min-h-[2.5rem]')
+    expect(footer).toContain('min-h-[2.5rem]')
   })
 
   it('sizes the title', () => {
     expect(classes(mount(CardTitle, { props: { size: 'md' } }))).toContain(
-      'text-[length:var(--text-control,0.875rem)]',
+      'text-control',
     )
     expect(classes(mount(CardTitle, { props: { size: 'lg' } }))).toContain(
       'text-xl',

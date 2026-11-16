@@ -85,7 +85,7 @@ export function createAttendanceInputColumns(
             {
               variant: 'outline',
               class:
-                'border-amber-500/40 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-medium text-xs px-2 py-0.5',
+                'border-warning bg-warning/10 text-warning font-medium text-xs px-2 py-0.5',
             },
             () => 'Perlu Keputusan',
           )
@@ -101,7 +101,7 @@ export function createAttendanceInputColumns(
                 {
                   variant: 'outline',
                   class:
-                    'border-sky-500/40 bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 font-medium text-xs px-2 py-0.5',
+                    'border-info bg-info/10 text-info font-medium text-xs px-2 py-0.5',
                 },
                 () => 'Gerbang',
               ),

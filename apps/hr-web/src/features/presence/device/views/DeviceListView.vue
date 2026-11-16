@@ -84,10 +84,7 @@ onMounted(() => void deviceService.fetch())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Perangkat Gerbang </CardTitle>
         <Button @click="showForm = true">
           <Plus class="h-4 w-4" />
@@ -98,7 +95,7 @@ onMounted(() => void deviceService.fetch())
       <CardContent class="space-y-6 p-0 sm:px-0">
         <div
           v-if="lastIssued"
-          class="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+          class="space-y-3 rounded-lg border border-warning/30 bg-warning/10 p-4 text-warning"
         >
           <div class="flex items-start gap-2 text-xs md:text-sm font-medium">
             <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0" />
@@ -115,7 +112,7 @@ onMounted(() => void deviceService.fetch())
             <Input
               :model-value="lastIssued.token"
               readonly
-              class="font-mono"
+              class="tabular-nums"
             />
             <Button
               variant="outline"

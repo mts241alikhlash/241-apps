@@ -21,9 +21,7 @@ const props = defineProps<{
   loading: boolean
 }>()
 
-const emit = defineEmits<{
-  'update:rows': [value: AttendanceInputRow[]]
-}>()
+const emit = defineEmits<{ 'update:rows': [value: AttendanceInputRow[]] }>()
 
 const selectedRows = ref<AttendanceInputRow[]>([])
 

@@ -5,7 +5,6 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -78,15 +77,13 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold">Preset Kebijakan Ujian</CardTitle>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
-        <p
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           Berlaku untuk kegiatan baru. Kegiatan yang sudah berjalan tetap
           memakai salinan kebijakannya sendiri.
         </p>
@@ -96,7 +93,7 @@ onMounted(load)
           role="alert"
           class="space-y-3 rounded-md border p-4"
         >
-          <p class="text-[length:var(--text-control,0.875rem)]">{{ error }}</p>
+          <p class="text-control">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -107,7 +104,7 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Memuat preset kebijakan…
         </p>
@@ -117,7 +114,7 @@ onMounted(load)
           class="overflow-x-auto rounded-md border"
         >
           <table class="w-full text-left text-xs">
-            <thead class="border-b bg-muted/50">
+            <thead class="border-b bg-table-header">
               <tr>
                 <th class="p-3 font-semibold">Jenis</th>
                 <th class="p-3 font-semibold">Kategori</th>
@@ -226,7 +223,6 @@ onMounted(load)
           </table>
         </div>
       </CardContent>
-      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

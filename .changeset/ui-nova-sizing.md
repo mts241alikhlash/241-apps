@@ -1,5 +1,6 @@
 ---
 '@mts241alikhlash/ui': minor
+'@mts241alikhlash/platform': patch
 'academic-web': patch
 'account-web': patch
 'admin-web': patch
@@ -11,4 +12,4 @@
 'portal-web': patch
 ---
 
-UI sizing moves from shadcn-vue `mira` to `nova`: controls are 24/28/32/36 px (28/36/40/44 px on phones) with 14 px control text and 16 px icons (15 px on phones), `--text-xs` is 13 px, radius follows the `nova` scale from `--radius: 0.625rem`, and the global sidebar is 17rem with truncating menu labels of at most 26 characters.
+The design system settles on Inter with the `nova` control sizes and one type scale. `text-xs` and `text-sm` both read `--text-control` (12 px, 13 px on phones) so sidebar, breadcrumb, table and control text share one size; headings read `--text-heading-sm|heading|title|display|display-lg` (16/18/20/24/30 px); a floating label sits at `--text-label` (11 px). Radius follows the Nova ladder off one `--radius` (10 px; `md` 0.8× for controls, `lg` 1× for cards, `xl` 1.4× for a panel), a status colour is a token (`--success`, `--warning`, `--info`, `--destructive`) with no Tailwind palette class outside the admission landing page and the kiosk, `text-control` is a utility registered in `cn` so `twMerge` keeps it, the sidebar is 15rem, tabs are an underline strip only, a card header and footer are 40 px, and the active sidebar item and breadcrumb are marked by `text-primary` alone. Dead variants are gone: `Card variant="flat"`, `CardFooter` `standard`/`thin`, `FieldLegend` `variant`, and the pill `Tabs` variant. Pages no longer set a size of their own: no `text-[Npx]`, no `font-size`, no `font-mono`, no `font-bold`. A badge is plain coloured text with an optional icon instead of a chip, a card uses `CardHeader plain` for a list page's borderless header and `p-4` padding, table surfaces read `--table-stripe`/`--table-header` so a sticky column never shows the cells under it, and spacing uses one scale (0, 0.5, 1, 1.5, 2, 3, 4, 6) checked by `check-card-overrides`.

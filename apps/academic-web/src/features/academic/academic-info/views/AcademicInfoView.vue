@@ -142,7 +142,7 @@ onMounted(init)
                 </p>
                 <Badge
                   variant="secondary"
-                  class="shrink-0 text-xs"
+                  class="shrink-0"
                 >
                   {{ formatDate(event.startDate) }}
                 </Badge>

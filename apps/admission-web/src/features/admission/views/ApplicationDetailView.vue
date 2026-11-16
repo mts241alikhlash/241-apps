@@ -183,7 +183,7 @@ const documentColumns = computed<ColumnDef<DocumentRow>[]>(() => [
                 type: 'button',
                 'data-test': 'open-file',
                 class:
-                  'group inline-flex items-center gap-1.5 text-left text-[length:var(--text-control,0.875rem)] text-foreground transition-colors hover:text-primary',
+                  'group inline-flex items-center gap-1.5 text-left text-control text-foreground transition-colors hover:text-primary',
                 onClick: () => preview.show(doc.file!),
               },
               [
@@ -334,7 +334,7 @@ const achievementColumns = computed<ColumnDef<AdmissionAchievement>[]>(() => [
             type: 'button',
             'data-test': 'open-file',
             class:
-              'group inline-flex items-center gap-1.5 text-left text-[length:var(--text-control,0.875rem)] text-foreground transition-colors hover:text-primary',
+              'group inline-flex items-center gap-1.5 text-left text-control text-foreground transition-colors hover:text-primary',
             onClick: () => preview.show(file),
           },
           [
@@ -434,7 +434,7 @@ const scholarshipColumns = computed<ColumnDef<AdmissionScholarship>[]>(() => [
             type: 'button',
             'data-test': 'open-file',
             class:
-              'group inline-flex items-center gap-1.5 text-left text-[length:var(--text-control,0.875rem)] text-foreground transition-colors hover:text-primary',
+              'group inline-flex items-center gap-1.5 text-left text-control text-foreground transition-colors hover:text-primary',
             onClick: () => preview.show(file),
           },
           [
@@ -597,7 +597,7 @@ useBreadcrumbs(() => {
 <template>
   <div
     v-if="loading"
-    class="p-6 text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+    class="p-6 text-control text-muted-foreground"
   >
     Memuat detail pendaftar…
   </div>
@@ -606,9 +606,7 @@ useBreadcrumbs(() => {
     v-else-if="error === 'not-found'"
     class="space-y-3 p-6"
   >
-    <p class="text-[length:var(--text-control,0.875rem)] text-muted-foreground">
-      Pendaftar tidak ditemukan.
-    </p>
+    <p class="text-control text-muted-foreground">Pendaftar tidak ditemukan.</p>
     <Button
       variant="outline"
       @click="router.push('/admin/applicants')"
@@ -621,7 +619,7 @@ useBreadcrumbs(() => {
     v-else-if="error === 'load-failed'"
     class="space-y-3 p-6"
   >
-    <p class="text-[length:var(--text-control,0.875rem)] text-muted-foreground">
+    <p class="text-control text-muted-foreground">
       Gagal memuat detail pendaftar.
     </p>
     <div class="flex flex-wrap gap-2">
@@ -655,7 +653,7 @@ useBreadcrumbs(() => {
         >
           <div
             v-if="application.revisionNote && status === 'REVISION_NEEDED'"
-            class="flex min-h-[var(--control-h-md,2rem)] min-w-0 flex-1 items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-1 text-destructive"
+            class="flex min-h-[var(--control-h-md,1.75rem)] min-w-0 flex-1 items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-1 text-destructive"
           >
             <TriangleAlert class="size-3.5 shrink-0" />
             <p class="min-w-0 leading-normal">
@@ -689,12 +687,11 @@ useBreadcrumbs(() => {
 
         <Tabs
           v-model="activeTab"
-          variant="line"
           class="min-w-0 gap-0"
         >
           <Card gap="none">
             <CardHeader class="p-0 shrink-0">
-              <TabsList class="w-full bg-muted/30 px-4">
+              <TabsList class="w-full px-4">
                 <TabsTrigger value="personal"> Data Diri </TabsTrigger>
                 <TabsTrigger value="parents"> Orang Tua/Wali </TabsTrigger>
                 <TabsTrigger value="address"> Alamat </TabsTrigger>
@@ -710,7 +707,7 @@ useBreadcrumbs(() => {
             <CardContent variant="standard">
               <TabsContent
                 value="personal"
-                class="space-y-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-4 text-control"
               >
                 <Card gap="none">
                   <CardHeader standard>
@@ -854,11 +851,11 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="parents"
-                class="space-y-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-4 text-control"
               >
                 <div
                   v-if="(application.parents ?? []).length === 0"
-                  class="rounded-xl border bg-card p-6 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground shadow-xs"
+                  class="rounded-xl border bg-card p-6 text-center text-control text-muted-foreground shadow-xs"
                 >
                   Belum ada data orang tua atau wali.
                 </div>
@@ -940,7 +937,7 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="address"
-                class="text-[length:var(--text-control,0.875rem)]"
+                class="text-control"
               >
                 <Card gap="none">
                   <CardHeader standard>
@@ -948,7 +945,7 @@ useBreadcrumbs(() => {
                   </CardHeader>
                   <CardContent variant="standard">
                     <dl
-                      class="grid gap-x-8 gap-y-3 text-[length:var(--text-control,0.875rem)] xl:grid-cols-2"
+                      class="grid gap-x-8 gap-y-3 text-control xl:grid-cols-2"
                     >
                       <DetailItem
                         label="Alamat (Jalan)"
@@ -1016,7 +1013,7 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="school"
-                class="text-[length:var(--text-control,0.875rem)]"
+                class="text-control"
               >
                 <Card gap="none">
                   <CardHeader standard>
@@ -1024,7 +1021,7 @@ useBreadcrumbs(() => {
                   </CardHeader>
                   <CardContent variant="standard">
                     <dl
-                      class="grid gap-x-8 gap-y-3 text-[length:var(--text-control,0.875rem)] xl:grid-cols-2"
+                      class="grid gap-x-8 gap-y-3 text-control xl:grid-cols-2"
                     >
                       <DetailItem
                         label="Nama Sekolah Asal"
@@ -1049,7 +1046,7 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="achievements"
-                class="space-y-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-4 text-control"
               >
                 <Card gap="none">
                   <CardHeader standard>
@@ -1108,7 +1105,7 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="documents"
-                class="text-[length:var(--text-control,0.875rem)]"
+                class="text-control"
               >
                 <Card gap="none">
                   <CardHeader standard>
@@ -1117,7 +1114,7 @@ useBreadcrumbs(() => {
                   <CardContent variant="standard">
                     <p
                       v-if="documentRows.length === 0"
-                      class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                      class="text-control text-muted-foreground"
                     >
                       Belum ada jenis berkas.
                     </p>
@@ -1138,7 +1135,7 @@ useBreadcrumbs(() => {
 
               <TabsContent
                 value="payment"
-                class="space-y-4 text-[length:var(--text-control,0.875rem)]"
+                class="space-y-4 text-control"
               >
                 <Alert
                   v-if="application.waveIsFull"
@@ -1223,7 +1220,7 @@ useBreadcrumbs(() => {
                             v-if="application.payment.proofFile"
                             type="button"
                             data-test="open-file"
-                            class="group inline-flex items-center gap-1.5 text-left text-[length:var(--text-control,0.875rem)] text-foreground transition-colors hover:text-primary"
+                            class="group inline-flex items-center gap-1.5 text-left text-control text-foreground transition-colors hover:text-primary"
                             @click="preview.show(application.payment.proofFile)"
                           >
                             <FileText
@@ -1427,7 +1424,7 @@ useBreadcrumbs(() => {
               </div>
               <p
                 v-if="application?.nis && application?.nisn"
-                class="text-[length:var(--text-control,0.875rem)]"
+                class="text-control"
               >
                 NIS {{ application.nis }} dan NISN
                 {{ application.nisn }} dipakai untuk membuat akun santri.
@@ -1504,7 +1501,7 @@ useBreadcrumbs(() => {
     v-else
     class="p-6"
   >
-    <p class="text-[length:var(--text-control,0.875rem)] text-muted-foreground">
+    <p class="text-control text-muted-foreground">
       Data pendaftar belum tersedia.
     </p>
     <Button

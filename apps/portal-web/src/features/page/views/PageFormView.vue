@@ -172,7 +172,7 @@ useBreadcrumbs(() => {
           </div>
           <p
             v-if="slugChanged"
-            class="text-xs text-amber-600"
+            class="text-xs text-warning"
           >
             Alamat lama akan tetap mengarah ke sini, tetapi tautan yang sudah
             dicetak sebaiknya diperbarui.

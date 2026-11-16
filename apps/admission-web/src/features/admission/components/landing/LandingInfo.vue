@@ -59,7 +59,7 @@ function onViewerKey(event: KeyboardEvent) {
     class="scroll-mt-14 bg-white py-14 sm:py-20"
   >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-6">
         <h2
           id="informasi-title"
           class="font-[Georgia,serif] text-4xl font-normal leading-[1.1] tracking-tight text-[#203f73] sm:text-5xl"

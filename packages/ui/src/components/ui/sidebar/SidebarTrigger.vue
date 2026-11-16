@@ -20,7 +20,7 @@ const { toggleSidebar } = useSidebar()
     size="icon"
     :class="
       cn(
-        'h-[var(--control-h-md,2rem)] w-[var(--control-h-md,2rem)]',
+        'h-[var(--control-h-md,1.75rem)] w-[var(--control-h-md,1.75rem)]',
         props.class,
       )
     "

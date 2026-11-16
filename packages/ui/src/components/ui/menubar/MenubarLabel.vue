@@ -18,7 +18,7 @@ const delegatedProps = reactiveOmit(props, 'class', 'inset')
     v-bind="delegatedProps"
     :class="
       cn(
-        'text-muted-foreground px-2 py-1.5 text-[length:var(--text-control,0.875rem)] data-inset:pl-7.5',
+        'text-muted-foreground px-2 py-1.5 text-control data-inset:pl-7.5',
         props.class,
       )
     "

@@ -29,10 +29,10 @@ const props = withDefaults(
     :data-active="isActive ? 'true' : undefined"
     :class="
       cn(
-        'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground flex h-[var(--control-h-sm,1.75rem)] min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span]:truncate [&>span]:whitespace-nowrap [&>svg]:size-4 [&>svg]:shrink-0',
-        'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:font-medium',
-        size === 'sm' && 'text-[length:var(--text-control,0.875rem)]',
-        size === 'md' && 'text-[length:var(--text-control,0.875rem)]',
+        'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground flex h-[var(--control-h-sm,1.5rem)] min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span]:truncate [&>span]:whitespace-nowrap [&>svg]:size-4 [&>svg]:shrink-0',
+        'data-[active=true]:bg-sidebar-accent data-[active=true]:text-primary',
+        size === 'sm' && 'text-control',
+        size === 'md' && 'text-control',
         'group-data-[collapsible=icon]:hidden',
         props.class,
       )

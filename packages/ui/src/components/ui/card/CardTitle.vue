@@ -14,7 +14,7 @@ const props = defineProps<{
     :class="
       cn(
         'text-base leading-none font-medium min-w-0',
-        props.size === 'md' && 'text-[length:var(--text-control,0.875rem)]',
+        props.size === 'md' && 'text-control',
         props.size === 'lg' && 'text-xl font-semibold',
         props.class,
       )

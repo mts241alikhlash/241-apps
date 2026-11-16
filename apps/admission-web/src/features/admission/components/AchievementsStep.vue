@@ -333,7 +333,7 @@ defineExpose({ validate: validateStep })
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="space-y-6">
     <Card
       gap="none"
       class="overflow-hidden"
@@ -383,8 +383,8 @@ defineExpose({ validate: validateStep })
               >
             </DialogHeader>
             <div class="min-h-0 flex-1 overflow-y-auto">
-              <div class="space-y-5 p-6">
-                <div class="grid gap-5 sm:grid-cols-2">
+              <div class="space-y-4 p-6">
+                <div class="grid gap-4 sm:grid-cols-2">
                   <FloatingField
                     v-slot="{ componentField }"
                     :name="`achievements[${index}].year`"
@@ -475,9 +475,7 @@ defineExpose({ validate: validateStep })
                     </FormControl>
                   </FloatingField>
                 </div>
-                <div
-                  class="space-y-2 text-[length:var(--text-control,0.875rem)]"
-                >
+                <div class="space-y-2 text-control">
                   <p class="font-medium">Lampiran</p>
                   <FileDropzone
                     v-if="editable"
@@ -591,8 +589,8 @@ defineExpose({ validate: validateStep })
               >
             </DialogHeader>
             <div class="min-h-0 flex-1 overflow-y-auto">
-              <div class="space-y-5 p-6">
-                <div class="grid gap-5 sm:grid-cols-2">
+              <div class="space-y-4 p-6">
+                <div class="grid gap-4 sm:grid-cols-2">
                   <FloatingField
                     v-slot="{ componentField }"
                     :name="`scholarships[${index}].year`"
@@ -718,9 +716,7 @@ defineExpose({ validate: validateStep })
                     </FormControl>
                   </FloatingField>
                 </div>
-                <div
-                  class="space-y-2 text-[length:var(--text-control,0.875rem)]"
-                >
+                <div class="space-y-2 text-control">
                   <p class="font-medium">Lampiran</p>
                   <FileDropzone
                     v-if="editable"

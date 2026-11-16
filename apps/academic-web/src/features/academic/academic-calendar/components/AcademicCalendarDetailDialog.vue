@@ -71,7 +71,7 @@ function handleEdit() {
         <DialogTitle>Detail Agenda</DialogTitle>
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-3.5 text-xs">
+      <div class="px-6 py-5 space-y-4 text-xs">
         <div class="flex items-start gap-2">
           <span class="w-[115px] shrink-0 font-medium text-foreground leading-5"
             >Nama Kegiatan</span

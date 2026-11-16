@@ -147,7 +147,7 @@ function handleEnroll() {
       <div class="flex-1 overflow-y-auto border rounded-md">
         <Table>
           <TableHeader>
-            <TableRow class="bg-muted/50 hover:bg-muted/50">
+            <TableRow>
               <TableHead class="w-[50px] text-center px-4">
                 <Checkbox
                   :model-value="allChecked || (someChecked && 'indeterminate')"

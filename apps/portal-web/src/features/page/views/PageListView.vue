@@ -134,10 +134,7 @@ const columns: ColumnDef<PortalPage>[] = [
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg">Halaman</CardTitle>
         </div>

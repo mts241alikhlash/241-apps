@@ -222,7 +222,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.875rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -342,7 +342,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
             <template #mobile-chips>
               <div
                 v-if="activeFiltersCount"
-                class="flex flex-wrap gap-2 text-[length:var(--text-control,0.875rem)]"
+                class="flex flex-wrap gap-2 text-control"
               >
                 <Button
                   v-if="statusFilter !== 'ALL'"

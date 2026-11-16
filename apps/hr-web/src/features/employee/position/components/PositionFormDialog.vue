@@ -34,10 +34,7 @@ const props = defineProps<{
   initialData?: Position | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  success: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; success: [] }>()
 
 const { isSaving, savePosition } = usePosition()
 const categories = ref<PositionCategoryOption[]>([])

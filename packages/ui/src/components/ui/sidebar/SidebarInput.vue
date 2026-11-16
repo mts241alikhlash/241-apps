@@ -14,7 +14,7 @@ const props = defineProps<{
     data-sidebar="input"
     :class="
       cn(
-        'bg-background h-[var(--control-h-md,2rem)] w-full text-[length:var(--text-control,0.875rem)] shadow-none',
+        'bg-background h-[var(--control-h-md,1.75rem)] w-full text-control shadow-none',
         props.class,
       )
     "

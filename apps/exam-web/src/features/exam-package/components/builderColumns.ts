@@ -48,8 +48,7 @@ export function buildBuilderColumns(
             ? h(
                 'p',
                 {
-                  class:
-                    'text-[length:var(--text-control,0.875rem)] font-normal text-destructive',
+                  class: 'text-control font-normal text-destructive',
                 },
                 `Catatan: ${note}`,
               )

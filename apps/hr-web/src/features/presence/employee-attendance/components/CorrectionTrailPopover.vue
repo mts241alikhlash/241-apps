@@ -57,7 +57,7 @@ async function load(isOpen: boolean) {
       <Button
         variant="ghost"
         size="sm"
-        class="text-amber-600"
+        class="text-warning"
       >
         <History class="h-3.5 w-3.5" />
         Dikoreksi

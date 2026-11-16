@@ -20,7 +20,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     v-bind="forwardedProps"
     :class="
       cn(
-        'px-2 py-1.5 text-[length:var(--text-control,0.875rem)] font-medium data-[inset]:pl-7.5',
+        'px-2 py-1.5 text-control font-medium data-[inset]:pl-7.5',
         props.class,
       )
     "

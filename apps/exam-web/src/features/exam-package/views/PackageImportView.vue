@@ -141,7 +141,7 @@ onMounted(init)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke paket"
@@ -152,11 +152,11 @@ onMounted(init)
       </CardHeader>
       <CardContent
         v-if="!loading"
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-6"
       >
         <div
           v-if="!canEdit"
-          class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
+          class="rounded-md border bg-muted/30 p-3 text-control"
           role="status"
         >
           Paket ini tidak bisa diubah, jadi soal tidak bisa diimpor ke dalamnya.
@@ -165,9 +165,7 @@ onMounted(init)
           <ApprovedEditNotice v-if="pkg?.status === 'APPROVED'" />
 
           <div class="space-y-2">
-            <p
-              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-            >
+            <p class="text-control text-muted-foreground">
               Soal masuk ke paket {{ pkg?.title }}. Unduh template, isi soalnya,
               lalu unggah.
             </p>
@@ -203,7 +201,7 @@ onMounted(init)
           />
           <p
             v-if="problem"
-            class="text-[length:var(--text-control,0.875rem)] text-destructive"
+            class="text-control text-destructive"
             role="alert"
           >
             {{ problem }}
@@ -229,7 +227,7 @@ onMounted(init)
             </p>
             <ul
               v-if="result.errors.length > 0"
-              class="space-y-1 text-[length:var(--text-control,0.875rem)]"
+              class="space-y-1 text-control"
             >
               <li
                 v-for="error in result.errors"

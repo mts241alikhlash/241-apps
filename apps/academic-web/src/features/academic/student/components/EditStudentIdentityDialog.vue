@@ -26,10 +26,7 @@ const props = defineProps<{
   initialData?: StudentIdentityData | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  reload: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; reload: [] }>()
 
 const { isSaving, saveStudent } = useStudent()
 
@@ -108,7 +105,7 @@ const onSubmit = form.handleSubmit(async (values) => {
 
         <ScrollArea class="flex-1 min-h-0">
           <div class="p-6">
-            <div class="grid gap-5 md:grid-cols-2">
+            <div class="grid gap-4 md:grid-cols-2">
               <FloatingField
                 v-slot="{ componentField }"
                 name="nis"

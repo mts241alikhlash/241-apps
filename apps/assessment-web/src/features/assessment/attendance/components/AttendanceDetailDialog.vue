@@ -16,9 +16,7 @@ const props = defineProps<{
   attendances: Attendance[]
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
 const STATUS_LABEL: Record<AttendanceStatus, string> = {
   PRESENT: 'Hadir',
@@ -54,10 +52,12 @@ const formattedDate = computed(() => {
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
       <DialogHeader class="px-6 py-4 border-b shrink-0">
-        <DialogTitle class="text-base font-bold">Detail Kehadiran</DialogTitle>
+        <DialogTitle class="text-base font-semibold"
+          >Detail Kehadiran</DialogTitle
+        >
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-3.5 text-xs">
+      <div class="px-6 py-5 space-y-4 text-xs">
         <div class="flex items-start gap-2">
           <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
             Hari

@@ -19,8 +19,8 @@ const props = defineProps<
     :as-child="asChild"
     :class="
       cn(
-        'text-sidebar-foreground/70 flex h-[var(--control-h-md,2rem)] shrink-0 items-center rounded-md px-2 text-[length:var(--text-control,0.875rem)] font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring [&>svg]:size-4 [&>svg]:shrink-0',
-        'group-data-[collapsible=icon]:-mt-[var(--control-h-md,2rem)] group-data-[collapsible=icon]:opacity-0',
+        'text-sidebar-foreground/70 flex h-[var(--control-h-md,1.75rem)] shrink-0 items-center rounded-md px-2 text-control font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:outline-1 focus-visible:outline-solid focus-visible:-outline-offset-1 focus-visible:outline-ring [&>svg]:size-4 [&>svg]:shrink-0',
+        'group-data-[collapsible=icon]:-mt-[var(--control-h-md,1.75rem)] group-data-[collapsible=icon]:opacity-0',
         props.class,
       )
     "

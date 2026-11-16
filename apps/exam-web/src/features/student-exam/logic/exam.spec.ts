@@ -100,7 +100,7 @@ describe('isAnswered', () => {
 
   it('treats a blank essay as unanswered', () => {
     const essay = question({ type: 'ESSAY', choices: null })
-    expect(isAnswered(essay, { text: '   ' })).toBe(false)
+    expect(isAnswered(essay, { text: ' ' })).toBe(false)
     expect(isAnswered(essay, { text: 'Jawaban' })).toBe(true)
   })
 

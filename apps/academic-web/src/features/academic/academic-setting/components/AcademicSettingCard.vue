@@ -32,14 +32,14 @@ const { can } = useRoleGuard()
       class="overflow-hidden"
     >
       <CardHeader standard>
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-3">
           <CardTitle size="lg">
             {{ title }}
           </CardTitle>
           <Badge
             v-if="setting.isDirty.value"
-            variant="outline"
-            class="text-xs font-semibold text-amber-600 bg-amber-500/10 border-amber-500/30 dark:text-amber-400"
+            variant="warning"
+            class="font-semibold"
           >
             Belum disimpan
           </Badge>
@@ -80,7 +80,7 @@ const { can } = useRoleGuard()
 
       <CardContent
         variant="standard"
-        class="md:p-8 space-y-6"
+        class="md: p-4 space-y-6"
       >
         <div
           v-if="setting.loading.value"

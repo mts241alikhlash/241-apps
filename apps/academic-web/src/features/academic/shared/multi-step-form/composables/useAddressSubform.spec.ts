@@ -14,7 +14,7 @@ describe('useAddressSubform', () => {
 
   it('treats a whitespace-only street as no address', () => {
     const { address, hasAddress } = useAddressSubform()
-    address.value.street = '   '
+    address.value.street = ' '
     expect(hasAddress.value).toBe(false)
   })
 

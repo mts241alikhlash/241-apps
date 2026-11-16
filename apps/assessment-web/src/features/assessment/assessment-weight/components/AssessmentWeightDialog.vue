@@ -42,22 +42,19 @@ watch(open, (isOpen) => {
 })
 
 const TYPE_COLORS: Record<string, string> = {
-  DAILY: 'bg-blue-500',
-  ASSIGNMENT: 'bg-emerald-500',
-  PRACTICAL: 'bg-amber-500',
-  MIDTERM: 'bg-violet-500',
-  FINAL: 'bg-rose-500',
+  DAILY: 'bg-info',
+  ASSIGNMENT: 'bg-success',
+  PRACTICAL: 'bg-warning',
+  MIDTERM: 'bg-muted-foreground',
+  FINAL: 'bg-destructive',
 }
 
 const TYPE_BADGE_CLASSES: Record<string, string> = {
-  DAILY: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-  ASSIGNMENT:
-    'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
-  PRACTICAL:
-    'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
-  MIDTERM:
-    'bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20',
-  FINAL: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20',
+  DAILY: 'bg-info text-info border-info',
+  ASSIGNMENT: 'bg-success text-success border-success',
+  PRACTICAL: 'bg-warning text-warning border-warning',
+  MIDTERM: 'bg-muted text-muted-foreground border-border',
+  FINAL: 'bg-destructive text-destructive border-destructive',
 }
 
 const SAMPLE_SCORES: Record<string, number> = {
@@ -161,7 +158,7 @@ async function handleSave() {
             >
               <Badge
                 variant="outline"
-                class="w-[4.5rem] justify-center shrink-0 text-xs font-medium py-0.5"
+                class="w-[4.5rem] justify-center shrink-0 font-medium"
                 :class="TYPE_BADGE_CLASSES[type]"
               >
                 {{ ASSESSMENT_TYPE_LABELS[type] }}
@@ -198,7 +195,7 @@ async function handleSave() {
             class="flex items-center justify-between rounded-md px-3 py-2 text-xs transition-colors"
             :class="
               isBalanced
-                ? 'bg-emerald-500/5 border border-emerald-500/20'
+                ? 'bg-success border border-success'
                 : total > 100
                   ? 'bg-destructive/5 border border-destructive/20'
                   : 'bg-muted/50 border border-border'
@@ -207,13 +204,11 @@ async function handleSave() {
             <div class="flex items-center gap-1.5">
               <CheckCircle2
                 v-if="isBalanced"
-                class="size-3.5 text-emerald-600 dark:text-emerald-400"
+                class="size-3.5 text-success"
               />
               <span
                 class="font-medium"
-                :class="
-                  isBalanced ? 'text-emerald-700 dark:text-emerald-400' : ''
-                "
+                :class="isBalanced ? 'text-success' : ''"
               >
                 Total
               </span>
@@ -222,7 +217,7 @@ async function handleSave() {
               class="font-semibold tabular-nums"
               :class="
                 isBalanced
-                  ? 'text-emerald-700 dark:text-emerald-400'
+                  ? 'text-success'
                   : total > 100
                     ? 'text-destructive'
                     : ''
@@ -272,7 +267,7 @@ async function handleSave() {
               class="border-t pt-1.5 flex items-center justify-between text-sm"
             >
               <span class="font-medium">Nilai Akhir</span>
-              <span class="font-bold tabular-nums">{{ sampleResult }}</span>
+              <span class="font-semibold tabular-nums">{{ sampleResult }}</span>
             </div>
           </div>
         </template>

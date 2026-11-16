@@ -13,9 +13,9 @@ export const toggleVariants = cva(
       },
       size: {
         default:
-          'h-[var(--control-h-md,2rem)] min-w-7 px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5',
-        sm: 'h-[var(--control-h-sm,1.75rem)] min-w-6 rounded-[min(var(--radius-md),8px)] px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
-        lg: 'h-[var(--control-h-lg,2.25rem)] min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
+          'h-[var(--control-h-md,1.75rem)] min-w-7 px-2 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5',
+        sm: 'h-[var(--control-h-sm,1.5rem)] min-w-6 rounded-[min(var(--radius-md),8px)] px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
+        lg: 'h-[var(--control-h-lg,2rem)] min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
       },
     },
     defaultVariants: {

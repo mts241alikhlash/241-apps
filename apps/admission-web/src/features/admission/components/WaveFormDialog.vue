@@ -256,7 +256,7 @@ const onSubmit = handleSubmit((formValues) => {
               label="Rentang Tanggal"
               required
               always-float
-              class="[&_button]:border-input [&_button]:bg-transparent [&_button:hover]:bg-transparent [&_button:hover]:text-foreground dark:[&_button]:bg-input/30 dark:[&_button:hover]:bg-input/30"
+              class="[&_button]:border-input [&_button]:bg-transparent [&_button:hover]:bg-transparent [&_button:hover]:text-foreground"
             >
               <FormControl>
                 <DateRangePicker
@@ -330,7 +330,7 @@ const onSubmit = handleSubmit((formValues) => {
               hide-label
             >
               <div
-                class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2"
+                class="flex min-h-[var(--control-h-lg,2rem)] items-center gap-2"
               >
                 <FormControl>
                   <Checkbox
@@ -340,10 +340,7 @@ const onSubmit = handleSubmit((formValues) => {
                     @update:model-value="handleChange"
                   />
                 </FormControl>
-                <span
-                  class="text-[length:var(--text-control,0.875rem)] font-medium"
-                  >Aktifkan</span
-                >
+                <span class="text-control font-medium">Aktifkan</span>
               </div>
             </FloatingField>
           </div>

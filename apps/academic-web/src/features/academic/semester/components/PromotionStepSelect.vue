@@ -54,7 +54,7 @@ function formatSemesterLabel(s: Semester) {
 
 <template>
   <div
-    class="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+    class="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500"
   >
     <div class="text-center space-y-2 mb-8">
       <h2 class="text-2xl font-bold tracking-tight">Pilih Siklus Akademik</h2>

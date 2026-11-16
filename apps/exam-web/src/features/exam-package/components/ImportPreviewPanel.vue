@@ -8,9 +8,7 @@ const props = defineProps<{
   confirmDuplicates: boolean
 }>()
 
-const emit = defineEmits<{
-  'update:confirmDuplicates': [value: boolean]
-}>()
+const emit = defineEmits<{ 'update:confirmDuplicates': [value: boolean] }>()
 
 const typeLabels = [
   { key: 'MULTIPLE_CHOICE', label: 'PG' },
@@ -40,7 +38,7 @@ const identity = computed(() => [
 
 <template>
   <div
-    class="space-y-3 rounded-md border p-4 text-[length:var(--text-control,0.875rem)]"
+    class="space-y-3 rounded-md border p-4 text-control"
     role="status"
     data-testid="import-preview"
   >

@@ -85,7 +85,7 @@ function handleSave() {
         <p class="text-xs text-muted-foreground">
           Centang hari yang sekolah tidak aktif setiap minggunya.
         </p>
-        <div class="space-y-2.5">
+        <div class="space-y-3">
           <label
             v-for="day in DISPLAY_WEEKDAYS"
             :key="day.value"

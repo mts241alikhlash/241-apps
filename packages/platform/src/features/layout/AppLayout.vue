@@ -136,7 +136,7 @@ const searchGroups = computed(() => {
       <SidebarInset class="flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
         <header
           data-app-topbar
-          class="relative mr-2 ml-2 md:ml-0 mt-2 mb-2 flex h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-2 rounded-lg border border-border bg-card/85 px-3 shadow-xs backdrop-blur-md"
+          class="relative mr-2 ml-2 md:ml-0 mt-2 mb-2 flex h-10 shrink-0 items-center gap-2 rounded-lg border border-border bg-card/85 px-3 shadow-xs backdrop-blur-md"
         >
           <SidebarTrigger
             class="size-8 shrink-0 md:hidden"

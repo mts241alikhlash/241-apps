@@ -23,7 +23,7 @@ const props = withDefaults(
     :as-child="props.asChild"
     :class="
       cn(
-        'gap-1.5 sm:min-h-7 grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center',
+        'gap-1.5 sm:min-h-7 grid min-h-[var(--control-h-lg,2rem)] w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center',
         props.class,
       )
     "

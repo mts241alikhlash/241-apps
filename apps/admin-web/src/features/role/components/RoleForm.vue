@@ -182,7 +182,7 @@ function confirmSave() {
                     v-if="isEditing"
                     class="text-xs text-muted-foreground mt-1"
                   >
-                    <span class="text-amber-600 font-medium block mt-1">
+                    <span class="text-warning font-medium block mt-1">
                       Kode role tidak dapat diubah setelah dibuat.
                     </span>
                   </p>
@@ -206,18 +206,16 @@ function confirmSave() {
 
               <div
                 v-if="isSystemRole"
-                class="flex gap-3 rounded-xl border border-amber-200 bg-amber-50/40 p-4 text-sm text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-300"
+                class="flex gap-3 rounded-xl border border-warning/30 bg-warning/10 p-4 text-sm text-warning"
               >
-                <Info class="size-5 shrink-0 text-amber-600" />
+                <Info class="size-5 shrink-0 text-warning" />
                 <div class="space-y-1">
                   <p
-                    class="font-semibold text-xs uppercase tracking-wider text-amber-700 dark:text-amber-400"
+                    class="font-semibold text-xs uppercase tracking-wider text-warning"
                   >
                     Role Sistem
                   </p>
-                  <p
-                    class="text-xs text-amber-800/80 dark:text-amber-300/80 leading-relaxed"
-                  >
+                  <p class="text-xs text-warning leading-relaxed">
                     Ini adalah role bawaan sistem. Hak akses dapat
                     dikonfigurasi, namun kode role dilindungi dan tidak dapat
                     dihapus.

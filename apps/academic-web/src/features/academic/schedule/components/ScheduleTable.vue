@@ -135,9 +135,7 @@ function toHHMM(val: string): string {
           <div class="cell break-cell">
             {{ formatPukul(ts.startTime, ts.endTime) }}
           </div>
-          <div
-            class="cell break-cell font-semibold text-amber-600 dark:text-amber-400"
-          >
+          <div class="cell break-cell font-semibold text-warning">
             {{ formatEntityName(ts.name) }}
           </div>
           <div
@@ -185,9 +183,7 @@ function toHHMM(val: string): string {
             ]"
           >
             <template v-if="overlayMap[ts.id]?.[day.value]">
-              <span
-                class="text-xs font-semibold text-amber-600 dark:text-amber-400 italic"
-              >
+              <span class="text-xs font-semibold text-warning italic">
                 {{ formatEntityName(overlayMap[ts.id][day.value].name) }}
               </span>
             </template>
@@ -264,7 +260,7 @@ function toHHMM(val: string): string {
 .header-cell {
   background: var(--muted);
   color: var(--muted-foreground);
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--text-xs);
   padding: 0.375rem;
 }

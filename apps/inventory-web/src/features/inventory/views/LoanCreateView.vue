@@ -164,10 +164,7 @@ function handleCancel() {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke daftar peminjaman"
@@ -219,7 +216,7 @@ function handleCancel() {
           </div>
 
           <div class="space-y-3">
-            <Label class="text-base font-semibold"
+            <Label class="font-semibold"
               >Pilih Unit Tersedia
               <span class="text-destructive">*</span></Label
             >

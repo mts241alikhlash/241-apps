@@ -35,7 +35,7 @@ useBreadcrumbs(() => {
 <template>
   <div class="p-4 md:p-6 lg:p-8">
     <Card
-      class="overflow-hidden rounded-2xl shadow-sm shadow-black/5 ring-1 ring-black/4 flex flex-col gap-0"
+      class="overflow-hidden shadow-sm shadow-black/5 ring-1 ring-black/4 flex flex-col gap-0"
     >
       <CardHeader
         class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b px-6 py-5 shrink-0 gap-4"
@@ -46,7 +46,7 @@ useBreadcrumbs(() => {
             @click="handleBack"
           />
           <div>
-            <CardTitle class="text-2xl font-bold tracking-tight">
+            <CardTitle class="text-2xl font-semibold tracking-tight">
               Ubah Data Diri
             </CardTitle>
             <p class="text-sm text-muted-foreground">
@@ -73,7 +73,6 @@ useBreadcrumbs(() => {
         <Tabs
           v-model="activeTab"
           class="w-full flex flex-col"
-          variant="line"
         >
           <div class="px-6 pt-4 border-b shrink-0">
             <TabsList class="grid w-full max-w-md grid-cols-2">

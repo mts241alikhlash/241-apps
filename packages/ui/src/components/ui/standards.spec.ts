@@ -8,20 +8,20 @@ const source = (name: string) =>
 describe('radius scale', () => {
   const theme = source('../../theme.css')
 
-  it('follows the nova radius scale', () => {
+  it('keeps the nova radius ladder from one base value', () => {
     expect(theme).toContain('--radius-sm: calc(var(--radius) * 0.6);')
     expect(theme).toContain('--radius-md: calc(var(--radius) * 0.8);')
     expect(theme).toContain('--radius-lg: var(--radius);')
     expect(theme).toContain('--radius-xl: calc(var(--radius) * 1.4);')
+    expect(theme).toContain('--radius-2xl: calc(var(--radius) * 1.8);')
   })
 
-  it('draws controls, badge and the sidebar inset with md', () => {
+  it('draws controls and the sidebar inset with md', () => {
     for (const file of [
       './input/Input.vue',
       './textarea/Textarea.vue',
       './select/SelectTrigger.vue',
       './sidebar/SidebarInset.vue',
-      './badge/index.ts',
     ]) {
       expect(source(file), file).toContain('rounded-md')
       expect(source(file), file).not.toContain('rounded-[12px]')

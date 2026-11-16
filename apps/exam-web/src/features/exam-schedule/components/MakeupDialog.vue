@@ -75,7 +75,7 @@ async function create() {
       <DialogBody class="min-h-0 flex-1 space-y-4 overflow-y-auto">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ form.error.value }}
@@ -83,14 +83,14 @@ async function create() {
 
         <div
           v-if="form.loadError.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
           role="alert"
         >
           {{ form.loadError.value }}
         </div>
         <p
           v-else-if="!form.loading.value && form.absentees.value.length === 0"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Tidak ada siswa di kelas ini.
         </p>
@@ -110,9 +110,7 @@ async function create() {
             >
               Kosongkan
             </Button>
-            <span
-              class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-            >
+            <span class="text-control text-muted-foreground">
               {{ form.selected.value.size }} siswa dipilih
             </span>
           </div>
@@ -120,7 +118,7 @@ async function create() {
             <li
               v-for="row in form.absentees.value"
               :key="row.studentId"
-              class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.875rem)]"
+              class="flex items-center gap-3 p-3 text-control"
             >
               <Checkbox
                 :model-value="form.selected.value.has(row.studentId)"
@@ -177,7 +175,7 @@ async function create() {
           </ul>
         </template>
 
-        <div class="grid gap-5 sm:grid-cols-2">
+        <div class="grid gap-4 sm:grid-cols-2">
           <FloatingLabelField
             label="Alasan untuk semua"
             :for="`${fieldId}-reason`"
@@ -282,15 +280,13 @@ async function create() {
             />
           </FloatingLabelField>
         </div>
-        <p
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           Untuk UTS dan UAS, salin paketnya dan ganti sebagian soal agar soal
           susulan berbeda dari ujian utama.
         </p>
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

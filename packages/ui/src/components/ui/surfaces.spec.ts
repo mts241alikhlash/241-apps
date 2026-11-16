@@ -9,11 +9,11 @@ import { Table } from './table'
 import { Tabs, TabsList, TabsTrigger } from './tabs'
 import { h } from 'vue'
 
-const text = 'text-[length:var(--text-control,0.875rem)]'
+const text = 'text-control'
 
-function tabs(variant?: 'line') {
+function tabs() {
   return mount(Tabs, {
-    props: { defaultValue: 'a', variant },
+    props: { defaultValue: 'a' },
     slots: {
       default: () => [
         h(TabsList, null, () => h(TabsTrigger, { value: 'a' }, () => 'A')),
@@ -23,26 +23,19 @@ function tabs(variant?: 'line') {
 }
 
 describe('tabs', () => {
-  it('default is the Mira pill list and line is the underline strip', () => {
-    const pill = tabs().get('[data-slot=tabs-list]').classes()
-    expect(pill).toContain('bg-muted')
-    expect(pill).not.toContain('border-b')
-    const line = tabs('line').get('[data-slot=tabs-list]').classes()
-    expect(line).toContain('border-b')
-    expect(line).toContain('bg-transparent')
-    expect(line).not.toContain('bg-muted')
+  it('the list is an underline strip, never a pill', () => {
+    const c = tabs().get('[data-slot=tabs-list]').classes()
+    expect(c).toContain('border-b')
+    expect(c).toContain('bg-transparent')
+    expect(c).not.toContain('bg-muted')
   })
 
-  it('line trigger follows the control height token, the underline and the control text token', () => {
-    const c = tabs('line').get('[data-slot=tabs-trigger]').classes()
-    expect(c).toContain('min-h-[var(--control-h-lg,2.25rem)]')
+  it('trigger follows the control height token, the underline and the control text token', () => {
+    const c = tabs().get('[data-slot=tabs-trigger]').classes()
+    expect(c).toContain('min-h-[var(--control-h-lg,2rem)]')
     expect(c).not.toContain('min-h-11')
     expect(c).toContain('data-[state=active]:border-primary')
     expect(c).toContain(text)
-  })
-
-  it('pill trigger uses the control text token', () => {
-    expect(tabs().get('[data-slot=tabs-trigger]').classes()).toContain(text)
   })
 })
 

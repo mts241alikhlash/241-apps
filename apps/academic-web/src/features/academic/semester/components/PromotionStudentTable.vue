@@ -244,7 +244,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
           <SelectContent>
             <SelectItem
               value="approve"
-              class="text-xs text-green-600 focus:text-green-600"
+              class="text-xs text-success focus:text-success"
             >
               Setujui
             </SelectItem>
@@ -431,10 +431,10 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                 <span
                   class="font-semibold tabular-nums text-xs"
                   :class="{
-                    'text-green-600':
+                    'text-success':
                       scoreStanding(row.averageScore, passingScore) ===
                       'at-or-above',
-                    'text-amber-600':
+                    'text-warning':
                       scoreStanding(row.averageScore, passingScore) === 'below',
                     'text-muted-foreground':
                       scoreStanding(row.averageScore, passingScore) ===

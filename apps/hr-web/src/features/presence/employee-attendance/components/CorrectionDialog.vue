@@ -151,7 +151,7 @@ async function submit() {
 
         <div class="space-y-1">
           <Label for="correction-reason">
-            Alasan koreksi <span class="text-red-500">*</span>
+            Alasan koreksi <span class="text-destructive">*</span>
           </Label>
           <Textarea
             id="correction-reason"

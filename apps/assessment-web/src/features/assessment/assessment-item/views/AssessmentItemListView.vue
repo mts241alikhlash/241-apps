@@ -195,10 +195,7 @@ onMounted(fetchRelatedData)
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Tugas </CardTitle>
         <div class="flex items-center gap-2">
           <Button
@@ -206,6 +203,7 @@ onMounted(fetchRelatedData)
             variant="outline"
             size="icon"
             class="sm:hidden"
+            aria-label="Bobot penilaian"
             @click="weightDialogOpen = true"
           >
             <Scale class="size-4" />
@@ -223,6 +221,7 @@ onMounted(fetchRelatedData)
             v-if="!waitingFor && canCreate"
             size="icon"
             class="sm:hidden"
+            aria-label="Tambah item penilaian"
             @click="openAddForm"
           >
             <Plus class="size-4" />
@@ -242,13 +241,13 @@ onMounted(fetchRelatedData)
         <div class="hidden lg:flex lg:flex-row lg:items-center gap-3 mb-6">
           <template v-if="academicYearLabel">
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)]"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)]"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -256,7 +255,7 @@ onMounted(fetchRelatedData)
           </template>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)] text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -295,7 +294,7 @@ onMounted(fetchRelatedData)
           </Select>
           <div
             v-else-if="selectedSubjectLabel"
-            class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)]"
+            class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
           >
             <span class="text-muted-foreground">Mapel</span>
             <span class="font-semibold">{{ selectedSubjectLabel }}</span>
@@ -308,13 +307,13 @@ onMounted(fetchRelatedData)
             class="flex items-center justify-center gap-2"
           >
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -322,7 +321,7 @@ onMounted(fetchRelatedData)
           </div>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -362,7 +361,7 @@ onMounted(fetchRelatedData)
             </Select>
             <div
               v-else-if="selectedSubjectLabel"
-              class="flex items-center gap-2 rounded-l-none rounded-r-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-[length:var(--text-control,0.875rem)] min-w-0"
+              class="flex items-center gap-2 rounded-l-none rounded-r-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control min-w-0"
             >
               <span class="text-muted-foreground shrink-0">Mapel</span>
               <span class="font-semibold truncate">{{

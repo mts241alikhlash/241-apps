@@ -114,7 +114,7 @@ onMounted(() => {
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader
-        variant="muted"
+        standard
         class="px-2"
       >
         <div class="flex items-center gap-3">
@@ -131,7 +131,7 @@ onMounted(() => {
       <CardContent class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto p-2">
         <div
           v-if="review.loadFailed.value"
-          class="flex flex-wrap items-center gap-3 rounded-md border p-4 text-[length:var(--text-control,0.875rem)]"
+          class="flex flex-wrap items-center gap-3 rounded-md border p-4 text-control"
           role="alert"
         >
           Paket tidak dapat dimuat.
@@ -146,14 +146,14 @@ onMounted(() => {
         <template v-else-if="pkg">
           <div
             v-if="!canReview"
-            class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border bg-muted/30 p-3 text-control"
             role="status"
           >
             Paket ini tidak sedang menunggu tinjauan.
           </div>
           <div
             v-if="wroteIt && canReview"
-            class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border bg-muted/30 p-3 text-control"
             role="status"
           >
             Anda menyusun paket ini, jadi penyetujuan harus dilakukan orang
@@ -161,14 +161,14 @@ onMounted(() => {
           </div>
           <div
             v-if="error"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="alert"
           >
             {{ error }}
           </div>
           <div
             v-if="review.unreadable.value.size > 0"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="alert"
           >
             {{ review.unreadable.value.size }} soal tidak bisa dimuat. Muat
@@ -181,7 +181,7 @@ onMounted(() => {
               class="hidden min-w-0 lg:flex"
             >
               <CardHeader
-                variant="muted"
+                standard
                 class="px-2"
               >
                 <CardTitle>Daftar soal</CardTitle>
@@ -207,13 +207,11 @@ onMounted(() => {
                           @click="selectItem(index)"
                         >
                           <span
-                            class="w-4 shrink-0 text-right text-[length:var(--text-control,0.875rem)] text-muted-foreground tabular-nums"
+                            class="w-4 shrink-0 text-right text-control text-muted-foreground tabular-nums"
                           >
                             {{ item.position }}
                           </span>
-                          <span
-                            class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.875rem)]"
-                          >
+                          <span class="min-w-0 flex-1 truncate text-control">
                             {{ item.summary }}
                           </span>
                         </button>
@@ -221,7 +219,7 @@ onMounted(() => {
                       <ItemActions class="shrink-0">
                         <Badge
                           variant="outline"
-                          class="w-9 shrink-0 justify-center px-0"
+                          class="w-9 shrink-0 justify-center"
                           :title="typeLabel(item.type)"
                         >
                           {{ typeCode(item.type) }}
@@ -263,7 +261,7 @@ onMounted(() => {
                 class="min-w-0"
               >
                 <CardHeader
-                  variant="muted"
+                  standard
                   class="px-2"
                 >
                   <CardTitle>Soal {{ activeItem.position }}</CardTitle>
@@ -282,7 +280,7 @@ onMounted(() => {
                   </template>
                   <p
                     v-else
-                    class="text-[length:var(--text-control,0.875rem)] text-destructive"
+                    class="text-control text-destructive"
                     role="alert"
                   >
                     Soal ini tidak bisa dimuat.
@@ -316,7 +314,7 @@ onMounted(() => {
 
     <div
       v-if="pkg && canReview"
-      class="mt-2 flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
+      class="mt-2 flex min-h-[var(--control-h-lg,2rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
     >
       <Button
         variant="ghost"

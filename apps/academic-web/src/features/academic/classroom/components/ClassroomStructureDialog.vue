@@ -148,7 +148,7 @@ const popoverStates = reactive<PopoverStates>({
       </DialogHeader>
 
       <form
-        class="flex-1 overflow-y-auto space-y-5 py-2"
+        class="flex-1 overflow-y-auto space-y-4 py-2"
         @submit="onSubmit"
       >
         <FormField
@@ -200,7 +200,7 @@ const popoverStates = reactive<PopoverStates>({
                 <Command>
                   <CommandInput
                     placeholder="Cari nama guru..."
-                    class="text-[length:var(--text-control,0.875rem)]"
+                    class="text-control"
                   />
                   <CommandEmpty>Guru tidak ditemukan.</CommandEmpty>
                   <CommandList class="max-h-[180px]">
@@ -297,7 +297,7 @@ const popoverStates = reactive<PopoverStates>({
                 <Command>
                   <CommandInput
                     placeholder="Cari nama siswa..."
-                    class="text-[length:var(--text-control,0.875rem)]"
+                    class="text-control"
                   />
                   <CommandEmpty>Siswa tidak ditemukan.</CommandEmpty>
                   <CommandList class="max-h-[180px]">

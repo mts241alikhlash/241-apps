@@ -21,10 +21,7 @@ const props = defineProps<{
   editing: WorkPattern | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  success: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; success: [] }>()
 
 const name = ref('')
 const graceMinutes = ref(15)
@@ -101,7 +98,7 @@ async function handleDelete() {
         <DialogDescription class="sr-only" />
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="space-y-1.5">
             <Label for="pattern-name">Nama Pola Kerja</Label>
@@ -136,7 +133,7 @@ async function handleDelete() {
         </div>
 
         <div class="space-y-3">
-          <Label class="text-sm font-medium">Pengaturan Jam Kerja Hari</Label>
+          <Label>Pengaturan Jam Kerja Hari</Label>
           <div class="space-y-2">
             <div
               v-for="day in days"

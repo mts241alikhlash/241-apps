@@ -145,13 +145,13 @@ async function start() {
           gap="none"
           class="overflow-hidden"
         >
-          <CardHeader variant="muted">
+          <CardHeader standard>
             <CardTitle class="font-semibold">{{
               resumeSessionId ? 'Masukkan Token Kembali' : 'Token Ujian'
             }}</CardTitle>
           </CardHeader>
 
-          <CardContent class="space-y-4 p-4 sm:p-6">
+          <CardContent class="space-y-4 p-4 sm: p-4">
             <div
               v-if="loading"
               class="space-y-2"
@@ -165,21 +165,19 @@ async function start() {
               class="space-y-1"
             >
               <p class="font-medium">{{ displayTitle(exam) }}</p>
-              <p
-                class="text-[length:var(--text-control)] text-muted-foreground"
-              >
+              <p class="text-control text-muted-foreground">
                 {{ exam.durationMinutes }} menit
               </p>
             </div>
             <div
               v-else-if="error && !exam"
-              class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+              class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
               role="alert"
             >
               {{ error }}
             </div>
 
-            <p class="text-[length:var(--text-control)] text-muted-foreground">
+            <p class="text-control text-muted-foreground">
               {{
                 resumeSessionId
                   ? 'Anda keluar dari aplikasi. Minta token terbaru kepada pengawas ruangan untuk melanjutkan.'
@@ -196,7 +194,7 @@ async function start() {
               <Input
                 :id="fieldId"
                 v-model="code"
-                class="min-h-[var(--control-h-lg,2.25rem)]"
+                class="min-h-[var(--control-h-lg,2rem)]"
                 :disabled="submitting || loading"
                 autocomplete="off"
                 autocapitalize="characters"
@@ -207,7 +205,7 @@ async function start() {
 
             <p
               v-if="error && exam"
-              class="text-[length:var(--text-control)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ error }}
             </p>
@@ -215,7 +213,7 @@ async function start() {
             <Button
               v-if="sebRequired"
               variant="outline"
-              class="min-h-[var(--control-h-lg,2.25rem)] w-full"
+              class="min-h-[var(--control-h-lg,2rem)] w-full"
               @click="showSebGuide = true"
             >
               Panduan Safe Exam Browser
@@ -223,7 +221,7 @@ async function start() {
 
             <Button
               v-if="!error || exam"
-              class="min-h-[var(--control-h-lg,2.25rem)] w-full"
+              class="min-h-[var(--control-h-lg,2rem)] w-full"
               :disabled="submitting || loading || !code.trim()"
               @click="start"
             >
@@ -236,9 +234,7 @@ async function start() {
               }}
             </Button>
 
-            <p
-              class="text-center text-[length:var(--text-control)] text-muted-foreground"
-            >
+            <p class="text-center text-control text-muted-foreground">
               Layar dikunci selama ujian berlangsung.
             </p>
           </CardContent>

@@ -13,7 +13,7 @@ it('marks current step and emits selection, but locks while saving', async () =>
   expect(buttons[1].attributes('aria-current')).toBeUndefined()
   expect(
     buttons.every((button) =>
-      button.classes().includes('size-[var(--control-h-md,2rem)]'),
+      button.classes().includes('size-[var(--control-h-md,1.75rem)]'),
     ),
   ).toBe(true)
   expect(

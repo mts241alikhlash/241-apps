@@ -6,7 +6,6 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -129,7 +128,7 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
@@ -149,11 +148,11 @@ onMounted(load)
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
           role="alert"
         >
           <p>{{ error }}</p>
@@ -169,7 +168,7 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Menyiapkan dokumen...
         </p>
@@ -180,7 +179,7 @@ onMounted(load)
         >
           <p
             v-if="rosterShort"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.875rem)] text-destructive"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
             role="alert"
           >
             Daftar hadir memuat {{ roster.length }} dari
@@ -188,7 +187,7 @@ onMounted(load)
           </p>
           <header class="border-b-2 border-black pb-3">
             <div class="text-center">
-              <p class="text-[length:var(--text-control,0.875rem)] uppercase">
+              <p class="text-control uppercase">
                 Kementerian Agama Republik Indonesia
               </p>
               <p
@@ -199,13 +198,13 @@ onMounted(load)
               </p>
               <p
                 v-if="address"
-                class="text-[length:var(--text-control,0.875rem)]"
+                class="text-control"
               >
                 {{ address }}
               </p>
               <p
                 v-if="letterhead?.nsm || letterhead?.npsn"
-                class="text-[length:var(--text-control,0.875rem)] tabular-nums"
+                class="text-control tabular-nums"
               >
                 <span v-if="letterhead?.nsm">NSM {{ letterhead.nsm }}</span>
                 <span v-if="letterhead?.npsn">
@@ -219,16 +218,16 @@ onMounted(load)
             <h1 class="text-base font-semibold uppercase">
               Berita Acara Pelaksanaan Ujian
             </h1>
-            <p class="text-[length:var(--text-control,0.875rem)] tabular-nums">
+            <p class="text-control tabular-nums">
               {{ meta ? `${meta.room.code} · ${meta.room.name} · ` : ''
               }}{{ slotWindow }}
             </p>
-            <p class="text-[length:var(--text-control,0.875rem)]">
+            <p class="text-control">
               Status: {{ reportStatusLabel(report.status) }}
             </p>
           </div>
 
-          <p class="text-[length:var(--text-control,0.875rem)] leading-relaxed">
+          <p class="text-control leading-relaxed">
             Pada hari ini, {{ slotWindow }}, telah dilaksanakan ujian di
             {{ meta ? meta.room.name : 'ruangan ini' }}. Jumlah peserta
             terdaftar {{ totals.registered }} siswa, hadir
@@ -238,14 +237,8 @@ onMounted(load)
           </p>
 
           <section class="space-y-2">
-            <h2
-              class="text-[length:var(--text-control,0.875rem)] font-semibold"
-            >
-              Rekap Kehadiran
-            </h2>
-            <table
-              class="w-full border-collapse text-[length:var(--text-control,0.875rem)]"
-            >
+            <h2 class="text-control font-semibold">Rekap Kehadiran</h2>
+            <table class="w-full border-collapse text-control">
               <thead>
                 <tr class="border-y border-black">
                   <th class="py-1 text-left">Mata Pelajaran</th>
@@ -284,14 +277,8 @@ onMounted(load)
           </section>
 
           <section class="space-y-2">
-            <h2
-              class="text-[length:var(--text-control,0.875rem)] font-semibold"
-            >
-              Daftar Hadir Peserta
-            </h2>
-            <table
-              class="w-full border-collapse text-[length:var(--text-control,0.875rem)]"
-            >
+            <h2 class="text-control font-semibold">Daftar Hadir Peserta</h2>
+            <table class="w-full border-collapse text-control">
               <thead>
                 <tr class="border-y border-black">
                   <th class="py-1 text-center">No</th>
@@ -332,20 +319,18 @@ onMounted(load)
           </section>
 
           <section class="space-y-1">
-            <h2
-              class="text-[length:var(--text-control,0.875rem)] font-semibold"
-            >
+            <h2 class="text-control font-semibold">
               Catatan Insiden &amp; Tindakan Teknis
             </h2>
             <p
               v-if="report.auditLogs.length === 0"
-              class="text-[length:var(--text-control,0.875rem)]"
+              class="text-control"
             >
               Tidak ada tindakan teknis pada jam ujian ini.
             </p>
             <ol
               v-else
-              class="list-decimal space-y-1 pl-5 text-[length:var(--text-control,0.875rem)]"
+              class="list-decimal space-y-1 pl-5 text-control"
             >
               <li
                 v-for="entry in report.auditLogs"
@@ -360,14 +345,10 @@ onMounted(load)
               v-if="report.fieldNotes.length > 0"
               class="space-y-1"
             >
-              <h3
-                class="text-[length:var(--text-control,0.875rem)] font-semibold"
-              >
+              <h3 class="text-control font-semibold">
                 Catatan Pelanggaran Fisik
               </h3>
-              <ol
-                class="list-decimal space-y-1 pl-5 text-[length:var(--text-control,0.875rem)]"
-              >
+              <ol class="list-decimal space-y-1 pl-5 text-control">
                 <li
                   v-for="note in report.fieldNotes"
                   :key="note.id"
@@ -381,15 +362,13 @@ onMounted(load)
             </div>
             <p
               v-if="report.incidentNotes"
-              class="text-[length:var(--text-control,0.875rem)]"
+              class="text-control"
             >
               Catatan pengawas: {{ report.incidentNotes }}
             </p>
           </section>
 
-          <section
-            class="flex justify-between gap-8 pt-6 text-[length:var(--text-control,0.875rem)]"
-          >
+          <section class="flex justify-between gap-6 pt-6 text-control">
             <div class="text-center">
               <p>Pengawas Ruangan</p>
               <div class="h-16" />
@@ -403,7 +382,6 @@ onMounted(load)
           </section>
         </div>
       </CardContent>
-      <CardFooter variant="thin" />
     </Card>
   </div>
 </template>

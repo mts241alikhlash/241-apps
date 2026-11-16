@@ -50,7 +50,7 @@ export function createDeviceColumns(
         const stale = isStale(row.original.lastSeenAt)
         return h(
           'span',
-          { class: stale ? 'text-amber-600 font-medium' : 'text-foreground' },
+          { class: stale ? 'text-warning font-medium' : 'text-foreground' },
           lastSeenLabel(row.original.lastSeenAt),
         )
       },

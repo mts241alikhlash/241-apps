@@ -268,7 +268,8 @@ onMounted(async () => {
     >
       <CardHeader
         standard
-        class="justify-end min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
+        plain
+        class="justify-end"
       >
         <Button
           v-if="canCreate"
@@ -283,12 +284,11 @@ onMounted(async () => {
       <div class="space-y-4 p-0 sm:px-0">
         <Tabs
           v-model="tab"
-          variant="line"
           class="min-w-0 gap-0"
         >
           <Card gap="none">
             <CardHeader class="p-0 shrink-0">
-              <TabsList class="w-full bg-muted/30 px-4 sm:px-6">
+              <TabsList class="w-full px-4 sm:px-6">
                 <TabsTrigger
                   v-for="item in TABS"
                   :key="item.value"
@@ -306,7 +306,7 @@ onMounted(async () => {
             </CardHeader>
 
             <CardContent
-              class="space-y-4 px-4 pt-3 pb-4 sm:px-6 sm:pt-3.5 sm:pb-6"
+              class="space-y-4 px-4 pt-3 pb-4 sm: px-4 sm:pt-3.5 sm:pb-6"
             >
               <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
@@ -347,7 +347,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.875rem)]">
+                <p class="text-control">
                   {{ listError }}
                 </p>
                 <Button
@@ -360,13 +360,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                  class="text-center text-control text-muted-foreground"
                 >
                   Memuat pembayaran…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-control text-muted-foreground"
                 >
                   Tidak ada pembayaran.
                 </p>

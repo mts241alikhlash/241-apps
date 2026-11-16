@@ -175,7 +175,7 @@ onMounted(async () => {
         </Alert>
         <p
           v-else-if="!loading && !pkg"
-          class="text-[length:var(--text-control,0.875rem)]"
+          class="text-control"
           role="status"
         >
           Paket tidak ditemukan.
@@ -192,11 +192,7 @@ onMounted(async () => {
           <ReturnedNotes :review="builder.lastReturn.value" />
           <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
             <div class="flex flex-col gap-1">
-              <span
-                class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-              >
-                Status
-              </span>
+              <span class="text-control text-muted-foreground"> Status </span>
               <Badge
                 :variant="statusVariant(pkg.status)"
                 class="w-fit"
@@ -204,9 +200,7 @@ onMounted(async () => {
                 {{ packageStatusLabel(pkg.status) }}
               </Badge>
             </div>
-            <dl
-              class="flex flex-wrap items-start gap-x-6 gap-y-3 text-[length:var(--text-control,0.875rem)]"
-            >
+            <dl class="flex flex-wrap items-start gap-x-6 gap-y-3 text-control">
               <div class="flex flex-col gap-1">
                 <dt class="text-muted-foreground">Mapel</dt>
                 <dd class="font-medium">
@@ -248,9 +242,7 @@ onMounted(async () => {
           >
             <template #empty>
               <div class="space-y-3 py-2">
-                <p
-                  class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
-                >
+                <p class="text-control text-muted-foreground">
                   {{
                     canEdit
                       ? 'Paket ini belum berisi soal. Mulai dari salah satu cara berikut.'
@@ -288,7 +280,7 @@ onMounted(async () => {
           </DataTable>
           <Collapsible
             v-if="pkg.reviews.length > 0"
-            class="text-[length:var(--text-control,0.875rem)]"
+            class="text-control"
           >
             <CollapsibleTrigger as-child>
               <Button

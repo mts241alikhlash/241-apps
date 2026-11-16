@@ -57,7 +57,7 @@ async function handleLogout() {
     <div class="flex min-h-svh w-full flex-col">
       <header
         data-app-topbar
-        class="sticky top-0 z-20 flex h-[var(--control-h-lg,2.25rem)] items-center gap-2 border-b bg-background px-3"
+        class="sticky top-0 z-20 flex h-10 items-center gap-2 border-b bg-background px-3"
       >
         <RouterLink
           to="/"
@@ -68,9 +68,7 @@ async function handleLogout() {
             alt="241 Akun"
             class="size-6 object-contain"
           />
-          <span class="text-[length:var(--text-control,0.875rem)]"
-            >241 Akun</span
-          >
+          <span class="text-control">241 Akun</span>
         </RouterLink>
 
         <nav class="flex items-center gap-1">

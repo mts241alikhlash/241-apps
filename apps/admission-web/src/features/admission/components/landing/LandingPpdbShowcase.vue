@@ -122,7 +122,9 @@ const { target, visible } = useInView()
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <p class="text-xs font-bold tracking-widest text-[#836d29] uppercase">
+          <p
+            class="text-xs font-semibold tracking-widest text-[#836d29] uppercase"
+          >
             Informasi Khusus PPDB
           </p>
           <h2
@@ -204,7 +206,7 @@ const { target, visible } = useInView()
                 class="absolute inset-0 flex items-center justify-center bg-[#162d53]/30 opacity-0 backdrop-blur-[2px] transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
               >
                 <span
-                  class="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-xs font-bold text-[#203f73] shadow"
+                  class="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#203f73] shadow"
                 >
                   <Expand
                     class="size-3.5"

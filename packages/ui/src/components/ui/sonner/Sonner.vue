@@ -27,24 +27,24 @@ const props = defineProps<ToasterProps>()
     v-bind="props"
   >
     <template #success-icon>
-      <CircleCheckIcon class="size-[var(--icon-control,1rem)]" />
+      <CircleCheckIcon class="size-[var(--icon-control,0.875rem)]" />
     </template>
     <template #info-icon>
-      <InfoIcon class="size-[var(--icon-control,1rem)]" />
+      <InfoIcon class="size-[var(--icon-control,0.875rem)]" />
     </template>
     <template #warning-icon>
-      <TriangleAlertIcon class="size-[var(--icon-control,1rem)]" />
+      <TriangleAlertIcon class="size-[var(--icon-control,0.875rem)]" />
     </template>
     <template #error-icon>
-      <OctagonXIcon class="size-[var(--icon-control,1rem)]" />
+      <OctagonXIcon class="size-[var(--icon-control,0.875rem)]" />
     </template>
     <template #loading-icon>
       <div>
-        <Loader2Icon class="size-[var(--icon-control,1rem)] animate-spin" />
+        <Loader2Icon class="size-[var(--icon-control,0.875rem)] animate-spin" />
       </div>
     </template>
     <template #close-icon>
-      <XIcon class="size-[var(--icon-control,1rem)]" />
+      <XIcon class="size-[var(--icon-control,0.875rem)]" />
     </template>
   </Sonner>
 </template>
