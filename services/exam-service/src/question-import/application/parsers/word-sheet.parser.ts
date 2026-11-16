@@ -14,6 +14,11 @@ import {
 } from '../../domain/policies/import-content.policy.js'
 import { inlineToHtml } from '../../domain/policies/inline-latex.policy.js'
 import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
+import { isBlank, plain } from './html-text.js'
+import {
+  hasVerticalSections,
+  readVerticalQuestions,
+} from './vertical-word.parser.js'
 
 export type ImageSaver = (
   content: Buffer,
@@ -24,25 +29,6 @@ const TABLE = /<table\b[^>]*>([\s\S]*?)<\/table>/gu
 const ROW = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gu
 const CELL = /<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gu
 const CHOICE_KEYS = ['A', 'B', 'C', 'D', 'E'] as const
-const ENTITIES: Record<string, string> = {
-  '&amp;': '&',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&quot;': '"',
-  '&#39;': "'",
-}
-
-function plain(html: string): string {
-  return html
-    .replace(/<[^>]+>/gu, ' ')
-    .replace(/&(?:amp|lt|gt|quot|#39);/gu, (entity) => ENTITIES[entity] ?? '')
-    .replace(/\s+/gu, ' ')
-    .trim()
-}
-
-function isBlank(html: string): boolean {
-  return plain(html) === '' && !/<img\b/u.test(html)
-}
 
 function rowsOf(table: string): string[][] {
   return [...table.matchAll(ROW)].map((row) =>
@@ -142,6 +128,18 @@ export async function parseWordSheet(
     questions: [],
     errors: [],
     warnings: tables.slice(2).map(() => 'Tabel tambahan diabaikan'),
+  }
+  if (hasVerticalSections(html)) {
+    const vertical = readVerticalQuestions(html)
+    const counted =
+      vertical.questions.length +
+      vertical.errors.filter((issue) => issue.row > 0).length
+    if (counted > IMPORT_MAX_QUESTIONS) {
+      throw new BadRequestException('Maksimal 500 soal per berkas')
+    }
+    result.questions = vertical.questions
+    result.errors = vertical.errors
+    return result
   }
   const questionRows = tables[1]
   if (questionRows === undefined) {
