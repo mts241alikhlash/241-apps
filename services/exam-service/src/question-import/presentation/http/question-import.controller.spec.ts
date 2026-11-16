@@ -1,4 +1,6 @@
 import { BadRequestException, StreamableFile } from '@nestjs/common'
+import { plainToInstance } from 'class-transformer'
+import { validate } from 'class-validator'
 import type { Response } from 'express'
 import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
 import {
@@ -15,6 +17,8 @@ import {
 import { GetImportTemplateUseCase } from '../../application/use-cases/get-import-template/get-import-template.use-case.js'
 import { ImportQuestionsUseCase } from '../../application/use-cases/import-questions/import-questions.use-case.js'
 import { FakeExamPackageRepository } from '../../../exam-package/application/exam-package.repository.fake.js'
+import { STANDARD_COUNTS } from '../../domain/import-standard.js'
+import { ImportTemplateQueryDto } from './dto/import-questions.dto.js'
 import { QuestionImportController } from './question-import.controller.js'
 
 const PACKAGE_ID = '33333333-3333-4333-8333-333333333333'
@@ -113,5 +117,62 @@ describe('QuestionImportController', () => {
     await expect(
       build().controller.preview(TEACHER, undefined, { packageId: PACKAGE_ID }),
     ).rejects.toThrow(new BadRequestException('Berkas wajib dilampirkan'))
+  })
+
+  it('passes the layout and chosen counts to the template use case', async () => {
+    const { controller, template } = build()
+    const execute = vi.spyOn(template, 'execute')
+
+    await controller.template(
+      {
+        format: 'docx',
+        layout: 'vertical',
+        pg: 3,
+        pgKompleks: 2,
+        benarSalah: 1,
+        isian: 0,
+        uraian: 4,
+      },
+      { set: vi.fn() } as unknown as Response,
+    )
+
+    expect(execute).toHaveBeenCalledWith('docx', {
+      layout: 'vertical',
+      counts: {
+        MULTIPLE_CHOICE: 3,
+        MULTIPLE_RESPONSE: 2,
+        TRUE_FALSE: 1,
+        SHORT_ANSWER: 0,
+        ESSAY: 4,
+      },
+    })
+  })
+
+  it('falls back to the standard counts when none are given', async () => {
+    const { controller, template } = build()
+    const execute = vi.spyOn(template, 'execute')
+
+    await controller.template({ format: 'docx', layout: 'vertical' }, {
+      set: vi.fn(),
+    } as unknown as Response)
+
+    expect(execute).toHaveBeenCalledWith('docx', {
+      layout: 'vertical',
+      counts: {
+        MULTIPLE_CHOICE: STANDARD_COUNTS.MULTIPLE_CHOICE,
+        MULTIPLE_RESPONSE: STANDARD_COUNTS.MULTIPLE_RESPONSE,
+        TRUE_FALSE: STANDARD_COUNTS.TRUE_FALSE,
+        SHORT_ANSWER: STANDARD_COUNTS.SHORT_ANSWER,
+        ESSAY: STANDARD_COUNTS.ESSAY,
+      },
+    })
+  })
+
+  it('rejects a template count above 100', async () => {
+    const errors = await validate(
+      plainToInstance(ImportTemplateQueryDto, { format: 'docx', pg: '101' }),
+    )
+
+    expect(errors.map((error) => error.property)).toEqual(['pg'])
   })
 })

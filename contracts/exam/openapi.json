@@ -5866,6 +5866,73 @@
                 "docx"
               ]
             }
+          },
+          {
+            "name": "layout",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "table",
+                "vertical"
+              ]
+            }
+          },
+          {
+            "name": "pg",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pgKompleks",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "benarSalah",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isian",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "uraian",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 5,
+              "type": "number"
+            }
           }
         ],
         "responses": {

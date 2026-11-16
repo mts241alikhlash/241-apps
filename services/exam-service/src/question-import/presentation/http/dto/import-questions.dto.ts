@@ -1,7 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
-import { IsBoolean, IsIn, IsOptional, IsUUID } from 'class-validator'
+import { Transform, Type } from 'class-transformer'
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator'
 import { toBooleanFromTransform } from '@mts241alikhlash/nest-core/validators'
+import { STANDARD_COUNTS } from '../../../domain/import-standard.js'
 import type { ImportPreview } from '../../../application/use-cases/import-questions/import-questions.input.js'
 
 export class ImportQuestionsDto {
@@ -13,10 +22,44 @@ export class ImportQuestionsDto {
   confirmDuplicates?: boolean
 }
 
+function CountProperty(fallback: number) {
+  return function decorate(target: object, key: string): void {
+    ApiPropertyOptional({ minimum: 0, maximum: 100, default: fallback })(
+      target,
+      key,
+    )
+    IsOptional()(target, key)
+    Type(() => Number)(target, key)
+    IsInt()(target, key)
+    Min(0)(target, key)
+    Max(100)(target, key)
+  }
+}
+
 export class ImportTemplateQueryDto {
   @ApiProperty({ enum: ['xlsx', 'docx'] })
   @IsIn(['xlsx', 'docx'])
   format!: 'xlsx' | 'docx'
+
+  @ApiPropertyOptional({ enum: ['table', 'vertical'] })
+  @IsOptional()
+  @IsIn(['table', 'vertical'])
+  layout?: 'table' | 'vertical'
+
+  @CountProperty(STANDARD_COUNTS.MULTIPLE_CHOICE)
+  pg?: number
+
+  @CountProperty(STANDARD_COUNTS.MULTIPLE_RESPONSE)
+  pgKompleks?: number
+
+  @CountProperty(STANDARD_COUNTS.TRUE_FALSE)
+  benarSalah?: number
+
+  @CountProperty(STANDARD_COUNTS.SHORT_ANSWER)
+  isian?: number
+
+  @CountProperty(STANDARD_COUNTS.ESSAY)
+  uraian?: number
 }
 
 export class ImportErrorDto {

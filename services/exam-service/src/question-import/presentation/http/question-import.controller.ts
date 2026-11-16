@@ -30,6 +30,7 @@ import type { ScopeUser } from '../../../question/application/teacher-scope.serv
 import { GetImportTemplateUseCase } from '../../application/use-cases/get-import-template/get-import-template.use-case.js'
 import { ImportQuestionsUseCase } from '../../application/use-cases/import-questions/import-questions.use-case.js'
 import { IMPORT_MAX_BYTES } from '../../domain/import-limits.js'
+import { STANDARD_COUNTS } from '../../domain/import-standard.js'
 import {
   ImportPreviewDto,
   ImportQuestionsDto,
@@ -65,7 +66,17 @@ export class QuestionImportController {
     @Query() query: ImportTemplateQueryDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
-    const template = await this.getTemplate.execute(query.format)
+    const template = await this.getTemplate.execute(query.format, {
+      layout: query.layout,
+      counts: {
+        MULTIPLE_CHOICE: query.pg ?? STANDARD_COUNTS.MULTIPLE_CHOICE,
+        MULTIPLE_RESPONSE:
+          query.pgKompleks ?? STANDARD_COUNTS.MULTIPLE_RESPONSE,
+        TRUE_FALSE: query.benarSalah ?? STANDARD_COUNTS.TRUE_FALSE,
+        SHORT_ANSWER: query.isian ?? STANDARD_COUNTS.SHORT_ANSWER,
+        ESSAY: query.uraian ?? STANDARD_COUNTS.ESSAY,
+      },
+    })
     res.set({
       'Content-Type': template.contentType,
       'Content-Length': String(template.buffer.length),

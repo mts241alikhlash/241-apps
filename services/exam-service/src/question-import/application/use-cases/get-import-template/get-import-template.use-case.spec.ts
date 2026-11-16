@@ -1,4 +1,5 @@
 import JSZip from 'jszip'
+import { BadRequestException } from '@nestjs/common'
 import { describe, expect, it } from 'vitest'
 import { parseExcelSheet } from '../../parsers/excel-sheet.parser.js'
 import { parseWordSheet } from '../../parsers/word-sheet.parser.js'
@@ -46,5 +47,29 @@ describe('GetImportTemplateUseCase', () => {
     expect(sheet.identity.version).toBe(2)
     expect(sheet.errors).toEqual([])
     expect(sheet.questions.map((q) => q.type)).toEqual(QUESTION_TYPES)
+  })
+
+  it('gives the vertical Word template for the vertical layout', async () => {
+    const template = await new GetImportTemplateUseCase().execute('docx', {
+      layout: 'vertical',
+    })
+
+    const xml = await JSZip.loadAsync(template.buffer).then((zip) =>
+      zip.file('word/document.xml')!.async('string'),
+    )
+
+    expect(template.fileName).toBe('template-soal-vertikal.docx')
+    expect(template.contentType).toBe(
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    )
+    expect(xml).toContain('BAGIAN PG')
+  })
+
+  it('rejects the vertical layout for Excel', async () => {
+    await expect(
+      new GetImportTemplateUseCase().execute('xlsx', { layout: 'vertical' }),
+    ).rejects.toThrow(
+      new BadRequestException('Susunan vertikal hanya untuk Word'),
+    )
   })
 })
