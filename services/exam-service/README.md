@@ -30,7 +30,7 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - One bad row cancels the whole import; nothing is saved. Duplicates need `confirmDuplicates`.
 - Limits: 500 questions per file, 10 MB.
 - Vertical Word layout (`GET /exam-imports/template?format=docx&layout=vertical`, with optional `pg`, `pgKompleks`, `benarSalah`, `isian`, `uraian` counts from 0 to 100, default 20, 10, 10, 0, 5). Sections are `BAGIAN PG`, `BAGIAN PG KOMPLEKS`, `BAGIAN BENAR/SALAH`, `BAGIAN ISIAN` and `BAGIAN URAIAN`; a parenthesised note after the name is ignored. Each question is its question lines (an optional leading number such as `1.`), then choice lines, then `Kunci:` and optional `Abaikan harakat: ya`, and the last line is `Poin:`, which is required and ends the question.
-- Choices are typed `A.` to `E.` (also `A)` or `A:`), or left to Word's automatic numbering, where item 1 is A. Typed choices must run in order A, B, C and so on; trailing blank ones are ignored, while a skipped, blank or out-of-order letter is an error. A question takes 2 to 5 choices for PG and PG Kompleks.
+- Choices are typed `A.` to `E.` (also `A)` or `A:`), or left to Word's automatic numbering, where item 1 is A. Typed choices must run in order A, B, C and so on; trailing blank ones are ignored, while a skipped, blank or out-of-order letter is an error. A question takes 2 to 5 choices for PG and PG Kompleks. A `Kunci:` letter that no choice carries is an error, which also catches a blank middle item that Word's automatic numbering silently closed up.
 - The standard counts are 20 PG, 10 PG Kompleks, 10 Benar/Salah and 5 Uraian; Isian has no standard. A different count adds a warning such as `PG 18 dari 20` to the preview. Warnings never block a save.
 
 ## Gotchas

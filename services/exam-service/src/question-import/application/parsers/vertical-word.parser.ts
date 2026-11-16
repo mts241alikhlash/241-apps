@@ -158,6 +158,18 @@ export function readVerticalQuestions(html: string): ParseResult {
         key: CHOICE_KEYS[index] ?? 'E',
         html: inlineToHtml(stripChoiceMarker(choice)),
       }))
+      if (hasChoices(current.type)) {
+        const available = new Set<string>(choices.map((choice) => choice.key))
+        for (const part of current.key.split(/[\s,;]+/u)) {
+          if (part === '') continue
+          const letter = part.toUpperCase()
+          if (!available.has(letter)) {
+            throw new ImportRowError(
+              `Kunci ${letter} tidak ada di antara pilihan soal ini`,
+            )
+          }
+        }
+      }
       result.questions.push({
         row: current.order,
         type: current.type,

@@ -486,4 +486,26 @@ describe('vertical Word layout', () => {
       /^Bagian PG, soal 1: Pilihan harus berurutan A, B, C dan seterusnya, pilihan A kosong atau tidak berurutan$/u,
     )
   })
+
+  it('rejects a Kunci letter that no choice carries', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        item(0, 'Soal'),
+        item(1, 'satu'),
+        item(1, 'tiga'),
+        para('Kunci: C'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason:
+          'Bagian PG, soal 1: Kunci C tidak ada di antara pilihan soal ini',
+      },
+    ])
+  })
 })
