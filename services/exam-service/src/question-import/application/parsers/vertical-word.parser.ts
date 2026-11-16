@@ -39,6 +39,8 @@ interface Draft {
 
 const TABLE = /<table\b[\s\S]*?<\/table>/gu
 const BLOCK_TAG = /<(\/?)(p|h[1-6]|ol|ul|li)\b[^>]*>/giu
+const UNKNOWN_SECTION = /^bagian\b/iu
+const NUMBERED = /^\d+[.)]\s/u
 const BREAK = /<br\s*\/?>/giu
 const SPACES = /&nbsp;|\u00a0/gu
 const CHOICE_KEYS = ['A', 'B', 'C', 'D', 'E'] as const
@@ -112,7 +114,7 @@ export function readVerticalQuestions(html: string): ParseResult {
     const prefix = `Bagian ${SECTION_NAMES[current.type]}, soal ${current.number}: `
     try {
       if (current.error !== null) throw new ImportRowError(current.error)
-      if (points === null) {
+      if (points === null || points === '') {
         throw new ImportRowError('soal tidak diakhiri baris Poin')
       }
       if (current.typed && current.automatic) {
@@ -125,8 +127,14 @@ export function readVerticalQuestions(html: string): ParseResult {
       )
       if (isBlank(bodyHtml)) throw new ImportRowError('soal kosong')
       const filled = current.choices.filter((choice) => !isBlank(choice))
-      if (filled.length > CHOICE_KEYS.length) {
-        throw new ImportRowError('pilihan lebih dari lima')
+      if (
+        hasChoices(current.type) &&
+        (filled.length < 2 || filled.length > CHOICE_KEYS.length)
+      ) {
+        throw new ImportRowError('Pilihan jawaban harus 2 sampai 5')
+      }
+      if (current.type !== 'ESSAY' && current.key.trim() === '') {
+        throw new ImportRowError('Kunci jawaban harus diisi')
       }
       const choices: Choice[] = filled.map((choice, index) => ({
         key: CHOICE_KEYS[index] ?? 'E',
@@ -184,6 +192,16 @@ export function readVerticalQuestions(html: string): ParseResult {
       number = 0
       continue
     }
+    if (block.kind === 'p' && UNKNOWN_SECTION.test(text)) {
+      close()
+      type = null
+      orphaned = false
+      result.errors.push({
+        row: order + 1,
+        reason: `Bagian tidak dikenal: ${text}`,
+      })
+      continue
+    }
     const label = block.kind === 'p' ? readLabel(text) : null
 
     if (type === null) {
@@ -216,7 +234,18 @@ export function readVerticalQuestions(html: string): ParseResult {
       continue
     }
 
-    const current = draft
+    const finished = draft
+    const restarts =
+      block.kind === 'item'
+        ? !hasChoices(type) || finished.answering
+        : finished.answering || NUMBERED.test(text)
+    if (restarts) {
+      finish(finished, null)
+      draft = open(type, [block.html])
+      continue
+    }
+
+    const current = finished
     const marker =
       block.kind === 'p' && hasChoices(type) ? choiceMarker(text) : null
     const choice =

@@ -247,4 +247,114 @@ describe('vertical Word layout', () => {
       parse(para('BAGIAN BENAR/SALAH') + questions.join('')),
     ).rejects.toThrow(new BadRequestException('Maksimal 500 soal per berkas'))
   })
+
+  it('does not read questions under an unknown section', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN ISIAN'),
+        para('1. Tuliskan'),
+        para('Kunci: kitab'),
+        para('Poin: 1'),
+        para('BAGIAN ESAI'),
+        para('1. Jelaskan'),
+        para('Kunci: x'),
+        para('Poin: 5'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toHaveLength(1)
+    expect(sheet.errors).toEqual([
+      { row: 2, reason: 'Bagian tidak dikenal: BAGIAN ESAI' },
+      { row: 0, reason: 'Bagian tidak ditemukan sebelum soal' },
+    ])
+  })
+
+  it('flags a middle PG question missing Poin without swallowing the next', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Satu'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+        para('2. Dua'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: B'),
+        para('3. Tiga'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+        para('Poin: 2'),
+        para('4. Empat'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: B'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions.map((q) => q.row)).toEqual([1, 3, 4])
+    expect(sheet.errors).toEqual([
+      { row: 2, reason: 'Bagian PG, soal 2: soal tidak diakhiri baris Poin' },
+    ])
+  })
+
+  it('flags an Isian question missing Kunci and Poin', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN ISIAN'),
+        para('1. Satu'),
+        para('2. Dua'),
+        para('Kunci: b'),
+        para('Poin: 1'),
+        para('3. Tiga'),
+        para('Kunci: c'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions.map((q) => q.row)).toEqual([2, 3])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason: 'Bagian Isian, soal 1: soal tidak diakhiri baris Poin',
+      },
+    ])
+  })
+
+  it('prefixes validation errors', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Satu'),
+        para('A. a'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+        para('2. Dua'),
+        para('A. a'),
+        para('B. b'),
+        para('Poin: 1'),
+        para('3. Tiga'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+        para('Poin:'),
+        para('4. Empat'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci:B'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([
+      { row: 1, reason: 'Bagian PG, soal 1: Pilihan jawaban harus 2 sampai 5' },
+      { row: 2, reason: 'Bagian PG, soal 2: Kunci jawaban harus diisi' },
+      { row: 3, reason: 'Bagian PG, soal 3: soal tidak diakhiri baris Poin' },
+    ])
+    expect(sheet.questions).toHaveLength(1)
+    expect(sheet.questions[0]?.content).toMatchObject({ answer: { key: 'B' } })
+  })
 })
