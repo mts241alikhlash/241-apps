@@ -423,4 +423,67 @@ describe('vertical Word layout', () => {
       answer: { keys: ['A', 'C'] },
     })
   })
+
+  it('rejects a blank choice followed by a filled one and keeps the key on its letter', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Berapa $2+3$?'),
+        para('A. 4'),
+        para('B.'),
+        para('C. 6'),
+        para('D. 7'),
+        para('Kunci: C'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason:
+          'Bagian PG, soal 1: Pilihan harus berurutan A, B, C dan seterusnya, pilihan B kosong atau tidak berurutan',
+      },
+    ])
+  })
+
+  it('rejects typed choices that skip a letter', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Berapa $2+3$?'),
+        para('A. 4'),
+        para('C. 6'),
+        para('D. 7'),
+        para('Kunci: C'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toHaveLength(1)
+    expect(sheet.errors[0]?.reason).toMatch(
+      /^Bagian PG, soal 1: Pilihan harus berurutan A, B, C dan seterusnya, pilihan B kosong atau tidak berurutan$/u,
+    )
+  })
+
+  it('rejects typed choices out of order', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Berapa $2+3$?'),
+        para('B. 5'),
+        para('A. 4'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toHaveLength(1)
+    expect(sheet.errors[0]?.reason).toMatch(
+      /^Bagian PG, soal 1: Pilihan harus berurutan A, B, C dan seterusnya, pilihan A kosong atau tidak berurutan$/u,
+    )
+  })
 })

@@ -98,6 +98,21 @@ export function hasVerticalSections(html: string): boolean {
   )
 }
 
+function checkTypedOrder(choices: string[]): void {
+  const blank = (choice: string): boolean => isBlank(stripChoiceMarker(choice))
+  let end = choices.length
+  while (end > 0 && blank(choices[end - 1] ?? '')) end -= 1
+  for (const [index, choice] of choices.slice(0, end).entries()) {
+    const expected = CHOICE_KEYS[index]
+    if (expected === undefined) return
+    if (blank(choice) || choiceMarker(plain(choice))?.key !== expected) {
+      throw new ImportRowError(
+        `Pilihan harus berurutan A, B, C dan seterusnya, pilihan ${expected} kosong atau tidak berurutan`,
+      )
+    }
+  }
+}
+
 function hasChoices(type: QuestionType): boolean {
   return type === 'MULTIPLE_CHOICE' || type === 'MULTIPLE_RESPONSE'
 }
@@ -126,6 +141,7 @@ export function readVerticalQuestions(html: string): ParseResult {
         stripQuestionNumber(current.body.join('<br>')),
       )
       if (isBlank(bodyHtml)) throw new ImportRowError('soal kosong')
+      if (current.typed) checkTypedOrder(current.choices)
       const filled = current.choices.filter(
         (choice) => !isBlank(stripChoiceMarker(choice)),
       )
