@@ -319,7 +319,8 @@ describe('vertical Word layout', () => {
     expect(sheet.errors).toEqual([
       {
         row: 1,
-        reason: 'Bagian Isian, soal 1: soal tidak diakhiri baris Poin',
+        reason:
+          'Bagian Isian, soal 1: soal tidak diakhiri baris Poin (baris yang diawali angka dibaca sebagai soal baru; tulis pernyataan sebagai (1), (2))',
       },
     ])
   })
@@ -352,7 +353,11 @@ describe('vertical Word layout', () => {
     expect(sheet.errors).toEqual([
       { row: 1, reason: 'Bagian PG, soal 1: Pilihan jawaban harus 2 sampai 5' },
       { row: 2, reason: 'Bagian PG, soal 2: Kunci jawaban harus diisi' },
-      { row: 3, reason: 'Bagian PG, soal 3: soal tidak diakhiri baris Poin' },
+      {
+        row: 3,
+        reason:
+          'Bagian PG, soal 3: Poin belum diisi (hapus slot soal yang tidak dipakai)',
+      },
     ])
     expect(sheet.questions).toHaveLength(1)
     expect(sheet.questions[0]?.content).toMatchObject({ answer: { key: 'B' } })
@@ -523,5 +528,131 @@ describe('vertical Word layout', () => {
 
     expect(sheet.errors).toEqual([])
     expect(sheet.questions[0]?.content).toMatchObject({ answer: { key: 'B' } })
+  })
+
+  it('reports a table inside a question', async () => {
+    const identity =
+      '<w:tbl><w:tr><w:tc><w:p><w:r><w:t>Versi Template</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>2</w:t></w:r></w:p></w:tc></w:tr></w:tbl>'
+    const data =
+      '<w:tbl><w:tr><w:tc><w:p><w:r><w:t>Nilai</w:t></w:r></w:p></w:tc></w:tr></w:tbl>'
+    const sheet = await parse(
+      [
+        identity,
+        para('BAGIAN ISIAN'),
+        para('1. Perhatikan tabel'),
+        data,
+        para('Nilai terbesar?'),
+        para('Kunci: 9'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([
+      {
+        row: 0,
+        reason:
+          'tabel di dalam soal belum didukung, pindahkan isinya menjadi gambar atau teks',
+      },
+    ])
+    expect(sheet.warnings).toEqual([])
+  })
+
+  it('numbers soal by file order across sections', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Satu'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+        para('BAGIAN PG KOMPLEKS'),
+        para('2. Dua'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+      ].join(''),
+    )
+
+    expect(sheet.errors).toEqual([
+      {
+        row: 2,
+        reason: 'Bagian PG Kompleks, soal 2: soal tidak diakhiri baris Poin',
+      },
+    ])
+  })
+
+  it('gives one clear error per unused template slot', async () => {
+    const slot = (n: number) => [
+      para(`${n}. &lt;tulis soal di sini&gt;`),
+      para('A.'),
+      para('B.'),
+      para('C.'),
+      para('D.'),
+      para('Kunci:'),
+      para('Poin:'),
+    ]
+    const sheet = await parse(
+      [para('BAGIAN PG'), ...slot(1), ...slot(2)].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason:
+          'Bagian PG, soal 1: Poin belum diisi (hapus slot soal yang tidak dipakai)',
+      },
+      {
+        row: 2,
+        reason:
+          'Bagian PG, soal 2: Poin belum diisi (hapus slot soal yang tidak dipakai)',
+      },
+    ])
+  })
+
+  it('explains a question cut by numbered statements', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Perhatikan pernyataan berikut'),
+        para('1) Air mendidih'),
+        para('2) Es mencair'),
+        para('A. a'),
+        para('B. b'),
+        para('Kunci: A'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    const cut =
+      'soal tidak diakhiri baris Poin (baris yang diawali angka dibaca sebagai soal baru; tulis pernyataan sebagai (1), (2))'
+    expect(sheet.errors.slice(0, 2)).toEqual([
+      { row: 1, reason: `Bagian PG, soal 1: ${cut}` },
+      { row: 2, reason: `Bagian PG, soal 2: ${cut}` },
+    ])
+  })
+
+  it('requires exactly one Kunci for a single-answer PG', async () => {
+    const sheet = await parse(
+      [
+        para('BAGIAN PG'),
+        para('1. Soal'),
+        para('A. a'),
+        para('B. b'),
+        para('C. c'),
+        para('Kunci: A, C'),
+        para('Poin: 1'),
+      ].join(''),
+    )
+
+    expect(sheet.questions).toEqual([])
+    expect(sheet.errors).toEqual([
+      {
+        row: 1,
+        reason:
+          'Bagian PG, soal 1: PG hanya boleh satu Kunci; gunakan BAGIAN PG KOMPLEKS untuk lebih dari satu jawaban',
+      },
+    ])
   })
 })

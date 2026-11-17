@@ -25,7 +25,6 @@ interface Block {
 
 interface Draft {
   order: number
-  number: number
   type: QuestionType
   body: string[]
   choices: string[]
@@ -51,6 +50,9 @@ const SECTION_NAMES: Record<QuestionType, string> = {
   SHORT_ANSWER: 'Isian',
   ESSAY: 'Uraian',
 }
+
+export const TABLE_IN_QUESTION =
+  'tabel di dalam soal belum didukung, pindahkan isinya menjadi gambar atau teks'
 
 function readBlocks(html: string): Block[] {
   const source = html.replace(TABLE, '').replace(SPACES, ' ')
@@ -120,17 +122,25 @@ function hasChoices(type: QuestionType): boolean {
 export function readVerticalQuestions(html: string): ParseResult {
   const result: ParseResult = { questions: [], errors: [] }
   let type: QuestionType | null = null
-  let number = 0
   let order = 0
   let draft = null as Draft | null
   let orphaned = false
 
-  const finish = (current: Draft, points: string | null): void => {
-    const prefix = `Bagian ${SECTION_NAMES[current.type]}, soal ${current.number}: `
+  const finish = (current: Draft, points: string | null, cut = false): void => {
+    const prefix = `Bagian ${SECTION_NAMES[current.type]}, soal ${current.order}: `
     try {
       if (current.error !== null) throw new ImportRowError(current.error)
-      if (points === null || points === '') {
-        throw new ImportRowError('soal tidak diakhiri baris Poin')
+      if (points === null) {
+        throw new ImportRowError(
+          cut
+            ? 'soal tidak diakhiri baris Poin (baris yang diawali angka dibaca sebagai soal baru; tulis pernyataan sebagai (1), (2))'
+            : 'soal tidak diakhiri baris Poin',
+        )
+      }
+      if (points === '') {
+        throw new ImportRowError(
+          'Poin belum diisi (hapus slot soal yang tidak dipakai)',
+        )
       }
       if (current.typed && current.automatic) {
         throw new ImportRowError(
@@ -172,6 +182,11 @@ export function readVerticalQuestions(html: string): ParseResult {
             )
           }
         }
+        if (current.type === 'MULTIPLE_CHOICE' && letters.length !== 1) {
+          throw new ImportRowError(
+            'PG hanya boleh satu Kunci; gunakan BAGIAN PG KOMPLEKS untuk lebih dari satu jawaban',
+          )
+        }
         key = letters.join(', ')
       }
       result.questions.push({
@@ -196,10 +211,8 @@ export function readVerticalQuestions(html: string): ParseResult {
 
   const open = (current: QuestionType, body: string[]): Draft => {
     order += 1
-    number += 1
     return {
       order,
-      number,
       type: current,
       body,
       choices: [],
@@ -223,7 +236,6 @@ export function readVerticalQuestions(html: string): ParseResult {
     if (section !== null) {
       close()
       type = section
-      number = 0
       continue
     }
     if (block.kind === 'p' && UNKNOWN_SECTION.test(text)) {
@@ -274,7 +286,11 @@ export function readVerticalQuestions(html: string): ParseResult {
         ? !hasChoices(type) || finished.answering
         : finished.answering || NUMBERED.test(text)
     if (restarts) {
-      finish(finished, null)
+      finish(
+        finished,
+        null,
+        block.kind === 'p' && !finished.answering && NUMBERED.test(text),
+      )
       draft = open(type, [block.html])
       continue
     }

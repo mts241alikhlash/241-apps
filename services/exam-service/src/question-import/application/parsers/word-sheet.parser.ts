@@ -17,6 +17,7 @@ import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
 import { isBlank, plain } from './html-text.js'
 import {
   hasVerticalSections,
+  TABLE_IN_QUESTION,
   readVerticalQuestions,
 } from './vertical-word.parser.js'
 
@@ -138,7 +139,11 @@ export async function parseWordSheet(
       throw new BadRequestException('Maksimal 500 soal per berkas')
     }
     result.questions = vertical.questions
-    result.errors = vertical.errors
+    result.errors = [
+      ...tables.slice(1).map(() => ({ row: 0, reason: TABLE_IN_QUESTION })),
+      ...vertical.errors,
+    ]
+    result.warnings = []
     return result
   }
   const questionRows = tables[1]

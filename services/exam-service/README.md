@@ -24,7 +24,7 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 
 ### Question import
 
-- One table template, version 2, for Word (`.docx`) and Excel (`.xlsx`) alike. Sheet `Identitas` (Word: the first table) holds the identity: Versi Template, Nama Guru, NIK, Mapel, Tingkat. Sheet `Soal` (Word: the second table) holds the questions with the columns Jenis, Soal, A to E, Kunci, Abaikan harakat, Poin. A Word file with a third table gets a warning and that table is ignored.
+- One table template, version 2, for Word (`.docx`) and Excel (`.xlsx`) alike. Sheet `Identitas` (Word: the first table) holds the identity: Versi Template, Nama Guru, NIK, Mapel, Tingkat. Sheet `Soal` (Word: the second table) holds the questions with the columns Jenis, Soal, A to E, Kunci, Abaikan harakat, Poin. A Word file with a third table gets a warning and that table is ignored (table layout only).
 - `GET /exam-imports/template` returns the template. `POST /exam-imports/preview` reads the file and returns the questions and row errors without saving. `POST /exam-imports` saves; it takes `confirmDuplicates` when a question's text already exists in the bank.
 - The identity must match the package: Mapel, Tingkat, and a NIK of a staff account. A mismatch is refused.
 - One bad row cancels the whole import; nothing is saved. Duplicates need `confirmDuplicates`.
@@ -40,7 +40,10 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - Nested Word tables are not supported.
 - Old v1 Excel files and paragraph-style Word files are rejected with "Unduh template baru".
 - In a vertical file, any paragraph starting with the word `Bagian` that is not a section line is an error.
-- In Isian, Benar/Salah and Uraian bodies, avoid lists and avoid later lines that start with `2.` or `3)`: they are read as the next question.
+- In every section, a body line that starts with a number and a dot or bracket (`2.`, `3)`) is read as the next question, and so are list items outside PG and PG Kompleks choices. Write numbered statements as `(1)`, `(2)` or with letters or `i.`, `ii.`; a question cut this way reports "soal tidak diakhiri baris Poin" with that hint.
+- A table inside a question is an error (row 0); turn its content into an image or text. Only the first table, the identity, is allowed in a vertical file.
+- Questions are numbered `soal n` by their order in the file, across sections, in error messages; the template numbers them the same way.
+- `Poin:` present but empty means an unused template slot: delete the slot. PG takes exactly one `Kunci:` letter; use PG Kompleks for several.
 - A `Poin:` line is required for every question; a question without one is an error.
 
 ## Open work
