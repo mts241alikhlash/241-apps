@@ -144,6 +144,7 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
   constructor(
     private readonly options: {
       number?: string | null
+      numbers?: Map<string, string>
       failWith?: Error
     } = {},
   ) {
@@ -153,6 +154,19 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
   findNumber() {
     if (this.options.failWith) return Promise.reject(this.options.failWith)
     return Promise.resolve(this.options.number ?? null)
+  }
+
+  findNumbers(studentIds: string[]) {
+    if (this.options.failWith) return Promise.reject(this.options.failWith)
+    const numbers = this.options.numbers ?? new Map<string, string>()
+    return Promise.resolve(
+      new Map(
+        studentIds.flatMap((id) => {
+          const number = numbers.get(id)
+          return number === undefined ? [] : [[id, number] as const]
+        }),
+      ),
+    )
   }
 
   issueNumbers() {

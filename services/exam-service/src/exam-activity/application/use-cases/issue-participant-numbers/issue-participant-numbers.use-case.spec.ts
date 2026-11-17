@@ -41,6 +41,10 @@ class FakeParticipants extends IParticipantNumberPort {
     return Promise.resolve(null)
   }
 
+  findNumbers() {
+    return Promise.resolve(new Map<string, string>())
+  }
+
   issueNumbers(semesterId: string) {
     this.issued.push(semesterId)
     return this.failure === null
