@@ -3621,6 +3621,65 @@
         ]
       }
     },
+    "/exam-events/{id}/print-pack": {
+      "get": {
+        "operationId": "ExamEventController_getPrintPack",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PrintPackDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The print pack of an exam event",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
     "/exam-rooms/{roomId}/monitor": {
       "get": {
         "operationId": "ExamRoomController_roomMonitor",
@@ -9517,6 +9576,172 @@
           "code",
           "name",
           "capacity"
+        ]
+      },
+      "PrintPackTechnicianDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PrintPackSupervisorDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "name"
+        ]
+      },
+      "PrintPackStudentDto": {
+        "type": "object",
+        "properties": {
+          "seatNumber": {
+            "type": "number"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "nis": {
+            "type": "string",
+            "nullable": true
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "seatNumber",
+          "studentId",
+          "name",
+          "nis",
+          "classroomName",
+          "participantNumber"
+        ]
+      },
+      "PrintPackRoomDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "technician": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintPackTechnicianDto"
+              }
+            ]
+          },
+          "supervisors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackSupervisorDto"
+            }
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackStudentDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "building",
+          "technician",
+          "supervisors",
+          "students"
+        ]
+      },
+      "PrintPackDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "required": [
+              "id",
+              "name",
+              "startsAt",
+              "endsAt"
+            ],
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endsAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackRoomDto"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "rooms",
+          "warnings"
         ]
       },
       "RoomMonitorLastEventDto": {

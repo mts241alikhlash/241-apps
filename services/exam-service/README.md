@@ -30,6 +30,11 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - One bad row cancels the whole import; nothing is saved. Duplicates need `confirmDuplicates`.
 - Limits: 500 questions per file, 10 MB.
 
+### Print pack
+
+- `GET /exam-events/:id/print-pack?roomId=<uuid>` (`exam-events.manage`) returns the event, its rooms in code order, each room's seated students (seat number, name, NIS, classroom, participant number), supervisor slots and technician, and `warnings` (for example students without a participant number). `roomId` limits the pack to one room and answers 404 when it is not in the event.
+- Participant numbers come from one bulk call to student-service (`POST /students/participant-numbers/lookup`) per pack, for every seated student of the event. Never call it per student or per room.
+
 ## Gotchas
 
 - A default `test` run reports skipped specs; they are not failures.
