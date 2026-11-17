@@ -104,7 +104,7 @@ watch(
         <DialogTitle>Peserta Susulan</DialogTitle>
         <DialogDescription>{{ title }}</DialogDescription>
       </DialogHeader>
-      <DialogBody class="min-h-0 flex-1 overflow-y-auto">
+      <DialogBody>
         <div
           v-if="removeError"
           class="mb-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"

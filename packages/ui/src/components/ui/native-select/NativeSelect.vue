@@ -37,7 +37,7 @@ const delegatedProps = reactiveOmit(props, 'class')
       data-slot="native-select"
       :class="
         cn(
-          'border-input bg-transparent placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 h-[var(--control-h-md,1.75rem)] w-full min-w-0 appearance-none rounded-md border py-0.5 pr-6 pl-2 text-control leading-relaxed transition-colors select-none outline-none disabled:pointer-events-none disabled:cursor-not-allowed',
+          'border-input bg-transparent placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 h-[var(--control-h-md,2rem)] w-full min-w-0 appearance-none rounded-md border py-0.5 pr-6 pl-2 text-control leading-relaxed transition-colors select-none outline-none disabled:pointer-events-none disabled:cursor-not-allowed',
           props.class,
         )
       "

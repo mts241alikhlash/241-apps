@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
@@ -139,6 +140,7 @@ onMounted(load)
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <SessionRecoveryDialog

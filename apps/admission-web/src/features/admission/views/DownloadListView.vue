@@ -321,7 +321,7 @@ onMounted(load)
           <DialogTitle>
             {{ editing ? 'Ubah Berkas' : 'Tambah Berkas' }}
           </DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Berkas PDF yang bisa diunduh dari halaman depan pendaftaran.
           </DialogDescription>
         </DialogHeader>
@@ -373,7 +373,7 @@ onMounted(load)
                 type="file"
                 accept="application/pdf,.pdf"
                 :aria-describedby="fileHintId"
-                class="block min-h-[var(--control-h-lg,2rem)] w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-control file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-control file:font-medium"
+                class="block min-h-[var(--control-h-lg,2.25rem)] w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-control file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-control file:font-medium"
                 @change="onFileChange"
               />
               <p

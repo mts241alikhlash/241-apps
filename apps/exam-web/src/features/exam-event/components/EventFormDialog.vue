@@ -70,7 +70,7 @@ onMounted(() => {
         <DialogTitle>{{
           isEdit ? 'Ubah Kegiatan Ujian' : 'Tambah Kegiatan Ujian'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Atur nama, jenis, rentang waktu, dan toleransi kegiatan ujian.
         </DialogDescription>
       </DialogHeader>

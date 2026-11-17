@@ -610,7 +610,7 @@ useBreadcrumbs(() => {
       >
         <DialogHeader standard>
           <DialogTitle>Ketentuan Pendaftaran</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Informasi gelombang dan ketentuan pendaftaran.
           </DialogDescription>
         </DialogHeader>

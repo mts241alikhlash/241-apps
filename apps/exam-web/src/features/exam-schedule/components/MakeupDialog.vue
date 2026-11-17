@@ -72,7 +72,7 @@ async function create() {
           {{ schedule.packageTitle }} · {{ schedule.classroomName ?? '-' }}
         </DialogDescription>
       </DialogHeader>
-      <DialogBody class="min-h-0 flex-1 space-y-4 overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div
           v-if="form.error.value"
           class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"

@@ -5,6 +5,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -516,16 +517,19 @@ function toggleAllVisible() {
 
   <Dialog v-model:open="showDeclineDialog">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-4 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Alasan Tidak Lulus</DialogTitle>
-        <DialogDescription class="text-xs">
-          Siswa ini tidak diikutkan dalam proses kelulusan kali ini. Alasannya
-          hanya tampil di layar sebagai pengingat selama pengecekan, tidak ada
-          tempat menyimpannya, jadi ia hilang saat halaman dimuat ulang.
+        <DialogDescription>
+          Catat alasan siswa tidak diikutkan dalam kelulusan kali ini.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-4 space-y-3">
+      <DialogBody class="space-y-3">
+        <p class="text-control text-muted-foreground">
+          Alasan ini hanya tampil di layar sebagai pengingat selama pengecekan;
+          tidak ada tempat menyimpannya, jadi ia hilang saat halaman dimuat
+          ulang.
+        </p>
         <div class="space-y-1.5">
           <Label
             for="graduation-decline-reason"
@@ -541,11 +545,9 @@ function toggleAllVisible() {
             class="resize-none"
           />
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="border-t px-6 py-3 flex justify-end gap-2 bg-muted/10"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

@@ -344,7 +344,7 @@ onMounted(() => {
           v-else-if="tasks.some((task) => task.key === 'payment')"
           as-child
           variant="outline"
-          class="min-h-[var(--control-h-lg,2rem)]"
+          class="min-h-[var(--control-h-lg,2.25rem)]"
         >
           <RouterLink
             :to="{ path: '/registration/form', query: { step: 'payment' } }"
@@ -401,7 +401,7 @@ onMounted(() => {
                           }
                         : '/registration/form'
                     "
-                    class="inline-flex min-h-[var(--control-h-lg,2rem)] items-center font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                    class="inline-flex min-h-[var(--control-h-lg,2.25rem)] items-center font-medium underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
                     {{ task.title }}
                   </RouterLink>
@@ -419,7 +419,7 @@ onMounted(() => {
 
         <details class="sm:hidden">
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer items-center font-medium"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer items-center font-medium"
           >
             Tahapan pendaftaran
           </summary>

@@ -238,7 +238,7 @@ onMounted(load)
           <DialogTitle>
             {{ editing ? 'Ubah Rekening' : 'Tambah Rekening' }}
           </DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pendaftar mentransfer biaya pendaftaran ke rekening ini.
           </DialogDescription>
         </DialogHeader>

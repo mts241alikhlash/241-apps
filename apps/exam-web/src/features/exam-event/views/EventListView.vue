@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
@@ -198,6 +199,7 @@ onMounted(async () => {
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <EventFormDialog

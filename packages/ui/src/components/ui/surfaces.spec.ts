@@ -32,7 +32,7 @@ describe('tabs', () => {
 
   it('trigger follows the control height token, the underline and the control text token', () => {
     const c = tabs().get('[data-slot=tabs-trigger]').classes()
-    expect(c).toContain('min-h-[var(--control-h-lg,2rem)]')
+    expect(c).toContain('min-h-[var(--control-h-lg,2.25rem)]')
     expect(c).not.toContain('min-h-11')
     expect(c).toContain('data-[state=active]:border-primary')
     expect(c).toContain(text)

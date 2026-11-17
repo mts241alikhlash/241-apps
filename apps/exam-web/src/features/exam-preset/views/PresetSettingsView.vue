@@ -7,6 +7,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import {
@@ -223,6 +224,7 @@ onMounted(load)
           </table>
         </div>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

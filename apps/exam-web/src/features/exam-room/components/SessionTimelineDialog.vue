@@ -86,7 +86,7 @@ watch(
         <DialogTitle>Riwayat Kejadian</DialogTitle>
         <DialogDescription>{{ title }}</DialogDescription>
       </DialogHeader>
-      <DialogBody class="min-h-0 flex-1 overflow-y-auto">
+      <DialogBody>
         <p
           v-if="error"
           class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"

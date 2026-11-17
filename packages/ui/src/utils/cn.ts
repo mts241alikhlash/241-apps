@@ -3,7 +3,7 @@ import { clsx } from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
 const twMerge = extendTailwindMerge({
-  extend: { classGroups: { 'font-size': [{ text: ['control'] }] } },
+  extend: { classGroups: { 'font-size': [{ text: ['control', 'md'] }] } },
 })
 
 export function cn(...inputs: ClassValue[]) {

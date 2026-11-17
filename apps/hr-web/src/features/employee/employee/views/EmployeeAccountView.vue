@@ -20,6 +20,7 @@ import {
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -244,14 +245,14 @@ onMounted(() => {
 
   <Dialog v-model:open="isFilterDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Filter Akun Pegawai</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Saring daftar akun guru berdasarkan kategori, jabatan, dan status.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="p-6 space-y-4">
+      <DialogBody class="space-y-4">
         <FloatingLabelField
           label="Kategori"
           for="employee-account-filter-category"
@@ -330,11 +331,9 @@ onMounted(() => {
             </SelectContent>
           </Select>
         </FloatingLabelField>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

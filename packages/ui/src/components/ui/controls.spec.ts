@@ -11,7 +11,7 @@ import { Select, SelectTrigger } from './select'
 import { Switch } from './switch'
 import { Textarea } from './textarea'
 
-const md = 'h-[var(--control-h-md,1.75rem)]'
+const md = 'h-[var(--control-h-md,2rem)]'
 
 describe('button', () => {
   it('default size reads the md control height, text and icon tokens', () => {
@@ -28,13 +28,13 @@ describe('button', () => {
       'h-[var(--control-h-sm,1.5rem)]',
     )
     expect(buttonVariants({ size: 'lg' })).toContain(
-      'h-[var(--control-h-lg,2rem)]',
+      'h-[var(--control-h-lg,2.25rem)]',
     )
     expect(buttonVariants({ size: 'xs' })).toContain(
       'h-[var(--control-h-xs,1.25rem)]',
     )
     expect(buttonVariants({ size: 'icon' })).toContain(
-      'size-[var(--control-h-md,1.75rem)]',
+      'size-[var(--control-h-md,2rem)]',
     )
   })
 
@@ -113,7 +113,7 @@ describe('form controls', () => {
       .get('[data-slot=select-trigger]')
       .classes()
       .join(' ')
-    expect(c).toContain('data-[size=default]:h-[var(--control-h-md,1.75rem)]')
+    expect(c).toContain('data-[size=default]:h-[var(--control-h-md,2rem)]')
     expect(c).toContain('data-[size=sm]:h-[var(--control-h-sm,1.5rem)]')
     expect(c).toContain('focus-visible:border-ring')
     expect(c).not.toContain('focus-visible:ring-2')

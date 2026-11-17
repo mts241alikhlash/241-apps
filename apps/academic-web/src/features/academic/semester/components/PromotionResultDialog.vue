@@ -54,7 +54,7 @@ function handleDone() {
 <template>
   <Dialog v-model:open="open">
     <DialogScrollContent class="sm:max-w-md">
-      <DialogHeader>
+      <DialogHeader standard>
         <div class="flex items-center gap-3">
           <div
             class="flex h-10 w-10 items-center justify-center rounded-full bg-success/10"
@@ -86,7 +86,7 @@ function handleDone() {
         </div>
       </div>
 
-      <DialogFooter>
+      <DialogFooter standard>
         <Button @click="handleDone"> Selesai </Button>
       </DialogFooter>
     </DialogScrollContent>

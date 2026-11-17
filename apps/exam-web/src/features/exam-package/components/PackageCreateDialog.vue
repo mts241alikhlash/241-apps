@@ -51,7 +51,7 @@ async function save() {
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Tambah Paket</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Beri judul paket, pilih mapel dan tingkat, lalu susun soalnya.
         </DialogDescription>
       </DialogHeader>

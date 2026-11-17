@@ -155,7 +155,7 @@ function onViewerKey(event: KeyboardEvent) {
               <DialogTitle class="break-words text-base">
                 {{ active.alt }}
               </DialogTitle>
-              <DialogDescription class="text-xs">
+              <DialogDescription>
                 {{ (viewerIndex ?? 0) + 1 }} / {{ total }}
               </DialogDescription>
             </div>

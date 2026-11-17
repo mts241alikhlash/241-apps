@@ -21,17 +21,17 @@ export const buttonVariants = cva(
       },
       size: {
         default:
-          'h-[var(--control-h-md,1.75rem)] gap-1 px-2 text-control leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+          'h-[var(--control-h-md,2rem)] gap-1 px-2 text-control leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
         xs: 'h-[var(--control-h-xs,1.25rem)] gap-1 rounded-sm px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-2.5',
         sm: 'h-[var(--control-h-sm,1.5rem)] gap-1 px-2 text-control leading-relaxed has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3',
-        lg: 'h-[var(--control-h-lg,2rem)] gap-1 px-2.5 text-control leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
-        icon: 'size-[var(--control-h-md,1.75rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
+        lg: 'h-[var(--control-h-lg,2.25rem)] gap-1 px-2.5 text-control leading-relaxed has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*=size-])]:size-4',
+        icon: 'size-[var(--control-h-md,2rem)] [&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
         'icon-xs':
           'size-[var(--control-h-xs,1.25rem)] rounded-sm [&_svg:not([class*=size-])]:size-2.5',
         'icon-sm':
           'size-[var(--control-h-sm,1.5rem)] [&_svg:not([class*=size-])]:size-3',
         'icon-lg':
-          'size-[var(--control-h-lg,2rem)] [&_svg:not([class*=size-])]:size-4',
+          'size-[var(--control-h-lg,2.25rem)] [&_svg:not([class*=size-])]:size-4',
       },
     },
     defaultVariants: {

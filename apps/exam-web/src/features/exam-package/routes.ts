@@ -30,6 +30,20 @@ export const examPackageRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/exam/packages/:id/questions/bulk-edit',
+    name: 'ExamPackageQuestionBulkEdit',
+    component: () => import('./views/PackageQuestionBulkEditView.vue'),
+    meta: {
+      title: 'Ubah Soal Massal',
+      requiresAuth: true,
+      requiredPermission: 'exam-packages.update',
+      breadcrumbs: [
+        { title: 'Ujian', href: '#' },
+        { title: 'Paket Soal', href: '/exam/packages' },
+      ],
+    },
+  },
+  {
     path: '/exam/packages/:id/questions/new',
     name: 'ExamPackageQuestionCreate',
     component: () => import('./views/PackageQuestionFormView.vue'),

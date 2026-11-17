@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
@@ -182,6 +183,7 @@ onMounted(() => {
         <p v-else-if="loadingActivity">Memuat kegiatan…</p>
         <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

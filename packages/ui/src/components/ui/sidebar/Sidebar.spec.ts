@@ -21,7 +21,7 @@ describe('sidebar items', () => {
 
   it('menu buttons use the Mira sizes and a visible focus outline', () => {
     expect(sidebarMenuButtonVariants()).toContain(
-      'h-[var(--control-h-md,1.75rem)]',
+      'h-[var(--control-h-md,2rem)]',
     )
     expect(sidebarMenuButtonVariants({ size: 'sm' })).toContain(
       'h-[var(--control-h-sm,1.5rem)]',

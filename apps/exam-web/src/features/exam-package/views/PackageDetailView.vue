@@ -114,7 +114,7 @@ onMounted(async () => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Paket Soal"
@@ -155,7 +155,7 @@ onMounted(async () => {
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto px-4 pt-2 pb-4 space-y-4"
       >
         <Alert
           v-if="loadFailed"
@@ -190,46 +190,45 @@ onMounted(async () => {
           </Alert>
           <ApprovedEditNotice v-if="status === 'APPROVED' && canEdit" />
           <ReturnedNotes :review="builder.lastReturn.value" />
-          <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
-            <div class="flex flex-col gap-1">
-              <span class="text-control text-muted-foreground"> Status </span>
-              <Badge
-                :variant="statusVariant(pkg.status)"
-                class="w-fit"
-              >
-                {{ packageStatusLabel(pkg.status) }}
-              </Badge>
+          <dl
+            class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2 text-control"
+          >
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-muted-foreground">Status</dt>
+              <dd>
+                <Badge :variant="statusVariant(pkg.status)">
+                  {{ packageStatusLabel(pkg.status) }}
+                </Badge>
+              </dd>
             </div>
-            <dl class="flex flex-wrap items-start gap-x-6 gap-y-3 text-control">
-              <div class="flex flex-col gap-1">
-                <dt class="text-muted-foreground">Mapel</dt>
-                <dd class="font-medium">
-                  {{ store.subjectName(pkg.subjectId) }}
-                </dd>
-              </div>
-              <div class="flex flex-col gap-1">
-                <dt class="text-muted-foreground">Tingkat</dt>
-                <dd class="font-medium">{{ store.gradeName(pkg.gradeId) }}</dd>
-              </div>
-              <div class="flex flex-col gap-1">
-                <dt class="text-muted-foreground">Soal</dt>
-                <dd class="font-medium tabular-nums">
-                  {{ pkg.items.length }}
-                </dd>
-              </div>
-              <div class="flex flex-col gap-1">
-                <dt class="text-muted-foreground">Poin</dt>
-                <dd class="font-medium tabular-nums">{{ totalPoints }}</dd>
-              </div>
-              <div
-                v-if="updatedLabel"
-                class="flex flex-col gap-1"
-              >
-                <dt class="text-muted-foreground">Diperbarui</dt>
-                <dd class="font-medium tabular-nums">{{ updatedLabel }}</dd>
-              </div>
-            </dl>
-          </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-muted-foreground">Mapel</dt>
+              <dd class="font-medium">
+                {{ store.subjectName(pkg.subjectId) }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-muted-foreground">Tingkat</dt>
+              <dd class="font-medium">{{ store.gradeName(pkg.gradeId) }}</dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-muted-foreground">Soal</dt>
+              <dd class="font-medium tabular-nums">
+                {{ pkg.items.length }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-muted-foreground">Poin</dt>
+              <dd class="font-medium tabular-nums">{{ totalPoints }}</dd>
+            </div>
+            <div
+              v-if="updatedLabel"
+              class="flex flex-col gap-0.5"
+            >
+              <dt class="text-muted-foreground">Diperbarui</dt>
+              <dd class="font-medium tabular-nums">{{ updatedLabel }}</dd>
+            </div>
+          </dl>
           <DataTable
             mobile="cards"
             hide-pagination
@@ -313,7 +312,7 @@ onMounted(async () => {
           </Collapsible>
         </template>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <TakeQuestionsDialog

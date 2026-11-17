@@ -48,7 +48,7 @@ describe('Tabs', () => {
       expect(trigger.classes()).toEqual(
         expect.arrayContaining([
           'border-b-2',
-          'min-h-[var(--control-h-lg,2rem)]',
+          'min-h-[var(--control-h-lg,2.25rem)]',
           'data-[state=active]:border-primary',
           'data-[state=active]:bg-transparent',
         ]),

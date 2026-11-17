@@ -117,11 +117,11 @@ const onSubmit = handleSubmit(async (values) => {
     @update:open="$emit('update:open', $event)"
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle
           >{{ initialData ? 'Edit' : 'Tambah' }} Tipe Jam</DialogTitle
         >
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -242,9 +242,7 @@ const onSubmit = handleSubmit(async (values) => {
         </form>
       </ScrollArea>
 
-      <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
-      >
+      <DialogFooter standard class="sm:justify-between">
         <Button
           type="button"
           variant="outline"

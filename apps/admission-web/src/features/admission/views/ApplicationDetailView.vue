@@ -31,6 +31,7 @@ import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -653,7 +654,7 @@ useBreadcrumbs(() => {
         >
           <div
             v-if="application.revisionNote && status === 'REVISION_NEEDED'"
-            class="flex min-h-[var(--control-h-md,1.75rem)] min-w-0 flex-1 items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-1 text-destructive"
+            class="flex min-h-[var(--control-h-md,2rem)] min-w-0 flex-1 items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-1 text-destructive"
           >
             <TriangleAlert class="size-3.5 shrink-0" />
             <p class="min-w-0 leading-normal">
@@ -1363,7 +1364,7 @@ useBreadcrumbs(() => {
           <DialogTitle>
             {{ dialogKind ? dialogTitles[dialogKind] : '' }}
           </DialogTitle>
-          <DialogDescription class="text-xs text-muted-foreground">
+          <DialogDescription>
             <template v-if="dialogKind === 'enroll'">
               <template v-if="application?.nis && application?.nisn">
                 Akun pendaftar akan otomatis menjadi akun santri.
@@ -1397,7 +1398,7 @@ useBreadcrumbs(() => {
           class="flex flex-1 flex-col justify-between"
           @submit.prevent="confirmDialog"
         >
-          <div class="space-y-4 px-6 py-5">
+          <DialogBody class="space-y-4">
             <div
               v-if="dialogKind === 'enroll'"
               class="space-y-4"
@@ -1456,7 +1457,7 @@ useBreadcrumbs(() => {
                 />
               </FloatingLabelField>
             </div>
-          </div>
+          </DialogBody>
 
           <DialogFooter
             standard

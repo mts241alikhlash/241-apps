@@ -20,7 +20,7 @@ describe('navigation and data components', () => {
   it('pagination ellipsis is as big as a md control', () => {
     const w = mount(PaginationEllipsis)
     expect(w.get('[data-slot=pagination-ellipsis]').classes()).toContain(
-      'size-[var(--control-h-md,1.75rem)]',
+      'size-[var(--control-h-md,2rem)]',
     )
   })
 

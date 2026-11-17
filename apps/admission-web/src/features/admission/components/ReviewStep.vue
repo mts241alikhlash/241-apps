@@ -95,7 +95,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Data Diri</span>
             <ChevronDown
@@ -218,7 +218,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Orang Tua/Wali</span>
             <ChevronDown
@@ -283,7 +283,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Alamat</span>
             <ChevronDown
@@ -326,7 +326,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Sekolah Asal</span>
             <ChevronDown
@@ -357,7 +357,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium"
               >Tempat Tinggal & Perjalanan</span
@@ -410,7 +410,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Prestasi & Beasiswa</span>
             <ChevronDown
@@ -459,7 +459,7 @@ const fieldGridClass =
           class="group"
         >
           <summary
-            class="flex min-h-[var(--control-h-lg,2rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
+            class="flex min-h-[var(--control-h-lg,2.25rem)] cursor-pointer list-none items-center justify-between gap-3 border-b bg-muted/30 px-4 py-0.5 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring marker:content-none"
           >
             <span class="min-w-0 flex-1 font-medium">Berkas & Pembayaran</span>
             <ChevronDown

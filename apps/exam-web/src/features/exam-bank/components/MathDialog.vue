@@ -44,7 +44,7 @@ function confirm() {
         <DialogTitle>{{
           editing ? 'Ubah Rumus' : 'Sisipkan Rumus'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Tulis rumus dalam LaTeX, misalnya \frac{1}{2}.
         </DialogDescription>
       </DialogHeader>

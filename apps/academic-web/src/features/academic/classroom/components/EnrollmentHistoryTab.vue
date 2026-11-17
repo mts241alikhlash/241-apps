@@ -80,9 +80,9 @@ function formatDate(value?: string | null) {
       v-if="isLoading"
       class="space-y-2"
     >
-      <Skeleton class="h-[var(--control-h-lg,2rem)] w-full" />
-      <Skeleton class="h-[var(--control-h-lg,2rem)] w-full" />
-      <Skeleton class="h-[var(--control-h-lg,2rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
     </div>
 
     <ServiceUnavailable

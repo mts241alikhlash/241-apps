@@ -10,6 +10,7 @@ import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -134,9 +135,9 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Salin Data Semester</DialogTitle>
-        <DialogDescription class="sr-only"></DialogDescription>
+        <DialogDescription></DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -219,7 +220,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
           v-else
           class="space-y-4 px-6 py-5"
         >
-          <div class="rounded-lg bg-muted/30 border py-4 px-5">
+          <DialogBody class="rounded-lg bg-muted/30 border">
             <div class="flex items-center justify-between gap-3 mb-3">
               <span
                 class="text-xs text-muted-foreground font-semibold uppercase tracking-wider flex-1 text-center"
@@ -260,7 +261,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                 }}
               </Badge>
             </div>
-          </div>
+          </DialogBody>
 
           <p
             v-if="sourceSemester && !targetSemester"
@@ -271,9 +272,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
         </div>
       </ScrollArea>
 
-      <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background mt-auto"
-      >
+      <DialogFooter standard class="sm:justify-between mt-auto">
         <template v-if="rolloverSummary">
           <div />
           <Button

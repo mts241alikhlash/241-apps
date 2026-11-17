@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
@@ -272,6 +273,7 @@ onMounted(async () => {
           </section>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

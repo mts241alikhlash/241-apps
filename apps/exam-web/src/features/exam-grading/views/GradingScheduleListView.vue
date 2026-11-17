@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import MakeupDialog from '@/features/exam-schedule/components/MakeupDialog.vue'
@@ -109,6 +110,7 @@ function changePageSize(size: number) {
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <MakeupDialog

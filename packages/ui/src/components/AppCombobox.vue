@@ -66,7 +66,7 @@ function onSelect(val: string) {
         :disabled="disabled"
         :class="
           cn(
-            'h-[var(--control-h-md,1.75rem)] w-full justify-between border-input bg-transparent hover:bg-transparent aria-expanded:bg-transparent aria-expanded:border-ring font-normal',
+            'h-[var(--control-h-md,2rem)] w-full justify-between border-input bg-transparent hover:bg-transparent aria-expanded:bg-transparent aria-expanded:border-ring font-normal',
             !modelValue && 'text-muted-foreground',
             props.class,
           )

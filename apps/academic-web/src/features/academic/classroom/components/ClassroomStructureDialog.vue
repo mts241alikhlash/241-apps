@@ -16,6 +16,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -145,6 +146,7 @@ const popoverStates = reactive<PopoverStates>({
     <DialogContent class="sm:max-w-lg max-h-[85vh] flex flex-col">
       <DialogHeader>
         <DialogTitle>Kelola Struktur Kelas</DialogTitle>
+        <DialogDescription>Susun struktur kelas: tingkat, rombel, dan wali kelas.</DialogDescription>
       </DialogHeader>
 
       <form

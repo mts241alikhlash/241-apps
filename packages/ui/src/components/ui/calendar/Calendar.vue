@@ -322,7 +322,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
             "
           >
             <SelectTrigger
-              class="h-[var(--control-h-lg,2rem)] data-[size=default]:h-[var(--control-h-lg,2rem)] w-auto gap-1 text-control font-medium px-2 focus:ring-0"
+              class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-auto gap-1 text-control font-medium px-2 focus:ring-0"
             >
               <SelectValue />
             </SelectTrigger>
@@ -350,7 +350,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
           "
         >
           <SelectTrigger
-            class="h-[var(--control-h-lg,2rem)] w-auto gap-1 text-control font-medium px-2 focus:ring-0"
+            class="h-[var(--control-h-md,2rem)] w-auto gap-1 text-control font-medium px-2 focus:ring-0"
           >
             <SelectValue />
           </SelectTrigger>
@@ -384,7 +384,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
             buttonVariants({
               variant: date.month === m.month ? 'default' : 'ghost',
             }),
-            'h-[var(--control-h-md,1.75rem)] text-control w-full shadow-none',
+            'h-[var(--control-h-md,2rem)] text-control w-full shadow-none',
             isMonthDisabled(m.month) &&
               'opacity-30 pointer-events-none cursor-not-allowed',
           )
@@ -406,7 +406,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
         :class="
           cn(
             buttonVariants({ variant: date.year === yr ? 'default' : 'ghost' }),
-            'h-[var(--control-h-md,1.75rem)] text-control w-full shadow-none',
+            'h-[var(--control-h-md,2rem)] text-control w-full shadow-none',
             isYearDisabled(yr) &&
               'opacity-30 pointer-events-none cursor-not-allowed',
           )

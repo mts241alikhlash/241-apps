@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import {
   Sheet,
@@ -324,10 +325,7 @@ async function confirmSave() {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader
-        variant="muted"
-        class="px-2"
-      >
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             v-if="isEdit"
@@ -417,7 +415,7 @@ async function confirmSave() {
                   min="0.25"
                   max="100"
                   step="0.25"
-                  class="h-[var(--control-h-sm, 1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  class="h-[var(--control-h-sm,1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   @update:model-value="setEditPoints"
                 />
               </template>
@@ -448,10 +446,7 @@ async function confirmSave() {
               gap="none"
               class="hidden min-w-0 lg:flex"
             >
-              <CardHeader
-                variant="muted"
-                class="px-2"
-              >
+              <CardHeader standard>
                 <CardTitle>Daftar soal</CardTitle>
                 <Button
                   variant="ghost"
@@ -484,10 +479,7 @@ async function confirmSave() {
                 gap="none"
                 class="min-w-0"
               >
-                <CardHeader
-                  variant="muted"
-                  class="px-2"
-                >
+                <CardHeader standard>
                   <CardTitle>Soal {{ activeIndex + 1 }}</CardTitle>
                 </CardHeader>
                 <CardContent class="flex flex-col gap-2 p-2">
@@ -545,7 +537,7 @@ async function confirmSave() {
                         min="0.25"
                         max="100"
                         step="0.25"
-                        class="h-[var(--control-h-sm, 1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        class="h-[var(--control-h-sm,1.5rem)] w-14 text-center appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         @update:model-value="
                           (value) => setCardPoints(activeCard, value)
                         "
@@ -585,7 +577,7 @@ async function confirmSave() {
       <CardFooter
         v-if="!loading && canEdit && isEdit"
         standard
-        class="justify-end px-2"
+        class="justify-end"
       >
         <Button
           type="button"
@@ -599,7 +591,7 @@ async function confirmSave() {
 
     <div
       v-if="!loading && canEdit && !isEdit"
-      class="mt-2 flex min-h-[var(--control-h-lg, 2rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
+      class="mt-2 flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
     >
       <div class="flex flex-wrap items-center gap-2">
         <Button
@@ -673,6 +665,7 @@ async function confirmSave() {
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Simpan Soal</DialogTitle>
+        <DialogDescription>Periksa perubahan soal sebelum disimpan.</DialogDescription>
         </DialogHeader>
         <DialogBody class="space-y-3">
           <dl

@@ -221,7 +221,7 @@ async function upload() {
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Unggah {{ activeDocType?.name }}</DialogTitle>
-          <DialogDescription class="sr-only"
+          <DialogDescription
             >Pilih berkas dokumen pendaftaran.</DialogDescription
           >
         </DialogHeader>

@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
@@ -146,6 +147,7 @@ onMounted(load)
           "
         />
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

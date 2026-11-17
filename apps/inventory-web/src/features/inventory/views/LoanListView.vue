@@ -243,7 +243,7 @@ onMounted(() => {
                 <Label>Kondisi Saat Kembali</Label>
                 <select
                   v-model="item.returnedConditionId"
-                  class="flex min-h-[var(--control-h-md,1.75rem)] w-full rounded-md border border-input bg-transparent px-3 py-1 text-control transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  class="flex min-h-[var(--control-h-md,2rem)] w-full rounded-md border border-input bg-transparent px-3 py-1 text-control transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option
                     v-for="cond in metadata?.conditions"
@@ -265,7 +265,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <DialogFooter class="pt-4">
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"

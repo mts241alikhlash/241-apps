@@ -9,6 +9,7 @@ import {
   ScrollArea,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -98,10 +99,11 @@ const onSubmit = handleSubmit((values) => {
     @update:open="emit('update:open', $event)"
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle class="text-xl font-semibold tracking-tight">
           {{ isEdit ? 'Ubah Lokasi' : 'Tambah Lokasi' }}
         </DialogTitle>
+        <DialogDescription>Isi nama lokasi aset.</DialogDescription>
       </DialogHeader>
 
       <form
@@ -203,9 +205,7 @@ const onSubmit = handleSubmit((values) => {
           </div>
         </ScrollArea>
 
-        <DialogFooter
-          class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
-        >
+        <DialogFooter standard class="sm:justify-between">
           <Button
             type="button"
             variant="outline"

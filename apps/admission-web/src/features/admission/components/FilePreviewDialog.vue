@@ -107,7 +107,7 @@ onBeforeUnmount(() => {
     >
       <DialogHeader standard>
         <DialogTitle class="break-all">{{ file?.originalName }}</DialogTitle>
-        <DialogDescription class="sr-only">Pratinjau berkas</DialogDescription>
+        <DialogDescription>Pratinjau berkas</DialogDescription>
       </DialogHeader>
       <div class="min-h-0 flex-1 overflow-auto p-4">
         <p

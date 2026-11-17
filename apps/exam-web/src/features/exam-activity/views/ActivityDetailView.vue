@@ -20,6 +20,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examTypeLabel } from '@/features/exam-shared/examType'
@@ -256,6 +257,7 @@ onMounted(load)
           </section>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <ActivityPolicyDialog

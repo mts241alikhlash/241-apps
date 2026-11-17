@@ -9,6 +9,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -111,12 +112,12 @@ onMounted(() => void leaveService.fetchRequests())
           <DialogContent
             class="sm:max-w-lg flex flex-col gap-0 p-0 overflow-hidden"
           >
-            <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+            <DialogHeader standard>
               <DialogTitle>Tolak Pengajuan Izin / Cuti</DialogTitle>
-              <DialogDescription class="sr-only" />
+              <DialogDescription />
             </DialogHeader>
 
-            <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+            <DialogBody class="space-y-4">
               <div class="space-y-1">
                 <Label for="reject-reason">
                   Alasan Penolakan <span class="text-destructive">*</span>
@@ -128,9 +129,9 @@ onMounted(() => void leaveService.fetchRequests())
                   rows="3"
                 />
               </div>
-            </div>
+            </DialogBody>
 
-            <DialogFooter class="px-6 py-4 border-t bg-muted/20">
+            <DialogFooter standard>
               <Button
                 variant="outline"
                 @click="rejectOpen = false"

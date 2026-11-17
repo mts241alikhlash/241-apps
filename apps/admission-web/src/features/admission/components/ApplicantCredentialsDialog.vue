@@ -55,7 +55,7 @@ async function copyCredentials() {
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Akun Pendaftar Dibuat</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Kredensial akun pendaftar yang baru dibuat.
         </DialogDescription>
       </DialogHeader>

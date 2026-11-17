@@ -241,13 +241,13 @@ onMounted(fetchRelatedData)
         <div class="hidden lg:flex lg:flex-row lg:items-center gap-3 mb-6">
           <template v-if="academicYearLabel">
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
+              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -255,7 +255,7 @@ onMounted(fetchRelatedData)
           </template>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -294,7 +294,7 @@ onMounted(fetchRelatedData)
           </Select>
           <div
             v-else-if="selectedSubjectLabel"
-            class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control"
+            class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
           >
             <span class="text-muted-foreground">Mapel</span>
             <span class="font-semibold">{{ selectedSubjectLabel }}</span>
@@ -307,13 +307,13 @@ onMounted(fetchRelatedData)
             class="flex items-center justify-center gap-2"
           >
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
             >
               <span class="text-muted-foreground">Tahun Ajaran</span>
               <span class="font-semibold">{{ academicYearLabel }}</span>
             </div>
             <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs"
+              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
             >
               <span class="text-muted-foreground">Semester</span>
               <span class="font-semibold">{{ semesterLabel }}</span>
@@ -321,7 +321,7 @@ onMounted(fetchRelatedData)
           </div>
           <div
             v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,1.75rem)] text-xs text-destructive"
+            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
           >
             Belum ada semester aktif
           </div>
@@ -361,7 +361,7 @@ onMounted(fetchRelatedData)
             </Select>
             <div
               v-else-if="selectedSubjectLabel"
-              class="flex items-center gap-2 rounded-l-none rounded-r-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2rem)] whitespace-nowrap text-control min-w-0"
+              class="flex items-center gap-2 rounded-l-none rounded-r-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control min-w-0"
             >
               <span class="text-muted-foreground shrink-0">Mapel</span>
               <span class="font-semibold truncate">{{

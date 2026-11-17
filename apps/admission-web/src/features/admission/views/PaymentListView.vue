@@ -405,7 +405,7 @@ onMounted(async () => {
                 : 'Tolak Bukti Pembayaran'
             }}
           </DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             {{
               reasonKind === 'cancel'
                 ? 'Pembayaran kembali ke Menunggu dan pendaftar diberi tahu.'

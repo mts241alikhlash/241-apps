@@ -243,7 +243,7 @@ const totalAttendance = computed(() =>
               <Skeleton
                 v-for="i in 3"
                 :key="i"
-                class="h-[var(--control-h-lg,2rem)] w-full rounded-lg"
+                class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
               />
             </div>
             <p

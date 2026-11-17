@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
@@ -162,7 +163,6 @@ onMounted(load)
         <template v-else>
           <DataTable
             mobile="cards"
-            row-clickable
             :columns="columns"
             :data="paginatedRooms"
             :page="page"
@@ -172,7 +172,6 @@ onMounted(load)
             item-label="ruangan"
             @update:page="goToPage"
             @update:page-size="changePageSize"
-            @row-click="openRoom"
           >
             <template #filters>
               <div
@@ -270,13 +269,14 @@ onMounted(load)
           </DataTable>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <Dialog v-model:open="filterOpen">
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Ruang Ujian</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Filter ruangan berdasarkan status
           </DialogDescription>
         </DialogHeader>

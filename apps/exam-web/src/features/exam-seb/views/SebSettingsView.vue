@@ -210,7 +210,7 @@ onMounted(load)
     >
       <CardHeader
         standard
-        class="flex min-h-[var(--control-h-lg,2rem)] flex-wrap items-center justify-between gap-2 px-4 py-2"
+        class="flex min-h-[var(--control-h-lg,2.25rem)] flex-wrap items-center justify-between gap-2 px-4 py-2"
       >
         <CardTitle class="min-w-0 truncate font-semibold">
           Konfigurasi Safe Exam Browser

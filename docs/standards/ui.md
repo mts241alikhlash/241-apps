@@ -1,6 +1,6 @@
 # UI standard
 
-Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `nova` sizes with Inter and the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
+Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `mira` sizes with Inter and the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
 
 ## Pages and navigation
 
@@ -18,15 +18,15 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 ## Cards, fields, actions
 
-**Rule.** A card header holds the title and at most the page's primary action on the right; summaries, notes and secondary actions go in the content. Cards use the `ui` props, never per-page classes: `Card gap="none"`, `CardHeader standard` (40 px, its title truncates) or `CardHeader plain` (a list page's borderless header above the table), `CardTitle size="lg"` (page title) or `"md"`, `CardContent variant="standard"` (`flush` for tables), `CardFooter` (one style). Card padding is `p-4`; `p-6`, `p-8`, `px-5` and `px-6` are rejected by `check-card-overrides`. A card has no decorative footer: never a strip or an empty footer.
+**Rule.** A card header holds the title and at most the page's primary action on the right; summaries, notes and secondary actions go in the content. Cards use the `ui` props, never per-page classes: `Card gap="none"`, `CardHeader standard` (48 px, its title truncates) or `CardHeader plain` (a list page's borderless header above the table), `CardTitle size="lg"` (page title) or `"md"`, `CardContent variant="standard"` (`flush` for tables), `CardFooter` (48 px, one style) or `CardFooter plain` (a 4 px spacer, no border or background). A detail page's summary (status, subject, grade, count, points) is one full-width box that reads as a single row — `dl` with `rounded-md border bg-muted/30 px-4 py-2` and `flex flex-wrap items-start justify-between gap-x-6 gap-y-2` so the first pair starts at the left edge and the last ends at the right. Each item is one column, `flex flex-col gap-0.5`: the label (`dt`, muted) sits above its value (`dd`, medium), never beside it. Never a box per item, never a grid of tiles, never label/value pairs floating without the box. Card padding is `p-4`; `p-6`, `p-8`, `px-5` and `px-6` are rejected by `check-card-overrides`. A full-height list card whose content scrolls (`CardContent` with `overflow-auto`) ends with `CardFooter plain` when it has no action footer, so the content stops short of the rounded bottom edge; never add a tinted or bordered empty footer.
 **Why.** Spacing and tints are defined once.
 **Check.** `pnpm exec check-card-overrides src` (reports `gap-0`, `py-0`, font sizes and backgrounds on those tags); `packages/ui` `check-card-overrides.spec.ts`.
 
-**Rule.** Every text, select, date and textarea field is a `FloatingField` (the label floats, the validation message replaces the label and the control turns red). Checkbox, switch and radio keep a plain label.
+**Rule.** Every text, select, date and textarea field is a `FloatingField` (the label floats, the validation message replaces the label and the control turns red). The label's notch is painted with `--ff-label-bg`, which a surface sets to its own fill: `Card` sets `var(--card)`, `DialogContent` sets `var(--card)`, and a page-level field falls back to `var(--background)`. A new surface that holds a field sets `--ff-label-bg` to its own background, never leaves the grey fallback on a white panel. Checkbox, switch and radio keep a plain label.
 **Why.** One field pattern and one error treatment.
 **Check.** `pnpm exec check-field-style src` (reports `FormField` + `FormLabel` pairs); a component used without its import renders as an unknown element and `vue-tsc` stays silent, so check imports when converting by script.
 
-**Rule.** One row action is a direct button; two or more use `ActionCell` (edit, delete with its own confirmation, `manageLabel`, custom entries through `items`). No hand-written dropdowns in columns.
+**Rule.** A row is never a link: no `row-clickable`, no click handler on the row or the card, no `cursor-pointer` on data. Every detail view is reached through the row action — one action is a direct button, two or more use `ActionCell` (edit, delete with its own confirmation, `manageLabel`, custom entries through `items`). No hand-written dropdowns in columns.
 **Why.** Consistent row menus.
 **Check.** review.
 
@@ -36,7 +36,7 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 ## Sizes and type
 
-**Rule.** Controls use tokens, never fixed classes: `--control-h-xs|sm|md|lg` (20/24/28/32 px; 24/32/36/40 px on phones), text `--text-control` (12 px; 13 px on phones), icons `--icon-control` (14 px; 16 px on phones). The type scale is tokens, never a raw size: `text-xs` and `text-sm` both read `--text-control` (12 px, 13 px on phones), so sidebar, breadcrumb, table and control text share one size; then `text-base` = `--text-heading-sm` 16 px, `text-lg` = `--text-heading` 18 px, `text-xl` = `--text-title` 20 px, `text-2xl` = `--text-display` 24 px, `text-3xl` = `--text-display-lg` 30 px. A page never sets `text-[Npx]` or a `font-size` of its own. No `h-9`, `h-10` or `min-h-11` on Button, Input, SelectTrigger or Badge; filters and selects are `md`, not `size="sm"`.
+**Rule.** Controls use tokens, never fixed classes: `--control-h-xs|sm|md|lg` (20/24/32/36 px; 24/32/36/40 px on phones), text `--text-control` (12 px; 13 px on phones), icons `--icon-control` (14 px; 16 px on phones). The type scale is tokens, never a raw size: `text-xs` and `text-sm` both read `--text-control` (12 px, 13 px on phones), so sidebar, breadcrumb, table and control text share one size; then `text-md` = `--text-subheading` 14 px, `text-base` = `--text-heading-sm` 16 px, `text-lg` = `--text-heading` 18 px, `text-xl` = `--text-title` 20 px, `text-2xl` = `--text-display` 24 px, `text-3xl` = `--text-display-lg` 30 px. A page never sets `text-[Npx]` or a `font-size` of its own. No `h-9`, `h-10` or `min-h-11` on Button, Input, SelectTrigger or Badge; filters and selects are `md`, not `size="sm"`.
 **Why.** Density follows the viewport from one place (`theme.css`).
 **Check.** `packages/ui` `theme.spec.ts` and `standards.spec.ts`; review for pages.
 
@@ -44,15 +44,15 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 **Why.** One type scale.
 **Check.** `packages/ui` `standards.spec.ts`; review.
 
-**Rule.** Radius is the Nova ladder off one base: `--radius` 10 px, `sm` 0.6×, `md` 0.8×, `lg` 1×, `xl` 1.4×, `2xl` 1.8×, `3xl` 2.2×, `4xl` 2.6×. Controls, inputs, dialogs, popovers and cards use `rounded-md`; a page never writes a pixel radius and never picks a step above `md` for a surface that has one.
-**Why.** Owner decision: Nova, not the flat 8 px of `mira`; the corner grows with the control.
+**Rule.** Every radius step above `md` maps to `md` in `theme.css`: an 8 px corner for cards, dialogs, popovers, badges and controls; `xs` buttons keep `sm`, circles keep `full`. Controls, inputs, dialogs, popovers and cards use `rounded-md`; a page never writes a pixel radius and never picks a step above `md` for a surface that has one.
+**Why.** Owner decision: one flat corner, so a big card and a small input read as the same family.
 **Check.** `packages/ui` `theme.spec.ts` and `standards.spec.ts`.
 
 **Rule.** Tabs are an underline strip, never a pill: `TabsList` carries `border-b` with a transparent background, `TabsTrigger` is `border-b-2` and turns `border-primary text-primary` when active. No `variant` prop and no `bg-muted` on the list.
 **Why.** One tab pattern across the nine apps.
 **Check.** `packages/ui` `Tabs.spec.ts` and `surfaces.spec.ts`; review.
 
-**Rule.** A badge is plain coloured text with an optional 14 px icon on its left, never a box: no border, background, padding or fixed height. `variant` picks the colour (`outline` default, `default` primary, `secondary` and `ghost` muted, `success`, `warning`, `info`, `destructive`, `link`); a page never adds `bg-*`, `border-*`, `px-*`, `py-*`, `h-*` or a text size to a badge.
+**Rule.** A badge is plain coloured text at normal weight (`font-normal`, never medium or semibold) with an optional 14 px icon on its left, never a box: no border, background, padding or fixed height. `variant` picks the colour (`outline` default, `default` primary, `secondary` and `ghost` muted, `success`, `warning`, `info`, `destructive`, `link`); a page never adds `bg-*`, `border-*`, `px-*`, `py-*`, `h-*` or a text size to a badge.
 **Why.** A status reads as a label, not as a chip competing with the content.
 **Check.** `packages/ui` `controls.spec.ts`; review.
 
@@ -70,10 +70,10 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 
 ## Dialogs
 
-**Rule.** `DialogContent size="md"` (one column, 448 px, up to about 5 fields) or `size="xl"` (two columns, 672 px, 6 fields or more); no other widths for forms. `DialogHeader standard`, `DialogBody` and `DialogFooter standard` carry the spacing; a plain body element uses `class="dialog-body"`, never `px-6 py-5`, borders or hand padding.
+**Rule.** `DialogContent size="md"` (one column, 448 px, up to about 5 fields) or `size="xl"` (two columns, 672 px, 6 fields or more); no other widths for forms. `DialogHeader standard` and `DialogFooter standard` are 48 px tall (a `md` control plus 1rem of breathing room) and `DialogTitle` is `text-md font-semibold` (14 px, `--text-subheading`), one step under a card title and never `text-sm`; `DialogDescription` is `sr-only` by default and carries one short sentence for screen readers, never a visible paragraph under the title (a form explains itself through its field labels); `AlertDialogDescription` stays visible because it states what a destructive action will do. `DialogBody` is the only dialog body: it carries the padding and its own `overflow-y-auto`, so a body never writes `px-6 py-5`, `max-h-[70vh]`, `overflow-y-auto` or `flex-1` again; the body keeps only its layout classes (`space-y-*`).
 **Why.** Dialog spacing is defined once in `theme.css`.
 
-**Rule.** Dialogs sit on `bg-card`; header and footer carry no tint of their own. `BackButton` is the ghost variant. An icon inside `Button` takes no margin class: the button's `gap` spaces it. Table headers use the `table-header` token and rows stripe with `muted`.
+**Rule.** Dialogs sit on `bg-card`; header and footer carry no tint and no border of their own — the 48 px height separates them, because a rule between two surfaces of the same colour is noise. `BackButton` is the ghost variant. An icon inside `Button` takes no margin class: the button's `gap` spaces it. Table headers use the `table-header` token and rows stripe with `muted`.
 **Why.** One surface colour per layer and one spacing source keep the nine apps alike; a margin on the icon doubles the gap.
 **Check.** review; `pnpm --filter @mts241alikhlash/ui run test`.
 **Check.** `packages/ui` dialog specs; review.
@@ -92,11 +92,11 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 **Why.** Same table everywhere; the server owns paging (see [frontend](frontend.md)).
 **Check.** `packages/ui` table specs; review.
 
-**Rule.** Phone lists use `DataTable mobile="cards"` (with `row-clickable` for detail links): the `strong` column is the title, other columns are label and value rows (`meta.mobileLabel`, `meta.mobileValue(row)`, `meta.mobile: 'hide'`), `actions` sits at the right and a `select` cell at the left. No badges on cards, no hand-made `<ul class="md:hidden">`, no local pager; data that exists only in phone markup is a bug. The phone toolbar is Tambah, `mobile-filter` and rows per page, with `mobile-toolbar` holding the search.
+**Rule.** Phone lists use `DataTable mobile="cards"`: the `strong` column is the title, other columns are label and value rows (`meta.mobileLabel`, `meta.mobileValue(row)`, `meta.mobile: 'hide'`), `actions` sits at the right and a `select` cell at the left. No badges on cards, no hand-made `<ul class="md:hidden">`, no local pager; data that exists only in phone markup is a bug. The phone toolbar is Tambah, `mobile-filter` and rows per page, with `mobile-toolbar` holding the search.
 **Why.** One phone pattern.
 **Check.** review.
 
-**Rule.** Table surfaces read the tokens in `theme.css`: `TableHeader` and `TableFooter` use `bg-table-header`, a striped row uses `bg-table-stripe`, and its hover uses `bg-table-stripe-hover`. A page never paints a row, header or footer with `bg-muted/*`, because a translucent row lets the sticky action column show the cells underneath it.
+**Rule.** A table header, a data row and a loading row are the same 32 px: the row height comes from the row action (`ActionCell` at `--control-h-sm` 24 px) plus `py-1`, and the header reads the same pair (`calc(--control-h-sm + 0.5rem)`), never a height of its own. A header taller than its rows, or a skeleton row taller than the loaded row, is a bug. Table surfaces read the tokens in `theme.css`: `TableHeader` and `TableFooter` use `bg-table-header`, a striped row uses `bg-table-stripe`, and its hover uses `bg-table-stripe-hover`. A page never paints a row, header or footer with `bg-muted/*`, because a translucent row lets the sticky action column show the cells underneath it.
 **Why.** A sticky column inherits its row background; a translucent row makes the column see-through.
 **Check.** `packages/ui` table specs; review.
 

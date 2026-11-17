@@ -391,7 +391,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
       <DialogContent size="md">
         <DialogHeader standard
           ><DialogTitle>Filter Gelombang</DialogTitle
-          ><DialogDescription class="sr-only"
+          ><DialogDescription
             >Pilih status dan tahun ajaran.</DialogDescription
           ></DialogHeader
         >

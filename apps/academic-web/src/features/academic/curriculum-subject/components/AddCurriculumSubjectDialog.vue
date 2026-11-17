@@ -207,7 +207,7 @@ function handleSave() {
         </Table>
       </div>
 
-      <DialogFooter class="pt-4 border-t">
+      <DialogFooter>
         <Button
           type="button"
           variant="outline"

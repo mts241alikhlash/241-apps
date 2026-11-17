@@ -120,7 +120,7 @@ onMounted(load)
           {{ error }}
         </p>
         <Button
-          class="min-h-[var(--control-h-lg,2rem)]"
+          class="min-h-[var(--control-h-lg,2.25rem)]"
           @click="load"
           >Coba Lagi</Button
         >
@@ -161,7 +161,7 @@ onMounted(load)
                   </p>
                 </div>
                 <Button
-                  class="min-h-[var(--control-h-lg,2rem)] shrink-0"
+                  class="min-h-[var(--control-h-lg,2.25rem)] shrink-0"
                   :disabled="!canStart(exam)"
                   @click="open(exam)"
                 >

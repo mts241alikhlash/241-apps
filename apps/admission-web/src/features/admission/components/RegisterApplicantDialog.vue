@@ -135,7 +135,7 @@ function handleOpenChange(open: boolean) {
     <DialogContent size="xl">
       <DialogHeader standard>
         <DialogTitle>Tambah Pendaftar</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Buat akun untuk calon santri. Setelah akun dibuat, Anda akan
           melanjutkan ke pengisian formulir.
         </DialogDescription>

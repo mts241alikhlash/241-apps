@@ -37,7 +37,7 @@ const fieldId = useId()
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Kembalikan Paket</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Tulis catatan untuk guru, lalu kembalikan paket.
         </DialogDescription>
       </DialogHeader>

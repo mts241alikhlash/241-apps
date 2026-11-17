@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
     :data-unchecked="checked ? undefined : ''"
     :class="
       cn(
-        'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-3 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-[var(--control-h-lg,2rem)] cursor-pointer items-start text-start transition-colors outline-none select-none',
+        'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-3 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-[var(--control-h-md,2rem)] cursor-pointer items-start text-start transition-colors outline-none select-none',
         'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50',
         props.class,
       )

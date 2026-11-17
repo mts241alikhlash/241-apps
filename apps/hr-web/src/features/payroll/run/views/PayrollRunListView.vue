@@ -9,6 +9,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -117,12 +118,12 @@ onMounted(() => void payrollRunService.fetch())
 
   <Dialog v-model:open="dialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Hitung Penggajian Bulanan</DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1.5">
             <Label>Tahun <span class="text-destructive">*</span></Label>
@@ -184,11 +185,9 @@ onMounted(() => void payrollRunService.fetch())
             placeholder="Masukkan catatan..."
           />
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="dialogOpen = false"

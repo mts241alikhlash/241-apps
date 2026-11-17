@@ -6,6 +6,7 @@ import { Progress } from '@mts241alikhlash/ui/progress'
 import { DataTable } from '@mts241alikhlash/ui'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -106,7 +107,7 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
     <DialogContent
       class="w-[98vw] sm:max-w-[98vw] max-h-[95vh] p-0 flex flex-col overflow-hidden"
     >
-      <DialogHeader class="px-6 py-4 bg-muted/20 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Pratinjau Impor</DialogTitle>
         <DialogDescription>
           Belum ada data yang disimpan. Periksa dulu, lalu klik
@@ -115,7 +116,7 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
         </DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-4 flex-1 min-h-0 overflow-y-auto space-y-4">
+      <DialogBody class="space-y-4">
         <DataTable
           :key="Object.values(actions).join('-')"
           :columns="tableColumns"
@@ -126,7 +127,7 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
           hide-pagination
           hide-per-page
         />
-      </div>
+      </DialogBody>
 
       <div
         v-if="loading"
@@ -144,26 +145,24 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
         <Progress :model-value="progress" />
       </div>
 
-      <DialogFooter
-        class="px-6 py-4 bg-muted/30 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0"
-      >
+      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div
           class="flex flex-wrap items-center gap-2 text-xs justify-center sm:justify-start"
         >
           <div
-            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,1.75rem)] bg-success/10 border border-success/30 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-success/10 border border-success/30 rounded-md text-foreground font-medium select-none"
           >
             <CheckCircle2 class="h-4 w-4 text-success shrink-0" />
             <span>{{ summary.willProcess }} akan diproses</span>
           </div>
           <div
-            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,1.75rem)] bg-warning/10 border border-warning/30 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-warning/10 border border-warning/30 rounded-md text-foreground font-medium select-none"
           >
             <AlertTriangle class="h-4 w-4 text-warning shrink-0" />
             <span>{{ summary.skipConflicts }} akan dilewati</span>
           </div>
           <div
-            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,1.75rem)] bg-destructive/10 border border-destructive/30 rounded-md text-foreground font-medium select-none"
+            class="flex items-center gap-1.5 px-3 min-h-[var(--control-h-md,2rem)] bg-destructive/10 border border-destructive/30 rounded-md text-foreground font-medium select-none"
           >
             <AlertCircle class="h-4 w-4 text-destructive shrink-0" />
             <span>{{ summary.failedRows }} gagal</span>

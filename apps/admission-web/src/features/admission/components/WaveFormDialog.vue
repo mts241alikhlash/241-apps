@@ -181,7 +181,7 @@ const onSubmit = handleSubmit((formValues) => {
         <DialogTitle>
           {{ isEdit ? 'Ubah Gelombang' : 'Tambah Gelombang' }}
         </DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Isi data gelombang pendaftaran.
         </DialogDescription>
       </DialogHeader>
@@ -330,7 +330,7 @@ const onSubmit = handleSubmit((formValues) => {
               hide-label
             >
               <div
-                class="flex min-h-[var(--control-h-lg,2rem)] items-center gap-2"
+                class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2"
               >
                 <FormControl>
                   <Checkbox

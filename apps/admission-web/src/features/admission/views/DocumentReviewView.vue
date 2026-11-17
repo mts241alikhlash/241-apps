@@ -502,7 +502,7 @@ onMounted(() => fetchReview(true))
                           v-if="item.document"
                           type="button"
                           data-test="open-file"
-                          class="ml-auto inline-flex min-h-[var(--control-h-lg,2rem)] shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
+                          class="ml-auto inline-flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/10 sm:min-h-0 lg:hidden"
                           @click.stop="handleOpenFile(item)"
                         >
                           <Eye class="size-3.5" />
@@ -587,7 +587,7 @@ onMounted(() => fetchReview(true))
               </div>
 
               <div
-                class="flex h-[var(--control-h-md,1.75rem)] shrink-0 items-center gap-1.5"
+                class="flex h-[var(--control-h-md,2rem)] shrink-0 items-center gap-1.5"
               >
                 <template v-if="activeSlot?.document?.file">
                   <Button
@@ -744,7 +744,7 @@ onMounted(() => fetchReview(true))
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Tolak {{ rejectSlot?.name }}</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Alasan disimpan dan dikirim ke pendaftar bersama hasil pemeriksaan.
           </DialogDescription>
         </DialogHeader>
@@ -807,7 +807,7 @@ onMounted(() => fetchReview(true))
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Kirim hasil pemeriksaan?</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Konfirmasi pengiriman hasil pemeriksaan berkas ke pendaftar.
           </DialogDescription>
         </DialogHeader>
@@ -856,7 +856,7 @@ onMounted(() => fetchReview(true))
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Minta Perbaikan Data</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Formulir dikembalikan ke pendaftar dengan catatan ini, bersama
             berkas yang ditolak.
           </DialogDescription>

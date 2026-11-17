@@ -5,10 +5,12 @@ import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Label } from '@mts241alikhlash/ui/label'
 import {
@@ -543,11 +545,12 @@ function getTargetClass(row: PromotionRecommendationItem): string {
       <DialogContent
         class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden"
       >
-        <DialogHeader class="px-6 py-4 border-b shrink-0 bg-muted/20">
+        <DialogHeader standard>
           <DialogTitle>Alasan Penolakan</DialogTitle>
+        <DialogDescription>Tuliskan alasan siswa tidak dinaikkan.</DialogDescription>
         </DialogHeader>
 
-        <div class="px-6 py-4 space-y-3">
+        <DialogBody class="space-y-3">
           <div class="space-y-1.5">
             <Label
               for="promotion-decline-reason"
@@ -563,11 +566,9 @@ function getTargetClass(row: PromotionRecommendationItem): string {
               class="resize-none"
             />
           </div>
-        </div>
+        </DialogBody>
 
-        <DialogFooter
-          class="border-t px-6 py-3 flex justify-end gap-2 bg-muted/10"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             size="sm"

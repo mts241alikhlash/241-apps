@@ -2,6 +2,7 @@
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -95,14 +96,14 @@ async function handleSave() {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Bobot Penilaian</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Atur bobot tiap jenis penilaian agar total 100%.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-4 space-y-3 overflow-y-auto">
+      <DialogBody class="space-y-3">
         <div
           v-if="loading"
           class="flex items-center justify-center py-8 text-muted-foreground"
@@ -271,11 +272,9 @@ async function handleSave() {
             </div>
           </div>
         </template>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-3 border-t shrink-0 flex sm:justify-between w-full bg-background"
-      >
+      <DialogFooter standard class="sm:justify-between">
         <Button
           type="button"
           variant="outline"

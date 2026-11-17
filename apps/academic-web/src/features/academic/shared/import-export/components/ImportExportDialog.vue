@@ -138,12 +138,12 @@ watch(
     @update:open="handleDialogClose"
   >
     <DialogContent class="sm:max-w-[450px] p-0 overflow-hidden">
-      <DialogHeader class="px-6 pt-6 pb-4 bg-muted/20 border-b">
+      <DialogHeader standard>
         <DialogTitle class="flex items-center gap-2">
           <FileSpreadsheet class="size-5 text-success" />
           Manajemen Data Excel
         </DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           {{ labels.dialogDescription }}
         </DialogDescription>
       </DialogHeader>

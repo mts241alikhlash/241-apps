@@ -7,6 +7,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -204,7 +205,6 @@ onMounted(() => examPackageService.loadReferences())
         <DataTable
           v-else
           mobile="cards"
-          row-clickable
           :columns="columns"
           :data="filtersPending ? [] : packages"
           :page="page"
@@ -214,7 +214,6 @@ onMounted(() => examPackageService.loadReferences())
           item-label="paket"
           @update:page="page = $event"
           @update:page-size="changePageSize"
-          @row-click="openPackage"
         >
           <template #filters>
             <PackageFilterFields
@@ -275,13 +274,14 @@ onMounted(() => examPackageService.loadReferences())
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <Dialog v-model:open="filterOpen">
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Paket</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pilih mapel, tingkat, dan status paket.
           </DialogDescription>
         </DialogHeader>

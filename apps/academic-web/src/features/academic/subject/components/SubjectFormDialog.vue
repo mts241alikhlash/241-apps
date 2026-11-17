@@ -114,11 +114,11 @@ function confirmSave() {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{ isEditing ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran Baru' }}
         </DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -165,9 +165,7 @@ function confirmSave() {
         </form>
       </ScrollArea>
 
-      <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
-      >
+      <DialogFooter standard class="sm:justify-between">
         <Button
           type="button"
           variant="outline"

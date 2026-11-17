@@ -10,6 +10,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { examTypeLabel } from '@/features/exam-shared/examType'
 import { examActivityApi } from '../api/examActivityApi'
@@ -144,6 +145,7 @@ onMounted(load)
           </li>
         </ul>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

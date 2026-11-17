@@ -19,6 +19,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
@@ -259,13 +260,14 @@ const columns = computed(() =>
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <Dialog v-model:open="filterOpen">
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Jadwal</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pilih status jadwal.
           </DialogDescription>
         </DialogHeader>

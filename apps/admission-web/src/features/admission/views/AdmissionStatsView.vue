@@ -410,7 +410,7 @@ onMounted(async () => {
       <DialogContent size="md">
         <DialogHeader standard
           ><DialogTitle>Filter Statistik</DialogTitle
-          ><DialogDescription class="sr-only"
+          ><DialogDescription
             >Pilih tahun ajaran dan gelombang.</DialogDescription
           ></DialogHeader
         >

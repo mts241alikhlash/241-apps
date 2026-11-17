@@ -169,7 +169,7 @@ function handleOpenChange(open: boolean) {
     @update:open="handleOpenChange"
   >
     <DialogScrollContent class="max-w-md">
-      <DialogHeader>
+      <DialogHeader standard>
         <DialogTitle>Daftar Akun Pendaftaran</DialogTitle>
         <DialogDescription>
           Buat akun untuk memulai pendaftaran santri baru.

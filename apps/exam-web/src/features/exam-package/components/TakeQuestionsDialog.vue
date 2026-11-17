@@ -57,7 +57,7 @@ async function copy() {
     <DialogContent size="xl">
       <DialogHeader standard>
         <DialogTitle>Ambil Soal dari Paket Lain</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Pilih paket yang sudah disetujui, lalu salin soalnya ke paket ini.
         </DialogDescription>
       </DialogHeader>

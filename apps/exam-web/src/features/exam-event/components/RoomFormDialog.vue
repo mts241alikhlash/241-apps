@@ -63,7 +63,7 @@ onMounted(async () => {
         <DialogTitle>{{
           room ? 'Ubah Ruangan' : 'Tambah Ruangan'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Atur kode, nama, gedung, kapasitas, dan teknisi ruangan.
         </DialogDescription>
       </DialogHeader>

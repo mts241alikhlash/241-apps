@@ -25,6 +25,7 @@ import {
 import { Filter, Plus } from '@lucide/vue'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -338,11 +339,11 @@ async function confirmPendingAction() {
       <DialogContent size="md">
         <DialogHeader standard
           ><DialogTitle>Filter Pengumuman</DialogTitle
-          ><DialogDescription class="sr-only"
+          ><DialogDescription
             >Pilih status dan gelombang.</DialogDescription
           ></DialogHeader
         >
-        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6">
+        <DialogBody class="space-y-4 sm:px-6">
           <FloatingLabelField
             label="Status"
             :for="mobileStatusFilterId"
@@ -381,7 +382,7 @@ async function confirmPendingAction() {
               ></Select
             >
           </FloatingLabelField>
-        </div>
+        </DialogBody>
         <DialogFooter
           standard
           class="justify-between"

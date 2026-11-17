@@ -3,7 +3,9 @@ import { computed } from 'vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -51,13 +53,14 @@ const formattedDate = computed(() => {
     @update:open="(val) => emit('update:open', val)"
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle class="text-base font-semibold"
           >Detail Kehadiran</DialogTitle
         >
+        <DialogDescription>Rincian kehadiran siswa pada sesi ini.</DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 text-xs">
+      <DialogBody class="space-y-4 text-xs">
         <div class="flex items-start gap-2">
           <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
             Hari
@@ -165,11 +168,9 @@ const formattedDate = computed(() => {
             >
           </div>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-3 border-t bg-muted/20 flex justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

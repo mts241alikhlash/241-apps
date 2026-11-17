@@ -10,10 +10,12 @@ import {
 import { DatePicker } from '@mts241alikhlash/ui'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Label } from '@mts241alikhlash/ui/label'
 import {
@@ -320,11 +322,12 @@ async function handleConfirmGraduate() {
     <DialogContent
       class="sm:max-w-3xl flex flex-col gap-0 p-0 overflow-hidden max-h-[90svh]"
     >
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Konfirmasi Kelulusan</DialogTitle>
+        <DialogDescription>Periksa siswa yang lulus dan yang belum, lalu konfirmasi.</DialogDescription>
       </DialogHeader>
 
-      <div class="overflow-y-auto px-6 py-4 space-y-4">
+      <DialogBody class="space-y-4">
         <div class="overflow-x-auto rounded-xl border bg-background shadow-xs">
           <Table class="min-w-[500px]">
             <TableHeader>
@@ -377,11 +380,9 @@ async function handleConfirmGraduate() {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-3.5 border-t shrink-0 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3 w-full"
-      >
+      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3">
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="summaryStats.approved > 0"

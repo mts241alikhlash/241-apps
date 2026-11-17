@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { Printer } from '@lucide/vue'
 import { examRoomService } from '../services/examRoomService'
@@ -382,6 +383,7 @@ onMounted(load)
           </section>
         </div>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

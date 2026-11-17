@@ -63,7 +63,7 @@ onMounted(async () => {
               :key="download.label"
             >
               <a
-                class="inline-flex min-h-[var(--control-h-lg,2rem)] items-center rounded-md border px-3 text-control font-medium underline-offset-4 hover:underline"
+                class="inline-flex min-h-[var(--control-h-lg,2.25rem)] items-center rounded-md border px-3 text-control font-medium underline-offset-4 hover:underline"
                 :href="download.href"
                 target="_blank"
                 rel="noopener"
@@ -109,7 +109,7 @@ onMounted(async () => {
             >
               <span class="font-medium">{{ config.name }}</span>
               <a
-                class="min-h-[var(--control-h-lg,2rem)] text-control break-all underline underline-offset-4"
+                class="min-h-[var(--control-h-lg,2.25rem)] text-control break-all underline underline-offset-4"
                 :href="sebLink(config.id)"
               >
                 {{ sebLink(config.id) }}

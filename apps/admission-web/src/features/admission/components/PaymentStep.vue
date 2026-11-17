@@ -220,7 +220,7 @@ async function upload() {
               class="flex min-w-0 items-start gap-2"
             >
               <label
-                class="flex min-h-[var(--control-h-lg,2rem)] min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-md border p-3 text-control has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                class="flex min-h-[var(--control-h-lg,2.25rem)] min-w-0 flex-1 cursor-pointer items-start gap-3 rounded-md border p-3 text-control has-[:checked]:border-primary has-[:checked]:bg-primary/5"
               >
                 <input
                   type="radio"

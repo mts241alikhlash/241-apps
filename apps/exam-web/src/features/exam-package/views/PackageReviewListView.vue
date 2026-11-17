@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { buildReviewColumns } from '../components/reviewPackageColumns'
 import { usePackageList } from '../composables/usePackageList'
@@ -80,7 +81,6 @@ onMounted(() => examPackageService.loadReferences())
         <DataTable
           v-else
           mobile="cards"
-          row-clickable
           :columns="columns"
           :data="filtersPending ? [] : packages"
           :page="page"
@@ -90,7 +90,6 @@ onMounted(() => examPackageService.loadReferences())
           item-label="paket"
           @update:page="page = $event"
           @update:page-size="changePageSize"
-          @row-click="openPackage"
         >
           <template #header-right>
             <SearchInput
@@ -117,6 +116,7 @@ onMounted(() => examPackageService.loadReferences())
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

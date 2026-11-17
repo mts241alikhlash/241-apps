@@ -139,7 +139,7 @@ async function save() {
         <DialogTitle>{{
           isEdit ? 'Ubah Jadwal' : 'Tambah Jadwal'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Atur paket, kelas, waktu, dan durasi ujian.
         </DialogDescription>
       </DialogHeader>

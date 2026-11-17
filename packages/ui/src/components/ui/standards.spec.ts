@@ -8,12 +8,12 @@ const source = (name: string) =>
 describe('radius scale', () => {
   const theme = source('../../theme.css')
 
-  it('keeps the nova radius ladder from one base value', () => {
+  it('keeps one flat 8 px corner: every step above md maps to md', () => {
     expect(theme).toContain('--radius-sm: calc(var(--radius) * 0.6);')
     expect(theme).toContain('--radius-md: calc(var(--radius) * 0.8);')
-    expect(theme).toContain('--radius-lg: var(--radius);')
-    expect(theme).toContain('--radius-xl: calc(var(--radius) * 1.4);')
-    expect(theme).toContain('--radius-2xl: calc(var(--radius) * 1.8);')
+    for (const step of ['lg', 'xl', '2xl', '3xl', '4xl']) {
+      expect(theme).toContain(`--radius-${step}: var(--radius-md);`)
+    }
   })
 
   it('draws controls and the sidebar inset with md', () => {

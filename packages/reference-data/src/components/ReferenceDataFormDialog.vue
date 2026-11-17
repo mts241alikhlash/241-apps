@@ -165,7 +165,7 @@ const onSubmit = handleSubmit((values) => {
                 <div
                   role="button"
                   tabindex="0"
-                  class="flex min-h-[var(--control-h-md,1.75rem)] w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-control transition-colors hover:bg-accent/50 cursor-pointer select-none"
+                  class="flex min-h-[var(--control-h-md,2rem)] w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-control transition-colors hover:bg-accent/50 cursor-pointer select-none"
                   :class="{ 'opacity-50 pointer-events-none': isSubmitting }"
                   @click="handleChange(!value)"
                   @keydown.enter.prevent="handleChange(!value)"

@@ -35,7 +35,7 @@ function toneOf(position: number): string {
       v-for="(question, position) in questions"
       :key="question.id"
       type="button"
-      class="flex min-h-[var(--control-h-lg,2rem)] w-full items-center justify-center rounded-md border text-control tabular-nums transition-colors motion-reduce:transition-none"
+      class="flex min-h-[var(--control-h-lg,2.25rem)] w-full items-center justify-center rounded-md border text-control tabular-nums transition-colors motion-reduce:transition-none"
       :class="toneOf(position)"
       :aria-label="`Soal ${position + 1}`"
       :aria-current="position === currentIndex ? 'step' : undefined"

@@ -385,7 +385,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-if="!wide"
                   variant="outline"
                   size="sm"
-                  class="min-h-[var(--control-h-lg,2rem)]"
+                  class="min-h-[var(--control-h-lg,2.25rem)]"
                   @click="showList = true"
                 >
                   Daftar Soal
@@ -416,7 +416,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keyOf(current) === choice.key
                       ? 'border-primary bg-primary/[0.06]'
@@ -451,7 +451,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keysOf(current).includes(choice.key)
                       ? 'border-primary bg-primary/[0.06]'
@@ -486,7 +486,7 @@ function statusOf(question: PaperQuestion | null): string {
                   ]"
                   :key="option.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2rem)]"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)]"
                   :class="
                     boolOf(current) === option.value
                       ? 'border-primary bg-primary/[0.06]'
@@ -531,7 +531,7 @@ function statusOf(question: PaperQuestion | null): string {
               <Button
                 variant="outline"
                 size="sm"
-                class="min-h-[var(--control-h-lg,2rem)] shrink-0"
+                class="min-h-[var(--control-h-lg,2.25rem)] shrink-0"
                 :disabled="index === 0 || submitting"
                 @click="go(index - 1)"
               >
@@ -540,7 +540,7 @@ function statusOf(question: PaperQuestion | null): string {
 
               <button
                 type="button"
-                class="flex min-h-[var(--control-h-lg,2rem)] shrink-0 items-center gap-1.5 rounded-md border px-3 text-control font-medium transition-colors motion-reduce:transition-none"
+                class="flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 items-center gap-1.5 rounded-md border px-3 text-control font-medium transition-colors motion-reduce:transition-none"
                 :class="
                   doubtful.has(current.id)
                     ? 'border-warning bg-warning/10 text-warning'
@@ -557,7 +557,7 @@ function statusOf(question: PaperQuestion | null): string {
               </button>
 
               <Button
-                class="ml-auto min-h-[var(--control-h-lg,2rem)] shrink-0 font-semibold"
+                class="ml-auto min-h-[var(--control-h-lg,2.25rem)] shrink-0 font-semibold"
                 :class="
                   isLast
                     ? 'bg-success text-white hover:bg-success'
@@ -606,9 +606,12 @@ function statusOf(question: PaperQuestion | null): string {
         </DialogHeader>
         <div class="space-y-2 px-4 py-3">
           <DialogDescription>
+            Konfirmasi pengumpulan ujian.
+          </DialogDescription>
+          <p class="text-control">
             Masih ada {{ unanswered }} soal belum dijawab. Jawaban tidak bisa
             diubah setelah dikumpulkan.
-          </DialogDescription>
+          </p>
           <p
             v-if="gateNotice"
             class="text-control text-warning"
@@ -652,10 +655,12 @@ function statusOf(question: PaperQuestion | null): string {
         </DialogHeader>
         <div class="px-4 py-3">
           <DialogDescription>
-            Ujian masih berjalan. Waktu tetap berjalan dan jawaban yang
-            tersimpan tidak hilang, tetapi Anda harus memasukkan token lagi
-            untuk kembali.
+            Konfirmasi keluar dari ujian yang sedang berjalan.
           </DialogDescription>
+          <p class="text-control">
+            Waktu tetap berjalan dan jawaban yang tersimpan tidak hilang, tetapi
+            Anda harus memasukkan token lagi untuk kembali.
+          </p>
         </div>
         <DialogFooter
           standard

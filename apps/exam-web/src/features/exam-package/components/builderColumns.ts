@@ -39,7 +39,13 @@ export function buildBuilderColumns(
     {
       id: 'summary',
       header: 'Soal',
-      meta: { align: 'left', strong: true },
+      meta: {
+        align: 'left',
+        strong: true,
+        truncate: true,
+        title: (row: ExamPackageItemView) =>
+          row.summary || undefined,
+      },
       cell: ({ row }) => {
         const note = options.noteOf(row.original.questionId)
         return h('div', { class: 'space-y-1' }, [
@@ -60,6 +66,7 @@ export function buildBuilderColumns(
       id: 'type',
       header: 'Jenis',
       meta: {
+        align: 'center',
         mobileLabel: 'Jenis',
         mobileValue: (row: ExamPackageItemView) => typeLabel(row.type),
       },

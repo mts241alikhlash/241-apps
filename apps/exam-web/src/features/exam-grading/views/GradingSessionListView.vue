@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
@@ -146,6 +147,7 @@ function changePageSize(size: number) {
           </template>
         </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

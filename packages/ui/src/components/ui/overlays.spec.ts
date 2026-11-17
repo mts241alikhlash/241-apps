@@ -18,7 +18,7 @@ import {
 } from './tooltip'
 
 const text = 'text-control'
-const md = 'min-h-[var(--control-h-md,1.75rem)]'
+const md = 'min-h-[var(--control-h-md,2rem)]'
 
 function classOf(selector: string) {
   const el = document.body.querySelector(selector)

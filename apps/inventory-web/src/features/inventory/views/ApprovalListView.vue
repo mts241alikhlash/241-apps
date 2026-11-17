@@ -294,7 +294,7 @@ onMounted(() => {
           {{ nextStep.approverRoleCode }} setelah Anda setujui.
         </p>
 
-        <DialogFooter class="pt-4 flex sm:justify-between">
+        <DialogFooter class="sm:justify-between">
           <Button
             class="mr-auto sm:mr-0"
             type="button"

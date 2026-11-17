@@ -444,7 +444,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-[var(--control-h-lg,2rem)] items-center gap-2 text-control sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-control sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -529,7 +529,7 @@ onMounted(async () => {
           <DialogTitle>{{
             actionKind ? DIALOG_TITLES[actionKind] : ''
           }}</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             {{ actionKind ? DIALOG_TITLES[actionKind] : '' }}
           </DialogDescription>
         </DialogHeader>

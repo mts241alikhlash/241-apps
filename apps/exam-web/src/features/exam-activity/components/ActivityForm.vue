@@ -381,7 +381,7 @@ async function submit(): Promise<void> {
       >
         <span>Preset kebijakan</span>
         <p
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
         >
           Kebijakan {{ examTypeLabel(type) }}
         </p>
@@ -411,7 +411,7 @@ async function submit(): Promise<void> {
       >
         <span>Jenis token</span>
         <p
-          class="text-[length:var(--text-control,0.875rem)] text-muted-foreground"
+          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
         >
           Token berputar
         </p>

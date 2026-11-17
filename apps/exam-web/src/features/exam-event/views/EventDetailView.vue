@@ -13,6 +13,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
@@ -303,6 +304,7 @@ onMounted(async () => {
           </Tabs>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <RoomFormDialog

@@ -30,7 +30,7 @@ const { filterState } = useCommand()
     class="p-1 pb-0"
   >
     <div
-      class="border-input bg-input/20 flex h-[var(--control-h-lg,2rem)] items-center gap-2 rounded-md border px-2"
+      class="border-input bg-input/20 flex h-[var(--control-h-md,2rem)] items-center gap-2 rounded-md border px-2"
     >
       <Search class="size-[var(--icon-control,0.875rem)] shrink-0 opacity-50" />
       <ListboxFilter

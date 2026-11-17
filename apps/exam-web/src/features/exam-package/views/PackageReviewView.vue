@@ -9,6 +9,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -113,10 +114,7 @@ onMounted(() => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader
-        standard
-        class="px-2"
-      >
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Persetujuan Paket"
@@ -128,7 +126,7 @@ onMounted(() => {
         </div>
       </CardHeader>
 
-      <CardContent class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto p-2">
+      <CardContent class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-4 pt-2 pb-4">
         <div
           v-if="review.loadFailed.value"
           class="flex flex-wrap items-center gap-3 rounded-md border p-4 text-control"
@@ -310,11 +308,12 @@ onMounted(() => {
           </div>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <div
       v-if="pkg && canReview"
-      class="mt-2 flex min-h-[var(--control-h-lg,2rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
+      class="mt-2 flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
     >
       <Button
         variant="ghost"
