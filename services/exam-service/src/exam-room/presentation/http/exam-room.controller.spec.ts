@@ -4,10 +4,13 @@ import {
   ConflictException,
   ParseUUIDPipe,
 } from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { Test } from '@nestjs/testing'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import { PERMISSIONS_ANY_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { FakeExamRoomRepository } from '../../application/exam-room.repository.fake.js'
 import { AssignSupervisorUseCase } from '../../application/use-cases/assign-supervisor/assign-supervisor.use-case.js'
 import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam-events/manage-exam-events.use-case.js'
@@ -17,6 +20,7 @@ import { ExamRoomController } from './exam-room.controller.js'
 import { ExamEventController } from './exam-event.controller.js'
 import { AssignSeatsDto, ExamRoomSeatDto } from './dto/exam-room.dto.js'
 import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
+import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import type { PrintPack } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 
 const UUID_A = '11111111-1111-4111-8111-111111111111'
@@ -271,6 +275,34 @@ describe('ExamEventController print pack', () => {
     const dto = plainToInstance(PrintPackQueryDto, { roomId: UUID_B })
 
     expect(await validate(dto)).toHaveLength(0)
+  })
+})
+
+describe('PrintPackDto contract', () => {
+  it('lists the event, rooms and warnings as required', async () => {
+    const moduleRef = await Test.createTestingModule({
+      controllers: [ExamEventController],
+      providers: [
+        { provide: ManageExamEventsUseCase, useValue: {} },
+        { provide: ManageExamRoomsUseCase, useValue: {} },
+        { provide: GetPrintPackUseCase, useValue: {} },
+      ],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
+    const app = moduleRef.createNestApplication()
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder().build(),
+    )
+    await app.close()
+
+    expect(document.components?.schemas?.PrintPackDto).toEqual(
+      expect.objectContaining({
+        required: expect.arrayContaining(['event', 'rooms', 'warnings']),
+      }),
+    )
   })
 })
 

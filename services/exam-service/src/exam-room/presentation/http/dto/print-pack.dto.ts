@@ -77,18 +77,15 @@ export class PrintPackRoomDto {
   }
 }
 
+export class PrintPackEventDto {
+  @ApiProperty({ format: 'uuid' }) id!: string
+  @ApiProperty() name!: string
+  @ApiProperty({ format: 'date-time' }) startsAt!: string
+  @ApiProperty({ format: 'date-time' }) endsAt!: string
+}
+
 export class PrintPackDto {
-  @ApiProperty({
-    type: 'object',
-    properties: {
-      id: { type: 'string', format: 'uuid' },
-      name: { type: 'string' },
-      startsAt: { type: 'string', format: 'date-time' },
-      endsAt: { type: 'string', format: 'date-time' },
-    },
-    required: ['id', 'name', 'startsAt', 'endsAt'],
-  })
-  event!: { id: string; name: string; startsAt: string; endsAt: string }
+  @ApiProperty({ type: () => PrintPackEventDto }) event!: PrintPackEventDto
   @ApiProperty({ type: () => [PrintPackRoomDto] })
   rooms!: PrintPackRoomDto[]
   @ApiProperty({ type: [String] })

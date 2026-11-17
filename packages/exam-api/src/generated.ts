@@ -2191,17 +2191,18 @@ export interface components {
             studentId: string;
         };
         PrintPackDto: {
-            event?: {
-                /** Format: date-time */
-                endsAt: string;
-                /** Format: uuid */
-                id: string;
-                name: string;
-                /** Format: date-time */
-                startsAt: string;
-            };
+            event: components["schemas"]["PrintPackEventDto"];
             rooms: components["schemas"]["PrintPackRoomDto"][];
             warnings: string[];
+        };
+        PrintPackEventDto: {
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date-time */
+            startsAt: string;
         };
         PrintPackRoomDto: {
             building: string | null;
