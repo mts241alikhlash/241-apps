@@ -23,6 +23,9 @@ import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
+import { ListParticipantNumbersUseCase } from '../../application/use-cases/list-participant-numbers/list-participant-numbers.use-case.js'
+import { ListParticipantNumbersQueryDto } from './dto/request/list-participant-numbers-query.dto.js'
+import { ListParticipantNumbersResponseDto } from './dto/response/list-participant-numbers-response.dto.js'
 import { ParticipantNumberResponseDto } from './dto/response/participant-number-response.dto.js'
 import { IStudentIdentityReadPort } from '../../domain/repositories/student-identity-read.port.js'
 
@@ -91,6 +94,7 @@ export class StudentInternalController {
     private readonly studentIdentityRead: IStudentIdentityReadPort,
     private readonly getParticipantNumber: GetParticipantNumberUseCase,
     private readonly issueNumbers: IssueParticipantNumbersUseCase,
+    private readonly listParticipantNumbers: ListParticipantNumbersUseCase,
   ) {}
 
   @Post('by-ids')
@@ -132,6 +136,29 @@ export class StudentInternalController {
     @Body() dto: IssueParticipantNumbersRequestDto,
   ): Promise<IssueParticipantNumbersResponseDto> {
     return this.issueNumbers.execute(dto.semesterId)
+  }
+
+  @Get('participant-numbers')
+  @ApiOperation({
+    summary: 'Participant numbers of many students in one semester',
+    description:
+      'exam-service projects the numbers into a whole exam roster. Students ' +
+      'without a number in the semester are absent from the response.',
+  })
+  @ApiResponse({ status: 200, type: ListParticipantNumbersResponseDto })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid provisioning token',
+  })
+  async listNumbers(
+    @Query() query: ListParticipantNumbersQueryDto,
+  ): Promise<ListParticipantNumbersResponseDto> {
+    return {
+      data: await this.listParticipantNumbers.execute(
+        query.studentIds,
+        query.semesterId,
+      ),
+    }
   }
 
   @Get('by-user/:userId')

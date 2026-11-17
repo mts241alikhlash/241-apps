@@ -1,6 +1,7 @@
 import { GetMyClassroomUseCase } from './application/use-cases/get-my-classroom/get-my-classroom.use-case.js'
 import { GetParticipantNumberUseCase } from './application/use-cases/get-participant-number/get-participant-number.use-case.js'
 import { IssueParticipantNumbersUseCase } from './application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
+import { ListParticipantNumbersUseCase } from './application/use-cases/list-participant-numbers/list-participant-numbers.use-case.js'
 import { IParticipantNumberRepository } from './domain/repositories/participant-number.repository.js'
 import { PrismaParticipantNumberRepository } from './infrastructure/persistence/prisma/prisma-participant-number.repository.js'
 import { Module, forwardRef } from '@nestjs/common'
@@ -49,6 +50,7 @@ import { EnrollExistingAccountUseCase } from './application/use-cases/enroll-exi
     GetMyClassroomUseCase,
     GetParticipantNumberUseCase,
     IssueParticipantNumbersUseCase,
+    ListParticipantNumbersUseCase,
     { provide: IStudentRepository, useClass: PrismaStudentRepository },
     {
       provide: IParticipantNumberRepository,

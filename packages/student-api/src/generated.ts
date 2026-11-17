@@ -825,6 +825,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/students/participant-numbers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Participant numbers of many students in one semester
+         * @description exam-service projects the numbers into a whole exam roster. Students without a number in the semester are absent from the response.
+         */
+        get: operations["StudentInternalController_listNumbers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/students/participant-numbers/issue": {
         parameters: {
             query?: never;
@@ -1389,6 +1409,9 @@ export interface components {
             /** @description Students without a grade level, so they got no number */
             skipped: string[];
         };
+        ListParticipantNumbersResponseDto: {
+            data: components["schemas"]["ParticipantNumberEntryDto"][];
+        };
         MyClassroomResponseClassmatesClassroomDto: {
             academicYearId: string;
             capacity: number;
@@ -1858,6 +1881,11 @@ export interface components {
              * @enum {string}
              */
             relation: "FATHER" | "MOTHER" | "GUARDIAN";
+        };
+        ParticipantNumberEntryDto: {
+            number: string;
+            /** Format: uuid */
+            studentId: string;
         };
         ParticipantNumberResponseDto: {
             /** @description Registry number for the semester, or null when none was issued */
@@ -4825,6 +4853,42 @@ export interface operations {
                         statusCode?: number;
                     };
                 };
+            };
+        };
+    };
+    StudentInternalController_listNumbers: {
+        parameters: {
+            query: {
+                semesterId: string;
+                /** @description Comma separated student ids, at most 500 */
+                studentIds: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ParticipantNumberEntryDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
