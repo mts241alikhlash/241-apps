@@ -24,7 +24,7 @@ import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
 import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListParticipantNumbersUseCase } from '../../application/use-cases/list-participant-numbers/list-participant-numbers.use-case.js'
-import { ListParticipantNumbersQueryDto } from './dto/request/list-participant-numbers-query.dto.js'
+import { LookupParticipantNumbersDto } from './dto/request/lookup-participant-numbers.dto.js'
 import { ListParticipantNumbersResponseDto } from './dto/response/list-participant-numbers-response.dto.js'
 import { ParticipantNumberResponseDto } from './dto/response/participant-number-response.dto.js'
 import { IStudentIdentityReadPort } from '../../domain/repositories/student-identity-read.port.js'
@@ -138,7 +138,8 @@ export class StudentInternalController {
     return this.issueNumbers.execute(dto.semesterId)
   }
 
-  @Get('participant-numbers')
+  @Post('participant-numbers/lookup')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Participant numbers of many students in one semester',
     description:
@@ -151,12 +152,12 @@ export class StudentInternalController {
     description: 'Missing or invalid provisioning token',
   })
   async listNumbers(
-    @Query() query: ListParticipantNumbersQueryDto,
+    @Body() dto: LookupParticipantNumbersDto,
   ): Promise<ListParticipantNumbersResponseDto> {
     return {
       data: await this.listParticipantNumbers.execute(
-        query.studentIds,
-        query.semesterId,
+        dto.studentIds,
+        dto.semesterId,
       ),
     }
   }

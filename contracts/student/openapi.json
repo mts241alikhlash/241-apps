@@ -1498,32 +1498,21 @@
         ]
       }
     },
-    "/students/participant-numbers": {
-      "get": {
+    "/students/participant-numbers/lookup": {
+      "post": {
         "description": "exam-service projects the numbers into a whole exam roster. Students without a number in the semester are absent from the response.",
         "operationId": "StudentInternalController_listNumbers",
-        "parameters": [
-          {
-            "name": "semesterId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "studentIds",
-            "required": true,
-            "in": "query",
-            "description": "Comma separated student ids, at most 500",
-            "schema": {
-              "maxItems": 500,
-              "format": "uuid",
-              "type": "string"
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupParticipantNumbersDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "",
@@ -4896,6 +4885,28 @@
         "required": [
           "issued",
           "skipped"
+        ]
+      },
+      "LookupParticipantNumbersDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentIds": {
+            "minItems": 1,
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "semesterId",
+          "studentIds"
         ]
       },
       "ParticipantNumberEntryDto": {
