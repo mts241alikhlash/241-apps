@@ -56,7 +56,8 @@ describe('Card family', () => {
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[2.5rem]',
+        'min-h-[calc(var(--control-h-md,2rem)+1rem)]',
+        'shrink-0',
         'items-center',
         'justify-between',
         'border-b',
@@ -73,7 +74,7 @@ describe('Card family', () => {
     expect(c).toEqual(
       expect.arrayContaining([
         'flex',
-        'min-h-[2.5rem]',
+        'min-h-[calc(var(--control-h-md,2rem)+1rem)]',
         'items-center',
         'justify-end',
         'gap-2',
@@ -85,11 +86,11 @@ describe('Card family', () => {
     )
   })
 
-  it('gives the standard header and footer the same 40px height', () => {
+  it('gives the standard header and footer the same 48px height', () => {
     const header = classes(mount(CardHeader, { props: { standard: true } }))
     const footer = classes(mount(CardFooter))
-    expect(header).toContain('min-h-[2.5rem]')
-    expect(footer).toContain('min-h-[2.5rem]')
+    expect(header).toContain('min-h-[calc(var(--control-h-md,2rem)+1rem)]')
+    expect(footer).toContain('min-h-[calc(var(--control-h-md,2rem)+1rem)]')
   })
 
   it('sizes the title', () => {

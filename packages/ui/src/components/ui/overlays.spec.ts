@@ -51,7 +51,7 @@ describe('overlays', () => {
     expect(classOf('[data-slot=dropdown-menu-label]')).toContain(text)
   })
 
-  it('dialog keeps its default width and close button, with Mira title and text', async () => {
+  it('dialog keeps its default width and close button, with a nova title and text', async () => {
     mount(Dialog, {
       props: { open: true },
       slots: {
@@ -72,9 +72,9 @@ describe('overlays', () => {
       document.body.querySelector('[data-slot=dialog-close]'),
     ).not.toBeNull()
     const title = classOf('[data-slot=dialog-title]')
-    expect(title).toContain('text-sm')
-    expect(title).toContain('font-medium')
-    expect(classOf('[data-slot=dialog-description]')).toContain(text)
+    expect(title).toContain('text-md')
+    expect(title).toContain('font-semibold')
+    expect(classOf('[data-slot=dialog-description]')).toContain('sr-only')
   })
 
   it('popover uses the md radius and text', async () => {

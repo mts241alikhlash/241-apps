@@ -1,10 +1,10 @@
 # UI standard
 
-Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `mira` sizes with Inter and the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
+Applies to every page and component in `apps/` and to `packages/ui`. The components follow shadcn-vue's `nova` sizes with Inter and the owner decisions below. A page never restyles a `ui` component to fit; when a standard is missing, fix it once in `packages/ui`. Each rule is **Rule**, **Why**, **Check**.
 
 ## Pages and navigation
 
-**Rule.** The sidebar (`collapsible: 'icon'`, `variant: 'floating'`) sits flush under the top bar with a right border and the content has no inset card. The active item and the active breadcrumb are marked by `text-primary` alone, at the same weight as their neighbours; every other item stays muted. Its width is `SIDEBAR_WIDTH` (15rem) from `packages/ui`; an app never overrides `--sidebar-width`. A menu label is at most 26 characters so it fits one line, and a longer one truncates with its full text in `title`. A list page is not wrapped in another card (no ring, border or shadow); the page wrapper is `px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2`. A title that repeats the last breadcrumb is dropped; detail and form pages keep theirs next to `BackButton`.
+**Rule.** The sidebar (`collapsible: 'icon'`, `variant: 'floating'`) sits flush under the top bar with a right border and the content has no inset card. The active item and the active breadcrumb are marked by `text-primary` alone, at the same weight as their neighbours; every other item stays muted. Its width is `SIDEBAR_WIDTH` (17rem) from `packages/ui`; an app never overrides `--sidebar-width`. A menu label is at most 26 characters so it fits one line, and a longer one truncates with its full text in `title`. A list page is not wrapped in another card (no ring, border or shadow); the page wrapper is `px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2`. A title that repeats the last breadcrumb is dropped; detail and form pages keep theirs next to `BackButton`.
 **Why.** One layout in every app, owned by `packages/platform`.
 **Check.** `packages/platform` `AppLayout.spec.ts`; `pnpm run runtime:check` (`scripts/check-menu-labels.spec.mjs`); review for page wrappers.
 
@@ -44,8 +44,8 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 **Why.** One type scale.
 **Check.** `packages/ui` `standards.spec.ts`; review.
 
-**Rule.** Every radius step above `md` maps to `md` in `theme.css`: an 8 px corner for cards, dialogs, popovers, badges and controls; `xs` buttons keep `sm`, circles keep `full`. Controls, inputs, dialogs, popovers and cards use `rounded-md`; a page never writes a pixel radius and never picks a step above `md` for a surface that has one.
-**Why.** Owner decision: one flat corner, so a big card and a small input read as the same family.
+**Rule.** Radius follows the `nova` scale from `--radius` (10 px) in `theme.css`: `sm` 6 px, `md` 8 px, `lg` 10 px, `xl` 14 px, and so on up. Controls, inputs, dialogs and popovers use `rounded-md` (8 px), cards `rounded-lg` (10 px), `xs` buttons `sm`, circles `full`; a page never writes a pixel radius.
+**Why.** One scale, so a card, a dialog and an input grow together instead of every corner sitting at one size.
 **Check.** `packages/ui` `theme.spec.ts` and `standards.spec.ts`.
 
 **Rule.** Tabs are an underline strip, never a pill: `TabsList` carries `border-b` with a transparent background, `TabsTrigger` is `border-b-2` and turns `border-primary text-primary` when active. No `variant` prop and no `bg-muted` on the list.

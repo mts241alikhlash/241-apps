@@ -15,6 +15,7 @@ import {
   cardRows,
   nextCardPage,
   previousCardPage,
+  rowActionProps,
 } from '@/test/dataTableCards'
 
 const { rows, waves, filters, fetchWaves, push } = vi.hoisted(() => ({
@@ -177,7 +178,7 @@ describe('ApplicationListView', () => {
     expect(mobile.text()).toContain('Contoh Panjang')
     expect(mobile.text()).toContain('REG-001')
     expect(mobile.text()).toContain('Pendaftaran:Draft')
-    expect(cardRow(wrapper).find('[role="link"]').exists()).toBe(true)
+    expect(cardRow(wrapper).find('[role="link"]').exists()).toBe(false)
 
     const search = wrapper.get('input[aria-label="Cari pendaftar"]')
 
@@ -270,7 +271,7 @@ describe('ApplicationListView', () => {
     const wrapper = mount(ApplicationListView, { global: { stubs } })
     await wrapper.get('input[aria-label="Cari pendaftar"]').setValue('Budi')
     await nextCardPage(wrapper).trigger('click')
-    await cardRow(wrapper).get('[role="link"]').trigger('click')
+    rowActionProps(wrapper, rows[0]).onView?.()
     expect(useApplicationStore().listContext.returning).toBe(true)
     wrapper.unmount()
     const returned = mount(ApplicationListView, { global: { stubs } })

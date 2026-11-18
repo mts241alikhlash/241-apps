@@ -14,6 +14,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -378,147 +379,143 @@ defineExpose({ validate: validateStep })
               <DialogTitle>{{
                 original === null ? 'Tambah Prestasi' : 'Edit Prestasi'
               }}</DialogTitle>
-              <DialogDescription class="sr-only"
-                >Isi data prestasi siswa.</DialogDescription
-              >
+              <DialogDescription>Isi data prestasi siswa.</DialogDescription>
             </DialogHeader>
-            <div class="min-h-0 flex-1 overflow-y-auto">
-              <div class="space-y-4 p-6">
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`achievements[${index}].year`"
-                    label="Tahun"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-digits
-                        v-bind="componentField"
-                        inputmode="numeric"
-                        maxlength="4"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
+            <DialogBody class="space-y-4">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`achievements[${index}].year`"
+                  label="Tahun"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-digits
+                      v-bind="componentField"
+                      inputmode="numeric"
+                      maxlength="4"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
 
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`achievements[${index}].competitionName`"
-                    label="Nama Lomba"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`achievements[${index}].competitionName`"
+                  label="Nama Lomba"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
 
-                  <FloatingField
-                    v-slot="{ value, handleChange, errorMessage }"
-                    :name="`achievements[${index}].competitionFieldId`"
+                <FloatingField
+                  v-slot="{ value, handleChange, errorMessage }"
+                  :name="`achievements[${index}].competitionFieldId`"
+                  label="Bidang"
+                  required
+                >
+                  <OptionSelect
+                    :invalid="!!errorMessage"
                     label="Bidang"
-                    required
-                  >
-                    <OptionSelect
-                      :invalid="!!errorMessage"
-                      label="Bidang"
-                      :model-value="value"
-                      :options="listOf('competitionFields')"
-                      :disabled="!editable"
-                      @update:model-value="handleChange"
-                    />
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`achievements[${index}].organizer`"
-                    label="Penyelenggara"
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ value, handleChange, errorMessage }"
-                    :name="`achievements[${index}].competitionLevelId`"
-                    label="Tingkat"
-                    required
-                  >
-                    <OptionSelect
-                      :invalid="!!errorMessage"
-                      label="Tingkat"
-                      :model-value="value"
-                      :options="listOf('competitionLevels')"
-                      :disabled="!editable"
-                      @update:model-value="handleChange"
-                    />
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`achievements[${index}].rank`"
-                    label="Peringkat"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-                </div>
-                <div class="space-y-2 text-control">
-                  <p class="font-medium">Lampiran</p>
-                  <FileDropzone
-                    v-if="editable"
-                    :file-name="pendingFile?.name || row.fileName"
-                    clearable
-                    :disabled="!!uploading"
-                    aria-label="Pilih lampiran"
-                    hint="JPG, PNG, atau PDF, maks. 5 MB"
-                    @change="attach($event)"
-                    @clear="clearAttachment('achievements', index)"
+                    :model-value="value"
+                    :options="listOf('competitionFields')"
+                    :disabled="!editable"
+                    @update:model-value="handleChange"
                   />
-                  <div
-                    v-else-if="pendingFile || row.fileName"
-                    class="flex min-w-0 items-center gap-3 rounded-xl border bg-muted/30 p-4"
-                  >
-                    <span
-                      class="shrink-0 rounded-lg bg-primary/10 p-2 text-primary"
-                    >
-                      <FileText class="size-5" />
-                    </span>
-                    <span class="min-w-0 flex-1 truncate font-medium">{{
-                      pendingFile?.name || row.fileName
-                    }}</span>
-                    <Button
-                      v-if="editable"
-                      variant="ghost"
-                      size="icon"
-                      class="shrink-0"
-                      aria-label="Lepas lampiran"
-                      @click="clearAttachment('achievements', index)"
-                    >
-                      <XCircle class="size-4" />
-                    </Button>
-                  </div>
-                  <p
-                    v-else
-                    class="text-muted-foreground"
-                  >
-                    Tidak ada lampiran.
-                  </p>
-                </div>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`achievements[${index}].organizer`"
+                  label="Penyelenggara"
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ value, handleChange, errorMessage }"
+                  :name="`achievements[${index}].competitionLevelId`"
+                  label="Tingkat"
+                  required
+                >
+                  <OptionSelect
+                    :invalid="!!errorMessage"
+                    label="Tingkat"
+                    :model-value="value"
+                    :options="listOf('competitionLevels')"
+                    :disabled="!editable"
+                    @update:model-value="handleChange"
+                  />
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`achievements[${index}].rank`"
+                  label="Peringkat"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
               </div>
-            </div>
+              <div class="space-y-2 text-control">
+                <p class="font-medium">Lampiran</p>
+                <FileDropzone
+                  v-if="editable"
+                  :file-name="pendingFile?.name || row.fileName"
+                  clearable
+                  :disabled="!!uploading"
+                  aria-label="Pilih lampiran"
+                  hint="JPG, PNG, atau PDF, maks. 5 MB"
+                  @change="attach($event)"
+                  @clear="clearAttachment('achievements', index)"
+                />
+                <div
+                  v-else-if="pendingFile || row.fileName"
+                  class="flex min-w-0 items-center gap-3 rounded-xl border bg-muted/30 p-4"
+                >
+                  <span
+                    class="shrink-0 rounded-lg bg-primary/10 p-2 text-primary"
+                  >
+                    <FileText class="size-5" />
+                  </span>
+                  <span class="min-w-0 flex-1 truncate font-medium">{{
+                    pendingFile?.name || row.fileName
+                  }}</span>
+                  <Button
+                    v-if="editable"
+                    variant="ghost"
+                    size="icon"
+                    class="shrink-0"
+                    aria-label="Lepas lampiran"
+                    @click="clearAttachment('achievements', index)"
+                  >
+                    <XCircle class="size-4" />
+                  </Button>
+                </div>
+                <p
+                  v-else
+                  class="text-muted-foreground"
+                >
+                  Tidak ada lampiran.
+                </p>
+              </div>
+            </DialogBody>
             <DialogFooter
               standard
               class="justify-between"
@@ -584,182 +581,178 @@ defineExpose({ validate: validateStep })
               <DialogTitle>{{
                 original === null ? 'Tambah Beasiswa' : 'Edit Beasiswa'
               }}</DialogTitle>
-              <DialogDescription class="sr-only"
-                >Isi data beasiswa siswa.</DialogDescription
-              >
+              <DialogDescription>Isi data beasiswa siswa.</DialogDescription>
             </DialogHeader>
-            <div class="min-h-0 flex-1 overflow-y-auto">
-              <div class="space-y-4 p-6">
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`scholarships[${index}].year`"
-                    label="Tahun"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-digits
-                        v-bind="componentField"
-                        inputmode="numeric"
-                        maxlength="4"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
+            <DialogBody class="space-y-4">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`scholarships[${index}].year`"
+                  label="Tahun"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-digits
+                      v-bind="componentField"
+                      inputmode="numeric"
+                      maxlength="4"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
 
-                  <FloatingField
-                    v-slot="{ value, handleChange, errorMessage }"
-                    :name="`scholarships[${index}].categoryId`"
+                <FloatingField
+                  v-slot="{ value, handleChange, errorMessage }"
+                  :name="`scholarships[${index}].categoryId`"
+                  label="Kategori"
+                  required
+                >
+                  <OptionSelect
+                    :invalid="!!errorMessage"
                     label="Kategori"
-                    required
-                  >
-                    <OptionSelect
-                      :invalid="!!errorMessage"
-                      label="Kategori"
-                      :model-value="value"
-                      :options="listOf('scholarshipCategories')"
-                      :disabled="!editable"
-                      @update:model-value="handleChange"
-                    />
-                  </FloatingField>
-
-                  <FloatingField
-                    v-if="isKip(index)"
-                    v-slot="{ componentField }"
-                    :name="`scholarships[${index}].kipNumber`"
-                    label="No. KIP"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        maxlength="30"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`scholarships[${index}].scholarshipName`"
-                    label="Nama Beasiswa"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`scholarships[${index}].providerName`"
-                    label="Instansi Pemberi"
-                    required
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ value, handleChange, errorMessage }"
-                    :name="`scholarships[${index}].providerTypeId`"
-                    label="Jenis Instansi"
-                    required
-                  >
-                    <OptionSelect
-                      :invalid="!!errorMessage"
-                      label="Jenis Instansi"
-                      :model-value="value"
-                      :options="listOf('scholarshipProviderTypes')"
-                      :disabled="!editable"
-                      @update:model-value="handleChange"
-                    />
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ componentField }"
-                    :name="`scholarships[${index}].duration`"
-                    label="Jangka Waktu"
-                  >
-                    <FormControl>
-                      <Input
-                        v-bind="componentField"
-                        :disabled="!editable"
-                      />
-                    </FormControl>
-                  </FloatingField>
-
-                  <FloatingField
-                    v-slot="{ value, setValue }"
-                    :name="`scholarships[${index}].amount`"
-                    label="Jumlah"
-                  >
-                    <FormControl>
-                      <FormattedNumberInput
-                        :name="`scholarships[${index}].amount`"
-                        :model-value="value"
-                        prefix="Rp. "
-                        suffix=",-"
-                        thousands
-                        :max-digits="12"
-                        :disabled="!editable"
-                        @update:model-value="setValue"
-                      />
-                    </FormControl>
-                  </FloatingField>
-                </div>
-                <div class="space-y-2 text-control">
-                  <p class="font-medium">Lampiran</p>
-                  <FileDropzone
-                    v-if="editable"
-                    :file-name="pendingFile?.name || row.fileName"
-                    clearable
-                    :disabled="!!uploading"
-                    aria-label="Pilih lampiran"
-                    hint="JPG, PNG, atau PDF, maks. 5 MB"
-                    @change="attach($event)"
-                    @clear="clearAttachment('scholarships', index)"
+                    :model-value="value"
+                    :options="listOf('scholarshipCategories')"
+                    :disabled="!editable"
+                    @update:model-value="handleChange"
                   />
-                  <div
-                    v-else-if="pendingFile || row.fileName"
-                    class="flex min-w-0 items-center gap-3 rounded-xl border bg-muted/30 p-4"
-                  >
-                    <span
-                      class="shrink-0 rounded-lg bg-primary/10 p-2 text-primary"
-                    >
-                      <FileText class="size-5" />
-                    </span>
-                    <span class="min-w-0 flex-1 truncate font-medium">{{
-                      pendingFile?.name || row.fileName
-                    }}</span>
-                    <Button
-                      v-if="editable"
-                      variant="ghost"
-                      size="icon"
-                      class="shrink-0"
-                      aria-label="Lepas lampiran"
-                      @click="clearAttachment('scholarships', index)"
-                    >
-                      <XCircle class="size-4" />
-                    </Button>
-                  </div>
-                  <p
-                    v-else
-                    class="text-muted-foreground"
-                  >
-                    Tidak ada lampiran.
-                  </p>
-                </div>
+                </FloatingField>
+
+                <FloatingField
+                  v-if="isKip(index)"
+                  v-slot="{ componentField }"
+                  :name="`scholarships[${index}].kipNumber`"
+                  label="No. KIP"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      maxlength="30"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`scholarships[${index}].scholarshipName`"
+                  label="Nama Beasiswa"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`scholarships[${index}].providerName`"
+                  label="Instansi Pemberi"
+                  required
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ value, handleChange, errorMessage }"
+                  :name="`scholarships[${index}].providerTypeId`"
+                  label="Jenis Instansi"
+                  required
+                >
+                  <OptionSelect
+                    :invalid="!!errorMessage"
+                    label="Jenis Instansi"
+                    :model-value="value"
+                    :options="listOf('scholarshipProviderTypes')"
+                    :disabled="!editable"
+                    @update:model-value="handleChange"
+                  />
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ componentField }"
+                  :name="`scholarships[${index}].duration`"
+                  label="Jangka Waktu"
+                >
+                  <FormControl>
+                    <Input
+                      v-bind="componentField"
+                      :disabled="!editable"
+                    />
+                  </FormControl>
+                </FloatingField>
+
+                <FloatingField
+                  v-slot="{ value, setValue }"
+                  :name="`scholarships[${index}].amount`"
+                  label="Jumlah"
+                >
+                  <FormControl>
+                    <FormattedNumberInput
+                      :name="`scholarships[${index}].amount`"
+                      :model-value="value"
+                      prefix="Rp. "
+                      suffix=",-"
+                      thousands
+                      :max-digits="12"
+                      :disabled="!editable"
+                      @update:model-value="setValue"
+                    />
+                  </FormControl>
+                </FloatingField>
               </div>
-            </div>
+              <div class="space-y-2 text-control">
+                <p class="font-medium">Lampiran</p>
+                <FileDropzone
+                  v-if="editable"
+                  :file-name="pendingFile?.name || row.fileName"
+                  clearable
+                  :disabled="!!uploading"
+                  aria-label="Pilih lampiran"
+                  hint="JPG, PNG, atau PDF, maks. 5 MB"
+                  @change="attach($event)"
+                  @clear="clearAttachment('scholarships', index)"
+                />
+                <div
+                  v-else-if="pendingFile || row.fileName"
+                  class="flex min-w-0 items-center gap-3 rounded-xl border bg-muted/30 p-4"
+                >
+                  <span
+                    class="shrink-0 rounded-lg bg-primary/10 p-2 text-primary"
+                  >
+                    <FileText class="size-5" />
+                  </span>
+                  <span class="min-w-0 flex-1 truncate font-medium">{{
+                    pendingFile?.name || row.fileName
+                  }}</span>
+                  <Button
+                    v-if="editable"
+                    variant="ghost"
+                    size="icon"
+                    class="shrink-0"
+                    aria-label="Lepas lampiran"
+                    @click="clearAttachment('scholarships', index)"
+                  >
+                    <XCircle class="size-4" />
+                  </Button>
+                </div>
+                <p
+                  v-else
+                  class="text-muted-foreground"
+                >
+                  Tidak ada lampiran.
+                </p>
+              </div>
+            </DialogBody>
             <DialogFooter
               standard
               class="justify-between"

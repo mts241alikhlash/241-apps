@@ -627,7 +627,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-[var(--control-h-lg,2rem)] items-center gap-2 text-control sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-control sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -724,12 +724,12 @@ onMounted(async () => {
         >
           <DialogHeader standard>
             <DialogTitle>Proses jadi santri</DialogTitle>
-            <DialogDescription class="sr-only">
+            <DialogDescription>
               {{ selected.length }} pendaftar akan diproses menjadi santri dan
               akunnya menjadi akun santri.
             </DialogDescription>
           </DialogHeader>
-          <div class="space-y-4 px-6 py-5">
+          <DialogBody class="space-y-4">
             <div
               class="space-y-1 rounded-lg border bg-muted/10 p-3 text-control"
             >
@@ -748,7 +748,7 @@ onMounted(async () => {
             >
               {{ nisnError }}
             </p>
-          </div>
+          </DialogBody>
           <DialogFooter
             standard
             class="justify-between"
@@ -995,13 +995,13 @@ onMounted(async () => {
               NIS dikunci
             </Badge>
           </div>
-          <DialogDescription class="text-xs text-muted-foreground">
+          <DialogDescription>
             Kelola penomoran induk santri (NIS) tahun ajaran dan status
             sinkronisasi.
           </DialogDescription>
         </DialogHeader>
 
-        <div class="space-y-4 px-6 py-5 text-control">
+        <DialogBody class="space-y-4 text-control">
           <div class="space-y-1.5">
             <p class="font-medium text-foreground">
               NIS tahun ajaran {{ currentYear.academicYearName ?? '-' }}
@@ -1026,7 +1026,6 @@ onMounted(async () => {
               </Select>
             </div>
           </div>
-
           <div
             v-if="syncPending > 0"
             class="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive"
@@ -1056,7 +1055,7 @@ onMounted(async () => {
               setelah kunci akan melanjutkan nomor urut tertinggi.
             </p>
           </div>
-        </div>
+        </DialogBody>
 
         <DialogFooter
           standard
@@ -1074,7 +1073,7 @@ onMounted(async () => {
             <Button
               v-if="counts.done > 0 || syncPending > 0"
               variant="outline"
-              class="min-h-[var(--control-h-lg,2rem)] sm:min-h-0"
+              class="min-h-[var(--control-h-lg,2.25rem)] sm:min-h-0"
               :disabled="acting"
               @click="syncStudents"
             >

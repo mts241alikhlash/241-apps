@@ -13,8 +13,8 @@ describe('theme.css', () => {
   it('defines every size token for desktop', () => {
     expect(css).toContain('--control-h-xs: 1.25rem')
     expect(css).toContain('--control-h-sm: 1.5rem')
-    expect(css).toContain('--control-h-md: 1.75rem')
-    expect(css).toContain('--control-h-lg: 2rem')
+    expect(css).toContain('--control-h-md: 2rem')
+    expect(css).toContain('--control-h-lg: 2.25rem')
     expect(css).toContain('--text-control: 0.75rem')
     expect(css).toContain('--icon-control: 0.875rem')
   })
@@ -53,6 +53,12 @@ describe('theme.css', () => {
 
   it('lets the sidebar use the card background', () => {
     expect(css).toContain('--sidebar: var(--card)')
+  })
+
+  it('steps the radius up from md instead of flattening every corner', () => {
+    expect(css).toContain('--radius-md: calc(var(--radius) * 0.8)')
+    expect(css).toContain('--radius-lg: var(--radius)')
+    expect(css).toContain('--radius-xl: calc(var(--radius) * 1.4)')
   })
 
   it('keeps the identity colors the apps already use', () => {
