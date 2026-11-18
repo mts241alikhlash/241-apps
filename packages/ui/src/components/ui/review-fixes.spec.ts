@@ -80,7 +80,7 @@ describe('review fixes', () => {
     expect(base.slice(0, base.indexOf('}'))).toContain('left 150ms ease')
     expect(base.slice(0, base.indexOf('}'))).toContain('line-height: 1')
     expect(base.slice(0, base.indexOf('}'))).toContain(
-      'padding-inline: 0.25rem',
+      'padding-inline: 0.125rem',
     )
   })
 

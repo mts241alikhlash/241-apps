@@ -118,10 +118,10 @@ describe('custom components on the control tokens', () => {
     expect(css).toContain('font-size: var(--text-label, 0.6875rem)')
   })
 
-  it('the command input uses the control height token and the number and tags inputs keep the Mira text-sm', () => {
+  it('the command input uses the control height token and the number and tags inputs keep the control text', () => {
     const command = source('ui/command/CommandInput.vue')
     expect(command).not.toMatch(/\bh-9\b/)
-    expect(command).toContain('h-[var(--control-h-lg,2.25rem)]')
+    expect(command).toContain('h-[var(--control-h-md,2rem)]')
     for (const file of [
       'ui/number-field/NumberFieldInput.vue',
       'ui/tags-input/TagsInputInput.vue',

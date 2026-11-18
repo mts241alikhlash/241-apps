@@ -6,11 +6,11 @@
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius-md);
-  --radius-xl: var(--radius-md);
-  --radius-2xl: var(--radius-md);
-  --radius-3xl: var(--radius-md);
-  --radius-4xl: var(--radius-md);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
   --text-xs: var(--text-control);
   --text-sm: var(--text-control);
   --text-md: var(--text-subheading);
