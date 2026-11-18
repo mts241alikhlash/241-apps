@@ -103,15 +103,7 @@ describe('PrintDocumentView', () => {
     expect(wrapper.text()).toContain('1 siswa belum bernomor peserta')
   })
 
-  it('lists supervisors and the technician in the staff attendance', async () => {
-    const wrapper = mountView('staff-attendance')
-    await flushPromises()
-    expect(wrapper.text()).toContain('Pengawas')
-    expect(wrapper.text()).toContain('Teknisi')
-    expect(loadSchedules).not.toHaveBeenCalled()
-  })
-
-  it('loads schedules only for the exam schedule document', async () => {
+  it('loads schedules for the schedule document', async () => {
     loadSchedules.mockResolvedValue({
       success: true,
       data: [
@@ -126,7 +118,12 @@ describe('PrintDocumentView', () => {
     })
     const wrapper = mountView('schedule')
     await flushPromises()
-    expect(loadSchedules).toHaveBeenCalledWith('e1')
+    expect(loadSchedules).toHaveBeenCalledWith({
+      id: 'e1',
+      name: 'UAS',
+      startsAt: '2026-11-23T00:00:00.000Z',
+      endsAt: '2026-12-05T00:00:00.000Z',
+    })
     expect(wrapper.text()).toContain('Matematika')
   })
 

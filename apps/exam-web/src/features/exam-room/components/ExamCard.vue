@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { CARD_HEADER } from './cardHeader'
 import artwork from '../assets/exam-card.svg'
 
 const props = defineProps<{
@@ -7,11 +8,8 @@ const props = defineProps<{
   className: string | null
   nis: string | null
   participantNumber: string | null
-  password: string | null
   roomCode: string
-  eventTitle: string
-  eventPeriod: string
-  schoolName: string
+  password?: string | null
 }>()
 
 const roomCode = computed(() => props.roomCode.trim().replace(/^[A-Za-z]+/, ''))
@@ -33,7 +31,9 @@ const rows = computed(() => [
     value: (props.className ?? '').replace(/^Kelas\s+/i, ''),
   },
   { label: 'NIS', value: props.nis ?? '' },
-  { label: 'Password', value: props.password ?? '' },
+  props.password
+    ? { label: 'Password', value: props.password }
+    : { label: 'Password', value: '', blank: true },
 ])
 </script>
 
@@ -48,9 +48,11 @@ const rows = computed(() => [
       aria-hidden="true"
       class="absolute inset-0 size-full"
     />
-    <p class="exam-card-heading">{{ eventTitle }}</p>
-    <p class="exam-card-subheading">{{ eventPeriod }}</p>
-    <p class="exam-card-school">{{ schoolName }}</p>
+    <p class="exam-card-title">KARTU PESERTA</p>
+    <p class="exam-card-caption">RUANGAN</p>
+    <p class="exam-card-heading">{{ CARD_HEADER.title }}</p>
+    <p class="exam-card-subheading">{{ CARD_HEADER.period }}</p>
+    <p class="exam-card-school">{{ CARD_HEADER.school }}</p>
     <dl class="exam-card-rows">
       <template
         v-for="row in rows"
@@ -62,7 +64,12 @@ const rows = computed(() => [
           aria-hidden="true"
           >:</span
         >
-        <dd class="exam-card-value">{{ row.value }}</dd>
+        <dd
+          class="exam-card-value"
+          :class="{ 'exam-card-blank': 'blank' in row }"
+        >
+          {{ row.value }}
+        </dd>
       </template>
     </dl>
     <span class="exam-card-room">{{ roomCode }}</span>
@@ -82,6 +89,33 @@ const rows = computed(() => [
 
 .exam-card > * {
   --u: calc(100cqw / 658.02);
+}
+
+.exam-card-title {
+  position: absolute;
+  left: calc(74.9 * var(--u));
+  top: calc(112 * var(--u));
+  margin: 0;
+  font-family: 'Ruberoid', 'Inter', sans-serif;
+  font-size: calc(34.21 * var(--u));
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.exam-card-caption {
+  position: absolute;
+  left: calc(547 * var(--u));
+  top: calc(96.2 * var(--u));
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: 'Ruberoid', 'Inter', sans-serif;
+  font-size: calc(21.13 * var(--u));
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
 }
 
 .exam-card-heading,
@@ -134,6 +168,11 @@ const rows = computed(() => [
   padding-inline: calc(1.2 * var(--u));
   text-align: center;
   line-height: calc(24.25 * var(--u));
+}
+
+.exam-card-blank {
+  border-bottom: calc(1.2 * var(--u)) dotted rgb(247 240 214 / 65%);
+  min-width: calc(150 * var(--u));
 }
 
 .exam-card-value {

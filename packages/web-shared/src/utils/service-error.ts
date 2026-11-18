@@ -152,6 +152,19 @@ export function serviceUnavailableMessage(err: unknown): string {
   return 'Salah satu layanan sedang tidak berjalan, jadi data ini belum bisa ditampilkan.'
 }
 
+const OUTAGE_MESSAGES = new Set([
+  'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+  'Salah satu layanan sedang tidak berjalan, jadi data ini belum bisa ditampilkan.',
+  'Server terlalu lama merespons. Silakan coba lagi.',
+])
+
+const OUTAGE_PATTERN =
+  /^Layanan .+ (?:sedang tidak berjalan|terlalu lama merespons)\./
+
+export function isOutageMessage(message: string): boolean {
+  return OUTAGE_MESSAGES.has(message) || OUTAGE_PATTERN.test(message)
+}
+
 export function serviceErrorMessage(err: unknown): string {
   const label = unavailableServiceLabel(err)
   return label

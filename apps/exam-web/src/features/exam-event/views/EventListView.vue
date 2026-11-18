@@ -142,7 +142,7 @@ onMounted(async () => {
           @update:page-size="changePageSize"
         >
           <template #filters>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-end gap-2">
               <FloatingLabelField
                 label="Semester"
                 :for="'event-semester'"

@@ -21,7 +21,10 @@ export default {
     examPresets: 'Presets',
     examReports: 'Exam Reports',
     examCards: 'Participant Cards',
-    examSeatLabels: 'Seat Lists',
+    examSeatLabels: 'Desk Numbers',
+    examPrintSchedule: 'Exam Schedule',
+    examPrintStudentAttendance: 'Participant Attendance',
+    examPrintStaffAttendance: 'Supervisor Attendance',
     examSeb: 'Safe Exam Browser',
   },
 }

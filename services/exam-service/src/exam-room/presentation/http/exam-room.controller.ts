@@ -10,10 +10,19 @@ import {
   Post,
   Put,
   Query,
+  Res,
+  StreamableFile,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import type { Response } from 'express'
 import {
   ApiBearerAuth,
+  ApiBody,
+  type ApiBodyOptions,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -39,6 +48,10 @@ import { GetRoomReportUseCase } from '../../application/use-cases/get-room-repor
 import { SaveRoomReportUseCase } from '../../application/use-cases/save-room-report/save-room-report.use-case.js'
 import { SubmitRoomReportUseCase } from '../../application/use-cases/submit-room-report/submit-room-report.use-case.js'
 import { VerifyRoomReportUseCase } from '../../application/use-cases/verify-room-report/verify-room-report.use-case.js'
+import {
+  extensionOf,
+  REPORT_FILE_MAX_BYTES,
+} from '../../domain/policies/report-file.policy.js'
 import {
   RoomAccessService,
   type RoomStaffUser,
@@ -72,6 +85,39 @@ import {
   SubstituteSupervisorDto,
   SupervisorSlotDto,
 } from '../../../exam-session/presentation/http/dto/recovery.dto.js'
+
+const REPORT_FILE_LIMITS = { fileSize: REPORT_FILE_MAX_BYTES + 1, files: 1 }
+
+const REPORT_FILE_BODY: ApiBodyOptions = {
+  schema: {
+    type: 'object',
+    required: ['file'],
+    properties: { file: { type: 'string', format: 'binary' } },
+  },
+}
+
+function reportFileName(
+  roomCode: string,
+  uploadedAt: Date,
+  extension: string,
+): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    })
+      .formatToParts(uploadedAt)
+      .map((part) => [part.type, part.value]),
+  )
+  const stamp = `${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}`
+  const code = roomCode.replace(/[^A-Za-z0-9_-]/g, '')
+  return `berita-acara-${code}-${stamp}.${extension}`
+}
 
 @ApiTags('Exam Rooms')
 @ApiBearerAuth()
@@ -221,7 +267,13 @@ export class ExamRoomController {
 
   @Post('reports/:slotId/submit')
   @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
-  @ApiOperation({ summary: 'Hand the Berita Acara in and lock it' })
+  @UseInterceptors(FileInterceptor('file', { limits: REPORT_FILE_LIMITS }))
+  @ApiOperation({
+    summary:
+      'Hand the signed, scanned Berita Acara in (PDF, JPG or PNG, 10 MB) and lock it',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody(REPORT_FILE_BODY)
   @ApiParam({ name: 'roomId', format: 'uuid' })
   @ApiParam({ name: 'slotId', format: 'uuid' })
   @ApiResponse({ status: 201, type: RoomReportDto })
@@ -229,11 +281,84 @@ export class ExamRoomController {
     @CurrentUser() user: RoomStaffUser,
     @Param('roomId', ParseUUIDPipe) roomId: string,
     @Param('slotId', ParseUUIDPipe) slotId: string,
+    @UploadedFile() file: Express.Multer.File | undefined,
   ): Promise<RoomReportDto> {
-    await this.submitReport.execute(user, roomId, slotId)
+    await this.submitReport.execute(
+      user,
+      roomId,
+      slotId,
+      file && { buffer: file.buffer, originalName: file.originalname },
+    )
     return RoomReportDto.fromDomain(
       await this.getReport.execute(user, roomId, slotId),
     )
+  }
+
+  @Put('reports/:slotId/file')
+  @RequirePermissions('exam-rooms.manage-all')
+  @UseInterceptors(FileInterceptor('file', { limits: REPORT_FILE_LIMITS }))
+  @ApiOperation({ summary: 'Replace the file of a submitted Berita Acara' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody(REPORT_FILE_BODY)
+  @ApiParam({ name: 'roomId', format: 'uuid' })
+  @ApiParam({ name: 'slotId', format: 'uuid' })
+  @ApiResponse({ status: 200, type: RoomReportDto })
+  async replaceRoomReportFile(
+    @CurrentUser() user: RoomStaffUser,
+    @Param('roomId', ParseUUIDPipe) roomId: string,
+    @Param('slotId', ParseUUIDPipe) slotId: string,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ): Promise<RoomReportDto> {
+    await this.submitReport.replaceFile(
+      user,
+      roomId,
+      slotId,
+      file && { buffer: file.buffer, originalName: file.originalname },
+    )
+    return RoomReportDto.fromDomain(
+      await this.getReport.execute(user, roomId, slotId),
+    )
+  }
+
+  @Get('reports/:slotId/file')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  )
+  @ApiOperation({ summary: 'Download the file of a submitted Berita Acara' })
+  @ApiParam({ name: 'roomId', format: 'uuid' })
+  @ApiParam({ name: 'slotId', format: 'uuid' })
+  @ApiResponse({
+    status: 200,
+    description: 'The file bytes, always as an attachment',
+    content: {
+      'application/pdf': { schema: { type: 'string', format: 'binary' } },
+    },
+  })
+  async downloadRoomReportFile(
+    @CurrentUser() user: RoomStaffUser,
+    @Param('roomId', ParseUUIDPipe) roomId: string,
+    @Param('slotId', ParseUUIDPipe) slotId: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const { stream, attachment, room } = await this.submitReport.download(
+      user,
+      roomId,
+      slotId,
+    )
+    res.set({
+      'Content-Type': attachment.mimeType,
+      'Content-Length': String(attachment.sizeBytes),
+      'Content-Disposition': `attachment; filename="${reportFileName(
+        room.code,
+        attachment.uploadedAt,
+        extensionOf(attachment.mimeType),
+      )}"`,
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'private, no-store',
+    })
+    return new StreamableFile(stream)
   }
 
   @Post('reports/:slotId/verify')

@@ -10,9 +10,6 @@ const props = defineProps<{
   rows: readonly RoomMonitorParticipant[]
   roomLabel: string
   roomCode: string
-  schoolName: string
-  eventTitle: string
-  eventPeriod: string
   shortWarning?: string | null
 }>()
 
@@ -41,11 +38,7 @@ const sorted = computed(() =>
         :class-name="row.classroomName"
         :nis="row.nis"
         :participant-number="row.participantNumber"
-        :password="null"
         :room-code="roomCode"
-        :event-title="eventTitle"
-        :event-period="eventPeriod"
-        :school-name="schoolName"
       />
     </div>
 
@@ -61,9 +54,6 @@ const sorted = computed(() =>
         :name="row.studentName ?? 'Siswa tidak ditemukan'"
         :class-name="row.classroomName"
         :room-code="roomCode"
-        :event-title="eventTitle"
-        :event-period="eventPeriod"
-        :school-name="schoolName"
       />
     </div>
   </div>

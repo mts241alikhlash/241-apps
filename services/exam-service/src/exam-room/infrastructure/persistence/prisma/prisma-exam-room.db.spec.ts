@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { SAMPLE_ATTACHMENT } from '../../../application/room-report-file-storage.fake.js'
 import { ConfigService } from '@nestjs/config'
 import { FakeExamRoomRepository } from '../../../application/exam-room.repository.fake.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
@@ -467,11 +468,13 @@ suite('Prisma exam rooms against a real database', () => {
       report.id,
       supervisorA,
       new Date('2026-11-02T02:00:00Z'),
+      SAMPLE_ATTACHMENT,
     )
     const resubmitted = await repo.submitReport(
       report.id,
       supervisorA,
       new Date('2026-11-02T02:30:00Z'),
+      SAMPLE_ATTACHMENT,
     )
     const lateDraft = await repo.saveReportDraft(report.id, {
       incidentNotes: 'Setelah diserahkan',

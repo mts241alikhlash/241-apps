@@ -120,6 +120,17 @@ export function toExamRoomReport(row: ReportRow): ExamRoomReport {
     verifiedByUserId: row.verifiedByUserId,
     verifiedAt: row.verifiedAt,
     status: row.status,
+    attachment:
+      row.attachmentStorageKey === null
+        ? null
+        : {
+            storageKey: row.attachmentStorageKey,
+            mimeType: row.attachmentMimeType ?? 'application/octet-stream',
+            sizeBytes: row.attachmentSizeBytes ?? 0,
+            originalName: row.attachmentOriginalName ?? 'berita-acara',
+            uploadedById: row.attachmentUploadedById ?? '',
+            uploadedAt: row.attachmentUploadedAt ?? row.updatedAt,
+          },
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }

@@ -12,6 +12,15 @@ export const ROOM_EXECUTION_CONDITIONS = [
 
 export type RoomExecutionCondition = (typeof ROOM_EXECUTION_CONDITIONS)[number]
 
+export interface ExamRoomReportAttachment {
+  storageKey: string
+  mimeType: string
+  sizeBytes: number
+  originalName: string
+  uploadedById: string
+  uploadedAt: Date
+}
+
 export interface ExamRoomReport {
   id: string
   roomId: string
@@ -23,6 +32,7 @@ export interface ExamRoomReport {
   verifiedByUserId: string | null
   verifiedAt: Date | null
   status: RoomReportStatus
+  attachment: ExamRoomReportAttachment | null
   createdAt: Date
   updatedAt: Date
 }

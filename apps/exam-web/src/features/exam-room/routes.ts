@@ -23,7 +23,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/exam/reports',
+    path: '/exam/reports/:dayId?/:subjectId?',
     name: 'ExamRoomReports',
     component: () => import('./views/RoomReportListView.vue'),
     meta: {

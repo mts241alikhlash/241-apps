@@ -3749,6 +3749,198 @@
         ]
       }
     },
+    "/exam-events/{id}/attendance-files": {
+      "put": {
+        "operationId": "ExamAttendanceFileController_upload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceUploadBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AttendanceFileDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload or replace a signed attendance sheet scan (PDF, JPG or PNG, 10 MB)",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      },
+      "get": {
+        "operationId": "ExamAttendanceFileController_list",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STUDENT",
+                "SUPERVISOR",
+                "TECHNICIAN"
+              ]
+            }
+          },
+          {
+            "name": "day",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-11-18",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AttendanceFileDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The uploaded attendance sheets of an event",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      }
+    },
+    "/exam-events/{id}/attendance-files/{fileId}": {
+      "get": {
+        "operationId": "ExamAttendanceFileController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file bytes, always as an attachment",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download an uploaded attendance sheet",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      }
+    },
     "/exam-rooms/{roomId}/monitor": {
       "get": {
         "operationId": "ExamRoomController_roomMonitor",
@@ -4155,6 +4347,25 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -4185,7 +4396,130 @@
             "bearer": []
           }
         ],
-        "summary": "Hand the Berita Acara in and lock it",
+        "summary": "Hand the signed, scanned Berita Acara in (PDF, JPG or PNG, 10 MB) and lock it",
+        "tags": [
+          "Exam Rooms"
+        ]
+      }
+    },
+    "/exam-rooms/{roomId}/reports/{slotId}/file": {
+      "put": {
+        "operationId": "ExamRoomController_replaceRoomReportFile",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RoomReportDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace the file of a submitted Berita Acara",
+        "tags": [
+          "Exam Rooms"
+        ]
+      },
+      "get": {
+        "operationId": "ExamRoomController_downloadRoomReportFile",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file bytes, always as an attachment",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download the file of a submitted Berita Acara",
         "tags": [
           "Exam Rooms"
         ]
@@ -8144,7 +8478,9 @@
               "VERIFY_ROOM_REPORT",
               "REOPEN_ROOM_REPORT",
               "CLOSED_BY_ADMIN",
-              "RESET_CREDENTIALS"
+              "RESET_CREDENTIALS",
+              "REPLACE_ROOM_REPORT_FILE",
+              "UPLOAD_ATTENDANCE_FILE"
             ]
           },
           "actorId": {
@@ -9996,6 +10332,97 @@
           "skipped"
         ]
       },
+      "AttendanceUploadBodyDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "STUDENT",
+              "SUPERVISOR",
+              "TECHNICIAN"
+            ],
+            "type": "string"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-18",
+            "description": "WIB calendar day"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "kind",
+          "day",
+          "file"
+        ]
+      },
+      "AttendanceFileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "STUDENT",
+              "SUPERVISOR",
+              "TECHNICIAN"
+            ],
+            "type": "string"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-18"
+          },
+          "roomId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "slotId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedById": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "day",
+          "roomId",
+          "slotId",
+          "originalName",
+          "sizeBytes",
+          "uploadedAt",
+          "uploadedById"
+        ]
+      },
       "RoomMonitorLastEventDto": {
         "type": "object",
         "properties": {
@@ -10643,6 +11070,13 @@
             "nullable": true,
             "format": "date-time"
           },
+          "hasAttachment": {
+            "type": "boolean"
+          },
+          "attachmentName": {
+            "type": "string",
+            "nullable": true
+          },
           "slot": {
             "$ref": "#/components/schemas/RoomReportSlotDto"
           },
@@ -10680,6 +11114,8 @@
           "incidentNotes",
           "submittedAt",
           "verifiedAt",
+          "hasAttachment",
+          "attachmentName",
           "slot",
           "schedules",
           "absences",
@@ -11115,6 +11551,23 @@
             "type": "string",
             "nullable": true,
             "format": "uuid"
+          },
+          "hasAttachment": {
+            "type": "boolean"
+          },
+          "attachmentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "supervisorName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -11126,7 +11579,11 @@
           "endsAt",
           "status",
           "registeredCount",
-          "reportId"
+          "reportId",
+          "hasAttachment",
+          "attachmentName",
+          "subjectNames",
+          "supervisorName"
         ]
       },
       "ExamFileDto": {

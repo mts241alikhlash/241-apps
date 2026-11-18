@@ -1,4 +1,5 @@
 import { serviceErrorMessage, serviceUnavailableMessage } from './service-error'
+import { notifyIfOutage } from './notify-outage'
 
 type ErrorMapping = [test: (msg: string) => boolean, translation: string]
 
@@ -394,6 +395,8 @@ export function getIndonesianErrorMessage(
   fallback: string,
 ): string {
   if (!err) return fallback
+
+  notifyIfOutage(err)
 
   const axiosErr = err as {
     response?: { data?: { message?: string | string[] } }

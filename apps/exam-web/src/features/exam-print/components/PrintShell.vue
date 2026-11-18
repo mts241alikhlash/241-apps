@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { useId } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
@@ -17,9 +27,11 @@ import {
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { Printer } from '@lucide/vue'
-import { ALL_ROOMS } from '../composables/usePrintPack'
+import PrintFilters from './PrintFilters.vue'
+import { ALL_SCOPES } from '../composables/usePrintScope'
+import type { PrintScopeOption } from '../composables/usePrintScope'
 
-defineProps<{
+const props = defineProps<{
   title: string
   events: { id: string; name: string }[]
   eventId: string
@@ -30,20 +42,106 @@ defineProps<{
   warnings: string[]
   hasContent: boolean
   showRoomFilter: boolean
+  showFilters: boolean
+  scopes: PrintScopeOption[]
 }>()
 
 const emit = defineEmits<{
   'update:eventId': [value: string]
   'update:roomId': [value: string]
-  print: []
+  print: [scope: string]
   retry: []
 }>()
 
-const eventFieldId = useId()
-const roomFieldId = useId()
-
 const asText = (value: AcceptableValue) =>
   typeof value === 'string' ? value : ''
+
+const scopeFieldId = useId()
+const targetFieldId = useId()
+
+const CAKUPAN = {
+  all: 'Semua dokumen',
+  room: 'Per ruangan',
+  class: 'Per kelas',
+  grade: 'Per tingkat',
+} as const
+
+type Cakupan = keyof typeof CAKUPAN
+
+const availableCakupan = computed(() =>
+  (Object.keys(CAKUPAN) as Cakupan[]).filter(
+    (key) => key === 'all' || props.scopes.some((scope) => scope.group === key),
+  ),
+)
+
+const printOpen = ref(false)
+const cakupan = ref<Cakupan>('all')
+const target = ref('')
+
+const roomScopes = computed(() =>
+  props.scopes.filter((item) => item.group === 'room'),
+)
+const classScopes = computed(() =>
+  props.scopes.filter((item) => item.group === 'class'),
+)
+const gradeScopes = computed(() =>
+  props.scopes.filter((item) => item.group === 'grade'),
+)
+
+const targetScopes = computed(() => {
+  if (cakupan.value === 'room') return roomScopes.value
+  if (cakupan.value === 'class') return classScopes.value
+  if (cakupan.value === 'grade') return gradeScopes.value
+  return []
+})
+
+const targetLabel = computed(() =>
+  cakupan.value === 'grade'
+    ? 'Tingkat'
+    : cakupan.value === 'room'
+      ? 'Ruang'
+      : 'Kelas',
+)
+
+const targetPlaceholder = computed(() =>
+  cakupan.value === 'grade'
+    ? 'Pilih tingkat'
+    : cakupan.value === 'room'
+      ? 'Pilih ruangan'
+      : 'Pilih kelas',
+)
+
+const canConfirm = computed(
+  () =>
+    cakupan.value === 'all' ||
+    targetScopes.value.some((scope) => scope.key === target.value),
+)
+
+function openPrint() {
+  cakupan.value = 'all'
+  target.value = ''
+  printOpen.value = true
+}
+
+function changeCakupan(value: AcceptableValue) {
+  const next = asText(value)
+  if (
+    next !== 'all' &&
+    next !== 'room' &&
+    next !== 'class' &&
+    next !== 'grade'
+  ) {
+    return
+  }
+  cakupan.value = next
+  target.value = ''
+}
+
+function confirmPrint() {
+  if (!canConfirm.value) return
+  printOpen.value = false
+  emit('print', target.value === '' ? ALL_SCOPES : target.value)
+}
 </script>
 
 <template>
@@ -52,84 +150,33 @@ const asText = (value: AcceptableValue) =>
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle class="font-semibold">{{ title }}</CardTitle>
-          <div class="flex flex-wrap items-end gap-2">
-            <FloatingLabelField
-              label="Periode Ujian"
-              :for="eventFieldId"
-              class="w-fit min-w-40"
-              floating
-            >
-              <Select
-                :model-value="eventId"
-                @update:model-value="
-                  (value) => emit('update:eventId', asText(value))
-                "
-              >
-                <SelectTrigger
-                  :id="eventFieldId"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Pilih periode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="event in events"
-                    :key="event.id"
-                    :value="event.id"
-                  >
-                    {{ event.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
-            <FloatingLabelField
-              v-if="showRoomFilter"
-              label="Ruang"
-              :for="roomFieldId"
-              class="w-fit min-w-40"
-              floating
-            >
-              <Select
-                :model-value="roomId"
-                @update:model-value="
-                  (value) => emit('update:roomId', asText(value))
-                "
-              >
-                <SelectTrigger
-                  :id="roomFieldId"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Semua ruang" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem :value="ALL_ROOMS">Semua ruang</SelectItem>
-                  <SelectItem
-                    v-for="room in rooms"
-                    :key="room.id"
-                    :value="room.id"
-                  >
-                    {{ room.label }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
-            <Button
-              :disabled="loading || !hasContent"
-              @click="emit('print')"
-            >
-              <Printer class="size-4" />
-              Cetak A4
-            </Button>
-          </div>
-        </div>
+      <CardHeader standard>
+        <CardTitle class="font-semibold">{{ title }}</CardTitle>
+        <Button
+          class="shrink-0"
+          :disabled="loading || !hasContent"
+          @click="openPrint"
+        >
+          <Printer class="size-4" />
+          Cetak
+        </Button>
       </CardHeader>
 
       <CardContent
-        class="print-stack flex min-h-0 flex-1 flex-col space-y-6 overflow-auto p-4 sm:p-6"
+        class="print-stack flex min-h-0 flex-1 flex-col space-y-6 overflow-auto p-4"
       >
+        <PrintFilters
+          v-if="showFilters"
+          class="print:hidden"
+          :events="events"
+          :event-id="eventId"
+          :rooms="rooms"
+          :room-id="roomId"
+          :show-room-filter="showRoomFilter"
+          @update:event-id="(value) => emit('update:eventId', value)"
+          @update:room-id="(value) => emit('update:roomId', value)"
+        />
+
         <div
           v-if="error"
           class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-destructive print:hidden"
@@ -157,12 +204,6 @@ const asText = (value: AcceptableValue) =>
         >
           Belum ada periode ujian.
         </p>
-        <p
-          v-else-if="!hasContent"
-          class="text-muted-foreground"
-        >
-          Periode ini belum memiliki data untuk dokumen ini.
-        </p>
         <template v-else>
           <p
             v-for="warning in warnings"
@@ -175,6 +216,89 @@ const asText = (value: AcceptableValue) =>
           <slot />
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
+
+    <Dialog v-model:open="printOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Cetak {{ title }}</DialogTitle>
+          <DialogDescription>
+            Pilih bagian dokumen yang dicetak.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <FloatingLabelField
+            label="Cakupan"
+            :for="scopeFieldId"
+            floating
+          >
+            <Select
+              :model-value="cakupan"
+              @update:model-value="changeCakupan"
+            >
+              <SelectTrigger
+                :id="scopeFieldId"
+                class="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="key in availableCakupan"
+                  :key="key"
+                  :value="key"
+                >
+                  {{ CAKUPAN[key] }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+
+          <FloatingLabelField
+            v-if="cakupan !== 'all'"
+            :label="targetLabel"
+            :for="targetFieldId"
+            floating
+          >
+            <Select v-model="target">
+              <SelectTrigger
+                :id="targetFieldId"
+                class="w-full"
+              >
+                <SelectValue :placeholder="targetPlaceholder" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="scope in targetScopes"
+                  :key="scope.key"
+                  :value="scope.key"
+                >
+                  {{ scope.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
+        >
+          <Button
+            variant="outline"
+            @click="printOpen = false"
+          >
+            Batal
+          </Button>
+          <Button
+            :disabled="!canConfirm"
+            @click="confirmPrint"
+          >
+            <Printer class="size-4" />
+            Cetak
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>

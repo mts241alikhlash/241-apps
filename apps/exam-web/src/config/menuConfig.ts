@@ -1,7 +1,9 @@
 import {
   Armchair,
-  ClipboardList,
   CalendarClock,
+  CalendarDays,
+  ClipboardCheck,
+  ClipboardList,
   ClipboardPen,
   IdCard,
   Layers,
@@ -11,6 +13,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   SquareCheckBig,
+  UserCheck,
   Users,
 } from '@lucide/vue'
 
@@ -86,17 +89,6 @@ export const menuSections: MenuSection[] = [
         requiredPermission: 'exam-grading.read',
       },
       {
-        key: 'exam-cards',
-        title: 'menu.examCards',
-        url: '/exam/prints/cards',
-        icon: IdCard,
-        requiredAnyPermission: [
-          'exam-rooms.supervise',
-          'exam-rooms.technician',
-          'exam-rooms.manage-all',
-        ],
-      },
-      {
         key: 'exam-reports',
         title: 'menu.examReports',
         url: '/exam/reports',
@@ -108,15 +100,39 @@ export const menuSections: MenuSection[] = [
         ],
       },
       {
-        key: 'exam-seat-labels',
+        key: 'exam-print-cards',
+        title: 'menu.examCards',
+        url: '/exam/print/cards',
+        icon: IdCard,
+        requiredPermission: 'exam-events.manage',
+      },
+      {
+        key: 'exam-print-desks',
         title: 'menu.examSeatLabels',
-        url: '/exam/prints/seats',
+        url: '/exam/print/desks',
         icon: Armchair,
-        requiredAnyPermission: [
-          'exam-rooms.supervise',
-          'exam-rooms.technician',
-          'exam-rooms.manage-all',
-        ],
+        requiredPermission: 'exam-events.manage',
+      },
+      {
+        key: 'exam-print-schedule',
+        title: 'menu.examPrintSchedule',
+        url: '/exam/print/schedule',
+        icon: CalendarDays,
+        requiredPermission: 'exam-events.manage',
+      },
+      {
+        key: 'exam-print-student-attendance',
+        title: 'menu.examPrintStudentAttendance',
+        url: '/exam/print/student-attendance',
+        icon: ClipboardCheck,
+        requiredPermission: 'exam-events.manage',
+      },
+      {
+        key: 'exam-print-staff-attendance',
+        title: 'menu.examPrintStaffAttendance',
+        url: '/exam/print/staff-attendance',
+        icon: UserCheck,
+        requiredPermission: 'exam-events.manage',
       },
     ],
   },

@@ -24,6 +24,7 @@ import type {
 } from '../entities/exam-room-supervisor.entity.js'
 import type {
   ExamRoomReport,
+  ExamRoomReportAttachment,
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
@@ -145,6 +146,11 @@ export abstract class IExamRoomRepository {
     reportId: string,
     submittedByUserId: string,
     at: Date,
+    attachment: ExamRoomReportAttachment,
+  ): Promise<ExamRoomReport | null>
+  abstract replaceReportAttachment(
+    reportId: string,
+    attachment: ExamRoomReportAttachment,
   ): Promise<ExamRoomReport | null>
   abstract listAbsencesByReport(
     reportId: string,

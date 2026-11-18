@@ -1,15 +1,16 @@
 import type { Component } from 'vue'
+import type { PrintScopeGroup } from '../composables/usePrintScope'
 import type { PrintDocumentKey } from '../types'
-import DeskNumbersDocument from './DeskNumbersDocument.vue'
 import ExamScheduleDocument from './ExamScheduleDocument.vue'
-import ParticipantCardsDocument from './ParticipantCardsDocument.vue'
-import StaffAttendanceDocument from './StaffAttendanceDocument.vue'
-import StudentAttendanceDocument from './StudentAttendanceDocument.vue'
+import PrintParticipantDocument from './PrintParticipantDocument.vue'
 
 export interface PrintDocumentDefinition {
   title: string
   component: Component
   perRoom: boolean
+  scopeGroups?: PrintScopeGroup[]
+  inlineFilters?: boolean
+  componentProps?: Record<string, unknown>
 }
 
 export const PRINT_DOCUMENTS: Record<
@@ -18,27 +19,21 @@ export const PRINT_DOCUMENTS: Record<
 > = {
   cards: {
     title: 'Kartu Peserta',
-    component: ParticipantCardsDocument,
+    component: PrintParticipantDocument,
     perRoom: true,
+    inlineFilters: true,
+    componentProps: { kind: 'card' },
   },
   desks: {
     title: 'Nomor Meja',
-    component: DeskNumbersDocument,
+    component: PrintParticipantDocument,
     perRoom: true,
+    inlineFilters: true,
+    componentProps: { kind: 'seat' },
   },
   schedule: {
     title: 'Jadwal Ujian',
     component: ExamScheduleDocument,
     perRoom: false,
-  },
-  'student-attendance': {
-    title: 'Daftar Hadir Peserta',
-    component: StudentAttendanceDocument,
-    perRoom: true,
-  },
-  'staff-attendance': {
-    title: 'Daftar Hadir Pengawas dan Teknisi',
-    component: StaffAttendanceDocument,
-    perRoom: true,
   },
 }

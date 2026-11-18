@@ -13,6 +13,8 @@ export const SESSION_AUDIT_ACTIONS = [
   'REOPEN_ROOM_REPORT',
   'CLOSED_BY_ADMIN',
   'RESET_CREDENTIALS',
+  'REPLACE_ROOM_REPORT_FILE',
+  'UPLOAD_ATTENDANCE_FILE',
 ] as const
 
 export type SessionAuditAction = (typeof SESSION_AUDIT_ACTIONS)[number]

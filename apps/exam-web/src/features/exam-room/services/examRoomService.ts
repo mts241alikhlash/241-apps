@@ -244,13 +244,47 @@ export const examRoomService = {
   async submitReport(
     roomId: string,
     slotId: string,
+    file: File,
+    options: { silent?: boolean } = {},
   ): Promise<Outcome<RoomReport>> {
     try {
-      const response = await examRoomApi.submitReport(roomId, slotId)
-      toast.success('Berita acara diserahkan dan dikunci.')
+      const response = await examRoomApi.submitReport(roomId, slotId, file)
+      if (!options.silent) toast.success('Berita acara diserahkan dan dikunci.')
       return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal menyerahkan berita acara.')
+    }
+  },
+
+  async replaceReportFile(
+    roomId: string,
+    slotId: string,
+    file: File,
+  ): Promise<Outcome<RoomReport>> {
+    try {
+      const response = await examRoomApi.replaceReportFile(roomId, slotId, file)
+      toast.success('Berkas berita acara diganti.')
+      return { success: true, data: response }
+    } catch (err: unknown) {
+      return failure(err, 'Gagal mengganti berkas berita acara.')
+    }
+  },
+
+  async downloadReportFile(
+    roomId: string,
+    slotId: string,
+    fileName: string | null,
+  ): Promise<void> {
+    try {
+      const blob = await examRoomApi.downloadReportFile(roomId, slotId)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName ?? 'berita-acara'
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (err: unknown) {
+      toast.error(messageOf(err, 'Gagal mengunduh berkas berita acara.'))
     }
   },
 

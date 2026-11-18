@@ -31,7 +31,7 @@ import { FileStack, Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
 import { examEventService } from '../../exam-event/services/examEventService'
 import { examRoomService } from '../services/examRoomService'
-import type { Letterhead, RoomMonitorParticipant } from '../types'
+import type { RoomMonitorParticipant } from '../types'
 
 interface RoomSheet {
   roomId: string
@@ -49,7 +49,6 @@ const eventFieldId = useId()
 const events = ref<{ id: string; name: string; startsAt?: string | null }[]>([])
 const eventId = ref('')
 const sheets = ref<RoomSheet[]>([])
-const letterhead = ref<Letterhead | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const skippedRooms = ref(0)
@@ -57,20 +56,6 @@ const skippedRooms = ref(0)
 const title = computed(() =>
   props.kind === 'cards' ? 'Kartu Peserta' : 'Daftar Meja',
 )
-const schoolName = computed(() => letterhead.value?.name ?? '')
-const eventTitle = computed(
-  () => events.value.find((event) => event.id === eventId.value)?.name ?? '',
-)
-const eventPeriod = computed(() => {
-  const startsAt = events.value.find(
-    (event) => event.id === eventId.value,
-  )?.startsAt
-  if (!startsAt) return ''
-  const date = new Date(startsAt)
-  const odd = date.getMonth() >= 6
-  const start = odd ? date.getFullYear() : date.getFullYear() - 1
-  return `Semester ${odd ? 'Ganjil' : 'Genap'} Tahun Ajaran ${start}/${start + 1}`
-})
 const participantCount = computed(() =>
   sheets.value.reduce((sum, sheet) => sum + sheet.rows.length, 0),
 )
@@ -153,22 +138,12 @@ async function load() {
   await loadAll(eventId.value)
 }
 
-async function loadLetterhead() {
-  try {
-    letterhead.value = await examRoomService.loadLetterhead()
-  } catch {
-    letterhead.value = null
-  }
-}
-
 async function changeEvent(value: AcceptableValue) {
   eventId.value = typeof value === 'string' ? value : ''
   await loadAll(eventId.value)
 }
 
-onMounted(async () => {
-  await Promise.all([load(), loadLetterhead()])
-})
+onMounted(load)
 </script>
 
 <template>
@@ -311,9 +286,6 @@ onMounted(async () => {
               :rows="sheet.rows"
               :room-label="sheet.label"
               :room-code="sheet.roomCode"
-              :school-name="schoolName"
-              :event-title="eventTitle"
-              :event-period="eventPeriod"
               :short-warning="
                 sheet.total > sheet.loaded
                   ? `Memuat ${sheet.loaded} dari ${sheet.total} peserta.`

@@ -60,6 +60,8 @@ export interface RoomReportView {
   incidentNotes: string | null
   submittedAt: string | null
   verifiedAt: string | null
+  hasAttachment: boolean
+  attachmentName: string | null
   slot: { startsAt: string; endsAt: string }
   schedules: ReportScheduleRow[]
   absences: ReportAbsenceRow[]
@@ -136,6 +138,8 @@ export class GetRoomReportUseCase {
       incidentNotes: report.incidentNotes,
       submittedAt: report.submittedAt?.toISOString() ?? null,
       verifiedAt: report.verifiedAt?.toISOString() ?? null,
+      hasAttachment: report.attachment !== null,
+      attachmentName: report.attachment?.originalName ?? null,
       slot: {
         startsAt: slot.startsAt.toISOString(),
         endsAt: slot.endsAt.toISOString(),

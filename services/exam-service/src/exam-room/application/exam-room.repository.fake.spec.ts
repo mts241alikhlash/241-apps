@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { SAMPLE_ATTACHMENT } from './room-report-file-storage.fake.js'
 import type { ExamRoom } from '../domain/entities/exam-room.entity.js'
 import {
   DuplicateRoomCodeError,
@@ -565,10 +566,22 @@ describe('FakeExamRoomRepository reports', () => {
     ).toBeNull()
 
     expect(
-      (await rooms.submitReport(report.id, slot.actualUserId, NOW))?.status,
+      (
+        await rooms.submitReport(
+          report.id,
+          slot.actualUserId,
+          NOW,
+          SAMPLE_ATTACHMENT,
+        )
+      )?.status,
     ).toBe('SUBMITTED')
     expect(
-      await rooms.submitReport(report.id, slot.actualUserId, NOW),
+      await rooms.submitReport(
+        report.id,
+        slot.actualUserId,
+        NOW,
+        SAMPLE_ATTACHMENT,
+      ),
     ).toBeNull()
 
     expect(

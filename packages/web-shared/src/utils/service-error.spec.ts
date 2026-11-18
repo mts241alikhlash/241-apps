@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  isOutageMessage,
   isServiceUnavailable,
   serviceErrorMessage,
   serviceUnavailableMessage,
@@ -134,5 +135,40 @@ describe('naming the service', () => {
     expect(serviceUnavailableMessage({ code: 'ERR_NETWORK' })).toContain(
       'koneksi internet',
     )
+  })
+})
+
+describe('isOutageMessage', () => {
+  it('recognises every message the outage paths produce', () => {
+    expect(
+      isOutageMessage(
+        'Salah satu layanan sedang tidak berjalan, jadi data ini belum bisa ditampilkan.',
+      ),
+    ).toBe(true)
+    expect(
+      isOutageMessage(
+        'Layanan Kepegawaian sedang tidak berjalan, jadi data ini belum bisa ditampilkan.',
+      ),
+    ).toBe(true)
+    expect(
+      isOutageMessage(
+        'Layanan Kepegawaian terlalu lama merespons. Silakan coba lagi.',
+      ),
+    ).toBe(true)
+    expect(
+      isOutageMessage(
+        'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+      ),
+    ).toBe(true)
+  })
+
+  it('leaves a fault and an ordinary refusal alone', () => {
+    expect(
+      isOutageMessage(
+        'Layanan Kepegawaian mengalami kesalahan. Silakan coba lagi nanti.',
+      ),
+    ).toBe(false)
+    expect(isOutageMessage('Data siswa tidak ditemukan.')).toBe(false)
+    expect(isOutageMessage('')).toBe(false)
   })
 })

@@ -28,11 +28,27 @@ describe('examPrintApi', () => {
     })
   })
 
-  it('lists the schedules of an event', async () => {
+  it('lists the schedules of an event window', async () => {
     GET.mockResolvedValue(ok([{ id: 's' }], { total: 1, page: 1, limit: 200 }))
-    await examPrintApi.getSchedules('e1')
+    await examPrintApi.getSchedules(
+      {
+        id: 'e1',
+        name: 'ASAS',
+        startsAt: '2026-11-09T00:00:00.000Z',
+        endsAt: '2026-11-14T00:00:00.000Z',
+      },
+      1,
+    )
     expect(GET).toHaveBeenCalledWith('/exam-schedules', {
-      params: { query: { eventId: 'e1', limit: 200 } },
+      params: {
+        query: {
+          page: 1,
+          limit: 200,
+          status: 'SCHEDULED',
+          from: '2026-11-09T00:00:00.000Z',
+          to: '2026-11-14T00:00:00.000Z',
+        },
+      },
     })
   })
 })

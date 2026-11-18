@@ -22,11 +22,7 @@ import { Spinner } from '@mts241alikhlash/ui/spinner'
 import { Armchair, Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
 import { examRoomService } from '../services/examRoomService'
-import type {
-  Letterhead,
-  RoomMonitorMeta,
-  RoomMonitorParticipant,
-} from '../types'
+import type { RoomMonitorMeta, RoomMonitorParticipant } from '../types'
 
 const props = defineProps<{ kind: 'cards' | 'labels' }>()
 
@@ -41,11 +37,9 @@ const slotId = computed(() =>
 const roster = ref<RoomMonitorParticipant[]>([])
 const rosterTotal = ref(0)
 const meta = ref<RoomMonitorMeta | null>(null)
-const letterhead = ref<Letterhead | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-const schoolName = computed(() => letterhead.value?.name ?? '')
 const rosterShort = computed(() => rosterTotal.value > roster.value.length)
 const roomLabel = computed(() =>
   meta.value === null
@@ -53,8 +47,6 @@ const roomLabel = computed(() =>
     : `${meta.value.room.code} · ${meta.value.room.name}`,
 )
 const roomCode = computed(() => meta.value?.room.code ?? '')
-const eventTitle = computed(() => roster.value[0]?.packageTitle ?? '')
-const eventPeriod = computed(() => '')
 const title = computed(() =>
   props.kind === 'cards' ? 'Cetak Kartu Peserta' : 'Cetak Daftar Meja',
 )
@@ -69,14 +61,13 @@ async function load() {
   loading.value = true
   error.value = null
   try {
-    const [rosterResult, letterheadResult] = await Promise.all([
-      examRoomService.loadRoster(roomId.value, slotId.value),
-      examRoomService.loadLetterhead(),
-    ])
+    const rosterResult = await examRoomService.loadRoster(
+      roomId.value,
+      slotId.value,
+    )
     roster.value = rosterResult.data
     rosterTotal.value = rosterResult.total
     meta.value = rosterResult.meta
-    letterhead.value = letterheadResult
   } catch {
     roster.value = []
     error.value = 'Dokumen tidak dapat dimuat. Periksa koneksi lalu coba lagi.'
@@ -164,9 +155,6 @@ onMounted(load)
           :rows="roster"
           :room-label="roomLabel"
           :room-code="roomCode"
-          :school-name="schoolName"
-          :event-title="eventTitle"
-          :event-period="eventPeriod"
           :short-warning="
             rosterShort
               ? `Memuat ${roster.length} dari ${rosterTotal} peserta.`

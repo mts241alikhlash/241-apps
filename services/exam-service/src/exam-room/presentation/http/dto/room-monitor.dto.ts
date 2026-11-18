@@ -422,6 +422,9 @@ export class RoomReportDto {
   submittedAt!: string | null
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   verifiedAt!: string | null
+  @ApiProperty() hasAttachment!: boolean
+  @ApiProperty({ type: String, nullable: true })
+  attachmentName!: string | null
   @ApiProperty({ type: () => RoomReportSlotDto }) slot!: RoomReportSlotDto
   @ApiProperty({ type: [ReportScheduleDto] }) schedules!: ReportScheduleDto[]
   @ApiProperty({ type: [ReportAbsenceDto] }) absences!: ReportAbsenceDto[]
@@ -432,6 +435,8 @@ export class RoomReportDto {
   static fromDomain(domain: RoomReportView): RoomReportDto {
     const dto = new RoomReportDto()
     dto.reportId = domain.reportId
+    dto.hasAttachment = domain.hasAttachment
+    dto.attachmentName = domain.attachmentName
     dto.roomId = domain.roomId
     dto.slotId = domain.slotId
     dto.status = domain.status
@@ -439,6 +444,8 @@ export class RoomReportDto {
     dto.incidentNotes = domain.incidentNotes
     dto.submittedAt = domain.submittedAt
     dto.verifiedAt = domain.verifiedAt
+    dto.hasAttachment = domain.hasAttachment
+    dto.attachmentName = domain.attachmentName
     dto.slot = Object.assign(new RoomReportSlotDto(), domain.slot)
     dto.schedules = domain.schedules.map((row) =>
       ReportScheduleDto.fromDomain(row),
@@ -467,6 +474,12 @@ export class RoomReportSummaryDto {
   @ApiProperty() registeredCount!: number
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   reportId!: string | null
+  @ApiProperty() hasAttachment!: boolean
+  @ApiProperty({ type: String, nullable: true })
+  attachmentName!: string | null
+  @ApiProperty({ type: [String] }) subjectNames!: string[]
+  @ApiProperty({ type: String, nullable: true })
+  supervisorName!: string | null
 
   static fromDomain(domain: RoomReportSummary): RoomReportSummaryDto {
     const dto = new RoomReportSummaryDto()
@@ -479,6 +492,8 @@ export class RoomReportSummaryDto {
     dto.status = domain.status
     dto.registeredCount = domain.registeredCount
     dto.reportId = domain.reportId
+    dto.subjectNames = domain.subjectNames
+    dto.supervisorName = domain.supervisorName
     return dto
   }
 }

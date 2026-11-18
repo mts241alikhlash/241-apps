@@ -23,6 +23,7 @@ import type {
 } from '../domain/entities/exam-room-supervisor.entity.js'
 import type {
   ExamRoomReport,
+  ExamRoomReportAttachment,
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
@@ -523,6 +524,7 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       verifiedByUserId: null,
       verifiedAt: null,
       status: 'DRAFT',
+      attachment: null,
       createdAt: now,
       updatedAt: now,
     }
@@ -583,7 +585,12 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     return Promise.resolve(row)
   }
 
-  submitReport(reportId: string, submittedByUserId: string, at: Date) {
+  submitReport(
+    reportId: string,
+    submittedByUserId: string,
+    at: Date,
+    attachment: ExamRoomReportAttachment,
+  ) {
     const report = this.reports.get(reportId)
     if (report?.status !== 'DRAFT') return Promise.resolve(null)
     const updated: ExamRoomReport = {
@@ -591,8 +598,20 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       status: 'SUBMITTED',
       submittedByUserId,
       submittedAt: at,
+      attachment,
       updatedAt: new Date(),
     }
+    this.reports.set(reportId, updated)
+    return Promise.resolve(updated)
+  }
+
+  replaceReportAttachment(
+    reportId: string,
+    attachment: ExamRoomReportAttachment,
+  ) {
+    const report = this.reports.get(reportId)
+    if (report?.status !== 'SUBMITTED') return Promise.resolve(null)
+    const updated: ExamRoomReport = { ...report, attachment }
     this.reports.set(reportId, updated)
     return Promise.resolve(updated)
   }

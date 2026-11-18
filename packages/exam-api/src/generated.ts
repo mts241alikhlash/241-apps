@@ -127,6 +127,41 @@ export interface paths {
         patch: operations["ExamEventController_update"];
         trace?: never;
     };
+    "/exam-events/{id}/attendance-files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The uploaded attendance sheets of an event */
+        get: operations["ExamAttendanceFileController_list"];
+        /** Upload or replace a signed attendance sheet scan (PDF, JPG or PNG, 10 MB) */
+        put: operations["ExamAttendanceFileController_upload"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/attendance-files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an uploaded attendance sheet */
+        get: operations["ExamAttendanceFileController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-events/{id}/credentials/reset": {
         parameters: {
             query?: never;
@@ -712,6 +747,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-rooms/{roomId}/reports/{slotId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the file of a submitted Berita Acara */
+        get: operations["ExamRoomController_downloadRoomReportFile"];
+        /** Replace the file of a submitted Berita Acara */
+        put: operations["ExamRoomController_replaceRoomReportFile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-rooms/{roomId}/reports/{slotId}/submit": {
         parameters: {
             query?: never;
@@ -721,7 +774,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Hand the Berita Acara in and lock it */
+        /** Hand the signed, scanned Berita Acara in (PDF, JPG or PNG, 10 MB) and lock it */
         post: operations["ExamRoomController_submitRoomReport"];
         delete?: never;
         options?: never;
@@ -1548,9 +1601,42 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
         };
+        AttendanceFileDto: {
+            /** @example 2026-11-18 */
+            day: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            originalName: string;
+            /** Format: uuid */
+            roomId: string | null;
+            sizeBytes: number;
+            /** Format: uuid */
+            slotId: string | null;
+            /** Format: date-time */
+            uploadedAt: string;
+            /** Format: uuid */
+            uploadedById: string;
+        };
+        AttendanceUploadBodyDto: {
+            /**
+             * @description WIB calendar day
+             * @example 2026-11-18
+             */
+            day: string;
+            /** Format: binary */
+            file: string;
+            /** @enum {string} */
+            kind: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            /** Format: uuid */
+            roomId?: string;
+            /** Format: uuid */
+            slotId?: string;
+        };
         AuditLogDto: {
             /** @enum {string} */
-            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN" | "RESET_CREDENTIALS";
+            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN" | "RESET_CREDENTIALS" | "REPLACE_ROOM_REPORT_FILE" | "UPLOAD_ATTENDANCE_FILE";
             /** Format: uuid */
             actorId: string;
             /** Format: date-time */
@@ -2599,10 +2685,12 @@ export interface components {
         };
         RoomReportDto: {
             absences: components["schemas"]["ReportAbsenceDto"][];
+            attachmentName: string | null;
             auditLogs: components["schemas"]["ReportAuditDto"][];
             /** @enum {string} */
             condition: "SMOOTH" | "TECHNICAL_ISSUE" | "DISCIPLINARY_NOTE";
             fieldNotes: components["schemas"]["ReportFieldNoteDto"][];
+            hasAttachment: boolean;
             incidentNotes: string | null;
             /** Format: uuid */
             reportId: string;
@@ -2626,8 +2714,10 @@ export interface components {
             startsAt: string;
         };
         RoomReportSummaryDto: {
+            attachmentName: string | null;
             /** Format: date-time */
             endsAt: string;
+            hasAttachment: boolean;
             registeredCount: number;
             /** Format: uuid */
             reportId: string | null;
@@ -2641,6 +2731,8 @@ export interface components {
             startsAt: string;
             /** @enum {string} */
             status: "DRAFT" | "SUBMITTED" | "VERIFIED";
+            subjectNames: string[];
+            supervisorName: string | null;
         };
         SaveAnswerDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
@@ -3302,6 +3394,92 @@ export interface operations {
                         /** @example 200 */
                         statusCode?: number;
                     };
+                };
+            };
+        };
+    };
+    ExamAttendanceFileController_list: {
+        parameters: {
+            query?: {
+                day?: string;
+                kind?: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AttendanceFileDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamAttendanceFileController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["AttendanceUploadBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AttendanceFileDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamAttendanceFileController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file bytes, always as an attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/jpeg": string;
+                    "image/png": string;
                 };
             };
         };
@@ -4537,7 +4715,7 @@ export interface operations {
             };
         };
     };
-    ExamRoomController_submitRoomReport: {
+    ExamRoomController_downloadRoomReportFile: {
         parameters: {
             query?: never;
             header?: never;
@@ -4548,6 +4726,71 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description The file bytes, always as an attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    ExamRoomController_replaceRoomReportFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: string;
+                slotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RoomReportDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamRoomController_submitRoomReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: string;
+                slotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {

@@ -31,6 +31,7 @@ import {
 } from '@mts241alikhlash/ui/table'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { Printer } from '@lucide/vue'
+import ReportFileDialog from './ReportFileDialog.vue'
 import { examRoomService } from '../services/examRoomService'
 import type {
   RoomExecutionCondition,
@@ -59,6 +60,8 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const saving = ref(false)
 const submitting = ref(false)
+const submitOpen = ref(false)
+const submitError = ref<string | null>(null)
 const verifying = ref(false)
 const reopening = ref(false)
 const reopenOpen = ref(false)
@@ -138,13 +141,33 @@ async function save() {
   else error.value = result.error
 }
 
-async function submit() {
+async function submit(file: File) {
   if (submitting.value) return
   submitting.value = true
-  const result = await examRoomService.submitReport(props.roomId, props.slotId)
+  submitError.value = null
+  const result = await examRoomService.submitReport(
+    props.roomId,
+    props.slotId,
+    file,
+  )
   submitting.value = false
-  if (result.success) apply(result.data)
-  else error.value = result.error
+  if (result.success) {
+    submitOpen.value = false
+    apply(result.data)
+  } else submitError.value = result.error
+}
+
+function openSubmit() {
+  submitError.value = null
+  submitOpen.value = true
+}
+
+function downloadFile() {
+  void examRoomService.downloadReportFile(
+    props.roomId,
+    props.slotId,
+    report.value?.attachmentName ?? null,
+  )
 }
 
 async function verify() {
@@ -211,6 +234,12 @@ watch(
           <Badge :variant="statusVariant(report.status)">
             {{ reportStatusLabel(report.status) }}
           </Badge>
+          <Badge
+            v-if="report.hasAttachment"
+            variant="secondary"
+          >
+            Berkas terunggah
+          </Badge>
           <span class="tabular-nums text-control text-muted-foreground">
             Sesi {{ timeFormat.format(new Date(report.slot.startsAt)) }}–{{
               timeFormat.format(new Date(report.slot.endsAt))
@@ -247,9 +276,16 @@ watch(
           <Button
             v-if="canSubmit"
             :disabled="submitting"
-            @click="submit"
+            @click="openSubmit"
           >
             Serahkan Berita Acara
+          </Button>
+          <Button
+            v-if="report.hasAttachment"
+            variant="outline"
+            @click="downloadFile"
+          >
+            Unduh berkas
           </Button>
         </div>
       </div>
@@ -444,6 +480,16 @@ watch(
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ReportFileDialog
+        v-model:open="submitOpen"
+        title="Serahkan Berita Acara"
+        description="Unggah berita acara yang sudah ditandatangani dan dipindai. Setelah diserahkan, berita acara tidak dapat diubah lagi."
+        confirm-label="Serahkan"
+        :busy="submitting"
+        :error="submitError"
+        @confirm="submit"
+      />
 
       <div
         v-if="!locked"

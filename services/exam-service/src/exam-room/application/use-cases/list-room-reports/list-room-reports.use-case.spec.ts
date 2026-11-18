@@ -1,17 +1,32 @@
 import type { RoomStaffUser } from '../../room-access.service.js'
+import { SAMPLE_ATTACHMENT } from '../../room-report-file-storage.fake.js'
+import { CLASSROOM_7A } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { MANAGE_ALL, SUPERVISE, TECHNICIAN } from '../../room-access.service.js'
 import {
   SUPERVISOR_ID,
   TECHNICIAN_ID,
   seedMonitorRoom,
 } from '../../room-monitor.test-support.js'
+import { FakeAcademicLookup } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { ListRoomReportsUseCase } from './list-room-reports.use-case.js'
 
 const COORDINATOR: RoomStaffUser = { id: 'koord-1', permissions: [MANAGE_ALL] }
 
 async function build() {
   const fixture = await seedMonitorRoom(4)
-  return { fixture, reports: new ListRoomReportsUseCase(fixture.rooms) }
+  const academic = new FakeAcademicLookup({
+    subjects: [{ id: CLASSROOM_7A.id, name: 'Matematika' }],
+  })
+  return {
+    fixture,
+    reports: new ListRoomReportsUseCase(
+      fixture.rooms,
+      fixture.schedules,
+      academic,
+      fixture.authors,
+      fixture.employees,
+    ),
+  }
 }
 
 describe('ListRoomReportsUseCase', () => {
@@ -40,7 +55,12 @@ describe('ListRoomReportsUseCase', () => {
       roomId: fixture.room.id,
       supervisorSlotId: fixture.slotId,
     })
-    await fixture.rooms.submitReport(report.id, SUPERVISOR_ID, new Date())
+    await fixture.rooms.submitReport(
+      report.id,
+      SUPERVISOR_ID,
+      new Date(),
+      SAMPLE_ATTACHMENT,
+    )
 
     const rows = await reports.execute(COORDINATOR, {})
 
@@ -78,5 +98,48 @@ describe('ListRoomReportsUseCase', () => {
     expect(
       (await reports.execute(COORDINATOR, { eventId: fixture.eventId })).length,
     ).toBe(3)
+  })
+
+  it('names the subject once when two classrooms of the room sit the same subject', async () => {
+    const { fixture, reports } = await build()
+
+    const rows = await reports.execute(COORDINATOR, {})
+
+    expect(rows.find((row) => row.slotId === fixture.slotId)).toMatchObject({
+      subjectNames: ['Matematika'],
+      supervisorName: 'Ustadz Ahmad',
+    })
+  })
+
+  it('leaves subjectNames empty for a slot without a matching schedule', async () => {
+    const { fixture, reports } = await build()
+
+    const rows = await reports.execute(COORDINATOR, {})
+
+    expect(
+      rows.find((row) => row.slotId === fixture.laterSlotId)?.subjectNames,
+    ).toEqual([])
+  })
+
+  it('shows the actual supervisor after a substitution', async () => {
+    const { fixture, reports } = await build()
+    const before = await reports.execute(COORDINATOR, {})
+    await fixture.rooms.substituteSupervisor({
+      supervisorId: fixture.foreignSlotId,
+      actualUserId: SUPERVISOR_ID,
+      substitutedByAdminId: 'admin-1',
+      reason: 'sakit',
+      at: new Date(),
+    })
+
+    const after = await reports.execute(COORDINATOR, {})
+
+    expect(
+      before.find((row) => row.slotId === fixture.foreignSlotId)
+        ?.supervisorName,
+    ).toBe(null)
+    expect(
+      after.find((row) => row.slotId === fixture.foreignSlotId)?.supervisorName,
+    ).toBe('Ustadz Ahmad')
   })
 })

@@ -140,18 +140,33 @@ describe('examRoomApi', () => {
     )
   })
 
-  it.each([
-    ['submitReport', 'submit'],
-    ['verifyReport', 'verify'],
-  ] as const)('%s posts without a body', async (method, action) => {
+  it('verifies without a body', async () => {
     POST.mockResolvedValue(ok({ reportId: 'p' }))
-    await expect(examRoomApi[method]('r', 'sl')).resolves.toEqual({
+    await expect(examRoomApi.verifyReport('r', 'sl')).resolves.toEqual({
       reportId: 'p',
     })
     expect(POST).toHaveBeenCalledWith(
-      `/exam-rooms/{roomId}/reports/{slotId}/${action}`,
+      '/exam-rooms/{roomId}/reports/{slotId}/verify',
       path,
     )
+  })
+
+  it('submits the scanned file as multipart', async () => {
+    POST.mockResolvedValue(ok({ reportId: 'p' }))
+    const file = new File(['%PDF-'], 'scan.pdf')
+    await examRoomApi.submitReport('r', 'sl', file)
+    const [url, options] = POST.mock.calls[0] as [
+      string,
+      {
+        body: FormData
+        params: unknown
+        bodySerializer: (b: unknown) => unknown
+      },
+    ]
+    expect(url).toBe('/exam-rooms/{roomId}/reports/{slotId}/submit')
+    expect(options.params).toEqual(path.params)
+    expect(options.body.get('file')).toBe(file)
+    expect(options.bodySerializer(options.body)).toBe(options.body)
   })
 
   it('gets the letterhead from the identity contract', async () => {

@@ -70,6 +70,7 @@ class StubRooms extends IExamRoomRepository {
   recordAbsence = vi.fn()
   recordFieldNote = vi.fn()
   submitReport = vi.fn()
+  replaceReportAttachment = vi.fn()
   verifyReport = vi.fn()
   listAbsencesByScheduleStudent = vi.fn()
   listAbsencesByScheduleStudents = vi.fn()

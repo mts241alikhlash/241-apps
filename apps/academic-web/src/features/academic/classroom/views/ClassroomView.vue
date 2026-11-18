@@ -128,7 +128,7 @@ onMounted(async () => {
           @update:page-size="(limit) => fetchClassrooms({ limit, page: 1 })"
         >
           <template #filters>
-            <div class="flex items-center gap-2">
+            <div class="flex items-end gap-2">
               <Select
                 :model-value="selectedAcademicYearId"
                 @update:model-value="onAcademicYearChange"

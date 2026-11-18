@@ -21,7 +21,10 @@ export default {
     examPresets: 'Preset',
     examReports: 'Berita Acara',
     examCards: 'Kartu Peserta',
-    examSeatLabels: 'Daftar Meja',
+    examSeatLabels: 'Nomor Meja',
+    examPrintSchedule: 'Jadwal Ujian',
+    examPrintStudentAttendance: 'Daftar Hadir Peserta',
+    examPrintStaffAttendance: 'Daftar Hadir Pengawas',
     examSeb: 'Safe Exam Browser',
   },
 }

@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { Readable } from 'node:stream'
 import {
   BadRequestException,
   ConflictException,
@@ -67,9 +68,20 @@ const roomRoutes: Record<string, string[]> = {
   ],
   submitRoomReport: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   verifyRoomReport: ['exam-rooms.manage-all'],
+  replaceRoomReportFile: ['exam-rooms.manage-all'],
+  downloadRoomReportFile: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  ],
 }
 
 const roomAnyRoutes: Record<string, string[]> = {
+  downloadRoomReportFile: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  ],
   accessCode: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   rotateToken: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   auditLogs: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
@@ -152,6 +164,39 @@ describe('ExamRoomController permissions', () => {
   it('leaves no room route without a permission', () => {
     expect(handlers(ExamRoomController.prototype).sort()).toEqual(
       Object.keys(roomRoutes).sort(),
+    )
+  })
+})
+
+describe('ExamRoomController report file download', () => {
+  it('serves the file as an attachment with a safe name', async () => {
+    const stream = Readable.from(Buffer.from('%PDF-1.4'))
+    const download = vi.fn().mockResolvedValue({
+      stream,
+      attachment: {
+        mimeType: 'application/pdf',
+        sizeBytes: 8,
+        uploadedAt: new Date('2026-11-02T02:05:00Z'),
+      },
+      room: { code: 'R-01/../x' },
+    })
+    const controller: ExamRoomController = Object.assign(
+      Object.create(ExamRoomController.prototype) as ExamRoomController,
+      { submitReport: { download } },
+    )
+    const set = vi.fn()
+
+    await controller.downloadRoomReportFile({ id: 'u' }, UUID_A, UUID_B, {
+      set,
+    } as never)
+
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename="berita-acara-R-01x-20261102-0905.pdf"',
+        'X-Content-Type-Options': 'nosniff',
+      }),
     )
   })
 })

@@ -317,19 +317,12 @@ function cellText(cell: Cell<TData, unknown>): string | null {
     : String(value)
 }
 
-const rangeText = computed(() => {
-  const shown = table.getRowModel().rows.length
-  if (shown === 0) return '0'
-  const start = pagination.value.pageIndex * pagination.value.pageSize + 1
-  return `${start}–${start + shown - 1}`
-})
-
 const countText = computed(() => {
   const total = totalItemCount.value
   const shown = table.getRowModel().rows.length
   if (shown === 0) return `0 ${itemLabel.value}`
   if (shown >= total) return `${total} ${itemLabel.value}`
-  return `${rangeText.value} dari ${total} ${itemLabel.value}`
+  return `${shown} dari ${total} ${itemLabel.value}`
 })
 
 const pageNumber = computed(() => pagination.value.pageIndex + 1)
@@ -354,14 +347,12 @@ defineExpose({ table })
     >
       <div
         v-if="$slots['header-left'] || $slots.filters"
-        class="flex items-center gap-2"
+        class="flex items-end gap-2"
       >
         <slot name="filters" />
         <slot name="header-left" />
       </div>
-      <div
-        class="flex items-center gap-2 w-full sm:w-auto sm:ml-auto justify-end"
-      >
+      <div class="flex items-end gap-2 w-full sm:w-auto sm:ml-auto justify-end">
         <slot name="header-right">
           <SearchInput
             v-if="showFilterInput"
@@ -556,9 +547,9 @@ defineExpose({ table })
             <TableRow>
               <TableCell
                 :colspan="columns.length"
-                class="h-24 text-center"
+                class="h-24 text-center text-control text-muted-foreground"
               >
-                Tidak ada data.
+                <slot name="empty">Tidak ada data.</slot>
               </TableCell>
             </TableRow>
           </template>
@@ -610,9 +601,7 @@ defineExpose({ table })
               :props="cardParts(row).select!.getContext()"
             />
           </div>
-          <div
-            class="min-w-0 flex-1 space-y-0.5 px-3 py-2"
-          >
+          <div class="min-w-0 flex-1 space-y-0.5 px-3 py-2">
             <div
               v-if="cardParts(row).title"
               class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-medium"

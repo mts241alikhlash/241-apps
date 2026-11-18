@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { CARD_HEADER } from './cardHeader'
 import artwork from '../assets/exam-seat.svg'
 
 const props = defineProps<{
@@ -8,9 +9,6 @@ const props = defineProps<{
   name: string
   className: string | null
   roomCode: string
-  eventTitle: string
-  eventPeriod: string
-  schoolName: string
 }>()
 
 const roomCode = computed(() => props.roomCode.trim().replace(/^[A-Za-z]+/, ''))
@@ -39,14 +37,9 @@ const rows = computed(() => [
       class="absolute inset-0 size-full"
     />
     <p class="seat-card-title">MEJA PESERTA</p>
-    <p class="seat-card-heading">{{ eventTitle }}</p>
-    <p
-      v-if="eventPeriod"
-      class="seat-card-subheading"
-    >
-      {{ eventPeriod }}
-    </p>
-    <p class="seat-card-school">{{ schoolName }}</p>
+    <p class="seat-card-heading">{{ CARD_HEADER.title }}</p>
+    <p class="seat-card-subheading">{{ CARD_HEADER.period }}</p>
+    <p class="seat-card-school">{{ CARD_HEADER.school }}</p>
     <dl class="seat-card-rows">
       <template
         v-for="row in rows"

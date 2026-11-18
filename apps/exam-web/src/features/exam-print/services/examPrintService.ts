@@ -1,6 +1,6 @@
 import { messageOf } from '@/features/exam-package/utils/messageOf'
-import { examPrintApi } from '../api/examPrintApi'
-import type { PrintPack, PrintSchedule } from '../types'
+import { SCHEDULE_PAGE_LIMIT, examPrintApi } from '../api/examPrintApi'
+import type { PrintPack, PrintSchedule, ResetCredentials } from '../types'
 
 export type PrintOutcome<T> =
   { success: true; data: T } | { success: false; error: string }
@@ -19,13 +19,41 @@ export const examPrintService = {
     }
   },
 
-  async loadSchedules(eventId: string): Promise<PrintOutcome<PrintSchedule[]>> {
+  async resetCredentials(
+    eventId: string,
+    roomId?: string,
+  ): Promise<PrintOutcome<ResetCredentials>> {
     try {
-      const page = await examPrintApi.getSchedules(eventId)
       return {
         success: true,
-        data: page.data.filter((schedule) => schedule.status === 'SCHEDULED'),
+        data: await examPrintApi.resetCredentials(eventId, roomId),
       }
+    } catch (err: unknown) {
+      return failure(err, 'Kata sandi tidak dapat direset.')
+    }
+  },
+
+  async loadSchedules(
+    event: PrintPack['event'],
+  ): Promise<PrintOutcome<PrintSchedule[]>> {
+    try {
+      const collected: PrintSchedule[] = []
+      let page = 1
+      for (;;) {
+        const result = await examPrintApi.getSchedules(event, page)
+        collected.push(
+          ...result.data.filter((schedule) => schedule.eventId === event.id),
+        )
+        const seen = (page - 1) * SCHEDULE_PAGE_LIMIT + result.data.length
+        if (
+          result.data.length < SCHEDULE_PAGE_LIMIT ||
+          seen >= result.meta.total
+        ) {
+          break
+        }
+        page += 1
+      }
+      return { success: true, data: collected }
     } catch (err: unknown) {
       return failure(err, 'Jadwal ujian tidak dapat dimuat.')
     }
