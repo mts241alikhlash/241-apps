@@ -6,7 +6,7 @@ import {
 } from './identity-credentials.port.js'
 
 const URL_KEY = 'IDENTITY_SERVICE_URL'
-const RESET_CHUNK = 500
+const RESET_CHUNK = 25
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'

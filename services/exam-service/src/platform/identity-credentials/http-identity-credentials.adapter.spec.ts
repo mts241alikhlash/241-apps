@@ -38,14 +38,14 @@ describe('HttpIdentityCredentialsAdapter.resetPasswords', () => {
     ])
   })
 
-  it('sends at most 500 ids per call', async () => {
-    const ids = Array.from({ length: 1001 }, (_, i) => `u${i}`)
+  it('sends at most 25 ids per call', async () => {
+    const ids = Array.from({ length: 101 }, (_, i) => `u${i}`)
     const { adapter, postData } = build(answerAll)
 
     const result = await adapter.resetPasswords(ids)
 
-    expect(postData).toHaveBeenCalledTimes(3)
-    expect(result).toHaveLength(1001)
+    expect(postData).toHaveBeenCalledTimes(5)
+    expect(result).toHaveLength(101)
   })
 
   it('refuses an answer whose rows lack a password', async () => {
