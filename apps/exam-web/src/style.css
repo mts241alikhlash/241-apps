@@ -108,6 +108,43 @@
     padding: 0;
   }
 
+  body.printing-stack .card-sheet,
+  body.printing-sheet .card-sheet {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 95mm);
+    grid-auto-rows: 60mm;
+    gap: 4mm;
+    justify-content: center;
+    padding: 1.5mm;
+  }
+
+  body.printing-stack .card-sheet::before,
+  body.printing-sheet .card-sheet::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 0.1mm dashed #000;
+    pointer-events: none;
+  }
+
+  body.printing-stack .card-sheet > *,
+  body.printing-sheet .card-sheet > * {
+    position: relative;
+    overflow: visible !important;
+    width: 95mm;
+    height: 60mm;
+  }
+
+  body.printing-stack .card-sheet > *::after,
+  body.printing-sheet .card-sheet > *::after {
+    content: '';
+    position: absolute;
+    inset: -1.5mm;
+    border: 0.1mm dashed #000;
+    pointer-events: none;
+  }
+
   body.printing-stack .print-room {
     break-before: page;
   }
@@ -118,6 +155,27 @@
 
   @page {
     size: A4;
-    margin: 15mm;
+    margin: 6.5mm;
   }
+}
+
+@font-face {
+  font-family: 'Tusker Grotesk';
+  src: url('./assets/fonts/TuskerGrotesk-3600Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ruberoid';
+  src: url('./assets/fonts/Ruberoid-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Trajan Pro';
+  src: url('./assets/fonts/TrajanPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
 }
