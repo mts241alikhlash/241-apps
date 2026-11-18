@@ -339,12 +339,17 @@ export class FakeStudentDirectory extends IStudentDirectoryPort {
       id: string
       nis: string
       name: string | null
+      userId?: string | null
     }[] = [{ id: STUDENT_ID, nis: '2024001', name: 'Ahmad Fauzi' }],
   ) {
     super()
   }
 
   refsByIds(ids: string[]) {
-    return Promise.resolve(this.refs.filter((ref) => ids.includes(ref.id)))
+    return Promise.resolve(
+      this.refs
+        .filter((ref) => ids.includes(ref.id))
+        .map((ref) => ({ ...ref, userId: ref.userId ?? null })),
+    )
   }
 }

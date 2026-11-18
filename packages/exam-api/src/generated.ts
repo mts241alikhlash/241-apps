@@ -127,6 +127,23 @@ export interface paths {
         patch: operations["ExamEventController_update"];
         trace?: never;
     };
+    "/exam-events/{id}/credentials/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give every seated student of an event a new login password, shown once */
+        post: operations["ExamEventController_resetPasswords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-events/{id}/print-pack": {
         parameters: {
             query?: never;
@@ -1533,7 +1550,7 @@ export interface components {
         };
         AuditLogDto: {
             /** @enum {string} */
-            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN";
+            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN" | "RESET_CREDENTIALS";
             /** Format: uuid */
             actorId: string;
             /** Format: date-time */
@@ -2421,6 +2438,24 @@ export interface components {
             subjectName: string | null;
             submittedCount: number;
         };
+        ResetCredentialsBodyDto: {
+            /**
+             * @description Must be true: the old passwords stop working at once
+             * @enum {boolean}
+             */
+            confirm: true;
+        };
+        ResetCredentialsDto: {
+            items: components["schemas"]["ResetCredentialsItemDto"][];
+            skipped: string[];
+        };
+        ResetCredentialsItemDto: {
+            identifier: string;
+            /** @description Shown once; never stored */
+            password: string;
+            /** Format: uuid */
+            studentId: string;
+        };
         ResumeSessionRequestDto: {
             /** @description The room or schedule token shown now */
             accessCode: string;
@@ -3262,6 +3297,39 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamEventDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_resetPasswords: {
+        parameters: {
+            query?: {
+                roomId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetCredentialsBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ResetCredentialsDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

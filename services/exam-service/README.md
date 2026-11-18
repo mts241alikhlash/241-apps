@@ -37,6 +37,7 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 
 - `GET /exam-events/:id/print-pack?roomId=<uuid>` (`exam-events.manage`) returns the event, its rooms in code order, each room's seated students (seat number, name, NIS, classroom, participant number), supervisor slots and technician, and `warnings` (for example students without a participant number). `roomId` limits the pack to one room and answers 404 when it is not in the event.
 - Participant numbers come from one bulk call to student-service (`POST /students/participant-numbers/lookup`) per pack, for every seated student of the event. Never call it per student or per room.
+- `POST /exam-events/:id/credentials/reset?roomId=<uuid>` (`exam-events.manage`, body `{ confirm: true }`) resets the login passwords of the event's seated students in one identity-service call (chunks of 500) and answers `{ items, skipped }` once, `Cache-Control: no-store`. Passwords are never stored, logged or audited; the audit entry (`RESET_CREDENTIALS`) holds the count and the actor. Students without an account are listed in `skipped`. Not idempotent: each call issues new passwords and kills the cards printed before.
 
 ## Gotchas
 

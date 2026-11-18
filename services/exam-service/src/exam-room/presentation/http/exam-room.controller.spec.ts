@@ -20,7 +20,9 @@ import { ExamRoomController } from './exam-room.controller.js'
 import { ExamEventController } from './exam-event.controller.js'
 import { AssignSeatsDto, ExamRoomSeatDto } from './dto/exam-room.dto.js'
 import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
+import { ResetCredentialsBodyDto } from './dto/reset-credentials.dto.js'
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
+import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
 import type { PrintPack } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 
 const UUID_A = '11111111-1111-4111-8111-111111111111'
@@ -109,6 +111,7 @@ const eventRoutes: Record<string, string[]> = {
   update: ['exam-events.manage'],
   createRoom: ['exam-events.manage'],
   getPrintPack: ['exam-events.manage'],
+  resetPasswords: ['exam-events.manage'],
 }
 
 const eventAnyRoutes: Record<string, string[]> = {
@@ -229,6 +232,7 @@ describe('ExamEventController print pack', () => {
       undefined as never,
       undefined as never,
       printPack,
+      undefined as never,
     )
     return { calls, controller }
   }
@@ -286,6 +290,7 @@ describe('PrintPackDto contract', () => {
         { provide: ManageExamEventsUseCase, useValue: {} },
         { provide: ManageExamRoomsUseCase, useValue: {} },
         { provide: GetPrintPackUseCase, useValue: {} },
+        { provide: ResetEventCredentialsUseCase, useValue: {} },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -676,6 +681,7 @@ describe('ExamEventController supervised listing', () => {
       events,
       undefined as never,
       undefined as never,
+      undefined as never,
     )
     const mine = await rooms.createEvent({
       semesterId: 'sem-1',
@@ -741,5 +747,54 @@ describe('ExamEventController supervised listing', () => {
     )
 
     expect(scoped.data.map((row) => row.id)).toEqual([mine.id])
+  })
+})
+
+describe('ExamEventController credentials reset', () => {
+  it('rejects a body without confirm: true', async () => {
+    const body = (confirm: unknown) =>
+      validate(plainToInstance(ResetCredentialsBodyDto, { confirm }))
+
+    expect(await body(true)).toHaveLength(0)
+    expect(await body(false)).not.toHaveLength(0)
+    expect(await body(undefined)).not.toHaveLength(0)
+    expect(await body('true')).not.toHaveLength(0)
+  })
+
+  it('passes the event, room and actor on and answers the items and skipped', async () => {
+    const calls: unknown[][] = []
+    const reset = {
+      execute: (...args: unknown[]) => {
+        calls.push(args)
+        return Promise.resolve({
+          items: [
+            { studentId: UUID_A, identifier: 'nis-1', password: 'Abcdefghjk' },
+          ],
+          skipped: [UUID_B],
+        })
+      },
+    } as never
+    const controller = new ExamEventController(
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      reset,
+    )
+    const query = Object.assign(new PrintPackQueryDto(), { roomId: UUID_B })
+
+    const result = await controller.resetPasswords(
+      { id: 'admin-1' },
+      UUID_A,
+      query,
+      { confirm: true },
+    )
+
+    expect(calls).toEqual([[UUID_A, 'admin-1', UUID_B]])
+    expect(result).toEqual({
+      items: [
+        { studentId: UUID_A, identifier: 'nis-1', password: 'Abcdefghjk' },
+      ],
+      skipped: [UUID_B],
+    })
   })
 })

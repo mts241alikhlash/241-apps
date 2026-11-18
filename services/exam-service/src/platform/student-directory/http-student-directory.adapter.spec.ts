@@ -21,7 +21,7 @@ describe('HttpStudentDirectoryAdapter.refsByIds', () => {
     )
 
     await expect(adapter.refsByIds(['s1'])).resolves.toEqual([
-      { id: 's1', nis: '2024001', name: 'Ahmad Fauzi' },
+      { id: 's1', nis: '2024001', name: 'Ahmad Fauzi', userId: 'u1' },
     ])
     expect(postData).toHaveBeenCalledWith(
       'STUDENT_SERVICE_URL',
@@ -51,7 +51,7 @@ describe('HttpStudentDirectoryAdapter.refsByIds', () => {
     )
 
     await expect(adapter.refsByIds(['s1'])).resolves.toEqual([
-      { id: 's1', nis: '1', name: null },
+      { id: 's1', nis: '1', name: null, userId: 'u1' },
     ])
   })
 

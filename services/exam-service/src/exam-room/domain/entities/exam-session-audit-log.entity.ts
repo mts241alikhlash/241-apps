@@ -12,6 +12,7 @@ export const SESSION_AUDIT_ACTIONS = [
   'VERIFY_ROOM_REPORT',
   'REOPEN_ROOM_REPORT',
   'CLOSED_BY_ADMIN',
+  'RESET_CREDENTIALS',
 ] as const
 
 export type SessionAuditAction = (typeof SESSION_AUDIT_ACTIONS)[number]

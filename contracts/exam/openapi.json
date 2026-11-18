@@ -3680,6 +3680,75 @@
         ]
       }
     },
+    "/exam-events/{id}/credentials/reset": {
+      "post": {
+        "operationId": "ExamEventController_resetPasswords",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetCredentialsBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ResetCredentialsDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Give every seated student of an event a new login password, shown once",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
     "/exam-rooms/{roomId}/monitor": {
       "get": {
         "operationId": "ExamRoomController_roomMonitor",
@@ -8074,7 +8143,8 @@
               "SUBMIT_ROOM_REPORT",
               "VERIFY_ROOM_REPORT",
               "REOPEN_ROOM_REPORT",
-              "CLOSED_BY_ADMIN"
+              "CLOSED_BY_ADMIN",
+              "RESET_CREDENTIALS"
             ]
           },
           "actorId": {
@@ -9866,6 +9936,64 @@
           "event",
           "rooms",
           "warnings"
+        ]
+      },
+      "ResetCredentialsBodyDto": {
+        "type": "object",
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "enum": [
+              true
+            ],
+            "description": "Must be true: the old passwords stop working at once"
+          }
+        },
+        "required": [
+          "confirm"
+        ]
+      },
+      "ResetCredentialsItemDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "Shown once; never stored"
+          }
+        },
+        "required": [
+          "studentId",
+          "identifier",
+          "password"
+        ]
+      },
+      "ResetCredentialsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResetCredentialsItemDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "items",
+          "skipped"
         ]
       },
       "RoomMonitorLastEventDto": {

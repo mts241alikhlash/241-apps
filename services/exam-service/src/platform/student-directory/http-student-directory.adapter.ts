@@ -54,6 +54,7 @@ export class HttpStudentDirectoryAdapter extends IStudentDirectoryPort {
       id: student.id,
       nis: student.nis,
       name: names.get(student.userId) ?? null,
+      userId: student.userId,
     }))
   }
 
