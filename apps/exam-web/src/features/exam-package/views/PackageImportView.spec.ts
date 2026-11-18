@@ -365,7 +365,7 @@ describe('PackageImportView', () => {
     await choose(wrapper, new File(['x'], 'soal.xlsx'))
 
     expect(wrapper.text()).toContain('Versi template tidak sesuai')
-    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
+    expect(findButton(wrapper, 'Impor')).toBeUndefined()
     wrapper.unmount()
   })
 
@@ -387,7 +387,7 @@ describe('PackageImportView', () => {
     await choose(wrapper, big)
     expect(wrapper.text()).toContain('Ukuran berkas maksimal 10 MB.')
     expect(previewImport).not.toHaveBeenCalled()
-    expect(saveButton(wrapper).attributes('disabled')).toBeDefined()
+    expect(findButton(wrapper, 'Impor')).toBeUndefined()
     wrapper.unmount()
   })
 
