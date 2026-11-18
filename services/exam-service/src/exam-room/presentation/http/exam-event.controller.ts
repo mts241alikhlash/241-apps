@@ -13,6 +13,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -22,6 +23,7 @@ import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam-events/manage-exam-events.use-case.js'
 import { ManageExamRoomsUseCase } from '../../application/use-cases/manage-exam-rooms/manage-exam-rooms.use-case.js'
+import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import {
   CreateExamEventDto,
   CreateExamRoomDto,
@@ -31,6 +33,7 @@ import {
   ExamEventQueryDto,
   UpdateExamEventDto,
 } from './dto/exam-room.dto.js'
+import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
 
 @ApiTags('Exam Events')
 @ApiBearerAuth()
@@ -40,6 +43,7 @@ export class ExamEventController {
   constructor(
     private readonly events: ManageExamEventsUseCase,
     private readonly rooms: ManageExamRoomsUseCase,
+    private readonly printPack: GetPrintPackUseCase,
   ) {}
 
   @Get()
@@ -145,6 +149,21 @@ export class ExamEventController {
         capacity: dto.capacity,
         technicianUserId: dto.technicianUserId ?? null,
       }),
+    )
+  }
+
+  @Get(':id/print-pack')
+  @RequirePermissions('exam-events.manage')
+  @ApiOperation({ summary: 'The print pack of an exam event' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiQuery({ name: 'roomId', required: false, format: 'uuid' })
+  @ApiResponse({ status: 200, type: PrintPackDto })
+  async getPrintPack(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query() query: PrintPackQueryDto,
+  ): Promise<PrintPackDto> {
+    return PrintPackDto.fromDomain(
+      await this.printPack.execute(id, query.roomId),
     )
   }
 }

@@ -11,6 +11,10 @@ export abstract class IParticipantNumberRepository {
     studentId: string,
     semesterId: string,
   ): Promise<ParticipantNumberRow | null>
+  abstract findByStudents(
+    studentIds: string[],
+    semesterId: string,
+  ): Promise<{ studentId: string; number: string }[]>
   abstract issue(
     semesterId: string,
     build: (

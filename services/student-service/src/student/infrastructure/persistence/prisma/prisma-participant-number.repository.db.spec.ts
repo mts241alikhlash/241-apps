@@ -79,6 +79,28 @@ suite('Prisma participant numbers against a real database', () => {
     ).resolves.toMatchObject({ number: '241-261-08-002' })
   })
 
+  it('answers the numbers of the asked students in that semester only', async () => {
+    const stranger = randomUUID()
+
+    await expect(
+      repository.findByStudents([anna, budi, stranger], semesterId),
+    ).resolves.toEqual(
+      expect.arrayContaining([
+        { studentId: anna, number: '241-261-08-001' },
+        { studentId: budi, number: '241-261-08-002' },
+      ]),
+    )
+    await expect(
+      repository.findByStudents([anna, budi, stranger], semesterId),
+    ).resolves.toHaveLength(2)
+    await expect(
+      repository.findByStudents([anna], otherSemesterId),
+    ).resolves.toEqual([])
+    await expect(
+      repository.findByStudents([budi], semesterId),
+    ).resolves.toEqual([{ studentId: budi, number: '241-261-08-002' }])
+  })
+
   it('shows the rows already issued to the next run', async () => {
     const seen: ParticipantNumberRow[][] = []
 

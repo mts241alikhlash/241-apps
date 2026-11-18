@@ -127,6 +127,23 @@ export interface paths {
         patch: operations["ExamEventController_update"];
         trace?: never;
     };
+    "/exam-events/{id}/print-pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The print pack of an exam event */
+        get: operations["ExamEventController_getPrintPack"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-events/{id}/rooms": {
         parameters: {
             query?: never;
@@ -2173,6 +2190,49 @@ export interface components {
             /** Format: uuid */
             studentId: string;
         };
+        PrintPackDto: {
+            event: components["schemas"]["PrintPackEventDto"];
+            rooms: components["schemas"]["PrintPackRoomDto"][];
+            warnings: string[];
+        };
+        PrintPackEventDto: {
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date-time */
+            startsAt: string;
+        };
+        PrintPackRoomDto: {
+            building: string | null;
+            code: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            students: components["schemas"]["PrintPackStudentDto"][];
+            supervisors: components["schemas"]["PrintPackSupervisorDto"][];
+            technician: components["schemas"]["PrintPackTechnicianDto"] | null;
+        };
+        PrintPackStudentDto: {
+            classroomName: string | null;
+            name: string | null;
+            nis: string | null;
+            participantNumber: string | null;
+            seatNumber: number;
+            /** Format: uuid */
+            studentId: string;
+        };
+        PrintPackSupervisorDto: {
+            /** Format: date-time */
+            endsAt: string;
+            name: string | null;
+            /** Format: date-time */
+            startsAt: string;
+        };
+        PrintPackTechnicianDto: {
+            name: string | null;
+        };
         QuestionDetailDto: {
             /** Format: uuid */
             authorEmployeeId: string;
@@ -3166,6 +3226,35 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamEventDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_getPrintPack: {
+        parameters: {
+            query?: {
+                roomId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["PrintPackDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
