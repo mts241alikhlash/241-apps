@@ -67,6 +67,7 @@ export class ImportPreviewDto {
   @ApiProperty({ type: () => SheetIdentityDto }) identity!: SheetIdentityDto
   @ApiProperty({ type: String, nullable: true }) authorName!: string | null
   @ApiProperty({ type: () => ImportCountsDto }) counts!: ImportCountsDto
+  @ApiProperty({ type: () => ImportCountsDto }) points!: ImportCountsDto
   @ApiProperty() totalPoints!: number
   @ApiProperty() total!: number
   @ApiProperty({ type: () => [ImportErrorDto] }) errors!: ImportErrorDto[]
@@ -79,6 +80,7 @@ export class ImportPreviewDto {
     dto.identity = Object.assign(new SheetIdentityDto(), preview.identity)
     dto.authorName = preview.authorName
     dto.counts = Object.assign(new ImportCountsDto(), preview.counts)
+    dto.points = Object.assign(new ImportCountsDto(), preview.points)
     dto.totalPoints = preview.totalPoints
     dto.total = preview.total
     dto.errors = preview.errors.map((error) =>

@@ -140,6 +140,7 @@ const stubs = {
   DialogContent: passthrough,
   DialogHeader: passthrough,
   DialogTitle: passthrough,
+  DialogDescription: passthrough,
   DialogBody: passthrough,
   DialogFooter: passthrough,
   Sheet: passthrough,

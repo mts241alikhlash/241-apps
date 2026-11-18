@@ -80,6 +80,13 @@ const stubs = {
   CardContent: passthrough,
   CardFooter: passthrough,
   FileDropzone: dropzone,
+  Dialog: passthrough,
+  DialogContent: passthrough,
+  DialogHeader: passthrough,
+  DialogTitle: passthrough,
+  DialogDescription: passthrough,
+  DialogBody: passthrough,
+  DialogFooter: passthrough,
 }
 
 const view = (overrides: Partial<ExamPackageView> = {}): ExamPackageView => ({
@@ -106,6 +113,13 @@ const preview = (overrides: Partial<ImportPreview> = {}): ImportPreview => ({
     TRUE_FALSE: 0,
     SHORT_ANSWER: 0,
     ESSAY: 0,
+  },
+  points: {
+    MULTIPLE_CHOICE: 3,
+    MULTIPLE_RESPONSE: 2,
+    TRUE_FALSE: 0,
+    SHORT_ANSWER: 4,
+    ESSAY: 10,
   },
   duplicateRows: [],
   errors: [],
@@ -172,7 +186,7 @@ describe('PackageImportView', () => {
     await choose(wrapper, new File(['x'], 'soal.xlsx'))
 
     expect(wrapper.text()).toContain('Siti Aminah')
-    expect(wrapper.text()).toContain('Total soal 2')
+    expect(wrapper.text()).toContain('Pilihan ganda')
     wrapper.unmount()
   })
 

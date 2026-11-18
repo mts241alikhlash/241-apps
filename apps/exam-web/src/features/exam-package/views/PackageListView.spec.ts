@@ -195,15 +195,11 @@ describe('PackageListView', () => {
     wrapper.unmount()
   })
 
-  it('opens the package when a row is clicked', async () => {
+  it('opens the package from its row action', async () => {
     const wrapper = mount(PackageListView, { global: { stubs } })
     await flushPromises()
 
-    ;(
-      wrapper.findComponent({ name: 'DataTable' }).vm as unknown as {
-        $emit: (event: string, value?: unknown) => void
-      }
-    ).$emit('row-click', pkg())
+    rowActionProps(wrapper, pkg()).onView?.()
 
     expect(push).toHaveBeenCalledWith('/exam/packages/p1')
     wrapper.unmount()

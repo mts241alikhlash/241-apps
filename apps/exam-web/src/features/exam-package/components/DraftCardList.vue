@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends CardEntry">
 import { Trash2 } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -8,12 +8,12 @@ import {
   ItemGroup,
 } from '@mts241alikhlash/ui/item'
 import { typeCode, typeLabel } from '@/features/exam-bank/types'
-import type { DraftCard } from '../types'
+import type { CardEntry } from '../types'
 
 defineProps<{
-  cards: DraftCard[]
+  cards: T[]
   activeIndex: number
-  snippetOf: (card: DraftCard) => string
+  snippetOf: (card: T) => string
 }>()
 
 const emit = defineEmits<{

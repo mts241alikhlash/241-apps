@@ -18,6 +18,7 @@ export interface ImportPreview {
   identity: SheetIdentity
   authorName: string | null
   counts: Record<QuestionType, number>
+  points: Record<QuestionType, number>
   totalPoints: number
   total: number
   errors: { row: number; reason: string }[]
