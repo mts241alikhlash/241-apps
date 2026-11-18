@@ -79,6 +79,9 @@ export const examRoomApi = {
       }),
     ),
 
+  getReports: (query?: { eventId?: string }) =>
+    unwrap(examClient.GET('/exam-rooms/reports', { params: { query } })),
+
   getReport: (roomId: string, slotId: string) =>
     unwrap(
       examClient.GET(

@@ -52,6 +52,13 @@ const schoolName = computed(() => letterhead.value?.name ?? '')
 
 const rosterShort = computed(() => rosterTotal.value > roster.value.length)
 
+const roomCode = computed(() =>
+  (meta.value?.room.code ?? '').trim().replace(/^[A-Za-z]+/, ''),
+)
+
+const seatLabel = (seatNumber: number): string =>
+  String(seatNumber).padStart(2, '0')
+
 const slotWindow = computed(() => {
   const slot = report.value?.slot
   if (!slot) return '-'
@@ -84,6 +91,11 @@ const technicianName = computed(
     (meta.value ? meta.value.room.technicianName : null) ??
     '......................',
 )
+
+function goBack() {
+  if (router.options.history.state.back) router.back()
+  else void router.push('/exam/reports')
+}
 
 function print() {
   document.body.classList.add('printing-report')
@@ -133,8 +145,8 @@ onMounted(load)
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
-              label="Kembali ke Ruang Ujian"
-              @click="router.push(`/exam/rooms/${roomId}`)"
+              label="Kembali"
+              @click="goBack"
             />
             <CardTitle class="font-semibold">Cetak Berita Acara</CardTitle>
           </div>
@@ -176,7 +188,7 @@ onMounted(load)
 
         <div
           v-else-if="report"
-          class="exam-report mx-auto max-w-[210mm] space-y-6 bg-white p-8 text-black"
+          class="exam-report mx-auto w-full min-w-0 max-w-[210mm] space-y-6 bg-white p-8 text-black"
         >
           <p
             v-if="rosterShort"
@@ -220,7 +232,7 @@ onMounted(load)
               Berita Acara Pelaksanaan Ujian
             </h1>
             <p class="text-control tabular-nums">
-              {{ meta ? `${meta.room.code} · ${meta.room.name} · ` : ''
+              {{ meta ? `${roomCode} · ${meta.room.name} · ` : ''
               }}{{ slotWindow }}
             </p>
             <p class="text-control">
@@ -239,84 +251,88 @@ onMounted(load)
 
           <section class="space-y-2">
             <h2 class="text-control font-semibold">Rekap Kehadiran</h2>
-            <table class="w-full border-collapse text-control">
-              <thead>
-                <tr class="border-y border-black">
-                  <th class="py-1 text-left">Mata Pelajaran</th>
-                  <th class="py-1 text-left">Rombel</th>
-                  <th class="py-1 text-center">Terdaftar</th>
-                  <th class="py-1 text-center">Hadir</th>
-                  <th class="py-1 text-center">Terkumpul</th>
-                  <th class="py-1 text-center">Tidak Hadir</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in report.schedules"
-                  :key="row.scheduleId"
-                  class="border-b border-black/30"
-                >
-                  <td class="py-1">
-                    {{ row.subjectName ?? row.packageTitle }}
-                  </td>
-                  <td class="py-1">{{ row.classroomName ?? '-' }}</td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.registeredCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.startedCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.submittedCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.absentCount }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto print:overflow-visible">
+              <table class="w-full min-w-[32rem] border-collapse text-control">
+                <thead>
+                  <tr class="border-y border-black">
+                    <th class="py-1 text-left">Mata Pelajaran</th>
+                    <th class="py-1 text-left">Rombel</th>
+                    <th class="py-1 text-center">Terdaftar</th>
+                    <th class="py-1 text-center">Hadir</th>
+                    <th class="py-1 text-center">Terkumpul</th>
+                    <th class="py-1 text-center">Tidak Hadir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="row in report.schedules"
+                    :key="row.scheduleId"
+                    class="border-b border-black/30"
+                  >
+                    <td class="py-1">
+                      {{ row.subjectName ?? row.packageTitle }}
+                    </td>
+                    <td class="py-1">{{ row.classroomName ?? '-' }}</td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.registeredCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.startedCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.submittedCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.absentCount }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section class="space-y-2">
             <h2 class="text-control font-semibold">Daftar Hadir Peserta</h2>
-            <table class="w-full border-collapse text-control">
-              <thead>
-                <tr class="border-y border-black">
-                  <th class="py-1 text-center">No</th>
-                  <th class="py-1 text-center">Kursi</th>
-                  <th class="py-1 text-left">Nama</th>
-                  <th class="py-1 text-left">NIS</th>
-                  <th class="py-1 text-left">Kelas</th>
-                  <th class="py-1 text-left">Kehadiran</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(row, index) in roster"
-                  :key="`${row.studentId}-${row.scheduleId}`"
-                  class="border-b border-black/30"
-                >
-                  <td class="py-1 text-center tabular-nums">
-                    {{ index + 1 }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.seatNumber }}
-                  </td>
-                  <td class="py-1">{{ row.studentName ?? '-' }}</td>
-                  <td class="py-1 tabular-nums">{{ row.nis ?? '-' }}</td>
-                  <td class="py-1">{{ row.classroomName ?? '-' }}</td>
-                  <td class="py-1">
-                    {{
-                      row.absence
-                        ? `Tidak hadir: ${reasonLabel(row.absence.reason)}`
-                        : row.session
-                          ? 'Hadir'
-                          : 'Belum mulai'
-                    }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto print:overflow-visible">
+              <table class="w-full min-w-[32rem] border-collapse text-control">
+                <thead>
+                  <tr class="border-y border-black">
+                    <th class="py-1 text-center">No</th>
+                    <th class="py-1 text-center">Kursi</th>
+                    <th class="py-1 text-left">Nama</th>
+                    <th class="py-1 text-left">NIS</th>
+                    <th class="py-1 text-left">Kelas</th>
+                    <th class="py-1 text-left">Kehadiran</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(row, index) in roster"
+                    :key="`${row.studentId}-${row.scheduleId}`"
+                    class="border-b border-black/30"
+                  >
+                    <td class="py-1 text-center tabular-nums">
+                      {{ index + 1 }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ seatLabel(row.seatNumber) }}
+                    </td>
+                    <td class="py-1">{{ row.studentName ?? '-' }}</td>
+                    <td class="py-1 tabular-nums">{{ row.nis ?? '-' }}</td>
+                    <td class="py-1">{{ row.classroomName ?? '-' }}</td>
+                    <td class="py-1">
+                      {{
+                        row.absence
+                          ? `Tidak hadir: ${reasonLabel(row.absence.reason)}`
+                          : row.session
+                            ? 'Hadir'
+                            : 'Belum mulai'
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section class="space-y-1">

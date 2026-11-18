@@ -13,6 +13,7 @@ import { ManageExamRoomsUseCase } from './application/use-cases/manage-exam-room
 import { SubstituteSupervisorUseCase } from './application/use-cases/substitute-supervisor/substitute-supervisor.use-case.js'
 import { ExtendRoomTimeUseCase } from './application/use-cases/extend-room-time/extend-room-time.use-case.js'
 import { GetRoomMonitorUseCase } from './application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
+import { ListRoomReportsUseCase } from './application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from './application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
 import { GetSessionTimelineUseCase } from './application/use-cases/get-session-timeline/get-session-timeline.use-case.js'
 import { GetRoomReportUseCase } from './application/use-cases/get-room-report/get-room-report.use-case.js'
@@ -60,6 +61,7 @@ import {
     RoomReportService,
     GetRoomMonitorUseCase,
     ListRoomsOverviewUseCase,
+    ListRoomReportsUseCase,
     GetSessionTimelineUseCase,
     GetRoomReportUseCase,
     SaveRoomReportUseCase,

@@ -4824,6 +4824,59 @@
         ]
       }
     },
+    "/exam-rooms/reports": {
+      "get": {
+        "operationId": "ExamRoomOverviewController_roomReports",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RoomReportSummaryDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Every Berita Acara the caller may see, one row per supervisor slot",
+        "tags": [
+          "Exam Rooms"
+        ]
+      }
+    },
     "/exam-files": {
       "post": {
         "operationId": "ExamFileController_upload",
@@ -9696,6 +9749,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "studentName": {
             "type": "string",
             "nullable": true
@@ -9744,6 +9801,7 @@
         "required": [
           "seatNumber",
           "studentId",
+          "participantNumber",
           "studentName",
           "nis",
           "classroomName",
@@ -10593,6 +10651,60 @@
           "isActiveNow"
         ]
       },
+      "RoomReportSummaryDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomCode": {
+            "type": "string"
+          },
+          "roomName": {
+            "type": "string"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "VERIFIED"
+            ]
+          },
+          "registeredCount": {
+            "type": "number"
+          },
+          "reportId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "roomId",
+          "roomCode",
+          "roomName",
+          "slotId",
+          "startsAt",
+          "endsAt",
+          "status",
+          "registeredCount",
+          "reportId"
+        ]
+      },
       "ExamFileDto": {
         "type": "object",
         "properties": {
@@ -11399,6 +11511,9 @@
           "counts": {
             "$ref": "#/components/schemas/ImportCountsDto"
           },
+          "points": {
+            "$ref": "#/components/schemas/ImportCountsDto"
+          },
           "totalPoints": {
             "type": "number"
           },
@@ -11431,6 +11546,7 @@
           "identity",
           "authorName",
           "counts",
+          "points",
           "totalPoints",
           "total",
           "errors",

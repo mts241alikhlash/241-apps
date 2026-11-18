@@ -19,6 +19,7 @@ export default {
     classworkGrading: 'Penilaian',
     myExams: 'Ujian Saya',
     examPresets: 'Preset',
+    examReports: 'Berita Acara',
     examCards: 'Kartu Peserta',
     examSeatLabels: 'Daftar Meja',
     examSeb: 'Safe Exam Browser',
