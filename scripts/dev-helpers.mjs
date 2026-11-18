@@ -27,3 +27,10 @@ export function ownedByWorkspace(cwd, workspace) {
   if (relative.startsWith('..') || path.isAbsolute(relative)) return false
   return relative.split(path.sep)[0] !== '.worktrees'
 }
+
+export function withEnvOverrides(lines, overrides) {
+  return lines.map((line) => {
+    const key = line.match(/^([A-Z_][A-Z0-9_]*)=/)?.[1]
+    return key && key in overrides ? `${key}=${overrides[key]}` : line
+  })
+}

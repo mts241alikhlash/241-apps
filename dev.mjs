@@ -18,6 +18,7 @@ import {
   ownedByWorkspace,
   referencedServices,
   withDependencies,
+  withEnvOverrides,
 } from './scripts/dev-helpers.mjs'
 
 const workspace = path.dirname(fileURLToPath(import.meta.url))
@@ -73,18 +74,19 @@ function readEnv(file) {
 const envFile = (service) =>
   path.join(servicesRoot, 'services', `${service}-service`, '.env')
 
-function ensureIdentityEnv() {
-  const file = envFile('identity')
-  if (existsSync(file)) return
+function mainCheckoutFile(relative) {
   const common = execFileSync(
     'git',
     ['rev-parse', '--path-format=absolute', '--git-common-dir'],
     { cwd: workspace, encoding: 'utf8' },
   ).trim()
-  const source = path.join(
-    path.dirname(common),
-    'services/identity-service/.env',
-  )
+  return path.join(path.dirname(common), relative)
+}
+
+function ensureIdentityEnv() {
+  const file = envFile('identity')
+  if (existsSync(file)) return
+  const source = mainCheckoutFile('services/identity-service/.env')
   if (!existsSync(source) || source === file) {
     console.error(
       `${path.relative(workspace, file)} is missing; create it from its .env.example (see docs/guides/local-development.md).`,
@@ -103,10 +105,24 @@ function databaseUrl(service) {
   return url.toString()
 }
 
+const LOCAL_S3 = {
+  S3_ENDPOINT: 'http://localhost:9000',
+  S3_PUBLIC_ENDPOINT: 'http://localhost:9000',
+  S3_ACCESS_KEY_ID: 'local',
+  S3_SECRET_ACCESS_KEY: 'local',
+}
+
 function ensureEnv(service) {
   const file = envFile(service)
   if (existsSync(file)) return
+  const source = mainCheckoutFile(`services/${service}-service/.env`)
+  if (existsSync(source) && source !== file) {
+    writeFileSync(file, readFileSync(source), { mode: 0o600 })
+    console.log(`copied ${path.relative(workspace, file)} from ${source}`)
+    return
+  }
   const overrides = {
+    ...LOCAL_S3,
     DATABASE_URL: databaseUrl(service),
     DIRECT_URL: databaseUrl(service),
     NODE_ENV: 'development',
@@ -122,11 +138,9 @@ function ensureEnv(service) {
     ),
   }
   const example = readFileSync(`${file}.example`, 'utf8').split('\n')
-  const lines = example.map((line) => {
-    const key = line.match(/^([A-Z_][A-Z0-9_]*)=/)?.[1]
-    return key && key in overrides ? `${key}=${overrides[key]}` : line
+  writeFileSync(file, withEnvOverrides(example, overrides).join('\n'), {
+    mode: 0o600,
   })
-  writeFileSync(file, lines.join('\n'), { mode: 0o600 })
   console.log(`created ${path.relative(workspace, file)}`)
 }
 

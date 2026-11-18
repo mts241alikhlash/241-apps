@@ -17,7 +17,7 @@ Result: `pnpm install` ends with `Done`. After a fresh install generate each ser
 
 ## 2. Create identity's env file
 
-`dev.mjs` creates every other service's `.env` from its `.env.example`, copying identity's secrets, but it reads identity's first.
+`dev.mjs` gives every other service a missing `.env` by copying the main checkout's file when it exists, and otherwise by building it from the `.env.example` with identity's secrets and the local S3 (`http://localhost:9000`, keys `local`, which the local SeaweedFS accepts); it reads identity's first.
 
 ```
 cp services/identity-service/.env.example services/identity-service/.env
