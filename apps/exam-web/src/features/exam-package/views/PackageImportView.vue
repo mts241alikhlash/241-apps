@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Download } from '@lucide/vue'
+import { FileSpreadsheet, FileUp } from '@lucide/vue'
 import { BackButton, FileDropzone } from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { Spinner } from '@mts241alikhlash/ui/spinner'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -45,10 +55,12 @@ const { pkg, canEdit } = builder
 const file = ref<File | null>(null)
 const preview = ref<ImportPreview | null>(null)
 const confirmDuplicates = ref(false)
+const previewOpen = ref(false)
 const previewing = ref(false)
 let picks = 0
 const importing = ref(false)
 const problem = ref<string | null>(null)
+const fileProblem = ref(false)
 const result = ref<ImportResult | null>(null)
 const loading = ref(true)
 
@@ -105,13 +117,16 @@ async function pickFile(event: Event) {
   preview.value = null
   previewing.value = false
   confirmDuplicates.value = false
+  fileProblem.value = false
   if (!chosen) return
   if (!/\.(xlsx|docx)$/i.test(chosen.name)) {
     problem.value = 'Berkas harus .xlsx atau .docx.'
+    fileProblem.value = true
     return
   }
   if (chosen.size > MAX_BYTES) {
     problem.value = 'Ukuran berkas maksimal 10 MB.'
+    fileProblem.value = true
     return
   }
   file.value = chosen
@@ -124,6 +139,7 @@ async function pickFile(event: Event) {
   previewing.value = false
   if (response.success) {
     preview.value = response.data
+    previewOpen.value = true
   } else {
     file.value = null
     problem.value = response.error
@@ -132,6 +148,8 @@ async function pickFile(event: Event) {
 
 function clearFile() {
   picks++
+  fileProblem.value = false
+  previewOpen.value = false
   previewing.value = false
   file.value = null
   preview.value = null
@@ -157,6 +175,7 @@ async function submit() {
     file.value = null
     preview.value = null
     confirmDuplicates.value = false
+    previewOpen.value = false
   } else {
     problem.value = response.error
   }
@@ -184,7 +203,7 @@ onMounted(init)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke paket"
@@ -195,11 +214,11 @@ onMounted(init)
       </CardHeader>
       <CardContent
         v-if="!loading"
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 space-y-4"
       >
         <div
           v-if="!canEdit"
-          class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border bg-muted/30 px-4 py-2 text-control"
           role="status"
         >
           Paket ini tidak bisa diubah, jadi soal tidak bisa diimpor ke dalamnya.
@@ -207,12 +226,10 @@ onMounted(init)
         <template v-else>
           <ApprovedEditNotice v-if="pkg?.status === 'APPROVED'" />
 
-          <div class="space-y-2">
-            <p
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-            >
+          <div class="space-y-3">
+            <p class="text-control text-muted-foreground">
               Soal masuk ke paket {{ pkg?.title }}. Unduh template, isi soalnya,
-              lalu unggah.
+              lalu unggah. Pratinjau terbuka sebelum soal disimpan.
             </p>
             <div class="flex flex-wrap gap-2">
               <Button
@@ -220,7 +237,7 @@ onMounted(init)
                 variant="outline"
                 @click="examBankService.downloadTemplate('xlsx')"
               >
-                <Download class="size-4" />
+                <FileSpreadsheet class="size-4" />
                 Template Excel
               </Button>
               <Button
@@ -228,7 +245,7 @@ onMounted(init)
                 variant="outline"
                 @click="examBankService.downloadTemplate('docx')"
               >
-                <Download class="size-4" />
+                <FileUp class="size-4" />
                 Template Word
               </Button>
               <Button
@@ -294,74 +311,117 @@ onMounted(init)
             accept=".xlsx,.docx"
             :file-name="file?.name"
             clearable
-            :invalid="problem !== null"
+            :invalid="fileProblem"
             aria-label="Pilih berkas soal"
             hint="Excel (.xlsx) atau Word (.docx), maks. 10 MB"
             @change="pickFile"
             @clear="clearFile"
           />
-          <p
-            v-if="problem"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
-            role="alert"
-          >
-            {{ problem }}
-          </p>
-
-          <ImportPreviewPanel
-            v-if="preview"
-            v-model:confirm-duplicates="confirmDuplicates"
-            :preview="preview"
-          />
 
           <div
-            v-if="result"
-            class="space-y-3 rounded-md border p-4"
+            v-if="previewing"
+            class="flex items-center gap-2 text-control text-muted-foreground"
             role="status"
-            data-testid="import-result"
           >
-            <p class="font-medium">
-              {{ result.created }} soal ditambahkan ke paket
-              <template v-if="result.errors.length > 0">
-                , {{ result.errors.length }} baris gagal
-              </template>
-            </p>
-            <ul
-              v-if="result.errors.length > 0"
-              class="space-y-1 text-[length:var(--text-control,0.75rem)]"
-            >
-              <li
-                v-for="error in result.errors"
-                :key="`${error.row}-${error.reason}`"
-                data-testid="import-error"
-              >
-                Baris {{ error.row }}: {{ error.reason }}
-              </li>
-            </ul>
+            <Spinner />
+            Membaca berkas…
+          </div>
+
+          <Alert
+            v-if="problem"
+            variant="destructive"
+          >
+            <AlertDescription>{{ problem }}</AlertDescription>
+          </Alert>
+
+          <div
+            v-if="file && !previewing"
+            class="flex flex-wrap gap-2"
+          >
             <Button
-              v-if="result.created > 0"
+              v-if="preview"
               type="button"
               variant="outline"
-              @click="router.push(`/exam/packages/${packageId}`)"
+              @click="previewOpen = true"
             >
-              Kembali ke paket
+              Lihat pratinjau
             </Button>
           </div>
+
+          <Alert
+            v-if="result"
+            :variant="result.errors.length > 0 ? 'destructive' : 'default'"
+            data-testid="import-result"
+          >
+            <AlertDescription>
+              <p class="font-medium text-foreground">
+                {{ result.created }} soal ditambahkan ke paket
+                <template v-if="result.errors.length > 0">
+                  , {{ result.errors.length }} baris gagal
+                </template>
+              </p>
+              <ul
+                v-if="result.errors.length > 0"
+                class="space-y-1"
+              >
+                <li
+                  v-for="error in result.errors"
+                  :key="`${error.row}-${error.reason}`"
+                  data-testid="import-error"
+                >
+                  Baris {{ error.row }}: {{ error.reason }}
+                </li>
+              </ul>
+              <Button
+                v-if="result.created > 0"
+                type="button"
+                variant="outline"
+                @click="router.push(`/exam/packages/${packageId}`)"
+              >
+                Kembali ke paket
+              </Button>
+            </AlertDescription>
+          </Alert>
+
+          <Dialog v-model:open="previewOpen">
+            <DialogContent size="xl">
+              <DialogHeader standard>
+                <DialogTitle>Pratinjau impor</DialogTitle>
+                <DialogDescription class="sr-only">
+                  Pratinjau soal yang dibaca dari berkas, sebelum disimpan.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogBody>
+                <ImportPreviewPanel
+                  v-if="preview"
+                  v-model:confirm-duplicates="confirmDuplicates"
+                  :preview="preview"
+                />
+              </DialogBody>
+              <DialogFooter
+                standard
+                class="justify-between"
+              >
+                <Button
+                  type="button"
+                  variant="outline"
+                  @click="previewOpen = false"
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="button"
+                  :disabled="importing || !canSubmit"
+                  @click="submit"
+                >
+                  <Spinner v-if="importing" />
+                  {{ importing ? 'Mengimpor…' : 'Impor' }}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </template>
       </CardContent>
-      <CardFooter
-        v-if="!loading && canEdit"
-        standard
-        class="justify-end"
-      >
-        <Button
-          type="button"
-          :disabled="importing || previewing || !canSubmit"
-          @click="submit"
-        >
-          {{ importing ? 'Mengimpor…' : 'Impor' }}
-        </Button>
-      </CardFooter>
     </Card>
   </div>
 </template>

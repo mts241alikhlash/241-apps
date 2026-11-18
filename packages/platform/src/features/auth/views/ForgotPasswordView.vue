@@ -66,7 +66,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="hidden justify-center gap-2 lg:flex lg:justify-start">
         <router-link
           to="/login"
-          class="flex items-center gap-2.5 font-semibold text-lg tracking-tight"
+          class="flex items-center gap-3 font-semibold text-lg tracking-tight"
         >
           <AuthLogo size="sm" />
           <span>{{ authConfig.appTitle }}</span>
@@ -75,7 +75,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="flex flex-1 flex-col items-center justify-center gap-6">
         <div class="flex flex-col items-center gap-3 lg:hidden">
           <AuthLogo size="md" />
-          <h1 class="text-xl font-bold tracking-tight">
+          <h1 class="text-xl font-semibold tracking-tight">
             {{ authConfig.appTitle }}
           </h1>
         </div>
@@ -88,11 +88,11 @@ const onSubmit = handleSubmit(async (values) => {
           >
             <div class="flex flex-col items-center gap-2 text-center">
               <div
-                class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500 mb-2"
+                class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center text-success mb-2"
               >
                 <CheckCircle2 class="size-6" />
               </div>
-              <h1 class="text-2xl font-bold">Email Terkirim</h1>
+              <h1 class="text-2xl font-semibold">Email Terkirim</h1>
               <p class="text-muted-foreground text-sm">
                 {{ successMessage }}
               </p>
@@ -100,9 +100,9 @@ const onSubmit = handleSubmit(async (values) => {
 
             <div
               v-if="debugToken"
-              class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs space-y-2"
+              class="p-4 rounded-lg bg-warning/10 border border-warning/30 text-warning text-xs space-y-2"
             >
-              <p class="font-bold flex items-center gap-1">
+              <p class="font-semibold flex items-center gap-1">
                 <AlertCircle class="size-4" /> [DEVELOPMENT MODE]
               </p>
               <p>
@@ -119,7 +119,8 @@ const onSubmit = handleSubmit(async (values) => {
 
             <Button
               variant="outline"
-              class="w-full h-10 rounded-xl"
+              size="lg"
+              class="w-full"
               @click="router.push('/login')"
             >
               <ArrowLeft class="h-4 w-4" /> Kembali ke Login
@@ -132,7 +133,7 @@ const onSubmit = handleSubmit(async (values) => {
             @submit.prevent="onSubmit"
           >
             <div class="flex flex-col items-center gap-1 text-center">
-              <h1 class="text-2xl font-bold">Lupa Password?</h1>
+              <h1 class="text-2xl font-semibold">Lupa Password?</h1>
               <p class="text-muted-foreground text-sm text-balance">
                 Masukkan {{ authConfig.identifierLabel }} Anda untuk menerima
                 tautan reset password
@@ -159,7 +160,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="submit"
               :disabled="isSubmitting"
-              class="w-full cursor-pointer h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full cursor-pointer font-semibold"
             >
               <Loader2
                 v-if="isSubmitting"
@@ -171,7 +173,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="button"
               variant="ghost"
-              class="w-full h-10 rounded-xl text-muted-foreground"
+              size="lg"
+              class="w-full text-muted-foreground"
               @click="router.push('/login')"
             >
               Kembali ke Login

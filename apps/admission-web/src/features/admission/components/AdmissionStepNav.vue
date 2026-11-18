@@ -35,7 +35,7 @@ function visibleOnMobile(index: number) {
         type="button"
         :disabled="disabled"
         :aria-current="index === currentStep ? 'step' : undefined"
-        class="flex size-[var(--control-h-md,1.75rem)] shrink-0 items-center justify-center rounded-full border text-[length:var(--text-control,0.75rem)] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        class="flex size-[var(--control-h-md,2rem)] shrink-0 items-center justify-center rounded-full border text-control font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         :class="
           flagged?.includes(index)
             ? index === currentStep

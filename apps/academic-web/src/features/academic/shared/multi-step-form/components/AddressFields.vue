@@ -6,7 +6,7 @@ const address = defineModel<AddressFormState>({ required: true })
 </script>
 
 <template>
-  <div class="grid gap-5 md:grid-cols-2 items-start">
+  <div class="grid gap-4 md:grid-cols-2 items-start">
     <div class="md:col-span-2 space-y-2">
       <label class="text-sm font-medium">Jalan / Alamat</label>
       <Input

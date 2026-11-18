@@ -73,7 +73,7 @@ const dotClass = {
         </span>
         <span
           v-if="step.caption"
-          class="text-muted-foreground text-[11px]"
+          class="text-muted-foreground text-xs"
         >
           {{ step.caption }}
         </span>

@@ -32,10 +32,7 @@ const props = defineProps<{
   participant: RoomMonitorParticipant | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  saved: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
 const reason = ref<(typeof REASONS)[number]>('SICK')
 const note = ref('')
@@ -94,7 +91,7 @@ watch(
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
           role="alert"
         >
           {{ error }}

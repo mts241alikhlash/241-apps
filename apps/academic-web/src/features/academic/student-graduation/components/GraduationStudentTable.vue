@@ -5,6 +5,7 @@ import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -243,7 +244,7 @@ function toggleAllVisible() {
         v-model="filterClass"
         :disabled="uniqueClasses.length === 0"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-36">
+        <SelectTrigger class="bg-background w-36">
           <Filter class="size-3 mr-1 text-muted-foreground" />
           <SelectValue placeholder="Pilih Kelas..." />
         </SelectTrigger>
@@ -263,7 +264,7 @@ function toggleAllVisible() {
         v-model="filterStatus"
         :disabled="!filterClass"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-32">
+        <SelectTrigger class="bg-background w-32">
           <SelectValue placeholder="Semua Status" />
         </SelectTrigger>
         <SelectContent>
@@ -299,7 +300,7 @@ function toggleAllVisible() {
             }
           "
         >
-          <SelectTrigger class="h-8 text-xs bg-background w-36">
+          <SelectTrigger class="bg-background w-36">
             <SelectValue
               :placeholder="
                 selectedIds.size > 0
@@ -311,7 +312,7 @@ function toggleAllVisible() {
           <SelectContent>
             <SelectItem
               value="approve"
-              class="text-xs text-green-600 focus:text-green-600"
+              class="text-xs text-success focus:text-success"
             >
               Luluskan
             </SelectItem>
@@ -398,7 +399,7 @@ function toggleAllVisible() {
                   <p class="text-xs font-medium text-foreground">
                     Pilih kelas terlebih dahulu
                   </p>
-                  <p class="text-[11px] max-w-sm">
+                  <p class="text-xs max-w-sm">
                     Silakan pilih salah satu kelas tingkat akhir pada filter di
                     atas untuk menampilkan dan memproses kelulusan siswa.
                   </p>
@@ -453,13 +454,13 @@ function toggleAllVisible() {
                 </div>
                 <div
                   v-if="getDecision(candidate.studentId)?.declineReason"
-                  class="text-[11px] text-destructive mt-0.5 italic"
+                  class="text-xs text-destructive mt-0.5 italic"
                 >
                   Alasan: {{ getDecision(candidate.studentId)?.declineReason }}
                 </div>
                 <div
                   v-if="candidate.previousHold"
-                  class="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5"
+                  class="text-xs text-warning mt-0.5"
                 >
                   Ditahan {{ candidate.previousHold.academicYearName }}:
                   {{ candidate.previousHold.reason }}
@@ -481,7 +482,8 @@ function toggleAllVisible() {
                   "
                 >
                   <SelectTrigger
-                    class="h-7 w-full text-[11px]"
+                    size="sm"
+                    class="w-full"
                     :class="
                       getDecision(candidate.studentId)?.approved === false
                         ? 'text-destructive border-destructive/50'
@@ -515,16 +517,19 @@ function toggleAllVisible() {
 
   <Dialog v-model:open="showDeclineDialog">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-4 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Alasan Tidak Lulus</DialogTitle>
-        <DialogDescription class="text-xs">
-          Siswa ini tidak diikutkan dalam proses kelulusan kali ini. Alasannya
-          hanya tampil di layar sebagai pengingat selama pengecekan, tidak ada
-          tempat menyimpannya, jadi ia hilang saat halaman dimuat ulang.
+        <DialogDescription>
+          Catat alasan siswa tidak diikutkan dalam kelulusan kali ini.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-4 space-y-3">
+      <DialogBody class="space-y-3">
+        <p class="text-control text-muted-foreground">
+          Alasan ini hanya tampil di layar sebagai pengingat selama pengecekan;
+          tidak ada tempat menyimpannya, jadi ia hilang saat halaman dimuat
+          ulang.
+        </p>
         <div class="space-y-1.5">
           <Label
             for="graduation-decline-reason"
@@ -537,14 +542,12 @@ function toggleAllVisible() {
             v-model="declineReason"
             placeholder="Contoh: Nilai belum lengkap / tidak memenuhi syarat..."
             rows="3"
-            class="text-xs resize-none"
+            class="resize-none"
           />
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="border-t px-6 py-3 flex justify-end gap-2 bg-muted/10"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

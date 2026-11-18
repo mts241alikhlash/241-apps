@@ -32,7 +32,7 @@ const emit = defineEmits<{
       <Button
         size="sm"
         variant="outline"
-        class="h-8 shadow-xs gap-1.5"
+        class="shadow-xs gap-1.5"
         @click="emit('add-parent')"
       >
         <Plus class="size-3.5" />
@@ -53,14 +53,15 @@ const emit = defineEmits<{
           v-for="(parent, index) in parents"
           :key="index"
           gap="none"
-          class="overflow-hidden rounded-xl border bg-card shadow-xs transition-all hover:border-primary/20"
+          class="overflow-hidden border bg-card shadow-xs transition-all hover:border-primary/20"
         >
           <CardHeader standard>
             <CardTitle size="md"> Orang Tua / Wali {{ index + 1 }} </CardTitle>
             <Button
               size="icon"
               variant="ghost"
-              class="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 rounded-lg transition-colors"
+              class="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+              aria-label="Hapus orang tua"
               @click="emit('remove-parent', index)"
             >
               <Trash2 class="size-4" />

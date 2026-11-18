@@ -1,5 +1,6 @@
 import {
   Armchair,
+  ClipboardList,
   CalendarClock,
   ClipboardPen,
   IdCard,
@@ -89,6 +90,17 @@ export const menuSections: MenuSection[] = [
         title: 'menu.examCards',
         url: '/exam/prints/cards',
         icon: IdCard,
+        requiredAnyPermission: [
+          'exam-rooms.supervise',
+          'exam-rooms.technician',
+          'exam-rooms.manage-all',
+        ],
+      },
+      {
+        key: 'exam-reports',
+        title: 'menu.examReports',
+        url: '/exam/reports',
+        icon: ClipboardList,
         requiredAnyPermission: [
           'exam-rooms.supervise',
           'exam-rooms.technician',

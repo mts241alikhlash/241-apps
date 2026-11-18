@@ -257,7 +257,6 @@ useBreadcrumbs(() => {
                   :model-value="photo.caption ?? ''"
                   :aria-label="`Keterangan untuk ${photo.altText}`"
                   placeholder="Keterangan foto (opsional)"
-                  class="h-8 text-sm"
                   @blur="saveCaption(photo.id, $event)"
                 />
               </div>

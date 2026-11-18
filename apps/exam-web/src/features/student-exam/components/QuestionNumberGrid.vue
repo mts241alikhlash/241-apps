@@ -17,13 +17,13 @@ function toneOf(position: number): string {
   const question = props.questions[position]
   if (!question) return 'border-input bg-card text-muted-foreground'
   if (position === props.currentIndex) {
-    return 'border-primary bg-primary text-primary-foreground font-bold'
+    return 'border-primary bg-primary text-primary-foreground font-semibold'
   }
   if (props.doubtful.has(question.id)) {
-    return 'border-amber-600 bg-amber-100 text-amber-900 font-medium'
+    return 'border-warning bg-warning/10 text-warning font-medium'
   }
   if (isAnswered(question, props.answers.get(question.id))) {
-    return 'border-green-600 bg-green-100 text-green-900 font-medium'
+    return 'border-success bg-success/10 text-success font-medium'
   }
   return 'border-input bg-card text-muted-foreground font-medium'
 }
@@ -35,7 +35,7 @@ function toneOf(position: number): string {
       v-for="(question, position) in questions"
       :key="question.id"
       type="button"
-      class="flex min-h-11 w-full items-center justify-center rounded-md border text-[length:var(--text-control)] tabular-nums transition-colors motion-reduce:transition-none"
+      class="flex min-h-[var(--control-h-lg,2.25rem)] w-full items-center justify-center rounded-md border text-control tabular-nums transition-colors motion-reduce:transition-none"
       :class="toneOf(position)"
       :aria-label="`Soal ${position + 1}`"
       :aria-current="position === currentIndex ? 'step' : undefined"

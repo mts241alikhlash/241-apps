@@ -180,10 +180,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div class="flex items-center gap-3">
           <CardTitle size="lg">Daftar Persetujuan</CardTitle>
           <p class="text-sm text-muted-foreground mt-1">
@@ -297,7 +294,7 @@ onMounted(() => {
           {{ nextStep.approverRoleCode }} setelah Anda setujui.
         </p>
 
-        <DialogFooter class="pt-4 flex sm:justify-between">
+        <DialogFooter class="sm:justify-between">
           <Button
             class="mr-auto sm:mr-0"
             type="button"
@@ -320,7 +317,7 @@ onMounted(() => {
               Tolak
             </Button>
             <Button
-              class="bg-emerald-600 hover:bg-emerald-700 text-white"
+              class="bg-success hover:bg-success text-white"
               type="button"
               :disabled="isSubmitting"
               @click="processApproval('APPROVE')"

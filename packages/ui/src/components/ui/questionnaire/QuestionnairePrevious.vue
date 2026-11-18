@@ -68,7 +68,7 @@ function handleClick(event: MouseEvent) {
     :class="
       cn(
         buttonVariants({ size: props.size, variant: props.variant }),
-        'col-start-1 row-start-1 min-h-11 justify-self-start sm:min-h-0',
+        'col-start-1 row-start-1 min-h-[var(--control-h-md,2rem)] justify-self-start sm:min-h-0',
         props.class,
       )
     "

@@ -32,7 +32,7 @@ const linkClass =
   <footer class="border-t border-[#203f73]/20 bg-[#f5f2e9]">
     <div class="mx-auto max-w-7xl px-4 py-10 text-center sm:px-6 lg:px-8">
       <div
-        class="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:text-left"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:text-left"
       >
         <img
           src="/logo-name.webp"

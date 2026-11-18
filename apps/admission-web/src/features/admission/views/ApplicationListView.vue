@@ -265,11 +265,6 @@ watch(
   { immediate: true },
 )
 
-function openApplicant(item: AdmissionApplicationListItem) {
-  saveListContext()
-  void router.push(`/admin/applicants/${item.id}`)
-}
-
 async function openRegister() {
   registerError.value = null
   isRegistering.value = false
@@ -335,7 +330,7 @@ function fillForm() {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -348,7 +343,6 @@ function fillForm() {
         <template v-else>
           <DataTable
             mobile="cards"
-            row-clickable
             :columns="columns"
             :data="filtersPending ? [] : applications"
             :page="page"
@@ -358,7 +352,6 @@ function fillForm() {
             item-label="pendaftar"
             @update:page="goToPage"
             @update:page-size="changePageSize"
-            @row-click="openApplicant"
           >
             <template #header-left>
               <Button
@@ -463,7 +456,7 @@ function fillForm() {
             <template #mobile-chips>
               <div
                 v-if="activeFiltersCount"
-                class="flex flex-wrap gap-2 text-[length:var(--text-control,0.75rem)]"
+                class="flex flex-wrap gap-2 text-control"
               >
                 <Button
                   v-if="statusFilter !== 'ALL'"
@@ -511,7 +504,7 @@ function fillForm() {
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Pendaftar</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pilih status dan gelombang pendaftaran.
           </DialogDescription>
         </DialogHeader>

@@ -27,8 +27,8 @@ const deltaIcon = computed(() => {
 const deltaClass = computed(() => {
   if (props.monthDelta === null || props.monthDelta === 0) return ''
   return props.monthDelta > 0
-    ? 'border-transparent bg-emerald-500/10 text-emerald-600'
-    : 'border-transparent bg-rose-500/10 text-rose-600'
+    ? 'border-transparent bg-success text-success'
+    : 'border-transparent bg-destructive text-destructive'
 })
 </script>
 
@@ -44,7 +44,9 @@ const deltaClass = computed(() => {
           </div>
           <div>
             <p class="text-xs font-medium text-muted-foreground">Total Siswa</p>
-            <p class="text-2xl font-bold tabular-nums">{{ totalStudents }}</p>
+            <p class="text-2xl font-semibold tabular-nums">
+              {{ totalStudents }}
+            </p>
           </div>
         </div>
       </CardContent>
@@ -70,7 +72,7 @@ const deltaClass = computed(() => {
                 {{ monthDelta > 0 ? '+' : '' }}{{ monthDelta }}%
               </Badge>
             </div>
-            <p class="mt-1 text-2xl font-bold tabular-nums">
+            <p class="mt-1 text-2xl font-semibold tabular-nums">
               {{ classPercentage }}%
             </p>
             <Progress
@@ -86,15 +88,15 @@ const deltaClass = computed(() => {
       <CardContent variant="standard">
         <div class="flex items-start gap-3">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/10"
+            class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-destructive"
           >
-            <Users class="size-4 text-rose-600" />
+            <Users class="size-4 text-destructive" />
           </div>
           <div>
             <p class="text-xs font-medium text-muted-foreground">
               Total Alpha (Bulan Ini)
             </p>
-            <p class="text-2xl font-bold tabular-nums">{{ totalAbsent }}</p>
+            <p class="text-2xl font-semibold tabular-nums">{{ totalAbsent }}</p>
           </div>
         </div>
       </CardContent>

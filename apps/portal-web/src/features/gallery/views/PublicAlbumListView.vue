@@ -29,9 +29,9 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="space-y-6">
     <header class="space-y-1">
-      <h1 class="text-2xl font-bold tracking-tight">Galeri</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">Galeri</h1>
       <p class="text-sm text-muted-foreground">
         Dokumentasi kegiatan MTs Persis 241 Al-Ikhlash.
       </p>

@@ -87,7 +87,7 @@ function confirmSave() {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{
             parentForm.isEditing.value
@@ -257,9 +257,7 @@ function confirmSave() {
         </form>
       </ScrollArea>
 
-      <DialogFooter
-        class="p-6 border-t bg-muted/10 flex items-center justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

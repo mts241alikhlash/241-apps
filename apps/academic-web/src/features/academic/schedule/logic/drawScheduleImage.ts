@@ -20,7 +20,7 @@ const BAND_FILL = '#fef3c7'
 const BAND_INK = '#92400e'
 const FAINT = '#cbd5e1'
 
-const FONT = "'DM Sans', ui-sans-serif, system-ui, sans-serif"
+const FONT = "'Inter', ui-sans-serif, system-ui, sans-serif"
 
 function sheetHeight(sheet: ScheduleSheet): number {
   const body = sheet.rows.reduce(

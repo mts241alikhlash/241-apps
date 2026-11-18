@@ -833,6 +833,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-rooms/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every Berita Acara the caller may see, one row per supervisor slot */
+        get: operations["ExamRoomOverviewController_roomReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-schedules": {
         parameters: {
             query?: never;
@@ -2058,6 +2075,7 @@ export interface components {
             duplicateRows: number[];
             errors: components["schemas"]["ImportErrorDto"][];
             identity: components["schemas"]["SheetIdentityDto"];
+            points: components["schemas"]["ImportCountsDto"];
             total: number;
             totalPoints: number;
             warnings: string[];
@@ -2456,6 +2474,7 @@ export interface components {
             classroomName: string | null;
             nis: string | null;
             packageTitle: string;
+            participantNumber: string | null;
             /** Format: uuid */
             scheduleId: string;
             seatNumber: number;
@@ -2570,6 +2589,23 @@ export interface components {
             endsAt: string;
             /** Format: date-time */
             startsAt: string;
+        };
+        RoomReportSummaryDto: {
+            /** Format: date-time */
+            endsAt: string;
+            registeredCount: number;
+            /** Format: uuid */
+            reportId: string | null;
+            roomCode: string;
+            /** Format: uuid */
+            roomId: string;
+            roomName: string;
+            /** Format: uuid */
+            slotId: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SUBMITTED" | "VERIFIED";
         };
         SaveAnswerDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
@@ -4718,6 +4754,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["RoomOverviewDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamRoomOverviewController_roomReports: {
+        parameters: {
+            query?: {
+                eventId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RoomReportSummaryDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

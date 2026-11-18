@@ -168,7 +168,7 @@ defineExpose({ print })
     height: var(--label-h);
     border: 0.3mm solid #000;
     overflow: hidden;
-    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     color: #000;
   }
 
@@ -214,7 +214,7 @@ defineExpose({ print })
   .unit-label-print .label-number {
     border-bottom: 0.3mm solid #000;
     font-size: var(--font-number);
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .unit-label-print .label-number .label-value {

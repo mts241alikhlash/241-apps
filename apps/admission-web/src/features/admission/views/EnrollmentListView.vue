@@ -514,12 +514,11 @@ onMounted(async () => {
       <div class="space-y-4 p-0 sm:px-0">
         <Tabs
           v-model="tab"
-          variant="line"
           class="min-w-0 gap-0"
         >
           <Card gap="none">
             <CardHeader class="p-0 shrink-0">
-              <TabsList class="w-full bg-muted/30 px-4 sm:px-6">
+              <TabsList class="w-full px-4 sm:px-6">
                 <TabsTrigger
                   v-for="item in TABS"
                   :key="item.value"
@@ -537,7 +536,7 @@ onMounted(async () => {
             </CardHeader>
 
             <CardContent
-              class="space-y-4 px-4 pt-3 pb-4 sm:px-6 sm:pt-3.5 sm:pb-6"
+              class="space-y-4 px-4 pt-3 pb-4 sm: px-4 sm:pt-3.5 sm:pb-6"
             >
               <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
@@ -592,7 +591,7 @@ onMounted(async () => {
                     <Badge
                       v-else-if="syncPending > 0"
                       variant="destructive"
-                      class="ml-1.5 text-[10px]"
+                      class="ml-1.5 text-xs"
                     >
                       {{ syncPending }} tertunda
                     </Badge>
@@ -603,7 +602,7 @@ onMounted(async () => {
               <div
                 v-if="processResult"
                 data-test="process-result"
-                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 rounded-md border p-3 text-control"
               >
                 <p class="font-medium">
                   {{ processResult.enrolled }} diproses,
@@ -628,7 +627,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.75rem)] sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-control sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -644,7 +643,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.75rem)]">
+                <p class="text-control">
                   {{ listError }}
                 </p>
                 <Button
@@ -657,13 +656,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-center text-control text-muted-foreground"
                 >
                   Memuat antrean daftar ulang…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-control text-muted-foreground"
                 >
                   {{ emptyText }}
                 </p>
@@ -688,13 +687,12 @@ onMounted(async () => {
                     class="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3 sm:px-4"
                   >
                     <div class="flex items-center gap-2">
-                      <span
-                        class="text-[length:var(--text-control,0.75rem)] font-medium"
+                      <span class="text-control font-medium"
                         >{{ selected.length }} dipilih</span
                       >
                       <span
                         v-if="selected.length > MAX_PROCESS"
-                        class="text-[length:var(--text-control,0.75rem)] text-destructive"
+                        class="text-control text-destructive"
                       >
                         Maksimal {{ MAX_PROCESS }} pendaftar sekali proses
                       </span>
@@ -726,14 +724,14 @@ onMounted(async () => {
         >
           <DialogHeader standard>
             <DialogTitle>Proses jadi santri</DialogTitle>
-            <DialogDescription class="sr-only">
+            <DialogDescription>
               {{ selected.length }} pendaftar akan diproses menjadi santri dan
               akunnya menjadi akun santri.
             </DialogDescription>
           </DialogHeader>
-          <div class="space-y-4 px-6 py-5">
+          <DialogBody class="space-y-4">
             <div
-              class="space-y-1 rounded-lg border bg-muted/10 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="space-y-1 rounded-lg border bg-muted/10 p-3 text-control"
             >
               <p class="font-medium text-foreground">
                 {{ selected.length }} pendaftar dipilih
@@ -746,11 +744,11 @@ onMounted(async () => {
             <p
               v-if="nisnError"
               role="alert"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ nisnError }}
             </p>
-          </div>
+          </DialogBody>
           <DialogFooter
             standard
             class="justify-between"
@@ -822,7 +820,7 @@ onMounted(async () => {
             </Select>
             <p
               v-if="placementError"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ placementError }}
             </p>
@@ -868,20 +866,20 @@ onMounted(async () => {
         <DialogBody>
           <p
             v-if="nisLoading"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Memuat pratinjau…
           </p>
           <p
             v-else-if="nisError"
             role="alert"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-control text-destructive"
           >
             {{ nisError }}
           </p>
           <div
             v-else-if="nisPreview"
-            class="space-y-3 text-[length:var(--text-control,0.75rem)]"
+            class="space-y-3 text-control"
           >
             <p>
               <strong>{{ nisPreview.changes }} NIS berubah</strong>,
@@ -997,15 +995,13 @@ onMounted(async () => {
               NIS dikunci
             </Badge>
           </div>
-          <DialogDescription class="text-xs text-muted-foreground">
+          <DialogDescription>
             Kelola penomoran induk santri (NIS) tahun ajaran dan status
             sinkronisasi.
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          class="space-y-4 px-6 py-5 text-[length:var(--text-control,0.75rem)]"
-        >
+        <DialogBody class="space-y-4 text-control">
           <div class="space-y-1.5">
             <p class="font-medium text-foreground">
               NIS tahun ajaran {{ currentYear.academicYearName ?? '-' }}
@@ -1030,7 +1026,6 @@ onMounted(async () => {
               </Select>
             </div>
           </div>
-
           <div
             v-if="syncPending > 0"
             class="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive"
@@ -1054,13 +1049,13 @@ onMounted(async () => {
             </p>
             <p
               v-if="currentYear.locked"
-              class="pt-1 font-medium text-amber-600 dark:text-amber-400"
+              class="pt-1 font-medium text-warning"
             >
               Tahun ajaran ini sudah dikunci. Pendaftar baru yang diterima
               setelah kunci akan melanjutkan nomor urut tertinggi.
             </p>
           </div>
-        </div>
+        </DialogBody>
 
         <DialogFooter
           standard
@@ -1078,7 +1073,7 @@ onMounted(async () => {
             <Button
               v-if="counts.done > 0 || syncPending > 0"
               variant="outline"
-              class="min-h-11 sm:min-h-0"
+              class="min-h-[var(--control-h-lg,2.25rem)] sm:min-h-0"
               :disabled="acting"
               @click="syncStudents"
             >

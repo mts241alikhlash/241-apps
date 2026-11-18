@@ -27,7 +27,7 @@ const emit = defineEmits<(e: 'update:kategori', value: string) => void>()
 </script>
 
 <template>
-  <div class="grid gap-5 md:grid-cols-2 items-start">
+  <div class="grid gap-4 md:grid-cols-2 items-start">
     <FloatingField
       v-slot="{ componentField }"
       name="nip"

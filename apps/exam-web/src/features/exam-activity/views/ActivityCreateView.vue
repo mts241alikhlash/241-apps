@@ -7,9 +7,9 @@ import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
@@ -138,7 +138,7 @@ onMounted(() => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold">
           {{
             editingId !== ''
@@ -148,12 +148,12 @@ onMounted(() => {
         </CardTitle>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <p
           v-if="error !== null"
           role="alert"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-control text-destructive"
         >
           {{ error }}
         </p>
@@ -183,7 +183,7 @@ onMounted(() => {
         <p v-else-if="loadingActivity">Memuat kegiatan…</p>
         <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

@@ -89,7 +89,7 @@ defineProps<{ payslip: Payslip }>()
               </template>
               <template v-else>Tetap</template>
             </TableCell>
-            <TableCell class="text-right font-medium">
+            <TableCell class="text-right">
               {{ line.componentType === 'DEDUCTION' ? '−' : ''
               }}{{ formatRupiah(line.amount) }}
             </TableCell>

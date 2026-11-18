@@ -6,9 +6,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { buildReviewColumns } from '../components/reviewPackageColumns'
 import { usePackageList } from '../composables/usePackageList'
@@ -57,7 +57,7 @@ onMounted(() => examPackageService.loadReferences())
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold">Persetujuan Paket Soal</CardTitle>
       </CardHeader>
       <CardContent
@@ -68,7 +68,7 @@ onMounted(() => examPackageService.loadReferences())
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -81,7 +81,6 @@ onMounted(() => examPackageService.loadReferences())
         <DataTable
           v-else
           mobile="cards"
-          row-clickable
           :columns="columns"
           :data="filtersPending ? [] : packages"
           :page="page"
@@ -91,7 +90,6 @@ onMounted(() => examPackageService.loadReferences())
           item-label="paket"
           @update:page="page = $event"
           @update:page-size="changePageSize"
-          @row-click="openPackage"
         >
           <template #header-right>
             <SearchInput
@@ -118,7 +116,7 @@ onMounted(() => examPackageService.loadReferences())
           </template>
         </DataTable>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

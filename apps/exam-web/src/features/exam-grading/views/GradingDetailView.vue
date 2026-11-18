@@ -7,9 +7,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
@@ -104,7 +104,7 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
@@ -115,7 +115,7 @@ onMounted(load)
           </div>
           <span
             v-if="detail"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             {{
               waiting > 0
@@ -128,7 +128,7 @@ onMounted(load)
         </div>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <p v-if="loading">Memuat…</p>
         <div
@@ -171,7 +171,7 @@ onMounted(load)
           />
         </template>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

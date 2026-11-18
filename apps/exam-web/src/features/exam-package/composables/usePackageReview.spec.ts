@@ -112,10 +112,10 @@ describe('usePackageReview', () => {
     approve.mockResolvedValue({ success: true, data: view() })
     const review = await loaded()
 
-    expect(await review.approve('  Bagus  ')).toBe(true)
+    expect(await review.approve('  Bagus ')).toBe(true)
     expect(approve).toHaveBeenCalledWith('p1', 'Bagus')
 
-    expect(await review.approve('   ')).toBe(true)
+    expect(await review.approve(' ')).toBe(true)
     expect(approve).toHaveBeenLastCalledWith('p1', undefined)
   })
 
@@ -135,7 +135,7 @@ describe('usePackageReview', () => {
   it('needs a general note to return a package', async () => {
     const review = await loaded()
 
-    expect(await review.returnPackage('   ')).toBe(false)
+    expect(await review.returnPackage(' ')).toBe(false)
     expect(review.returnError.value).toBe('Catatan wajib diisi')
     expect(returnPackage).not.toHaveBeenCalled()
   })
@@ -144,7 +144,7 @@ describe('usePackageReview', () => {
     returnPackage.mockResolvedValue({ success: true, data: view() })
     const review = await loaded()
     review.setNote('q1', '  Kunci salah ')
-    review.setNote('q2', '   ')
+    review.setNote('q2', ' ')
     review.setNote('ghost', 'Tidak ada')
 
     expect(await review.returnPackage('Perbaiki')).toBe(true)

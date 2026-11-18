@@ -48,7 +48,7 @@ onMounted(() => void raporService.fetchMine())
           <span class="text-xs text-muted-foreground font-medium"
             >Rata-rata:</span
           >
-          <span class="text-base font-bold tabular-nums">
+          <span class="text-base font-semibold tabular-nums">
             {{ summary.averageScore.toFixed(2) }}
           </span>
         </div>
@@ -62,7 +62,7 @@ onMounted(() => void raporService.fetchMine())
           v-if="!loading && rapors.length === 0"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             Belum ada rapor yang diterbitkan untuk Anda. Rapor akan muncul di
             sini setelah wali kelas menerbitkannya.
           </CardContent>

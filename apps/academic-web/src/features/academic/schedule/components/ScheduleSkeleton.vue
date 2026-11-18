@@ -21,7 +21,7 @@ import { Skeleton } from '@mts241alikhlash/ui/skeleton'
       <Skeleton
         v-for="i in 8"
         :key="i"
-        class="h-10 w-full"
+        class="h-[var(--control-h-lg,2.25rem)] w-full"
       />
     </div>
   </div>

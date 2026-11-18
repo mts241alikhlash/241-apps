@@ -14,7 +14,7 @@ export const getColumns = (): ColumnDef<Permission>[] => [
     accessorKey: 'code',
     header: 'Kode',
     cell: ({ row }) =>
-      h(Badge, { variant: 'outline', class: 'font-mono' }, () =>
+      h(Badge, { variant: 'outline', class: 'tabular-nums' }, () =>
         row.getValue<string>('code'),
       ),
   },

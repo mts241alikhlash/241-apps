@@ -211,7 +211,7 @@ describe('answer sync', () => {
 
   it('never sends a blank answer as pending', () => {
     const rows = rowsWith(1)
-    recordAnswer(rows, 'q2', { text: '   ' }, 2_000, () => 'c2')
+    recordAnswer(rows, 'q2', { text: ' ' }, 2_000, () => 'c2')
 
     expect(pendingRows(rows).map((row) => row.questionId)).toEqual(['q1'])
     expect(submitPayload(rows).pendingAnswers).toHaveLength(1)

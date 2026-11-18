@@ -121,7 +121,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
   <div class="space-y-6 p-4 sm:p-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Berkas & Dokumen</h1>
+        <h1 class="text-3xl font-semibold tracking-tight">Berkas & Dokumen</h1>
         <p class="text-muted-foreground text-sm mt-1">
           Unggah dan kelola dokumen unit sekolah, arsip yayasan, dan aset media.
         </p>
@@ -141,7 +141,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
 
     <div class="grid gap-6 md:grid-cols-3">
       <Card
-        class="md:col-span-1 border-dashed border-2 flex flex-col justify-center items-center p-8 text-center bg-muted/20 hover:bg-muted/30 transition-all duration-300"
+        class="md:col-span-1 border-dashed border-2 flex flex-col justify-center items-center p-4 text-center bg-muted/20 hover:bg-muted/30 transition-all duration-300"
         :class="{ 'border-primary bg-primary/5': isDragging }"
         @dragover="handleDragOver"
         @dragleave="handleDragLeave"
@@ -234,6 +234,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
                     :href="file.url"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Unduh berkas"
                   >
                     <Download class="size-4 text-muted-foreground" />
                   </a>
@@ -241,6 +242,7 @@ const formatBytes = (bytes: number, decimals = 2) => {
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Hapus berkas"
                   @click="handleDelete(file.id)"
                 >
                   <Trash2

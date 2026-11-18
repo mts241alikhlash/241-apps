@@ -9,6 +9,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -84,10 +85,7 @@ onMounted(() => void deviceService.fetch())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Perangkat Gerbang </CardTitle>
         <Button @click="showForm = true">
           <Plus class="h-4 w-4" />
@@ -98,7 +96,7 @@ onMounted(() => void deviceService.fetch())
       <CardContent class="space-y-6 p-0 sm:px-0">
         <div
           v-if="lastIssued"
-          class="space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200"
+          class="space-y-3 rounded-lg border border-warning/30 bg-warning/10 p-4 text-warning"
         >
           <div class="flex items-start gap-2 text-xs md:text-sm font-medium">
             <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0" />
@@ -115,7 +113,7 @@ onMounted(() => void deviceService.fetch())
             <Input
               :model-value="lastIssued.token"
               readonly
-              class="font-mono"
+              class="tabular-nums"
             />
             <Button
               variant="outline"
@@ -152,12 +150,12 @@ onMounted(() => void deviceService.fetch())
 
   <Dialog v-model:open="showForm">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Daftarkan Perangkat Gerbang</DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div class="space-y-1.5">
           <Label for="device-name">Nama Gerbang</Label>
           <Input
@@ -175,11 +173,9 @@ onMounted(() => void deviceService.fetch())
             placeholder="Contoh: Depan, dekat pos satpam"
           />
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="showForm = false"

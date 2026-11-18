@@ -63,8 +63,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   transform: translateY(-50%);
   padding-inline: 0.125rem;
   background-color: var(--ff-label-bg, var(--background));
-  font-size: 0.625rem;
-  line-height: 0.5rem;
+  font-size: var(--text-label, 0.6875rem);
+  line-height: 1;
   font-weight: 400;
   color: color-mix(in oklab, var(--foreground) 70%, transparent);
   pointer-events: none;
@@ -90,8 +90,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   )
   :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
-  top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px);
-  font-size: var(--text-control, 0.75rem);
+  top: calc(0.75rem + var(--control-h-md,2rem) / 2 + 0.75px);
+  font-size: var(--text-control,0.75rem);
   color: var(--muted-foreground);
 }
 
@@ -108,8 +108,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   )
   :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
-  top: calc(0.75rem + var(--control-h-md, 1.75rem) / 2 + 0.75px);
-  font-size: var(--text-control, 0.75rem);
+  top: calc(0.75rem + var(--control-h-md,2rem) / 2 + 0.75px);
+  font-size: var(--text-control,0.75rem);
   color: var(--muted-foreground);
 }
 

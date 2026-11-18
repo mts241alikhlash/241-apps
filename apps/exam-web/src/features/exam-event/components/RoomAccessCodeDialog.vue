@@ -97,7 +97,7 @@ onMounted(load)
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ error }}
@@ -106,9 +106,7 @@ onMounted(load)
           v-else
           class="space-y-2 rounded-md border p-4 text-center"
         >
-          <p
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <p class="text-control text-muted-foreground">
             {{
               action === 'rotate'
                 ? 'Putar untuk melihat token baru'
@@ -118,16 +116,12 @@ onMounted(load)
           <p class="text-2xl font-semibold tabular-nums tracking-[0.3em]">
             {{ code?.accessCode ?? '······' }}
           </p>
-          <p
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <p class="text-control text-muted-foreground">
             Berlaku sampai {{ expiresText() }} · rotasi
             {{ code?.rotation ?? 0 }}
           </p>
         </div>
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           Token berganti otomatis setiap 10 menit. Putar sekarang untuk
           membatalkan token lama seketika.
         </p>

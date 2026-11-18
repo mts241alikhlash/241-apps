@@ -14,6 +14,8 @@ it('checks saved holidays and toggles the clicked day', async () => {
         DialogContent: passthrough,
         DialogHeader: passthrough,
         DialogTitle: passthrough,
+        DialogDescription: passthrough,
+        DialogBody: passthrough,
         DialogFooter: passthrough,
       },
     },

@@ -18,7 +18,7 @@ const COLUMNS = {
     class="scroll-mt-14 bg-[#203f73] py-14 text-white sm:py-20 lg:flex lg:min-h-[calc(100svh-3.5rem)] lg:items-center lg:py-8"
   >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-6">
         <h2
           class="font-[Georgia,serif] text-4xl font-normal leading-[1.1] tracking-tight sm:text-5xl"
         >

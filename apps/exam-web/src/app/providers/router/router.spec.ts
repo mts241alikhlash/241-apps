@@ -172,6 +172,15 @@ describe('menu', () => {
             ],
           ],
           [
+            '/exam/reports',
+            undefined,
+            [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          ],
+          [
             '/exam/prints/seats',
             undefined,
             [

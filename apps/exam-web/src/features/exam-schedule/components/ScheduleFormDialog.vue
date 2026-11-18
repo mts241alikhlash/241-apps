@@ -139,14 +139,14 @@ async function save() {
         <DialogTitle>{{
           isEdit ? 'Ubah Jadwal' : 'Tambah Jadwal'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Atur paket, kelas, waktu, dan durasi ujian.
         </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
         <div
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ form.error.value }}
@@ -154,16 +154,16 @@ async function save() {
 
         <p
           v-if="isEdit"
-          class="text-[length:var(--text-control,0.75rem)]"
+          class="text-control"
         >
           {{ schedule?.packageTitle }} · {{ schedule?.classroomName ?? '-' }}
         </p>
 
-        <div class="grid gap-5 sm:grid-cols-2">
+        <div class="grid gap-4 sm:grid-cols-2">
           <template v-if="!isEdit">
             <p
               v-if="props.packageId"
-              class="self-center text-[length:var(--text-control,0.75rem)] sm:col-span-2"
+              class="self-center text-control sm:col-span-2"
             >
               {{ packageName }}
             </p>
@@ -219,7 +219,7 @@ async function save() {
             </FloatingLabelField>
             <p
               v-if="classroomsLoaded && classrooms.length === 0"
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground sm:col-span-2"
+              class="text-control text-muted-foreground sm:col-span-2"
             >
               Tidak ada kelas aktif untuk tingkat ini. Pastikan semester aktif
               sudah diatur.
@@ -346,7 +346,7 @@ async function save() {
 
         <p
           v-if="form.problem.value"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ form.problem.value }}
         </p>

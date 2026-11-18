@@ -87,8 +87,6 @@ describe('messageOf', () => {
     expect(messageOf(new Error('boom'), 'Gagal menyimpan paket.')).toBe(
       'Gagal menyimpan paket.',
     )
-    expect(messageOf(failure(409, '   '), 'Gagal menyimpan paket.')).not.toBe(
-      '   ',
-    )
+    expect(messageOf(failure(409, ' '), 'Gagal menyimpan paket.')).not.toBe(' ')
   })
 })

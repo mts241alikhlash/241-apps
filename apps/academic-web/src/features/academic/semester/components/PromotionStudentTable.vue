@@ -5,10 +5,12 @@ import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Label } from '@mts241alikhlash/ui/label'
 import {
@@ -176,7 +178,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
         v-model="filterClass"
         :disabled="uniqueClasses.length === 0"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-36">
+        <SelectTrigger class="bg-background w-36">
           <Filter class="size-3 mr-1 text-muted-foreground" />
           <SelectValue placeholder="Pilih Kelas..." />
         </SelectTrigger>
@@ -196,7 +198,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
         v-model="filterStatus"
         :disabled="!filterClass"
       >
-        <SelectTrigger class="h-8 text-xs bg-background w-32">
+        <SelectTrigger class="bg-background w-32">
           <SelectValue placeholder="Semua Status" />
         </SelectTrigger>
         <SelectContent>
@@ -232,7 +234,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
             }
           "
         >
-          <SelectTrigger class="h-8 text-xs bg-background w-36">
+          <SelectTrigger class="bg-background w-36">
             <SelectValue
               :placeholder="
                 selectedIds.size > 0
@@ -244,7 +246,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
           <SelectContent>
             <SelectItem
               value="approve"
-              class="text-xs text-green-600 focus:text-green-600"
+              class="text-xs text-success focus:text-success"
             >
               Setujui
             </SelectItem>
@@ -263,7 +265,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
           :disabled="selectedIds.size === 0"
           @update:model-value="setTargetClassroomForSelected(String($event))"
         >
-          <SelectTrigger class="h-8 w-40 text-xs bg-background">
+          <SelectTrigger class="w-40 bg-background">
             <SelectValue :placeholder="`Pindahkan ${selectedIds.size} ke...`" />
           </SelectTrigger>
           <SelectContent>
@@ -368,7 +370,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                   <p class="text-xs font-medium text-foreground">
                     Pilih kelas terlebih dahulu
                   </p>
-                  <p class="text-[11px] max-w-sm">
+                  <p class="text-xs max-w-sm">
                     Silakan pilih salah satu kelas pada filter di atas untuk
                     menampilkan dan memproses kenaikan kelas siswa.
                   </p>
@@ -422,7 +424,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                 </div>
                 <div
                   v-if="getDecision(row.studentId)?.declineReason"
-                  class="text-[11px] text-destructive mt-0.5 italic"
+                  class="text-xs text-destructive mt-0.5 italic"
                 >
                   Alasan: {{ getDecision(row.studentId)?.declineReason }}
                 </div>
@@ -431,10 +433,10 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                 <span
                   class="font-semibold tabular-nums text-xs"
                   :class="{
-                    'text-green-600':
+                    'text-success':
                       scoreStanding(row.averageScore, passingScore) ===
                       'at-or-above',
-                    'text-amber-600':
+                    'text-warning':
                       scoreStanding(row.averageScore, passingScore) === 'below',
                     'text-muted-foreground':
                       scoreStanding(row.averageScore, passingScore) ===
@@ -447,7 +449,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
               <TableCell class="text-center py-2.5">
                 <Badge
                   :variant="getActionVariant(row.recommendedAction)"
-                  class="font-medium text-[10px] px-2 py-0.5 shadow-none"
+                  class="font-medium text-xs px-2 py-0.5 shadow-none"
                 >
                   {{ getActionLabel(row.recommendedAction) }}
                 </Badge>
@@ -465,7 +467,8 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                   "
                 >
                   <SelectTrigger
-                    class="h-7 w-20 mx-auto text-[11px] justify-center text-center px-2 [&_svg]:hidden [&_[data-slot=select-value]]:justify-center"
+                    size="sm"
+                    class="w-20 mx-auto justify-center text-center px-2 [&_svg]:hidden [&_[data-slot=select-value]]:justify-center"
                     :class="
                       chosenTargetFor(row)
                         ? ''
@@ -492,7 +495,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                       ? 'destructive'
                       : 'secondary'
                   "
-                  class="font-medium text-[11px] px-2 py-0.5"
+                  class="font-medium text-xs px-2 py-0.5"
                 >
                   {{ getTargetClass(row) }}
                 </Badge>
@@ -506,7 +509,8 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                   "
                 >
                   <SelectTrigger
-                    class="h-7 w-full text-[11px]"
+                    size="sm"
+                    class="w-full"
                     :class="
                       getDecision(row.studentId)?.approved === false
                         ? 'text-destructive border-destructive/50'
@@ -541,11 +545,12 @@ function getTargetClass(row: PromotionRecommendationItem): string {
       <DialogContent
         class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden"
       >
-        <DialogHeader class="px-6 py-4 border-b shrink-0 bg-muted/20">
+        <DialogHeader standard>
           <DialogTitle>Alasan Penolakan</DialogTitle>
+        <DialogDescription>Tuliskan alasan siswa tidak dinaikkan.</DialogDescription>
         </DialogHeader>
 
-        <div class="px-6 py-4 space-y-3">
+        <DialogBody class="space-y-3">
           <div class="space-y-1.5">
             <Label
               for="promotion-decline-reason"
@@ -558,14 +563,12 @@ function getTargetClass(row: PromotionRecommendationItem): string {
               v-model="declineReason"
               placeholder="Contoh: Nilai di bawah KKM, kehadiran kurang, dll."
               rows="3"
-              class="text-xs resize-none"
+              class="resize-none"
             />
           </div>
-        </div>
+        </DialogBody>
 
-        <DialogFooter
-          class="border-t px-6 py-3 flex justify-end gap-2 bg-muted/10"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             size="sm"

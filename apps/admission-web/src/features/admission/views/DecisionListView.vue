@@ -357,12 +357,11 @@ onMounted(async () => {
       <div class="space-y-4 p-0 sm:px-0">
         <Tabs
           v-model="tab"
-          variant="line"
           class="min-w-0 gap-0"
         >
           <Card gap="none">
             <CardHeader class="p-0 shrink-0">
-              <TabsList class="w-full bg-muted/30 px-4 sm:px-6">
+              <TabsList class="w-full px-4 sm:px-6">
                 <TabsTrigger
                   v-for="item in TABS"
                   :key="item.value"
@@ -380,7 +379,7 @@ onMounted(async () => {
             </CardHeader>
 
             <CardContent
-              class="space-y-4 px-4 pt-3 pb-4 sm:px-6 sm:pt-3.5 sm:pb-6"
+              class="space-y-4 px-4 pt-3 pb-4 sm: px-4 sm:pt-3.5 sm:pb-6"
             >
               <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
@@ -419,7 +418,7 @@ onMounted(async () => {
               <div
                 v-if="manyResult"
                 data-test="many-result"
-                class="space-y-1 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+                class="space-y-1 rounded-md border p-3 text-control"
               >
                 <p class="font-medium">
                   {{ manyResult.accepted }} diterima,
@@ -445,7 +444,7 @@ onMounted(async () => {
               >
                 <label
                   data-test="select-all"
-                  class="flex min-h-11 items-center gap-2 text-[length:var(--text-control,0.75rem)] sm:min-h-0"
+                  class="flex min-h-[var(--control-h-lg,2.25rem)] items-center gap-2 text-control sm:min-h-0"
                 >
                   <Checkbox
                     :model-value="allSelected"
@@ -461,7 +460,7 @@ onMounted(async () => {
                 class="space-y-3 rounded-md border p-4"
                 role="alert"
               >
-                <p class="text-[length:var(--text-control,0.75rem)]">
+                <p class="text-control">
                   {{ listError }}
                 </p>
                 <Button
@@ -474,13 +473,13 @@ onMounted(async () => {
               <template v-else>
                 <p
                   v-if="loading && !rows.length"
-                  class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="text-center text-control text-muted-foreground"
                 >
                   Memuat antrean keputusan…
                 </p>
                 <p
                   v-else-if="!rows.length"
-                  class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                  class="rounded-md border p-4 text-center text-control text-muted-foreground"
                 >
                   {{ emptyText }}
                 </p>
@@ -503,8 +502,7 @@ onMounted(async () => {
                     data-test="selection-bar"
                     class="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/20 p-3 sm:px-4"
                   >
-                    <span
-                      class="text-[length:var(--text-control,0.75rem)] font-medium"
+                    <span class="text-control font-medium"
                       >{{ selected.length }} dipilih</span
                     >
                     <Button
@@ -531,7 +529,7 @@ onMounted(async () => {
           <DialogTitle>{{
             actionKind ? DIALOG_TITLES[actionKind] : ''
           }}</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             {{ actionKind ? DIALOG_TITLES[actionKind] : '' }}
           </DialogDescription>
         </DialogHeader>

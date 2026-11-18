@@ -791,7 +791,7 @@ describe('useApplicationFormState', () => {
         },
         {
           year: '2024',
-          competitionName: '  ',
+          competitionName: ' ',
           competitionFieldId: '',
           organizer: '',
           competitionLevelId: '',

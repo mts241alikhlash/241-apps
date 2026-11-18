@@ -12,6 +12,7 @@ import type {
   RoomOverview,
   RoomReport,
   RoomReportPayload,
+  RoomReportSummary,
   SessionTimelineEntry,
   SupervisorSlotRow,
 } from '../types'
@@ -171,6 +172,17 @@ export const examRoomService = {
     } catch (err: unknown) {
       toast.error(messageOf(err, 'Gagal mengizinkan masuk terlambat.'))
       return false
+    }
+  },
+
+  async loadReports(eventId?: string): Promise<Outcome<RoomReportSummary[]>> {
+    try {
+      const response = await examRoomApi.getReports(
+        eventId === undefined ? undefined : { eventId },
+      )
+      return { success: true, data: response }
+    } catch (err: unknown) {
+      return failure(err, 'Gagal memuat daftar berita acara.')
     }
   },
 

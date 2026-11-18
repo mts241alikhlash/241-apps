@@ -138,12 +138,12 @@ watch(
     @update:open="handleDialogClose"
   >
     <DialogContent class="sm:max-w-[450px] p-0 overflow-hidden">
-      <DialogHeader class="px-6 pt-6 pb-4 bg-muted/20 border-b">
+      <DialogHeader standard>
         <DialogTitle class="flex items-center gap-2">
-          <FileSpreadsheet class="size-5 text-emerald-600" />
+          <FileSpreadsheet class="size-5 text-success" />
           Manajemen Data Excel
         </DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           {{ labels.dialogDescription }}
         </DialogDescription>
       </DialogHeader>
@@ -203,9 +203,7 @@ watch(
               class="bg-muted/30 border rounded-xl p-4 flex items-center justify-between"
             >
               <div class="flex items-center gap-3 overflow-hidden">
-                <div
-                  class="p-2 bg-emerald-100 text-emerald-600 rounded-lg shrink-0"
-                >
+                <div class="p-2 bg-success/10 text-success rounded-lg shrink-0">
                   <FileType class="size-5" />
                 </div>
                 <div class="min-w-0 pr-4">
@@ -221,6 +219,7 @@ watch(
                 variant="ghost"
                 size="icon"
                 class="shrink-0 text-muted-foreground hover:text-destructive"
+                aria-label="Hapus berkas"
                 @click="clearFile"
               >
                 <XCircle class="size-4" />
@@ -244,7 +243,7 @@ watch(
 
             <Alert
               variant="default"
-              class="bg-blue-50/30 border-blue-100 text-blue-900 text-xs"
+              class="bg-info/10 border-info/30 text-info text-xs"
             >
               <Info class="size-4" />
               <AlertTitle>Penting</AlertTitle>
@@ -257,7 +256,6 @@ watch(
             <div class="flex items-center justify-between pt-2">
               <Button
                 variant="outline"
-                class="text-xs h-9"
                 :disabled="isProcessing"
                 @click="$emit('downloadTemplate')"
               >
@@ -266,7 +264,6 @@ watch(
               </Button>
 
               <Button
-                class="h-9"
                 :disabled="!selectedFile || isProcessing"
                 @click="handleImport"
               >
@@ -287,7 +284,7 @@ watch(
               class="bg-muted/30 border rounded-xl p-6 text-center space-y-3"
             >
               <div
-                class="mx-auto w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2 ring-4 ring-emerald-50"
+                class="mx-auto w-12 h-12 bg-success/10 text-success rounded-full flex items-center justify-center mb-2 ring-4 ring-success/30"
               >
                 <Inbox class="size-6" />
               </div>

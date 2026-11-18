@@ -73,7 +73,7 @@ function go(step: number) {
         <p class="text-xs font-medium text-white/80">
           {{ slides[current].title }}
         </p>
-        <p class="mt-0.5 text-[11px] text-white/60">
+        <p class="mt-0.5 text-xs text-white/60">
           {{ slides[current].caption }}
         </p>
       </div>

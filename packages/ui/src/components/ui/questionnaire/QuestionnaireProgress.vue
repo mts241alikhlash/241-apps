@@ -44,7 +44,7 @@ const label = computed(() =>
     :data-total="root.total.value"
     :class="
       cn(
-        'text-[0.625rem] min-h-[1lh] w-fit min-w-[14ch] font-medium text-muted-foreground tabular-nums',
+        'text-xs min-h-[1lh] w-fit min-w-[14ch] font-medium text-muted-foreground tabular-nums',
         props.class,
       )
     "

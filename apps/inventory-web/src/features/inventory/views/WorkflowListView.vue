@@ -161,17 +161,17 @@ onMounted(() => {
           <Card
             v-for="wf in workflows"
             :key="wf.id"
-            class="border shadow-none rounded-xl overflow-hidden bg-card"
+            class="border shadow-none overflow-hidden bg-card"
           >
             <div class="p-5 border-b flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-lg text-foreground">
+                <h3 class="text-lg font-semibold text-foreground">
                   {{ wf.name }}
                 </h3>
                 <p class="text-xs text-muted-foreground mt-0.5">
                   Entity Target:
                   <span
-                    class="font-mono text-primary bg-primary/5 px-1.5 py-0.5 rounded-md"
+                    class="tabular-nums text-primary bg-primary/5 px-1.5 py-0.5 rounded-md"
                     >{{ wf.targetEntity }}</span
                   >
                 </p>
@@ -280,9 +280,9 @@ onMounted(() => {
           <Label>Tahapan</Label>
           <p class="text-xs text-muted-foreground">
             Isi dengan kode role, bukan nama orang, mis.
-            <span class="font-mono">ADMIN_INVENTARIS</span>,
-            <span class="font-mono">KEPALA_SEKOLAH</span>. Role dengan kode itu
-            harus ada di Manajemen Role.
+            <span class="tabular-nums">ADMIN_INVENTARIS</span>,
+            <span class="tabular-nums">KEPALA_SEKOLAH</span>. Role dengan kode
+            itu harus ada di Manajemen Role.
           </p>
           <div
             v-for="(step, index) in form.steps"
@@ -298,12 +298,13 @@ onMounted(() => {
               <Input
                 v-model="step.approverRoleCode"
                 placeholder="Kode role penyetuju"
-                class="font-mono"
+                class="tabular-nums"
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
+                aria-label="Hapus tahap"
                 :disabled="form.steps.length === 1"
                 @click="removeStep(index)"
               >

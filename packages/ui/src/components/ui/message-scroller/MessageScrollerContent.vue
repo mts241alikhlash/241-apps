@@ -62,7 +62,7 @@ onBeforeUnmount(() => {
     data-slot="message-scroller-content"
     role="log"
     aria-relevant="additions"
-    :class="cn('flex h-max min-h-full flex-col gap-8', props.class)"
+    :class="cn('flex h-max min-h-full flex-col gap-6', props.class)"
   >
     <slot />
     <div

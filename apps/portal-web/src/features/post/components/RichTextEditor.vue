@@ -32,8 +32,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      class:
-        'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none dark:prose-invert',
+      class: 'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none',
     },
   },
   onUpdate: ({ editor: instance }) => {
@@ -90,7 +89,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('bold') }"
         title="Tebal"
         @click="editor.chain().focus().toggleBold().run()"
@@ -101,7 +99,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('italic') }"
         title="Miring"
         @click="editor.chain().focus().toggleItalic().run()"
@@ -118,7 +115,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('heading', { level: 2 }) }"
         title="Judul bagian"
         @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
@@ -129,7 +125,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('heading', { level: 3 }) }"
         title="Sub-judul"
         @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
@@ -146,7 +141,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('bulletList') }"
         title="Daftar butir"
         @click="editor.chain().focus().toggleBulletList().run()"
@@ -157,7 +151,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('orderedList') }"
         title="Daftar bernomor"
         @click="editor.chain().focus().toggleOrderedList().run()"
@@ -168,7 +161,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('blockquote') }"
         title="Kutipan"
         @click="editor.chain().focus().toggleBlockquote().run()"
@@ -179,7 +171,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('link') }"
         title="Tautan"
         @click="promptForLink"
@@ -190,7 +181,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         title="Sisipkan gambar"
         @click="libraryOpen = true"
       >
@@ -206,7 +196,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         title="Batalkan"
         @click="editor.chain().focus().undo().run()"
       >
@@ -216,7 +205,6 @@ function onSelectImage(selection: MediaSelection) {
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         title="Ulangi"
         @click="editor.chain().focus().redo().run()"
       >

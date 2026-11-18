@@ -33,6 +33,7 @@ import { SubstituteSupervisorUseCase } from '../../application/use-cases/substit
 import { AllowLateEntryUseCase } from '../../../exam-session/application/use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ExtendRoomTimeUseCase } from '../../application/use-cases/extend-room-time/extend-room-time.use-case.js'
 import { GetRoomMonitorUseCase } from '../../application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
+import { ListRoomReportsUseCase } from '../../application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from '../../application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
 import { GetRoomReportUseCase } from '../../application/use-cases/get-room-report/get-room-report.use-case.js'
 import { SaveRoomReportUseCase } from '../../application/use-cases/save-room-report/save-room-report.use-case.js'
@@ -57,6 +58,8 @@ import {
   RoomOverviewDto,
   RoomOverviewQueryDto,
   RoomReportDto,
+  RoomReportListQueryDto,
+  RoomReportSummaryDto,
   UpdateRoomReportDto,
 } from './dto/room-monitor.dto.js'
 import {
@@ -510,7 +513,10 @@ export class ExamRoomController {
 @UseGuards(JwtAuthGuard)
 @Controller('exam-rooms')
 export class ExamRoomOverviewController {
-  constructor(private readonly overview: ListRoomsOverviewUseCase) {}
+  constructor(
+    private readonly overview: ListRoomsOverviewUseCase,
+    private readonly listReports: ListRoomReportsUseCase,
+  ) {}
 
   @Get('overview')
   @RequireAnyPermission(
@@ -529,5 +535,25 @@ export class ExamRoomOverviewController {
     return (await this.overview.execute(user, query)).map((row) =>
       RoomOverviewDto.fromDomain(row),
     )
+  }
+
+  @Get('reports')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  )
+  @ApiOperation({
+    summary:
+      'Every Berita Acara the caller may see, one row per supervisor slot',
+  })
+  @ApiResponse({ status: 200, type: [RoomReportSummaryDto] })
+  async roomReports(
+    @CurrentUser() user: RoomStaffUser,
+    @Query() query: RoomReportListQueryDto,
+  ): Promise<RoomReportSummaryDto[]> {
+    return (
+      await this.listReports.execute(user, { eventId: query.eventId })
+    ).map((row) => RoomReportSummaryDto.fromDomain(row))
   }
 }

@@ -11,9 +11,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
@@ -199,7 +199,7 @@ onMounted(async () => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Kegiatan Ujian"
@@ -219,16 +219,14 @@ onMounted(async () => {
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <div
           v-if="loadFailed"
           class="space-y-3"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
-            Kegiatan ujian tidak dapat dimuat.
-          </p>
+          <p class="text-control">Kegiatan ujian tidak dapat dimuat.</p>
           <Button
             variant="outline"
             @click="load()"
@@ -238,9 +236,7 @@ onMounted(async () => {
         </div>
 
         <template v-else-if="event">
-          <div
-            class="flex flex-wrap items-center gap-2 text-[length:var(--text-control,0.75rem)]"
-          >
+          <div class="flex flex-wrap items-center gap-2 text-control">
             <Badge :variant="eventStatusVariant(event.status)">
               {{ eventStatusLabel(event.status) }}
             </Badge>
@@ -253,10 +249,7 @@ onMounted(async () => {
             </span>
           </div>
 
-          <Tabs
-            v-model="tab"
-            variant="line"
-          >
+          <Tabs v-model="tab">
             <TabsList>
               <TabsTrigger value="rooms">Ruangan &amp; Teknisi</TabsTrigger>
               <TabsTrigger value="seats">Pembagian Kursi Siswa</TabsTrigger>
@@ -311,7 +304,7 @@ onMounted(async () => {
           </Tabs>
         </template>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <RoomFormDialog
@@ -346,7 +339,7 @@ onMounted(async () => {
         <DialogBody class="space-y-4">
           <div
             v-if="extendError"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="alert"
           >
             {{ extendError }}

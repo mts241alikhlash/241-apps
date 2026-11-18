@@ -98,7 +98,7 @@ const onSubmit = handleSubmit((values) => {
         <DialogTitle>
           {{ isEdit ? 'Ubah Pengumuman' : 'Buat Pengumuman' }}
         </DialogTitle>
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
       <div class="min-h-0 flex-1 overflow-y-auto">

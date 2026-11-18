@@ -10,10 +10,12 @@ import {
 import { DatePicker } from '@mts241alikhlash/ui'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Label } from '@mts241alikhlash/ui/label'
 import {
@@ -206,7 +208,7 @@ async function handleConfirmGraduate() {
                 :class="
                   graduationDate
                     ? 'text-foreground'
-                    : 'text-amber-600 dark:text-amber-400 font-medium italic'
+                    : 'text-warning font-medium italic'
                 "
               >
                 {{ formattedGraduationDate }}
@@ -215,15 +217,15 @@ async function handleConfirmGraduate() {
                 <PopoverTrigger as-child>
                   <Button
                     variant="outline"
-                    size="sm"
-                    class="h-6 text-[11px] px-2 gap-1 font-normal text-muted-foreground hover:text-foreground"
+                    size="xs"
+                    class="px-2 gap-1 font-normal text-muted-foreground hover:text-foreground"
                   >
                     <Pencil class="size-3" />
                     {{ graduationDate ? 'Ubah' : 'Atur' }}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                  class="w-auto p-3 space-y-2.5"
+                  class="w-auto p-3 space-y-3"
                   align="start"
                 >
                   <div class="space-y-1">
@@ -234,23 +236,23 @@ async function handleConfirmGraduate() {
                       v-model="graduationDate"
                       placeholder="Pilih Tanggal Lulus"
                       :allow-future-dates="true"
-                      class="h-8 text-xs w-44"
+                      class="w-44"
                     />
                   </div>
                   <div class="flex items-center justify-between gap-2 pt-1">
                     <Button
                       v-if="graduationDate"
                       variant="ghost"
-                      size="sm"
-                      class="h-6 text-[11px] px-2 text-muted-foreground"
+                      size="xs"
+                      class="px-2 text-muted-foreground"
                       @click="clearGraduationDate"
                     >
                       Hapus
                     </Button>
                     <div v-else />
                     <Button
-                      size="sm"
-                      class="h-6 text-[11px] px-2.5"
+                      size="xs"
+                      class="px-2.5"
                       @click="isDatePopoverOpen = false"
                     >
                       Selesai
@@ -275,7 +277,7 @@ async function handleConfirmGraduate() {
         >
           <div class="flex items-center gap-4 text-xs">
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-green-500" />
+              <div class="size-2.5 rounded-full bg-success" />
               <span class="text-muted-foreground">
                 Lulus:
                 <strong class="text-foreground">{{
@@ -284,7 +286,7 @@ async function handleConfirmGraduate() {
               </span>
             </div>
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-amber-500" />
+              <div class="size-2.5 rounded-full bg-warning" />
               <span class="text-muted-foreground">
                 Tidak Lulus:
                 <strong class="text-foreground">{{
@@ -320,25 +322,24 @@ async function handleConfirmGraduate() {
     <DialogContent
       class="sm:max-w-3xl flex flex-col gap-0 p-0 overflow-hidden max-h-[90svh]"
     >
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Konfirmasi Kelulusan</DialogTitle>
+        <DialogDescription>Periksa siswa yang lulus dan yang belum, lalu konfirmasi.</DialogDescription>
       </DialogHeader>
 
-      <div class="overflow-y-auto px-6 py-4 space-y-4">
+      <DialogBody class="space-y-4">
         <div class="overflow-x-auto rounded-xl border bg-background shadow-xs">
           <Table class="min-w-[500px]">
-            <TableHeader class="bg-muted/50">
+            <TableHeader>
               <TableRow>
-                <TableHead class="text-center text-xs font-semibold w-[120px]">
+                <TableHead class="text-center text-xs w-[120px]">
                   NIS
                 </TableHead>
-                <TableHead class="text-xs font-semibold">
-                  Nama Siswa
-                </TableHead>
-                <TableHead class="text-center text-xs font-semibold w-[110px]">
+                <TableHead class="text-xs"> Nama Siswa </TableHead>
+                <TableHead class="text-center text-xs w-[110px]">
                   Kelas
                 </TableHead>
-                <TableHead class="text-center text-xs font-semibold w-[120px]">
+                <TableHead class="text-center text-xs w-[120px]">
                   Status
                 </TableHead>
               </TableRow>
@@ -361,7 +362,7 @@ async function handleConfirmGraduate() {
                   </div>
                   <div
                     v-if="row.declineReason"
-                    class="text-[11px] text-destructive italic mt-0.5"
+                    class="text-xs text-destructive italic mt-0.5"
                   >
                     Alasan: {{ row.declineReason }}
                   </div>
@@ -371,11 +372,7 @@ async function handleConfirmGraduate() {
                 </TableCell>
                 <TableCell
                   class="text-center py-2 text-xs font-medium"
-                  :class="
-                    row.approved
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-destructive'
-                  "
+                  :class="row.approved ? 'text-success' : 'text-destructive'"
                 >
                   {{ row.approved ? 'Lulus' : 'Tidak Lulus' }}
                 </TableCell>
@@ -383,24 +380,22 @@ async function handleConfirmGraduate() {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-3.5 border-t shrink-0 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3 w-full"
-      >
+      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3">
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="summaryStats.approved > 0"
-            class="flex items-center gap-1.5 font-medium text-green-600 dark:text-green-400"
+            class="flex items-center gap-1.5 font-medium text-success"
           >
-            <div class="size-2 rounded-full bg-green-500" />
+            <div class="size-2 rounded-full bg-success" />
             {{ summaryStats.approved }} Lulus
           </div>
           <div
             v-if="summaryStats.declined > 0"
-            class="flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400"
+            class="flex items-center gap-1.5 font-medium text-warning"
           >
-            <div class="size-2 rounded-full bg-amber-500" />
+            <div class="size-2 rounded-full bg-warning" />
             {{ summaryStats.declined }} Tidak Lulus
           </div>
           <div class="text-muted-foreground">

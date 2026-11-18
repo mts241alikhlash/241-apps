@@ -6,9 +6,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { Printer } from '@lucide/vue'
 import { examRoomService } from '../services/examRoomService'
@@ -52,6 +52,13 @@ const schoolName = computed(() => letterhead.value?.name ?? '')
 
 const rosterShort = computed(() => rosterTotal.value > roster.value.length)
 
+const roomCode = computed(() =>
+  (meta.value?.room.code ?? '').trim().replace(/^[A-Za-z]+/, ''),
+)
+
+const seatLabel = (seatNumber: number): string =>
+  String(seatNumber).padStart(2, '0')
+
 const slotWindow = computed(() => {
   const slot = report.value?.slot
   if (!slot) return '-'
@@ -84,6 +91,11 @@ const technicianName = computed(
     (meta.value ? meta.value.room.technicianName : null) ??
     '......................',
 )
+
+function goBack() {
+  if (router.options.history.state.back) router.back()
+  else void router.push('/exam/reports')
+}
 
 function print() {
   document.body.classList.add('printing-report')
@@ -129,12 +141,12 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
-              label="Kembali ke Ruang Ujian"
-              @click="router.push(`/exam/rooms/${roomId}`)"
+              label="Kembali"
+              @click="goBack"
             />
             <CardTitle class="font-semibold">Cetak Berita Acara</CardTitle>
           </div>
@@ -149,11 +161,11 @@ onMounted(load)
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
           role="alert"
         >
           <p>{{ error }}</p>
@@ -169,18 +181,18 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Menyiapkan dokumen...
         </p>
 
         <div
           v-else-if="report"
-          class="exam-report mx-auto max-w-[210mm] space-y-6 bg-white p-8 text-black"
+          class="exam-report mx-auto w-full min-w-0 max-w-[210mm] space-y-6 bg-white p-8 text-black"
         >
           <p
             v-if="rosterShort"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
             role="alert"
           >
             Daftar hadir memuat {{ roster.length }} dari
@@ -188,7 +200,7 @@ onMounted(load)
           </p>
           <header class="border-b-2 border-black pb-3">
             <div class="text-center">
-              <p class="text-[length:var(--text-control,0.75rem)] uppercase">
+              <p class="text-control uppercase">
                 Kementerian Agama Republik Indonesia
               </p>
               <p
@@ -199,13 +211,13 @@ onMounted(load)
               </p>
               <p
                 v-if="address"
-                class="text-[length:var(--text-control,0.75rem)]"
+                class="text-control"
               >
                 {{ address }}
               </p>
               <p
                 v-if="letterhead?.nsm || letterhead?.npsn"
-                class="text-[length:var(--text-control,0.75rem)] tabular-nums"
+                class="text-control tabular-nums"
               >
                 <span v-if="letterhead?.nsm">NSM {{ letterhead.nsm }}</span>
                 <span v-if="letterhead?.npsn">
@@ -219,16 +231,16 @@ onMounted(load)
             <h1 class="text-base font-semibold uppercase">
               Berita Acara Pelaksanaan Ujian
             </h1>
-            <p class="text-[length:var(--text-control,0.75rem)] tabular-nums">
-              {{ meta ? `${meta.room.code} · ${meta.room.name} · ` : ''
+            <p class="text-control tabular-nums">
+              {{ meta ? `${roomCode} · ${meta.room.name} · ` : ''
               }}{{ slotWindow }}
             </p>
-            <p class="text-[length:var(--text-control,0.75rem)]">
+            <p class="text-control">
               Status: {{ reportStatusLabel(report.status) }}
             </p>
           </div>
 
-          <p class="text-[length:var(--text-control,0.75rem)] leading-relaxed">
+          <p class="text-control leading-relaxed">
             Pada hari ini, {{ slotWindow }}, telah dilaksanakan ujian di
             {{ meta ? meta.room.name : 'ruangan ini' }}. Jumlah peserta
             terdaftar {{ totals.registered }} siswa, hadir
@@ -238,108 +250,104 @@ onMounted(load)
           </p>
 
           <section class="space-y-2">
-            <h2 class="text-[length:var(--text-control,0.75rem)] font-semibold">
-              Rekap Kehadiran
-            </h2>
-            <table
-              class="w-full border-collapse text-[length:var(--text-control,0.75rem)]"
-            >
-              <thead>
-                <tr class="border-y border-black">
-                  <th class="py-1 text-left">Mata Pelajaran</th>
-                  <th class="py-1 text-left">Rombel</th>
-                  <th class="py-1 text-center">Terdaftar</th>
-                  <th class="py-1 text-center">Hadir</th>
-                  <th class="py-1 text-center">Terkumpul</th>
-                  <th class="py-1 text-center">Tidak Hadir</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in report.schedules"
-                  :key="row.scheduleId"
-                  class="border-b border-black/30"
-                >
-                  <td class="py-1">
-                    {{ row.subjectName ?? row.packageTitle }}
-                  </td>
-                  <td class="py-1">{{ row.classroomName ?? '-' }}</td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.registeredCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.startedCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.submittedCount }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.absentCount }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <h2 class="text-control font-semibold">Rekap Kehadiran</h2>
+            <div class="overflow-x-auto print:overflow-visible">
+              <table class="w-full min-w-[32rem] border-collapse text-control">
+                <thead>
+                  <tr class="border-y border-black">
+                    <th class="py-1 text-left">Mata Pelajaran</th>
+                    <th class="py-1 text-left">Rombel</th>
+                    <th class="py-1 text-center">Terdaftar</th>
+                    <th class="py-1 text-center">Hadir</th>
+                    <th class="py-1 text-center">Terkumpul</th>
+                    <th class="py-1 text-center">Tidak Hadir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="row in report.schedules"
+                    :key="row.scheduleId"
+                    class="border-b border-black/30"
+                  >
+                    <td class="py-1">
+                      {{ row.subjectName ?? row.packageTitle }}
+                    </td>
+                    <td class="py-1">{{ row.classroomName ?? '-' }}</td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.registeredCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.startedCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.submittedCount }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ row.absentCount }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section class="space-y-2">
-            <h2 class="text-[length:var(--text-control,0.75rem)] font-semibold">
-              Daftar Hadir Peserta
-            </h2>
-            <table
-              class="w-full border-collapse text-[length:var(--text-control,0.75rem)]"
-            >
-              <thead>
-                <tr class="border-y border-black">
-                  <th class="py-1 text-center">No</th>
-                  <th class="py-1 text-center">Kursi</th>
-                  <th class="py-1 text-left">Nama</th>
-                  <th class="py-1 text-left">NIS</th>
-                  <th class="py-1 text-left">Kelas</th>
-                  <th class="py-1 text-left">Kehadiran</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(row, index) in roster"
-                  :key="`${row.studentId}-${row.scheduleId}`"
-                  class="border-b border-black/30"
-                >
-                  <td class="py-1 text-center tabular-nums">
-                    {{ index + 1 }}
-                  </td>
-                  <td class="py-1 text-center tabular-nums">
-                    {{ row.seatNumber }}
-                  </td>
-                  <td class="py-1">{{ row.studentName ?? '-' }}</td>
-                  <td class="py-1 tabular-nums">{{ row.nis ?? '-' }}</td>
-                  <td class="py-1">{{ row.classroomName ?? '-' }}</td>
-                  <td class="py-1">
-                    {{
-                      row.absence
-                        ? `Tidak hadir: ${reasonLabel(row.absence.reason)}`
-                        : row.session
-                          ? 'Hadir'
-                          : 'Belum mulai'
-                    }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <h2 class="text-control font-semibold">Daftar Hadir Peserta</h2>
+            <div class="overflow-x-auto print:overflow-visible">
+              <table class="w-full min-w-[32rem] border-collapse text-control">
+                <thead>
+                  <tr class="border-y border-black">
+                    <th class="py-1 text-center">No</th>
+                    <th class="py-1 text-center">Kursi</th>
+                    <th class="py-1 text-left">Nama</th>
+                    <th class="py-1 text-left">NIS</th>
+                    <th class="py-1 text-left">Kelas</th>
+                    <th class="py-1 text-left">Kehadiran</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(row, index) in roster"
+                    :key="`${row.studentId}-${row.scheduleId}`"
+                    class="border-b border-black/30"
+                  >
+                    <td class="py-1 text-center tabular-nums">
+                      {{ index + 1 }}
+                    </td>
+                    <td class="py-1 text-center tabular-nums">
+                      {{ seatLabel(row.seatNumber) }}
+                    </td>
+                    <td class="py-1">{{ row.studentName ?? '-' }}</td>
+                    <td class="py-1 tabular-nums">{{ row.nis ?? '-' }}</td>
+                    <td class="py-1">{{ row.classroomName ?? '-' }}</td>
+                    <td class="py-1">
+                      {{
+                        row.absence
+                          ? `Tidak hadir: ${reasonLabel(row.absence.reason)}`
+                          : row.session
+                            ? 'Hadir'
+                            : 'Belum mulai'
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section class="space-y-1">
-            <h2 class="text-[length:var(--text-control,0.75rem)] font-semibold">
+            <h2 class="text-control font-semibold">
               Catatan Insiden &amp; Tindakan Teknis
             </h2>
             <p
               v-if="report.auditLogs.length === 0"
-              class="text-[length:var(--text-control,0.75rem)]"
+              class="text-control"
             >
               Tidak ada tindakan teknis pada jam ujian ini.
             </p>
             <ol
               v-else
-              class="list-decimal space-y-1 pl-5 text-[length:var(--text-control,0.75rem)]"
+              class="list-decimal space-y-1 pl-5 text-control"
             >
               <li
                 v-for="entry in report.auditLogs"
@@ -354,14 +362,10 @@ onMounted(load)
               v-if="report.fieldNotes.length > 0"
               class="space-y-1"
             >
-              <h3
-                class="text-[length:var(--text-control,0.75rem)] font-semibold"
-              >
+              <h3 class="text-control font-semibold">
                 Catatan Pelanggaran Fisik
               </h3>
-              <ol
-                class="list-decimal space-y-1 pl-5 text-[length:var(--text-control,0.75rem)]"
-              >
+              <ol class="list-decimal space-y-1 pl-5 text-control">
                 <li
                   v-for="note in report.fieldNotes"
                   :key="note.id"
@@ -375,15 +379,13 @@ onMounted(load)
             </div>
             <p
               v-if="report.incidentNotes"
-              class="text-[length:var(--text-control,0.75rem)]"
+              class="text-control"
             >
               Catatan pengawas: {{ report.incidentNotes }}
             </p>
           </section>
 
-          <section
-            class="flex justify-between gap-8 pt-6 text-[length:var(--text-control,0.75rem)]"
-          >
+          <section class="flex justify-between gap-6 pt-6 text-control">
             <div class="text-center">
               <p>Pengawas Ruangan</p>
               <div class="h-16" />
@@ -397,7 +399,7 @@ onMounted(load)
           </section>
         </div>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

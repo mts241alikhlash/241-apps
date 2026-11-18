@@ -135,9 +135,7 @@ function toHHMM(val: string): string {
           <div class="cell break-cell">
             {{ formatPukul(ts.startTime, ts.endTime) }}
           </div>
-          <div
-            class="cell break-cell font-semibold text-amber-600 dark:text-amber-400"
-          >
+          <div class="cell break-cell font-semibold text-warning">
             {{ formatEntityName(ts.name) }}
           </div>
           <div
@@ -185,9 +183,7 @@ function toHHMM(val: string): string {
             ]"
           >
             <template v-if="overlayMap[ts.id]?.[day.value]">
-              <span
-                class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 italic"
-              >
+              <span class="text-xs font-semibold text-warning italic">
                 {{ formatEntityName(overlayMap[ts.id][day.value].name) }}
               </span>
             </template>
@@ -201,7 +197,7 @@ function toHHMM(val: string): string {
                   isStudent &&
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
                 "
-                class="text-[10px] text-muted-foreground mt-0.5 truncate"
+                class="text-xs text-muted-foreground mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
@@ -213,7 +209,7 @@ function toHHMM(val: string): string {
                   !isStudent &&
                   lessonMap[ts.id]?.[day.value]?.classroom?.name
                 "
-                class="text-[10px] text-primary/80 font-medium mt-0.5 truncate"
+                class="text-xs text-primary/80 font-medium mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.classroom?.code ??
@@ -226,7 +222,7 @@ function toHHMM(val: string): string {
                   !isPersonal &&
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
                 "
-                class="text-[10px] text-muted-foreground mt-0.5 truncate"
+                class="text-xs text-muted-foreground mt-0.5 truncate"
               >
                 {{
                   lessonMap[ts.id]?.[day.value]?.employee?.user?.profile?.name
@@ -254,7 +250,7 @@ function toHHMM(val: string): string {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  font-size: 0.6875rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   color: var(--muted-foreground);
   border-bottom: 1px solid var(--border);
@@ -264,8 +260,8 @@ function toHHMM(val: string): string {
 .header-cell {
   background: var(--muted);
   color: var(--muted-foreground);
-  font-weight: 700;
-  font-size: 0.6875rem;
+  font-weight: 600;
+  font-size: var(--text-xs);
   padding: 0.375rem;
 }
 

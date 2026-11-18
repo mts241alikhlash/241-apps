@@ -28,9 +28,7 @@ const props = defineProps<{
   log: AuditLog | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
 const open = computed({
   get: () => props.open,
@@ -90,7 +88,7 @@ const copyToClipboard = () => {
   <Sheet v-model:open="open">
     <SheetContent class="w-full sm:max-w-lg flex flex-col gap-0 border-l p-0">
       <SheetHeader class="px-6 py-6 border-b shrink-0 bg-muted/20">
-        <SheetTitle class="text-xl font-bold">
+        <SheetTitle class="text-xl font-semibold">
           Detail Log Aktivitas
         </SheetTitle>
         <SheetDescription>
@@ -107,7 +105,7 @@ const copyToClipboard = () => {
             <div class="flex items-center justify-between">
               <Badge
                 :variant="getActionVariant(log.action)"
-                class="capitalize font-semibold text-xs py-1 px-3"
+                class="capitalize font-semibold"
               >
                 {{ log.action }}
               </Badge>
@@ -140,7 +138,7 @@ const copyToClipboard = () => {
                   <FileJson class="size-3.5" /> Modul / Entitas
                 </span>
                 <span
-                  class="col-span-2 font-mono text-xs font-semibold bg-muted px-2 py-0.5 rounded-md w-fit border"
+                  class="col-span-2 tabular-nums text-xs font-semibold bg-muted px-2 py-0.5 rounded-md w-fit border"
                 >
                   {{ log.resource }}
                 </span>
@@ -156,7 +154,7 @@ const copyToClipboard = () => {
                   <CheckCircle2 class="size-3.5" /> ID Resource
                 </span>
                 <span
-                  class="col-span-2 font-mono text-xs text-muted-foreground break-all"
+                  class="col-span-2 tabular-nums text-xs text-muted-foreground break-all"
                 >
                   {{ log.resourceId }}
                 </span>
@@ -168,7 +166,7 @@ const copyToClipboard = () => {
                 >
                   <Network class="size-3.5" /> IP Address
                 </span>
-                <span class="col-span-2 font-mono text-xs">
+                <span class="col-span-2 tabular-nums text-xs">
                   {{ log.ipAddress ?? '-' }}
                 </span>
               </div>
@@ -189,7 +187,7 @@ const copyToClipboard = () => {
 
             <Separator />
 
-            <div class="space-y-2.5">
+            <div class="space-y-3">
               <div class="flex items-center justify-between">
                 <span
                   class="text-xs font-semibold text-muted-foreground flex items-center gap-1.5"
@@ -201,7 +199,7 @@ const copyToClipboard = () => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  class="h-7 text-xs gap-1.5"
+                  class="gap-1.5"
                   @click="copyToClipboard"
                 >
                   <Clipboard class="size-3" />
@@ -212,7 +210,7 @@ const copyToClipboard = () => {
               <div class="rounded-xl border bg-muted/40 overflow-hidden">
                 <pre
                   v-if="formattedMetadata"
-                  class="p-4 text-[11px] font-mono overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
+                  class="p-4 text-xs tabular-nums overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
                   >{{ formattedMetadata }}</pre>
                 <div
                   v-else

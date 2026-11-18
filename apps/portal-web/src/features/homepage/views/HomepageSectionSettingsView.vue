@@ -77,7 +77,7 @@ function save(key: string, itemCount: number, isEnabled: boolean) {
 
           <div class="space-y-1.5">
             <Label :for="`enabled-${section.key}`">Tampilkan</Label>
-            <div class="h-9 pt-1.5">
+            <div class="flex h-[var(--control-h-md,2rem)] items-center">
               <Switch
                 :id="`enabled-${section.key}`"
                 v-model="section.isEnabled"

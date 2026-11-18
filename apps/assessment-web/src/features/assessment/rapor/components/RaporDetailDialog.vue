@@ -20,9 +20,7 @@ const props = withDefaults(
   { scope: 'any' },
 )
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
 const detailData = ref<RaporDetailData | null>(null)
 const scores = ref<RaporScoreRow[]>([])
@@ -97,7 +95,7 @@ function formatType(type: string): string {
         >
           <div>
             <span class="text-muted-foreground">Rata-rata</span>
-            <p class="text-lg font-bold">
+            <p class="text-lg font-semibold">
               {{
                 detailData.totalAverage !== null
                   ? Number(detailData.totalAverage).toFixed(2)
@@ -107,7 +105,7 @@ function formatType(type: string): string {
           </div>
           <div>
             <span class="text-muted-foreground">Peringkat</span>
-            <p class="text-lg font-bold">{{ detailData.rank ?? '-' }}</p>
+            <p class="text-lg font-semibold">{{ detailData.rank ?? '-' }}</p>
           </div>
           <div>
             <span class="text-muted-foreground">Status</span>
@@ -115,8 +113,8 @@ function formatType(type: string): string {
               <span
                 :class="
                   detailData.isPublished
-                    ? 'inline-flex items-center rounded-md bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20'
-                    : 'inline-flex items-center rounded-md bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20'
+                    ? 'inline-flex items-center rounded-md bg-success/10 px-2 py-0.5 text-xs font-medium text-success ring-1 ring-inset ring-success'
+                    : 'inline-flex items-center rounded-md bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning ring-1 ring-inset ring-warning'
                 "
               >
                 {{ detailData.isPublished ? 'Published' : 'Draft' }}
@@ -133,19 +131,19 @@ function formatType(type: string): string {
           <h4 class="text-sm font-semibold">Kehadiran</h4>
           <div class="grid grid-cols-3 gap-3">
             <div class="rounded-lg border p-3 text-center">
-              <p class="text-2xl font-bold text-red-600">
+              <p class="text-2xl font-semibold text-destructive">
                 {{ detailData.attendance?.ABSENT || 0 }}
               </p>
               <p class="text-xs text-muted-foreground">Alpha</p>
             </div>
             <div class="rounded-lg border p-3 text-center">
-              <p class="text-2xl font-bold text-orange-600">
+              <p class="text-2xl font-semibold text-warning">
                 {{ detailData.attendance?.SICK || 0 }}
               </p>
               <p class="text-xs text-muted-foreground">Sakit</p>
             </div>
             <div class="rounded-lg border p-3 text-center">
-              <p class="text-2xl font-bold text-blue-600">
+              <p class="text-2xl font-semibold text-info">
                 {{ detailData.attendance?.EXCUSED || 0 }}
               </p>
               <p class="text-xs text-muted-foreground">Izin</p>
@@ -172,7 +170,7 @@ function formatType(type: string): string {
             class="rounded-lg border overflow-hidden"
           >
             <table class="w-full text-sm">
-              <thead class="bg-muted/50 text-left">
+              <thead class="bg-table-header text-left">
                 <tr>
                   <th class="px-3 py-2 font-medium">Mata Pelajaran</th>
                   <th class="px-3 py-2 font-medium text-right">KKM</th>
@@ -189,11 +187,11 @@ function formatType(type: string): string {
                 >
                   <td class="px-3 py-2">{{ subject.subjectName }}</td>
                   <td
-                    class="px-3 py-2 text-right font-mono text-muted-foreground"
+                    class="px-3 py-2 text-right tabular-nums text-muted-foreground"
                   >
                     {{ subject.passingScore }}
                   </td>
-                  <td class="px-3 py-2 text-right font-mono font-semibold">
+                  <td class="px-3 py-2 text-right tabular-nums font-semibold">
                     {{ Number(subject.score).toFixed(2) }}
                   </td>
                   <td class="px-3 py-2 text-center">
@@ -207,8 +205,8 @@ function formatType(type: string): string {
                       class="rounded-md px-2 py-0.5 text-xs font-medium"
                       :class="
                         subject.isComplete
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-red-100 text-red-700'
+                          ? 'bg-success/10 text-success'
+                          : 'bg-destructive/10 text-destructive'
                       "
                     >
                       {{ subject.isComplete ? 'Tuntas' : 'Belum Tuntas' }}
@@ -235,7 +233,7 @@ function formatType(type: string): string {
             class="rounded-lg border overflow-hidden"
           >
             <table class="w-full text-sm">
-              <thead class="bg-muted/50 text-left">
+              <thead class="bg-table-header text-left">
                 <tr>
                   <th class="px-3 py-2 font-medium">Komponen</th>
                   <th class="px-3 py-2 font-medium">Jenis</th>
@@ -252,7 +250,7 @@ function formatType(type: string): string {
                   <td class="px-3 py-2">{{ score.subject }}</td>
                   <td class="px-3 py-2">{{ formatType(score.type) }}</td>
                   <td class="px-3 py-2 text-right">{{ score.weight }}</td>
-                  <td class="px-3 py-2 text-right font-mono">
+                  <td class="px-3 py-2 text-right tabular-nums">
                     {{ formatScore(score.score) }}
                   </td>
                 </tr>

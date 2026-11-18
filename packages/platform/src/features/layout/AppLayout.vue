@@ -122,10 +122,7 @@ const searchGroups = computed(() => {
 </script>
 
 <template>
-  <SidebarProvider
-    class="h-svh"
-    style="--sidebar-width: 12rem"
-  >
+  <SidebarProvider class="h-svh">
     <TooltipProvider :delay-duration="100">
       <AppSidebar
         variant="floating"

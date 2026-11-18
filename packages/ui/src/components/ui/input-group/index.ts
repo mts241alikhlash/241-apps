@@ -11,7 +11,7 @@ export { default as InputGroupText } from './InputGroupText.vue'
 export { default as InputGroupTextarea } from './InputGroupTextarea.vue'
 
 export const inputGroupAddonVariants = cva(
-  'text-muted-foreground **:data-[slot=kbd]:bg-muted-foreground/10 h-auto gap-1 py-2 text-[length:var(--text-control,0.75rem)] leading-relaxed font-medium group-data-[disabled=true]/input-group:opacity-50 **:data-[slot=kbd]:rounded-[calc(var(--radius-sm)-2px)] **:data-[slot=kbd]:px-1 **:data-[slot=kbd]:text-[0.625rem] [&>svg:not([class*=size-])]:size-3.5 flex cursor-text items-center justify-center select-none',
+  'text-muted-foreground **:data-[slot=kbd]:bg-muted-foreground/10 h-auto gap-1 py-2 text-control leading-relaxed font-medium group-data-[disabled=true]/input-group:opacity-50 **:data-[slot=kbd]:rounded-[calc(var(--radius-sm)-2px)] **:data-[slot=kbd]:px-1 **:data-[slot=kbd]:text-xs [&>svg:not([class*=size-])]:size-3.5 flex cursor-text items-center justify-center select-none',
   {
     variants: {
       align: {
@@ -34,7 +34,7 @@ export const inputGroupAddonVariants = cva(
 export type InputGroupVariants = VariantProps<typeof inputGroupAddonVariants>
 
 export const inputGroupButtonVariants = cva(
-  'gap-2 rounded-md text-[length:var(--text-control,0.75rem)] leading-relaxed flex items-center shadow-none',
+  'gap-2 rounded-md text-control leading-relaxed flex items-center shadow-none',
   {
     variants: {
       size: {

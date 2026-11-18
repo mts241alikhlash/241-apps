@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
+import { rowActionProps } from '@/test/dataTableCards'
 import PackageReviewListView from './PackageReviewListView.vue'
 
 const { push, filters, loadReferences } = vi.hoisted(() => ({
@@ -77,7 +78,7 @@ describe('PackageReviewListView', () => {
     wrapper.unmount()
   })
 
-  it('opens the review page of a package from its row', async () => {
+  it('opens the review page from the row action', async () => {
     const wrapper = mount(PackageReviewListView, {
       global: {
         stubs: {
@@ -90,11 +91,7 @@ describe('PackageReviewListView', () => {
     })
     await flushPromises()
 
-    ;(
-      wrapper.findComponent({ name: 'DataTable' }).vm as unknown as {
-        $emit: (event: string, value?: unknown) => void
-      }
-    ).$emit('row-click', { id: 'p1' })
+    rowActionProps(wrapper, { id: 'p1' } as never).onView?.()
 
     expect(push).toHaveBeenCalledWith('/exam/package-approvals/p1')
     wrapper.unmount()

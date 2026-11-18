@@ -5,6 +5,7 @@ import { AppCombobox, DatePicker } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -108,15 +109,15 @@ async function submit() {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-lg flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Catat Kehadiran Manual</DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div class="space-y-1">
           <Label for="manual-user">
-            Pegawai <span class="text-red-500">*</span>
+            Pegawai <span class="text-destructive">*</span>
           </Label>
           <AppCombobox
             v-model="userId"
@@ -177,7 +178,7 @@ async function submit() {
 
         <div class="space-y-1">
           <Label for="manual-reason">
-            Alasan <span class="text-red-500">*</span>
+            Alasan <span class="text-destructive">*</span>
           </Label>
           <Textarea
             id="manual-reason"
@@ -186,11 +187,9 @@ async function submit() {
             placeholder="Mis. kartu tertinggal, hadir sesuai jadwal"
           />
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="open = false"

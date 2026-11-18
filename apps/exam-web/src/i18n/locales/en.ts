@@ -19,6 +19,7 @@ export default {
     classworkGrading: 'Grading',
     myExams: 'My Exams',
     examPresets: 'Presets',
+    examReports: 'Exam Reports',
     examCards: 'Participant Cards',
     examSeatLabels: 'Seat Lists',
     examSeb: 'Safe Exam Browser',

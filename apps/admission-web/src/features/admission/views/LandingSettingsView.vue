@@ -109,7 +109,8 @@ const publishedLabel = computed(() =>
     >
       <CardHeader
         standard
-        class="justify-end min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
+        plain
+        class="justify-end"
       >
         <Button
           class="w-full sm:w-auto"
@@ -120,13 +121,13 @@ const publishedLabel = computed(() =>
         </Button>
       </CardHeader>
 
-      <div class="space-y-5 p-0 sm:px-0">
+      <div class="space-y-4 p-0 sm:px-0">
         <div
           v-if="loadError"
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ loadError }}
           </p>
           <Button
@@ -177,10 +178,7 @@ const publishedLabel = computed(() =>
             </div>
           </div>
 
-          <Tabs
-            v-model="active"
-            variant="line"
-          >
+          <Tabs v-model="active">
             <TabsList class="flex-wrap">
               <TabsTrigger
                 v-for="section in LANDING_SECTIONS"
@@ -190,7 +188,7 @@ const publishedLabel = computed(() =>
                 {{ section.label
                 }}<span
                   v-if="dirtyKeys.has(section.key)"
-                  class="ml-1.5 text-xs text-amber-700"
+                  class="ml-1.5 text-xs text-warning"
                   >(belum disimpan)</span
                 >
               </TabsTrigger>

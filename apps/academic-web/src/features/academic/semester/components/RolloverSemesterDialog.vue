@@ -10,6 +10,7 @@ import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -134,9 +135,9 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Salin Data Semester</DialogTitle>
-        <DialogDescription class="sr-only"></DialogDescription>
+        <DialogDescription></DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -146,9 +147,9 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
         >
           <Alert
             variant="default"
-            class="border-emerald-200 bg-emerald-50 text-emerald-800"
+            class="border-success/30 bg-success/10 text-success"
           >
-            <CheckCircle2 class="size-4 text-emerald-600" />
+            <CheckCircle2 class="size-4 text-success" />
             <AlertDescription class="font-medium">
               Penyalinan berhasil! {{ totalCreated }} data disalin,
               {{ totalSkipped }} data dilewati.
@@ -158,7 +159,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
           <div class="rounded-lg border overflow-hidden">
             <table class="w-full text-sm">
               <thead>
-                <tr class="border-b bg-muted/50">
+                <tr class="border-b bg-table-header">
                   <th
                     class="px-4 py-2.5 text-left font-medium text-muted-foreground"
                   >
@@ -186,8 +187,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                   <td class="px-4 py-3 text-center">
                     <Badge
                       v-if="row.created > 0"
-                      variant="default"
-                      class="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200"
+                      variant="success"
                     >
                       +{{ row.created }}
                     </Badge>
@@ -200,8 +200,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                   <td class="px-4 py-3 text-center">
                     <Badge
                       v-if="row.skipped > 0"
-                      variant="secondary"
-                      class="bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200"
+                      variant="warning"
                     >
                       {{ row.skipped }}
                     </Badge>
@@ -221,7 +220,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
           v-else
           class="space-y-4 px-6 py-5"
         >
-          <div class="rounded-lg bg-muted/30 border py-4 px-5">
+          <DialogBody class="rounded-lg bg-muted/30 border">
             <div class="flex items-center justify-between gap-3 mb-3">
               <span
                 class="text-xs text-muted-foreground font-semibold uppercase tracking-wider flex-1 text-center"
@@ -238,7 +237,7 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
             <div class="flex items-center justify-between gap-3">
               <Badge
                 variant="outline"
-                class="px-3 py-1.5 text-sm bg-background flex-1 justify-center truncate"
+                class="flex-1 justify-center truncate"
               >
                 {{
                   sourceSemester
@@ -252,8 +251,8 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                 <ArrowRight class="size-4" />
               </div>
               <Badge
-                variant="outline"
-                class="px-3 py-1.5 text-sm bg-background border-primary/20 text-primary flex-1 justify-center truncate"
+                variant="default"
+                class="flex-1 justify-center truncate"
               >
                 {{
                   targetSemester
@@ -262,20 +261,18 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
                 }}
               </Badge>
             </div>
-          </div>
+          </DialogBody>
 
           <p
             v-if="sourceSemester && !targetSemester"
-            class="text-xs text-amber-600 dark:text-amber-400 text-center"
+            class="text-xs text-warning text-center"
           >
             Semester Genap untuk tahun ajaran ini belum dibuat.
           </p>
         </div>
       </ScrollArea>
 
-      <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background mt-auto"
-      >
+      <DialogFooter standard class="sm:justify-between mt-auto">
         <template v-if="rolloverSummary">
           <div />
           <Button

@@ -37,14 +37,14 @@ const fieldId = useId()
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Kembalikan Paket</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Tulis catatan untuk guru, lalu kembalikan paket.
         </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ error }}
@@ -61,9 +61,7 @@ const fieldId = useId()
             rows="4"
           />
         </FloatingLabelField>
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           {{
             noteCount > 0
               ? `${noteCount} soal sudah diberi catatan.`

@@ -87,8 +87,10 @@ export class GetRoomReportUseCase {
     const seats = await this.rooms.listSeatsByRoom(roomId)
     const sessions = await this.sessions.listByRoom(roomId)
     const overlapping = await this.slotSchedules(room.eventId, slot)
+    const roomClassrooms = new Set(seats.map((seat) => seat.classroomId))
     const schedules = overlapping.filter(
       (row) =>
+        roomClassrooms.has(row.classroomId) &&
         row.startsAt.getTime() >= slot.startsAt.getTime() &&
         row.startsAt.getTime() < slot.endsAt.getTime(),
     )

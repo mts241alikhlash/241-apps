@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import {
   Sheet,
@@ -324,10 +325,7 @@ async function confirmSave() {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader
-        variant="muted"
-        class="px-2"
-      >
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             v-if="isEdit"
@@ -358,7 +356,7 @@ async function confirmSave() {
         <template v-if="isEdit">
           <dl
             v-if="detail"
-            class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[length:var(--text-control,0.75rem)]"
+            class="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-control"
           >
             <div class="flex items-baseline gap-1.5">
               <dt class="text-muted-foreground">Jenis</dt>
@@ -374,7 +372,7 @@ async function confirmSave() {
 
           <div
             v-if="note"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="status"
           >
             Catatan penyetuju: {{ note }}
@@ -382,7 +380,7 @@ async function confirmSave() {
 
           <template v-if="!canEdit">
             <div
-              class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="rounded-md border bg-muted/30 p-3 text-control"
               role="status"
             >
               Paket ini tidak bisa diubah. Anda hanya bisa melihat soalnya.
@@ -434,7 +432,7 @@ async function confirmSave() {
         <template v-else>
           <div
             v-if="!canEdit"
-            class="rounded-md border bg-muted/30 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border bg-muted/30 p-3 text-control"
             role="status"
           >
             Paket ini tidak bisa diubah, jadi soal baru tidak bisa ditambahkan.
@@ -448,10 +446,7 @@ async function confirmSave() {
               gap="none"
               class="hidden min-w-0 lg:flex"
             >
-              <CardHeader
-                variant="muted"
-                class="px-2"
-              >
+              <CardHeader standard>
                 <CardTitle>Daftar soal</CardTitle>
                 <Button
                   variant="ghost"
@@ -484,10 +479,7 @@ async function confirmSave() {
                 gap="none"
                 class="min-w-0"
               >
-                <CardHeader
-                  variant="muted"
-                  class="px-2"
-                >
+                <CardHeader standard>
                   <CardTitle>Soal {{ activeIndex + 1 }}</CardTitle>
                 </CardHeader>
                 <CardContent class="flex flex-col gap-2 p-2">
@@ -562,7 +554,7 @@ async function confirmSave() {
 
                   <p
                     v-if="activeCard.error"
-                    class="text-[length:var(--text-control,0.75rem)] text-destructive"
+                    class="text-control text-destructive"
                     role="alert"
                   >
                     {{ activeCard.error }}
@@ -575,7 +567,7 @@ async function confirmSave() {
 
         <p
           v-if="formError"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-control text-destructive"
           role="alert"
         >
           {{ formError }}
@@ -585,7 +577,7 @@ async function confirmSave() {
       <CardFooter
         v-if="!loading && canEdit && isEdit"
         standard
-        class="justify-end px-2"
+        class="justify-end"
       >
         <Button
           type="button"
@@ -599,7 +591,7 @@ async function confirmSave() {
 
     <div
       v-if="!loading && canEdit && !isEdit"
-      class="mt-2 flex min-h-[var(--control-h-lg,2rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
+      class="mt-2 flex min-h-[var(--control-h-lg,2.25rem)] shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card/85 px-3 py-1 shadow-xs backdrop-blur-md"
     >
       <div class="flex flex-wrap items-center gap-2">
         <Button
@@ -673,10 +665,11 @@ async function confirmSave() {
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Simpan Soal</DialogTitle>
+        <DialogDescription>Periksa perubahan soal sebelum disimpan.</DialogDescription>
         </DialogHeader>
         <DialogBody class="space-y-3">
           <dl
-            class="grid grid-cols-[6rem_auto_1fr] items-center gap-x-2 gap-y-2 text-[length:var(--text-control,0.75rem)]"
+            class="grid grid-cols-[6rem_auto_1fr] items-center gap-x-2 gap-y-2 text-control"
           >
             <dt class="text-muted-foreground">Paket</dt>
             <dd class="text-muted-foreground">:</dd>
@@ -719,7 +712,7 @@ async function confirmSave() {
           </dl>
           <p
             v-if="formError"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive"
+            class="text-control text-destructive"
             role="alert"
           >
             {{ formError }}

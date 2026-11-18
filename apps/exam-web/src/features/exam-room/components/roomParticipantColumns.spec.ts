@@ -41,6 +41,7 @@ const participant = (
   overrides: Partial<RoomMonitorParticipant> = {},
 ): RoomMonitorParticipant => ({
   seatNumber: 1,
+  participantNumber: null,
   studentId: 'st1',
   studentName: 'Ahmad Fauzi',
   nis: '2024001',

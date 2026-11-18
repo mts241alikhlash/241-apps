@@ -92,7 +92,7 @@ function updateRowNote(index: number, note: string) {
     <div class="border rounded-md bg-background overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow class="bg-muted/50 hover:bg-muted/50">
+          <TableRow>
             <TableHead class="hidden sm:table-cell w-28 px-4 text-center"
               >NIS</TableHead
             >

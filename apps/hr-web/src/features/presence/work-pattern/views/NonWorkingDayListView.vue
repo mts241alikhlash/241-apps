@@ -12,6 +12,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -123,10 +124,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Hari Libur </CardTitle>
         <Button
           variant="outline"
@@ -168,12 +166,12 @@ onMounted(() => {
 
   <Dialog v-model:open="syncDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Sinkron dari Kalender Akademik</DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div
           v-if="calendarTypes.length > 1"
           class="space-y-1.5"
@@ -217,11 +215,9 @@ onMounted(() => {
             </p>
           </div>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 shrink-0"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="syncDialogOpen = false"

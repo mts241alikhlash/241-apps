@@ -6,9 +6,11 @@ import { buildFullAddress, formatCoordinate, hasCoordinates } from '../utils'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { ExternalLink, MapPin, Navigation } from '@lucide/vue'
 
@@ -45,14 +47,15 @@ const openStreetMapUrl = computed(() =>
     <DialogContent
       class="sm:max-w-2xl flex flex-col gap-0 p-0 overflow-hidden max-h-[90svh]"
     >
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle class="flex items-center gap-2">
           <MapPin class="size-4 text-primary shrink-0" />
           Lokasi
         </DialogTitle>
+        <DialogDescription>Pilih lokasi sekolah pada peta.</DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-4 overflow-y-auto">
+      <DialogBody class="space-y-4">
         <div
           v-if="hasPin"
           class="h-[280px] w-full overflow-hidden rounded-xl border"
@@ -128,7 +131,7 @@ const openStreetMapUrl = computed(() =>
             Buka di OpenStreetMap
           </Button>
         </div>
-      </div>
+      </DialogBody>
     </DialogContent>
   </Dialog>
 </template>

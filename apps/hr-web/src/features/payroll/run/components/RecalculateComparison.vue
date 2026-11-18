@@ -54,7 +54,7 @@ const hasChanges = computed(() => props.comparison.changedPayslips.length > 0)
           <TableCell class="text-muted-foreground text-right">
             {{ formatRupiah(change.previousNet) }}
           </TableCell>
-          <TableCell class="text-right font-medium">
+          <TableCell class="text-right">
             {{ formatRupiah(change.currentNet) }}
           </TableCell>
           <TableCell class="text-right">

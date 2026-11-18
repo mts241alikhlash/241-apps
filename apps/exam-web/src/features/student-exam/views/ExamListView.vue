@@ -100,7 +100,7 @@ onMounted(load)
     </header>
 
     <main
-      class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 overflow-y-auto p-4 md:p-6"
+      class="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6"
     >
       <h1 class="text-lg font-semibold">Daftar Ujian</h1>
 
@@ -116,11 +116,11 @@ onMounted(load)
         v-else-if="error"
         class="space-y-3"
       >
-        <p class="text-[length:var(--text-control)] text-destructive">
+        <p class="text-control text-destructive">
           {{ error }}
         </p>
         <Button
-          class="min-h-11"
+          class="min-h-[var(--control-h-lg,2.25rem)]"
           @click="load"
           >Coba Lagi</Button
         >
@@ -128,7 +128,7 @@ onMounted(load)
 
       <p
         v-else-if="exams.length === 0"
-        class="py-10 text-center text-[length:var(--text-control)] text-muted-foreground"
+        class="py-10 text-center text-control text-muted-foreground"
       >
         Belum ada ujian. Ujian muncul di sini setelah guru menjadwalkannya.
       </p>
@@ -139,9 +139,7 @@ onMounted(load)
           :key="section.category"
           class="space-y-2"
         >
-          <h2
-            class="text-[length:var(--text-control)] font-semibold text-muted-foreground"
-          >
+          <h2 class="text-control font-semibold text-muted-foreground">
             {{ section.label }}
           </h2>
           <ul class="space-y-3">
@@ -154,18 +152,16 @@ onMounted(load)
               >
                 <div class="min-w-0 space-y-1">
                   <h3 class="font-semibold">{{ displayTitle(exam) }}</h3>
-                  <p
-                    class="text-[length:var(--text-control)] text-muted-foreground"
-                  >
+                  <p class="text-control text-muted-foreground">
                     {{ windowLabel(exam) }} · {{ exam.durationMinutes }} menit
                   </p>
-                  <p class="text-[length:var(--text-control)] font-medium">
+                  <p class="text-control font-medium">
                     <span class="text-muted-foreground">Status</span>
                     {{ statusLabel(exam) }}
                   </p>
                 </div>
                 <Button
-                  class="min-h-11 shrink-0"
+                  class="min-h-[var(--control-h-lg,2.25rem)] shrink-0"
                   :disabled="!canStart(exam)"
                   @click="open(exam)"
                 >

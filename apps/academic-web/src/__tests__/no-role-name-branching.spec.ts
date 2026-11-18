@@ -13,7 +13,6 @@ function code(text: string): string {
 
 const SANCTIONED = [
   'config/menuConfig.ts',
-
   'profile/setup.ts',
   'profile/components/SchoolIdentityTab.vue',
   'educational-history/components/EducationalHistoryTab.vue',

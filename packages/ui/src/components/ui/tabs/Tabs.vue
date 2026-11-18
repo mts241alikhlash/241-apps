@@ -4,20 +4,12 @@ import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { TabsRoot, useForwardPropsEmits } from 'reka-ui'
 import { cn } from '@mts241alikhlash/ui/utils'
-import { computed, provide } from 'vue'
-import { tabsVariantKey, type TabsVariant } from './variant'
 
-const props = defineProps<
-  TabsRootProps & { class?: HTMLAttributes['class']; variant?: TabsVariant }
->()
+const props = defineProps<TabsRootProps & { class?: HTMLAttributes['class'] }>()
+
 const emits = defineEmits<TabsRootEmits>()
 
-provide(
-  tabsVariantKey,
-  computed(() => props.variant ?? 'default'),
-)
-
-const delegatedProps = reactiveOmit(props, 'class', 'variant')
+const delegatedProps = reactiveOmit(props, 'class')
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 

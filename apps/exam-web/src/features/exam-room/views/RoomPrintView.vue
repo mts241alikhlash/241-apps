@@ -2,15 +2,24 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { BackButton } from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
-import { Printer } from '@lucide/vue'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@mts241alikhlash/ui/empty'
+import { Spinner } from '@mts241alikhlash/ui/spinner'
+import { Armchair, Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
 import { examRoomService } from '../services/examRoomService'
 import type {
@@ -43,6 +52,9 @@ const roomLabel = computed(() =>
     ? 'Ruangan'
     : `${meta.value.room.code} · ${meta.value.room.name}`,
 )
+const roomCode = computed(() => meta.value?.room.code ?? '')
+const eventTitle = computed(() => roster.value[0]?.packageTitle ?? '')
+const eventPeriod = computed(() => '')
 const title = computed(() =>
   props.kind === 'cards' ? 'Cetak Kartu Peserta' : 'Cetak Daftar Meja',
 )
@@ -82,7 +94,7 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <BackButton
@@ -91,55 +103,70 @@ onMounted(load)
             />
             <CardTitle class="font-semibold">{{ title }}</CardTitle>
           </div>
-          <Button
-            :disabled="loading || roster.length === 0"
-            @click="print"
-          >
-            <Printer class="size-4" />
-            Cetak A4
-          </Button>
+          <div class="flex items-end gap-2">
+            <Button
+              :disabled="loading || roster.length === 0"
+              @click="print"
+            >
+              <Printer class="size-4" />
+              Cetak A4
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 space-y-4"
       >
-        <div
+        <Alert
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
-          role="alert"
+          variant="destructive"
         >
-          <p>{{ error }}</p>
-          <Button
-            class="mt-2"
-            variant="outline"
-            :disabled="loading"
-            @click="load"
-          >
-            Coba lagi
-          </Button>
-        </div>
+          <AlertDescription class="space-y-2">
+            <p>{{ error }}</p>
+            <Button
+              variant="outline"
+              :disabled="loading"
+              @click="load"
+            >
+              Coba lagi
+            </Button>
+          </AlertDescription>
+        </Alert>
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="flex items-center gap-2 text-control text-muted-foreground"
+          role="status"
         >
-          Menyiapkan dokumen...
+          <Spinner />
+          Menyiapkan dokumen…
         </p>
 
-        <p
+        <Empty
           v-else-if="roster.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="border"
         >
-          Ruangan ini belum memiliki kursi peserta.
-        </p>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Armchair />
+            </EmptyMedia>
+            <EmptyTitle>Belum ada kursi peserta</EmptyTitle>
+            <EmptyDescription>
+              Atur kursi peserta di ruangan ini, lalu cetak kartunya.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
 
         <RosterSheet
           v-else
           :kind="kind"
           :rows="roster"
           :room-label="roomLabel"
+          :room-code="roomCode"
           :school-name="schoolName"
+          :event-title="eventTitle"
+          :event-period="eventPeriod"
           :short-warning="
             rosterShort
               ? `Memuat ${roster.length} dari ${rosterTotal} peserta.`
@@ -147,7 +174,7 @@ onMounted(load)
           "
         />
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

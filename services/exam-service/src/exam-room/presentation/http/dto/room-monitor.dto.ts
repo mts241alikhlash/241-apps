@@ -20,6 +20,7 @@ import type {
   RoomMonitorSession,
 } from '../../../application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
 import type { RoomOverviewRow } from '../../../application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
+import type { RoomReportSummary } from '../../../application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import type {
   ReportAbsenceRow,
   ReportAuditRow,
@@ -132,6 +133,8 @@ export class RoomMonitorAbsenceDto {
 export class RoomMonitorParticipantDto {
   @ApiProperty() seatNumber!: number
   @ApiProperty({ format: 'uuid' }) studentId!: string
+  @ApiProperty({ type: String, nullable: true }) participantNumber!:
+    string | null
   @ApiProperty({ type: String, nullable: true }) studentName!: string | null
   @ApiProperty({ type: String, nullable: true }) nis!: string | null
   @ApiProperty({ type: String, nullable: true }) classroomName!: string | null
@@ -148,6 +151,7 @@ export class RoomMonitorParticipantDto {
     const dto = new RoomMonitorParticipantDto()
     dto.seatNumber = domain.seatNumber
     dto.studentId = domain.studentId
+    dto.participantNumber = domain.participantNumber
     dto.studentName = domain.studentName
     dto.nis = domain.nis
     dto.classroomName = domain.classroomName
@@ -244,6 +248,13 @@ export class RoomMonitorResponseDto {
 }
 
 export class RoomOverviewQueryDto {
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  eventId?: string
+}
+
+export class RoomReportListQueryDto {
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()
@@ -441,6 +452,33 @@ export class RoomReportDto {
     dto.auditLogs = domain.auditLogs.map((row) =>
       ReportAuditDto.fromDomain(row),
     )
+    return dto
+  }
+}
+
+export class RoomReportSummaryDto {
+  @ApiProperty({ format: 'uuid' }) roomId!: string
+  @ApiProperty() roomCode!: string
+  @ApiProperty() roomName!: string
+  @ApiProperty({ format: 'uuid' }) slotId!: string
+  @ApiProperty({ type: String, format: 'date-time' }) startsAt!: string
+  @ApiProperty({ type: String, format: 'date-time' }) endsAt!: string
+  @ApiProperty({ enum: ['DRAFT', 'SUBMITTED', 'VERIFIED'] }) status!: string
+  @ApiProperty() registeredCount!: number
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  reportId!: string | null
+
+  static fromDomain(domain: RoomReportSummary): RoomReportSummaryDto {
+    const dto = new RoomReportSummaryDto()
+    dto.roomId = domain.roomId
+    dto.roomCode = domain.roomCode
+    dto.roomName = domain.roomName
+    dto.slotId = domain.slotId
+    dto.startsAt = domain.startsAt
+    dto.endsAt = domain.endsAt
+    dto.status = domain.status
+    dto.registeredCount = domain.registeredCount
+    dto.reportId = domain.reportId
     return dto
   }
 }

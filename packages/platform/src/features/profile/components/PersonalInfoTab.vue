@@ -123,7 +123,7 @@ function handleSubmit() {
       class="space-y-4 animate-in fade-in-50 duration-200"
       @submit.prevent="handleSubmit"
     >
-      <div class="grid gap-5 md:grid-cols-2">
+      <div class="grid gap-4 md:grid-cols-2">
         <FloatingLabelField
           label="Nama Lengkap"
           :for="`${fieldId}-name`"

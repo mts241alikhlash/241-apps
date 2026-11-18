@@ -19,17 +19,17 @@
     padding-right: 0.5rem !important;
   }
   .calendar-override .fc-col-header-cell-cushion {
-    font-size: 0.75rem !important;
+    font-size: var(--text-xs);
     padding: 6px 0 !important;
   }
   .calendar-override .fc-daygrid-day-number {
-    font-size: 0.8125rem !important;
+    font-size: var(--text-xs);
     padding: 4px !important;
   }
   .calendar-override .fc-event-main {
     padding: 1px 0 !important;
   }
   .calendar-override .fc-event {
-    font-size: 0.65rem !important;
+    font-size: var(--text-xs);
   }
 }

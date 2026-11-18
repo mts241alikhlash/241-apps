@@ -4,10 +4,12 @@ import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Loader2 } from '@lucide/vue'
 import { WEEKDAYS } from '../constants/weekdays'
@@ -65,7 +67,7 @@ function handleSave() {
       v-if="canEdit"
       variant="outline"
       size="sm"
-      class="h-8 text-xs shrink-0"
+      class="shrink-0"
       @click="openDialog"
     >
       Edit
@@ -77,15 +79,16 @@ function handleSave() {
     @update:open="(open) => (open ? openDialog() : closeDialog())"
   >
     <DialogContent class="sm:max-w-xs flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Hari Libur Mingguan</DialogTitle>
+        <DialogDescription>Atur hari libur mingguan yang berlaku untuk seluruh kelas.</DialogDescription>
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-3">
+      <DialogBody class="space-y-3">
         <p class="text-xs text-muted-foreground">
           Centang hari yang sekolah tidak aktif setiap minggunya.
         </p>
-        <div class="space-y-2.5">
+        <div class="space-y-3">
           <label
             v-for="day in DISPLAY_WEEKDAYS"
             :key="day.value"
@@ -103,9 +106,9 @@ function handleSave() {
             }}</span>
           </label>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter class="border-t px-6 py-3 flex justify-end gap-2">
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

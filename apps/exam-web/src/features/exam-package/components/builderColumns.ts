@@ -39,7 +39,13 @@ export function buildBuilderColumns(
     {
       id: 'summary',
       header: 'Soal',
-      meta: { align: 'left', strong: true },
+      meta: {
+        align: 'left',
+        strong: true,
+        truncate: true,
+        title: (row: ExamPackageItemView) =>
+          row.summary || undefined,
+      },
       cell: ({ row }) => {
         const note = options.noteOf(row.original.questionId)
         return h('div', { class: 'space-y-1' }, [
@@ -48,8 +54,7 @@ export function buildBuilderColumns(
             ? h(
                 'p',
                 {
-                  class:
-                    'text-[length:var(--text-control,0.75rem)] font-normal text-destructive',
+                  class: 'text-control font-normal text-destructive',
                 },
                 `Catatan: ${note}`,
               )
@@ -61,6 +66,7 @@ export function buildBuilderColumns(
       id: 'type',
       header: 'Jenis',
       meta: {
+        align: 'center',
         mobileLabel: 'Jenis',
         mobileValue: (row: ExamPackageItemView) => typeLabel(row.type),
       },

@@ -236,7 +236,7 @@ export function buildRoomParticipantColumns(
           {
             class:
               session.unsyncedCount > 0
-                ? 'tabular-nums text-amber-600 dark:text-amber-500'
+                ? 'tabular-nums text-warning'
                 : 'tabular-nums',
           },
           syncText(session),

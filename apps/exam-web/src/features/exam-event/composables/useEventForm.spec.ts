@@ -46,7 +46,7 @@ describe('useEventForm', () => {
     const form = filled()
     expect(form.problem.value).toBeNull()
 
-    form.name.value = '  '
+    form.name.value = ' '
     expect(form.problem.value).toBe('Nama kegiatan wajib diisi')
 
     form.name.value = 'UAS Ganjil'

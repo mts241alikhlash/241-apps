@@ -100,7 +100,7 @@ function handleOpenChange(val: boolean) {
 
       <div class="space-y-4 py-2">
         <div class="space-y-2">
-          <Label class="text-sm font-medium">Siswa yang dipindahkan</Label>
+          <Label>Siswa yang dipindahkan</Label>
           <div
             class="rounded-lg border bg-muted/30 p-3 max-h-[140px] overflow-y-auto space-y-1"
           >
@@ -112,10 +112,7 @@ function handleOpenChange(val: boolean) {
               <span>{{
                 formatEntityName(enrollment.student.user.profile.name)
               }}</span>
-              <Badge
-                variant="outline"
-                class="text-xs"
-              >
+              <Badge variant="outline">
                 {{ enrollment.student.nis }}
               </Badge>
             </div>
@@ -123,9 +120,7 @@ function handleOpenChange(val: boolean) {
         </div>
 
         <div class="space-y-2">
-          <Label class="text-sm font-medium">
-            Kelas Tujuan <span class="text-destructive">*</span>
-          </Label>
+          <Label> Kelas Tujuan <span class="text-destructive">*</span> </Label>
           <Popover v-model:open="classroomPopoverOpen">
             <PopoverTrigger as-child>
               <Button
@@ -151,7 +146,7 @@ function handleOpenChange(val: boolean) {
               <Command>
                 <CommandInput
                   placeholder="Cari kelas..."
-                  class="text-[length:var(--text-control,0.75rem)]"
+                  class="text-control"
                 />
                 <CommandEmpty>Kelas tidak ditemukan.</CommandEmpty>
                 <CommandList class="max-h-[200px]">
@@ -178,10 +173,7 @@ function handleOpenChange(val: boolean) {
                         "
                       />
                       <div class="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          class="text-xs"
-                        >
+                        <Badge variant="outline">
                           {{
                             classroom.grade?.name ??
                             classroom.classroomLevel?.name ??
@@ -199,7 +191,7 @@ function handleOpenChange(val: boolean) {
         </div>
 
         <div class="space-y-2">
-          <Label class="text-sm font-medium">Catatan (opsional)</Label>
+          <Label>Catatan (opsional)</Label>
           <Input
             v-model="note"
             placeholder="Alasan pindah kelas..."

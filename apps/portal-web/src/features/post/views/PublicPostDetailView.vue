@@ -53,7 +53,7 @@ const publishedLabel = computed(() => {
 
   <article
     v-else-if="store.current"
-    class="space-y-10"
+    class="space-y-6"
   >
     <header class="space-y-4">
       <div class="flex flex-wrap items-center gap-2">
@@ -66,7 +66,7 @@ const publishedLabel = computed(() => {
         <span class="text-sm text-muted-foreground">{{ publishedLabel }}</span>
       </div>
 
-      <h1 class="text-3xl font-bold leading-tight tracking-tight">
+      <h1 class="text-3xl font-semibold leading-tight tracking-tight">
         {{ store.current.title }}
       </h1>
 
@@ -84,7 +84,7 @@ const publishedLabel = computed(() => {
     />
 
     <SafeHtml
-      class="prose prose-neutral max-w-none dark:prose-invert"
+      class="prose prose-neutral max-w-none"
       :html="store.current.body"
     />
 

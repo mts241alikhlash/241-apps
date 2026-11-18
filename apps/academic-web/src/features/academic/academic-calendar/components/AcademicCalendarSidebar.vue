@@ -116,7 +116,7 @@ const { formatDateStr } = useCalendarFormat()
               >
                 {{ event.title }}
               </div>
-              <div class="text-[11px] text-muted-foreground mt-0.5">
+              <div class="text-xs text-muted-foreground mt-0.5">
                 {{ formatDateStr(event.startDate) }}
               </div>
             </div>

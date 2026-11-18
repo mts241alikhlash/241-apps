@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="
       cn(
-        'text-[0.625rem] font-medium text-muted-foreground px-2.5 group-has-data-[variant=ghost]/message:px-0 flex max-w-full min-w-0 items-center group-data-[align=end]/message:justify-end',
+        'text-xs font-medium text-muted-foreground px-2.5 group-has-data-[variant=ghost]/message:px-0 flex max-w-full min-w-0 items-center group-data-[align=end]/message:justify-end',
         props.class,
       )
     "

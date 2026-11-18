@@ -234,7 +234,7 @@ describe('LandingSettingsView', () => {
   it('shows the validation message and saves nothing when a limit is broken', async () => {
     const wrapper = mountView()
     await flushPromises()
-    await wrapper.get('input[name="eyebrow"]').setValue('   ')
+    await wrapper.get('input[name="eyebrow"]').setValue(' ')
     await button(wrapper, 'Simpan draf')!.trigger('click')
     await flushPromises()
     expect(wrapper.text()).toContain('Wajib diisi.')

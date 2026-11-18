@@ -19,7 +19,7 @@ const delegatedProps = reactiveOmit(props, 'class')
     v-bind="delegatedProps"
     :class="
       cn(
-        'flex size-[var(--control-h-md,1.75rem)] items-center justify-center',
+        'flex size-[var(--control-h-md,2rem)] items-center justify-center',
         props.class,
       )
     "

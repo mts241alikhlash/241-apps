@@ -190,7 +190,7 @@ onMounted(load)
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -238,7 +238,7 @@ onMounted(load)
           <DialogTitle>
             {{ editing ? 'Ubah Rekening' : 'Tambah Rekening' }}
           </DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pendaftar mentransfer biaya pendaftaran ke rekening ini.
           </DialogDescription>
         </DialogHeader>

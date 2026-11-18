@@ -91,7 +91,7 @@ watch(
       <DialogBody class="space-y-4">
         <div
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
           role="alert"
         >
           {{ error }}
@@ -105,7 +105,7 @@ watch(
         </p>
         <p
           v-else-if="busy"
-          class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-center text-control text-muted-foreground"
         >
           Memuat token…
         </p>
@@ -119,7 +119,7 @@ watch(
         </Button>
         <p
           v-if="code"
-          class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-center text-control text-muted-foreground"
         >
           Bagikan token ini kepada siswa saat ujian dimulai.
         </p>

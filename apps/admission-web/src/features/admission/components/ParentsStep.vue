@@ -193,7 +193,7 @@ defineExpose({ validate })
             label="Tanggal Lahir"
             :required="parent.isPrimary"
             always-float
-            class="[&_button]:border-input [&_button]:bg-transparent [&_button:hover]:bg-transparent [&_button:hover]:text-foreground dark:[&_button]:bg-input/30 dark:[&_button:hover]:bg-input/30"
+            class="[&_button]:border-input [&_button]:bg-transparent [&_button:hover]:bg-transparent [&_button:hover]:text-foreground"
           >
             <FormControl>
               <div class="birth-date-picker">
