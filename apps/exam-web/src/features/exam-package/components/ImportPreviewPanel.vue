@@ -80,7 +80,7 @@ const identity = computed(() => [
 
     <ul
       v-if="preview.warnings.length > 0"
-      class="space-y-1 text-muted-foreground"
+      class="space-y-1 rounded-md border border-amber-300 bg-amber-50 p-2 text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
     >
       <li
         v-for="warning in preview.warnings"

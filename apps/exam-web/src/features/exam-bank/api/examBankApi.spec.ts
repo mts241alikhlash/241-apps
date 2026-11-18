@@ -70,6 +70,28 @@ describe('examBankApi', () => {
     })
   })
 
+  it('passes the vertical layout and the question counts as query values', async () => {
+    GET.mockResolvedValue(okBlob(new Blob(['x'])))
+    await examBankApi.downloadTemplate('docx', {
+      layout: 'vertical',
+      counts: { pg: 20, pgKompleks: 10, benarSalah: 10, isian: 0, uraian: 5 },
+    })
+    expect(GET).toHaveBeenCalledWith('/exam-imports/template', {
+      params: {
+        query: {
+          format: 'docx',
+          layout: 'vertical',
+          pg: 20,
+          pgKompleks: 10,
+          benarSalah: 10,
+          isian: 0,
+          uraian: 5,
+        },
+      },
+      parseAs: 'blob',
+    })
+  })
+
   it('imports questions as multipart form data', async () => {
     POST.mockResolvedValue(ok({ created: 1, questionIds: ['q'], errors: [] }))
     const form = new FormData()

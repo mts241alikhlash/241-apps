@@ -3579,7 +3579,13 @@ export interface operations {
     QuestionImportController_template: {
         parameters: {
             query: {
+                benarSalah?: number;
                 format: "xlsx" | "docx";
+                isian?: number;
+                layout?: "table" | "vertical";
+                pg?: number;
+                pgKompleks?: number;
+                uraian?: number;
             };
             header?: never;
             path?: never;

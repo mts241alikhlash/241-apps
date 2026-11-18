@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Download } from '@lucide/vue'
 import { BackButton, FileDropzone } from '@mts241alikhlash/ui'
@@ -11,9 +11,24 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { Input } from '@mts241alikhlash/ui/input'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examBankService } from '@/features/exam-bank/services/examBankService'
-import type { ImportPreview, ImportResult } from '@/features/exam-bank/types'
+import type {
+  ImportPreview,
+  ImportResult,
+  TemplateCounts,
+} from '@/features/exam-bank/types'
 import ApprovedEditNotice from '../components/ApprovedEditNotice.vue'
 import ImportPreviewPanel from '../components/ImportPreviewPanel.vue'
 import { usePackageBuilder } from '../composables/usePackageBuilder'
@@ -36,6 +51,34 @@ const importing = ref(false)
 const problem = ref<string | null>(null)
 const result = ref<ImportResult | null>(null)
 const loading = ref(true)
+
+const templateOpen = ref(false)
+const templateFieldId = useId()
+const templateForm = reactive({
+  pg: '20',
+  pgKompleks: '10',
+  benarSalah: '10',
+  isian: '0',
+  uraian: '5',
+})
+const TEMPLATE_FIELDS: { key: keyof TemplateCounts; label: string }[] = [
+  { key: 'pg', label: 'PG' },
+  { key: 'pgKompleks', label: 'PG Kompleks' },
+  { key: 'benarSalah', label: 'Benar/Salah' },
+  { key: 'isian', label: 'Isian' },
+  { key: 'uraian', label: 'Uraian' },
+]
+const isCount = (value: string) => /^\d+$/.test(value) && Number(value) <= 100
+const templateValid = computed(() =>
+  TEMPLATE_FIELDS.every(({ key }) => isCount(templateForm[key])),
+)
+
+function downloadVerticalTemplate() {
+  const counts = {} as TemplateCounts
+  for (const { key } of TEMPLATE_FIELDS) counts[key] = Number(templateForm[key])
+  void examBankService.downloadTemplate('docx', { layout: 'vertical', counts })
+  templateOpen.value = false
+}
 
 const canSubmit = computed(
   () =>
@@ -188,7 +231,63 @@ onMounted(init)
                 <Download class="size-4" />
                 Template Word
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                @click="templateOpen = true"
+              >
+                <Download class="size-4" />
+                Template Word (vertikal)
+              </Button>
             </div>
+            <Dialog v-model:open="templateOpen">
+              <DialogContent size="md">
+                <DialogHeader standard>
+                  <DialogTitle>Template Word (vertikal)</DialogTitle>
+                  <DialogDescription>
+                    Isi jumlah soal per bagian. Jumlah standar sudah terisi,
+                    angka 0 sampai 100.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogBody class="space-y-3">
+                  <FloatingLabelField
+                    v-for="field in TEMPLATE_FIELDS"
+                    :key="field.key"
+                    :label="`Jumlah soal ${field.label}`"
+                    :for="`${templateFieldId}-${field.key}`"
+                    floating
+                  >
+                    <Input
+                      :id="`${templateFieldId}-${field.key}`"
+                      v-model="templateForm[field.key]"
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      max="100"
+                    />
+                  </FloatingLabelField>
+                </DialogBody>
+                <DialogFooter
+                  standard
+                  class="justify-between"
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    @click="templateOpen = false"
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="button"
+                    :disabled="!templateValid"
+                    @click="downloadVerticalTemplate"
+                  >
+                    Unduh
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <FileDropzone

@@ -42,6 +42,7 @@ import type {
   ImportSheet,
   SheetIdentity,
 } from '../../../domain/import-sheet.js'
+import { countWarnings } from '../../../domain/import-standard.js'
 import type { ParsedQuestion } from '../../../domain/parsed-question.js'
 import {
   duplicateRows,
@@ -108,7 +109,7 @@ export class ImportQuestionsUseCase {
       totalPoints,
       total: analysis.rows,
       errors: analysis.errors,
-      warnings: analysis.warnings,
+      warnings: [...analysis.warnings, ...countWarnings(counts)],
       duplicateRows: analysis.duplicates,
       canSave: analysis.errors.length === 0 && analysis.duplicates.length === 0,
     }

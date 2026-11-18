@@ -259,6 +259,15 @@ describe('ImportQuestionsUseCase', () => {
       expect(files.files.size).toBe(0)
     })
 
+    it('warns below the school standard without blocking the save', async () => {
+      const { useCase } = build()
+
+      const preview = await useCase.preview(TEACHER, input(await xlsx([pg(1)])))
+
+      expect(preview.warnings).toContain('PG 1 dari 20')
+      expect(preview.canSave).toBe(true)
+    })
+
     it('says which subject and grade the file is for when they differ', async () => {
       const { useCase } = build()
 
