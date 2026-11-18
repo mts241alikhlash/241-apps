@@ -9,6 +9,7 @@ import { UpdateAccountProfileUseCase } from '../../application/use-cases/update-
 import { LookupAccountUseCase } from '../../application/use-cases/lookup-account/lookup-account.use-case.js'
 import { AssignAccountRoleUseCase } from '../../application/use-cases/assign-account-role/assign-account-role.use-case.js'
 import { GetUserByIdUseCase } from '../../application/use-cases/get-user-by-id/get-user-by-id.use-case.js'
+import { ResetPasswordsUseCase } from '../../application/use-cases/reset-passwords/reset-passwords.use-case.js'
 import { AccountsController } from './accounts.controller.js'
 
 describe('AccountsController', () => {
@@ -21,6 +22,7 @@ describe('AccountsController', () => {
   const mockLookupAccountUseCase = { execute: vi.fn() }
   const mockAssignAccountRoleUseCase = { execute: vi.fn() }
   const mockGetUserByIdUseCase = { execute: vi.fn() }
+  const mockResetPasswordsUseCase = { execute: vi.fn() }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +47,10 @@ describe('AccountsController', () => {
           useValue: mockAssignAccountRoleUseCase,
         },
         { provide: GetUserByIdUseCase, useValue: mockGetUserByIdUseCase },
+        {
+          provide: ResetPasswordsUseCase,
+          useValue: mockResetPasswordsUseCase,
+        },
         { provide: ConfigService, useValue: { get: vi.fn() } },
       ],
     }).compile()
@@ -55,6 +61,20 @@ describe('AccountsController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined()
+  })
+
+  describe('resetPasswords', () => {
+    it('answers the new passwords under data', async () => {
+      const rows = [
+        { userId: 'u1', identifier: 'nis1', password: 'Abcdefghjk' },
+      ]
+      mockResetPasswordsUseCase.execute.mockResolvedValue(rows)
+
+      const result = await controller.resetPasswords({ userIds: ['u1'] })
+
+      expect(mockResetPasswordsUseCase.execute).toHaveBeenCalledWith(['u1'])
+      expect(result).toEqual({ data: rows })
+    })
   })
 
   describe('provision', () => {
