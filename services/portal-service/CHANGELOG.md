@@ -1,5 +1,12 @@
 # portal-service
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [6d04832]
+  - @mts241alikhlash/nest-core@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

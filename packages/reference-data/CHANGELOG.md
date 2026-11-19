@@ -1,5 +1,13 @@
 # @mts241alikhlash/reference-data
 
+## 0.1.4
+
+### Patch Changes
+
+- 6d04832: Service outage and timeout errors are recognised by `isOutageMessage` and reported once through the shared error handler, table columns accept `truncate` and a `title` callback, and the reference data form dialog uses the shared control text size.
+- Updated dependencies [6d04832]
+  - @mts241alikhlash/ui@0.2.0
+
 ## 0.1.3
 
 ### Patch Changes
