@@ -60,6 +60,11 @@ const printedSheets = computed(() =>
 const search = ref('')
 const page = ref(1)
 const pageSize = ref(10)
+
+function changePageSize(size: number) {
+  pageSize.value = size
+  page.value = 1
+}
 const preview = ref<PrintParticipantRow | null>(null)
 const previewOpen = ref(false)
 const confirmingReset = ref(false)
@@ -173,10 +178,7 @@ function printOne() {
       :total-items="filtered.length"
       :item-label="unit"
       @update:page="page = $event"
-      @update:page-size="
-        pageSize = $event
-        page = 1
-      "
+      @update:page-size="changePageSize"
     >
       <template #filters>
         <PrintFilters
