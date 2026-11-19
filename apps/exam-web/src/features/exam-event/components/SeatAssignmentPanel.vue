@@ -24,6 +24,7 @@ import {
 import { buildSeatColumns } from './seatColumns'
 import { useSeatAssignment } from '../composables/useSeatAssignment'
 import type { ExamRoom } from '../types'
+import SeatGenerateDialog from './SeatGenerateDialog.vue'
 import type { SeatedStudent } from '../services/examEventService'
 import { examEventService } from '../services/examEventService'
 
@@ -41,7 +42,8 @@ const seat = useSeatAssignment(
 )
 
 const picked = ref<Set<string>>(new Set())
-const interleave = ref(true)
+const generateOpen = ref(false)
+const eventId = computed(() => props.rooms[0]?.eventId ?? '')
 const flagTarget = ref<SeatedStudent | null>(null)
 const flagReason = ref('')
 const flagSaving = ref(false)
@@ -93,14 +95,6 @@ function toggle(studentId: string) {
   if (next.has(studentId)) next.delete(studentId)
   else next.add(studentId)
   picked.value = next
-}
-
-async function distributeAll() {
-  const done = await seat.distribute(
-    props.rooms.map((room) => room.id),
-    interleave.value,
-  )
-  if (done) picked.value = new Set()
 }
 
 async function assignPicked() {
@@ -201,23 +195,23 @@ onMounted(() => {
 
     <div
       v-if="canAssign && rooms.length > 0"
-      class="flex flex-wrap items-center justify-between gap-3 rounded-md border p-4"
+      class="flex flex-wrap items-center justify-end gap-3 rounded-md border p-4"
     >
-      <label class="flex items-center gap-2 text-control">
-        <Checkbox
-          :model-value="interleave"
-          aria-label="Sebar bergiliran per kelas"
-          @update:model-value="interleave = Boolean($event)"
-        />
-        Sebar bergiliran per kelas
-      </label>
       <Button
         :disabled="seat.saving.value"
-        @click="distributeAll"
+        @click="generateOpen = true"
       >
-        Bagi Kursi Otomatis
+        Generate Kursi
       </Button>
     </div>
+
+    <SeatGenerateDialog
+      :open="generateOpen"
+      :event-id="eventId"
+      :students="seat.candidates.value"
+      @update:open="generateOpen = $event"
+      @saved="seat.load()"
+    />
 
     <div
       v-if="canAssign && seat.roomId.value"

@@ -1,5 +1,6 @@
 import { toast } from 'vue-sonner'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
+import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { studentEnrollmentApi } from '@/features/lookup/classroom'
 import type { StudentEnrollment } from '@/features/lookup/classroom'
@@ -17,6 +18,8 @@ import type {
   RoomUpdatePayload,
   SeatAssignPayload,
   SeatFlag,
+  SeatGenerateBody,
+  SeatGenerateResult,
   SupervisorSlot,
   UserOption,
   AuditLogEntry,
@@ -24,6 +27,10 @@ import type {
 
 export type Outcome<T> =
   { success: true; data: T } | { success: false; error: string }
+
+export type SeatGenerateOutcome =
+  | { success: true; data: SeatGenerateResult }
+  | { success: false; error: string; code?: string }
 
 export interface SeatedStudent extends RoomSeat {
   name: string | null
@@ -188,6 +195,23 @@ export const examEventService = {
       return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal membagi kursi otomatis.')
+    }
+  },
+
+  async generateSeats(
+    eventId: string,
+    body: SeatGenerateBody,
+  ): Promise<SeatGenerateOutcome> {
+    try {
+      const response = await examEventApi.generateSeats(eventId, body)
+      return { success: true, data: response }
+    } catch (err: unknown) {
+      const code = err instanceof ServiceRequestError ? err.code : undefined
+      return {
+        success: false,
+        error: messageOf(err, 'Gagal membuat kursi.'),
+        code,
+      }
     }
   },
 

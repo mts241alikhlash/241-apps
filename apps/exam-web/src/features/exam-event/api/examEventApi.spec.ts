@@ -224,4 +224,16 @@ describe('examEventApi', () => {
       },
     )
   })
+
+  it('generates seats for an event', async () => {
+    POST.mockResolvedValue(ok({ applied: false }))
+    const body = { mode: 'preview' as const, students: [] }
+    await expect(examEventApi.generateSeats('e1', body)).resolves.toEqual({
+      applied: false,
+    })
+    expect(POST).toHaveBeenCalledWith('/exam-events/{id}/seats/generate', {
+      params: { path: { id: 'e1' } },
+      body,
+    })
+  })
 })

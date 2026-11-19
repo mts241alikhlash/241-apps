@@ -41,3 +41,19 @@ export interface UserOption {
 }
 
 export type AuditLogEntry = Schemas['AuditLogDto']
+
+export type SeatGenerateBody = Schemas['GenerateSeatsBodyDto']
+
+export type SeatGenerateRules = Schemas['GenerateSeatRulesDto']
+
+export type SeatGenerateResult = Schemas['GenerateSeatsResponseDto']
+
+export type SeatGenerateRoom = Schemas['GenerateSeatsRoomDto']
+
+export type PlannedSeat = Schemas['SeatPlanSeatDto']
+
+export interface SeatCandidate {
+  studentId: string
+  classroomId: string
+  name?: string | null
+}
