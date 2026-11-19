@@ -1,5 +1,19 @@
 # @mts241alikhlash/exam-api
 
+## 0.7.0
+
+### Minor Changes
+
+- 6d04832: The signed student, supervisor and technician attendance sheets can be uploaded as scans (PDF, JPG or PNG, up to 10 MB): student sheets per room and supervisor slot, supervisor sheets per day, technician sheets per room and day. A new upload replaces the previous file of the same scope, and the files can be listed and downloaded.
+- 6d04832: Exam events can reset the login passwords of their seated students in one action (`POST /exam-events/:id/credentials/reset`, optional `roomId`, requires `confirm: true`): identity-service gives each account a random readable password, stores only its hash, revokes its sessions and answers the new passwords once. The nest-core helper `randomReadablePassword()` provides the password.
+- 6d04832: Participant numbers are issued and listed per semester from a standalone page under Ujian, Persiapan, Nomor Peserta (`POST /exam-participant-numbers/issue` and `POST /exam-participant-numbers/lookup`), no longer only from an activity. Desk numbers of the seat generator now snake within each block: odd rows run left to right and even rows right to left.
+- 6d04832: School-wide exam rules live in the exam policy, set per exam type in Pengaturan, Preset: late-entry tolerance and minimum time before submit (both in minutes), shuffle questions, shuffle choices and allow web access through Safe Exam Browser. The late cutoff is now the start of the paper plus the tolerance instead of the start of the exam period, the minimum submit time shown to students matches the one enforced, and a policy without the new keys falls back to the defaults. The exam period form takes dates only.
+- 6d04832: The exam service serves the print pack of an exam event (`GET /exam-events/:id/print-pack`, optional `roomId`) with each room's seated students, supervisors and technician, and the student service answers bulk participant-number lookups (`POST /students/participant-numbers/lookup`).
+- 6d04832: Every Berita Acara is reachable from one page: `GET /exam-rooms/reports` lists one row per supervisor slot the caller staffs, and exam-web adds `Berita Acara` to the sidebar next to the seat list. The document drops a schedule for a class with no seat in the room, shows the room code without its letter prefix and pads a seat number to two digits, and the print button returns to wherever it was opened from.
+- 6d04832: An exam period can generate its rooms and desk numbers in one action (`POST /exam-events/:id/seats/generate`, preview or apply, apply replaces the seats of the rooms in the plan only after confirmation). Girls take the left block and boys the right block of each room, desk numbers run block by block and row by row, and classrooms and grades are spread so that no neighbours share a grade or classroom where the numbers allow it. The Pembagian Kursi page replaces the automatic distribution with a Generate Kursi dialog with the rule choices, a grid preview and an apply step.
+- 6d04832: Handing in a Berita Acara now means uploading the signed, scanned file (PDF, JPG or PNG, up to 10 MB, checked by its first bytes): one file per room report, required to submit, replaceable by a coordinator while the report is submitted and downloadable by whoever may view the report. The Berita Acara list submits per room, per subject or per day with a file for every room, three uploads at a time, and retries only the rooms that failed.
+- 6d04832: Question import reads a vertical Word layout: sections per question type, A to E choices typed or automatic, Kunci, Abaikan harakat and Poin; the template download takes a layout and the question counts, and a count that differs from the school standard shows a warning in the preview without blocking the save.
+
 ## 0.6.0
 
 ### Minor Changes

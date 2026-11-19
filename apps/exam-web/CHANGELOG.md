@@ -1,5 +1,27 @@
 # exam-web
 
+## 0.7.0
+
+### Minor Changes
+
+- 6d04832: The signed student, supervisor and technician attendance sheets can be uploaded as scans (PDF, JPG or PNG, up to 10 MB): student sheets per room and supervisor slot, supervisor sheets per day, technician sheets per room and day. A new upload replaces the previous file of the same scope, and the files can be listed and downloaded.
+- 6d04832: Participant numbers are issued and listed per semester from a standalone page under Ujian, Persiapan, Nomor Peserta (`POST /exam-participant-numbers/issue` and `POST /exam-participant-numbers/lookup`), no longer only from an activity. Desk numbers of the seat generator now snake within each block: odd rows run left to right and even rows right to left.
+- 6d04832: School-wide exam rules live in the exam policy, set per exam type in Pengaturan, Preset: late-entry tolerance and minimum time before submit (both in minutes), shuffle questions, shuffle choices and allow web access through Safe Exam Browser. The late cutoff is now the start of the paper plus the tolerance instead of the start of the exam period, the minimum submit time shown to students matches the one enforced, and a policy without the new keys falls back to the defaults. The exam period form takes dates only.
+- 6d04832: Exam web gains the print pages for the room documents on one data source: participant cards, desk numbers, exam schedule, student attendance and supervisor and technician attendance, at `/exam/print/<document>`. The markup is a plain base for the layouts to come.
+- 6d04832: Every Berita Acara is reachable from one page: `GET /exam-rooms/reports` lists one row per supervisor slot the caller staffs, and exam-web adds `Berita Acara` to the sidebar next to the seat list. The document drops a schedule for a class with no seat in the room, shows the room code without its letter prefix and pads a seat number to two digits, and the print button returns to wherever it was opened from.
+- 6d04832: An exam period can generate its rooms and desk numbers in one action (`POST /exam-events/:id/seats/generate`, preview or apply, apply replaces the seats of the rooms in the plan only after confirmation). Girls take the left block and boys the right block of each room, desk numbers run block by block and row by row, and classrooms and grades are spread so that no neighbours share a grade or classroom where the numbers allow it. The Pembagian Kursi page replaces the automatic distribution with a Generate Kursi dialog with the rule choices, a grid preview and an apply step.
+- 6d04832: Handing in a Berita Acara now means uploading the signed, scanned file (PDF, JPG or PNG, up to 10 MB, checked by its first bytes): one file per room report, required to submit, replaceable by a coordinator while the report is submitted and downloadable by whoever may view the report. The Berita Acara list submits per room, per subject or per day with a file for every room, three uploads at a time, and retries only the rooms that failed.
+- 6d04832: Question import reads a vertical Word layout: sections per question type, A to E choices typed or automatic, Kunci, Abaikan harakat and Poin; the template download takes a layout and the question counts, and a count that differs from the school standard shows a warning in the preview without blocking the save.
+
+### Patch Changes
+
+- 6d04832: The design system settles on Inter with the `nova` control sizes (20/24/32/36 px, 24/32/36/40 px on a phone) and one type scale. `text-xs` and `text-sm` both read `--text-control` (12 px, 13 px on phones) so sidebar, breadcrumb, table and control text share one size; headings read `--text-heading-sm|heading|title|display|display-lg` (16/18/20/24/30 px); a floating label sits at `--text-label` (11 px). Radius follows the `nova` scale from `--radius` so controls and dialogs sit at 8 px and cards at 10 px, a status colour is a token (`--success`, `--warning`, `--info`, `--destructive`) with no Tailwind palette class outside the admission landing page and the kiosk, `text-control` is a utility registered in `cn` so `twMerge` keeps it, the sidebar is 17rem, tabs are an underline strip only, a card header and footer are 48 px, and the active sidebar item and breadcrumb are marked by `text-primary` alone. Dead variants are gone: `Card variant="flat"`, `CardFooter` `standard`/`thin`, `FieldLegend` `variant`, and the pill `Tabs` variant. Pages no longer set a size of their own: no `text-[Npx]`, no `font-size`, no `font-mono`, no `font-bold`. A badge is plain coloured text with an optional icon instead of a chip, a card uses `CardHeader plain` for a list page's borderless header and `p-4` padding, table surfaces read `--table-stripe`/`--table-header` so a sticky column never shows the cells under it, and spacing uses one scale (0, 0.5, 1, 1.5, 2, 3, 4, 6) checked by `check-card-overrides`.
+- Updated dependencies [6d04832]
+- Updated dependencies [6d04832]
+  - @mts241alikhlash/web-shared@0.2.1
+  - @mts241alikhlash/ui@0.2.0
+  - @mts241alikhlash/platform@0.2.1
+
 ## 0.6.0
 
 ### Minor Changes

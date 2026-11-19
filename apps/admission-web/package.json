@@ -1,7 +1,7 @@
 {
   "name": "admission-web",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "241 Admission: admission web app (waves, applications, documents, payments)",
   "type": "module",
   "scripts": {
