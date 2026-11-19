@@ -24,9 +24,11 @@ export function positionOf(desk: number, layout: SeatLayout): SeatPosition {
   }
   const side = desk <= layout.left ? 'LEFT' : 'RIGHT'
   const index = side === 'LEFT' ? desk : desk - layout.left
+  const row = Math.ceil(index / layout.lanes)
+  const offset = (index - 1) % layout.lanes
   return {
     side,
-    row: Math.ceil(index / layout.lanes),
-    lane: ((index - 1) % layout.lanes) + 1,
+    row,
+    lane: row % 2 === 1 ? offset + 1 : layout.lanes - offset,
   }
 }
