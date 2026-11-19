@@ -19,6 +19,12 @@ import {
   TabsTrigger,
 } from '@mts241alikhlash/ui/tabs'
 import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@mts241alikhlash/ui/tooltip'
 import { Camera, Loader2, Trash2 } from '@lucide/vue'
 import { Avatar, AvatarImage, AvatarFallback } from '@mts241alikhlash/ui/avatar'
 
@@ -141,31 +147,46 @@ useBreadcrumbs(() => {
                     class="hidden"
                     @change="onPhotoPicked"
                   />
-                  <button
-                    type="button"
-                    :title="avatarUrl ? 'Ganti foto' : 'Unggah foto'"
-                    :disabled="isUploadingPhoto"
-                    class="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
-                    @click="photoInput?.click()"
-                  >
-                    <Loader2
-                      v-if="isUploadingPhoto"
-                      class="size-4 animate-spin"
-                    />
-                    <Camera
-                      v-else
-                      class="size-4"
-                    />
-                  </button>
-                  <button
-                    v-if="avatarUrl && !isUploadingPhoto"
-                    type="button"
-                    title="Hapus foto"
-                    class="absolute -bottom-1 -left-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
-                    @click="handlePhotoDelete"
-                  >
-                    <Trash2 class="size-4" />
-                  </button>
+                  <TooltipProvider :delay-duration="300">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <button
+                          type="button"
+                          :aria-label="avatarUrl ? 'Ganti foto' : 'Unggah foto'"
+                          :disabled="isUploadingPhoto"
+                          class="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
+                          @click="photoInput?.click()"
+                        >
+                          <Loader2
+                            v-if="isUploadingPhoto"
+                            class="size-4 animate-spin"
+                          />
+                          <Camera
+                            v-else
+                            class="size-4"
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {{ avatarUrl ? 'Ganti foto' : 'Unggah foto' }}
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip v-if="avatarUrl && !isUploadingPhoto">
+                      <TooltipTrigger as-child>
+                        <button
+                          type="button"
+                          aria-label="Hapus foto"
+                          class="absolute -bottom-1 -left-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
+                          @click="handlePhotoDelete"
+                        >
+                          <Trash2 class="size-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Hapus foto
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </template>
               </div>
 

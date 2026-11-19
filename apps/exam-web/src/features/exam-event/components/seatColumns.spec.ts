@@ -9,7 +9,10 @@ const seat: SeatedStudent = {
   seatNumber: 3,
   name: 'Ahmad',
   nis: '001',
+  nisn: '0099887766',
   classroomName: 'VII A',
+  gradeName: 'VII',
+  className: 'A',
 }
 
 function actionNode(

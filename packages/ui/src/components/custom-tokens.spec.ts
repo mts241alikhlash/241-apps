@@ -78,7 +78,9 @@ describe('custom components on the control tokens', () => {
 
   it('back button is a md square', () => {
     const w = mount(BackButton, { props: { label: 'Kembali' } })
-    expect(w.classes()).toContain('size-[var(--control-h-md,2rem)]')
+    expect(w.get('button').classes()).toContain(
+      'size-[var(--control-h-md,2rem)]',
+    )
   })
 
   it('floating field hides the placeholder text of a date trigger while it is empty', () => {

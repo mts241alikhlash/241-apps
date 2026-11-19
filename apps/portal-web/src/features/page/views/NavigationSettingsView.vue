@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Button } from '@mts241alikhlash/ui/button'
+import { Button, TooltipButton } from '@mts241alikhlash/ui'
 import {
   Card,
   CardContent,
@@ -256,32 +256,32 @@ function describe(item: NavItem): string {
               @update:model-value="toggleActive(item)"
             />
 
-            <Button
+            <TooltipButton
+              label="Naikkan"
               variant="ghost"
               size="icon"
-              title="Naikkan"
               :disabled="index === 0"
               @click="move(index, -1)"
             >
               <ChevronUp class="size-4" />
-            </Button>
-            <Button
+            </TooltipButton>
+            <TooltipButton
+              label="Turunkan"
               variant="ghost"
               size="icon"
-              title="Turunkan"
               :disabled="index === store.navItems.length - 1"
               @click="move(index, 1)"
             >
               <ChevronDown class="size-4" />
-            </Button>
-            <Button
+            </TooltipButton>
+            <TooltipButton
+              label="Hapus"
               variant="ghost"
               size="icon"
-              title="Hapus"
               @click="remove(item)"
             >
               <Trash2 class="size-4" />
-            </Button>
+            </TooltipButton>
           </div>
         </section>
       </CardContent>

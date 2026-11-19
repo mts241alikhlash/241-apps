@@ -23,7 +23,12 @@ export function buildRoomColumns(
     {
       id: 'code',
       header: 'Kode',
-      meta: { align: 'left', strong: true },
+      meta: {
+        align: 'center',
+        strong: true,
+        mobileLabel: 'Kode',
+        mobileValue: (row: ExamRoom) => row.code,
+      },
       cell: ({ row }) =>
         h('span', { class: 'tabular-nums' }, row.original.code),
     },
@@ -31,6 +36,7 @@ export function buildRoomColumns(
       id: 'name',
       header: 'Ruangan',
       meta: {
+        align: 'left',
         mobileLabel: 'Ruangan',
         mobileValue: (row: ExamRoom) => row.name,
       },
@@ -40,6 +46,7 @@ export function buildRoomColumns(
       id: 'building',
       header: 'Gedung',
       meta: {
+        align: 'left',
         mobileLabel: 'Gedung',
         mobileValue: (row: ExamRoom) => row.building ?? '-',
       },
@@ -60,6 +67,7 @@ export function buildRoomColumns(
       id: 'technician',
       header: 'Teknisi',
       meta: {
+        align: 'left',
         mobileLabel: 'Teknisi',
         mobileValue: (row: ExamRoom) =>
           options.technicianName(row.technicianUserId),

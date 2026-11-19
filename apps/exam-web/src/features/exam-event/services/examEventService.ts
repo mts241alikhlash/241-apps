@@ -28,7 +28,10 @@ export type Outcome<T> =
 export interface SeatedStudent extends RoomSeat {
   name: string | null
   nis: string | null
+  nisn: string | null
   classroomName: string | null
+  gradeName: string | null
+  className: string | null
 }
 
 export interface CandidateStudent {
@@ -36,7 +39,10 @@ export interface CandidateStudent {
   classroomId: string
   name: string | null
   nis: string | null
+  nisn: string | null
   classroomName: string | null
+  gradeName: string | null
+  className: string | null
 }
 
 const failure = <T>(err: unknown, fallback: string): Outcome<T> => ({
@@ -49,7 +55,10 @@ const toCandidate = (row: StudentEnrollment): CandidateStudent => ({
   classroomId: row.classroomId,
   name: row.student?.user?.profile?.name ?? null,
   nis: null,
+  nisn: null,
   classroomName: row.classroom?.displayName ?? null,
+  gradeName: row.classroom?.grade?.name ?? null,
+  className: row.classroom?.name ?? null,
 })
 
 export const examEventService = {
@@ -58,7 +67,7 @@ export const examEventService = {
       const response = await examEventApi.getEvents(params)
       return { success: true, data: response.data }
     } catch (err: unknown) {
-      return failure(err, 'Gagal memuat kegiatan ujian.')
+      return failure(err, 'Gagal memuat periode ujian.')
     }
   },
 
@@ -76,7 +85,7 @@ export const examEventService = {
       const response = await examEventApi.getEvent(id)
       return { success: true, data: response }
     } catch (err: unknown) {
-      return failure(err, 'Gagal memuat kegiatan ujian.')
+      return failure(err, 'Gagal memuat periode ujian.')
     }
   },
 
@@ -91,7 +100,7 @@ export const examEventService = {
           : await examEventApi.updateEvent(target.id, payload)
       return { success: true, data: response }
     } catch (err: unknown) {
-      return failure(err, 'Gagal menyimpan kegiatan ujian.')
+      return failure(err, 'Gagal menyimpan periode ujian.')
     }
   },
 
@@ -141,7 +150,10 @@ export const examEventService = {
           ...seat,
           name: byStudent.get(seat.studentId)?.name ?? null,
           nis: byStudent.get(seat.studentId)?.nis ?? null,
+          nisn: byStudent.get(seat.studentId)?.nisn ?? null,
           classroomName: byStudent.get(seat.studentId)?.classroomName ?? null,
+          gradeName: byStudent.get(seat.studentId)?.gradeName ?? null,
+          className: byStudent.get(seat.studentId)?.className ?? null,
         })),
       }
     } catch (err: unknown) {
@@ -283,7 +295,7 @@ export const examEventService = {
     }
   },
 
-  async loadStaff(roleCode: string): Promise<UserOption[]> {
+  async loadStaff(roleCode: string, quiet = false): Promise<UserOption[]> {
     try {
       const response = await staffApi.getUsers({
         roleCode,
@@ -293,9 +305,11 @@ export const examEventService = {
         .map((row) => ({ id: row.id, identifier: row.identifier }))
         .sort((a, b) => a.identifier.localeCompare(b.identifier))
     } catch (err: unknown) {
-      toast.error(
-        getIndonesianErrorMessage(err, 'Gagal memuat daftar petugas.'),
-      )
+      if (!quiet) {
+        toast.error(
+          getIndonesianErrorMessage(err, 'Gagal memuat daftar petugas.'),
+        )
+      }
       return []
     }
   },
@@ -305,13 +319,24 @@ export const examEventService = {
     classroomId?: string,
   ): Promise<CandidateStudent[]> {
     try {
-      const response = await studentEnrollmentApi.getEnrollments({
-        semesterId,
-        classroomId,
-        status: 'ACTIVE',
-        limit: 1000,
+      const [enrollments, students] = await Promise.all([
+        studentEnrollmentApi.getEnrollments({
+          semesterId,
+          classroomId,
+          status: 'ACTIVE',
+          limit: 1000,
+        }),
+        studentEnrollmentApi.getStudents({ semesterId, limit: 1000 }),
+      ])
+      const byId = new Map(students.data.map((row) => [row.id, row] as const))
+      return enrollments.data.map((row) => {
+        const student = byId.get(row.studentId)
+        return {
+          ...toCandidate(row),
+          nis: student?.nis ?? null,
+          nisn: student?.nisn ?? null,
+        }
       })
-      return response.data.map(toCandidate)
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar siswa.'))
       return []

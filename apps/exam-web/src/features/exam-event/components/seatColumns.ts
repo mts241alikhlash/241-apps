@@ -36,12 +36,6 @@ export function buildSeatColumns(
         h('span', { class: 'tabular-nums' }, `${row.original.seatNumber}`),
     },
     {
-      id: 'name',
-      header: 'Siswa',
-      meta: { align: 'left', strong: true },
-      cell: ({ row }) => row.original.name ?? 'Siswa tidak ditemukan',
-    },
-    {
       id: 'nis',
       header: 'NIS',
       meta: {
@@ -53,13 +47,41 @@ export function buildSeatColumns(
         h('span', { class: 'tabular-nums' }, row.original.nis ?? '-'),
     },
     {
+      id: 'nisn',
+      header: 'NISN',
+      meta: {
+        align: 'center',
+        mobileLabel: 'NISN',
+        mobileValue: (row: SeatedStudent) => row.nisn ?? '-',
+      },
+      cell: ({ row }) =>
+        h('span', { class: 'tabular-nums' }, row.original.nisn ?? '-'),
+    },
+    {
+      id: 'name',
+      header: 'Nama',
+      meta: { align: 'left', strong: true, mobileLabel: 'Nama' },
+      cell: ({ row }) => row.original.name ?? 'Siswa tidak ditemukan',
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: SeatedStudent) => row.gradeName ?? '-',
+      },
+      cell: ({ row }) => row.original.gradeName ?? '-',
+    },
+    {
       id: 'classroom',
       header: 'Kelas',
       meta: {
+        align: 'center',
         mobileLabel: 'Kelas',
-        mobileValue: (row: SeatedStudent) => row.classroomName ?? '-',
+        mobileValue: (row: SeatedStudent) => row.className ?? '-',
       },
-      cell: ({ row }) => row.original.classroomName ?? '-',
+      cell: ({ row }) => row.original.className ?? '-',
     },
     {
       id: 'actions',

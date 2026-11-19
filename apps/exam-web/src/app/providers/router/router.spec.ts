@@ -123,7 +123,9 @@ describe('menu', () => {
     const instance = router()
     for (const section of menuSections) {
       for (const item of section.items) {
-        expect(instance.resolve(item.url).name).not.toBe('not-found')
+        for (const target of item.items ?? [item]) {
+          expect(instance.resolve(target.url).name).not.toBe('not-found')
+        }
       }
     }
   })
@@ -132,11 +134,13 @@ describe('menu', () => {
     expect(
       menuSections.map((section) => [
         section.key,
-        section.items.map((item) => [
-          item.url,
-          item.requiredPermission,
-          item.requiredAnyPermission,
-        ]),
+        section.items.flatMap((item) =>
+          (item.items ?? [item]).map((target) => [
+            target.url,
+            target.requiredPermission,
+            target.requiredAnyPermission,
+          ]),
+        ),
       ]),
     ).toEqual([
       [
@@ -150,6 +154,26 @@ describe('menu', () => {
         'exam',
         [
           ['/exam/events', 'exam-events.read', undefined],
+          [
+            '/exam/room-setup',
+            undefined,
+            ['exam-events.read', 'exam-rooms.supervise'],
+          ],
+          [
+            '/exam/seat-assignment',
+            undefined,
+            ['exam-events.read', 'exam-rooms.supervise'],
+          ],
+          [
+            '/exam/supervisor-schedule',
+            undefined,
+            ['exam-events.read', 'exam-rooms.supervise'],
+          ],
+          [
+            '/exam/room-cards',
+            undefined,
+            ['exam-events.read', 'exam-rooms.supervise'],
+          ],
           ['/exam/activities', 'exam-schedules.manage', undefined],
           ['/exam/schedules', 'exam-schedules.read', undefined],
           [
@@ -161,7 +185,6 @@ describe('menu', () => {
               'exam-rooms.manage-all',
             ],
           ],
-          ['/exam/grading', 'exam-grading.read', undefined],
           [
             '/exam/reports',
             undefined,
@@ -171,6 +194,7 @@ describe('menu', () => {
               'exam-rooms.manage-all',
             ],
           ],
+          ['/exam/grading', 'exam-grading.read', undefined],
           ['/exam/print/cards', 'exam-events.manage', undefined],
           ['/exam/print/desks', 'exam-events.manage', undefined],
           ['/exam/print/schedule', 'exam-events.manage', undefined],
@@ -208,7 +232,10 @@ describe('menu', () => {
 
     for (const key of menuSections.flatMap((section) => [
       section.label,
-      ...section.items.map((item) => item.title),
+      ...section.items.flatMap((item) => [
+        item.title,
+        ...(item.items ?? []).map((target) => target.title),
+      ]),
     ])) {
       expect(read(en, key), `en is missing ${key}`).toBeTypeOf('string')
       expect(read(id, key), `id is missing ${key}`).toBeTypeOf('string')

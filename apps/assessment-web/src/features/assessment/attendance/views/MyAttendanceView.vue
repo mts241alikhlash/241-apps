@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@mts241alikhlash/ui/button'
+import { Button, TooltipButton } from '@mts241alikhlash/ui'
 import {
   Card,
   CardHeader,
@@ -334,28 +334,26 @@ onMounted(() => void load())
           class="flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4"
         >
           <div class="flex items-center justify-center gap-1.5 sm:gap-2">
-            <Button
+            <TooltipButton
+              label="Bulan Sebelumnya"
               variant="outline"
-              size="icon"
-              title="Bulan Sebelumnya"
               @click="prevMonth"
             >
               <ChevronLeft class="h-4 w-4" />
-            </Button>
+            </TooltipButton>
             <Button
               variant="outline"
               @click="setToday"
             >
               Bulan Ini
             </Button>
-            <Button
+            <TooltipButton
+              label="Bulan Selanjutnya"
               variant="outline"
-              size="icon"
-              title="Bulan Selanjutnya"
               @click="nextMonth"
             >
               <ChevronRight class="h-4 w-4" />
-            </Button>
+            </TooltipButton>
           </div>
 
           <div class="flex items-center justify-center gap-2">
