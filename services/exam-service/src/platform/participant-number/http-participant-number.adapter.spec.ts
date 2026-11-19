@@ -53,7 +53,8 @@ describe('HttpParticipantNumberAdapter', () => {
   })
 
   it('asks student-service to issue the semester’s numbers', async () => {
-    const { adapter, postData } = build({ issued: 2, skipped: [] })
+    const { adapter, postData } = build(null)
+    postData.mockResolvedValueOnce({ issued: 2, skipped: [] })
 
     await adapter.issueNumbers('sem 1')
 
@@ -62,6 +63,30 @@ describe('HttpParticipantNumberAdapter', () => {
       '/students/participant-numbers/issue',
       { semesterId: 'sem 1' },
     )
+  })
+
+  it('maps the issue answer to the count and the skipped students', async () => {
+    const { adapter, postData } = build(null)
+    postData.mockResolvedValueOnce({ issued: 2, skipped: ['stu-9'] })
+
+    await expect(adapter.issueNumbers('sem-1')).resolves.toEqual({
+      issued: 2,
+      skipped: ['stu-9'],
+    })
+  })
+
+  it('treats an issue answer of the wrong shape as malformed', async () => {
+    const shapes = [
+      { issued: '2', skipped: [] },
+      { issued: 2, skipped: [1] },
+      { issued: 2 },
+      null,
+    ]
+    for (const shape of shapes) {
+      const { adapter, postData } = build(null)
+      postData.mockResolvedValueOnce(shape)
+      await expect(adapter.issueNumbers('sem-1')).rejects.toThrow('malformed')
+    }
   })
 
   it('looks up the numbers of many students with one POST', async () => {

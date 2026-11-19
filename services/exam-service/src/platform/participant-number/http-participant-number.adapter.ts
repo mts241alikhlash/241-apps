@@ -18,6 +18,20 @@ function isNumberEntry(
   )
 }
 
+function isIssueAnswer(
+  data: unknown,
+): data is { issued: number; skipped: string[] } {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'issued' in data &&
+    typeof data.issued === 'number' &&
+    'skipped' in data &&
+    Array.isArray(data.skipped) &&
+    data.skipped.every((id) => typeof id === 'string')
+  )
+}
+
 @Injectable()
 export class HttpParticipantNumberAdapter extends IParticipantNumberPort {
   constructor(private readonly client: ServiceClient) {
@@ -64,9 +78,15 @@ export class HttpParticipantNumberAdapter extends IParticipantNumberPort {
     return numbers
   }
 
-  async issueNumbers(semesterId: string): Promise<void> {
-    await this.client.postData(URL_KEY, '/students/participant-numbers/issue', {
-      semesterId,
-    })
+  async issueNumbers(
+    semesterId: string,
+  ): Promise<{ issued: number; skipped: string[] }> {
+    const data = await this.client.postData(
+      URL_KEY,
+      '/students/participant-numbers/issue',
+      { semesterId },
+    )
+    if (!isIssueAnswer(data)) return this.client.malformed(URL_KEY)
+    return data
   }
 }

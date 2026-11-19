@@ -5399,6 +5399,106 @@
         ]
       }
     },
+    "/exam-participant-numbers/issue": {
+      "post": {
+        "operationId": "ExamParticipantNumberController_issue",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueSemesterNumbersBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IssueSemesterNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue the missing participant numbers of a semester",
+        "tags": [
+          "Exam Participant Numbers"
+        ]
+      }
+    },
+    "/exam-participant-numbers/lookup": {
+      "post": {
+        "operationId": "ExamParticipantNumberController_lookup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupParticipantNumbersBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LookupParticipantNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Participant numbers of many students in one semester",
+        "tags": [
+          "Exam Participant Numbers"
+        ]
+      }
+    },
     "/exam-files": {
       "post": {
         "operationId": "ExamFileController_upload",
@@ -11950,6 +12050,89 @@
           "attachmentName",
           "subjectNames",
           "supervisorName"
+        ]
+      },
+      "IssueSemesterNumbersBodyDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "semesterId"
+        ]
+      },
+      "IssueSemesterNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "type": "number",
+            "description": "How many numbers this call created"
+          },
+          "skipped": {
+            "description": "Students without a grade level, so they got no number",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "issued",
+          "skipped"
+        ]
+      },
+      "LookupParticipantNumbersBodyDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "semesterId",
+          "studentIds"
+        ]
+      },
+      "ParticipantNumberItemDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "studentId",
+          "number"
+        ]
+      },
+      "LookupParticipantNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantNumberItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "ExamFileDto": {

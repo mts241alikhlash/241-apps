@@ -16,6 +16,8 @@ import { GetRoomMonitorUseCase } from './application/use-cases/get-room-monitor/
 import { GetPrintPackUseCase } from './application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from './application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
 import { GenerateSeatsUseCase } from './application/use-cases/generate-seats/generate-seats.use-case.js'
+import { IssueSemesterParticipantNumbersUseCase } from './application/use-cases/issue-semester-participant-numbers/issue-semester-participant-numbers.use-case.js'
+import { LookupParticipantNumbersUseCase } from './application/use-cases/lookup-participant-numbers/lookup-participant-numbers.use-case.js'
 import { ListRoomReportsUseCase } from './application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from './application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
 import { GetSessionTimelineUseCase } from './application/use-cases/get-session-timeline/get-session-timeline.use-case.js'
@@ -35,6 +37,7 @@ import { IRoomReportFileStorage } from './domain/repositories/room-report-file-s
 import { StorageRoomReportFileStorage } from './infrastructure/storage-room-report-file-storage.js'
 import { PrismaExamRoomRepository } from './infrastructure/persistence/prisma/prisma-exam-room.repository.js'
 import { ExamEventController } from './presentation/http/exam-event.controller.js'
+import { ExamParticipantNumberController } from './presentation/http/participant-number.controller.js'
 import {
   ExamRoomController,
   ExamRoomOverviewController,
@@ -52,6 +55,7 @@ import {
     ExamAttendanceFileController,
     ExamRoomController,
     ExamRoomOverviewController,
+    ExamParticipantNumberController,
   ],
   providers: [
     { provide: IExamRoomRepository, useClass: PrismaExamRoomRepository },
@@ -88,6 +92,8 @@ import {
     GetPrintPackUseCase,
     ResetEventCredentialsUseCase,
     GenerateSeatsUseCase,
+    IssueSemesterParticipantNumbersUseCase,
+    LookupParticipantNumbersUseCase,
     ListRoomsOverviewUseCase,
     ListRoomReportsUseCase,
     GetSessionTimelineUseCase,

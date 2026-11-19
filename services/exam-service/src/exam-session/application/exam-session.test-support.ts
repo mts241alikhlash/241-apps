@@ -170,7 +170,7 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
   }
 
   issueNumbers() {
-    return Promise.resolve()
+    return Promise.resolve({ issued: 0, skipped: [] })
   }
 }
 

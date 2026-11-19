@@ -7,5 +7,7 @@ export abstract class IParticipantNumberPort {
     studentIds: string[],
     semesterId: string,
   ): Promise<Map<string, string>>
-  abstract issueNumbers(semesterId: string): Promise<void>
+  abstract issueNumbers(
+    semesterId: string,
+  ): Promise<{ issued: number; skipped: string[] }>
 }

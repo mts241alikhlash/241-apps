@@ -152,7 +152,7 @@ class FakeParticipants extends IParticipantNumberPort {
   issueNumbers(semesterId: string) {
     this.issued.push(semesterId)
     return this.failure === null
-      ? Promise.resolve()
+      ? Promise.resolve({ issued: 0, skipped: [] })
       : Promise.reject(this.failure)
   }
 }

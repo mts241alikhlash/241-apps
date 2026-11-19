@@ -576,6 +576,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the missing participant numbers of a semester */
+        post: operations["ExamParticipantNumberController_issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-participant-numbers/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Participant numbers of many students in one semester */
+        post: operations["ExamParticipantNumberController_lookup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-policy-presets": {
         parameters: {
             query?: never;
@@ -2252,12 +2286,30 @@ export interface components {
         IssueParticipantNumbersResponseDto: {
             issued: boolean;
         };
+        IssueSemesterNumbersBodyDto: {
+            /** Format: uuid */
+            semesterId: string;
+        };
+        IssueSemesterNumbersResponseDto: {
+            /** @description How many numbers this call created */
+            issued: number;
+            /** @description Students without a grade level, so they got no number */
+            skipped: string[];
+        };
         KeyAnswerPayloadDto: {
             /** @enum {string} */
             key: "A" | "B" | "C" | "D" | "E";
         };
         KeysAnswerPayloadDto: {
             keys: ("A" | "B" | "C" | "D" | "E")[];
+        };
+        LookupParticipantNumbersBodyDto: {
+            /** Format: uuid */
+            semesterId: string;
+            studentIds: string[];
+        };
+        LookupParticipantNumbersResponseDto: {
+            items: components["schemas"]["ParticipantNumberItemDto"][];
         };
         MakeupParticipantDto: {
             note?: string | null;
@@ -2369,6 +2421,11 @@ export interface components {
             reason: "SICK" | "PERMITTED" | "ABSENT" | "OTHER";
             /** @enum {string} */
             status: "WAITING" | "SAT_REGULAR" | "IN_PROGRESS" | "DONE";
+            /** Format: uuid */
+            studentId: string;
+        };
+        ParticipantNumberItemDto: {
+            number: string;
             /** Format: uuid */
             studentId: string;
         };
@@ -4479,6 +4536,64 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamPackageDetailDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamParticipantNumberController_issue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueSemesterNumbersBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueSemesterNumbersResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamParticipantNumberController_lookup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LookupParticipantNumbersBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["LookupParticipantNumbersResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
