@@ -17,6 +17,7 @@ export default {
     examSeatAssignment: 'Pembagian Kursi',
     examSupervisorSchedule: 'Jadwal Pengawas',
     examRoomCards: 'Kartu per Ruangan',
+    examParticipantNumbers: 'Nomor Peserta',
     examActivities: 'Kegiatan',
     examRooms: 'Ruang',
     examSchedules: 'Jadwal',

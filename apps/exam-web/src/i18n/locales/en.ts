@@ -17,6 +17,7 @@ export default {
     examSeatAssignment: 'Seat Assignment',
     examSupervisorSchedule: 'Supervisor Schedule',
     examRoomCards: 'Room Cards',
+    examParticipantNumbers: 'Participant Numbers',
     examActivities: 'Activities',
     examRooms: 'Rooms',
     examSchedules: 'Schedules',
