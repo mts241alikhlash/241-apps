@@ -267,9 +267,7 @@ const columns = computed(() =>
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Jadwal</DialogTitle>
-          <DialogDescription>
-            Pilih status jadwal.
-          </DialogDescription>
+          <DialogDescription> Pilih status jadwal. </DialogDescription>
         </DialogHeader>
         <DialogBody class="space-y-4">
           <FloatingLabelField

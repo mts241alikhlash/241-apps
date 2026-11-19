@@ -181,9 +181,7 @@ const onSubmit = handleSubmit((formValues) => {
         <DialogTitle>
           {{ isEdit ? 'Ubah Gelombang' : 'Tambah Gelombang' }}
         </DialogTitle>
-        <DialogDescription>
-          Isi data gelombang pendaftaran.
-        </DialogDescription>
+        <DialogDescription> Isi data gelombang pendaftaran. </DialogDescription>
       </DialogHeader>
 
       <div class="min-h-0 flex-1 overflow-y-auto">

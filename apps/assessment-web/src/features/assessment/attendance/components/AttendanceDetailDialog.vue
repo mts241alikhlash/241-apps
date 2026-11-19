@@ -57,7 +57,9 @@ const formattedDate = computed(() => {
         <DialogTitle class="text-base font-semibold"
           >Detail Kehadiran</DialogTitle
         >
-        <DialogDescription>Rincian kehadiran siswa pada sesi ini.</DialogDescription>
+        <DialogDescription
+          >Rincian kehadiran siswa pada sesi ini.</DialogDescription
+        >
       </DialogHeader>
 
       <DialogBody class="space-y-4 text-xs">

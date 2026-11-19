@@ -128,7 +128,10 @@ const handleSave = async () => {
         </DialogBody>
       </ScrollArea>
 
-      <DialogFooter standard class="sm:justify-between">
+      <DialogFooter
+        standard
+        class="sm:justify-between"
+      >
         <Button
           variant="outline"
           :disabled="isSaving"

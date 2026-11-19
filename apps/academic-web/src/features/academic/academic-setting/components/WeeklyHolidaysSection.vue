@@ -81,7 +81,10 @@ function handleSave() {
     <DialogContent class="sm:max-w-xs flex flex-col gap-0 p-0 overflow-hidden">
       <DialogHeader standard>
         <DialogTitle>Hari Libur Mingguan</DialogTitle>
-        <DialogDescription>Atur hari libur mingguan yang berlaku untuk seluruh kelas.</DialogDescription>
+        <DialogDescription
+          >Atur hari libur mingguan yang berlaku untuk seluruh
+          kelas.</DialogDescription
+        >
       </DialogHeader>
 
       <DialogBody class="space-y-3">

@@ -90,8 +90,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   )
   :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
-  top: calc(0.75rem + var(--control-h-md,2rem) / 2 + 0.75px);
-  font-size: var(--text-control,0.75rem);
+  top: calc(0.75rem + var(--control-h-md, 2rem) / 2 + 0.75px);
+  font-size: var(--text-control, 0.75rem);
   color: var(--muted-foreground);
 }
 
@@ -108,8 +108,8 @@ provide(FORM_ITEM_INJECTION_KEY, id)
   )
   :deep([data-slot='ff-label']) {
   left: calc(0.375rem + 1px);
-  top: calc(0.75rem + var(--control-h-md,2rem) / 2 + 0.75px);
-  font-size: var(--text-control,0.75rem);
+  top: calc(0.75rem + var(--control-h-md, 2rem) / 2 + 0.75px);
+  font-size: var(--text-control, 0.75rem);
   color: var(--muted-foreground);
 }
 

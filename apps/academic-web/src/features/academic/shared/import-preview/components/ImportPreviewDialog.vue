@@ -145,7 +145,10 @@ const tableColumns = computed<ColumnDef<ImportPreviewRow<TData>>[]>(() =>
         <Progress :model-value="progress" />
       </div>
 
-      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <DialogFooter
+        standard
+        class="flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div
           class="flex flex-wrap items-center gap-2 text-xs justify-center sm:justify-start"
         >

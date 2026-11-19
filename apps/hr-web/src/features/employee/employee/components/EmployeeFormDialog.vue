@@ -95,7 +95,9 @@ const dialog = useEmployeeFormDialog({
             dialog.isEditing.value ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'
           }}
         </DialogTitle>
-        <DialogDescription>Isi data pegawai baru atau perbarui data yang ada.</DialogDescription>
+        <DialogDescription
+          >Isi data pegawai baru atau perbarui data yang ada.</DialogDescription
+        >
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -140,7 +142,10 @@ const dialog = useEmployeeFormDialog({
         </form>
       </ScrollArea>
 
-      <DialogFooter standard class="justify-between">
+      <DialogFooter
+        standard
+        class="justify-between"
+      >
         <Button
           type="button"
           variant="outline"

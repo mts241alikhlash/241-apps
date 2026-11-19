@@ -163,7 +163,10 @@ const curriculumForm = useCurriculumForm({
         </form>
       </ScrollArea>
 
-      <DialogFooter standard class="sm:justify-between mt-auto">
+      <DialogFooter
+        standard
+        class="sm:justify-between mt-auto"
+      >
         <Button
           type="button"
           variant="outline"

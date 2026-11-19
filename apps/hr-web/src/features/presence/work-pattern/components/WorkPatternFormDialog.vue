@@ -174,7 +174,10 @@ async function handleDelete() {
         </div>
       </DialogBody>
 
-      <DialogFooter standard class="justify-between">
+      <DialogFooter
+        standard
+        class="justify-between"
+      >
         <div>
           <Button
             v-if="editing && !editing.isDefault"

@@ -140,7 +140,10 @@ const onSubmit = form.handleSubmit(async (values) => {
           </DialogBody>
         </ScrollArea>
 
-        <DialogFooter standard class="sm:justify-end relative mt-auto">
+        <DialogFooter
+          standard
+          class="sm:justify-end relative mt-auto"
+        >
           <Button
             type="button"
             variant="outline"

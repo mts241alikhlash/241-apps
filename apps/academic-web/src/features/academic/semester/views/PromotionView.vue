@@ -508,7 +508,10 @@ onMounted(async () => {
     >
       <DialogHeader standard>
         <DialogTitle>Konfirmasi Kenaikan Kelas</DialogTitle>
-        <DialogDescription>Periksa siswa yang naik dan yang tinggal, lalu konfirmasi.</DialogDescription>
+        <DialogDescription
+          >Periksa siswa yang naik dan yang tinggal, lalu
+          konfirmasi.</DialogDescription
+        >
       </DialogHeader>
 
       <DialogBody class="space-y-4">
@@ -589,7 +592,10 @@ onMounted(async () => {
         </template>
       </DialogBody>
 
-      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3">
+      <DialogFooter
+        standard
+        class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3"
+      >
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="

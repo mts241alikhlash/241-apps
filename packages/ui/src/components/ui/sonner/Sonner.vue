@@ -53,20 +53,20 @@ const props = defineProps<ToasterProps>()
 .toaster [data-sonner-toast] {
   gap: 0.5rem !important;
   padding: 0.625rem 0.75rem !important;
-  font-size: var(--text-control,0.75rem) !important;
+  font-size: var(--text-control, 0.75rem) !important;
 }
 
 .toaster [data-sonner-toast] [data-title] {
-  font-size: var(--text-control,0.75rem) !important;
+  font-size: var(--text-control, 0.75rem) !important;
   font-weight: 500 !important;
 }
 
 .toaster [data-sonner-toast] [data-description] {
-  font-size: var(--text-control,0.75rem) !important;
+  font-size: var(--text-control, 0.75rem) !important;
 }
 
 .toaster [data-sonner-toast] [data-button] {
-  height: var(--control-h-sm,1.5rem) !important;
-  font-size: var(--text-control,0.75rem) !important;
+  height: var(--control-h-sm, 1.5rem) !important;
+  font-size: var(--text-control, 0.75rem) !important;
 }
 </style>

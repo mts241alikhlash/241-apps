@@ -54,9 +54,7 @@ async function save() {
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Ganti Judul</DialogTitle>
-        <DialogDescription>
-          Ganti judul paket soal.
-        </DialogDescription>
+        <DialogDescription> Ganti judul paket soal. </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
         <div

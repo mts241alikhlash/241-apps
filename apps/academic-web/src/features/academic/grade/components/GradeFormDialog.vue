@@ -339,7 +339,10 @@ onMounted(async () => {
         </template>
       </ScrollArea>
 
-      <DialogFooter standard class="sm:justify-between">
+      <DialogFooter
+        standard
+        class="sm:justify-between"
+      >
         <Button
           type="button"
           variant="outline"

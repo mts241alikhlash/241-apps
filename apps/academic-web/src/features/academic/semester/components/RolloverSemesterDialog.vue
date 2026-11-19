@@ -272,7 +272,10 @@ const summaryRows = computed((): RolloverSummaryRow[] => {
         </div>
       </ScrollArea>
 
-      <DialogFooter standard class="sm:justify-between mt-auto">
+      <DialogFooter
+        standard
+        class="sm:justify-between mt-auto"
+      >
         <template v-if="rolloverSummary">
           <div />
           <Button
