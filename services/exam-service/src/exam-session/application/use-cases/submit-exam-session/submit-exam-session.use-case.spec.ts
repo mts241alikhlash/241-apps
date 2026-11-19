@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common'
+import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
@@ -255,6 +256,51 @@ describe('SubmitExamSessionUseCase', () => {
     )
 
     expect(result.status).toBe('GRADED')
+  })
+
+  it('refuses a hand-in before the minimum submit time of the session policy', async () => {
+    const { useCase } = await setup()
+    sessions.sessions.set(
+      'a',
+      sessionFor(schedule, {
+        id: 'a',
+        policy: { ...DEFAULT_POLICIES.MIDTERM, minSubmitMinutes: 20 },
+      }),
+    )
+
+    await expect(
+      useCase.execute(
+        STUDENT_USER,
+        'a',
+        {},
+        new Date(NOW.getTime() + 10 * 60_000),
+      ),
+    ).rejects.toMatchObject({
+      code: 'MIN_SUBMIT',
+      message: 'Ujian baru dapat dikumpulkan setelah berjalan 20 menit',
+    })
+    expect(sessions.sessions.get('a')?.status).toBe('IN_PROGRESS')
+  })
+
+  it('falls back to the schedule minimum when the session policy has none', async () => {
+    const { useCase } = await setup()
+    schedules.schedules.set(schedule.id, { ...schedule, minSubmitMinutes: 20 })
+    sessions.sessions.set(
+      'a',
+      sessionFor(schedule, {
+        id: 'a',
+        policy: { ...DEFAULT_POLICIES.MIDTERM, minSubmitMinutes: 0 },
+      }),
+    )
+
+    await expect(
+      useCase.execute(
+        STUDENT_USER,
+        'a',
+        {},
+        new Date(NOW.getTime() + 10 * 60_000),
+      ),
+    ).rejects.toMatchObject({ code: 'MIN_SUBMIT' })
   })
 
   it('answers a session already handed in without finalising it again', async () => {

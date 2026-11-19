@@ -6951,6 +6951,21 @@
           },
           "tokenSlotSeconds": {
             "type": "number"
+          },
+          "lateToleranceMinutes": {
+            "type": "number"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleChoices": {
+            "type": "boolean"
+          },
+          "allowWeb": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -6960,7 +6975,12 @@
           "gapRecordedMs",
           "gapTokenMs",
           "gapViolationFrom",
-          "tokenSlotSeconds"
+          "tokenSlotSeconds",
+          "lateToleranceMinutes",
+          "minSubmitMinutes",
+          "shuffleQuestions",
+          "shuffleChoices",
+          "allowWeb"
         ]
       },
       "ExamActivityDto": {
@@ -7343,6 +7363,25 @@
             "type": "number",
             "minimum": 300,
             "maximum": 3600
+          },
+          "lateToleranceMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 120
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 180
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleChoices": {
+            "type": "boolean"
+          },
+          "allowWeb": {
+            "type": "boolean"
           }
         }
       },

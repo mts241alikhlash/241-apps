@@ -1,3 +1,4 @@
+import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { codeScopeOf } from '../../../../exam-schedule/domain/policies/access-code-scope.policy.js'
 import {
   ConflictException,
@@ -98,7 +99,8 @@ export class ResumeExamSessionUseCase {
     const platform = input.platform ?? 'native'
     const sebVerified =
       platform === 'web' && (await this.seb.verify(input.seb)).verified
-    assertClientVerified({ platform, sebVerified })
+    const allowWeb = (session.policy ?? DEFAULT_POLICIES.MIDTERM).allowWeb
+    assertClientVerified({ platform, sebVerified, allowWeb })
     const client: ExamClient = platform === 'web' ? 'SEB' : 'ISTIQRA'
     if (!(await this.codeMatches(session, input.accessCode, now))) {
       throw new ForbiddenException({

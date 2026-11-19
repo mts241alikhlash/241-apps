@@ -1,4 +1,5 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
+import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
 import { FakeQuestionRepository } from '../../../../question/application/question.repository.fake.js'
@@ -37,6 +38,47 @@ describe('GetPaperUseCase', () => {
   })
 
   const twelve = () => Array.from({ length: 12 }, () => choiceSpec())
+
+  it('keeps the authored order when the session policy turns the shuffles off', async () => {
+    const { schedule, questionIds } = await schedulePaper(
+      { packages, schedules, questions },
+      twelve(),
+    )
+    sessions.sessions.set(
+      'a',
+      sessionFor(schedule, {
+        id: 'a',
+        policy: {
+          ...DEFAULT_POLICIES.MIDTERM,
+          shuffleQuestions: false,
+          shuffleChoices: false,
+        },
+      }),
+    )
+
+    const paper = await useCase.execute(STUDENT_USER, 'a', NOW)
+
+    expect(paper.questions.map((q) => q.questionId)).toEqual(questionIds)
+    expect(paper.questions[0].choices?.map((c) => c.key).join('')).toBe('ABCDE')
+  })
+
+  it('tells the client the minimum submit time the policy enforces', async () => {
+    const { schedule } = await schedulePaper(
+      { packages, schedules, questions },
+      twelve(),
+    )
+    sessions.sessions.set(
+      'a',
+      sessionFor(schedule, {
+        id: 'a',
+        policy: { ...DEFAULT_POLICIES.MIDTERM, minSubmitMinutes: 20 },
+      }),
+    )
+
+    const paper = await useCase.execute(STUDENT_USER, 'a', NOW)
+
+    expect(paper.minSubmitMinutes).toBe(20)
+  })
 
   it('returns the same order on every call and another one for another session', async () => {
     const { schedule } = await schedulePaper(

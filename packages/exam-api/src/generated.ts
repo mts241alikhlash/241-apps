@@ -1956,11 +1956,16 @@ export interface components {
             updatedAt: string;
         };
         ExamPolicyDto: {
+            allowWeb: boolean;
             focusThresholdMs: number;
             gapRecordedMs: number;
             gapTokenMs: number;
             gapViolationFrom: number;
             heartbeatIntervalMs: number;
+            lateToleranceMinutes: number;
+            minSubmitMinutes: number;
+            shuffleChoices: boolean;
+            shuffleQuestions: boolean;
             tokenSlotSeconds: number;
             violationLimit: number;
         };
@@ -2997,11 +3002,16 @@ export interface components {
             answer: components["schemas"]["BooleanAnswerDto"];
         };
         UpdateActivityPolicyRequestDto: {
+            allowWeb?: boolean;
             focusThresholdMs?: number;
             gapRecordedMs?: number;
             gapTokenMs?: number;
             gapViolationFrom?: number;
             heartbeatIntervalMs?: number;
+            lateToleranceMinutes?: number;
+            minSubmitMinutes?: number;
+            shuffleChoices?: boolean;
+            shuffleQuestions?: boolean;
             tokenSlotSeconds?: number;
             violationLimit?: number;
         };

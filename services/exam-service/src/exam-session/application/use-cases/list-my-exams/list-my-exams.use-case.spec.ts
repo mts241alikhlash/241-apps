@@ -94,6 +94,19 @@ describe('ListMyExamsUseCase', () => {
     expect(row.minSubmitMinutes).toBe(20)
   })
 
+  it('carries the minimum submit time of the activity policy when it is set', async () => {
+    const exam = await scheduleExam(fixtures())
+    schedules.schedules.set(exam.id, {
+      ...exam,
+      minSubmitMinutes: 0,
+      activityPolicy: { ...DEFAULT_POLICIES.MIDTERM, minSubmitMinutes: 20 },
+    })
+
+    const [row] = await build().execute(STUDENT_USER, NOW)
+
+    expect(row.minSubmitMinutes).toBe(20)
+  })
+
   it('carries the exam type and the subject name', async () => {
     await scheduleExam(fixtures(), { type: 'MIDTERM' })
 

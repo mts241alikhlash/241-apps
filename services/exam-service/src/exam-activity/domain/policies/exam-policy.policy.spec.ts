@@ -15,6 +15,11 @@ const valid: ExamPolicy = {
   gapTokenMs: 480_000,
   gapViolationFrom: 2,
   tokenSlotSeconds: 600,
+  lateToleranceMinutes: 15,
+  minSubmitMinutes: 0,
+  shuffleQuestions: true,
+  shuffleChoices: true,
+  allowWeb: true,
 }
 
 describe('parsePolicy', () => {
@@ -39,6 +44,52 @@ describe('parsePolicy', () => {
     expect(() =>
       parsePolicy({ gapRecordedMs: 600_000, gapTokenMs: 300_000 }),
     ).toThrow()
+  })
+
+  it('fills the new fields with their defaults', () => {
+    expect(parsePolicy({})).toEqual(DEFAULT_POLICIES.MIDTERM)
+    const policy = parsePolicy({})
+    expect(policy.lateToleranceMinutes).toBe(15)
+    expect(policy.minSubmitMinutes).toBe(0)
+    expect(policy.shuffleQuestions).toBe(true)
+    expect(policy.shuffleChoices).toBe(true)
+    expect(policy.allowWeb).toBe(true)
+  })
+
+  it('refuses a late tolerance and a minimum submit time out of range', () => {
+    expect(() => parsePolicy({ lateToleranceMinutes: 121 })).toThrow(
+      'lateToleranceMinutes harus 0 sampai 120',
+    )
+    expect(() => parsePolicy({ minSubmitMinutes: 181 })).toThrow(
+      'minSubmitMinutes harus 0 sampai 180',
+    )
+  })
+
+  it('refuses a boolean key given as a non-boolean', () => {
+    expect(() => parsePolicy({ shuffleChoices: 'no' })).toThrow(
+      'shuffleChoices harus true atau false',
+    )
+    expect(() => parsePolicy({ allowWeb: 0 })).toThrow(
+      'allowWeb harus true atau false',
+    )
+  })
+
+  it('keeps an explicit false for a boolean key', () => {
+    expect(parsePolicy({ allowWeb: false }).allowWeb).toBe(false)
+  })
+
+  it('parses a legacy stored policy that lacks the new keys', () => {
+    const legacy = {
+      violationLimit: 3,
+      focusThresholdMs: 10_000,
+      heartbeatIntervalMs: 15_000,
+      gapRecordedMs: 60_000,
+      gapTokenMs: 300_000,
+      gapViolationFrom: 2,
+      tokenSlotSeconds: 600,
+    }
+    expect(() => parsePolicy(legacy)).not.toThrow()
+    expect(parsePolicy(legacy)).toEqual(DEFAULT_POLICIES.MIDTERM)
   })
 
   it('refuses a timestamp that is not a whole number of milliseconds', () => {

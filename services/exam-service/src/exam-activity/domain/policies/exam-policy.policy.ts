@@ -9,7 +9,17 @@ export interface ExamPolicy {
   gapTokenMs: number
   gapViolationFrom: number
   tokenSlotSeconds: number
+  lateToleranceMinutes: number
+  minSubmitMinutes: number
+  shuffleQuestions: boolean
+  shuffleChoices: boolean
+  allowWeb: boolean
 }
+
+export type BooleanPolicyKey =
+  'shuffleQuestions' | 'shuffleChoices' | 'allowWeb'
+
+type NumericPolicyKey = Exclude<keyof ExamPolicy, BooleanPolicyKey>
 
 export type ExamPresetName = ExamType
 
@@ -21,9 +31,17 @@ const BOUNDS = {
   gapTokenMs: [30_000, 3_600_000],
   gapViolationFrom: [1, 5],
   tokenSlotSeconds: [300, 3_600],
-} as const satisfies Record<keyof ExamPolicy, readonly [number, number]>
+  lateToleranceMinutes: [0, 120],
+  minSubmitMinutes: [0, 180],
+} as const satisfies Record<NumericPolicyKey, readonly [number, number]>
 
-export const POLICY_KEYS = Object.keys(BOUNDS) as (keyof ExamPolicy)[]
+export const POLICY_KEYS = Object.keys(BOUNDS) as NumericPolicyKey[]
+
+export const BOOLEAN_POLICY_KEYS: readonly BooleanPolicyKey[] = [
+  'shuffleQuestions',
+  'shuffleChoices',
+  'allowWeb',
+]
 
 export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
   DAILY: {
@@ -34,6 +52,11 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     gapTokenMs: 300_000,
     gapViolationFrom: 2,
     tokenSlotSeconds: 600,
+    lateToleranceMinutes: 15,
+    minSubmitMinutes: 0,
+    shuffleQuestions: true,
+    shuffleChoices: true,
+    allowWeb: true,
   },
   ASSIGNMENT: {
     violationLimit: 3,
@@ -43,6 +66,11 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     gapTokenMs: 1_800_000,
     gapViolationFrom: 3,
     tokenSlotSeconds: 600,
+    lateToleranceMinutes: 15,
+    minSubmitMinutes: 0,
+    shuffleQuestions: true,
+    shuffleChoices: true,
+    allowWeb: true,
   },
   MIDTERM: {
     violationLimit: 3,
@@ -52,6 +80,11 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     gapTokenMs: 300_000,
     gapViolationFrom: 2,
     tokenSlotSeconds: 600,
+    lateToleranceMinutes: 15,
+    minSubmitMinutes: 0,
+    shuffleQuestions: true,
+    shuffleChoices: true,
+    allowWeb: true,
   },
   FINAL: {
     violationLimit: 3,
@@ -61,6 +94,11 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     gapTokenMs: 300_000,
     gapViolationFrom: 2,
     tokenSlotSeconds: 600,
+    lateToleranceMinutes: 15,
+    minSubmitMinutes: 0,
+    shuffleQuestions: true,
+    shuffleChoices: true,
+    allowWeb: true,
   },
 }
 
@@ -70,7 +108,7 @@ export function policyOfPreset(name: ExamPresetName): ExamPolicy {
 
 function readNumber(
   value: unknown,
-  key: keyof ExamPolicy,
+  key: NumericPolicyKey,
   fallback: number,
 ): number {
   if (value === undefined || value === null) return fallback
@@ -80,6 +118,18 @@ function readNumber(
   const [min, max] = BOUNDS[key]
   if (value < min || value > max) {
     throw new BadRequestException(`${key} harus ${min} sampai ${max}`)
+  }
+  return value
+}
+
+function readBoolean(
+  value: unknown,
+  key: BooleanPolicyKey,
+  fallback: boolean,
+): boolean {
+  if (value === undefined || value === null) return fallback
+  if (typeof value !== 'boolean') {
+    throw new BadRequestException(`${key} harus true atau false`)
   }
   return value
 }
@@ -95,6 +145,9 @@ export function parsePolicy(
   const policy = {} as ExamPolicy
   for (const key of POLICY_KEYS) {
     policy[key] = readNumber(source[key], key, base[key])
+  }
+  for (const key of BOOLEAN_POLICY_KEYS) {
+    policy[key] = readBoolean(source[key], key, base[key])
   }
   if (policy.gapTokenMs < policy.gapRecordedMs) {
     throw new BadRequestException(

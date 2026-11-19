@@ -1,6 +1,9 @@
 import type { QuestionContent } from '../../../question/domain/value-objects/question-content.js'
 import { buildPaper, type PaperSource } from './build-paper.policy.js'
 
+const SHUFFLED = { shuffleQuestions: true, shuffleChoices: true }
+const AUTHORED = { shuffleQuestions: false, shuffleChoices: false }
+
 const choices = (['A', 'B', 'C', 'D', 'E'] as const).map((key) => ({
   key,
   html: `<p>${key}</p>`,
@@ -24,7 +27,7 @@ const many = Array.from({ length: 12 }, (_, index) => source(`q${index}`))
 
 describe('buildPaper', () => {
   it('numbers the questions from one in the shuffled order', () => {
-    const paper = buildPaper(many, 'seed-a')
+    const paper = buildPaper(many, 'seed-a', SHUFFLED)
 
     expect(paper.map((question) => question.number)).toEqual(
       Array.from({ length: 12 }, (_, index) => index + 1),
@@ -50,7 +53,7 @@ describe('buildPaper', () => {
     ]
 
     it('puts multiple choice first, then true/false, short answer and essay', () => {
-      const paper = buildPaper(mixed, 'seed-a')
+      const paper = buildPaper(mixed, 'seed-a', SHUFFLED)
 
       expect(paper.map((question) => question.type)).toEqual([
         ...Array(4).fill('MULTIPLE_CHOICE'),
@@ -67,7 +70,7 @@ describe('buildPaper', () => {
     it('still shuffles the questions inside each type', () => {
       const orders = new Set(
         ['seed-a', 'seed-b', 'seed-c', 'seed-d'].map((seed) =>
-          buildPaper(mixed, seed)
+          buildPaper(mixed, seed, SHUFFLED)
             .filter((question) => question.type === 'MULTIPLE_CHOICE')
             .map((question) => question.questionId)
             .join(),
@@ -81,22 +84,55 @@ describe('buildPaper', () => {
       const paper = buildPaper(
         [typed('e1', 'ESSAY'), typed('m1', 'MULTIPLE_CHOICE')],
         'seed-a',
+        SHUFFLED,
       )
 
       expect(paper.map((question) => question.questionId)).toEqual(['m1', 'e1'])
       expect(paper.map((question) => question.number)).toEqual([1, 2])
     })
+
+    it('keeps the authored order inside each type when questions are not shuffled', () => {
+      const paper = buildPaper(mixed, 'seed-a', {
+        ...SHUFFLED,
+        shuffleQuestions: false,
+      })
+
+      expect(paper.map((question) => question.questionId)).toEqual([
+        'mc0',
+        'mc1',
+        'mc2',
+        'mc3',
+        'multi0',
+        'multi1',
+        'multi2',
+        'multi3',
+        'tf0',
+        'tf1',
+        'tf2',
+        'tf3',
+        'short0',
+        'short1',
+        'short2',
+        'short3',
+        'essay0',
+        'essay1',
+        'essay2',
+        'essay3',
+      ])
+    })
   })
 
   it('gives the same paper for the same seed and another for another seed', () => {
-    expect(buildPaper(many, 'seed-a')).toEqual(buildPaper(many, 'seed-a'))
-    expect(buildPaper(many, 'seed-a').map((q) => q.questionId)).not.toEqual(
-      buildPaper(many, 'seed-b').map((q) => q.questionId),
+    expect(buildPaper(many, 'seed-a', SHUFFLED)).toEqual(
+      buildPaper(many, 'seed-a', SHUFFLED),
     )
+    expect(
+      buildPaper(many, 'seed-a', SHUFFLED).map((q) => q.questionId),
+    ).not.toEqual(buildPaper(many, 'seed-b', SHUFFLED).map((q) => q.questionId))
   })
 
   it('shuffles the choices but keeps each key with its text', () => {
-    const paper = buildPaper(many, 'seed-a')
+    const paper = buildPaper(many, 'seed-a', SHUFFLED)
     const orders = new Set(
       paper.map((question) => question.choices?.map((c) => c.key).join('')),
     )
@@ -107,6 +143,28 @@ describe('buildPaper', () => {
         expect(choice.html).toBe(`<p>${choice.key}</p>`)
       }
     }
+  })
+
+  it('keeps the authored choice order when choices are not shuffled', () => {
+    const paper = buildPaper(many, 'seed-a', AUTHORED)
+
+    for (const question of paper) {
+      expect(question.choices?.map((c) => c.key).join('')).toBe('ABCDE')
+    }
+  })
+
+  it('returns authored order for both flags off and the same paper as before when both are on', () => {
+    const authored = buildPaper(many, 'seed-a', AUTHORED)
+
+    expect(authored.map((question) => question.questionId)).toEqual(
+      many.map((question) => question.questionId),
+    )
+    expect(buildPaper(many, 'seed-a', SHUFFLED)).toEqual(
+      buildPaper(many, 'seed-a', {
+        shuffleQuestions: true,
+        shuffleChoices: true,
+      }),
+    )
   })
 
   it('never carries an answer key', () => {
@@ -138,6 +196,7 @@ describe('buildPaper', () => {
           }),
         ],
         'seed-a',
+        SHUFFLED,
       ),
     )
 
@@ -158,6 +217,7 @@ describe('buildPaper', () => {
         source('c', { type: 'ESSAY', content: { guideHtml: null } }),
       ],
       'seed-a',
+      SHUFFLED,
     )
 
     const byId = Object.fromEntries(paper.map((q) => [q.questionId, q]))
@@ -167,7 +227,11 @@ describe('buildPaper', () => {
   })
 
   it('keeps the body and the points', () => {
-    const [question] = buildPaper([source('a', { points: 3.5 })], 'seed-a')
+    const [question] = buildPaper(
+      [source('a', { points: 3.5 })],
+      'seed-a',
+      SHUFFLED,
+    )
 
     expect(question.bodyHtml).toBe('<p>Soal a</p>')
     expect(question.points).toBe(3.5)

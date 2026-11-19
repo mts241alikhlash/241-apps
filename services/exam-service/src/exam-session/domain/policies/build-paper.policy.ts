@@ -26,9 +26,15 @@ export interface PaperQuestion {
   choices: { key: ChoiceKey; html: string }[] | null
 }
 
+export interface PaperOptions {
+  shuffleQuestions: boolean
+  shuffleChoices: boolean
+}
+
 function choicesOf(
   source: PaperSource,
   seed: string,
+  shuffle: boolean,
 ): { key: ChoiceKey; html: string }[] | null {
   if (
     source.type !== 'MULTIPLE_CHOICE' &&
@@ -39,9 +45,10 @@ function choicesOf(
   const content = source.content as {
     choices: { key: ChoiceKey; html: string }[]
   }
-  return seededShuffle(content.choices, `${seed}:${source.questionId}`).map(
-    (choice) => ({ key: choice.key, html: choice.html }),
-  )
+  const choices = shuffle
+    ? seededShuffle(content.choices, `${seed}:${source.questionId}`)
+    : content.choices
+  return choices.map((choice) => ({ key: choice.key, html: choice.html }))
 }
 
 const TYPE_ORDER: readonly QuestionType[] = [
@@ -55,18 +62,19 @@ const TYPE_ORDER: readonly QuestionType[] = [
 export function buildPaper(
   sources: readonly PaperSource[],
   seed: string,
+  options: PaperOptions,
 ): PaperQuestion[] {
-  return TYPE_ORDER.flatMap((type) =>
-    seededShuffle(
-      sources.filter((source) => source.type === type),
-      `${seed}:${type}`,
-    ),
-  ).map((source, index) => ({
+  return TYPE_ORDER.flatMap((type) => {
+    const group = sources.filter((source) => source.type === type)
+    return options.shuffleQuestions
+      ? seededShuffle(group, `${seed}:${type}`)
+      : group
+  }).map((source, index) => ({
     questionId: source.questionId,
     number: index + 1,
     type: source.type,
     bodyHtml: source.bodyHtml,
     points: source.points,
-    choices: choicesOf(source, seed),
+    choices: choicesOf(source, seed, options.shuffleChoices),
   }))
 }
