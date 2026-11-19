@@ -33,13 +33,17 @@ export function buildBuilderColumns(
         mobileLabel: 'No',
         mobileValue: (row: ExamPackageItemView) => String(row.position),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, String(row.original.position)),
+      cell: ({ row }) => h('span', String(row.original.position)),
     },
     {
       id: 'summary',
       header: 'Soal',
-      meta: { align: 'left', strong: true },
+      meta: {
+        align: 'left',
+        strong: true,
+        truncate: true,
+        title: (row: ExamPackageItemView) => row.summary || undefined,
+      },
       cell: ({ row }) => {
         const note = options.noteOf(row.original.questionId)
         return h('div', { class: 'space-y-1' }, [
@@ -48,8 +52,7 @@ export function buildBuilderColumns(
             ? h(
                 'p',
                 {
-                  class:
-                    'text-[length:var(--text-control,0.75rem)] font-normal text-destructive',
+                  class: 'text-control font-normal text-destructive',
                 },
                 `Catatan: ${note}`,
               )
@@ -61,6 +64,7 @@ export function buildBuilderColumns(
       id: 'type',
       header: 'Jenis',
       meta: {
+        align: 'center',
         mobileLabel: 'Jenis',
         mobileValue: (row: ExamPackageItemView) => typeLabel(row.type),
       },
@@ -87,8 +91,7 @@ export function buildBuilderColumns(
         mobileLabel: 'Poin',
         mobileValue: (row: ExamPackageItemView) => String(row.points),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, String(row.original.points)),
+      cell: ({ row }) => h('span', String(row.original.points)),
     },
     {
       id: 'actions',

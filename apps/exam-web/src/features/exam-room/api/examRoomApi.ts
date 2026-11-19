@@ -1,5 +1,6 @@
 import {
   unwrap,
+  unwrapBlob,
   unwrapPage,
 } from '@mts241alikhlash/web-shared/utils/service-client'
 import { examClient, identityClient } from '@/shared/api/clients'
@@ -9,6 +10,8 @@ import type {
   RoomMonitorQuery,
   RoomReportPayload,
 } from '../types'
+
+const passThrough = (body: unknown) => body as never
 
 const reportPath = (roomId: string, slotId: string) => ({
   params: { path: { roomId, slotId } },
@@ -79,6 +82,9 @@ export const examRoomApi = {
       }),
     ),
 
+  getReports: (query?: { eventId?: string }) =>
+    unwrap(examClient.GET('/exam-rooms/reports', { params: { query } })),
+
   getReport: (roomId: string, slotId: string) =>
     unwrap(
       examClient.GET(
@@ -115,12 +121,36 @@ export const examRoomApi = {
       }),
     ),
 
-  submitReport: (roomId: string, slotId: string) =>
-    unwrap(
-      examClient.POST(
-        '/exam-rooms/{roomId}/reports/{slotId}/submit',
-        reportPath(roomId, slotId),
-      ),
+  submitReport: (roomId: string, slotId: string, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return unwrap(
+      examClient.POST('/exam-rooms/{roomId}/reports/{slotId}/submit', {
+        ...reportPath(roomId, slotId),
+        body: form as never,
+        bodySerializer: passThrough,
+      }),
+    )
+  },
+
+  replaceReportFile: (roomId: string, slotId: string, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return unwrap(
+      examClient.PUT('/exam-rooms/{roomId}/reports/{slotId}/file', {
+        ...reportPath(roomId, slotId),
+        body: form as never,
+        bodySerializer: passThrough,
+      }),
+    )
+  },
+
+  downloadReportFile: (roomId: string, slotId: string) =>
+    unwrapBlob(
+      examClient.GET('/exam-rooms/{roomId}/reports/{slotId}/file', {
+        ...reportPath(roomId, slotId),
+        parseAs: 'blob',
+      }),
     ),
 
   verifyReport: (roomId: string, slotId: string) =>

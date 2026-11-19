@@ -135,7 +135,7 @@ function handleOpenChange(open: boolean) {
     <DialogContent size="xl">
       <DialogHeader standard>
         <DialogTitle>Tambah Pendaftar</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Buat akun untuk calon santri. Setelah akun dibuat, Anda akan
           melanjutkan ke pengisian formulir.
         </DialogDescription>
@@ -266,14 +266,14 @@ function handleOpenChange(open: boolean) {
 
           <div
             v-if="waves.length === 0"
-            class="rounded-md border p-3 text-[length:var(--text-control,0.75rem)] text-muted-foreground sm:col-span-2"
+            class="rounded-md border p-3 text-control text-muted-foreground sm:col-span-2"
           >
             Tidak ada gelombang yang dibuka saat ini.
           </div>
 
           <p
             v-if="errorMessage"
-            class="text-[length:var(--text-control,0.75rem)] text-destructive sm:col-span-2"
+            class="text-control text-destructive sm:col-span-2"
           >
             {{ errorMessage }}
           </p>

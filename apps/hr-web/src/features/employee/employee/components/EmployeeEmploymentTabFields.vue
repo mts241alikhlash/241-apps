@@ -26,9 +26,7 @@ defineProps<{
   filteredPositions: PositionListItem[]
 }>()
 
-const emit = defineEmits<{
-  'category-select': []
-}>()
+const emit = defineEmits<{ 'category-select': [] }>()
 
 const kategori = defineModel<string>({ required: true })
 
@@ -39,7 +37,7 @@ function onCategorySelect(value: AcceptableValue) {
 </script>
 
 <template>
-  <div class="grid gap-5 md:grid-cols-2 p-1">
+  <div class="grid gap-4 md:grid-cols-2 p-1">
     <FloatingField
       v-slot="{ componentField }"
       name="nip"

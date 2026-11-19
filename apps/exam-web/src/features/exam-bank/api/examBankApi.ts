@@ -4,7 +4,7 @@ import {
   unwrapPage,
 } from '@mts241alikhlash/web-shared/utils/service-client'
 import { academicClient, examClient } from '@/shared/api/clients'
-import type { TemplateFormat } from '../types'
+import type { TemplateFormat, TemplateOptions } from '../types'
 
 const passThrough = (body: unknown) => body as never
 
@@ -33,10 +33,12 @@ export const examBankApi = {
       }),
     ),
 
-  downloadTemplate: (format: TemplateFormat) =>
+  downloadTemplate: (format: TemplateFormat, options?: TemplateOptions) =>
     unwrapBlob(
       examClient.GET('/exam-imports/template', {
-        params: { query: { format } },
+        params: {
+          query: { format, layout: options?.layout, ...options?.counts },
+        },
         parseAs: 'blob',
       }),
     ),

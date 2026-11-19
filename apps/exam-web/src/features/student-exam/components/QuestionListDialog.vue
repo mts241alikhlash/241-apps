@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import QuestionNumberGrid from './QuestionNumberGrid.vue'
 import type { AnswerPayload, PaperQuestion } from '../types'
@@ -35,6 +36,9 @@ function pick(position: number) {
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Daftar Soal</DialogTitle>
+        <DialogDescription
+          >Pilih nomor soal yang ingin dibuka.</DialogDescription
+        >
       </DialogHeader>
 
       <div class="max-h-[70svh] overflow-y-auto px-4 py-3">

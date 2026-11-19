@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import {
   Tabs,
@@ -88,12 +89,15 @@ const dialog = useEmployeeFormDialog({
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-2xl flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{
             dialog.isEditing.value ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'
           }}
         </DialogTitle>
+        <DialogDescription
+          >Isi data pegawai baru atau perbarui data yang ada.</DialogDescription
+        >
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -139,7 +143,8 @@ const dialog = useEmployeeFormDialog({
       </ScrollArea>
 
       <DialogFooter
-        class="p-6 border-t bg-muted/10 flex items-center justify-between shrink-0"
+        standard
+        class="justify-between"
       >
         <Button
           type="button"

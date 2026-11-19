@@ -38,7 +38,7 @@ async function submit() {
       class="w-full max-w-sm space-y-4 rounded-md border bg-card p-8"
       @submit.prevent="submit"
     >
-      <h1 class="text-xl font-bold tracking-tight">Masuk ke 241 Apps</h1>
+      <h1 class="text-xl font-semibold tracking-tight">Masuk ke 241 Apps</h1>
       <div class="space-y-2">
         <Label for="identifier">Nama pengguna</Label>
         <Input

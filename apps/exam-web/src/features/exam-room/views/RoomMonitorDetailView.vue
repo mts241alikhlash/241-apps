@@ -8,6 +8,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
@@ -150,7 +151,7 @@ const freshnessDotClass = computed(() =>
   staleness.value === 'fresh'
     ? 'bg-primary'
     : staleness.value === 'warning'
-      ? 'bg-amber-500'
+      ? 'bg-warning'
       : 'bg-destructive',
 )
 
@@ -267,7 +268,7 @@ onUnmounted(() => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Ruang Ujian"
@@ -277,7 +278,7 @@ onUnmounted(() => {
             <CardTitle class="truncate font-semibold">{{ title }}</CardTitle>
             <span
               v-if="roomSubtitle"
-              class="truncate text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="truncate text-control text-muted-foreground"
             >
               {{ roomSubtitle }}
             </span>
@@ -286,7 +287,7 @@ onUnmounted(() => {
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
       >
         <div class="flex flex-wrap items-end justify-between gap-3">
           <div
@@ -294,17 +295,14 @@ onUnmounted(() => {
             class="flex items-baseline gap-2"
           >
             <div class="flex flex-col">
-              <span
-                class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              <span class="text-control text-muted-foreground"
                 >Token masuk</span
               >
-              <span
-                class="text-lg leading-tight font-semibold tracking-wide tabular-nums"
-                >{{ token.accessCode }}</span
-              >
+              <span class="text-lg leading-tight font-semibold tracking-wide">{{
+                token.accessCode
+              }}</span>
             </div>
-            <span
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+            <span class="text-control text-muted-foreground"
               >sisa {{ tokenMinutes }} mnt</span
             >
             <Button
@@ -316,7 +314,7 @@ onUnmounted(() => {
           </div>
           <div class="flex flex-col items-start gap-1.5 sm:items-end">
             <span
-              class="flex items-center gap-1.5 text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+              class="flex items-center gap-1.5 text-control text-muted-foreground"
             >
               <span
                 class="size-1.5 rounded-full"
@@ -346,10 +344,7 @@ onUnmounted(() => {
 
         <RoomMonitorSummaryCards :summary="summary" />
 
-        <Tabs
-          v-model="tab"
-          variant="line"
-        >
+        <Tabs v-model="tab">
           <TabsList>
             <TabsTrigger value="participants"
               >Peserta &amp; Progres</TabsTrigger
@@ -360,13 +355,13 @@ onUnmounted(() => {
           <TabsContent value="participants">
             <p
               v-if="noSlotAssigned"
-              class="mb-4 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="mb-4 text-control text-muted-foreground"
             >
               Anda tidak bertugas pada jam ini.
             </p>
             <div
               v-if="failed && error"
-              class="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
               role="alert"
             >
               {{ error }}
@@ -462,6 +457,7 @@ onUnmounted(() => {
           </TabsContent>
         </Tabs>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <SessionTimelineDialog

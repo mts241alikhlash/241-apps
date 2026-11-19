@@ -5,7 +5,7 @@ import { Calendar } from './calendar'
 import { FieldDescription, FieldError } from './field'
 import { PaginationEllipsis } from './pagination'
 
-const text = 'text-[length:var(--text-control,0.75rem)]'
+const text = 'text-control'
 
 describe('navigation and data components', () => {
   it('calendar day cells and heading follow the control tokens', async () => {
@@ -20,7 +20,7 @@ describe('navigation and data components', () => {
   it('pagination ellipsis is as big as a md control', () => {
     const w = mount(PaginationEllipsis)
     expect(w.get('[data-slot=pagination-ellipsis]').classes()).toContain(
-      'size-[var(--control-h-md,1.75rem)]',
+      'size-[var(--control-h-md,2rem)]',
     )
   })
 

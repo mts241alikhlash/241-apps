@@ -71,7 +71,7 @@ onMounted(async () => {
           <p class="truncate font-semibold">
             {{ credential.holder.displayName ?? 'Tanpa nama' }}
           </p>
-          <p class="text-muted-foreground font-mono text-sm">
+          <p class="text-muted-foreground text-sm">
             {{ credential.holder.identifier }}
           </p>
           <p class="text-muted-foreground text-xs">

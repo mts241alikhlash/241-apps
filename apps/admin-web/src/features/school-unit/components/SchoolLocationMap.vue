@@ -112,7 +112,7 @@ watch(
 .school-map .leaflet-control-attribution {
   background: color-mix(in oklab, var(--background) 82%, transparent);
   color: var(--muted-foreground);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .school-map .leaflet-control-attribution a {

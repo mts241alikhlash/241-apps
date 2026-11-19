@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsIn,
   IsInt,
   IsISO8601,
@@ -135,6 +136,35 @@ export class UpdateActivityPolicyRequestDto {
   @Min(300)
   @Max(3_600)
   tokenSlotSeconds?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(120)
+  lateToleranceMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(180)
+  minSubmitMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  shuffleQuestions?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  shuffleChoices?: boolean
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  allowWeb?: boolean
 }
 
 export class ExamPolicyDto implements ExamPolicy {
@@ -145,6 +175,11 @@ export class ExamPolicyDto implements ExamPolicy {
   @ApiProperty() gapTokenMs!: number
   @ApiProperty() gapViolationFrom!: number
   @ApiProperty() tokenSlotSeconds!: number
+  @ApiProperty() lateToleranceMinutes!: number
+  @ApiProperty() minSubmitMinutes!: number
+  @ApiProperty() shuffleQuestions!: boolean
+  @ApiProperty() shuffleChoices!: boolean
+  @ApiProperty() allowWeb!: boolean
 }
 
 export class ExamActivityQueryDto {

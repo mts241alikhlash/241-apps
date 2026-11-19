@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
+  PayloadTooLargeException,
 } from '@nestjs/common'
 import {
   MANAGE_ALL,
@@ -22,10 +23,19 @@ import {
   seedMonitorRoom,
   startSession,
 } from '../../room-monitor.test-support.js'
+import {
+  FakeRoomReportFileStorage,
+  SAMPLE_ATTACHMENT,
+} from '../../room-report-file-storage.fake.js'
 import { GetRoomReportUseCase } from '../get-room-report/get-room-report.use-case.js'
 import { SaveRoomReportUseCase } from '../save-room-report/save-room-report.use-case.js'
 import { SubmitRoomReportUseCase } from '../submit-room-report/submit-room-report.use-case.js'
 import { VerifyRoomReportUseCase } from '../verify-room-report/verify-room-report.use-case.js'
+
+const PDF_FILE = {
+  buffer: Buffer.from('%PDF-1.4 berita acara'),
+  originalName: 'scan.pdf',
+}
 
 const SUPERVISOR_USER: RoomStaffUser = {
   id: SUPERVISOR_ID,
@@ -42,6 +52,7 @@ interface Reports {
   save: SaveRoomReportUseCase
   submit: SubmitRoomReportUseCase
   verify: VerifyRoomReportUseCase
+  files: FakeRoomReportFileStorage
 }
 
 async function build(): Promise<Reports> {
@@ -75,14 +86,17 @@ async function build(): Promise<Reports> {
       createdAt: new Date('2026-10-30T02:00:00.000Z'),
     },
   )
+  const files = new FakeRoomReportFileStorage()
   const reports = new RoomReportService(
     fixture.rooms,
     fixture.schedules,
     fixture.sessions,
     new RoomAccessService(fixture.rooms),
+    files,
   )
   return {
     fixture,
+    files,
     get: new GetRoomReportUseCase(
       fixture.rooms,
       fixture.sessions,
@@ -243,6 +257,196 @@ describe('SaveRoomReportUseCase', () => {
   })
 })
 
+const JPG_FILE = {
+  buffer: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00]),
+  originalName: 'scan.jpg',
+}
+const PNG_FILE = {
+  buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a]),
+  originalName: 'scan.png',
+}
+
+describe('SubmitRoomReportUseCase file', () => {
+  it.each([
+    ['pdf', PDF_FILE, 'application/pdf'],
+    ['jpg', JPG_FILE, 'image/jpeg'],
+    ['png', PNG_FILE, 'image/png'],
+  ])(
+    'accepts a %s and stores the attachment with the status',
+    async (_n, file, mime) => {
+      const { fixture, submit, files } = await build()
+      const submitted = await submit.execute(
+        SUPERVISOR_USER,
+        fixture.room.id,
+        fixture.slotId,
+        file,
+        MONITOR_NOW,
+      )
+      expect(submitted.status).toBe('SUBMITTED')
+      expect(submitted.attachment).toMatchObject({
+        mimeType: mime,
+        sizeBytes: file.buffer.length,
+        originalName: file.originalName,
+        uploadedById: SUPERVISOR_USER.id,
+      })
+      expect(submitted.attachment?.storageKey).not.toContain(file.originalName)
+      expect(files.objects.size).toBe(1)
+    },
+  )
+
+  it('rejects a text file named .pdf with 400 and stores nothing', async () => {
+    const { fixture, submit, files } = await build()
+    await expect(
+      submit.execute(
+        SUPERVISOR_USER,
+        fixture.room.id,
+        fixture.slotId,
+        { buffer: Buffer.from('bukan pdf'), originalName: 'fake.pdf' },
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow('Berkas harus PDF, JPG, atau PNG')
+    expect(files.objects.size).toBe(0)
+    const view = await fixture.rooms.findReportBySlot(
+      fixture.room.id,
+      fixture.slotId,
+    )
+    expect(view?.status).toBe('DRAFT')
+  })
+
+  it('rejects a file over 10 MB with 413', async () => {
+    const { fixture, submit } = await build()
+    const big = Buffer.alloc(10 * 1024 * 1024 + 1)
+    PDF_FILE.buffer.copy(big)
+    await expect(
+      submit.execute(
+        SUPERVISOR_USER,
+        fixture.room.id,
+        fixture.slotId,
+        { buffer: big, originalName: 'big.pdf' },
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow(PayloadTooLargeException)
+  })
+
+  it('requires a file', async () => {
+    const { fixture, submit } = await build()
+    await expect(
+      submit.execute(
+        SUPERVISOR_USER,
+        fixture.room.id,
+        fixture.slotId,
+        undefined,
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow('Berkas berita acara wajib diunggah')
+  })
+
+  it('deletes the stored object when the status transition loses a race', async () => {
+    const { fixture, files } = await build()
+    const reports = new RoomReportService(
+      fixture.rooms,
+      fixture.schedules,
+      fixture.sessions,
+      new RoomAccessService(fixture.rooms),
+      files,
+    )
+    const context = await reports.loadEditable(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+      MONITOR_NOW,
+    )
+    await fixture.rooms.submitReport(
+      context.report.id,
+      SUPERVISOR_ID,
+      MONITOR_NOW,
+      SAMPLE_ATTACHMENT,
+    )
+    await expect(
+      reports.submit(context, SUPERVISOR_ID, MONITOR_NOW, PDF_FILE),
+    ).rejects.toThrow(ConflictException)
+    expect(files.objects.size).toBe(0)
+  })
+
+  it('lets only a coordinator replace the file of a submitted report', async () => {
+    const { fixture, submit, files, verify } = await build()
+    await expect(
+      submit.replaceFile(
+        COORDINATOR,
+        fixture.room.id,
+        fixture.slotId,
+        JPG_FILE,
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow(ConflictException)
+    const submitted = await submit.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+      PDF_FILE,
+      MONITOR_NOW,
+    )
+    await expect(
+      submit.replaceFile(
+        SUPERVISOR_USER,
+        fixture.room.id,
+        fixture.slotId,
+        JPG_FILE,
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow(ForbiddenException)
+
+    const replaced = await submit.replaceFile(
+      COORDINATOR,
+      fixture.room.id,
+      fixture.slotId,
+      JPG_FILE,
+      MONITOR_NOW,
+    )
+    expect(replaced.attachment?.mimeType).toBe('image/jpeg')
+    expect(files.objects.has(submitted.attachment?.storageKey ?? '')).toBe(
+      false,
+    )
+    expect(files.objects.size).toBe(1)
+
+    await verify.execute(
+      COORDINATOR,
+      fixture.room.id,
+      fixture.slotId,
+      MONITOR_NOW,
+    )
+    await expect(
+      submit.replaceFile(
+        COORDINATOR,
+        fixture.room.id,
+        fixture.slotId,
+        PNG_FILE,
+        MONITOR_NOW,
+      ),
+    ).rejects.toThrow(ConflictException)
+  })
+
+  it('opens the file for download and 404s when none', async () => {
+    const { fixture, submit } = await build()
+    await expect(
+      submit.download(SUPERVISOR_USER, fixture.room.id, fixture.slotId),
+    ).rejects.toThrow(NotFoundException)
+    await submit.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+      PDF_FILE,
+      MONITOR_NOW,
+    )
+    const opened = await submit.download(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+    expect(opened.attachment.mimeType).toBe('application/pdf')
+  })
+})
+
 describe('SubmitRoomReportUseCase', () => {
   it('locks the report and refuses further edits with 409', async () => {
     const { fixture, submit, save } = await build()
@@ -251,6 +455,7 @@ describe('SubmitRoomReportUseCase', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
     expect(submitted.status).toBe('SUBMITTED')
@@ -282,6 +487,7 @@ describe('SubmitRoomReportUseCase', () => {
         SUPERVISOR_USER,
         fixture.room.id,
         fixture.slotId,
+        PDF_FILE,
         MONITOR_NOW,
       ),
     ).rejects.toThrow(ConflictException)
@@ -293,6 +499,7 @@ describe('SubmitRoomReportUseCase', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
 
@@ -316,6 +523,7 @@ describe('SubmitRoomReportUseCase', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
 
@@ -343,6 +551,7 @@ describe('VerifyRoomReportUseCase', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
     const verified = await verify.execute(
@@ -362,6 +571,7 @@ describe('VerifyRoomReportUseCase', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
 
@@ -460,6 +670,7 @@ describe('RoomReportService roster and slot guards', () => {
       fixture.schedules,
       fixture.sessions,
       new RoomAccessService(fixture.rooms),
+      new FakeRoomReportFileStorage(),
     )
     const context = await reports.loadEditable(
       SUPERVISOR_USER,
@@ -471,6 +682,7 @@ describe('RoomReportService roster and slot guards', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
 
@@ -486,6 +698,7 @@ describe('RoomReportService roster and slot guards', () => {
       fixture.schedules,
       fixture.sessions,
       new RoomAccessService(fixture.rooms),
+      new FakeRoomReportFileStorage(),
     )
     const context = await reports.loadEditable(
       SUPERVISOR_USER,
@@ -497,6 +710,7 @@ describe('RoomReportService roster and slot guards', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
 
@@ -707,6 +921,7 @@ describe('RoomReportService roster and slot guards', () => {
       SUPERVISOR_USER,
       fixture.room.id,
       fixture.slotId,
+      PDF_FILE,
       MONITOR_NOW,
     )
     await verify.execute(

@@ -127,6 +127,75 @@ export interface paths {
         patch: operations["ExamEventController_update"];
         trace?: never;
     };
+    "/exam-events/{id}/attendance-files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The uploaded attendance sheets of an event */
+        get: operations["ExamAttendanceFileController_list"];
+        /** Upload or replace a signed attendance sheet scan (PDF, JPG or PNG, 10 MB) */
+        put: operations["ExamAttendanceFileController_upload"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/attendance-files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an uploaded attendance sheet */
+        get: operations["ExamAttendanceFileController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/credentials/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give every seated student of an event a new login password, shown once */
+        post: operations["ExamEventController_resetPasswords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/print-pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The print pack of an exam event */
+        get: operations["ExamEventController_getPrintPack"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-events/{id}/rooms": {
         parameters: {
             query?: never;
@@ -139,6 +208,23 @@ export interface paths {
         put?: never;
         /** Add a room to an exam event */
         post: operations["ExamEventController_createRoom"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/seats/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan the seats of an exam event; with mode apply, write them in place of the existing seats */
+        post: operations["ExamEventController_generateSeats"];
         delete?: never;
         options?: never;
         head?: never;
@@ -490,6 +576,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-participant-numbers/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue the missing participant numbers of a semester */
+        post: operations["ExamParticipantNumberController_issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-participant-numbers/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Participant numbers of many students in one semester */
+        post: operations["ExamParticipantNumberController_lookup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-policy-presets": {
         parameters: {
             query?: never;
@@ -678,6 +798,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-rooms/{roomId}/reports/{slotId}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the file of a submitted Berita Acara */
+        get: operations["ExamRoomController_downloadRoomReportFile"];
+        /** Replace the file of a submitted Berita Acara */
+        put: operations["ExamRoomController_replaceRoomReportFile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-rooms/{roomId}/reports/{slotId}/submit": {
         parameters: {
             query?: never;
@@ -687,7 +825,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Hand the Berita Acara in and lock it */
+        /** Hand the signed, scanned Berita Acara in (PDF, JPG or PNG, 10 MB) and lock it */
         post: operations["ExamRoomController_submitRoomReport"];
         delete?: never;
         options?: never;
@@ -808,6 +946,23 @@ export interface paths {
         };
         /** Every active room, or only the rooms the caller staffs */
         get: operations["ExamRoomOverviewController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-rooms/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every Berita Acara the caller may see, one row per supervisor slot */
+        get: operations["ExamRoomOverviewController_roomReports"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1497,9 +1652,42 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
         };
+        AttendanceFileDto: {
+            /** @example 2026-11-18 */
+            day: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            originalName: string;
+            /** Format: uuid */
+            roomId: string | null;
+            sizeBytes: number;
+            /** Format: uuid */
+            slotId: string | null;
+            /** Format: date-time */
+            uploadedAt: string;
+            /** Format: uuid */
+            uploadedById: string;
+        };
+        AttendanceUploadBodyDto: {
+            /**
+             * @description WIB calendar day
+             * @example 2026-11-18
+             */
+            day: string;
+            /** Format: binary */
+            file: string;
+            /** @enum {string} */
+            kind: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            /** Format: uuid */
+            roomId?: string;
+            /** Format: uuid */
+            slotId?: string;
+        };
         AuditLogDto: {
             /** @enum {string} */
-            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN";
+            action: "RELEASE_DEVICE" | "REOPEN_SESSION" | "RESET_SESSION" | "EXTEND_TIME" | "ALLOW_WEB_CLIENT" | "ALLOW_LATE_ENTRY" | "ROTATE_ROOM_TOKEN" | "SUBSTITUTE_SUPERVISOR" | "ASSIGN_SUPERVISOR" | "SUBMIT_ROOM_REPORT" | "VERIFY_ROOM_REPORT" | "REOPEN_ROOM_REPORT" | "CLOSED_BY_ADMIN" | "RESET_CREDENTIALS" | "REPLACE_ROOM_REPORT_FILE" | "UPLOAD_ATTENDANCE_FILE";
             /** Format: uuid */
             actorId: string;
             /** Format: date-time */
@@ -1819,11 +2007,16 @@ export interface components {
             updatedAt: string;
         };
         ExamPolicyDto: {
+            allowWeb: boolean;
             focusThresholdMs: number;
             gapRecordedMs: number;
             gapTokenMs: number;
             gapViolationFrom: number;
             heartbeatIntervalMs: number;
+            lateToleranceMinutes: number;
+            minSubmitMinutes: number;
+            shuffleChoices: boolean;
+            shuffleQuestions: boolean;
             tokenSlotSeconds: number;
             violationLimit: number;
         };
@@ -1916,6 +2109,45 @@ export interface components {
         ExtendSessionTimeDto: {
             minutes: number;
             reason: string;
+        };
+        GenerateSeatRulesDto: {
+            lanesPerSide?: number;
+            /** @enum {string} */
+            order?: "alphabetical" | "random";
+            seed?: string;
+            separateGender?: boolean;
+            spreadClassrooms?: boolean;
+            spreadGrades?: boolean;
+        };
+        GenerateSeatsBodyDto: {
+            /** @enum {string} */
+            mode: "preview" | "apply";
+            replaceExisting?: boolean;
+            roomIds?: string[];
+            rules?: components["schemas"]["GenerateSeatRulesDto"];
+            students: components["schemas"]["GenerateSeatStudentDto"][];
+        };
+        GenerateSeatsResponseDto: {
+            adjacentSameClassroom: number;
+            adjacentSameGrade: number;
+            applied: boolean;
+            rooms: components["schemas"]["GenerateSeatsRoomDto"][];
+            seats: components["schemas"]["SeatPlanSeatDto"][];
+            unknownGender: components["schemas"]["SeatPlanStudentDto"][];
+            unseated: components["schemas"]["SeatPlanStudentDto"][];
+        };
+        GenerateSeatsRoomDto: {
+            capacity: number;
+            code: string;
+            layout: components["schemas"]["SeatLayoutDto"];
+            /** Format: uuid */
+            roomId: string;
+        };
+        GenerateSeatStudentDto: {
+            /** Format: uuid */
+            classroomId: string;
+            /** Format: uuid */
+            studentId: string;
         };
         GenerateSebConfigDto: {
             name: string;
@@ -2041,6 +2273,7 @@ export interface components {
             duplicateRows: number[];
             errors: components["schemas"]["ImportErrorDto"][];
             identity: components["schemas"]["SheetIdentityDto"];
+            points: components["schemas"]["ImportCountsDto"];
             total: number;
             totalPoints: number;
             warnings: string[];
@@ -2053,12 +2286,30 @@ export interface components {
         IssueParticipantNumbersResponseDto: {
             issued: boolean;
         };
+        IssueSemesterNumbersBodyDto: {
+            /** Format: uuid */
+            semesterId: string;
+        };
+        IssueSemesterNumbersResponseDto: {
+            /** @description How many numbers this call created */
+            issued: number;
+            /** @description Students without a grade level, so they got no number */
+            skipped: string[];
+        };
         KeyAnswerPayloadDto: {
             /** @enum {string} */
             key: "A" | "B" | "C" | "D" | "E";
         };
         KeysAnswerPayloadDto: {
             keys: ("A" | "B" | "C" | "D" | "E")[];
+        };
+        LookupParticipantNumbersBodyDto: {
+            /** Format: uuid */
+            semesterId: string;
+            studentIds: string[];
+        };
+        LookupParticipantNumbersResponseDto: {
+            items: components["schemas"]["ParticipantNumberItemDto"][];
         };
         MakeupParticipantDto: {
             note?: string | null;
@@ -2172,6 +2423,54 @@ export interface components {
             status: "WAITING" | "SAT_REGULAR" | "IN_PROGRESS" | "DONE";
             /** Format: uuid */
             studentId: string;
+        };
+        ParticipantNumberItemDto: {
+            number: string;
+            /** Format: uuid */
+            studentId: string;
+        };
+        PrintPackDto: {
+            event: components["schemas"]["PrintPackEventDto"];
+            rooms: components["schemas"]["PrintPackRoomDto"][];
+            warnings: string[];
+        };
+        PrintPackEventDto: {
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date-time */
+            startsAt: string;
+        };
+        PrintPackRoomDto: {
+            building: string | null;
+            code: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            students: components["schemas"]["PrintPackStudentDto"][];
+            supervisors: components["schemas"]["PrintPackSupervisorDto"][];
+            technician: components["schemas"]["PrintPackTechnicianDto"] | null;
+        };
+        PrintPackStudentDto: {
+            classroomName: string | null;
+            name: string | null;
+            nis: string | null;
+            participantNumber: string | null;
+            seatNumber: number;
+            /** Format: uuid */
+            studentId: string;
+        };
+        PrintPackSupervisorDto: {
+            /** Format: date-time */
+            endsAt: string;
+            name: string | null;
+            /** Format: date-time */
+            startsAt: string;
+        };
+        PrintPackTechnicianDto: {
+            name: string | null;
         };
         QuestionDetailDto: {
             /** Format: uuid */
@@ -2343,6 +2642,24 @@ export interface components {
             subjectName: string | null;
             submittedCount: number;
         };
+        ResetCredentialsBodyDto: {
+            /**
+             * @description Must be true: the old passwords stop working at once
+             * @enum {boolean}
+             */
+            confirm: true;
+        };
+        ResetCredentialsDto: {
+            items: components["schemas"]["ResetCredentialsItemDto"][];
+            skipped: string[];
+        };
+        ResetCredentialsItemDto: {
+            identifier: string;
+            /** @description Shown once; never stored */
+            password: string;
+            /** Format: uuid */
+            studentId: string;
+        };
         ResumeSessionRequestDto: {
             /** @description The room or schedule token shown now */
             accessCode: string;
@@ -2396,6 +2713,7 @@ export interface components {
             classroomName: string | null;
             nis: string | null;
             packageTitle: string;
+            participantNumber: string | null;
             /** Format: uuid */
             scheduleId: string;
             seatNumber: number;
@@ -2485,10 +2803,12 @@ export interface components {
         };
         RoomReportDto: {
             absences: components["schemas"]["ReportAbsenceDto"][];
+            attachmentName: string | null;
             auditLogs: components["schemas"]["ReportAuditDto"][];
             /** @enum {string} */
             condition: "SMOOTH" | "TECHNICAL_ISSUE" | "DISCIPLINARY_NOTE";
             fieldNotes: components["schemas"]["ReportFieldNoteDto"][];
+            hasAttachment: boolean;
             incidentNotes: string | null;
             /** Format: uuid */
             reportId: string;
@@ -2510,6 +2830,27 @@ export interface components {
             endsAt: string;
             /** Format: date-time */
             startsAt: string;
+        };
+        RoomReportSummaryDto: {
+            attachmentName: string | null;
+            /** Format: date-time */
+            endsAt: string;
+            hasAttachment: boolean;
+            registeredCount: number;
+            /** Format: uuid */
+            reportId: string | null;
+            roomCode: string;
+            /** Format: uuid */
+            roomId: string;
+            roomName: string;
+            /** Format: uuid */
+            slotId: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SUBMITTED" | "VERIFIED";
+            subjectNames: string[];
+            supervisorName: string | null;
         };
         SaveAnswerDto: {
             /** @description One of { key } | { keys } | { value } | { text } */
@@ -2601,6 +2942,38 @@ export interface components {
         };
         SeatFlagDto: {
             allowLateEntry: boolean;
+            /** Format: uuid */
+            studentId: string;
+        };
+        SeatLayoutDto: {
+            lanes: number;
+            left: number;
+            right: number;
+            rows: number;
+        };
+        SeatPlanSeatDto: {
+            /** Format: uuid */
+            classroomId: string;
+            desk: number;
+            /** @enum {string|null} */
+            gender: "MALE" | "FEMALE" | null;
+            gradeLevel: number;
+            lane: number;
+            /** Format: uuid */
+            roomId: string;
+            row: number;
+            /** @enum {string} */
+            side: "LEFT" | "RIGHT";
+            /** Format: uuid */
+            studentId: string;
+        };
+        SeatPlanStudentDto: {
+            /** Format: uuid */
+            classroomId: string;
+            /** @enum {string|null} */
+            gender: "MALE" | "FEMALE" | null;
+            gradeLevel: number;
+            name: string;
             /** Format: uuid */
             studentId: string;
         };
@@ -2774,11 +3147,16 @@ export interface components {
             answer: components["schemas"]["BooleanAnswerDto"];
         };
         UpdateActivityPolicyRequestDto: {
+            allowWeb?: boolean;
             focusThresholdMs?: number;
             gapRecordedMs?: number;
             gapTokenMs?: number;
             gapViolationFrom?: number;
             heartbeatIntervalMs?: number;
+            lateToleranceMinutes?: number;
+            minSubmitMinutes?: number;
+            shuffleChoices?: boolean;
+            shuffleQuestions?: boolean;
             tokenSlotSeconds?: number;
             violationLimit?: number;
         };
@@ -3175,6 +3553,154 @@ export interface operations {
             };
         };
     };
+    ExamAttendanceFileController_list: {
+        parameters: {
+            query?: {
+                day?: string;
+                kind?: "STUDENT" | "SUPERVISOR" | "TECHNICIAN";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AttendanceFileDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamAttendanceFileController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["AttendanceUploadBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["AttendanceFileDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamAttendanceFileController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The file bytes, always as an attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/jpeg": string;
+                    "image/png": string;
+                };
+            };
+        };
+    };
+    ExamEventController_resetPasswords: {
+        parameters: {
+            query?: {
+                roomId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetCredentialsBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ResetCredentialsDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_getPrintPack: {
+        parameters: {
+            query?: {
+                roomId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["PrintPackDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamEventController_roomsOfEvent: {
         parameters: {
             query?: never;
@@ -3224,6 +3750,37 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamRoomDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_generateSeats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateSeatsBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["GenerateSeatsResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
@@ -3490,7 +4047,13 @@ export interface operations {
     QuestionImportController_template: {
         parameters: {
             query: {
+                benarSalah?: number;
                 format: "xlsx" | "docx";
+                isian?: number;
+                layout?: "table" | "vertical";
+                pg?: number;
+                pgKompleks?: number;
+                uraian?: number;
             };
             header?: never;
             path?: never;
@@ -3982,6 +4545,64 @@ export interface operations {
             };
         };
     };
+    ExamParticipantNumberController_issue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueSemesterNumbersBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["IssueSemesterNumbersResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamParticipantNumberController_lookup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LookupParticipantNumbersBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["LookupParticipantNumbersResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamPolicyPresetController_list: {
         parameters: {
             query?: never;
@@ -4338,7 +4959,7 @@ export interface operations {
             };
         };
     };
-    ExamRoomController_submitRoomReport: {
+    ExamRoomController_downloadRoomReportFile: {
         parameters: {
             query?: never;
             header?: never;
@@ -4349,6 +4970,71 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description The file bytes, always as an attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    ExamRoomController_replaceRoomReportFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: string;
+                slotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RoomReportDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamRoomController_submitRoomReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: string;
+                slotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
         responses: {
             201: {
                 headers: {
@@ -4623,6 +5309,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["RoomOverviewDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamRoomOverviewController_roomReports: {
+        parameters: {
+            query?: {
+                eventId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RoomReportSummaryDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

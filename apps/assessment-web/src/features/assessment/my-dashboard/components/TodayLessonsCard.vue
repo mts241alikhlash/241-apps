@@ -44,7 +44,7 @@ const isEmpty = computed(() => props.lessons.length === 0)
         <Skeleton
           v-for="i in 4"
           :key="i"
-          class="h-12 w-full rounded-lg"
+          class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
         />
       </div>
 
@@ -66,9 +66,7 @@ const isEmpty = computed(() => props.lessons.length === 0)
           :key="lesson.id"
           class="flex items-center gap-3 rounded-lg border px-4 py-2.5"
         >
-          <div
-            class="w-24 shrink-0 text-sm font-medium tabular-nums text-muted-foreground"
-          >
+          <div class="w-24 shrink-0 text-sm font-medium text-muted-foreground">
             {{ lesson.startTime }} - {{ lesson.endTime }}
           </div>
           <div class="min-w-0 flex-1">

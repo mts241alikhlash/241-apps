@@ -131,7 +131,7 @@ describe('the three parts of the label', () => {
 
   it('does not divide by an empty name', () => {
     expect(Number.isFinite(nameFontMm(''))).toBe(true)
-    expect(Number.isFinite(nameFontMm('   '))).toBe(true)
+    expect(Number.isFinite(nameFontMm(' '))).toBe(true)
   })
 
   it('sets type large enough to read at arm’s length', () => {

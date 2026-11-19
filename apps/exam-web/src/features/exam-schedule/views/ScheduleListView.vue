@@ -17,9 +17,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import {
   Dialog,
@@ -155,7 +155,7 @@ const columns = computed(() =>
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold">Jadwal Ujian</CardTitle>
         <Button
           v-if="hasPermission('exam-schedules.create')"
@@ -174,7 +174,7 @@ const columns = computed(() =>
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -260,16 +260,14 @@ const columns = computed(() =>
           </template>
         </DataTable>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <Dialog v-model:open="filterOpen">
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Jadwal</DialogTitle>
-          <DialogDescription class="sr-only">
-            Pilih status jadwal.
-          </DialogDescription>
+          <DialogDescription> Pilih status jadwal. </DialogDescription>
         </DialogHeader>
         <DialogBody class="space-y-4">
           <FloatingLabelField

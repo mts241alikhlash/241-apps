@@ -8,21 +8,25 @@ const source = (name: string) =>
 describe('radius scale', () => {
   const theme = source('../../theme.css')
 
-  it('keeps sm and md and maps every larger step onto md', () => {
+  it('steps the radius up from md instead of flattening every corner', () => {
     expect(theme).toContain('--radius-sm: calc(var(--radius) * 0.6);')
     expect(theme).toContain('--radius-md: calc(var(--radius) * 0.8);')
-    for (const step of ['lg', 'xl', '2xl', '3xl', '4xl']) {
-      expect(theme).toContain(`--radius-${step}: var(--radius-md);`)
+    expect(theme).toContain('--radius-lg: var(--radius);')
+    for (const step of ['xl', '2xl', '3xl', '4xl']) {
+      expect(theme).toMatch(
+        new RegExp(
+          `--radius-${step}: calc\\(var\\(--radius\\) \\* [\\d.]+\\);`,
+        ),
+      )
     }
   })
 
-  it('draws controls, badge and the sidebar inset with md', () => {
+  it('draws controls and the sidebar inset with md', () => {
     for (const file of [
       './input/Input.vue',
       './textarea/Textarea.vue',
       './select/SelectTrigger.vue',
       './sidebar/SidebarInset.vue',
-      './badge/index.ts',
     ]) {
       expect(source(file), file).toContain('rounded-md')
       expect(source(file), file).not.toContain('rounded-[12px]')

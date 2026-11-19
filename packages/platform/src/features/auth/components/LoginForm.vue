@@ -34,7 +34,7 @@ function startGoogleSignIn() {
     @submit.prevent="onSubmit"
   >
     <div class="flex flex-col items-center gap-1 text-center">
-      <h1 class="text-2xl font-bold">{{ loginTitle }}</h1>
+      <h1 class="text-2xl font-semibold">{{ loginTitle }}</h1>
       <p class="text-muted-foreground text-sm text-balance">
         {{ loginSubtitle }}
       </p>
@@ -43,7 +43,8 @@ function startGoogleSignIn() {
       <Button
         type="button"
         variant="outline"
-        class="h-10 w-full cursor-pointer bg-background"
+        size="lg"
+        class="w-full cursor-pointer bg-background"
         :disabled="isSubmitting"
         @click="startGoogleSignIn"
       >
@@ -87,7 +88,7 @@ function startGoogleSignIn() {
           <Input
             v-bind="componentField"
             type="text"
-            class="h-10 scroll-my-28 bg-transparent"
+            class="scroll-my-28 bg-transparent"
             autocapitalize="none"
             autocomplete="username"
             spellcheck="false"
@@ -104,7 +105,7 @@ function startGoogleSignIn() {
             <FormControl>
               <Input
                 :type="showPassword ? 'text' : 'password'"
-                class="h-10 scroll-my-28 bg-transparent pr-10"
+                class="scroll-my-28 bg-transparent pr-10"
                 autocomplete="current-password"
                 v-bind="componentField"
               />
@@ -137,7 +138,8 @@ function startGoogleSignIn() {
       <Button
         type="submit"
         :disabled="isSubmitting"
-        class="h-10 w-full cursor-pointer"
+        size="lg"
+        class="w-full cursor-pointer"
       >
         {{ isSubmitting ? 'Sedang masuk...' : 'Masuk' }}
       </Button>
@@ -155,7 +157,7 @@ function startGoogleSignIn() {
         <router-link
           data-testid="login-signup-link"
           :to="signUpUrl"
-          class="text-primary font-bold underline underline-offset-4"
+          class="text-primary font-semibold underline underline-offset-4"
         >
           Daftar sekarang
         </router-link>

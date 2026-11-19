@@ -58,7 +58,7 @@ const {
           type="button"
           variant="outline"
           size="sm"
-          class="h-8 text-xs font-semibold text-primary border-primary/20 hover:bg-primary/10 hover:text-primary"
+          class="font-semibold text-primary border-primary/20 hover:bg-primary/10 hover:text-primary"
           @click="selectAll"
         >
           Pilih Semua
@@ -67,7 +67,7 @@ const {
           type="button"
           variant="outline"
           size="sm"
-          class="h-8 text-xs font-semibold text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
+          class="font-semibold text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive"
           @click="deselectAll"
         >
           Batal Semua
@@ -142,7 +142,7 @@ const {
                 moduleName
               }}</span>
               <span
-                class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold whitespace-nowrap shrink-0"
+                class="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold whitespace-nowrap shrink-0"
               >
                 {{
                   modulePerms.filter((p) => permissionIds?.includes(p.id))
@@ -157,6 +157,9 @@ const {
               variant="ghost"
               size="icon"
               class="size-8 text-muted-foreground hover:text-foreground"
+              :aria-label="
+                expandedGroups[moduleName] ? 'Tutup modul' : 'Buka modul'
+              "
               @click="toggleGroup(moduleName)"
             >
               <ChevronUp

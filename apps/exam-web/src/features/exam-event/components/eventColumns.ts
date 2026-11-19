@@ -2,17 +2,14 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Users } from '@lucide/vue'
 import type { ExamEvent } from '../types'
 import { eventStatusLabel, eventStatusVariant } from '../types'
 import { examTypeLabel } from '@/features/exam-schedule/types'
-import { formatWindow } from '@/features/exam-schedule/utils/formatWindow'
+import { formatDateRange } from '@/features/exam-schedule/utils/formatDateRange'
 
 export interface EventColumnOptions {
   canManage: boolean
-  onOpen: (event: ExamEvent) => void
   onEdit: (event: ExamEvent) => void
-  onRooms: (event: ExamEvent) => void
 }
 
 export function buildEventColumns(
@@ -21,14 +18,15 @@ export function buildEventColumns(
   return [
     {
       id: 'name',
-      header: 'Kegiatan',
-      meta: { align: 'left', strong: true },
+      header: 'Periode Ujian',
+      meta: { align: 'left', strong: true, mobileLabel: 'Periode Ujian' },
       cell: ({ row }) => row.original.name,
     },
     {
       id: 'type',
       header: 'Jenis',
       meta: {
+        align: 'center',
         mobileLabel: 'Jenis',
         mobileValue: (row: ExamEvent) => examTypeLabel(row.type),
       },
@@ -38,26 +36,13 @@ export function buildEventColumns(
       id: 'window',
       header: 'Waktu',
       meta: {
-        mobileLabel: 'Waktu',
-        mobileValue: (row: ExamEvent) => formatWindow(row.startsAt, row.endsAt),
-      },
-      cell: ({ row }) =>
-        formatWindow(row.original.startsAt, row.original.endsAt),
-    },
-    {
-      id: 'late',
-      header: 'Toleransi',
-      meta: {
         align: 'center',
-        mobileLabel: 'Toleransi',
-        mobileValue: (row: ExamEvent) => `${row.lateToleranceMinutes} menit`,
+        mobileLabel: 'Waktu',
+        mobileValue: (row: ExamEvent) =>
+          formatDateRange(row.startsAt, row.endsAt),
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          `${row.original.lateToleranceMinutes} menit`,
-        ),
+        formatDateRange(row.original.startsAt, row.original.endsAt),
     },
     {
       id: 'status',
@@ -78,18 +63,9 @@ export function buildEventColumns(
       enableSorting: false,
       cell: ({ row }) =>
         h(ActionCell, {
-          viewLabel: 'Buka',
           editLabel: 'Ubah',
           hideEdit: !options.canManage,
           hideDelete: true,
-          items: [
-            {
-              label: 'Ruangan',
-              icon: Users,
-              onClick: () => options.onRooms(row.original),
-            },
-          ],
-          onView: () => options.onOpen(row.original),
           onEdit: () => options.onEdit(row.original),
         }),
     },

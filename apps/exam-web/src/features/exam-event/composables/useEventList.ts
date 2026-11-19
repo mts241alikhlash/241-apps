@@ -27,7 +27,7 @@ export function useEventList(
         status: unless(filters.status.value) as ExamEventStatus | undefined,
         semesterId: filters.semesterId.value || undefined,
       }),
-    errorMessage: 'Gagal memuat kegiatan ujian.',
+    errorMessage: 'Gagal memuat periode ujian.',
   })
 
   return {

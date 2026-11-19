@@ -300,7 +300,7 @@ h2 {
 }
 .story-name {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 .story-position {
   font-size: 0.875rem;

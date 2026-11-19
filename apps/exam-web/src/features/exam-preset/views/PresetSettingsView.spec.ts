@@ -48,6 +48,11 @@ const samplePresets = [
       gapTokenMs: 600000,
       gapViolationFrom: 3,
       tokenSlotSeconds: 900,
+      lateToleranceMinutes: 15,
+      minSubmitMinutes: 0,
+      shuffleQuestions: true,
+      shuffleChoices: true,
+      allowWeb: true,
     },
   },
   {
@@ -63,6 +68,11 @@ const samplePresets = [
       gapTokenMs: 1800000,
       gapViolationFrom: 5,
       tokenSlotSeconds: 1800,
+      lateToleranceMinutes: 15,
+      minSubmitMinutes: 0,
+      shuffleQuestions: true,
+      shuffleChoices: true,
+      allowWeb: true,
     },
   },
   {
@@ -78,6 +88,11 @@ const samplePresets = [
       gapTokenMs: 300000,
       gapViolationFrom: 2,
       tokenSlotSeconds: 900,
+      lateToleranceMinutes: 15,
+      minSubmitMinutes: 0,
+      shuffleQuestions: true,
+      shuffleChoices: true,
+      allowWeb: true,
     },
   },
   {
@@ -93,6 +108,11 @@ const samplePresets = [
       gapTokenMs: 180000,
       gapViolationFrom: 1,
       tokenSlotSeconds: 600,
+      lateToleranceMinutes: 15,
+      minSubmitMinutes: 0,
+      shuffleQuestions: true,
+      shuffleChoices: true,
+      allowWeb: true,
     },
   },
 ]
@@ -183,6 +203,36 @@ describe('PresetSettingsView', () => {
     await flushPromises()
 
     expect((input().element as HTMLInputElement).value).toBe('4')
+    wrapper.unmount()
+  })
+
+  it('shows the five new policy fields and sends them on save', async () => {
+    updatePreset.mockResolvedValue(samplePresets[2])
+    const wrapper = mount(PresetSettingsView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Toleransi terlambat')
+    expect(wrapper.text()).toContain('Izinkan lewat web (SEB)')
+    const late = wrapper.get('input[aria-label="Toleransi terlambat UTS"]')
+    expect((late.element as HTMLInputElement).value).toBe('15')
+
+    await wrapper
+      .get('button[role="switch"][aria-label="Izinkan lewat web (SEB) UTS"]')
+      .trigger('click')
+    await wrapper.get('[data-test="save-preset-MIDTERM"]').trigger('click')
+    await flushPromises()
+
+    expect(updatePreset).toHaveBeenCalledWith(
+      'MIDTERM',
+      expect.objectContaining({
+        lateToleranceMinutes: 15,
+        minSubmitMinutes: 0,
+        shuffleQuestions: true,
+        shuffleChoices: true,
+        allowWeb: false,
+      }),
+    )
+    expect(Object.keys(updatePreset.mock.calls[0][1])).toHaveLength(12)
     wrapper.unmount()
   })
 })

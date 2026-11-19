@@ -14,6 +14,13 @@ const preview = (overrides: Partial<ImportPreview> = {}): ImportPreview => ({
     SHORT_ANSWER: 2,
     ESSAY: 1,
   },
+  points: {
+    MULTIPLE_CHOICE: 3,
+    MULTIPLE_RESPONSE: 2,
+    TRUE_FALSE: 0,
+    SHORT_ANSWER: 4,
+    ESSAY: 10,
+  },
   duplicateRows: [],
   errors: [],
   identity: {
@@ -52,15 +59,26 @@ describe('ImportPreviewPanel', () => {
   })
 
   it('counts each question type with its label and shows the totals', () => {
-    const text = mountPanel().text()
+    const rows = mountPanel().findAll('[role="status"] > div')
 
-    expect(text).toContain('PG 3')
-    expect(text).toContain('PG Kompleks 1')
-    expect(text).toContain('Benar/Salah 0')
-    expect(text).toContain('Isian 2')
-    expect(text).toContain('Uraian 1')
-    expect(text).toContain('Total soal 7')
-    expect(text).toContain('Total poin 42')
+    expect(rows.map((row) => row.get('dt').text())).toEqual([
+      'Pilihan ganda',
+      'Pilihan ganda kompleks',
+      'Benar atau salah',
+      'Isian singkat',
+      'Uraian',
+      'Total',
+    ])
+    expect(
+      rows.map((row) => row.findAll('dd span').map((span) => span.text())),
+    ).toEqual([
+      ['3', '3'],
+      ['1', '2'],
+      ['0', '0'],
+      ['2', '4'],
+      ['1', '10'],
+      ['7', '42'],
+    ])
   })
 
   it('lists every error with its row, and without a row when it is 0', () => {
@@ -93,7 +111,7 @@ describe('ImportPreviewPanel', () => {
   it('asks for the duplicate confirmation and reports the tick', async () => {
     const wrapper = mountPanel({ canSave: false, duplicateRows: [3, 5] })
 
-    expect(wrapper.text()).toContain('Soal ganda di baris 3, 5')
+    expect(wrapper.text()).toContain('Baris 3, 5 berisi soal yang sama.')
     expect(wrapper.text()).toContain('Simpan walau ada soal ganda')
     await wrapper.get('[role="checkbox"]').trigger('click')
 

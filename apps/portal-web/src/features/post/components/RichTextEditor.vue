@@ -4,7 +4,7 @@ import { EditorContent, useEditor } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
-import { Button } from '@mts241alikhlash/ui/button'
+import { TooltipButton } from '@mts241alikhlash/ui'
 import { Separator } from '@mts241alikhlash/ui/separator'
 import {
   Bold,
@@ -32,8 +32,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      class:
-        'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none dark:prose-invert',
+      class: 'prose prose-sm max-w-none min-h-64 px-4 py-3 focus:outline-none',
     },
   },
   onUpdate: ({ editor: instance }) => {
@@ -86,142 +85,131 @@ function onSelectImage(selection: MediaSelection) {
       v-if="editor"
       class="flex flex-wrap items-center gap-1 border-b bg-muted/40 p-1"
     >
-      <Button
+      <TooltipButton
+        label="Tebal"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('bold') }"
-        title="Tebal"
         @click="editor.chain().focus().toggleBold().run()"
       >
         <Bold class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Miring"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('italic') }"
-        title="Miring"
         @click="editor.chain().focus().toggleItalic().run()"
       >
         <Italic class="size-4" />
-      </Button>
+      </TooltipButton>
 
       <Separator
         orientation="vertical"
         class="mx-1 h-6"
       />
 
-      <Button
+      <TooltipButton
+        label="Judul bagian"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('heading', { level: 2 }) }"
-        title="Judul bagian"
         @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
       >
         <Heading2 class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Sub-judul"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('heading', { level: 3 }) }"
-        title="Sub-judul"
         @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
       >
         <Heading3 class="size-4" />
-      </Button>
+      </TooltipButton>
 
       <Separator
         orientation="vertical"
         class="mx-1 h-6"
       />
 
-      <Button
+      <TooltipButton
+        label="Daftar butir"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('bulletList') }"
-        title="Daftar butir"
         @click="editor.chain().focus().toggleBulletList().run()"
       >
         <List class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Daftar bernomor"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('orderedList') }"
-        title="Daftar bernomor"
         @click="editor.chain().focus().toggleOrderedList().run()"
       >
         <ListOrdered class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Kutipan"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('blockquote') }"
-        title="Kutipan"
         @click="editor.chain().focus().toggleBlockquote().run()"
       >
         <Quote class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Tautan"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
         :class="{ 'bg-accent': editor.isActive('link') }"
-        title="Tautan"
         @click="promptForLink"
       >
         <Link2 class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Sisipkan gambar"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
-        title="Sisipkan gambar"
         @click="libraryOpen = true"
       >
         <ImagePlus class="size-4" />
-      </Button>
+      </TooltipButton>
 
       <Separator
         orientation="vertical"
         class="mx-1 h-6"
       />
 
-      <Button
+      <TooltipButton
+        label="Batalkan"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
-        title="Batalkan"
         @click="editor.chain().focus().undo().run()"
       >
         <Undo2 class="size-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Ulangi"
         type="button"
         variant="ghost"
         size="icon"
-        class="h-8 w-8"
-        title="Ulangi"
         @click="editor.chain().focus().redo().run()"
       >
         <Redo2 class="size-4" />
-      </Button>
+      </TooltipButton>
 
       <slot name="toolbar-extra" />
     </div>

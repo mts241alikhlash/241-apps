@@ -19,6 +19,7 @@ import {
 } from '@mts241alikhlash/ui/select'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -156,10 +157,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div class="flex items-center gap-3">
           <CardTitle size="lg"> Akun Siswa </CardTitle>
         </div>
@@ -220,7 +218,7 @@ onMounted(async () => {
               Filter Siswa
               <span
                 v-if="activeFiltersCount > 0"
-                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
               >
                 {{ activeFiltersCount }}
               </span>
@@ -252,14 +250,14 @@ onMounted(async () => {
 
   <Dialog v-model:open="isFilterDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Filter Akun Siswa</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Saring daftar akun siswa berdasarkan tingkat dan kelas.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="p-6 space-y-4">
+      <DialogBody class="space-y-4">
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-muted-foreground"
             >Tingkat</label
@@ -307,11 +305,9 @@ onMounted(async () => {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

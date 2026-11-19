@@ -21,10 +21,7 @@ const props = defineProps<{
   open: boolean
   initialApplicationId: string | null
 }>()
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  saved: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf']
 const MAX_FILE_BYTES = 5 * 1024 * 1024
@@ -162,9 +159,7 @@ watch(debouncedSearch, loadApplicants)
           @submit.prevent="save"
         >
           <fieldset class="space-y-2">
-            <legend
-              class="text-[length:var(--text-control,0.75rem)] font-medium"
-            >
+            <legend class="text-control font-medium">
               Pendaftar <span class="text-destructive">*</span>
             </legend>
             <Input
@@ -179,7 +174,7 @@ watch(debouncedSearch, loadApplicants)
                 :key="applicant.applicationId"
               >
                 <label
-                  class="flex cursor-pointer items-center gap-3 rounded-md border p-2 text-[length:var(--text-control,0.75rem)]"
+                  class="flex cursor-pointer items-center gap-3 rounded-md border p-2 text-control"
                 >
                   <input
                     v-model="applicationId"
@@ -201,7 +196,7 @@ watch(debouncedSearch, loadApplicants)
             </ul>
             <p
               v-if="errors.applicationId"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ errors.applicationId }}
             </p>
@@ -209,21 +204,19 @@ watch(debouncedSearch, loadApplicants)
 
           <p
             v-if="selected"
-            class="text-[length:var(--text-control,0.75rem)]"
+            class="text-control"
           >
             Jumlah: <strong>{{ formatIDR(selected.amount) }}</strong>
           </p>
 
           <fieldset class="space-y-2">
-            <legend
-              class="text-[length:var(--text-control,0.75rem)] font-medium"
-            >
+            <legend class="text-control font-medium">
               Rekening Tujuan <span class="text-destructive">*</span>
             </legend>
             <label
               v-for="account in accounts"
               :key="account.id"
-              class="flex cursor-pointer items-start gap-3 rounded-md border p-2 text-[length:var(--text-control,0.75rem)]"
+              class="flex cursor-pointer items-start gap-3 rounded-md border p-2 text-control"
             >
               <input
                 v-model="bankAccountId"
@@ -234,9 +227,7 @@ watch(debouncedSearch, loadApplicants)
               />
               <span>
                 <span class="block font-medium">{{ account.bankName }}</span>
-                <span class="block tabular-nums">{{
-                  account.accountNumber
-                }}</span>
+                <span class="block">{{ account.accountNumber }}</span>
                 <span class="block text-muted-foreground">
                   a.n. {{ account.accountHolder }}
                 </span>
@@ -244,14 +235,14 @@ watch(debouncedSearch, loadApplicants)
             </label>
             <p
               v-if="errors.bankAccountId"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ errors.bankAccountId }}
             </p>
           </fieldset>
 
           <div class="grid gap-4 sm:grid-cols-2">
-            <label class="space-y-1 text-[length:var(--text-control,0.75rem)]">
+            <label class="space-y-1 text-control">
               <span class="font-medium">
                 Bank Pengirim <span class="text-destructive">*</span>
               </span>
@@ -266,7 +257,7 @@ watch(debouncedSearch, loadApplicants)
                 >{{ errors.bankName }}</span
               >
             </label>
-            <label class="space-y-1 text-[length:var(--text-control,0.75rem)]">
+            <label class="space-y-1 text-control">
               <span class="font-medium">
                 Nama Pemilik Rekening Pengirim
                 <span class="text-destructive">*</span>
@@ -282,7 +273,7 @@ watch(debouncedSearch, loadApplicants)
                 >{{ errors.senderAccountName }}</span
               >
             </label>
-            <label class="space-y-1 text-[length:var(--text-control,0.75rem)]">
+            <label class="space-y-1 text-control">
               <span class="font-medium">
                 Tanggal Transfer <span class="text-destructive">*</span>
               </span>
@@ -299,7 +290,7 @@ watch(debouncedSearch, loadApplicants)
           </div>
 
           <div class="space-y-2">
-            <p class="text-[length:var(--text-control,0.75rem)] font-medium">
+            <p class="text-control font-medium">
               Bukti Transfer <span class="text-destructive">*</span>
             </p>
             <FileDropzone
@@ -311,7 +302,7 @@ watch(debouncedSearch, loadApplicants)
             />
             <p
               v-if="errors.file"
-              class="text-[length:var(--text-control,0.75rem)] text-destructive"
+              class="text-control text-destructive"
             >
               {{ errors.file }}
             </p>

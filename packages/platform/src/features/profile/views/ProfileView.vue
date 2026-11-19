@@ -19,6 +19,12 @@ import {
   TabsTrigger,
 } from '@mts241alikhlash/ui/tabs'
 import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@mts241alikhlash/ui/tooltip'
 import { Camera, Loader2, Trash2 } from '@lucide/vue'
 import { Avatar, AvatarImage, AvatarFallback } from '@mts241alikhlash/ui/avatar'
 
@@ -92,7 +98,7 @@ useBreadcrumbs(() => {
   <div class="p-4 md:p-6 lg:p-8">
     <div
       v-if="loading"
-      class="flex items-center justify-center min-h-[500px] rounded-2xl bg-card shadow-sm shadow-black/5 ring-1 ring-black/4"
+      class="flex items-center justify-center min-h-[500px] bg-card shadow-sm shadow-black/5 ring-1 ring-black/4"
     >
       <div class="flex flex-col items-center gap-3">
         <Loader2 class="size-8 animate-spin text-muted-foreground" />
@@ -102,12 +108,11 @@ useBreadcrumbs(() => {
 
     <Card
       v-else-if="profileData"
-      class="overflow-hidden rounded-2xl shadow-sm shadow-black/5 ring-1 ring-black/4 bg-card border-none"
+      class="overflow-hidden shadow-sm shadow-black/5 ring-1 ring-black/4 bg-card border-none"
     >
       <Tabs
         v-model="activeTab"
         class="w-full"
-        variant="line"
       >
         <div class="grid grid-cols-1 lg:grid-cols-4">
           <div
@@ -128,7 +133,7 @@ useBreadcrumbs(() => {
                     :alt="profileData.fullName"
                   />
                   <AvatarFallback
-                    class="bg-primary/10 text-2xl font-bold text-primary"
+                    class="bg-primary/10 text-2xl font-semibold text-primary"
                   >
                     {{ initials }}
                   </AvatarFallback>
@@ -142,35 +147,50 @@ useBreadcrumbs(() => {
                     class="hidden"
                     @change="onPhotoPicked"
                   />
-                  <button
-                    type="button"
-                    :title="avatarUrl ? 'Ganti foto' : 'Unggah foto'"
-                    :disabled="isUploadingPhoto"
-                    class="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
-                    @click="photoInput?.click()"
-                  >
-                    <Loader2
-                      v-if="isUploadingPhoto"
-                      class="size-4 animate-spin"
-                    />
-                    <Camera
-                      v-else
-                      class="size-4"
-                    />
-                  </button>
-                  <button
-                    v-if="avatarUrl && !isUploadingPhoto"
-                    type="button"
-                    title="Hapus foto"
-                    class="absolute -bottom-1 -left-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
-                    @click="handlePhotoDelete"
-                  >
-                    <Trash2 class="size-4" />
-                  </button>
+                  <TooltipProvider :delay-duration="300">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <button
+                          type="button"
+                          :aria-label="avatarUrl ? 'Ganti foto' : 'Unggah foto'"
+                          :disabled="isUploadingPhoto"
+                          class="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
+                          @click="photoInput?.click()"
+                        >
+                          <Loader2
+                            v-if="isUploadingPhoto"
+                            class="size-4 animate-spin"
+                          />
+                          <Camera
+                            v-else
+                            class="size-4"
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {{ avatarUrl ? 'Ganti foto' : 'Unggah foto' }}
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip v-if="avatarUrl && !isUploadingPhoto">
+                      <TooltipTrigger as-child>
+                        <button
+                          type="button"
+                          aria-label="Hapus foto"
+                          class="absolute -bottom-1 -left-1 flex size-8 items-center justify-center rounded-full border-2 border-background bg-destructive text-destructive-foreground shadow-sm transition-opacity hover:opacity-90 cursor-pointer"
+                          @click="handlePhotoDelete"
+                        >
+                          <Trash2 class="size-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Hapus foto
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </template>
               </div>
 
-              <h2 class="text-xl font-bold text-foreground line-clamp-2">
+              <h2 class="text-xl font-semibold text-foreground line-clamp-2">
                 {{ profileData.fullName || '-' }}
               </h2>
               <p class="text-xs font-medium text-muted-foreground mt-1">
@@ -209,7 +229,7 @@ useBreadcrumbs(() => {
             >
               <TabsTrigger
                 value="personal"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Data Diri
               </TabsTrigger>
@@ -220,20 +240,20 @@ useBreadcrumbs(() => {
                 <TabsTrigger
                   v-if="!tab.show || tab.show(profileData.roles ?? [])"
                   :value="tab.value"
-                  class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                  class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
                 >
                   {{ tab.label }}
                 </TabsTrigger>
               </template>
               <TabsTrigger
                 value="address"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Alamat
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                class="justify-start px-3 py-2 h-9 text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
+                class="justify-start px-3 py-2 h-[var(--control-h-md,2rem)] text-left w-full border-0 rounded-md bg-transparent text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=active]:bg-sidebar-accent data-[state=active]:font-medium data-[state=active]:text-sidebar-accent-foreground shadow-none data-[state=active]:shadow-none transition-all duration-200 cursor-pointer"
               >
                 Keamanan
               </TabsTrigger>
@@ -244,13 +264,13 @@ useBreadcrumbs(() => {
             <div
               class="px-6 py-3.5 border-b border-border/60 shrink-0 flex items-center justify-between"
             >
-              <h3 class="text-lg font-bold tracking-tight text-foreground">
+              <h3 class="text-lg font-semibold tracking-tight text-foreground">
                 {{ activeTabLabel }}
               </h3>
               <Button
                 v-if="isEditable"
                 size="sm"
-                class="h-8 gap-1.5 cursor-pointer text-xs"
+                class="gap-1.5 cursor-pointer"
                 @click="handleActionClick(activeTab)"
               >
                 <component

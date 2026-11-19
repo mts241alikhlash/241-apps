@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, randomInt } from 'node:crypto'
 
 export async function hashPassword(password: string): Promise<string> {
   const saltRoundsStr = process.env.BCRYPT_SALT_ROUNDS
@@ -10,4 +10,15 @@ export async function hashPassword(password: string): Promise<string> {
 
 export function randomPassword(): string {
   return randomBytes(24).toString('base64url')
+}
+
+const READABLE_ALPHABET =
+  'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
+
+export function randomReadablePassword(): string {
+  let password = ''
+  for (let i = 0; i < 10; i++) {
+    password += READABLE_ALPHABET[randomInt(READABLE_ALPHABET.length)]
+  }
+  return password
 }

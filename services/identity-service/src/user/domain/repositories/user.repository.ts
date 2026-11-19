@@ -92,6 +92,16 @@ export interface AccountLookupResult {
   nikOwnerId: string | null
 }
 
+export interface ResetPasswordRepositoryInput {
+  userId: string
+  passwordHash: string
+}
+
+export interface ResetPasswordRepositoryResult {
+  userId: string
+  identifier: string
+}
+
 export interface UserSummary {
   total: number
   active: number
@@ -136,4 +146,8 @@ export abstract class IUserRepository {
   ): Promise<AccountLookupResult>
 
   abstract assignRole(userId: string, roleCode: string): Promise<void>
+
+  abstract resetPasswords(
+    entries: ResetPasswordRepositoryInput[],
+  ): Promise<ResetPasswordRepositoryResult[]>
 }

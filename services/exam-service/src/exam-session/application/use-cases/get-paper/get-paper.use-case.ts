@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
+import { effectiveMinSubmit } from '../../../domain/policies/effective-min-submit.policy.js'
 import {
   buildPaper,
   type PaperQuestion,
@@ -42,9 +43,15 @@ export class GetPaperUseCase {
     )
     const schedule = await this.schedules.findById(session.scheduleId)
     return {
-      questions: buildPaper(sources, session.shuffleSeed),
+      questions: buildPaper(sources, session.shuffleSeed, {
+        shuffleQuestions: session.policy?.shuffleQuestions ?? true,
+        shuffleChoices: session.policy?.shuffleChoices ?? true,
+      }),
       startedAt: session.startedAt,
-      minSubmitMinutes: schedule?.minSubmitMinutes ?? 0,
+      minSubmitMinutes: effectiveMinSubmit(
+        session.policy,
+        schedule?.minSubmitMinutes ?? 0,
+      ),
       serverTime: now,
     }
   }

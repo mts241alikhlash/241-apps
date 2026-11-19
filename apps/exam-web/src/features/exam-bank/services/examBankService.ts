@@ -11,6 +11,7 @@ import type {
   ImportResult,
   NamedOption,
   TemplateFormat,
+  TemplateOptions,
 } from '../types'
 
 export const examBankService = {
@@ -53,13 +54,19 @@ export const examBankService = {
     }
   },
 
-  async downloadTemplate(format: TemplateFormat): Promise<void> {
+  async downloadTemplate(
+    format: TemplateFormat,
+    options?: TemplateOptions,
+  ): Promise<void> {
     try {
-      const response = await examBankApi.downloadTemplate(format)
+      const response = await examBankApi.downloadTemplate(format, options)
       const url = URL.createObjectURL(response)
       const link = document.createElement('a')
       link.href = url
-      link.download = `template-soal.${format}`
+      link.download =
+        options?.layout === 'vertical'
+          ? 'template-soal-vertikal.docx'
+          : `template-soal.${format}`
       link.click()
       URL.revokeObjectURL(url)
     } catch (err: unknown) {

@@ -59,7 +59,7 @@ defineProps<{
         v-else
         class="flex items-baseline gap-2"
       >
-        <span class="text-3xl font-semibold tabular-nums">{{ value }}</span>
+        <span class="text-3xl font-semibold">{{ value }}</span>
         <span
           v-if="isFetching"
           class="text-xs text-muted-foreground"

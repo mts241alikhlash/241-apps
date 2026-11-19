@@ -80,9 +80,9 @@ function formatDate(value?: string | null) {
       v-if="isLoading"
       class="space-y-2"
     >
-      <Skeleton class="h-10 w-full" />
-      <Skeleton class="h-10 w-full" />
-      <Skeleton class="h-10 w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
+      <Skeleton class="h-[var(--control-h-lg,2.25rem)] w-full" />
     </div>
 
     <ServiceUnavailable
@@ -108,19 +108,17 @@ function formatDate(value?: string | null) {
       class="overflow-x-auto rounded-xl border bg-background shadow-xs"
     >
       <Table class="min-w-[640px]">
-        <TableHeader class="bg-muted/50">
+        <TableHeader>
           <TableRow>
-            <TableHead class="text-xs font-semibold w-[140px]">
-              Tahun Ajaran
-            </TableHead>
-            <TableHead class="text-xs font-semibold w-[110px]">Kelas</TableHead>
-            <TableHead class="text-center text-xs font-semibold w-[140px]">
+            <TableHead class="text-xs w-[140px]"> Tahun Ajaran </TableHead>
+            <TableHead class="text-xs w-[110px]">Kelas</TableHead>
+            <TableHead class="text-center text-xs w-[140px]">
               Status
             </TableHead>
-            <TableHead class="text-center text-xs font-semibold w-[120px]">
+            <TableHead class="text-center text-xs w-[120px]">
               Berakhir
             </TableHead>
-            <TableHead class="text-xs font-semibold">Catatan</TableHead>
+            <TableHead class="text-xs">Catatan</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -129,9 +127,9 @@ function formatDate(value?: string | null) {
             :key="row.id"
             class="hover:bg-muted/30"
           >
-            <TableCell class="py-2.5 text-xs font-medium">
+            <TableCell class="py-2.5 text-xs">
               {{ row.semester?.academicYear?.name ?? '-' }}
-              <span class="block text-[11px] text-muted-foreground">
+              <span class="block text-xs text-muted-foreground">
                 {{ semesterLabel(row.semester?.type?.name) }}
               </span>
             </TableCell>
@@ -139,16 +137,11 @@ function formatDate(value?: string | null) {
               {{ row.classroom?.displayName ?? '-' }}
             </TableCell>
             <TableCell class="text-center py-2.5">
-              <Badge
-                :variant="enrollmentOutcome(row.status).variant"
-                class="text-[11px] shadow-none"
-              >
+              <Badge :variant="enrollmentOutcome(row.status).variant">
                 {{ enrollmentOutcome(row.status).label }}
               </Badge>
             </TableCell>
-            <TableCell
-              class="text-center py-2.5 text-xs text-muted-foreground tabular-nums"
-            >
+            <TableCell class="text-center py-2.5 text-xs text-muted-foreground">
               {{ formatDate(row.endedAt) }}
             </TableCell>
             <TableCell class="py-2.5 text-xs">

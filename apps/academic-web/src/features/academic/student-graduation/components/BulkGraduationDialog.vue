@@ -150,7 +150,7 @@ async function handleSubmit() {
           v-else
           class="w-full text-sm"
         >
-          <thead class="sticky top-0 bg-muted/50">
+          <thead class="sticky top-0 bg-table-header">
             <tr class="border-b">
               <th class="p-3 w-10">
                 <Checkbox

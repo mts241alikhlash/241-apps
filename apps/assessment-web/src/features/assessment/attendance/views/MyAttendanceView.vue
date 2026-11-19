@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@mts241alikhlash/ui/button'
+import { Button, TooltipButton } from '@mts241alikhlash/ui'
 import {
   Card,
   CardHeader,
@@ -74,37 +74,32 @@ const STATUS_CONFIG: Record<
 > = {
   PRESENT: {
     label: 'Hadir',
-    class: 'text-emerald-600 dark:text-emerald-400',
-    badgeClass:
-      'border-emerald-500/30 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300',
+    class: 'text-success',
+    badgeClass: 'border-success bg-success/10 text-success',
     icon: UserCheck,
   },
   LATE: {
     label: 'Terlambat',
-    class: 'text-amber-600 dark:text-amber-400',
-    badgeClass:
-      'border-amber-500/30 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300',
+    class: 'text-warning',
+    badgeClass: 'border-warning bg-warning/10 text-warning',
     icon: Clock,
   },
   SICK: {
     label: 'Sakit',
-    class: 'text-blue-600 dark:text-blue-400',
-    badgeClass:
-      'border-blue-500/30 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
+    class: 'text-info',
+    badgeClass: 'border-info bg-info/10 text-info',
     icon: FileText,
   },
   EXCUSED: {
     label: 'Izin',
-    class: 'text-violet-600 dark:text-violet-400',
-    badgeClass:
-      'border-violet-500/30 bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300',
+    class: 'text-muted-foreground',
+    badgeClass: 'border-border bg-muted-foreground text-muted-foreground',
     icon: FileText,
   },
   ABSENT: {
     label: 'Alpa',
-    class: 'text-red-600 dark:text-red-400',
-    badgeClass:
-      'border-red-500/30 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300',
+    class: 'text-destructive',
+    badgeClass: 'border-destructive bg-destructive/10 text-destructive',
     icon: UserX,
   },
 }
@@ -327,7 +322,7 @@ onMounted(() => void load())
               {{ item.label }}
             </p>
             <p
-              class="text-2xl font-bold mt-1"
+              class="text-2xl font-semibold mt-1"
               :class="item.color"
             >
               {{ item.value }}
@@ -339,28 +334,26 @@ onMounted(() => void load())
           class="flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4"
         >
           <div class="flex items-center justify-center gap-1.5 sm:gap-2">
-            <Button
+            <TooltipButton
+              label="Bulan Sebelumnya"
               variant="outline"
-              size="icon"
-              title="Bulan Sebelumnya"
               @click="prevMonth"
             >
               <ChevronLeft class="h-4 w-4" />
-            </Button>
+            </TooltipButton>
             <Button
               variant="outline"
               @click="setToday"
             >
               Bulan Ini
             </Button>
-            <Button
+            <TooltipButton
+              label="Bulan Selanjutnya"
               variant="outline"
-              size="icon"
-              title="Bulan Selanjutnya"
               @click="nextMonth"
             >
               <ChevronRight class="h-4 w-4" />
-            </Button>
+            </TooltipButton>
           </div>
 
           <div class="flex items-center justify-center gap-2">
@@ -404,7 +397,7 @@ onMounted(() => void load())
 
         <div class="border rounded-xl bg-background overflow-hidden">
           <div
-            class="grid grid-cols-7 border-b bg-muted/50 text-center font-bold text-xs"
+            class="grid grid-cols-7 border-b bg-table-header text-center font-semibold text-xs"
           >
             <div
               v-for="(day, idx) in dayNames"
@@ -412,7 +405,7 @@ onMounted(() => void load())
               class="py-2.5 border-r last:border-r-0"
               :class="
                 idx === 6
-                  ? 'text-destructive font-bold'
+                  ? 'text-destructive font-semibold'
                   : 'text-muted-foreground'
               "
             >
@@ -443,9 +436,9 @@ onMounted(() => void load())
                   class="text-xs sm:text-sm font-semibold inline-flex size-6 sm:size-7 items-center justify-center rounded-full"
                   :class="[
                     day.isToday
-                      ? 'bg-primary text-primary-foreground font-bold shadow-xs'
+                      ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
                       : day.isSunday && day.isCurrentMonth
-                        ? 'text-destructive font-bold'
+                        ? 'text-destructive font-semibold'
                         : !day.isCurrentMonth
                           ? 'text-muted-foreground/40'
                           : 'text-foreground',
@@ -456,7 +449,7 @@ onMounted(() => void load())
 
                 <span
                   v-if="day.attendances.length > 1"
-                  class="text-[10px] text-muted-foreground font-medium"
+                  class="text-xs text-muted-foreground font-medium"
                 >
                   {{ day.attendances.length }} sesi
                 </span>
@@ -468,7 +461,7 @@ onMounted(() => void load())
                   :key="att.id ?? aIdx"
                 >
                   <div
-                    class="rounded-md px-1.5 py-0.5 border text-center text-[10px] sm:text-xs font-semibold leading-tight flex items-center justify-center gap-1 truncate"
+                    class="rounded-md px-1.5 py-0.5 border text-center text-xs sm:text-xs font-semibold leading-tight flex items-center justify-center gap-1 truncate"
                     :class="
                       STATUS_CONFIG[att.status]?.badgeClass ??
                       'bg-muted border-border'
@@ -481,14 +474,14 @@ onMounted(() => void load())
 
                   <p
                     v-if="att.note"
-                    class="text-[10px] text-muted-foreground truncate italic text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground truncate italic text-center px-0.5 leading-tight"
                     :title="att.note"
                   >
                     {{ att.note }}
                   </p>
                   <p
                     v-else-if="att.schedule?.timeSlot?.name"
-                    class="text-[10px] text-muted-foreground/80 truncate text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground/80 truncate text-center px-0.5 leading-tight"
                   >
                     {{ att.schedule.timeSlot.name }}
                   </p>
@@ -496,7 +489,7 @@ onMounted(() => void load())
 
                 <p
                   v-if="day.attendances.length > 2"
-                  class="text-[9px] text-muted-foreground text-center font-medium"
+                  class="text-xs text-muted-foreground text-center font-medium"
                 >
                   +{{ day.attendances.length - 2 }} lainnya
                 </p>

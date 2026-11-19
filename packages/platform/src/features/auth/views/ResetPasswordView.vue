@@ -77,7 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="hidden justify-center gap-2 lg:flex lg:justify-start">
         <router-link
           to="/login"
-          class="flex items-center gap-2.5 font-semibold text-lg tracking-tight"
+          class="flex items-center gap-3 font-semibold text-lg tracking-tight"
         >
           <AuthLogo size="sm" />
           <span>{{ authConfig.appTitle }}</span>
@@ -86,7 +86,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="flex flex-1 flex-col items-center justify-center gap-6">
         <div class="flex flex-col items-center gap-3 lg:hidden">
           <AuthLogo size="md" />
-          <h1 class="text-xl font-bold tracking-tight">
+          <h1 class="text-xl font-semibold tracking-tight">
             {{ authConfig.appTitle }}
           </h1>
         </div>
@@ -98,17 +98,18 @@ const onSubmit = handleSubmit(async (values) => {
             class="space-y-6 text-center flex flex-col items-center"
           >
             <div
-              class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-2"
+              class="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center text-destructive mb-2"
             >
               <AlertTriangle class="size-6" />
             </div>
-            <h1 class="text-2xl font-bold">Token Tidak Valid</h1>
+            <h1 class="text-2xl font-semibold">Token Tidak Valid</h1>
             <p class="text-muted-foreground text-sm">
               Tautan reset tidak memiliki token yang valid. Silakan ajukan
               kembali melalui halaman Lupa Password.
             </p>
             <Button
-              class="w-full h-10 rounded-xl"
+              size="lg"
+              class="w-full"
               @click="router.push('/forgot-password')"
             >
               Ke Halaman Lupa Password
@@ -120,17 +121,18 @@ const onSubmit = handleSubmit(async (values) => {
             class="space-y-6 text-center flex flex-col items-center"
           >
             <div
-              class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-500 mb-2"
+              class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center text-success mb-2"
             >
               <CheckCircle2 class="size-6" />
             </div>
-            <h1 class="text-2xl font-bold">Reset Sukses</h1>
+            <h1 class="text-2xl font-semibold">Reset Sukses</h1>
             <p class="text-muted-foreground text-sm">
               Password Anda telah berhasil diperbarui. Silakan login kembali
               menggunakan password baru Anda.
             </p>
             <Button
-              class="w-full h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full font-semibold"
               @click="router.push('/login')"
             >
               Masuk Sekarang
@@ -143,7 +145,7 @@ const onSubmit = handleSubmit(async (values) => {
             @submit.prevent="onSubmit"
           >
             <div class="flex flex-col items-center gap-1 text-center">
-              <h1 class="text-2xl font-bold">Reset Password</h1>
+              <h1 class="text-2xl font-semibold">Reset Password</h1>
               <p class="text-muted-foreground text-sm text-balance">
                 Masukkan password baru Anda untuk memulihkan akses akun
               </p>
@@ -182,7 +184,8 @@ const onSubmit = handleSubmit(async (values) => {
             <Button
               type="submit"
               :disabled="isSubmitting"
-              class="w-full cursor-pointer h-10 rounded-xl font-semibold"
+              size="lg"
+              class="w-full cursor-pointer font-semibold"
             >
               <Loader2
                 v-if="isSubmitting"

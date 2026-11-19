@@ -142,7 +142,7 @@ async function initialize() {
 
 <template>
   <div class="space-y-3">
-    <div class="grid gap-5 sm:grid-cols-2">
+    <div class="grid gap-4 sm:grid-cols-2">
       <div
         v-for="(level, index) in LEVELS"
         :key="level.key"

@@ -31,6 +31,7 @@ import {
 } from '@mts241alikhlash/ui/table'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { Printer } from '@lucide/vue'
+import ReportFileDialog from './ReportFileDialog.vue'
 import { examRoomService } from '../services/examRoomService'
 import type {
   RoomExecutionCondition,
@@ -59,6 +60,8 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const saving = ref(false)
 const submitting = ref(false)
+const submitOpen = ref(false)
+const submitError = ref<string | null>(null)
 const verifying = ref(false)
 const reopening = ref(false)
 const reopenOpen = ref(false)
@@ -138,13 +141,33 @@ async function save() {
   else error.value = result.error
 }
 
-async function submit() {
+async function submit(file: File) {
   if (submitting.value) return
   submitting.value = true
-  const result = await examRoomService.submitReport(props.roomId, props.slotId)
+  submitError.value = null
+  const result = await examRoomService.submitReport(
+    props.roomId,
+    props.slotId,
+    file,
+  )
   submitting.value = false
-  if (result.success) apply(result.data)
-  else error.value = result.error
+  if (result.success) {
+    submitOpen.value = false
+    apply(result.data)
+  } else submitError.value = result.error
+}
+
+function openSubmit() {
+  submitError.value = null
+  submitOpen.value = true
+}
+
+function downloadFile() {
+  void examRoomService.downloadReportFile(
+    props.roomId,
+    props.slotId,
+    report.value?.attachmentName ?? null,
+  )
 }
 
 async function verify() {
@@ -185,7 +208,7 @@ watch(
   <div class="space-y-4">
     <div
       v-if="error"
-      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+      class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
       role="alert"
     >
       {{ error }}
@@ -193,14 +216,14 @@ watch(
 
     <p
       v-else-if="slotId === ''"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-control text-muted-foreground"
     >
       Pilih sesi pengawasan untuk membuka berita acara.
     </p>
 
     <p
       v-else-if="loading && report === null"
-      class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+      class="text-control text-muted-foreground"
     >
       Memuat berita acara...
     </p>
@@ -211,16 +234,18 @@ watch(
           <Badge :variant="statusVariant(report.status)">
             {{ reportStatusLabel(report.status) }}
           </Badge>
-          <span
-            class="tabular-nums text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          <Badge
+            v-if="report.hasAttachment"
+            variant="secondary"
           >
+            Berkas terunggah
+          </Badge>
+          <span class="text-control text-muted-foreground">
             Sesi {{ timeFormat.format(new Date(report.slot.startsAt)) }}–{{
               timeFormat.format(new Date(report.slot.endsAt))
             }}
           </span>
-          <span
-            class="tabular-nums text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <span class="text-control text-muted-foreground">
             Hadir {{ totals.started }} dari {{ totals.registered }} · Terkumpul
             {{ totals.submitted }} · Tidak hadir {{ totals.absent }}
           </span>
@@ -251,9 +276,16 @@ watch(
           <Button
             v-if="canSubmit"
             :disabled="submitting"
-            @click="submit"
+            @click="openSubmit"
           >
             Serahkan Berita Acara
+          </Button>
+          <Button
+            v-if="report.hasAttachment"
+            variant="outline"
+            @click="downloadFile"
+          >
+            Unduh berkas
           </Button>
         </div>
       </div>
@@ -279,16 +311,16 @@ watch(
                 {{ row.subjectName ?? row.packageTitle }}
               </TableCell>
               <TableCell>{{ row.classroomName ?? '-' }}</TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.registeredCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.startedCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.submittedCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.absentCount }}
               </TableCell>
             </TableRow>
@@ -298,12 +330,10 @@ watch(
 
       <div class="grid gap-4 lg:grid-cols-2">
         <div class="space-y-2">
-          <h3 class="text-[length:var(--text-control,0.75rem)] font-medium">
-            Ketidakhadiran
-          </h3>
+          <h3 class="text-control font-medium">Ketidakhadiran</h3>
           <p
             v-if="report.absences.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Semua peserta hadir.
           </p>
@@ -314,10 +344,10 @@ watch(
             <li
               v-for="absence in report.absences"
               :key="absence.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-control"
             >
               <span>{{ absence.studentName ?? 'Siswa tidak ditemukan' }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ absence.nis ?? '-' }}
               </span>
               <Badge variant="destructive">
@@ -329,12 +359,12 @@ watch(
         </div>
 
         <div class="space-y-2">
-          <h3 class="text-[length:var(--text-control,0.75rem)] font-medium">
+          <h3 class="text-control font-medium">
             Insiden &amp; Tindakan Teknis
           </h3>
           <p
             v-if="report.auditLogs.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Tidak ada tindakan teknis pada jam ujian ini.
           </p>
@@ -345,23 +375,21 @@ watch(
             <li
               v-for="entry in report.auditLogs"
               :key="entry.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-control"
             >
               <span>{{ eventLabel(entry.action) }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ dateTimeFormat.format(new Date(entry.createdAt)) }}
               </span>
               <span class="text-muted-foreground">{{ entry.reason }}</span>
             </li>
           </ul>
-          <h3
-            class="pt-2 text-[length:var(--text-control,0.75rem)] font-medium"
-          >
+          <h3 class="pt-2 text-control font-medium">
             Catatan Pelanggaran Fisik
           </h3>
           <p
             v-if="report.fieldNotes.length === 0"
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Belum ada pelanggaran fisik yang dicatat.
           </p>
@@ -372,12 +400,12 @@ watch(
             <li
               v-for="note in report.fieldNotes"
               :key="note.id"
-              class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+              class="flex flex-wrap items-center gap-2 p-3 text-control"
             >
               <span>{{ note.studentName ?? 'Siswa' }}</span>
               <Badge variant="outline">{{ note.category }}</Badge>
               <span>{{ note.note }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ dateTimeFormat.format(new Date(note.recordedAt)) }}
               </span>
             </li>
@@ -452,6 +480,16 @@ watch(
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ReportFileDialog
+        v-model:open="submitOpen"
+        title="Serahkan Berita Acara"
+        description="Unggah berita acara yang sudah ditandatangani dan dipindai. Setelah diserahkan, berita acara tidak dapat diubah lagi."
+        confirm-label="Serahkan"
+        :busy="submitting"
+        :error="submitError"
+        @confirm="submit"
+      />
 
       <div
         v-if="!locked"

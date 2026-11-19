@@ -79,7 +79,7 @@ describe('usePackageCreate', () => {
     seed([pair('math', 'g7')])
     create.mockResolvedValue({ success: true, data: { id: 'p9' } })
     const form = usePackageCreate()
-    form.title.value = '  UAS Matematika  '
+    form.title.value = '  UAS Matematika '
 
     expect(await form.submit()).toBe('p9')
     expect(create).toHaveBeenCalledWith({

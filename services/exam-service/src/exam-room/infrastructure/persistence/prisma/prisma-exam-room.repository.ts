@@ -27,6 +27,7 @@ import type {
 } from '../../../domain/entities/exam-room-supervisor.entity.js'
 import type {
   ExamRoomReport,
+  ExamRoomReportAttachment,
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
@@ -66,6 +67,17 @@ import {
 
 function conflictError(error: Prisma.PrismaClientKnownRequestError): Error {
   return uniqueViolationError(uniqueConstraintOf(error.meta ?? {}))
+}
+
+function attachmentColumns(attachment: ExamRoomReportAttachment) {
+  return {
+    attachmentStorageKey: attachment.storageKey,
+    attachmentMimeType: attachment.mimeType,
+    attachmentSizeBytes: attachment.sizeBytes,
+    attachmentOriginalName: attachment.originalName,
+    attachmentUploadedById: attachment.uploadedById,
+    attachmentUploadedAt: attachment.uploadedAt,
+  }
 }
 
 @Injectable()
@@ -305,6 +317,32 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
   async listSeatsByEvent(eventId: string): Promise<ExamRoomSeat[]> {
     const rows = await this.prisma.examRoomSeat.findMany({ where: { eventId } })
     return rows.map(toExamRoomSeat)
+  }
+
+  async countSeatsByEvent(eventId: string): Promise<number> {
+    return this.prisma.examRoomSeat.count({ where: { eventId } })
+  }
+
+  async replaceSeats(
+    eventId: string,
+    roomIds: string[],
+    seats: {
+      roomId: string
+      seatNumber: number
+      studentId: string
+      classroomId: string
+    }[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.examRoomSeat.deleteMany({
+        where: { eventId, roomId: { in: roomIds } },
+      })
+      if (seats.length > 0) {
+        await tx.examRoomSeat.createMany({
+          data: seats.map((seat) => ({ eventId, ...seat })),
+        })
+      }
+    })
   }
 
   async setSeatFlags(
@@ -631,10 +669,31 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     reportId: string,
     submittedByUserId: string,
     at: Date,
+    attachment: ExamRoomReportAttachment,
   ): Promise<ExamRoomReport | null> {
     const { count } = await this.prisma.examRoomReport.updateMany({
       where: { id: reportId, status: 'DRAFT' },
-      data: { status: 'SUBMITTED', submittedByUserId, submittedAt: at },
+      data: {
+        status: 'SUBMITTED',
+        submittedByUserId,
+        submittedAt: at,
+        ...attachmentColumns(attachment),
+      },
+    })
+    if (count === 0) return null
+    const row = await this.prisma.examRoomReport.findUnique({
+      where: { id: reportId },
+    })
+    return row ? toExamRoomReport(row) : null
+  }
+
+  async replaceReportAttachment(
+    reportId: string,
+    attachment: ExamRoomReportAttachment,
+  ): Promise<ExamRoomReport | null> {
+    const { count } = await this.prisma.examRoomReport.updateMany({
+      where: { id: reportId, status: 'SUBMITTED' },
+      data: attachmentColumns(attachment),
     })
     if (count === 0) return null
     const row = await this.prisma.examRoomReport.findUnique({

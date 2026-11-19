@@ -17,8 +17,11 @@ import { LookupAccountUseCase } from './application/use-cases/lookup-account/loo
 import { AssignAccountRoleUseCase } from './application/use-cases/assign-account-role/assign-account-role.use-case.js'
 import { IUserRepository } from './domain/repositories/user.repository.js'
 import { ProvisioningTokenGuard } from './guards/provisioning-token.guard.js'
+import { ResetPasswordsUseCase } from './application/use-cases/reset-passwords/reset-passwords.use-case.js'
+import { AuditLogModule } from '../audit-log/audit-log.module.js'
 
 @Module({
+  imports: [AuditLogModule],
   controllers: [UserController, AccountsController, ProfilesController],
   providers: [
     { provide: IUserRepository, useClass: PrismaUserRepository },
@@ -35,6 +38,7 @@ import { ProvisioningTokenGuard } from './guards/provisioning-token.guard.js'
     UpdateAccountProfileUseCase,
     LookupAccountUseCase,
     AssignAccountRoleUseCase,
+    ResetPasswordsUseCase,
   ],
   exports: [IUserRepository],
 })

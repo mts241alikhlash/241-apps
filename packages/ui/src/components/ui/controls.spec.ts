@@ -11,13 +11,13 @@ import { Select, SelectTrigger } from './select'
 import { Switch } from './switch'
 import { Textarea } from './textarea'
 
-const md = 'h-[var(--control-h-md,1.75rem)]'
+const md = 'h-[var(--control-h-md,2rem)]'
 
 describe('button', () => {
   it('default size reads the md control height, text and icon tokens', () => {
     const c = buttonVariants()
     expect(c).toContain(md)
-    expect(c).toContain('text-[length:var(--text-control,0.75rem)]')
+    expect(c).toContain('text-control')
     expect(c).toContain(
       '[&_svg:not([class*=size-])]:size-[var(--icon-control,0.875rem)]',
     )
@@ -28,13 +28,13 @@ describe('button', () => {
       'h-[var(--control-h-sm,1.5rem)]',
     )
     expect(buttonVariants({ size: 'lg' })).toContain(
-      'h-[var(--control-h-lg,2rem)]',
+      'h-[var(--control-h-lg,2.25rem)]',
     )
     expect(buttonVariants({ size: 'xs' })).toContain(
       'h-[var(--control-h-xs,1.25rem)]',
     )
     expect(buttonVariants({ size: 'icon' })).toContain(
-      'size-[var(--control-h-md,1.75rem)]',
+      'size-[var(--control-h-md,2rem)]',
     )
   })
 
@@ -77,12 +77,13 @@ describe('button', () => {
 })
 
 describe('badge', () => {
-  it('is a 20px badge with the md radius', () => {
+  it('is plain coloured text with an optional icon, never a box', () => {
     const c = badgeVariants()
-    expect(c).toContain('h-[var(--control-h-xs,1.25rem)]')
-    expect(c).toContain('rounded-md')
-    expect(c).not.toContain('rounded-full')
-    expect(c).not.toContain('rounded-sm')
+    expect(c).toContain('text-control')
+    expect(c).toContain('[&>svg]:size-[var(--icon-control,0.875rem)]')
+    expect(c).not.toContain('border')
+    expect(c).not.toContain('rounded-')
+    expect(c).not.toContain('h-[var(--control-h-xs')
     expect(mount(Badge).exists()).toBe(true)
   })
 })
@@ -112,7 +113,7 @@ describe('form controls', () => {
       .get('[data-slot=select-trigger]')
       .classes()
       .join(' ')
-    expect(c).toContain('data-[size=default]:h-[var(--control-h-md,1.75rem)]')
+    expect(c).toContain('data-[size=default]:h-[var(--control-h-md,2rem)]')
     expect(c).toContain('data-[size=sm]:h-[var(--control-h-sm,1.5rem)]')
     expect(c).toContain('focus-visible:border-ring')
     expect(c).not.toContain('focus-visible:ring-2')
@@ -126,7 +127,7 @@ describe('form controls', () => {
 
   it('label uses the control text token', () => {
     const c = mount(Label).classes()
-    expect(c).toContain('text-[length:var(--text-control,0.75rem)]')
+    expect(c).toContain('text-control')
   })
 
   it('checkbox and switch keep their slots and use the reka state attributes', () => {

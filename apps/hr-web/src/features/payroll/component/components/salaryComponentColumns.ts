@@ -18,7 +18,7 @@ export function createSalaryComponentColumns(
       cell: ({ row }) =>
         h(
           'span',
-          { class: 'font-mono text-sm text-muted-foreground' },
+          { class: 'text-sm text-muted-foreground' },
           row.original.code,
         ),
     },

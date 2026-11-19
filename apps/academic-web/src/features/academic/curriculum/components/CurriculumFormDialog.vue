@@ -66,7 +66,7 @@ const curriculumForm = useCurriculumForm({
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{
             curriculumForm.isEditing.value
@@ -74,7 +74,7 @@ const curriculumForm = useCurriculumForm({
               : 'Tambah Kurikulum Baru'
           }}
         </DialogTitle>
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -164,7 +164,8 @@ const curriculumForm = useCurriculumForm({
       </ScrollArea>
 
       <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background mt-auto"
+        standard
+        class="sm:justify-between mt-auto"
       >
         <Button
           type="button"

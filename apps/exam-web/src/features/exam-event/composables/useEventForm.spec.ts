@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useEventForm } from './useEventForm'
-import { toInstant } from '@/features/exam-schedule/utils/instant'
 import type { ExamEvent } from '../types'
 
 const { saveEvent } = vi.hoisted(() => ({ saveEvent: vi.fn() }))
@@ -19,8 +18,8 @@ const existing: ExamEvent = {
   name: 'UTS Ganjil',
   type: 'MIDTERM',
   category: 'EXAM',
-  startsAt: toInstant('2026-11-02', '08:00'),
-  endsAt: toInstant('2026-11-06', '12:00'),
+  startsAt: '2026-11-01T17:00:00.000Z',
+  endsAt: '2026-11-06T16:59:00.000Z',
   lateToleranceMinutes: 30,
   minSubmitMinutes: 20,
   status: 'DRAFT',
@@ -28,64 +27,57 @@ const existing: ExamEvent = {
 
 function filled() {
   const form = useEventForm({ mode: 'create', semesterId: 'sem-1' })
-  form.name.value = 'UAS Ganjil'
-  form.type.value = 'FINAL'
-  form.startDate.value = '2026-12-01'
-  form.startTime.value = '08:00'
-  form.endDate.value = '2026-12-05'
-  form.endTime.value = '12:00'
-  form.lateToleranceMinutes.value = 30
-  form.minSubmitMinutes.value = 20
+  form.setFieldValue('name', 'UAS Ganjil')
+  form.setFieldValue('type', 'FINAL')
+  form.setFieldValue('startDate', '2026-12-01')
+  form.setFieldValue('endDate', '2026-12-05')
   return form
 }
 
 describe('useEventForm', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('needs a name and a type', () => {
+  it('does not save without a name', async () => {
     const form = filled()
-    expect(form.problem.value).toBeNull()
+    form.setFieldValue('name', ' ')
 
-    form.name.value = '  '
-    expect(form.problem.value).toBe('Nama kegiatan wajib diisi')
+    await form.onSubmit()
 
-    form.name.value = 'UAS Ganjil'
-    form.type.value = ''
-    expect(form.problem.value).toBe('Pilih jenis ujian')
+    expect(saveEvent).not.toHaveBeenCalled()
   })
 
-  it('rejects an end before the start', () => {
+  it('does not save without an exam type', async () => {
     const form = filled()
-    form.endDate.value = '2026-12-01'
-    form.endTime.value = '07:00'
+    form.setFieldValue('type', '')
 
-    expect(form.problem.value).toBe('Waktu selesai harus setelah waktu mulai')
+    await form.onSubmit()
+
+    expect(saveEvent).not.toHaveBeenCalled()
   })
 
-  it('rejects a negative lateness tolerance', () => {
+  it('does not save an end date before the start date', async () => {
     const form = filled()
-    form.lateToleranceMinutes.value = -1
+    form.setFieldValue('endDate', '2026-11-30')
 
-    expect(form.problem.value).toBe('Toleransi keterlambatan minimal 0 menit')
+    await form.onSubmit()
+
+    expect(saveEvent).not.toHaveBeenCalled()
   })
 
-  it('sends the window and the semester on create', async () => {
+  it('sends the WIB day bounds and the semester on create', async () => {
     saveEvent.mockResolvedValue({ success: true, data: existing })
     const form = filled()
 
-    const saved = await form.submit()
+    expect(await form.onSubmit()).toBe(true)
 
-    expect(saved?.id).toBe('e1')
     expect(saveEvent).toHaveBeenCalledWith(
       { mode: 'create' },
       {
         semesterId: 'sem-1',
         name: 'UAS Ganjil',
         type: 'FINAL',
-        startsAt: toInstant('2026-12-01', '08:00'),
-        endsAt: toInstant('2026-12-05', '12:00'),
-        lateToleranceMinutes: 30,
-        minSubmitMinutes: 20,
+        startsAt: '2026-12-01T00:00:00+07:00',
+        endsAt: '2026-12-05T23:59:00+07:00',
       },
     )
   })
@@ -94,22 +86,17 @@ describe('useEventForm', () => {
     saveEvent.mockResolvedValue({ success: true, data: existing })
     const form = useEventForm({ mode: 'edit', event: existing })
 
-    expect(form.name.value).toBe('UTS Ganjil')
-    expect(form.startDate.value).toBe('2026-11-02')
-    expect(form.endDate.value).toBe('2026-11-06')
-    expect(form.problem.value).toBeNull()
-
-    await form.submit()
+    await form.onSubmit()
 
     const payload = sentPayload(0)
     expect(Object.keys(payload).sort()).toEqual([
       'endsAt',
-      'lateToleranceMinutes',
-      'minSubmitMinutes',
       'name',
       'startsAt',
       'status',
     ])
+    expect(payload.startsAt).toBe('2026-11-02T00:00:00+07:00')
+    expect(payload.endsAt).toBe('2026-11-06T23:59:00+07:00')
     expect(payload).not.toHaveProperty('semesterId')
     expect(payload).not.toHaveProperty('type')
   })
@@ -118,8 +105,8 @@ describe('useEventForm', () => {
     saveEvent.mockResolvedValue({ success: true, data: existing })
     const form = useEventForm({ mode: 'edit', event: existing })
 
-    form.status.value = 'ACTIVE'
-    await form.submit()
+    form.setFieldValue('status', 'ACTIVE')
+    await form.onSubmit()
 
     expect(sentPayload(0).status).toBe('ACTIVE')
   })
@@ -128,7 +115,7 @@ describe('useEventForm', () => {
     saveEvent.mockResolvedValue({ success: false, error: 'Nama sudah dipakai' })
     const form = filled()
 
-    expect(await form.submit()).toBeNull()
-    expect(form.error.value).toBe('Nama sudah dipakai')
+    expect(await form.onSubmit()).toBe(false)
+    expect(form.saveError.value).toBe('Nama sudah dipakai')
   })
 })

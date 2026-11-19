@@ -54,7 +54,7 @@ export const createRecapColumns = (): ColumnDef<AttendanceRecapItem>[] => [
       const pct = row.original.percentage
       return h('div', { class: 'flex items-center gap-2 min-w-[120px]' }, [
         h(Progress, { modelValue: pct, class: 'h-1.5' }),
-        h('span', { class: 'text-xs font-medium tabular-nums' }, `${pct}%`),
+        h('span', { class: 'text-xs font-medium' }, `${pct}%`),
       ])
     },
   },

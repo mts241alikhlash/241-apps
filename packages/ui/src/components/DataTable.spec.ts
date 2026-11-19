@@ -130,15 +130,7 @@ describe('DataTable mobile cards', () => {
     expect(first.text()).toContain('Status:')
   })
 
-  it('emits row-click with the row when rows are clickable', async () => {
-    const w = mountCards({ rowClickable: true })
-    await w
-      .get('[data-slot="data-table-cards"] li [role="link"]')
-      .trigger('click')
-    expect(w.emitted('row-click')![0]).toEqual([{ id: '1', name: 'Ahmad' }])
-  })
-
-  it('does not make the card a link without rowClickable', () => {
+  it('never makes a card a link', () => {
     expect(
       mountCards()
         .find('[data-slot="data-table-cards"] [role="link"]')

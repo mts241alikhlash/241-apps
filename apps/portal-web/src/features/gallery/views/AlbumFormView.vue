@@ -4,7 +4,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
@@ -12,7 +11,12 @@ import {
   CardTitle,
   CardDescription,
 } from '@mts241alikhlash/ui/card'
-import { DatePicker, BackButton } from '@mts241alikhlash/ui'
+import {
+  BackButton,
+  Button,
+  DatePicker,
+  TooltipButton,
+} from '@mts241alikhlash/ui'
 import { Input } from '@mts241alikhlash/ui/input'
 import { Label } from '@mts241alikhlash/ui/label'
 import { Separator } from '@mts241alikhlash/ui/separator'
@@ -257,37 +261,36 @@ useBreadcrumbs(() => {
                   :model-value="photo.caption ?? ''"
                   :aria-label="`Keterangan untuk ${photo.altText}`"
                   placeholder="Keterangan foto (opsional)"
-                  class="h-8 text-sm"
                   @blur="saveCaption(photo.id, $event)"
                 />
               </div>
 
-              <Button
+              <TooltipButton
+                label="Geser ke kiri"
                 variant="ghost"
                 size="icon"
-                title="Geser ke kiri"
                 :disabled="index === 0"
                 @click="movePhoto(index, -1)"
               >
                 <ChevronLeft class="size-4" />
-              </Button>
-              <Button
+              </TooltipButton>
+              <TooltipButton
+                label="Geser ke kanan"
                 variant="ghost"
                 size="icon"
-                title="Geser ke kanan"
                 :disabled="index === photos.length - 1"
                 @click="movePhoto(index, 1)"
               >
                 <ChevronRight class="size-4" />
-              </Button>
-              <Button
+              </TooltipButton>
+              <TooltipButton
+                label="Hapus foto"
                 variant="ghost"
                 size="icon"
-                title="Hapus foto"
                 @click="removePhoto(photo.id)"
               >
                 <Trash2 class="size-4" />
-              </Button>
+              </TooltipButton>
             </li>
           </ul>
 

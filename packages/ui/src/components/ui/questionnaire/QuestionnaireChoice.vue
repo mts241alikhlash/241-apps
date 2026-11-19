@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
     :data-unchecked="checked ? undefined : ''"
     :class="
       cn(
-        'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-2.5 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start text-start transition-colors outline-none select-none',
+        'border-input bg-transparent hover:bg-input/40 data-[state=checked]:border-primary/40 data-[state=checked]:bg-primary/10 data-invalid:border-destructive has-[>input:focus-visible]:border-ring has-[>gap-3 rounded-md border px-3 py-2.5 text-xs/relaxed has-[>group/questionnaire-choice relative flex min-h-[var(--control-h-md,2rem)] cursor-pointer items-start text-start transition-colors outline-none select-none',
         'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50',
         props.class,
       )
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
     <span
       aria-hidden="true"
       data-slot="questionnaire-choice-indicator"
-      class="border-input dark:bg-input/30 group-data-[state=checked]/questionnaire-choice:bg-primary dark:group-data-[state=checked]/questionnaire-choice:bg-primary group-data-[state=checked]/questionnaire-choice:text-primary-foreground group-data-[state=checked]/questionnaire-choice:border-primary size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 rounded-md pointer-events-none relative flex shrink-0 items-center justify-center border group-data-[type=radio]/questionnaire-choice:rounded-full"
+      class="border-input group-data-[state=checked]/questionnaire-choice:bg-primary group-data-[state=checked]/questionnaire-choice:text-primary-foreground group-data-[state=checked]/questionnaire-choice:border-primary size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 rounded-md pointer-events-none relative flex shrink-0 items-center justify-center border group-data-[type=radio]/questionnaire-choice:rounded-full"
     >
       <span
         data-slot="questionnaire-choice-indicator-dot"
@@ -221,7 +221,7 @@ onBeforeUnmount(() => {
       v-if="shortcut"
       aria-hidden="true"
       data-slot="questionnaire-choice-shortcut"
-      class="border-input bg-background/80 text-muted-foreground size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 items-center justify-center rounded-md border font-mono text-[0.5625rem] font-medium leading-none pointer-events-none ms-auto hidden shrink-0 group-data-[shortcut]/questionnaire-choice:inline-flex"
+      class="border-input bg-background/80 text-muted-foreground size-4 translate-y-[--spacing(0.45)] group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 items-center justify-center rounded-md border text-xs font-medium leading-none pointer-events-none ms-auto hidden shrink-0 group-data-[shortcut]/questionnaire-choice:inline-flex"
     >
       {{ shortcut }}
     </span>

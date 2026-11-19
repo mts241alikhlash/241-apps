@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@mts241alikhlash/ui/button'
+import { Button, TooltipButton } from '@mts241alikhlash/ui'
 import {
   Select,
   SelectContent,
@@ -30,22 +30,20 @@ const emit = defineEmits<{
     class="flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4 mb-6"
   >
     <div class="flex items-center gap-1.5 sm:gap-2">
-      <Button
+      <TooltipButton
+        label="Sebelumnya"
         variant="outline"
-        size="icon"
-        title="Sebelumnya"
         @click="emit('prev')"
       >
         <ChevronLeft class="h-4 w-4" />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Selanjutnya"
         variant="outline"
-        size="icon"
-        title="Selanjutnya"
         @click="emit('next')"
       >
         <ChevronRight class="h-4 w-4" />
-      </Button>
+      </TooltipButton>
       <Button
         variant="outline"
         @click="emit('today')"

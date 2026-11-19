@@ -1,120 +1,92 @@
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
 import { examEventService } from '../services/examEventService'
 import type {
   EventCreatePayload,
   EventUpdatePayload,
   ExamEvent,
-  ExamEventStatus,
 } from '../types'
-import { fromInstant, toInstant } from '@/features/exam-schedule/utils/instant'
+import { fromInstant } from '@/features/exam-schedule/utils/instant'
 import type { ExamType } from '@/features/exam-schedule/types'
 
 export type EventFormOptions =
   { mode: 'create'; semesterId: string } | { mode: 'edit'; event: ExamEvent }
 
 export function useEventForm(options: EventFormOptions) {
-  const start =
-    options.mode === 'edit' ? fromInstant(options.event.startsAt) : null
-  const end = options.mode === 'edit' ? fromInstant(options.event.endsAt) : null
+  const existing = options.mode === 'edit' ? options.event : null
+  const semesterId = options.mode === 'create' ? options.semesterId : ''
+  const start = existing === null ? null : fromInstant(existing.startsAt)
+  const end = existing === null ? null : fromInstant(existing.endsAt)
+  const today = new Date().toISOString().slice(0, 10)
 
-  const name = ref(options.mode === 'edit' ? options.event.name : '')
-  const type = ref<ExamType | ''>(
-    options.mode === 'edit' ? options.event.type : '',
+  const formSchema = toTypedSchema(
+    z
+      .object({
+        name: z.string().trim().min(1, 'Nama kegiatan wajib diisi'),
+        type: z.string().min(1, 'Pilih jenis ujian'),
+        startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
+        endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
+        status: z.enum(['DRAFT', 'ACTIVE', 'COMPLETED']),
+      })
+      .superRefine((value, ctx) => {
+        if (!value.startDate || !value.endDate) return
+        if (value.endDate < value.startDate) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['endDate'],
+            message: 'Tanggal selesai tidak boleh sebelum tanggal mulai',
+          })
+        }
+      }),
   )
-  const startDate = ref(start?.date ?? '')
-  const startTime = ref(start?.time ?? '08:00')
-  const endDate = ref(end?.date ?? '')
-  const endTime = ref(end?.time ?? '12:00')
-  const lateToleranceMinutes = ref<number | null>(
-    options.mode === 'edit' ? options.event.lateToleranceMinutes : 30,
+
+  const { handleSubmit, isSubmitting, resetForm, values, setFieldValue } =
+    useForm({
+      validationSchema: formSchema,
+      initialValues: {
+        name: existing?.name ?? '',
+        type: existing?.type ?? '',
+        startDate: start?.date ?? today,
+        endDate: end?.date ?? '',
+        status: existing?.status ?? ('DRAFT' as const),
+      },
+    })
+
+  watch(
+    () => values.startDate,
+    (next) => {
+      if (!values.endDate) setFieldValue('endDate', next)
+    },
   )
-  const minSubmitMinutes = ref<number | null>(
-    options.mode === 'edit' ? options.event.minSubmitMinutes : 20,
-  )
-  const status = ref<ExamEventStatus>(
-    options.mode === 'edit' ? options.event.status : 'DRAFT',
-  )
-  const saving = ref(false)
-  const error = ref<string | null>(null)
 
-  watch(startDate, (value) => {
-    if (!endDate.value) endDate.value = value
-  })
+  const saveError = ref<string | null>(null)
 
-  const problem = computed<string | null>(() => {
-    if (!name.value.trim()) return 'Nama kegiatan wajib diisi'
-    if (!type.value) return 'Pilih jenis ujian'
-    if (!startDate.value || !startTime.value) return 'Waktu mulai wajib diisi'
-    if (!endDate.value || !endTime.value) return 'Waktu selesai wajib diisi'
-    const startsAt = toInstant(startDate.value, startTime.value)
-    const endsAt = toInstant(endDate.value, endTime.value)
-    if (new Date(endsAt).getTime() <= new Date(startsAt).getTime()) {
-      return 'Waktu selesai harus setelah waktu mulai'
+  const onSubmit = handleSubmit(async (value) => {
+    saveError.value = null
+    const base = {
+      name: value.name.trim(),
+      startsAt: `${value.startDate}T00:00:00+07:00`,
+      endsAt: `${value.endDate}T23:59:00+07:00`,
     }
-    const late = lateToleranceMinutes.value
-    if (late === null || !Number.isInteger(late) || late < 0) {
-      return 'Toleransi keterlambatan minimal 0 menit'
-    }
-    const minSubmit = minSubmitMinutes.value
-    if (minSubmit === null || !Number.isInteger(minSubmit) || minSubmit < 0) {
-      return 'Batas kumpul minimal 0 menit'
-    }
-    return null
-  })
-
-  function window() {
-    return {
-      name: name.value.trim(),
-      startsAt: toInstant(startDate.value, startTime.value),
-      endsAt: toInstant(endDate.value, endTime.value),
-      lateToleranceMinutes: lateToleranceMinutes.value ?? 0,
-      minSubmitMinutes: minSubmitMinutes.value ?? 0,
-    }
-  }
-
-  function createPayload(semesterId: string): EventCreatePayload {
-    return { semesterId, type: type.value as ExamType, ...window() }
-  }
-
-  function updatePayload(): EventUpdatePayload {
-    return { ...window(), status: status.value }
-  }
-
-  async function submit(): Promise<ExamEvent | null> {
-    if (problem.value !== null || saving.value) return null
-    saving.value = true
-    error.value = null
     const result =
-      options.mode === 'create'
-        ? await examEventService.saveEvent(
-            { mode: 'create' },
-            createPayload(options.semesterId),
-          )
-        : await examEventService.saveEvent(
-            { mode: 'edit', id: options.event.id },
-            updatePayload(),
-          )
-    saving.value = false
+      existing !== null
+        ? await examEventService.saveEvent({ mode: 'edit', id: existing.id }, {
+            ...base,
+            status: value.status,
+          } satisfies EventUpdatePayload)
+        : await examEventService.saveEvent({ mode: 'create' }, {
+            semesterId,
+            type: value.type as ExamType,
+            ...base,
+          } satisfies EventCreatePayload)
     if (!result.success) {
-      error.value = result.error
-      return null
+      saveError.value = result.error
+      return false
     }
-    return result.data
-  }
+    return true
+  })
 
-  return {
-    name,
-    type,
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    lateToleranceMinutes,
-    minSubmitMinutes,
-    status,
-    saving,
-    error,
-    problem,
-    submit,
-  }
+  return { onSubmit, isSubmitting, saveError, resetForm, setFieldValue }
 }

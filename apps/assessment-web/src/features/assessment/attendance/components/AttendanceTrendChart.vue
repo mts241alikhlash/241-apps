@@ -40,7 +40,7 @@ const tooltipTemplate = componentToString(chartConfig, ChartTooltipContent, {
 </script>
 
 <template>
-  <Card class="shadow-none border rounded-xl">
+  <Card class="shadow-none border">
     <CardHeader class="pb-3">
       <CardTitle size="md"> Tren Persentase Kehadiran </CardTitle>
       <CardDescription class="text-xs text-muted-foreground">

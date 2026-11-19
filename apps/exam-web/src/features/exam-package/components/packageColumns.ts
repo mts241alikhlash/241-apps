@@ -71,8 +71,7 @@ export function buildPackageColumns(
         mobileLabel: 'Jumlah Soal',
         mobileValue: (row: ExamPackageSummary) => itemsLabel(row),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, itemsLabel(row.original)),
+      cell: ({ row }) => h('span', itemsLabel(row.original)),
     },
     {
       id: 'status',

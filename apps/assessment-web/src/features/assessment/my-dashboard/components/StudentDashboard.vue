@@ -50,45 +50,45 @@ const attendanceItems = computed(() => {
       label: 'Hadir',
       value: recap.present,
       icon: UserCheck,
-      iconColor: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-950/20',
-      valueColor: 'text-emerald-700 dark:text-emerald-400',
+      iconColor: 'text-success',
+      bgColor: 'bg-success/10',
+      valueColor: 'text-success',
     },
     {
       key: 'absent',
       label: 'Alpha',
       value: recap.absent,
       icon: UserX,
-      iconColor: 'text-red-600',
-      bgColor: 'bg-red-50 dark:bg-red-950/20',
-      valueColor: 'text-red-700 dark:text-red-400',
+      iconColor: 'text-destructive',
+      bgColor: 'bg-destructive/10',
+      valueColor: 'text-destructive',
     },
     {
       key: 'late',
       label: 'Terlambat',
       value: recap.late,
       icon: Clock,
-      iconColor: 'text-amber-600',
-      bgColor: 'bg-amber-50 dark:bg-amber-950/20',
-      valueColor: 'text-amber-700 dark:text-amber-400',
+      iconColor: 'text-warning',
+      bgColor: 'bg-warning/10',
+      valueColor: 'text-warning',
     },
     {
       key: 'excused',
       label: 'Izin',
       value: recap.excused,
       icon: FileText,
-      iconColor: 'text-blue-600',
+      iconColor: 'text-info',
       bgColor: '',
-      valueColor: 'text-blue-700 dark:text-blue-400',
+      valueColor: 'text-info',
     },
     {
       key: 'sick',
       label: 'Sakit',
       value: recap.sick,
       icon: FileText,
-      iconColor: 'text-violet-600',
+      iconColor: 'text-muted-foreground',
       bgColor: '',
-      valueColor: 'text-violet-700 dark:text-violet-400',
+      valueColor: 'text-muted-foreground',
     },
   ]
 })
@@ -197,12 +197,12 @@ const totalAttendance = computed(() =>
                   :class="item.iconColor"
                 />
                 <p
-                  class="text-xl font-bold tabular-nums"
+                  class="text-xl font-semibold"
                   :class="item.valueColor"
                 >
                   {{ item.value }}
                 </p>
-                <p class="text-[10px] font-medium text-muted-foreground">
+                <p class="text-xs font-medium text-muted-foreground">
                   {{ item.label }}
                 </p>
               </div>
@@ -243,7 +243,7 @@ const totalAttendance = computed(() =>
               <Skeleton
                 v-for="i in 3"
                 :key="i"
-                class="h-12 w-full rounded-lg"
+                class="h-[var(--control-h-lg,2.25rem)] w-full rounded-lg"
               />
             </div>
             <p
@@ -271,7 +271,7 @@ const totalAttendance = computed(() =>
                 </div>
                 <Badge
                   variant="secondary"
-                  class="shrink-0 tabular-nums"
+                  class="shrink-0"
                 >
                   {{ score.score ?? '-' }} / {{ score.maxScore }}
                 </Badge>

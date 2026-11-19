@@ -266,7 +266,8 @@ onMounted(load)
     >
       <CardHeader
         standard
-        class="justify-end min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
+        plain
+        class="justify-end"
       >
         <Button
           v-if="canCreate"
@@ -279,9 +280,7 @@ onMounted(load)
       </CardHeader>
 
       <div class="space-y-4 p-0 sm:px-0">
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           Berkas PDF yang bisa diunduh calon pendaftar dari halaman depan,
           misalnya brosur dan formulir kosong. Hanya berkas yang aktif yang
           tampil.
@@ -291,7 +290,7 @@ onMounted(load)
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -322,7 +321,7 @@ onMounted(load)
           <DialogTitle>
             {{ editing ? 'Ubah Berkas' : 'Tambah Berkas' }}
           </DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Berkas PDF yang bisa diunduh dari halaman depan pendaftaran.
           </DialogDescription>
         </DialogHeader>
@@ -360,7 +359,7 @@ onMounted(load)
             <div class="space-y-1.5">
               <label
                 :for="fileInputId"
-                class="text-[length:var(--text-control,0.75rem)] font-medium"
+                class="text-control font-medium"
                 >Berkas PDF<span
                   v-if="!editing"
                   class="text-destructive"
@@ -374,7 +373,7 @@ onMounted(load)
                 type="file"
                 accept="application/pdf,.pdf"
                 :aria-describedby="fileHintId"
-                class="block min-h-11 w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-[length:var(--text-control,0.75rem)] file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-[length:var(--text-control,0.75rem)] file:font-medium"
+                class="block min-h-[var(--control-h-lg,2.25rem)] w-full cursor-pointer rounded-md border bg-background px-3 py-2 text-control file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1 file:text-control file:font-medium"
                 @change="onFileChange"
               />
               <p

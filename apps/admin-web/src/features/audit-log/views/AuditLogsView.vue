@@ -145,7 +145,7 @@ const columns: ColumnDef<AuditLog>[] = [
         Badge,
         {
           variant: getActionVariant(action),
-          class: 'text-[11px] px-2 py-0.5 font-medium font-mono',
+          class: 'text-xs px-2 py-0.5 font-medium',
         },
         () => action,
       )
@@ -159,7 +159,7 @@ const columns: ColumnDef<AuditLog>[] = [
         Badge,
         {
           variant: 'secondary',
-          class: 'font-mono text-[10px] px-2 py-0.5 rounded-md border',
+          class: 'text-xs px-2 py-0.5 rounded-md border',
         },
         () => row.getValue<string>('resource'),
       ),
@@ -204,10 +204,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg"> Log Aktivitas Sistem </CardTitle>
         </div>
@@ -233,7 +230,7 @@ onMounted(() => {
               <Input
                 v-model="filters.resource"
                 placeholder="Contoh: students, roles"
-                class="text-[length:var(--text-control,0.75rem)]"
+                class="text-control"
               />
             </div>
             <div class="space-y-1.5">
@@ -243,7 +240,7 @@ onMounted(() => {
               <Input
                 v-model="filters.action"
                 placeholder="Contoh: create, update"
-                class="text-[length:var(--text-control,0.75rem)]"
+                class="text-control"
               />
             </div>
           </div>

@@ -20,6 +20,7 @@ Port 3900 locally; database `student` (6 models: `StudentEnrollment`, `StudentGr
 ## Gotchas
 
 - Classroom, semester and academic year data are read from academic-service; keep the narrow read models in `platform/`.
+- `POST /students/participant-numbers/lookup` takes `{ semesterId, studentIds }` (`studentIds` 1 to 500 uuids) and answers `{ data: [{ studentId, number }] }`, one row per student that has a number in that semester. Callers batch their students into this single call; exam-service's print pack uses it once per pack.
 
 ## Open work
 

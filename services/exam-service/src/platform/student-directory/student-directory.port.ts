@@ -2,6 +2,8 @@ export interface StudentRef {
   id: string
   nis: string
   name: string | null
+  userId: string | null
+  gender: 'MALE' | 'FEMALE' | null
 }
 
 export abstract class IStudentDirectoryPort {

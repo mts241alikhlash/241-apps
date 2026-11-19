@@ -115,10 +115,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Penugasan Mengajar </CardTitle>
         <Button
           v-if="can('teaching-assignments.create')"
@@ -145,7 +142,7 @@ onMounted(async () => {
         >
           <template #filters>
             <Select v-model="selectedClassroomId">
-              <SelectTrigger class="h-8 w-[160px] text-xs">
+              <SelectTrigger class="w-[160px]">
                 <SelectValue placeholder="Semua Kelas" />
               </SelectTrigger>
               <SelectContent>

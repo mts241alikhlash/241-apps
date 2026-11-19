@@ -29,6 +29,16 @@ export class PrismaParticipantNumberRepository extends IParticipantNumberReposit
     })
   }
 
+  async findByStudents(
+    studentIds: string[],
+    semesterId: string,
+  ): Promise<{ studentId: string; number: string }[]> {
+    return this.prisma.studentParticipantNumber.findMany({
+      where: { semesterId, studentId: { in: studentIds } },
+      select: { studentId: true, number: true },
+    })
+  }
+
   async issue(
     semesterId: string,
     build: (

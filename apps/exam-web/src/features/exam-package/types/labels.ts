@@ -56,7 +56,7 @@ const STATUS_TEXT_CLASSES: Record<ExamPackageStatus, string> = {
   DRAFT: 'text-muted-foreground',
   SUBMITTED: 'text-primary',
   RETURNED: 'text-destructive',
-  APPROVED: 'text-green-600 dark:text-green-500',
+  APPROVED: 'text-success',
   LOCKED: 'text-muted-foreground',
 }
 

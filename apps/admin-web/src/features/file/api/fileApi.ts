@@ -22,9 +22,7 @@ export const fileApi = {
     if (categoryId) params.categoryId = categoryId
 
     return api.post<ApiSingleResponse<FileItem>>('/files/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
       params,
     })
   },

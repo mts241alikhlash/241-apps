@@ -173,7 +173,7 @@ onMounted(() => examPackageService.loadReferences())
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold">Paket Soal</CardTitle>
         <Button
           v-if="hasPermission('exam-packages.create')"
@@ -192,7 +192,7 @@ onMounted(() => examPackageService.loadReferences())
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -205,7 +205,6 @@ onMounted(() => examPackageService.loadReferences())
         <DataTable
           v-else
           mobile="cards"
-          row-clickable
           :columns="columns"
           :data="filtersPending ? [] : packages"
           :page="page"
@@ -215,7 +214,6 @@ onMounted(() => examPackageService.loadReferences())
           item-label="paket"
           @update:page="page = $event"
           @update:page-size="changePageSize"
-          @row-click="openPackage"
         >
           <template #filters>
             <PackageFilterFields
@@ -276,14 +274,14 @@ onMounted(() => examPackageService.loadReferences())
           </template>
         </DataTable>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <Dialog v-model:open="filterOpen">
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Filter Paket</DialogTitle>
-          <DialogDescription class="sr-only">
+          <DialogDescription>
             Pilih mapel, tingkat, dan status paket.
           </DialogDescription>
         </DialogHeader>
@@ -329,7 +327,7 @@ onMounted(() => examPackageService.loadReferences())
         </AlertDialogHeader>
         <p
           v-if="submitError"
-          class="text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="text-control text-destructive"
           role="alert"
         >
           {{ submitError }}

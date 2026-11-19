@@ -7,4 +7,6 @@ export const studentEnrollmentApi = {
     unwrapPage(
       studentClient.GET('/student-enrollments', { params: { query } }),
     ),
+  getStudents: (query?: { semesterId?: string; limit?: number }) =>
+    unwrapPage(studentClient.GET('/students', { params: { query } })),
 }

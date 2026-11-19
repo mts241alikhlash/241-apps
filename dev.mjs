@@ -1,11 +1,25 @@
 #!/usr/bin/env node
 
 import { spawn, execFileSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  readlinkSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
 import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+
+import {
+  ownedByWorkspace,
+  referencedServices,
+  withDependencies,
+  withEnvOverrides,
+} from './scripts/dev-helpers.mjs'
 
 const workspace = path.dirname(fileURLToPath(import.meta.url))
 const servicesRoot = workspace
@@ -60,6 +74,29 @@ function readEnv(file) {
 const envFile = (service) =>
   path.join(servicesRoot, 'services', `${service}-service`, '.env')
 
+function mainCheckoutFile(relative) {
+  const common = execFileSync(
+    'git',
+    ['rev-parse', '--path-format=absolute', '--git-common-dir'],
+    { cwd: workspace, encoding: 'utf8' },
+  ).trim()
+  return path.join(path.dirname(common), relative)
+}
+
+function ensureIdentityEnv() {
+  const file = envFile('identity')
+  if (existsSync(file)) return
+  const source = mainCheckoutFile('services/identity-service/.env')
+  if (!existsSync(source) || source === file) {
+    console.error(
+      `${path.relative(workspace, file)} is missing; create it from its .env.example (see docs/guides/local-development.md).`,
+    )
+    process.exit(1)
+  }
+  writeFileSync(file, readFileSync(source), { mode: 0o600 })
+  console.log(`copied ${path.relative(workspace, file)} from ${source}`)
+}
+ensureIdentityEnv()
 const identityEnv = readEnv(envFile('identity'))
 
 function databaseUrl(service) {
@@ -68,10 +105,24 @@ function databaseUrl(service) {
   return url.toString()
 }
 
+const LOCAL_S3 = {
+  S3_ENDPOINT: 'http://localhost:9000',
+  S3_PUBLIC_ENDPOINT: 'http://localhost:9000',
+  S3_ACCESS_KEY_ID: 'local',
+  S3_SECRET_ACCESS_KEY: 'local',
+}
+
 function ensureEnv(service) {
   const file = envFile(service)
   if (existsSync(file)) return
+  const source = mainCheckoutFile(`services/${service}-service/.env`)
+  if (existsSync(source) && source !== file) {
+    writeFileSync(file, readFileSync(source), { mode: 0o600 })
+    console.log(`copied ${path.relative(workspace, file)} from ${source}`)
+    return
+  }
   const overrides = {
+    ...LOCAL_S3,
     DATABASE_URL: databaseUrl(service),
     DIRECT_URL: databaseUrl(service),
     NODE_ENV: 'development',
@@ -87,11 +138,9 @@ function ensureEnv(service) {
     ),
   }
   const example = readFileSync(`${file}.example`, 'utf8').split('\n')
-  const lines = example.map((line) => {
-    const key = line.match(/^([A-Z_][A-Z0-9_]*)=/)?.[1]
-    return key && key in overrides ? `${key}=${overrides[key]}` : line
+  writeFileSync(file, withEnvOverrides(example, overrides).join('\n'), {
+    mode: 0o600,
   })
-  writeFileSync(file, lines.join('\n'), { mode: 0o600 })
   console.log(`created ${path.relative(workspace, file)}`)
 }
 
@@ -148,15 +197,74 @@ async function servicesOf(app) {
   return Object.keys(SERVICE_PREFIXES)
 }
 
-const services = new Set(['identity'])
+function servicesCalledBy(service) {
+  const root = path.join(workspace, 'services', `${service}-service`, 'src')
+  const known = Object.keys(SERVICE_PORTS)
+  const called = new Set()
+  for (const file of readdirSync(root, { recursive: true })) {
+    if (!file.endsWith('.ts') || file.endsWith('.spec.ts')) continue
+    const source = readFileSync(path.join(root, file), 'utf8')
+    for (const name of referencedServices(source, known)) called.add(name)
+  }
+  called.delete(service)
+  return [...called]
+}
+
+const routed = new Set(['identity'])
 for (const app of apps)
-  for (const service of await servicesOf(app)) services.add(service)
+  for (const service of await servicesOf(app)) routed.add(service)
+const services = withDependencies([...routed], servicesCalledBy)
 const webs = new Set(['account', ...apps])
 
 const children = new Set()
 const COLORS = [36, 33, 35, 32, 34, 31, 96, 93, 95, 92]
 let colorIndex = 0
 let stopping = false
+
+function killChildren() {
+  for (const child of children) {
+    try {
+      process.kill(-child.pid, 'SIGTERM')
+    } catch {
+      continue
+    }
+  }
+}
+process.on('exit', killChildren)
+
+function foreignOwner(port) {
+  if (process.platform !== 'linux') return ''
+  try {
+    const listing = execFileSync('ss', ['-H', '-ltnp', `sport = :${port}`], {
+      encoding: 'utf8',
+    })
+    const pid = listing.match(/pid=(\d+)/)?.[1]
+    if (!pid) return ''
+    const cwd = readlinkSync(`/proc/${pid}/cwd`)
+    return ownedByWorkspace(cwd, workspace) ? '' : cwd
+  } catch {
+    return ''
+  }
+}
+
+function refuseForeign(label, port) {
+  const owner = foreignOwner(port)
+  if (!owner) return
+  console.error(
+    `${label} :${port} is held by a process started in ${owner}, not in ${workspace}. Stop it first so this checkout's code runs.`,
+  )
+  process.exit(1)
+}
+
+function clientStale(service) {
+  const root = path.join(servicesRoot, 'services', `${service}-service`)
+  const client = path.join(root, 'src/generated/prisma/client.ts')
+  if (!existsSync(client)) return true
+  return (
+    statSync(path.join(root, 'prisma/schema.prisma')).mtimeMs >
+    statSync(client).mtimeMs
+  )
+}
 
 function run(label, command, args, cwd) {
   const color = COLORS[colorIndex++ % COLORS.length]
@@ -270,6 +378,7 @@ run(
 
 for (const service of services) {
   if (await portBusy(SERVICE_PORTS[service])) {
+    refuseForeign(`${service}-service`, SERVICE_PORTS[service])
     console.log(
       `${service}-service already on :${SERVICE_PORTS[service]}, skipping`,
     )
@@ -277,6 +386,13 @@ for (const service of services) {
   }
   ensureEnv(service)
   await ensureDatabase(service)
+  if (clientStale(service)) {
+    execFileSync(
+      'pnpm',
+      ['--filter', `${service}-service`, 'run', 'prisma:generate'],
+      { cwd: servicesRoot, stdio: ['ignore', 'ignore', 'inherit'] },
+    )
+  }
   execFileSync(
     'pnpm',
     ['--filter', `${service}-service`, 'exec', 'prisma', 'migrate', 'deploy'],
@@ -295,6 +411,7 @@ for (const service of services) {
 
 for (const web of webs) {
   if (await portBusy(WEB_PORTS[web])) {
+    refuseForeign(`${web}-web`, WEB_PORTS[web])
     console.log(`${web}-web already on :${WEB_PORTS[web]}, skipping`)
     continue
   }
@@ -312,13 +429,6 @@ console.log(
 
 function stop() {
   stopping = true
-  for (const child of children) {
-    try {
-      process.kill(-child.pid, 'SIGTERM')
-    } catch {
-      continue
-    }
-  }
   process.exit(0)
 }
 process.on('SIGINT', stop)

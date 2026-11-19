@@ -94,7 +94,7 @@ defineExpose({
     <div class="overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow class="bg-muted/50 hover:bg-muted/50">
+          <TableRow>
             <TableHead class="text-center font-medium w-20"> Urutan </TableHead>
             <TableHead class="text-center font-medium min-w-[160px]">
               Nama Jam
@@ -144,7 +144,7 @@ defineExpose({
                 v-model.number="row.order"
                 type="number"
                 min="1"
-                class="w-16 text-center mx-auto h-9"
+                class="w-16 text-center mx-auto"
                 :disabled="!props.canEdit || row.saving"
               />
             </TableCell>
@@ -152,7 +152,7 @@ defineExpose({
               <Input
                 v-model="row.name"
                 placeholder="cth: Jam ke-1"
-                class="text-center h-9"
+                class="text-center"
                 :disabled="!props.canEdit || row.saving"
               />
             </TableCell>
@@ -160,13 +160,13 @@ defineExpose({
               <Input
                 :model-value="row.startTime"
                 type="time"
-                class="h-9 text-center"
+                class="text-center"
                 :disabled="!props.canEdit || row.saving"
                 @update:model-value="(v) => applyStart(row, String(v))"
               />
               <p
                 v-if="gapLabel(index)"
-                class="mt-1 flex items-center justify-center gap-1 text-[11px] text-amber-600 dark:text-amber-500"
+                class="mt-1 flex items-center justify-center gap-1 text-xs text-warning"
               >
                 <AlertTriangle class="size-3 shrink-0" />
                 {{ gapLabel(index) }}
@@ -176,12 +176,12 @@ defineExpose({
               <Input
                 v-model="row.endTime"
                 type="time"
-                class="h-9 text-center"
+                class="text-center"
                 :disabled="!props.canEdit || row.saving"
               />
             </TableCell>
             <TableCell
-              class="text-center align-middle py-2 px-3 text-sm text-muted-foreground tabular-nums"
+              class="text-center align-middle py-2 px-3 text-sm text-muted-foreground"
             >
               {{ lengthLabel(row) }}
             </TableCell>
@@ -191,7 +191,7 @@ defineExpose({
                 :disabled="!props.canEdit || row.saving"
                 @update:model-value="(v) => applyType(row, String(v))"
               >
-                <SelectTrigger class="w-full justify-center h-9">
+                <SelectTrigger class="w-full justify-center">
                   <SelectValue placeholder="Pilih tipe..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -213,7 +213,8 @@ defineExpose({
                 <Button
                   size="icon"
                   variant="ghost"
-                  class="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                  class="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  aria-label="Hapus jam pelajaran"
                   :disabled="row.saving"
                   @click="requestDelete(row, index)"
                 >

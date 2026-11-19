@@ -15,7 +15,7 @@ const query = useQuery({
     :loading="query.isPending.value"
     :error="query.isError.value"
   >
-    <dl class="grid grid-cols-2 gap-2 tabular-nums">
+    <dl class="grid grid-cols-2 gap-2">
       <dt>Hadir</dt>
       <dd class="font-medium">{{ query.data.value?.present }}</dd>
       <dt>Terlambat</dt>

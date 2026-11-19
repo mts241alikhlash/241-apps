@@ -43,7 +43,7 @@ function structureOfficerName(
     </CardHeader>
     <CardContent
       variant="standard"
-      class="space-y-3 text-sm"
+      class="space-y-3"
     >
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
         <div

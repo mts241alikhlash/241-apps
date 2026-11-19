@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RotateCw, ServerCrash } from '@lucide/vue'
-import { Alert, AlertDescription, AlertTitle } from './ui/alert'
 import { Button } from './ui/button'
 
 const props = defineProps<{
@@ -19,32 +18,38 @@ const title = computed(() =>
 </script>
 
 <template>
-  <Alert
-    variant="destructive"
-    class="my-2"
+  <div
+    class="my-2 flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-start"
+    role="alert"
   >
-    <ServerCrash />
-    <AlertTitle>{{ title }}</AlertTitle>
-    <AlertDescription>
-      <p>{{ message }}</p>
-      <p class="text-muted-foreground mt-1 text-xs">
+    <span
+      class="flex size-9 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive"
+      aria-hidden="true"
+    >
+      <ServerCrash class="size-4" />
+    </span>
+    <div class="min-w-0 flex-1 space-y-1">
+      <p class="text-control font-medium">{{ title }}</p>
+      <p class="text-control wrap-break-word text-muted-foreground">
+        {{ message }}
+      </p>
+      <p class="text-xs text-muted-foreground">
         Data yang ada tidak hilang, hanya belum bisa diambil sekarang.
       </p>
-
-      <Button
-        v-if="retry"
-        variant="outline"
-        size="sm"
-        class="mt-3"
-        :disabled="isRetrying"
-        @click="retry"
-      >
-        <RotateCw
-          class="size-3.5"
-          :class="isRetrying && 'animate-spin'"
-        />
-        {{ isRetrying ? 'Mencoba lagi…' : 'Coba lagi' }}
-      </Button>
-    </AlertDescription>
-  </Alert>
+    </div>
+    <Button
+      v-if="retry"
+      variant="outline"
+      size="sm"
+      class="shrink-0 self-start"
+      :disabled="isRetrying"
+      @click="retry"
+    >
+      <RotateCw
+        class="size-3.5"
+        :class="isRetrying && 'animate-spin'"
+      />
+      {{ isRetrying ? 'Mencoba lagi…' : 'Coba lagi' }}
+    </Button>
+  </div>
 </template>

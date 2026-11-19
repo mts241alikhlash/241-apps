@@ -51,7 +51,7 @@ async function save() {
     <DialogContent size="md">
       <DialogHeader standard>
         <DialogTitle>Tambah Paket</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Beri judul paket, pilih mapel dan tingkat, lalu susun soalnya.
         </DialogDescription>
       </DialogHeader>
@@ -63,7 +63,7 @@ async function save() {
         >
           <div
             v-if="form.error.value"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="alert"
           >
             {{ form.error.value }}

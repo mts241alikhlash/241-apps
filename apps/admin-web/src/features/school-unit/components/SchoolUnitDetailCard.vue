@@ -94,10 +94,10 @@ const hasValidAddress = computed(() => {
     >
       <Card
         gap="none"
-        class="rounded-xl shadow-xs"
+        class="shadow-xs"
       >
         <CardHeader standard>
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-3">
             <Building2 class="size-4 text-primary shrink-0" />
             <CardTitle size="md"> Identitas, Legalitas &amp; Kontak </CardTitle>
           </div>
@@ -215,10 +215,10 @@ const hasValidAddress = computed(() => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card
           gap="none"
-          class="rounded-xl shadow-xs"
+          class="shadow-xs"
         >
           <CardHeader standard>
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-3">
               <MapPin class="size-4 text-primary shrink-0" />
               <CardTitle size="md"> Alamat Lembaga </CardTitle>
             </div>
@@ -310,10 +310,10 @@ const hasValidAddress = computed(() => {
 
         <Card
           gap="none"
-          class="rounded-xl shadow-xs"
+          class="shadow-xs"
         >
           <CardHeader standard>
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-3">
               <MapPinned class="size-4 text-primary shrink-0" />
               <CardTitle size="md"> Titik Lokasi </CardTitle>
             </div>

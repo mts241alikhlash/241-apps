@@ -38,14 +38,13 @@ export class HttpStudentDirectoryAdapter extends IStudentDirectoryPort {
       { userIds: students.map((student) => student.userId) },
     )
     const names = new Map<string, string>()
+    const genders = new Map<string, 'MALE' | 'FEMALE'>()
     if (Array.isArray(profiles)) {
       for (const row of profiles as unknown[]) {
-        if (
-          isRecord(row) &&
-          typeof row.userId === 'string' &&
-          typeof row.name === 'string'
-        ) {
-          names.set(row.userId, row.name)
+        if (!isRecord(row) || typeof row.userId !== 'string') continue
+        if (typeof row.name === 'string') names.set(row.userId, row.name)
+        if (row.gender === 'MALE' || row.gender === 'FEMALE') {
+          genders.set(row.userId, row.gender)
         }
       }
     }
@@ -54,6 +53,8 @@ export class HttpStudentDirectoryAdapter extends IStudentDirectoryPort {
       id: student.id,
       nis: student.nis,
       name: names.get(student.userId) ?? null,
+      userId: student.userId,
+      gender: genders.get(student.userId) ?? null,
     }))
   }
 

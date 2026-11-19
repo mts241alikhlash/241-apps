@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useId } from 'vue'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@mts241alikhlash/ui/empty'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { Spinner } from '@mts241alikhlash/ui/spinner'
 import {
   Select,
   SelectContent,
@@ -17,14 +27,15 @@ import {
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
-import { Printer } from '@lucide/vue'
+import { FileStack, Printer } from '@lucide/vue'
 import RosterSheet from '../components/RosterSheet.vue'
 import { examEventService } from '../../exam-event/services/examEventService'
 import { examRoomService } from '../services/examRoomService'
-import type { Letterhead, RoomMonitorParticipant } from '../types'
+import type { RoomMonitorParticipant } from '../types'
 
 interface RoomSheet {
   roomId: string
+  roomCode: string
   label: string
   rows: RoomMonitorParticipant[]
   loaded: number
@@ -35,10 +46,9 @@ const props = defineProps<{ kind: 'cards' | 'labels' }>()
 
 const eventFieldId = useId()
 
-const events = ref<{ id: string; name: string }[]>([])
+const events = ref<{ id: string; name: string; startsAt?: string | null }[]>([])
 const eventId = ref('')
 const sheets = ref<RoomSheet[]>([])
-const letterhead = ref<Letterhead | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const skippedRooms = ref(0)
@@ -46,7 +56,6 @@ const skippedRooms = ref(0)
 const title = computed(() =>
   props.kind === 'cards' ? 'Kartu Peserta' : 'Daftar Meja',
 )
-const schoolName = computed(() => letterhead.value?.name ?? '')
 const participantCount = computed(() =>
   sheets.value.reduce((sum, sheet) => sum + sheet.rows.length, 0),
 )
@@ -83,6 +92,7 @@ async function loadAll(target: string) {
         const roster = await examRoomService.loadRoster(room.id, '')
         collected.push({
           roomId: room.id,
+          roomCode: room.code,
           label: `${room.code} · ${room.name}`,
           rows: roster.data,
           loaded: roster.data.length,
@@ -116,6 +126,7 @@ async function load() {
     events.value = result.data.map((event) => ({
       id: event.id,
       name: event.name,
+      startsAt: event.startsAt,
     }))
     const active = result.data.find((event) => event.status === 'ACTIVE')
     eventId.value = active?.id ?? result.data[0]?.id ?? ''
@@ -127,22 +138,12 @@ async function load() {
   await loadAll(eventId.value)
 }
 
-async function loadLetterhead() {
-  try {
-    letterhead.value = await examRoomService.loadLetterhead()
-  } catch {
-    letterhead.value = null
-  }
-}
-
 async function changeEvent(value: AcceptableValue) {
   eventId.value = typeof value === 'string' ? value : ''
   await loadAll(eventId.value)
 }
 
-onMounted(async () => {
-  await Promise.all([load(), loadLetterhead()])
-})
+onMounted(load)
 </script>
 
 <template>
@@ -151,101 +152,123 @@ onMounted(async () => {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle class="font-semibold">{{ title }}</CardTitle>
-          <div class="flex items-end gap-2">
-            <FloatingLabelField
-              label="Periode Ujian"
-              :for="eventFieldId"
-              class="w-fit min-w-40"
-              floating
-            >
-              <Select
-                :model-value="eventId"
-                @update:model-value="changeEvent"
-              >
-                <SelectTrigger
-                  :id="eventFieldId"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Pilih periode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="event in events"
-                    :key="event.id"
-                    :value="event.id"
-                  >
-                    {{ event.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
-            <Button
-              :disabled="loading || !hasRows"
-              @click="print"
-            >
-              <Printer class="size-4" />
-              Cetak A4
-            </Button>
-          </div>
-        </div>
+      <CardHeader standard>
+        <CardTitle class="font-semibold">{{ title }}</CardTitle>
+        <Button
+          class="shrink-0"
+          :disabled="loading || !hasRows"
+          @click="print"
+        >
+          <Printer class="size-4" />
+          Cetak A4
+        </Button>
       </CardHeader>
 
       <CardContent
-        class="print-stack flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="print-stack flex min-h-0 flex-1 flex-col overflow-auto p-4 space-y-6"
       >
-        <div
-          v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive print:hidden"
-          role="alert"
-        >
-          <p>{{ error }}</p>
-          <Button
-            class="mt-2"
-            variant="outline"
-            :disabled="loading"
-            @click="loadAll(eventId)"
+        <div class="flex flex-wrap items-end gap-2 print:hidden">
+          <FloatingLabelField
+            label="Periode Ujian"
+            :for="eventFieldId"
+            class="w-fit min-w-40"
+            floating
           >
-            Coba lagi
-          </Button>
+            <Select
+              :model-value="eventId"
+              @update:model-value="changeEvent"
+            >
+              <SelectTrigger
+                :id="eventFieldId"
+                class="w-full"
+              >
+                <SelectValue placeholder="Pilih periode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="event in events"
+                  :key="event.id"
+                  :value="event.id"
+                >
+                  {{ event.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
         </div>
+
+        <Alert
+          v-if="error"
+          variant="destructive"
+          class="print:hidden"
+        >
+          <AlertDescription class="space-y-2">
+            <p>{{ error }}</p>
+            <Button
+              variant="outline"
+              :disabled="loading"
+              @click="loadAll(eventId)"
+            >
+              Coba lagi
+            </Button>
+          </AlertDescription>
+        </Alert>
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="flex items-center gap-2 text-control text-muted-foreground"
+          role="status"
         >
-          Menyiapkan dokumen...
+          <Spinner />
+          Menyiapkan dokumen…
         </p>
 
-        <p
+        <Empty
           v-else-if="events.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="border"
         >
-          Belum ada periode ujian.
-        </p>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileStack />
+            </EmptyMedia>
+            <EmptyTitle>Belum ada periode ujian</EmptyTitle>
+            <EmptyDescription>
+              Kartu peserta dibuat dari periode ujian yang sudah memiliki
+              ruangan dan kursi.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
 
-        <p
+        <Empty
           v-else-if="!hasRows"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="border"
         >
-          {{
-            skippedRooms > 0
-              ? 'Tidak ada ruangan pada periode ini yang bisa Anda akses.'
-              : 'Periode ini belum memiliki kursi peserta di ruangan mana pun.'
-          }}
-        </p>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileStack />
+            </EmptyMedia>
+            <EmptyTitle>Belum ada peserta</EmptyTitle>
+            <EmptyDescription>
+              {{
+                skippedRooms > 0
+                  ? 'Tidak ada ruangan pada periode ini yang bisa Anda akses.'
+                  : 'Periode ini belum memiliki kursi peserta di ruangan mana pun.'
+              }}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
 
         <template v-else>
-          <p
+          <Alert
             v-if="skippedRooms > 0"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive print:hidden"
-            role="alert"
+            variant="destructive"
+            class="print:hidden"
           >
-            {{ skippedRooms }} ruangan dilewati karena Anda tidak bertugas di
-            sana.
-          </p>
+            <AlertDescription>
+              {{ skippedRooms }} ruangan dilewati karena Anda tidak bertugas di
+              sana.
+            </AlertDescription>
+          </Alert>
           <section
             v-for="sheet in printableSheets"
             :key="sheet.roomId"
@@ -253,8 +276,7 @@ onMounted(async () => {
           >
             <h2 class="text-base font-semibold">
               {{ sheet.label }}
-              <span
-                class="ml-1 text-[length:var(--text-control,0.75rem)] font-normal text-muted-foreground tabular-nums"
+              <span class="ml-1 text-control font-normal text-muted-foreground"
                 >{{ sheet.rows.length }} peserta</span
               >
             </h2>
@@ -262,7 +284,7 @@ onMounted(async () => {
               :kind="kind"
               :rows="sheet.rows"
               :room-label="sheet.label"
-              :school-name="schoolName"
+              :room-code="sheet.roomCode"
               :short-warning="
                 sheet.total > sheet.loaded
                   ? `Memuat ${sheet.loaded} dari ${sheet.total} peserta.`
@@ -272,6 +294,7 @@ onMounted(async () => {
           </section>
         </template>
       </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>

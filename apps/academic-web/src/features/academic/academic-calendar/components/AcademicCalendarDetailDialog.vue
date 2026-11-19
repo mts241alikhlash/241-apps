@@ -4,10 +4,12 @@ import type { CalendarEventData } from '../types'
 import { useCalendarFormat } from '../composables/useCalendarFormat'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Button } from '@mts241alikhlash/ui/button'
 import { Pencil } from '@lucide/vue'
@@ -67,11 +69,14 @@ function handleEdit() {
     @update:open="(val) => emit('update:open', val)"
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Detail Agenda</DialogTitle>
+        <DialogDescription
+          >Detail agenda akademik yang dipilih.</DialogDescription
+        >
       </DialogHeader>
 
-      <div class="px-6 py-5 space-y-3.5 text-xs">
+      <DialogBody class="space-y-4 text-xs">
         <div class="flex items-start gap-2">
           <span class="w-[115px] shrink-0 font-medium text-foreground leading-5"
             >Nama Kegiatan</span
@@ -131,11 +136,11 @@ function handleEdit() {
             {{ event?.description || '-' }}
           </span>
         </div>
-      </div>
+      </DialogBody>
 
       <DialogFooter
         v-if="canManage"
-        class="px-6 py-4 border-t shrink-0 flex flex-row items-center justify-end"
+        standard
       >
         <Button
           size="sm"

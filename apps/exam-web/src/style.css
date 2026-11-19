@@ -25,7 +25,22 @@
   padding-top: 0.25rem !important;
 }
 
+@media screen {
+  .print-only {
+    display: none;
+  }
+}
+
 @media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
   body.printing-cards * {
     visibility: hidden;
   }
@@ -45,19 +60,33 @@
     visibility: hidden;
   }
 
-  body.printing-report .exam-report,
-  body.printing-report .exam-report * {
+  body.printing-report .print-only .exam-report,
+  body.printing-report .print-only .exam-report * {
     visibility: visible;
   }
 
-  body.printing-report .exam-report {
-    position: absolute;
-    inset: 0;
+  body.printing-report .print-only .exam-report {
+    position: relative;
     display: block;
     max-width: none;
-    padding: 0;
+    padding: 0 !important;
     color: #000;
     background: #fff;
+  }
+
+  body.printing-report .print-body > *:not(.print-only),
+  body.printing-report .print-body > *:not(.print-only) * {
+    display: none !important;
+  }
+
+  body.printing-report .print-only {
+    position: static;
+    width: 100%;
+    display: block !important;
+  }
+
+  body.printing-report .print-only > .exam-report + .exam-report {
+    break-before: page;
   }
 
   body.printing-sheet * {
@@ -103,21 +132,83 @@
     padding: 0;
   }
 
+  body.printing-stack .print-body > *:not(.print-only) {
+    display: none !important;
+  }
+
   body.printing-stack .print-sheet {
     display: block;
     padding: 0;
   }
 
-  body.printing-stack .print-room {
-    break-before: page;
+  body.printing-stack .card-sheet,
+  body.printing-sheet .card-sheet {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: repeat(2, 92mm) !important;
+    grid-auto-rows: 58.1mm !important;
+    gap: 6mm 4mm !important;
+    justify-content: center;
+    padding: 3mm !important;
   }
 
-  body.printing-stack .print-room:first-of-type {
-    break-before: auto;
+  body.printing-stack .card-sheet > *,
+  body.printing-sheet .card-sheet > * {
+    position: relative;
+    width: 92mm !important;
+    height: 58.1mm !important;
+    max-width: none !important;
+    margin: 0 !important;
+    outline: 0.1mm dashed #000;
+    outline-offset: 1.5mm;
+  }
+
+  body.printing-stack .card-sheet > * > *,
+  body.printing-sheet .card-sheet > * > * {
+    --u: calc(92mm / 658.02) !important;
+  }
+
+  body.printing-stack .exam-card,
+  body.printing-stack .seat-card,
+  body.printing-sheet .exam-card,
+  body.printing-sheet .seat-card {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    font-synthesis: none;
+  }
+
+  body.printing-stack .print-room {
+    break-after: page;
+    break-inside: avoid;
+  }
+
+  body.printing-stack .print-room:last-of-type {
+    break-after: auto;
   }
 
   @page {
     size: A4;
-    margin: 15mm;
+    margin: 12mm;
   }
+}
+
+@font-face {
+  font-family: 'Tusker Grotesk';
+  src: url('./assets/fonts/TuskerGrotesk-3600Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Ruberoid';
+  src: url('./assets/fonts/Ruberoid-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Trajan Pro';
+  src: url('./assets/fonts/TrajanPro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: block;
 }

@@ -40,7 +40,7 @@ defineExpose({ add })
 
 <template>
   <div class="flex flex-col gap-2">
-    <p class="text-[length:var(--text-control,0.75rem)] text-muted-foreground">
+    <p class="text-control text-muted-foreground">
       Tulis semua jawaban yang dianggap benar. Siswa benar bila jawabannya sama
       dengan salah satunya.
     </p>

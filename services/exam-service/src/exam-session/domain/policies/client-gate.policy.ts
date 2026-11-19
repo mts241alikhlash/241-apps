@@ -7,24 +7,26 @@ export type ClientPlatform = 'web' | 'native'
 
 export interface LateGateInput {
   now: Date
-  eventStartsAt: Date
+  scheduleStartsAt: Date
   lateToleranceMinutes: number
   allowLateEntry: boolean
   startedAt?: Date
 }
 
-export interface ClientGateInput extends LateGateInput {
+export interface ClientVerifyInput {
   platform: ClientPlatform
   sebVerified: boolean
+  allowWeb: boolean
 }
 
 function refuse(code: string, message: string): never {
   throw new ForbiddenException({ code, message })
 }
 
-export function assertClientVerified(
-  input: Pick<ClientGateInput, 'platform' | 'sebVerified'>,
-): void {
+export function assertClientVerified(input: ClientVerifyInput): void {
+  if (input.platform === 'web' && !input.allowWeb) {
+    refuse('WEB_NOT_ALLOWED', 'Ujian ini hanya dapat dibuka lewat aplikasi.')
+  }
   if (input.platform === 'web' && !input.sebVerified) {
     refuse(
       'SEB_REQUIRED',
@@ -35,7 +37,7 @@ export function assertClientVerified(
 
 export function assertNotLate(input: LateGateInput): void {
   const lateFrom =
-    input.eventStartsAt.getTime() + input.lateToleranceMinutes * 60_000
+    input.scheduleStartsAt.getTime() + input.lateToleranceMinutes * 60_000
   const reference = input.startedAt ?? input.now
   if (reference.getTime() > lateFrom && !input.allowLateEntry) {
     refuse(

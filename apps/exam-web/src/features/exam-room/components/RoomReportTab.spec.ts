@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import ReportFileDialog from './ReportFileDialog.vue'
 import RoomReportTab from './RoomReportTab.vue'
 import type { RoomReport } from '../types'
 
@@ -75,6 +76,8 @@ const report = (overrides: Partial<RoomReport> = {}): RoomReport => ({
   incidentNotes: null,
   submittedAt: null,
   verifiedAt: null,
+  hasAttachment: false,
+  attachmentName: null,
   slot: {
     startsAt: '2026-11-02T00:30:00.000Z',
     endsAt: '2026-11-02T02:00:00.000Z',
@@ -172,8 +175,13 @@ describe('RoomReportTab', () => {
 
     await buttonByText(wrapper, 'Serahkan Berita Acara')!.trigger('click')
     await flushPromises()
+    expect(submitReport).not.toHaveBeenCalled()
 
-    expect(submitReport).toHaveBeenCalledWith('r1', 'slot1')
+    const file = new File(['%PDF-'], 'scan.pdf')
+    wrapper.findComponent(ReportFileDialog).vm.$emit('confirm', file)
+    await flushPromises()
+
+    expect(submitReport).toHaveBeenCalledWith('r1', 'slot1', file)
     expect(buttonByText(wrapper, 'Serahkan Berita Acara')).toBeUndefined()
     expect(buttonByText(wrapper, 'Simpan Draf')).toBeUndefined()
     wrapper.unmount()

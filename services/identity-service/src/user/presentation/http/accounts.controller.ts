@@ -7,6 +7,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
@@ -23,6 +24,8 @@ import { ProvisionAccountDto } from './dto/request/provision-account.dto.js'
 import { SetAccountActiveDto } from './dto/request/set-account-active.dto.js'
 import { UpdateAccountProfileDto } from './dto/request/update-account-profile.dto.js'
 import { AssignAccountRoleDto } from './dto/request/assign-account-role.dto.js'
+import { ResetPasswordsDto } from './dto/request/reset-passwords.dto.js'
+import { ResetPasswordsResponseDto } from './dto/response/reset-passwords-response.dto.js'
 import { AccountProfileResponseDto } from './dto/response/account-profile-response.dto.js'
 import { AccountLookupResponseDto } from './dto/response/account-lookup-response.dto.js'
 import { AccountSummaryResponseDto } from './dto/response/account-summary-response.dto.js'
@@ -33,6 +36,7 @@ import { UpdateAccountProfileUseCase } from '../../application/use-cases/update-
 import { LookupAccountUseCase } from '../../application/use-cases/lookup-account/lookup-account.use-case.js'
 import { AssignAccountRoleUseCase } from '../../application/use-cases/assign-account-role/assign-account-role.use-case.js'
 import { GetUserByIdUseCase } from '../../application/use-cases/get-user-by-id/get-user-by-id.use-case.js'
+import { ResetPasswordsUseCase } from '../../application/use-cases/reset-passwords/reset-passwords.use-case.js'
 
 @ApiTags('Accounts')
 @Public()
@@ -47,7 +51,25 @@ export class AccountsController {
     private readonly lookupAccountUseCase: LookupAccountUseCase,
     private readonly assignAccountRoleUseCase: AssignAccountRoleUseCase,
     private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly resetPasswordsUseCase: ResetPasswordsUseCase,
   ) {}
+
+  @Post('passwords/reset')
+  @HttpCode(HttpStatus.OK)
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary: 'Give new random passwords to a batch of accounts',
+  })
+  @ApiResponse({ status: 200, type: ResetPasswordsResponseDto })
+  @ApiResponse({
+    status: 401,
+    description: 'Missing or invalid provisioning token',
+  })
+  async resetPasswords(
+    @Body() dto: ResetPasswordsDto,
+  ): Promise<ResetPasswordsResponseDto> {
+    return { data: await this.resetPasswordsUseCase.execute(dto.userIds) }
+  }
 
   @Get('lookup')
   @ApiOperation({

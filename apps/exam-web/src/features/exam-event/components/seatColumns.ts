@@ -32,14 +32,7 @@ export function buildSeatColumns(
         mobileLabel: 'Kursi',
         mobileValue: (row: SeatedStudent) => seatLabel(row.seatNumber),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, `${row.original.seatNumber}`),
-    },
-    {
-      id: 'name',
-      header: 'Siswa',
-      meta: { align: 'left', strong: true },
-      cell: ({ row }) => row.original.name ?? 'Siswa tidak ditemukan',
+      cell: ({ row }) => h('span', `${row.original.seatNumber}`),
     },
     {
       id: 'nis',
@@ -49,17 +42,43 @@ export function buildSeatColumns(
         mobileLabel: 'NIS',
         mobileValue: (row: SeatedStudent) => row.nis ?? '-',
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, row.original.nis ?? '-'),
+      cell: ({ row }) => h('span', row.original.nis ?? '-'),
+    },
+    {
+      id: 'nisn',
+      header: 'NISN',
+      meta: {
+        align: 'center',
+        mobileLabel: 'NISN',
+        mobileValue: (row: SeatedStudent) => row.nisn ?? '-',
+      },
+      cell: ({ row }) => h('span', row.original.nisn ?? '-'),
+    },
+    {
+      id: 'name',
+      header: 'Nama',
+      meta: { align: 'left', strong: true, mobileLabel: 'Nama' },
+      cell: ({ row }) => row.original.name ?? 'Siswa tidak ditemukan',
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: SeatedStudent) => row.gradeName ?? '-',
+      },
+      cell: ({ row }) => row.original.gradeName ?? '-',
     },
     {
       id: 'classroom',
       header: 'Kelas',
       meta: {
+        align: 'center',
         mobileLabel: 'Kelas',
-        mobileValue: (row: SeatedStudent) => row.classroomName ?? '-',
+        mobileValue: (row: SeatedStudent) => row.className ?? '-',
       },
-      cell: ({ row }) => row.original.classroomName ?? '-',
+      cell: ({ row }) => row.original.className ?? '-',
     },
     {
       id: 'actions',
@@ -100,8 +119,7 @@ export function buildSupervisorColumns(
       id: 'window',
       header: 'Jam',
       meta: { align: 'left', strong: true },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, windowText(row.original)),
+      cell: ({ row }) => h('span', windowText(row.original)),
     },
     {
       id: 'scheduled',

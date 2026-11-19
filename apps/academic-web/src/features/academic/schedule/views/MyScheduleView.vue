@@ -44,7 +44,7 @@ onMounted(() => void init())
           v-if="!isLoadingSchedule && lessons.length === 0"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             Jadwal Anda belum tersedia. Ini terjadi bila Anda belum terdaftar di
             sebuah kelas pada semester berjalan, atau jadwal kelas Anda belum
             disusun.

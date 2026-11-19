@@ -1,9 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { examActivityRoutes } from '@/features/exam-activity'
+import { examPrintRoutes } from '@/features/exam-print'
 import { examPackageRoutes } from '@/features/exam-package'
 import { examEventRoutes } from '@/features/exam-event'
 import { examGradingRoutes } from '@/features/exam-grading'
+import { examParticipantRoutes } from '@/features/exam-participant'
 import { examPresetRoutes } from '@/features/exam-preset'
 import { examSebRoutes } from '@/features/exam-seb'
 import { examRoomRoutes } from '@/features/exam-room'
@@ -36,7 +38,9 @@ export const routes: RouteRecordRaw[] = [
       ...examPackageRoutes,
       ...examScheduleRoutes,
       ...examRoomRoutes,
+      ...examPrintRoutes,
       ...examGradingRoutes,
+      ...examParticipantRoutes,
       ...examPresetRoutes,
       ...examSebRoutes,
       ...profileRoutes,

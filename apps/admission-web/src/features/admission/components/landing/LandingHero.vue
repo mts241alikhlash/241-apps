@@ -197,7 +197,7 @@ h1 {
   padding-inline: 1.5rem;
   background: #e5cc87;
   color: #162d53;
-  font-weight: 700;
+  font-weight: 600;
   border-radius: 0.375rem;
 }
 .hero-register:hover {

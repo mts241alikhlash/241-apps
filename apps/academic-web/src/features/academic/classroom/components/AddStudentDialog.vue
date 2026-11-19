@@ -140,14 +140,14 @@ function handleEnroll() {
         <Input
           v-model="searchQuery"
           placeholder="Cari nama / NIS / NISN..."
-          class="h-8 w-full sm:max-w-xs text-sm"
+          class="w-full sm:max-w-xs"
         />
       </div>
 
       <div class="flex-1 overflow-y-auto border rounded-md">
         <Table>
           <TableHeader>
-            <TableRow class="bg-muted/50 hover:bg-muted/50">
+            <TableRow>
               <TableHead class="w-[50px] text-center px-4">
                 <Checkbox
                   :model-value="allChecked || (someChecked && 'indeterminate')"
@@ -226,7 +226,7 @@ function handleEnroll() {
         </Table>
       </div>
 
-      <DialogFooter class="pt-4 border-t">
+      <DialogFooter>
         <Button
           type="button"
           variant="outline"

@@ -23,6 +23,21 @@ export const examRoomRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/exam/reports/:dayId?/:subjectId?',
+    name: 'ExamRoomReports',
+    component: () => import('./views/RoomReportListView.vue'),
+    meta: {
+      title: 'Berita Acara',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-rooms.supervise',
+        'exam-rooms.technician',
+        'exam-rooms.manage-all',
+      ],
+      breadcrumbs: crumbs('Berita Acara', '/exam/reports'),
+    },
+  },
+  {
     path: '/exam/rooms/:roomId',
     name: 'ExamRoomMonitor',
     component: () => import('./views/RoomMonitorDetailView.vue'),

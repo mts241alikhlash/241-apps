@@ -16,8 +16,7 @@ export function buildRoomOverviewColumns(
       id: 'code',
       header: 'Kode',
       meta: { align: 'center', strong: true },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, row.original.code),
+      cell: ({ row }) => h('span', row.original.code),
     },
     {
       id: 'name',
@@ -47,11 +46,7 @@ export function buildRoomOverviewColumns(
           `${row.registeredCount} dari ${row.capacity}`,
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          `${row.original.registeredCount} / ${row.original.capacity}`,
-        ),
+        h('span', `${row.original.registeredCount} / ${row.original.capacity}`),
     },
     {
       id: 'supervisor',

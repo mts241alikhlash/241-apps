@@ -13,6 +13,8 @@ import {
   ProfileSummaryEntity,
   ProvisionAccountRepositoryInput,
   ProvisionedAccount,
+  ResetPasswordRepositoryInput,
+  ResetPasswordRepositoryResult,
   UpdateProfileRepositoryInput,
   UserQueryInput,
 } from '../../../domain/repositories/user.repository.js'
@@ -335,6 +337,43 @@ export class PrismaUserRepository extends IUserRepository {
       where: { userId_roleId: { userId, roleId: role.id } },
       create: { userId, roleId: role.id },
       update: {},
+    })
+  }
+
+  async resetPasswords(
+    entries: ResetPasswordRepositoryInput[],
+  ): Promise<ResetPasswordRepositoryResult[]> {
+    const hashById = new Map(entries.map((e) => [e.userId, e.passwordHash]))
+
+    return this.prisma.$transaction(async (tx) => {
+      const users = await tx.user.findMany({
+        where: { id: { in: [...hashById.keys()] }, deletedAt: null },
+        select: { id: true, identifier: true },
+      })
+
+      const targets = users.flatMap((user) => {
+        const passwordHash = hashById.get(user.id)
+        return passwordHash === undefined
+          ? []
+          : [{ userId: user.id, identifier: user.identifier, passwordHash }]
+      })
+
+      for (const target of targets) {
+        await tx.user.update({
+          where: { id: target.userId },
+          data: { passwordHash: target.passwordHash },
+        })
+      }
+
+      await tx.authSession.updateMany({
+        where: {
+          userId: { in: targets.map((t) => t.userId) },
+          revokedAt: null,
+        },
+        data: { revokedAt: new Date() },
+      })
+
+      return targets.map(({ userId, identifier }) => ({ userId, identifier }))
     })
   }
 }

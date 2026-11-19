@@ -60,6 +60,8 @@ export interface RoomReportView {
   incidentNotes: string | null
   submittedAt: string | null
   verifiedAt: string | null
+  hasAttachment: boolean
+  attachmentName: string | null
   slot: { startsAt: string; endsAt: string }
   schedules: ReportScheduleRow[]
   absences: ReportAbsenceRow[]
@@ -87,8 +89,10 @@ export class GetRoomReportUseCase {
     const seats = await this.rooms.listSeatsByRoom(roomId)
     const sessions = await this.sessions.listByRoom(roomId)
     const overlapping = await this.slotSchedules(room.eventId, slot)
+    const roomClassrooms = new Set(seats.map((seat) => seat.classroomId))
     const schedules = overlapping.filter(
       (row) =>
+        roomClassrooms.has(row.classroomId) &&
         row.startsAt.getTime() >= slot.startsAt.getTime() &&
         row.startsAt.getTime() < slot.endsAt.getTime(),
     )
@@ -134,6 +138,8 @@ export class GetRoomReportUseCase {
       incidentNotes: report.incidentNotes,
       submittedAt: report.submittedAt?.toISOString() ?? null,
       verifiedAt: report.verifiedAt?.toISOString() ?? null,
+      hasAttachment: report.attachment !== null,
+      attachmentName: report.attachment?.originalName ?? null,
       slot: {
         startsAt: slot.startsAt.toISOString(),
         endsAt: slot.endsAt.toISOString(),

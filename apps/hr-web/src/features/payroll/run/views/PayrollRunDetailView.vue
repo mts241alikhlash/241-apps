@@ -138,7 +138,7 @@ useBreadcrumbs(() => {
               @click="openPayslip(slip.id)"
             >
               <TableCell>{{ slip.employee.displayName ?? '-' }}</TableCell>
-              <TableCell class="font-mono text-xs">
+              <TableCell class="text-xs">
                 {{ slip.employee.identifier }}
               </TableCell>
               <TableCell class="text-right">
@@ -147,7 +147,7 @@ useBreadcrumbs(() => {
               <TableCell class="text-right">
                 {{ formatRupiah(slip.deductions) }}
               </TableCell>
-              <TableCell class="text-right font-medium">
+              <TableCell class="text-right">
                 {{ formatRupiah(slip.net) }}
               </TableCell>
             </TableRow>

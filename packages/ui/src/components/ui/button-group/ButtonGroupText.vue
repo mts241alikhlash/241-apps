@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="
       cn(
-        'bg-muted gap-2 rounded-md border px-2.5 text-[length:var(--text-control,0.75rem)] leading-relaxed font-medium [&_svg:not([class*=size-])]:size-4 flex items-center [&_svg]:pointer-events-none',
+        'bg-muted gap-2 rounded-md border px-2.5 text-control leading-relaxed font-medium [&_svg:not([class*=size-])]:size-4 flex items-center [&_svg]:pointer-events-none',
         props.class,
       )
     "

@@ -3,6 +3,7 @@ import { DatePicker } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -97,16 +98,16 @@ const onSubmit = handleSubmit(async (form) => {
     @update:open="emit('update:open', $event)"
   >
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Tetapkan Gaji Pegawai</DialogTitle>
-        <DialogDescription class="sr-only" />
+        <DialogDescription />
       </DialogHeader>
 
       <form
         class="flex flex-col flex-1 min-h-0"
         @submit="onSubmit"
       >
-        <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+        <DialogBody class="space-y-4">
           <FloatingField
             v-slot="{ componentField }"
             name="componentId"
@@ -170,11 +171,9 @@ const onSubmit = handleSubmit(async (form) => {
               </FormControl>
             </div>
           </FloatingField>
-        </div>
+        </DialogBody>
 
-        <DialogFooter
-          class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2 shrink-0"
-        >
+        <DialogFooter standard>
           <Button
             type="button"
             variant="outline"

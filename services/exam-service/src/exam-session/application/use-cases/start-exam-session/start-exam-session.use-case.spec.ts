@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { FakeExamActivityRepository } from '../../../../exam-activity/application/exam-activity.repository.fake.js'
+import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import type { ExamActivity } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { AccessCodeService } from '../../../../exam-schedule/application/access-code.service.js'
@@ -173,6 +174,22 @@ describe('StartExamSessionUseCase', () => {
       })
     })
 
+    it('refuses a web start when the activity policy does not allow the web', async () => {
+      schedules.schedules.set(schedule.id, {
+        ...schedule,
+        activityPolicy: { ...DEFAULT_POLICIES.MIDTERM, allowWeb: false },
+      })
+
+      await expect(
+        start(build(), { platform: 'web', seb: verified }),
+      ).rejects.toMatchObject({
+        response: {
+          code: 'WEB_NOT_ALLOWED',
+          message: 'Ujian ini hanya dapat dibuka lewat aplikasi.',
+        },
+      })
+    })
+
     it('starts a native session as ISTIQRA', async () => {
       const started = await start(build(), { platform: 'native' })
 
@@ -237,10 +254,40 @@ describe('StartExamSessionUseCase', () => {
     })
     schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
 
-    const started = await start(build())
+    const started = await start(build(), {
+      now: new Date('2026-11-02T01:05:00.000Z'),
+    })
     const stored = await sessions.findById(started.sessionId)
 
     expect(stored).toMatchObject({ roomId: room.id, seatNumber: 12 })
+  })
+
+  describe('the late cutoff', () => {
+    beforeEach(async () => {
+      const event = await rooms.createEvent({
+        semesterId: 'sem-1',
+        name: 'UTS Ganjil',
+        type: 'MIDTERM',
+        startsAt: STARTS,
+        endsAt: ENDS,
+        createdById: 'admin-1',
+      })
+      schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
+    })
+
+    it('lets a student in exactly at schedule start plus tolerance', async () => {
+      await expect(
+        start(build(), { now: new Date('2026-11-02T01:15:00.000Z') }),
+      ).resolves.toMatchObject({ sessionId: expect.any(String) })
+    })
+
+    it('refuses a student one second after the cutoff', async () => {
+      await expect(
+        start(build(), { now: new Date('2026-11-02T01:15:01.000Z') }),
+      ).rejects.toMatchObject({
+        response: { code: 'LATE_ENTRY_FORBIDDEN' },
+      })
+    })
   })
 
   it('leaves the room empty when the student has no seat', async () => {
@@ -682,6 +729,7 @@ describe('StartExamSessionUseCase', () => {
       })
       schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
       const makeup = await withMakeup()
+      schedules.schedules.set(makeup.id, { ...makeup, startsAt: MAKEUP_NOW })
 
       const started = await startMakeup(makeup)
 

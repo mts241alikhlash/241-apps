@@ -2,15 +2,23 @@
 
 @theme inline {
   --font-sans:
-    'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius-md);
-  --radius-xl: var(--radius-md);
-  --radius-2xl: var(--radius-md);
-  --radius-3xl: var(--radius-md);
-  --radius-4xl: var(--radius-md);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --text-xs: var(--text-control);
+  --text-sm: var(--text-control);
+  --text-md: var(--text-subheading);
+  --text-base: var(--text-heading-sm);
+  --text-lg: var(--text-heading);
+  --text-xl: var(--text-title);
+  --text-2xl: var(--text-display);
+  --text-3xl: var(--text-display-lg);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -24,9 +32,17 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-table-header: var(--table-header);
+  --color-table-stripe: var(--table-stripe);
+  --color-table-stripe-hover: var(--table-stripe-hover);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -52,10 +68,17 @@
   --brand-gold: oklch(0.694 0.072 97);
   --control-h-xs: 1.25rem;
   --control-h-sm: 1.5rem;
-  --control-h-md: 1.75rem;
-  --control-h-lg: 2rem;
+  --control-h-md: 2rem;
+  --control-h-lg: 2.25rem;
   --text-control: 0.75rem;
+  --text-label: 0.6875rem;
   --icon-control: 0.875rem;
+  --text-subheading: 0.875rem;
+  --text-heading-sm: 1rem;
+  --text-heading: 1.125rem;
+  --text-title: 1.25rem;
+  --text-display: 1.5rem;
+  --text-display-lg: 1.875rem;
   --background: oklch(0.96 0.005 260);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
@@ -69,9 +92,17 @@
   --muted: oklch(0.967 0.003 264.542);
   --muted-foreground: oklch(0.551 0.027 264.364);
   --table-header: oklch(0.9 0.01 264.5);
+  --table-stripe: oklch(0.985 0.002 264.5);
+  --table-stripe-hover: oklch(0.955 0.004 264.5);
   --accent: oklch(0.967 0.003 264.542);
   --accent-foreground: oklch(0.21 0.034 264.665);
   --destructive: oklch(0.48 0.17 27);
+  --success: oklch(0.52 0.13 155);
+  --success-foreground: oklch(0.985 0.002 155);
+  --warning: oklch(0.52 0.13 70);
+  --warning-foreground: oklch(0.2 0.03 70);
+  --info: oklch(0.52 0.14 250);
+  --info-foreground: oklch(0.985 0.002 250);
   --border: oklch(0.928 0.006 264.531);
   --input: oklch(0.64 0.006 264.531);
   --ring: oklch(0.37 0.105 261);
@@ -152,6 +183,10 @@
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--muted-foreground);
   }
+}
+
+@utility text-control {
+  font-size: var(--text-control);
 }
 
 @utility dialog-body {

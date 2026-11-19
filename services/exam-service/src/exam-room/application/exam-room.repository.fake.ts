@@ -23,6 +23,7 @@ import type {
 } from '../domain/entities/exam-room-supervisor.entity.js'
 import type {
   ExamRoomReport,
+  ExamRoomReportAttachment,
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
@@ -336,6 +337,40 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     )
   }
 
+  countSeatsByEvent(eventId: string) {
+    return Promise.resolve(
+      [...this.seats.values()].filter((row) => row.eventId === eventId).length,
+    )
+  }
+
+  replaceSeats(
+    eventId: string,
+    roomIds: string[],
+    seats: {
+      roomId: string
+      seatNumber: number
+      studentId: string
+      classroomId: string
+    }[],
+  ) {
+    for (const row of [...this.seats.values()]) {
+      if (row.eventId === eventId && roomIds.includes(row.roomId)) {
+        this.seats.delete(row.id)
+      }
+    }
+    for (const seat of seats) {
+      const row: ExamRoomSeat = {
+        id: randomUUID(),
+        eventId,
+        allowLateEntry: false,
+        createdAt: new Date(),
+        ...seat,
+      }
+      this.seats.set(row.id, row)
+    }
+    return Promise.resolve()
+  }
+
   setSeatFlags(eventId: string, studentId: string, patch: SeatFlagsPatch) {
     const found = [...this.seats.values()].find(
       (row) => row.eventId === eventId && row.studentId === studentId,
@@ -523,6 +558,7 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       verifiedByUserId: null,
       verifiedAt: null,
       status: 'DRAFT',
+      attachment: null,
       createdAt: now,
       updatedAt: now,
     }
@@ -583,7 +619,12 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     return Promise.resolve(row)
   }
 
-  submitReport(reportId: string, submittedByUserId: string, at: Date) {
+  submitReport(
+    reportId: string,
+    submittedByUserId: string,
+    at: Date,
+    attachment: ExamRoomReportAttachment,
+  ) {
     const report = this.reports.get(reportId)
     if (report?.status !== 'DRAFT') return Promise.resolve(null)
     const updated: ExamRoomReport = {
@@ -591,8 +632,20 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       status: 'SUBMITTED',
       submittedByUserId,
       submittedAt: at,
+      attachment,
       updatedAt: new Date(),
     }
+    this.reports.set(reportId, updated)
+    return Promise.resolve(updated)
+  }
+
+  replaceReportAttachment(
+    reportId: string,
+    attachment: ExamRoomReportAttachment,
+  ) {
+    const report = this.reports.get(reportId)
+    if (report?.status !== 'SUBMITTED') return Promise.resolve(null)
+    const updated: ExamRoomReport = { ...report, attachment }
     this.reports.set(reportId, updated)
     return Promise.resolve(updated)
   }

@@ -72,11 +72,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="admission-landing min-h-screen bg-[#f5f2e9] text-slate-950">
+  <div class="admission-landing min-h-screen bg-[#f5f2e9] text-foreground">
     <div
       v-if="mode === 'draft'"
       data-test="draft-banner"
-      class="fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center justify-between gap-2 border-t border-amber-300 bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-950 shadow-lg"
+      class="fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center justify-between gap-2 border-t border-warning/30 bg-warning/10 px-4 py-2 text-sm font-semibold text-warning shadow-lg"
       role="status"
     >
       <span>Pratinjau draf — belum terbit</span>
@@ -116,12 +116,12 @@ onMounted(() => {
           v-if="hasError"
           id="gelombang"
           role="alert"
-          class="scroll-mt-14 border-b border-amber-200 bg-amber-50 p-5 text-center text-sm text-amber-950"
+          class="scroll-mt-14 border-b border-warning/30 bg-warning/10 p-5 text-center text-sm text-warning"
         >
           Informasi pendaftaran belum dapat dimuat. Silakan coba kembali.
           <button
             type="button"
-            class="ml-3 inline-flex min-h-11 items-center font-bold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-950"
+            class="ml-3 inline-flex min-h-11 items-center font-semibold underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning"
             @click="loadAdmission"
           >
             Coba lagi

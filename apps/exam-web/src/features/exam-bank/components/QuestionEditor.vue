@@ -68,7 +68,7 @@ const content = computed({
       class="min-w-0"
     >
       <CardHeader
-        variant="muted"
+        standard
         class="px-2"
       >
         <CardTitle>Soal</CardTitle>
@@ -91,7 +91,7 @@ const content = computed({
       class="min-w-0"
     >
       <CardHeader
-        variant="muted"
+        standard
         class="px-2"
       >
         <CardTitle>Jawaban</CardTitle>

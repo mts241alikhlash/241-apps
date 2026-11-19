@@ -16,6 +16,7 @@ Port 3000 locally; database `identity` (21 models: `User`, `AuthSession`, `OAuth
 
 - Owns `users`; nothing outside joins to it. A service that needs the person behind a `userId` asks over HTTP.
 - Owns login, refresh, logout, password flows and role and permission CRUD; consumers only verify tokens.
+- `POST /accounts/passwords/reset` (internal) gives random passwords to up to 500 accounts and answers them once: nothing stores or logs the plaintext, and the users' refresh sessions are revoked in the same transaction. Exam-service is its only caller.
 - The school unit lives here because every service eventually reads institution config and already calls this one for auth.
 - Structural roles (`SUPER_ADMIN`, `EMPLOYEE`, `TEACHER`, `STUDENT`, `APPLICANT`, in `structural-roles.policy.ts`) cannot be deleted and are ensured at startup; other services name some of them (`requiredBy`).
 

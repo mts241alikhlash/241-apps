@@ -13,7 +13,7 @@ import {
   Superscript,
   Underline,
 } from '@lucide/vue'
-import { Button } from '@mts241alikhlash/ui/button'
+import { TooltipButton } from '@mts241alikhlash/ui'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { examBankApi } from '../api/examBankApi'
 import MathDialog from './MathDialog.vue'
@@ -51,7 +51,7 @@ const editor = useEditor({
   extensions: buildExtensions(openMath),
   editorProps: {
     attributes: {
-      class: `${props.compact ? 'min-h-8 py-[1px]' : 'min-h-28 py-2'} px-2 text-[length:var(--text-control,0.75rem)] focus:outline-none [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5`,
+      class: `${props.compact ? 'min-h-8 py-[1px]' : 'min-h-28 py-2'} px-2 text-control focus:outline-none [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5`,
       'aria-label': props.label,
       dir: 'auto',
     },
@@ -131,105 +131,96 @@ defineExpose({ insertMath, uploadImage, openMath })
       class="flex-wrap items-center gap-1 border-b bg-muted/30 p-1"
       :class="compact ? 'hidden group-focus-within:flex' : 'flex'"
     >
-      <Button
+      <TooltipButton
+        label="Tebal"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('bold') }"
-        title="Tebal"
-        aria-label="Tebal"
         @click="editor.chain().focus().toggleBold().run()"
       >
         <Bold />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Miring"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('italic') }"
-        title="Miring"
-        aria-label="Miring"
         @click="editor.chain().focus().toggleItalic().run()"
       >
         <Italic />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Garis bawah"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('underline') }"
-        title="Garis bawah"
-        aria-label="Garis bawah"
         @click="editor.chain().focus().toggleUnderline().run()"
       >
         <Underline />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Pangkat (superskrip)"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('superscript') }"
-        title="Pangkat (superskrip)"
-        aria-label="Pangkat (superskrip)"
         @click="editor.chain().focus().toggleSuperscript().run()"
       >
         <Superscript />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Indeks (subskrip)"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('subscript') }"
-        title="Indeks (subskrip)"
-        aria-label="Indeks (subskrip)"
         @click="editor.chain().focus().toggleSubscript().run()"
       >
         <Subscript />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Daftar poin"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('bulletList') }"
-        title="Daftar poin"
-        aria-label="Daftar poin"
         @click="editor.chain().focus().toggleBulletList().run()"
       >
         <List />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Daftar bernomor"
         type="button"
         variant="ghost"
         size="icon"
         :class="{ 'bg-accent': editor.isActive('orderedList') }"
-        title="Daftar bernomor"
-        aria-label="Daftar bernomor"
         @click="editor.chain().focus().toggleOrderedList().run()"
       >
         <ListOrdered />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
+        label="Sisipkan rumus"
         type="button"
         variant="ghost"
         size="icon"
-        title="Sisipkan rumus"
-        aria-label="Sisipkan rumus"
         @click="openMath()"
       >
         <Sigma />
-      </Button>
-      <Button
+      </TooltipButton>
+      <TooltipButton
         v-if="allowImages"
+        label="Sisipkan gambar"
         type="button"
         variant="ghost"
         size="icon"
-        title="Sisipkan gambar"
-        aria-label="Sisipkan gambar"
         :disabled="uploading"
         @click="fileInput?.click()"
       >
         <ImagePlus />
-      </Button>
+      </TooltipButton>
       <input
         ref="fileInput"
         type="file"

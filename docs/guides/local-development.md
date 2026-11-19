@@ -17,7 +17,7 @@ Result: `pnpm install` ends with `Done`. After a fresh install generate each ser
 
 ## 2. Create identity's env file
 
-`dev.mjs` creates every other service's `.env` from its `.env.example`, copying identity's secrets, but it reads identity's first.
+`dev.mjs` gives every other service a missing `.env` by copying the main checkout's file when it exists, and otherwise by building it from the `.env.example` with identity's secrets and the local S3 (`http://localhost:9000`, keys `local`, which the local SeaweedFS accepts); it reads identity's first.
 
 ```
 cp services/identity-service/.env.example services/identity-service/.env
@@ -33,7 +33,7 @@ Result: `services/identity-service/.env` exists and `git status` does not list i
 node dev.mjs academic
 ```
 
-It starts the local stack when ports 5433 and 9000 are closed (Compose project `241-apps`, profile `storage`: Postgres 5433 and SeaweedFS S3 9000 with bucket `241-apps`), builds `nest-core` once and keeps it watching, creates missing databases (named after the service) and migrates them, then starts the named app, account-web, identity and every service the app's `api-routes.config.ts` routes to. Ctrl+C stops everything. If port 5433 or 9000 is held by something that is not the `241-apps` stack, `dev.mjs` stops and names the container.
+It starts the local stack when ports 5433 and 9000 are closed (Compose project `241-apps`, profile `storage`: Postgres 5433 and SeaweedFS S3 9000 with bucket `241-apps`), builds `nest-core` once and keeps it watching, creates missing databases (named after the service) and migrates them, then starts the named app, account-web, identity, every service the app's `api-routes.config.ts` routes to, and every service those call (found from their `*_SERVICE_URL` use). It generates a Prisma client that is missing or older than its schema. In a git worktree without `services/identity-service/.env` it copies that file from the main checkout. Ctrl+C stops everything, and so does a failed start. If port 5433 or 9000 is held by something that is not the `241-apps` stack, `dev.mjs` stops and names the container. If a service or app port is held by a process started in another checkout or worktree, it stops and names that folder instead of reusing the process; a process of the same checkout is reused.
 
 Result: the log shows the apps on their ports (academic 5173, inventory 5174, admission 5175, portal 5176, hr 5177, admin 5178, assessment 5179, account 5180, exam 5181) and each service printing `Nest application successfully started`.
 

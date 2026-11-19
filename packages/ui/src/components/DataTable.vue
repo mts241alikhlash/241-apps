@@ -69,7 +69,6 @@ const props = withDefaults(
     pageSize?: number
     pinnedColumns?: { left?: string[]; right?: string[] }
     mobile?: 'table' | 'cards'
-    rowClickable?: boolean
   }>(),
   {
     page: 1,
@@ -82,7 +81,6 @@ const emit = defineEmits<{
   (e: 'selectionChange', rows: TData[]): void
   (e: 'update:page', page: number): void
   (e: 'update:page-size', pageSize: number): void
-  (e: 'row-click', row: TData): void
 }>()
 
 const sorting = ref<SortingState>([])
@@ -295,6 +293,12 @@ function cardParts(row: Row<TData>) {
   }
 }
 
+function truncateTitle(cell: Cell<TData, unknown>) {
+  const meta = cell.column.columnDef.meta as ColumnMetaAlign | undefined
+  if (meta?.title) return meta.title(cell.row.original as never) ?? undefined
+  return undefined
+}
+
 function cellLabel(cell: Cell<TData, unknown>) {
   const label = mobileMeta(cell).mobileLabel
   if (label) return label
@@ -313,26 +317,12 @@ function cellText(cell: Cell<TData, unknown>): string | null {
     : String(value)
 }
 
-function onCardKey(event: KeyboardEvent, row: Row<TData>) {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault()
-    emit('row-click', row.original)
-  }
-}
-
-const rangeText = computed(() => {
-  const shown = table.getRowModel().rows.length
-  if (shown === 0) return '0'
-  const start = pagination.value.pageIndex * pagination.value.pageSize + 1
-  return `${start}–${start + shown - 1}`
-})
-
 const countText = computed(() => {
   const total = totalItemCount.value
   const shown = table.getRowModel().rows.length
   if (shown === 0) return `0 ${itemLabel.value}`
   if (shown >= total) return `${total} ${itemLabel.value}`
-  return `${rangeText.value} dari ${total} ${itemLabel.value}`
+  return `${shown} dari ${total} ${itemLabel.value}`
 })
 
 const pageNumber = computed(() => pagination.value.pageIndex + 1)
@@ -342,7 +332,7 @@ defineExpose({ table })
 </script>
 
 <template>
-  <div class="flex flex-col gap-2.5">
+  <div class="flex flex-col gap-3">
     <div
       v-if="
         showFilterInput ||
@@ -357,14 +347,12 @@ defineExpose({ table })
     >
       <div
         v-if="$slots['header-left'] || $slots.filters"
-        class="flex items-center gap-2"
+        class="flex items-end gap-2"
       >
         <slot name="filters" />
         <slot name="header-left" />
       </div>
-      <div
-        class="flex items-center gap-2 w-full sm:w-auto sm:ml-auto justify-end"
-      >
+      <div class="flex items-end gap-2 w-full sm:w-auto sm:ml-auto justify-end">
         <slot name="header-right">
           <SearchInput
             v-if="showFilterInput"
@@ -406,7 +394,7 @@ defineExpose({ table })
               @update:model-value="(val) => setPageSize(Number(val))"
             >
               <SelectTrigger
-                class="h-[var(--control-h-md,1.75rem)] data-[size=default]:h-[var(--control-h-md,1.75rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
+                class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
               >
                 <SelectValue :placeholder="String(pagination.pageSize)" />
               </SelectTrigger>
@@ -452,6 +440,9 @@ defineExpose({ table })
                 {
                   'w-[1%] whitespace-nowrap text-center':
                     header.column.id === 'actions',
+                  'w-full max-w-0 overflow-hidden': (
+                    header.column.columnDef.meta as ColumnMetaAlign
+                  )?.truncate,
                   'w-[50px] px-4 text-center': ['no', 'select'].includes(
                     header.column.id,
                   ),
@@ -480,14 +471,14 @@ defineExpose({ table })
             <TableRow
               v-for="i in 5"
               :key="i"
-              :class="i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20'"
+              :class="i % 2 === 1 ? 'bg-card' : 'bg-table-stripe'"
             >
               <TableCell
                 v-for="j in columns.length"
                 :key="j"
-                class="px-4 py-2.5"
+                class="px-4 py-1"
               >
-                <Skeleton class="h-5 w-full" />
+                <Skeleton class="h-[var(--control-h-sm,1.5rem)] w-full" />
               </TableCell>
             </TableRow>
           </template>
@@ -497,11 +488,9 @@ defineExpose({ table })
               :key="row.id"
               :class="[
                 index % 2 === 0
-                  ? 'bg-card hover:bg-muted/50'
-                  : 'bg-muted/50 hover:bg-muted dark:bg-muted/20 dark:hover:bg-muted/30',
-                rowClickable && 'cursor-pointer',
+                  ? 'bg-card hover:bg-table-stripe-hover'
+                  : 'bg-table-stripe hover:bg-table-stripe-hover',
               ]"
-              @click="rowClickable && emit('row-click', row.original)"
             >
               <TableCell
                 v-for="cell in row.getVisibleCells()"
@@ -513,6 +502,9 @@ defineExpose({ table })
                   {
                     'w-[1%] whitespace-nowrap text-center':
                       cell.column.id === 'actions',
+                    'w-full max-w-0 overflow-hidden': (
+                      cell.column.columnDef.meta as ColumnMetaAlign
+                    )?.truncate,
                     'w-[50px] px-4 text-center': ['no', 'select'].includes(
                       cell.column.id,
                     ),
@@ -535,10 +527,19 @@ defineExpose({ table })
                   $event.stopPropagation()
                 "
               >
-                <FlexRender
-                  :render="cell.column.columnDef.cell"
-                  :props="cell.getContext()"
-                />
+                <div
+                  :class="[
+                    'w-full min-w-0',
+                    (cell.column.columnDef.meta as ColumnMetaAlign)?.truncate &&
+                      'truncate',
+                  ]"
+                  :title="truncateTitle(cell)"
+                >
+                  <FlexRender
+                    :render="cell.column.columnDef.cell"
+                    :props="cell.getContext()"
+                  />
+                </div>
               </TableCell>
             </TableRow>
           </template>
@@ -546,9 +547,9 @@ defineExpose({ table })
             <TableRow>
               <TableCell
                 :colspan="columns.length"
-                class="h-24 text-center"
+                class="h-24 text-center text-control text-muted-foreground"
               >
-                Tidak ada data.
+                <slot name="empty">Tidak ada data.</slot>
               </TableCell>
             </TableRow>
           </template>
@@ -570,7 +571,7 @@ defineExpose({ table })
           :key="i"
           :class="[
             'space-y-1.5 px-3 py-2.5',
-            i % 2 === 1 ? 'bg-card' : 'bg-muted/50 dark:bg-muted/20',
+            i % 2 === 1 ? 'bg-card' : 'bg-table-stripe',
           ]"
         >
           <Skeleton class="h-4 w-2/3" />
@@ -587,8 +588,8 @@ defineExpose({ table })
           :class="[
             'flex min-w-0 items-start',
             index % 2 === 0
-              ? 'bg-card hover:bg-muted/50'
-              : 'bg-muted/50 hover:bg-muted dark:bg-muted/20 dark:hover:bg-muted/30',
+              ? 'bg-card hover:bg-table-stripe-hover'
+              : 'bg-table-stripe hover:bg-table-stripe-hover',
           ]"
         >
           <div
@@ -600,17 +601,7 @@ defineExpose({ table })
               :props="cardParts(row).select!.getContext()"
             />
           </div>
-          <div
-            :role="rowClickable ? 'link' : undefined"
-            :tabindex="rowClickable ? 0 : undefined"
-            :class="[
-              'min-w-0 flex-1 space-y-0.5 px-3 py-2',
-              rowClickable &&
-                'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px]',
-            ]"
-            @click="rowClickable && emit('row-click', row.original)"
-            @keydown="rowClickable && onCardKey($event, row)"
-          >
+          <div class="min-w-0 flex-1 space-y-0.5 px-3 py-2">
             <div
               v-if="cardParts(row).title"
               class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-medium"
@@ -624,7 +615,7 @@ defineExpose({ table })
             </div>
             <dl
               v-if="cardParts(row).details.length"
-              class="grid grid-cols-[max-content_auto_minmax(0,1fr)] gap-x-1.5 gap-y-0.5 text-[length:var(--text-control,0.75rem)]"
+              class="grid grid-cols-[max-content_auto_minmax(0,1fr)] gap-x-1.5 gap-y-0.5 text-control"
             >
               <template
                 v-for="detail in cardParts(row).details"
@@ -662,7 +653,7 @@ defineExpose({ table })
       </ul>
       <div
         v-else
-        class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="rounded-md border p-4 text-center text-control text-muted-foreground"
       >
         <slot name="empty">Tidak ada data.</slot>
       </div>
@@ -670,9 +661,7 @@ defineExpose({ table })
         v-if="!hidePagination && totalItemCount > 0"
         class="mt-2.5 flex items-center justify-between gap-2"
       >
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
+        <p class="text-control text-muted-foreground">
           {{ countText }}
         </p>
         <div
@@ -688,9 +677,7 @@ defineExpose({ table })
           >
             <ChevronLeft />
           </Button>
-          <span
-            class="px-1 text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <span class="px-1 text-control text-muted-foreground">
             {{ pageNumber }} / {{ pageTotal }}
           </span>
           <Button
@@ -722,7 +709,7 @@ defineExpose({ table })
           @update:model-value="(val) => setPageSize(Number(val))"
         >
           <SelectTrigger
-            class="h-[var(--control-h-md,1.75rem)] data-[size=default]:h-[var(--control-h-md,1.75rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
+            class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
           >
             <SelectValue :placeholder="String(pagination.pageSize)" />
           </SelectTrigger>
@@ -741,7 +728,7 @@ defineExpose({ table })
         >
       </div>
       <div
-        class="text-center lg:col-start-3 lg:row-start-1 lg:text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-center lg:col-start-3 lg:row-start-1 lg:text-right text-control text-muted-foreground"
       >
         Menampilkan {{ countText }}
       </div>
@@ -764,13 +751,13 @@ defineExpose({ table })
           >
             <PaginationFirst
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
               <ChevronsLeft class="size-[var(--icon-control,0.875rem)]" />
             </PaginationFirst>
             <PaginationPrevious
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
               <ChevronLeft class="size-[var(--icon-control,0.875rem)]" />
             </PaginationPrevious>
@@ -783,26 +770,26 @@ defineExpose({ table })
                 v-if="item.type === 'page'"
                 :value="item.value"
                 :is-active="item.value === pagination.pageIndex + 1"
-                class="size-[var(--control-h-md,1.75rem)]"
+                class="size-[var(--control-h-md,2rem)]"
               >
                 {{ item.value }}
               </PaginationItem>
               <PaginationEllipsis
                 v-else
                 :index="index"
-                class="size-[var(--control-h-md,1.75rem)]"
+                class="size-[var(--control-h-md,2rem)]"
               />
             </template>
 
             <PaginationNext
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
               <ChevronRight class="size-[var(--icon-control,0.875rem)]" />
             </PaginationNext>
             <PaginationLast
               size="icon"
-              class="size-[var(--control-h-md,1.75rem)] p-0 sm:px-0"
+              class="size-[var(--control-h-md,2rem)] p-0 sm:px-0"
             >
               <ChevronsRight class="size-[var(--icon-control,0.875rem)]" />
             </PaginationLast>

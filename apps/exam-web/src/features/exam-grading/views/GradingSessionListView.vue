@@ -7,9 +7,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
@@ -71,7 +71,7 @@ function changePageSize(size: number) {
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Penilaian Ujian"
@@ -88,7 +88,7 @@ function changePageSize(size: number) {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -147,7 +147,7 @@ function changePageSize(size: number) {
           </template>
         </DataTable>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
   </div>
 </template>

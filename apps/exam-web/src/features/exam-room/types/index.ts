@@ -64,6 +64,8 @@ export type RoomReportAudit = Schemas['ReportAuditDto']
 
 export type RoomReport = Schemas['RoomReportDto']
 
+export type RoomReportSummary = Schemas['RoomReportSummaryDto']
+
 export type RoomReportPayload = Schemas['UpdateRoomReportDto']
 
 export type RoomAbsencePayload = Schemas['RecordRoomAbsenceDto']
@@ -126,6 +128,7 @@ const EVENT_LABELS: Record<string, string> = {
   SUBMIT_ROOM_REPORT: 'Serahkan berita acara',
   VERIFY_ROOM_REPORT: 'Verifikasi berita acara',
   REOPEN_ROOM_REPORT: 'Buka berita acara',
+  REPLACE_ROOM_REPORT_FILE: 'Ganti berkas berita acara',
   CLOSED_BY_ADMIN: 'Ditutup admin',
   CALL_SUSPENDED: 'Ujian dijeda karena panggilan',
   ABSENCE_GAP: 'Hilang sementara',

@@ -38,7 +38,7 @@ onMounted(async () => {
     >
       Anda tidak punya akses ke {{ denied }}.
     </p>
-    <h1 class="text-2xl font-bold tracking-tight">Aplikasi</h1>
+    <h1 class="text-2xl font-semibold tracking-tight">Aplikasi</h1>
     <div
       v-if="apps.length"
       class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"

@@ -56,3 +56,15 @@ describe('EventFormDialog', () => {
     ])
   })
 })
+
+describe('EventFormDialog dates', () => {
+  it('asks only for dates, with no time or minute inputs', () => {
+    const wrapper = mount(EventFormDialog, {
+      props: { open: true, semesterId: 'sem-1' },
+      global: { stubs },
+    })
+
+    expect(wrapper.html()).not.toContain('type="time"')
+    expect(wrapper.html()).not.toContain('max-digits')
+  })
+})

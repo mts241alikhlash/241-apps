@@ -15,7 +15,7 @@ const props = defineProps<{
       cn(
         'flex flex-col gap-1',
         props.standard &&
-          'min-h-[var(--control-h-lg,2rem)] shrink-0 justify-center border-b bg-card px-4 py-0.5 pr-12',
+          'min-h-[calc(var(--control-h-md,2rem)+1rem)] shrink-0 justify-center bg-card px-4 py-0.5 pr-12',
         props.class,
       )
     "

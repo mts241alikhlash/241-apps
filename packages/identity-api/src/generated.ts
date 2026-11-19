@@ -91,6 +91,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/accounts/passwords/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give new random passwords to a batch of accounts */
+        post: operations["AccountsController_resetPasswords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/addresses": {
         parameters: {
             query?: never;
@@ -2001,6 +2018,19 @@ export interface components {
             /** @description Token reset password */
             token: string;
         };
+        ResetPasswordEntryDto: {
+            identifier: string;
+            /** @description Shown once; never stored */
+            password: string;
+            /** Format: uuid */
+            userId: string;
+        };
+        ResetPasswordsDto: {
+            userIds: string[];
+        };
+        ResetPasswordsResponseDto: {
+            data: components["schemas"]["ResetPasswordEntryDto"][];
+        };
         RoleWithPermissionsResponseDto: {
             code: string;
             /** Format: date-time */
@@ -2641,6 +2671,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AccountLookupResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description Missing or invalid provisioning token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AccountsController_resetPasswords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ResetPasswordEntryDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

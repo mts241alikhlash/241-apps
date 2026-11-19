@@ -31,6 +31,7 @@ interface StudentSeed {
 function setup(seeds: StudentSeed[], context: SemesterContext = semester) {
   const rows: ParticipantNumberRow[] = []
   const participantRepository = {
+    findByStudents: vi.fn(),
     findByStudent: vi.fn((studentId: string, semesterId: string) =>
       Promise.resolve(
         rows.find(

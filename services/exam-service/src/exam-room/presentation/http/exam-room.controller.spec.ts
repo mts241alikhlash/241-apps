@@ -1,9 +1,17 @@
 import 'reflect-metadata'
-import { ConflictException } from '@nestjs/common'
+import { Readable } from 'node:stream'
+import {
+  BadRequestException,
+  ConflictException,
+  ParseUUIDPipe,
+} from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { Test } from '@nestjs/testing'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import { PERMISSIONS_ANY_KEY } from '@mts241alikhlash/nest-core/access-control'
 import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { FakeExamRoomRepository } from '../../application/exam-room.repository.fake.js'
 import { AssignSupervisorUseCase } from '../../application/use-cases/assign-supervisor/assign-supervisor.use-case.js'
 import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam-events/manage-exam-events.use-case.js'
@@ -12,6 +20,13 @@ import { RoomAccessService } from '../../application/room-access.service.js'
 import { ExamRoomController } from './exam-room.controller.js'
 import { ExamEventController } from './exam-event.controller.js'
 import { AssignSeatsDto, ExamRoomSeatDto } from './dto/exam-room.dto.js'
+import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
+import { ResetCredentialsBodyDto } from './dto/reset-credentials.dto.js'
+import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
+import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
+import { GenerateSeatsUseCase } from '../../application/use-cases/generate-seats/generate-seats.use-case.js'
+import { GenerateSeatsBodyDto } from './dto/exam-room.dto.js'
+import type { PrintPack } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 
 const UUID_A = '11111111-1111-4111-8111-111111111111'
 const UUID_B = '22222222-2222-4222-8222-222222222222'
@@ -55,9 +70,20 @@ const roomRoutes: Record<string, string[]> = {
   ],
   submitRoomReport: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   verifyRoomReport: ['exam-rooms.manage-all'],
+  replaceRoomReportFile: ['exam-rooms.manage-all'],
+  downloadRoomReportFile: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  ],
 }
 
 const roomAnyRoutes: Record<string, string[]> = {
+  downloadRoomReportFile: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  ],
   accessCode: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
   rotateToken: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   auditLogs: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
@@ -98,6 +124,9 @@ const eventRoutes: Record<string, string[]> = {
   create: ['exam-events.manage'],
   update: ['exam-events.manage'],
   createRoom: ['exam-events.manage'],
+  getPrintPack: ['exam-events.manage'],
+  resetPasswords: ['exam-events.manage'],
+  generateSeats: ['exam-events.manage'],
 }
 
 const eventAnyRoutes: Record<string, string[]> = {
@@ -142,6 +171,39 @@ describe('ExamRoomController permissions', () => {
   })
 })
 
+describe('ExamRoomController report file download', () => {
+  it('serves the file as an attachment with a safe name', async () => {
+    const stream = Readable.from(Buffer.from('%PDF-1.4'))
+    const download = vi.fn().mockResolvedValue({
+      stream,
+      attachment: {
+        mimeType: 'application/pdf',
+        sizeBytes: 8,
+        uploadedAt: new Date('2026-11-02T02:05:00Z'),
+      },
+      room: { code: 'R-01/../x' },
+    })
+    const controller: ExamRoomController = Object.assign(
+      Object.create(ExamRoomController.prototype) as ExamRoomController,
+      { submitReport: { download } },
+    )
+    const set = vi.fn()
+
+    await controller.downloadRoomReportFile({ id: 'u' }, UUID_A, UUID_B, {
+      set,
+    } as never)
+
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename="berita-acara-R-01x-20261102-0905.pdf"',
+        'X-Content-Type-Options': 'nosniff',
+      }),
+    )
+  })
+})
+
 describe('ExamEventController permissions', () => {
   it.each(Object.entries(eventRoutes))('%s requires %j', (method, codes) => {
     const handler = ExamEventController.prototype[
@@ -165,6 +227,136 @@ describe('ExamEventController permissions', () => {
   it('leaves no event route without a permission', () => {
     expect(handlers(ExamEventController.prototype).sort()).toEqual(
       [...Object.keys(eventRoutes), ...Object.keys(eventAnyRoutes)].sort(),
+    )
+  })
+})
+
+describe('ExamEventController print pack', () => {
+  const pack: PrintPack = {
+    event: {
+      id: UUID_A,
+      name: 'UTS Ganjil',
+      startsAt: new Date('2026-11-02T01:00:00.000Z'),
+      endsAt: new Date('2026-11-02T04:00:00.000Z'),
+    },
+    rooms: [
+      {
+        id: UUID_B,
+        code: 'R01',
+        name: 'Ruang 01',
+        building: null,
+        technician: null,
+        supervisors: [
+          {
+            startsAt: new Date('2026-11-02T01:00:00.000Z'),
+            endsAt: new Date('2026-11-02T04:00:00.000Z'),
+            name: null,
+          },
+        ],
+        students: [
+          {
+            seatNumber: 1,
+            studentId: UUID_A,
+            name: null,
+            nis: '1234',
+            classroomName: 'VII A',
+            participantNumber: null,
+          },
+        ],
+      },
+    ],
+    warnings: ['1 peserta belum punya nomor peserta'],
+  }
+
+  function build() {
+    const calls: [string, string | undefined][] = []
+    const printPack = {
+      execute: (eventId: string, roomId?: string) => {
+        calls.push([eventId, roomId])
+        return Promise.resolve(pack)
+      },
+    } as never
+    const controller = new ExamEventController(
+      undefined as never,
+      undefined as never,
+      printPack,
+      undefined as never,
+      undefined as never,
+    )
+    return { calls, controller }
+  }
+
+  it('returns the pack as an ISO-dated DTO and passes the event and room on', async () => {
+    const { calls, controller } = build()
+    const query = Object.assign(new PrintPackQueryDto(), { roomId: UUID_B })
+
+    const result = await controller.getPrintPack(UUID_A, query)
+
+    expect(calls).toEqual([[UUID_A, UUID_B]])
+    expect(result).toBeInstanceOf(PrintPackDto)
+    expect(result.event.startsAt).toBe('2026-11-02T01:00:00.000Z')
+    expect(result.rooms[0].supervisors[0].endsAt).toBe(
+      '2026-11-02T04:00:00.000Z',
+    )
+    expect(result.rooms[0].students[0].participantNumber).toBeNull()
+    expect(result.warnings).toEqual(pack.warnings)
+  })
+
+  it('passes no room when the query omits roomId', async () => {
+    const { calls, controller } = build()
+
+    await controller.getPrintPack(UUID_A, new PrintPackQueryDto())
+
+    expect(calls).toEqual([[UUID_A, undefined]])
+  })
+
+  it('answers 400 for an event id that is not a uuid', async () => {
+    const pipe = new ParseUUIDPipe()
+
+    await expect(
+      pipe.transform('not-a-uuid', { type: 'param', data: 'id' }),
+    ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('answers 400 for a room id that is not a uuid', async () => {
+    const dto = plainToInstance(PrintPackQueryDto, { roomId: 'not-a-uuid' })
+
+    expect(await validate(dto)).not.toHaveLength(0)
+  })
+
+  it('accepts a query with a uuid room id', async () => {
+    const dto = plainToInstance(PrintPackQueryDto, { roomId: UUID_B })
+
+    expect(await validate(dto)).toHaveLength(0)
+  })
+})
+
+describe('PrintPackDto contract', () => {
+  it('lists the event, rooms and warnings as required', async () => {
+    const moduleRef = await Test.createTestingModule({
+      controllers: [ExamEventController],
+      providers: [
+        { provide: ManageExamEventsUseCase, useValue: {} },
+        { provide: ManageExamRoomsUseCase, useValue: {} },
+        { provide: GetPrintPackUseCase, useValue: {} },
+        { provide: ResetEventCredentialsUseCase, useValue: {} },
+        { provide: GenerateSeatsUseCase, useValue: {} },
+      ],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile()
+    const app = moduleRef.createNestApplication()
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder().build(),
+    )
+    await app.close()
+
+    expect(document.components?.schemas?.PrintPackDto).toEqual(
+      expect.objectContaining({
+        required: expect.arrayContaining(['event', 'rooms', 'warnings']),
+      }),
     )
   })
 })
@@ -444,16 +636,12 @@ describe('ExamRoomController supervisor slots', () => {
       capacity: 30,
     })
 
-    const slot = await controller.assignSupervisor(
-      { id: 'admin-1', permissions: ['exam-events.manage'] },
-      room.id,
-      {
-        scheduledUserId: UUID_A,
-        startsAt: '2026-11-02T01:00:00.000Z',
-        endsAt: '2026-11-02T03:00:00.000Z',
-        reason: 'Jadwal pengawas pagi',
-      },
-    )
+    const slot = await controller.assignSupervisor({ id: 'admin-1' }, room.id, {
+      scheduledUserId: UUID_A,
+      startsAt: '2026-11-02T01:00:00.000Z',
+      endsAt: '2026-11-02T03:00:00.000Z',
+      reason: 'Jadwal pengawas pagi',
+    })
 
     expect(slot.roomId).toBe(room.id)
     expect(
@@ -486,7 +674,7 @@ describe('ExamRoomController supervisor slots', () => {
 
     await expect(
       assign.execute(
-        { id: 'admin-1', permissions: ['exam-events.manage'] },
+        { id: 'admin-1' },
         {
           roomId: room.id,
           scheduledUserId: UUID_A,
@@ -539,7 +727,13 @@ describe('ExamEventController supervised listing', () => {
   async function build() {
     const rooms = new FakeExamRoomRepository()
     const events = new ManageExamEventsUseCase(rooms)
-    const controller = new ExamEventController(events, undefined as never)
+    const controller = new ExamEventController(
+      events,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+    )
     const mine = await rooms.createEvent({
       semesterId: 'sem-1',
       name: 'UTS Ganjil',
@@ -604,5 +798,96 @@ describe('ExamEventController supervised listing', () => {
     )
 
     expect(scoped.data.map((row) => row.id)).toEqual([mine.id])
+  })
+})
+
+describe('ExamEventController credentials reset', () => {
+  it('rejects a body without confirm: true', async () => {
+    const body = (confirm: unknown) =>
+      validate(plainToInstance(ResetCredentialsBodyDto, { confirm }))
+
+    expect(await body(true)).toHaveLength(0)
+    expect(await body(false)).not.toHaveLength(0)
+    expect(await body(undefined)).not.toHaveLength(0)
+    expect(await body('true')).not.toHaveLength(0)
+  })
+
+  it('passes the event, room and actor on and answers the items and skipped', async () => {
+    const calls: unknown[][] = []
+    const reset = {
+      execute: (...args: unknown[]) => {
+        calls.push(args)
+        return Promise.resolve({
+          items: [
+            { studentId: UUID_A, identifier: 'nis-1', password: 'Abcdefghjk' },
+          ],
+          skipped: [UUID_B],
+        })
+      },
+    } as never
+    const controller = new ExamEventController(
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      reset,
+      undefined as never,
+    )
+    const query = Object.assign(new PrintPackQueryDto(), { roomId: UUID_B })
+
+    const result = await controller.resetPasswords(
+      { id: 'admin-1' },
+      UUID_A,
+      query,
+      { confirm: true },
+    )
+
+    expect(calls).toEqual([[UUID_A, 'admin-1', UUID_B]])
+    expect(result).toEqual({
+      items: [
+        { studentId: UUID_A, identifier: 'nis-1', password: 'Abcdefghjk' },
+      ],
+      skipped: [UUID_B],
+    })
+  })
+})
+
+describe('GenerateSeatsBodyDto', () => {
+  const student = { studentId: UUID_A, classroomId: UUID_B }
+
+  it('accepts up to 1000 students', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: Array.from({ length: 1000 }, () => student),
+    })
+
+    expect(await validate(dto)).toHaveLength(0)
+  })
+
+  it('rejects more than 1000 students', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: Array.from({ length: 1001 }, () => student),
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
+  })
+
+  it('rejects more than 10 lanes per side', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: [],
+      rules: { lanesPerSide: 11 },
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
+  })
+
+  it('rejects an unknown mode', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'print',
+      students: [],
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
   })
 })

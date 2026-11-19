@@ -83,10 +83,10 @@ const initials = computed(() => {
                 {{ initials }}
               </AvatarFallback>
             </Avatar>
-            <div class="grid flex-1 text-left text-sm leading-tight">
+            <div class="grid flex-1 text-left text-control leading-tight">
               <span class="truncate font-medium">{{ user.name }}</span>
               <span
-                class="truncate text-xs text-muted-foreground in-[[data-sidebar=menu-button]:hover]:text-sidebar-accent-foreground in-[[data-sidebar=menu-button][data-state=open]]:text-sidebar-accent-foreground"
+                class="truncate text-control text-muted-foreground in-[[data-sidebar=menu-button]:hover]:text-sidebar-accent-foreground in-[[data-sidebar=menu-button][data-state=open]]:text-sidebar-accent-foreground"
                 >{{ user.email }}</span
               >
             </div>
@@ -102,7 +102,7 @@ const initials = computed(() => {
           :side-offset="4"
         >
           <DropdownMenuLabel class="font-normal">
-            <div class="flex items-center gap-2 text-left text-sm">
+            <div class="flex items-center gap-2 text-left text-control">
               <Avatar class="size-7 rounded-md">
                 <AvatarImage
                   :src="user.avatar"
@@ -112,11 +112,9 @@ const initials = computed(() => {
                   {{ initials }}
                 </AvatarFallback>
               </Avatar>
-              <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate text-xs font-medium">{{
-                  user.name
-                }}</span>
-                <span class="truncate text-xs text-muted-foreground">{{
+              <div class="grid flex-1 text-left text-control leading-tight">
+                <span class="truncate font-medium">{{ user.name }}</span>
+                <span class="truncate text-muted-foreground">{{
                   user.email
                 }}</span>
               </div>
@@ -125,14 +123,14 @@ const initials = computed(() => {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem
-              class="text-xs"
+              class="text-control"
               @click="emit('viewProfile')"
             >
               <UserRound class="size-[var(--icon-control,0.875rem)]" />
               Lihat Profil
             </DropdownMenuItem>
             <DropdownMenuItem
-              class="text-xs"
+              class="text-control"
               @click="emit('changePassword')"
             >
               <KeyRound class="size-[var(--icon-control,0.875rem)]" />
@@ -141,7 +139,7 @@ const initials = computed(() => {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            class="text-xs"
+            class="text-control"
             variant="destructive"
             @click="emit('logout')"
           >

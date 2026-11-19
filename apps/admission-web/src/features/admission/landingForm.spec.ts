@@ -77,7 +77,7 @@ describe('validateSection', () => {
 
   it('requires a text and names the field by path', () => {
     const values = hero()
-    values.eyebrow = '   '
+    values.eyebrow = ' '
     expect(validateSection(section('hero').fields, values)).toEqual({
       eyebrow: 'Wajib diisi.',
     })
@@ -275,7 +275,7 @@ describe('toServerContent', () => {
   it('turns blank optional texts into null and trims', () => {
     const info = cloneContent(landingDefaults.info)
     info.posters = [
-      { image: { imageId: 'abc' }, alt: ' Poster ', caption: '  ' },
+      { image: { imageId: 'abc' }, alt: ' Poster ', caption: ' ' },
     ]
     const sent = toServerContent(section('info').fields, info) as typeof info
     expect(sent.posters[0]).toEqual({

@@ -63,7 +63,7 @@ function handleScroll(e: Event) {
     :collapsible="props.collapsible"
   >
     <SidebarHeader
-      class="flex h-12 flex-row items-center"
+      class="flex h-[var(--control-h-md,2rem)] flex-row items-center"
       :class="isCollapsed ? 'justify-center px-0' : 'justify-start px-2'"
     >
       <slot name="header" />

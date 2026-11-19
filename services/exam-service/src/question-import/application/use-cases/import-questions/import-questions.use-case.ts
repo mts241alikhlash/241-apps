@@ -42,6 +42,7 @@ import type {
   ImportSheet,
   SheetIdentity,
 } from '../../../domain/import-sheet.js'
+import { countWarnings } from '../../../domain/import-standard.js'
 import type { ParsedQuestion } from '../../../domain/parsed-question.js'
 import {
   duplicateRows,
@@ -96,19 +97,28 @@ export class ImportQuestionsUseCase {
       SHORT_ANSWER: 0,
       ESSAY: 0,
     }
+    const points: Record<QuestionType, number> = {
+      MULTIPLE_CHOICE: 0,
+      MULTIPLE_RESPONSE: 0,
+      TRUE_FALSE: 0,
+      SHORT_ANSWER: 0,
+      ESSAY: 0,
+    }
     let totalPoints = 0
     for (const question of analysis.good) {
       counts[question.type] += 1
+      points[question.type] += question.points
       totalPoints += question.points
     }
     return {
       identity: analysis.identity,
       authorName: null,
       counts,
+      points,
       totalPoints,
       total: analysis.rows,
       errors: analysis.errors,
-      warnings: analysis.warnings,
+      warnings: [...analysis.warnings, ...countWarnings(counts)],
       duplicateRows: analysis.duplicates,
       canSave: analysis.errors.length === 0 && analysis.duplicates.length === 0,
     }

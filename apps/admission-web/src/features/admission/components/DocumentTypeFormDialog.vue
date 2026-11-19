@@ -97,7 +97,7 @@ const onSubmit = handleSubmit((formValues) => {
         <DialogTitle>
           {{ isEdit ? 'Ubah Jenis Berkas' : 'Tambah Jenis Berkas' }}
         </DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Berkas yang diunggah pendaftar saat mengisi formulir.
         </DialogDescription>
       </DialogHeader>

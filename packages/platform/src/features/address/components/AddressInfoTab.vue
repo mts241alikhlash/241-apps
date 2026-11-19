@@ -115,7 +115,7 @@ function handleSubmit() {
       class="space-y-4"
       @submit.prevent="handleSubmit"
     >
-      <div class="grid gap-5 md:grid-cols-2">
+      <div class="grid gap-4 md:grid-cols-2">
         <FloatingLabelField
           label="Jalan / Dusun"
           :for="`${fieldId}-street`"

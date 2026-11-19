@@ -458,7 +458,7 @@ useBreadcrumbs(() => {
                 class="text-xs"
                 :class="
                   shareDescription.length > 160
-                    ? 'text-amber-600'
+                    ? 'text-warning'
                     : 'text-muted-foreground'
                 "
               >

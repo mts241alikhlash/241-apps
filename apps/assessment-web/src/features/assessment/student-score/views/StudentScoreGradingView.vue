@@ -80,7 +80,7 @@ onMounted(() => {
           class="flex flex-wrap items-center justify-center sm:justify-start gap-2"
         >
           <div
-            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 h-8 text-xs"
+            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
           >
             <span class="text-muted-foreground">Tipe</span>
             <span class="font-semibold">
@@ -88,16 +88,16 @@ onMounted(() => {
             </span>
           </div>
           <div
-            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 h-8 text-xs"
+            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
           >
             <span class="text-muted-foreground">Bobot</span>
             <span class="font-semibold">{{ assessmentItem.weight }}%</span>
           </div>
           <div
-            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 h-8 text-xs"
+            class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
           >
             <span class="text-muted-foreground">Skor maks</span>
-            <span class="font-semibold tabular-nums">
+            <span class="font-semibold">
               {{ assessmentItem.maxScore }}
             </span>
           </div>

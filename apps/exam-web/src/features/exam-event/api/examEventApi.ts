@@ -10,6 +10,7 @@ import type {
   RoomCreatePayload,
   RoomUpdatePayload,
   SeatAssignPayload,
+  SeatGenerateBody,
 } from '../types'
 
 const roomPath = (roomId: string) => ({ params: { path: { roomId } } })
@@ -72,6 +73,14 @@ export const examEventApi = {
     unwrap(
       examClient.POST('/exam-rooms/{roomId}/seats', {
         ...roomPath(roomId),
+        body,
+      }),
+    ),
+
+  generateSeats: (eventId: string, body: SeatGenerateBody) =>
+    unwrap(
+      examClient.POST('/exam-events/{id}/seats/generate', {
+        params: { path: { id: eventId } },
         body,
       }),
     ),

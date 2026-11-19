@@ -67,11 +67,11 @@ const itemForm = useAssessmentItemForm({
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>{{
           itemForm.isEditing.value ? 'Ubah Tugas' : 'Tambah Tugas'
         }}</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           {{
             itemForm.isEditing.value
               ? 'Perbarui informasi tugas. Klik simpan untuk menerapkan.'
@@ -181,7 +181,8 @@ const itemForm = useAssessmentItemForm({
       </ScrollArea>
 
       <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
+        standard
+        class="sm:justify-between"
       >
         <Button
           type="button"

@@ -43,14 +43,14 @@ onMounted(async () => {
       gap="none"
       class="w-full max-w-md overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <CardTitle class="font-semibold"
           >Buka dengan Safe Exam Browser</CardTitle
         >
       </CardHeader>
 
-      <CardContent class="space-y-5 p-4 sm:p-6">
-        <p class="text-[length:var(--text-control)]">
+      <CardContent class="space-y-4 p-4 sm: p-4">
+        <p class="text-control">
           Ujian online hanya bisa dibuka di Safe Exam Browser (SEB). Pasang SEB,
           lalu buka tautan konfigurasi ujian di bawah dari perangkat yang sama.
         </p>
@@ -63,7 +63,7 @@ onMounted(async () => {
               :key="download.label"
             >
               <a
-                class="inline-flex min-h-11 items-center rounded-md border px-3 text-[length:var(--text-control)] font-medium underline-offset-4 hover:underline"
+                class="inline-flex min-h-[var(--control-h-lg,2.25rem)] items-center rounded-md border px-3 text-control font-medium underline-offset-4 hover:underline"
                 :href="download.href"
                 target="_blank"
                 rel="noopener"
@@ -72,7 +72,7 @@ onMounted(async () => {
               </a>
             </li>
           </ul>
-          <p class="text-[length:var(--text-control)] text-muted-foreground">
+          <p class="text-control text-muted-foreground">
             Di Android, ujian dibuka dengan aplikasi Istiqra.
           </p>
         </section>
@@ -81,20 +81,20 @@ onMounted(async () => {
           <h2 class="font-semibold">Konfigurasi ujian aktif</h2>
           <p
             v-if="loading"
-            class="text-[length:var(--text-control)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Memuat konfigurasi…
           </p>
           <p
             v-else-if="error"
-            class="text-[length:var(--text-control)] text-destructive"
+            class="text-control text-destructive"
             role="alert"
           >
             {{ error }}
           </p>
           <p
             v-else-if="configs.length === 0"
-            class="text-[length:var(--text-control)] text-muted-foreground"
+            class="text-control text-muted-foreground"
           >
             Belum ada konfigurasi Safe Exam Browser yang aktif.
           </p>
@@ -109,7 +109,7 @@ onMounted(async () => {
             >
               <span class="font-medium">{{ config.name }}</span>
               <a
-                class="min-h-11 text-[length:var(--text-control)] break-all underline underline-offset-4"
+                class="min-h-[var(--control-h-lg,2.25rem)] text-control break-all underline underline-offset-4"
                 :href="sebLink(config.id)"
               >
                 {{ sebLink(config.id) }}

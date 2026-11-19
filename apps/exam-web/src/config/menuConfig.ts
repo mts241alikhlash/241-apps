@@ -1,12 +1,10 @@
 import {
-  Armchair,
   CalendarClock,
   ClipboardPen,
-  IdCard,
   Layers,
   ListChecks,
   Package,
-  Radar,
+  Printer,
   ShieldCheck,
   SlidersHorizontal,
   SquareCheckBig,
@@ -46,35 +44,77 @@ export const menuSections: MenuSection[] = [
     label: 'menu.section.exam',
     items: [
       {
-        key: 'exam-events',
-        title: 'menu.examEvents',
-        url: '/exam/events',
+        key: 'exam-prepare',
+        title: 'menu.examPrepare',
+        url: '#',
         icon: Users,
-        requiredPermission: 'exam-events.read',
+        items: [
+          {
+            title: 'menu.examEvents',
+            url: '/exam/events',
+            requiredPermission: 'exam-events.read',
+          },
+          {
+            title: 'menu.examRoomSetup',
+            url: '/exam/room-setup',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
+          {
+            title: 'menu.examSeatAssignment',
+            url: '/exam/seat-assignment',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
+          {
+            title: 'menu.examSupervisorSchedule',
+            url: '/exam/supervisor-schedule',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
+          {
+            title: 'menu.examRoomCards',
+            url: '/exam/room-cards',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
+          {
+            title: 'menu.examParticipantNumbers',
+            url: '/exam/participant-numbers',
+            requiredPermission: 'exam-events.manage',
+          },
+        ],
       },
       {
-        key: 'exam-activities',
-        title: 'menu.examActivities',
-        url: '/exam/activities',
-        icon: Layers,
-        requiredPermission: 'exam-schedules.manage',
-      },
-      {
-        key: 'exam-schedules',
-        title: 'menu.examSchedules',
-        url: '/exam/schedules',
+        key: 'exam-run',
+        title: 'menu.examRun',
+        url: '#',
         icon: CalendarClock,
-        requiredPermission: 'exam-schedules.read',
-      },
-      {
-        key: 'exam-rooms',
-        title: 'menu.examRooms',
-        url: '/exam/rooms',
-        icon: Radar,
-        requiredAnyPermission: [
-          'exam-rooms.supervise',
-          'exam-rooms.technician',
-          'exam-rooms.manage-all',
+        items: [
+          {
+            title: 'menu.examActivities',
+            url: '/exam/activities',
+            requiredPermission: 'exam-schedules.manage',
+          },
+          {
+            title: 'menu.examSchedules',
+            url: '/exam/schedules',
+            requiredPermission: 'exam-schedules.read',
+          },
+          {
+            title: 'menu.examRooms',
+            url: '/exam/rooms',
+            requiredAnyPermission: [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          },
+          {
+            title: 'menu.examReports',
+            url: '/exam/reports',
+            requiredAnyPermission: [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          },
         ],
       },
       {
@@ -85,25 +125,36 @@ export const menuSections: MenuSection[] = [
         requiredPermission: 'exam-grading.read',
       },
       {
-        key: 'exam-cards',
-        title: 'menu.examCards',
-        url: '/exam/prints/cards',
-        icon: IdCard,
-        requiredAnyPermission: [
-          'exam-rooms.supervise',
-          'exam-rooms.technician',
-          'exam-rooms.manage-all',
-        ],
-      },
-      {
-        key: 'exam-seat-labels',
-        title: 'menu.examSeatLabels',
-        url: '/exam/prints/seats',
-        icon: Armchair,
-        requiredAnyPermission: [
-          'exam-rooms.supervise',
-          'exam-rooms.technician',
-          'exam-rooms.manage-all',
+        key: 'exam-print',
+        title: 'menu.examPrint',
+        url: '#',
+        icon: Printer,
+        items: [
+          {
+            title: 'menu.examCards',
+            url: '/exam/print/cards',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
+            title: 'menu.examSeatLabels',
+            url: '/exam/print/desks',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
+            title: 'menu.examPrintSchedule',
+            url: '/exam/print/schedule',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
+            title: 'menu.examPrintStudentAttendance',
+            url: '/exam/print/student-attendance',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
+            title: 'menu.examPrintStaffAttendance',
+            url: '/exam/print/staff-attendance',
+            requiredPermission: 'exam-events.manage',
+          },
         ],
       },
     ],

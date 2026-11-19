@@ -18,9 +18,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examTypeLabel } from '@/features/exam-shared/examType'
@@ -109,7 +109,7 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <CardTitle class="font-semibold">
             Detail Kegiatan
@@ -143,14 +143,14 @@ onMounted(load)
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm:p-6 space-y-6"
+        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-6"
       >
         <div
           v-if="error !== null"
           role="alert"
           class="space-y-3 rounded-md border p-4"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-control">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -161,7 +161,7 @@ onMounted(load)
 
         <p
           v-else-if="loading"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           Memuat detail kegiatan…
         </p>
@@ -226,6 +226,44 @@ onMounted(load)
                   {{ detail.policy.tokenSlotSeconds }} detik
                 </dd>
               </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Toleransi terlambat
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.lateToleranceMinutes }} menit
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Minimal sebelum kumpul
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.minSubmitMinutes }} menit
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">Acak urutan soal</dt>
+                <dd class="font-medium">
+                  {{ detail.policy.shuffleQuestions ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Acak urutan pilihan
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.shuffleChoices ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Izinkan lewat web (SEB)
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.allowWeb ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
             </dl>
           </section>
 
@@ -233,7 +271,7 @@ onMounted(load)
             <h2 class="text-sm font-semibold">Jadwal per Kelas</h2>
             <p
               v-if="detail.schedules.length === 0"
-              class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+              class="text-control text-muted-foreground"
             >
               Belum ada jadwal kelas pada kegiatan ini.
             </p>
@@ -249,9 +287,7 @@ onMounted(load)
                 <span class="font-medium">
                   {{ item.classroomName ?? item.classroomId }}
                 </span>
-                <span
-                  class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-                >
+                <span class="text-control text-muted-foreground">
                   {{ formatWindow(item.startsAt, item.endsAt) }}
                 </span>
               </li>
@@ -259,7 +295,7 @@ onMounted(load)
           </section>
         </template>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <ActivityPolicyDialog

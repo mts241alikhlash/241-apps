@@ -56,19 +56,19 @@ const STATE_FILTERS: { value: LateDocumentStateFilter; label: string }[] = [
 
 const URGENCY_ROW_CLASS: Record<LateDocumentRow['urgency'], string> = {
   ON_TIME: '',
-  LATE: 'border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/30',
-  OVERDUE: 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/30',
+  LATE: 'border-warning/30 bg-warning/10',
+  OVERDUE: 'border-destructive/30 bg-destructive/10',
 }
 
 const URGENCY_TEXT_CLASS: Record<LateDocumentRow['urgency'], string> = {
   ON_TIME: '',
-  LATE: 'text-amber-700 dark:text-amber-400',
-  OVERDUE: 'text-red-700 dark:text-red-400',
+  LATE: 'text-warning',
+  OVERDUE: 'text-destructive',
 }
 
 const BADGE_URGENCY_CLASS: Record<LateDocumentRow['urgency'], string> = {
   ON_TIME: '',
-  LATE: 'border-amber-400 text-amber-700 dark:text-amber-400',
+  LATE: 'border-warning text-warning',
   OVERDUE: '',
 }
 
@@ -141,8 +141,7 @@ const tiles = computed(() => [
     key: 'complete',
     label: 'Sudah lengkap',
     value: counts.value.complete,
-    class:
-      'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950/30',
+    class: 'border-success/30 bg-success/10',
   },
 ])
 
@@ -480,7 +479,7 @@ onMounted(async () => {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -493,13 +492,13 @@ onMounted(async () => {
         <template v-else>
           <p
             v-if="loading && !rows.length"
-            class="text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="text-center text-control text-muted-foreground"
           >
             Memuat berkas susulan…
           </p>
           <p
             v-else-if="!rows.length"
-            class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+            class="rounded-md border p-4 text-center text-control text-muted-foreground"
           >
             Tidak ada berkas susulan.
           </p>

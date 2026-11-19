@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends CardEntry">
 import { Trash2 } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -8,12 +8,12 @@ import {
   ItemGroup,
 } from '@mts241alikhlash/ui/item'
 import { typeCode, typeLabel } from '@/features/exam-bank/types'
-import type { DraftCard } from '../types'
+import type { CardEntry } from '../types'
 
 defineProps<{
-  cards: DraftCard[]
+  cards: T[]
   activeIndex: number
-  snippetOf: (card: DraftCard) => string
+  snippetOf: (card: T) => string
 }>()
 
 const emit = defineEmits<{
@@ -38,13 +38,11 @@ const emit = defineEmits<{
           @click="emit('select', index)"
         >
           <span
-            class="w-5 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground tabular-nums"
+            class="w-5 shrink-0 text-right text-control text-muted-foreground"
           >
             {{ index + 1 }}
           </span>
-          <span
-            class="min-w-0 flex-1 truncate text-[length:var(--text-control,0.75rem)]"
-          >
+          <span class="min-w-0 flex-1 truncate text-control">
             {{ snippetOf(card) }}
           </span>
           <span
@@ -56,7 +54,7 @@ const emit = defineEmits<{
       </ItemContent>
       <ItemActions class="shrink-0">
         <span
-          class="w-8 shrink-0 text-right text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="w-8 shrink-0 text-right text-control text-muted-foreground"
           :title="typeLabel(card.type)"
         >
           {{ typeCode(card.type) }}

@@ -20,6 +20,7 @@ import {
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -132,10 +133,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg"> Akun Pegawai </CardTitle>
         </div>
@@ -215,7 +213,7 @@ onMounted(() => {
               Filter Pegawai
               <span
                 v-if="activeFiltersCount > 0"
-                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
               >
                 {{ activeFiltersCount }}
               </span>
@@ -247,14 +245,14 @@ onMounted(() => {
 
   <Dialog v-model:open="isFilterDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Filter Akun Pegawai</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Saring daftar akun guru berdasarkan kategori, jabatan, dan status.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="p-6 space-y-4">
+      <DialogBody class="space-y-4">
         <FloatingLabelField
           label="Kategori"
           for="employee-account-filter-category"
@@ -333,11 +331,9 @@ onMounted(() => {
             </SelectContent>
           </Select>
         </FloatingLabelField>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

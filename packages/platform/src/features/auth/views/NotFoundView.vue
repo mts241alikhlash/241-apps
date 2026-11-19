@@ -31,20 +31,20 @@ function goHome() {
     <Card class="max-w-md w-full">
       <CardContent class="p-8 flex flex-col items-center">
         <div
-          class="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 mb-6 ring-8 ring-amber-50/50"
+          class="w-16 h-16 rounded-full bg-warning/10 flex items-center justify-center text-warning mb-6 ring-8 ring-warning/30"
         >
           <AlertTriangle class="size-8" />
         </div>
 
-        <h1 class="text-7xl font-extrabold tracking-tight mb-2">404</h1>
-        <h2 class="text-xl font-bold mb-4">Halaman Tidak Ditemukan</h2>
+        <h1 class="text-7xl font-semibold tracking-tight mb-2">404</h1>
+        <h2 class="text-xl font-semibold mb-4">Halaman Tidak Ditemukan</h2>
         <p class="text-sm text-muted-foreground mb-8 leading-relaxed">
           Maaf, halaman yang Anda cari tidak dapat ditemukan atau telah
           dipindahkan ke alamat lain.
         </p>
 
         <Button
-          class="w-full font-semibold h-11 rounded-xl shadow-md transition-transform active:scale-[0.98]"
+          class="w-full font-semibold shadow-md transition-transform active:scale-[0.98]"
           @click="goHome"
         >
           Kembali ke Beranda

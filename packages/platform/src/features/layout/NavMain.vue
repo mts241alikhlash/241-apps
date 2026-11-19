@@ -103,7 +103,11 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
               @click="handleLinkClick"
             >
               <component :is="item.icon" />
-              <span>{{ t(item.title) }}</span>
+              <span
+                class="min-w-0 truncate"
+                :title="t(item.title)"
+                >{{ t(item.title) }}</span
+              >
             </RouterLink>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -117,7 +121,11 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
                 :aria-label="t(item.title)"
               >
                 <component :is="item.icon" />
-                <span>{{ t(item.title) }}</span>
+                <span
+                  class="min-w-0 truncate"
+                  :title="t(item.title)"
+                  >{{ t(item.title) }}</span
+                >
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -158,9 +166,13 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
                 :is-active="isItemActive(item)"
               >
                 <component :is="item.icon" />
-                <span>{{ t(item.title) }}</span>
+                <span
+                  class="min-w-0 truncate"
+                  :title="t(item.title)"
+                  >{{ t(item.title) }}</span
+                >
                 <ChevronRight
-                  class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                  class="ml-auto shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
                 />
               </SidebarMenuButton>
             </CollapsibleTrigger>
@@ -179,7 +191,11 @@ function isSubActive(sub: SubMenuItem, parentItem: MenuItem): boolean {
                       :to="subItem.url"
                       @click="handleLinkClick"
                     >
-                      <span>{{ t(subItem.title) }}</span>
+                      <span
+                        class="min-w-0 truncate"
+                        :title="t(subItem.title)"
+                        >{{ t(subItem.title) }}</span
+                      >
                     </RouterLink>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>

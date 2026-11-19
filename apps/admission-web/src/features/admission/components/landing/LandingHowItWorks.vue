@@ -18,7 +18,7 @@ const COLUMNS = {
     class="scroll-mt-14 bg-[#203f73] py-14 text-white sm:py-20 lg:flex lg:min-h-[calc(100svh-3.5rem)] lg:items-center lg:py-8"
   >
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-16">
+      <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:gap-6">
         <h2
           class="font-[Georgia,serif] text-4xl font-normal leading-[1.1] tracking-tight sm:text-5xl"
         >
@@ -39,7 +39,7 @@ const COLUMNS = {
           class="grid grid-cols-[2.5rem_1fr] gap-x-4 border-b border-white/30 py-6 sm:block sm:pr-8 lg:border-r lg:pl-5 lg:first:pl-0 lg:last:border-r-0"
         >
           <span
-            class="row-span-2 block font-[Georgia,serif] text-3xl tabular-nums text-[#e5cc87] sm:text-4xl"
+            class="row-span-2 block font-[Georgia,serif] text-3xl text-[#e5cc87] sm:text-4xl"
           >
             {{ String(index + 1).padStart(2, '0') }}
           </span>

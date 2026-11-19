@@ -1,0 +1,1 @@
+ALTER TYPE "SessionAuditAction" ADD VALUE 'RESET_CREDENTIALS';

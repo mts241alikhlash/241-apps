@@ -88,7 +88,7 @@ defineExpose({ print })
     padding: 10mm;
     background: #fff;
     color: #0f172a;
-    font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
 
   .schedule-print-head {
@@ -98,7 +98,7 @@ defineExpose({ print })
   .schedule-print-head h1 {
     margin: 0;
     font-size: 15pt;
-    font-weight: 700;
+    font-weight: 600;
   }
   .schedule-print-head p {
     margin: 1mm 0 0;
@@ -120,7 +120,7 @@ defineExpose({ print })
   }
   .schedule-print-grid thead th {
     background: #e2e8f0;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   .schedule-print-grid thead {

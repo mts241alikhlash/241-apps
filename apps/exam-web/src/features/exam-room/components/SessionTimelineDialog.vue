@@ -86,17 +86,17 @@ watch(
         <DialogTitle>Riwayat Kejadian</DialogTitle>
         <DialogDescription>{{ title }}</DialogDescription>
       </DialogHeader>
-      <DialogBody class="min-h-0 flex-1 overflow-y-auto">
+      <DialogBody>
         <p
           v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)] text-destructive"
+          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
           role="alert"
         >
           {{ error }}
         </p>
         <p
           v-else-if="!loading && visibleEntries.length === 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{
             hiddenCount > 0
@@ -111,12 +111,12 @@ watch(
           <li
             v-for="entry in visibleEntries"
             :key="entry.id"
-            class="flex flex-wrap items-center gap-2 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="flex flex-wrap items-center gap-2 p-3 text-control"
           >
             <Badge :variant="entry.isViolation ? 'destructive' : 'outline'">
               {{ labelOf(entry) }}
             </Badge>
-            <span class="tabular-nums text-muted-foreground">
+            <span class="text-muted-foreground">
               {{ dateTime.format(new Date(entry.occurredAt)) }}
             </span>
             <span v-if="entry.detail">{{ entry.detail }}</span>
@@ -135,7 +135,7 @@ watch(
       >
         <p
           v-if="!showAll && hiddenCount > 0"
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+          class="text-control text-muted-foreground"
         >
           {{ hiddenCount }} kejadian lain disembunyikan
         </p>

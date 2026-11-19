@@ -89,10 +89,10 @@ const eventDate = computed(() => {
 
   <div
     v-else-if="store.publicAlbum"
-    class="space-y-8"
+    class="space-y-6"
   >
     <header class="space-y-2">
-      <h1 class="text-3xl font-bold leading-tight tracking-tight">
+      <h1 class="text-3xl font-semibold leading-tight tracking-tight">
         {{ store.publicAlbum.title }}
       </h1>
       <p class="text-sm text-muted-foreground">

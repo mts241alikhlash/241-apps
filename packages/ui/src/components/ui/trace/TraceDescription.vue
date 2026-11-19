@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
   <span
     data-slot="trace-description"
-    :class="cn('shrink-0 text-muted-foreground/70 tabular-nums', props.class)"
+    :class="cn('shrink-0 text-muted-foreground/70', props.class)"
   >
     <slot />
   </span>

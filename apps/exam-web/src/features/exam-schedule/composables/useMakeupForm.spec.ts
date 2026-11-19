@@ -183,8 +183,8 @@ describe('useMakeupForm', () => {
     form.toggle('b')
     form.reason.value = 'PERMITTED'
     form.setReason('a', 'SICK')
-    form.setNote('a', '  Demam  ')
-    form.setNote('b', '   ')
+    form.setNote('a', '  Demam ')
+    form.setNote('b', ' ')
     form.startDate.value = '2026-11-04'
     form.endDate.value = '2026-11-04'
     form.startTime.value = '08:00'

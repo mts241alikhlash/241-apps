@@ -7,6 +7,7 @@ import * as z from 'zod'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -26,10 +27,7 @@ const props = defineProps<{
   initialData?: StudentIdentityData | null
 }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  reload: []
-}>()
+const emit = defineEmits<{ 'update:open': [value: boolean]; reload: [] }>()
 
 const { isSaving, saveStudent } = useStudent()
 
@@ -101,14 +99,14 @@ const onSubmit = form.handleSubmit(async (values) => {
         class="flex flex-col h-full"
         @submit.prevent="onSubmit"
       >
-        <DialogHeader class="px-6 py-6 border-b shrink-0">
+        <DialogHeader standard>
           <DialogTitle class="text-xl"> Ubah Identitas Kesiswaan </DialogTitle>
-          <DialogDescription class="sr-only"> </DialogDescription>
+          <DialogDescription> </DialogDescription>
         </DialogHeader>
 
         <ScrollArea class="flex-1 min-h-0">
-          <div class="p-6">
-            <div class="grid gap-5 md:grid-cols-2">
+          <DialogBody>
+            <div class="grid gap-4 md:grid-cols-2">
               <FloatingField
                 v-slot="{ componentField }"
                 name="nis"
@@ -139,11 +137,12 @@ const onSubmit = form.handleSubmit(async (values) => {
                 </div>
               </FloatingField>
             </div>
-          </div>
+          </DialogBody>
         </ScrollArea>
 
         <DialogFooter
-          class="px-6 py-4 border-t shrink-0 flex gap-2 sm:justify-end w-full bg-background relative mt-auto"
+          standard
+          class="sm:justify-end relative mt-auto"
         >
           <Button
             type="button"

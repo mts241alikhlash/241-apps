@@ -65,10 +65,10 @@ const when = computed(() => {
 
   <article
     v-else-if="store.publicCurrent"
-    class="space-y-8"
+    class="space-y-6"
   >
     <header class="space-y-3">
-      <h1 class="text-3xl font-bold leading-tight tracking-tight">
+      <h1 class="text-3xl font-semibold leading-tight tracking-tight">
         {{ store.publicCurrent.title }}
       </h1>
       <div class="flex flex-wrap gap-x-4 gap-y-1.5">
@@ -93,7 +93,7 @@ const when = computed(() => {
     />
 
     <SafeHtml
-      class="prose prose-neutral max-w-none dark:prose-invert"
+      class="prose prose-neutral max-w-none"
       :html="store.publicCurrent.description"
     />
   </article>

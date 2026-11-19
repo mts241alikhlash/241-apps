@@ -3621,6 +3621,386 @@
         ]
       }
     },
+    "/exam-events/{id}/print-pack": {
+      "get": {
+        "operationId": "ExamEventController_getPrintPack",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PrintPackDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The print pack of an exam event",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
+    "/exam-events/{id}/credentials/reset": {
+      "post": {
+        "operationId": "ExamEventController_resetPasswords",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "roomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetCredentialsBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ResetCredentialsDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Give every seated student of an event a new login password, shown once",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
+    "/exam-events/{id}/seats/generate": {
+      "post": {
+        "operationId": "ExamEventController_generateSeats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSeatsBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GenerateSeatsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Plan the seats of an exam event; with mode apply, write them in place of the existing seats",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
+    "/exam-events/{id}/attendance-files": {
+      "put": {
+        "operationId": "ExamAttendanceFileController_upload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceUploadBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AttendanceFileDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload or replace a signed attendance sheet scan (PDF, JPG or PNG, 10 MB)",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      },
+      "get": {
+        "operationId": "ExamAttendanceFileController_list",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "STUDENT",
+                "SUPERVISOR",
+                "TECHNICIAN"
+              ]
+            }
+          },
+          {
+            "name": "day",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-11-18",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AttendanceFileDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The uploaded attendance sheets of an event",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      }
+    },
+    "/exam-events/{id}/attendance-files/{fileId}": {
+      "get": {
+        "operationId": "ExamAttendanceFileController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file bytes, always as an attachment",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download an uploaded attendance sheet",
+        "tags": [
+          "Exam Attendance Files"
+        ]
+      }
+    },
     "/exam-rooms/{roomId}/monitor": {
       "get": {
         "operationId": "ExamRoomController_roomMonitor",
@@ -4027,6 +4407,25 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "",
@@ -4057,7 +4456,130 @@
             "bearer": []
           }
         ],
-        "summary": "Hand the Berita Acara in and lock it",
+        "summary": "Hand the signed, scanned Berita Acara in (PDF, JPG or PNG, 10 MB) and lock it",
+        "tags": [
+          "Exam Rooms"
+        ]
+      }
+    },
+    "/exam-rooms/{roomId}/reports/{slotId}/file": {
+      "put": {
+        "operationId": "ExamRoomController_replaceRoomReportFile",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RoomReportDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace the file of a submitted Berita Acara",
+        "tags": [
+          "Exam Rooms"
+        ]
+      },
+      "get": {
+        "operationId": "ExamRoomController_downloadRoomReportFile",
+        "parameters": [
+          {
+            "name": "roomId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The file bytes, always as an attachment",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download the file of a submitted Berita Acara",
         "tags": [
           "Exam Rooms"
         ]
@@ -4821,6 +5343,159 @@
         "summary": "Every active room, or only the rooms the caller staffs",
         "tags": [
           "Exam Rooms"
+        ]
+      }
+    },
+    "/exam-rooms/reports": {
+      "get": {
+        "operationId": "ExamRoomOverviewController_roomReports",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RoomReportSummaryDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Every Berita Acara the caller may see, one row per supervisor slot",
+        "tags": [
+          "Exam Rooms"
+        ]
+      }
+    },
+    "/exam-participant-numbers/issue": {
+      "post": {
+        "operationId": "ExamParticipantNumberController_issue",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueSemesterNumbersBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/IssueSemesterNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Issue the missing participant numbers of a semester",
+        "tags": [
+          "Exam Participant Numbers"
+        ]
+      }
+    },
+    "/exam-participant-numbers/lookup": {
+      "post": {
+        "operationId": "ExamParticipantNumberController_lookup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupParticipantNumbersBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LookupParticipantNumbersResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Participant numbers of many students in one semester",
+        "tags": [
+          "Exam Participant Numbers"
         ]
       }
     },
@@ -5866,6 +6541,73 @@
                 "docx"
               ]
             }
+          },
+          {
+            "name": "layout",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "table",
+                "vertical"
+              ]
+            }
+          },
+          {
+            "name": "pg",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pgKompleks",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "benarSalah",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isian",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "uraian",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 100,
+              "default": 5,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -6369,6 +7111,21 @@
           },
           "tokenSlotSeconds": {
             "type": "number"
+          },
+          "lateToleranceMinutes": {
+            "type": "number"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleChoices": {
+            "type": "boolean"
+          },
+          "allowWeb": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -6378,7 +7135,12 @@
           "gapRecordedMs",
           "gapTokenMs",
           "gapViolationFrom",
-          "tokenSlotSeconds"
+          "tokenSlotSeconds",
+          "lateToleranceMinutes",
+          "minSubmitMinutes",
+          "shuffleQuestions",
+          "shuffleChoices",
+          "allowWeb"
         ]
       },
       "ExamActivityDto": {
@@ -6761,6 +7523,25 @@
             "type": "number",
             "minimum": 300,
             "maximum": 3600
+          },
+          "lateToleranceMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 120
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 180
+          },
+          "shuffleQuestions": {
+            "type": "boolean"
+          },
+          "shuffleChoices": {
+            "type": "boolean"
+          },
+          "allowWeb": {
+            "type": "boolean"
           }
         }
       },
@@ -7895,7 +8676,10 @@
               "SUBMIT_ROOM_REPORT",
               "VERIFY_ROOM_REPORT",
               "REOPEN_ROOM_REPORT",
-              "CLOSED_BY_ADMIN"
+              "CLOSED_BY_ADMIN",
+              "RESET_CREDENTIALS",
+              "REPLACE_ROOM_REPORT_FILE",
+              "UPLOAD_ATTENDANCE_FILE"
             ]
           },
           "actorId": {
@@ -9519,6 +10303,592 @@
           "capacity"
         ]
       },
+      "PrintPackEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "PrintPackTechnicianDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PrintPackSupervisorDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "name"
+        ]
+      },
+      "PrintPackStudentDto": {
+        "type": "object",
+        "properties": {
+          "seatNumber": {
+            "type": "number"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "nis": {
+            "type": "string",
+            "nullable": true
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "seatNumber",
+          "studentId",
+          "name",
+          "nis",
+          "classroomName",
+          "participantNumber"
+        ]
+      },
+      "PrintPackRoomDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "technician": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PrintPackTechnicianDto"
+              }
+            ]
+          },
+          "supervisors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackSupervisorDto"
+            }
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackStudentDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "building",
+          "technician",
+          "supervisors",
+          "students"
+        ]
+      },
+      "PrintPackDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/PrintPackEventDto"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintPackRoomDto"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "event",
+          "rooms",
+          "warnings"
+        ]
+      },
+      "ResetCredentialsBodyDto": {
+        "type": "object",
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "enum": [
+              true
+            ],
+            "description": "Must be true: the old passwords stop working at once"
+          }
+        },
+        "required": [
+          "confirm"
+        ]
+      },
+      "ResetCredentialsItemDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "Shown once; never stored"
+          }
+        },
+        "required": [
+          "studentId",
+          "identifier",
+          "password"
+        ]
+      },
+      "ResetCredentialsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResetCredentialsItemDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "items",
+          "skipped"
+        ]
+      },
+      "GenerateSeatStudentDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "studentId",
+          "classroomId"
+        ]
+      },
+      "GenerateSeatRulesDto": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "enum": [
+              "alphabetical",
+              "random"
+            ],
+            "type": "string"
+          },
+          "separateGender": {
+            "type": "boolean"
+          },
+          "spreadGrades": {
+            "type": "boolean"
+          },
+          "spreadClassrooms": {
+            "type": "boolean"
+          },
+          "lanesPerSide": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "seed": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "GenerateSeatsBodyDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "enum": [
+              "preview",
+              "apply"
+            ],
+            "type": "string"
+          },
+          "replaceExisting": {
+            "type": "boolean"
+          },
+          "students": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GenerateSeatStudentDto"
+            }
+          },
+          "roomIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "rules": {
+            "$ref": "#/components/schemas/GenerateSeatRulesDto"
+          }
+        },
+        "required": [
+          "mode",
+          "students"
+        ]
+      },
+      "SeatLayoutDto": {
+        "type": "object",
+        "properties": {
+          "lanes": {
+            "type": "number"
+          },
+          "rows": {
+            "type": "number"
+          },
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lanes",
+          "rows",
+          "left",
+          "right"
+        ]
+      },
+      "GenerateSeatsRoomDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "layout": {
+            "$ref": "#/components/schemas/SeatLayoutDto"
+          }
+        },
+        "required": [
+          "roomId",
+          "code",
+          "capacity",
+          "layout"
+        ]
+      },
+      "SeatPlanSeatDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "desk": {
+            "type": "number"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeLevel": {
+            "type": "number"
+          },
+          "gender": {
+            "nullable": true,
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ],
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "LEFT",
+              "RIGHT"
+            ],
+            "type": "string"
+          },
+          "row": {
+            "type": "number"
+          },
+          "lane": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "roomId",
+          "desk",
+          "studentId",
+          "classroomId",
+          "gradeLevel",
+          "gender",
+          "side",
+          "row",
+          "lane"
+        ]
+      },
+      "SeatPlanStudentDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeLevel": {
+            "type": "number"
+          },
+          "gender": {
+            "nullable": true,
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "studentId",
+          "classroomId",
+          "gradeLevel",
+          "gender",
+          "name"
+        ]
+      },
+      "GenerateSeatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "boolean"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GenerateSeatsRoomDto"
+            }
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanSeatDto"
+            }
+          },
+          "unseated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanStudentDto"
+            }
+          },
+          "unknownGender": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanStudentDto"
+            }
+          },
+          "adjacentSameGrade": {
+            "type": "number"
+          },
+          "adjacentSameClassroom": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "applied",
+          "rooms",
+          "seats",
+          "unseated",
+          "unknownGender",
+          "adjacentSameGrade",
+          "adjacentSameClassroom"
+        ]
+      },
+      "AttendanceUploadBodyDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "STUDENT",
+              "SUPERVISOR",
+              "TECHNICIAN"
+            ],
+            "type": "string"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-18",
+            "description": "WIB calendar day"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "kind",
+          "day",
+          "file"
+        ]
+      },
+      "AttendanceFileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "enum": [
+              "STUDENT",
+              "SUPERVISOR",
+              "TECHNICIAN"
+            ],
+            "type": "string"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-18"
+          },
+          "roomId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "slotId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedById": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "day",
+          "roomId",
+          "slotId",
+          "originalName",
+          "sizeBytes",
+          "uploadedAt",
+          "uploadedById"
+        ]
+      },
       "RoomMonitorLastEventDto": {
         "type": "object",
         "properties": {
@@ -9696,6 +11066,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "studentName": {
             "type": "string",
             "nullable": true
@@ -9744,6 +11118,7 @@
         "required": [
           "seatNumber",
           "studentId",
+          "participantNumber",
           "studentName",
           "nis",
           "classroomName",
@@ -10161,6 +11536,13 @@
             "nullable": true,
             "format": "date-time"
           },
+          "hasAttachment": {
+            "type": "boolean"
+          },
+          "attachmentName": {
+            "type": "string",
+            "nullable": true
+          },
           "slot": {
             "$ref": "#/components/schemas/RoomReportSlotDto"
           },
@@ -10198,6 +11580,8 @@
           "incidentNotes",
           "submittedAt",
           "verifiedAt",
+          "hasAttachment",
+          "attachmentName",
           "slot",
           "schedules",
           "absences",
@@ -10591,6 +11975,164 @@
           "currentSupervisorName",
           "isSubstituted",
           "isActiveNow"
+        ]
+      },
+      "RoomReportSummaryDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomCode": {
+            "type": "string"
+          },
+          "roomName": {
+            "type": "string"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "VERIFIED"
+            ]
+          },
+          "registeredCount": {
+            "type": "number"
+          },
+          "reportId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "hasAttachment": {
+            "type": "boolean"
+          },
+          "attachmentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "supervisorName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "roomId",
+          "roomCode",
+          "roomName",
+          "slotId",
+          "startsAt",
+          "endsAt",
+          "status",
+          "registeredCount",
+          "reportId",
+          "hasAttachment",
+          "attachmentName",
+          "subjectNames",
+          "supervisorName"
+        ]
+      },
+      "IssueSemesterNumbersBodyDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "semesterId"
+        ]
+      },
+      "IssueSemesterNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "issued": {
+            "type": "number",
+            "description": "How many numbers this call created"
+          },
+          "skipped": {
+            "description": "Students without a grade level, so they got no number",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "issued",
+          "skipped"
+        ]
+      },
+      "LookupParticipantNumbersBodyDto": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentIds": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "semesterId",
+          "studentIds"
+        ]
+      },
+      "ParticipantNumberItemDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "studentId",
+          "number"
+        ]
+      },
+      "LookupParticipantNumbersResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParticipantNumberItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "ExamFileDto": {
@@ -11399,6 +12941,9 @@
           "counts": {
             "$ref": "#/components/schemas/ImportCountsDto"
           },
+          "points": {
+            "$ref": "#/components/schemas/ImportCountsDto"
+          },
           "totalPoints": {
             "type": "number"
           },
@@ -11431,6 +12976,7 @@
           "identity",
           "authorName",
           "counts",
+          "points",
           "totalPoints",
           "total",
           "errors",

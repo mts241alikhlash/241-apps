@@ -170,9 +170,7 @@ const handleSave = async () => {
               <div class="text-sm font-semibold tracking-tight">
                 {{ role.name }}
               </div>
-              <div
-                class="text-[10px] text-muted-foreground font-mono uppercase"
-              >
+              <div class="text-xs text-muted-foreground uppercase">
                 {{ role.code }}
               </div>
             </div>

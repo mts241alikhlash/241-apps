@@ -40,8 +40,8 @@ export const columns: ColumnDef<RaporData>[] = [
         'span',
         {
           class: row.original.isPublished
-            ? 'inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20'
-            : 'inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20',
+            ? 'inline-flex items-center rounded-md bg-success/10 px-2 py-1 text-xs font-medium text-success ring-1 ring-inset ring-success'
+            : 'inline-flex items-center rounded-md bg-warning/10 px-2 py-1 text-xs font-medium text-warning ring-1 ring-inset ring-warning',
         },
         row.original.isPublished ? 'Published' : 'Draft',
       ),

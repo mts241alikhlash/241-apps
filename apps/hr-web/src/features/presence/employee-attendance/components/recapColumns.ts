@@ -24,7 +24,7 @@ export const recapColumns: ColumnDef<PresenceRecapRow>[] = [
       const val = row.original.absentDays
       return h(
         'span',
-        { class: val > 0 ? 'text-red-600 font-medium' : '' },
+        { class: val > 0 ? 'text-destructive font-medium' : '' },
         val,
       )
     },

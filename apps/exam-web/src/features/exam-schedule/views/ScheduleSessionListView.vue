@@ -7,9 +7,9 @@ import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
@@ -101,7 +101,7 @@ onMounted(load)
       gap="none"
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader variant="muted">
+      <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
             label="Kembali ke Jadwal Ujian"
@@ -118,7 +118,7 @@ onMounted(load)
           class="m-4 space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-control">{{ error }}</p>
           <Button
             variant="outline"
             @click="load"
@@ -140,7 +140,7 @@ onMounted(load)
           </template>
         </DataTable>
       </CardContent>
-      <CardFooter variant="thin" />
+      <CardFooter plain />
     </Card>
 
     <SessionRecoveryDialog

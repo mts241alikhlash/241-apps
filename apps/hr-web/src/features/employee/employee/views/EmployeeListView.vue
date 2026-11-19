@@ -22,6 +22,7 @@ import { watchDebounced } from '@vueuse/core'
 import { ArrowLeftRight, Plus, Filter } from '@lucide/vue'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -233,10 +234,7 @@ onMounted(() => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg"> Daftar Pegawai </CardTitle>
         </div>
@@ -245,8 +243,8 @@ onMounted(() => {
             <Button
               v-if="canImport"
               variant="outline"
-              size="sm"
-              class="h-10 px-4 bg-white"
+              size="lg"
+              class="bg-white"
               @click="isImportExportOpen = true"
             >
               <ArrowLeftRight class="size-4" />
@@ -254,8 +252,7 @@ onMounted(() => {
             </Button>
             <Button
               v-if="can('employees.create')"
-              size="sm"
-              class="h-10 px-4"
+              size="lg"
               @click="router.push('/staff/create')"
             >
               <Plus class="size-4" />
@@ -271,7 +268,7 @@ onMounted(() => {
               <DropdownMenuTrigger as-child>
                 <Button
                   size="sm"
-                  class="h-9 px-3 gap-1"
+                  class="px-3 gap-1"
                 >
                   <Plus class="size-4" />
                   Tambah
@@ -351,7 +348,7 @@ onMounted(() => {
               Filter Pegawai
               <span
                 v-if="activeFiltersCount > 0"
-                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
               >
                 {{ activeFiltersCount }}
               </span>
@@ -385,14 +382,14 @@ onMounted(() => {
 
   <Dialog v-model:open="isFilterDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Filter Pegawai</DialogTitle>
-        <DialogDescription class="sr-only">
+        <DialogDescription>
           Saring daftar guru berdasarkan kategori, jabatan, dan status.
         </DialogDescription>
       </DialogHeader>
 
-      <div class="p-6 space-y-4">
+      <DialogBody class="space-y-4">
         <FloatingLabelField
           label="Kategori"
           for="employee-filter-category"
@@ -445,11 +442,9 @@ onMounted(() => {
             </SelectContent>
           </Select>
         </FloatingLabelField>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

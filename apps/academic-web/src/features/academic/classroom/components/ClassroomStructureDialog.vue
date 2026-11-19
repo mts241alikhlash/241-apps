@@ -16,6 +16,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -145,10 +146,14 @@ const popoverStates = reactive<PopoverStates>({
     <DialogContent class="sm:max-w-lg max-h-[85vh] flex flex-col">
       <DialogHeader>
         <DialogTitle>Kelola Struktur Kelas</DialogTitle>
+        <DialogDescription
+          >Susun struktur kelas: tingkat, rombel, dan wali
+          kelas.</DialogDescription
+        >
       </DialogHeader>
 
       <form
-        class="flex-1 overflow-y-auto space-y-5 py-2"
+        class="flex-1 overflow-y-auto space-y-4 py-2"
         @submit="onSubmit"
       >
         <FormField
@@ -171,7 +176,7 @@ const popoverStates = reactive<PopoverStates>({
                   :disabled="isSaving"
                   :class="
                     cn(
-                      'h-10 w-full justify-between',
+                      'w-full justify-between',
                       !formValues.supervisorId && 'text-muted-foreground',
                     )
                   "
@@ -200,7 +205,7 @@ const popoverStates = reactive<PopoverStates>({
                 <Command>
                   <CommandInput
                     placeholder="Cari nama guru..."
-                    class="text-[length:var(--text-control,0.75rem)]"
+                    class="text-control"
                   />
                   <CommandEmpty>Guru tidak ditemukan.</CommandEmpty>
                   <CommandList class="max-h-[180px]">
@@ -272,7 +277,7 @@ const popoverStates = reactive<PopoverStates>({
                   :disabled="isSaving"
                   :class="
                     cn(
-                      'h-10 w-full justify-between',
+                      'w-full justify-between',
                       !formValues[field.name] && 'text-muted-foreground',
                     )
                   "
@@ -297,7 +302,7 @@ const popoverStates = reactive<PopoverStates>({
                 <Command>
                   <CommandInput
                     placeholder="Cari nama siswa..."
-                    class="text-[length:var(--text-control,0.75rem)]"
+                    class="text-control"
                   />
                   <CommandEmpty>Siswa tidak ditemukan.</CommandEmpty>
                   <CommandList class="max-h-[180px]">

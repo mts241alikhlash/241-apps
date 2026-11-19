@@ -144,6 +144,7 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
   constructor(
     private readonly options: {
       number?: string | null
+      numbers?: Map<string, string>
       failWith?: Error
     } = {},
   ) {
@@ -155,8 +156,21 @@ export class FakeParticipantNumber extends IParticipantNumberPort {
     return Promise.resolve(this.options.number ?? null)
   }
 
+  findNumbers(studentIds: string[]) {
+    if (this.options.failWith) return Promise.reject(this.options.failWith)
+    const numbers = this.options.numbers ?? new Map<string, string>()
+    return Promise.resolve(
+      new Map(
+        studentIds.flatMap((id) => {
+          const number = numbers.get(id)
+          return number === undefined ? [] : [[id, number] as const]
+        }),
+      ),
+    )
+  }
+
   issueNumbers() {
-    return Promise.resolve()
+    return Promise.resolve({ issued: 0, skipped: [] })
   }
 }
 
@@ -325,12 +339,22 @@ export class FakeStudentDirectory extends IStudentDirectoryPort {
       id: string
       nis: string
       name: string | null
+      userId?: string | null
+      gender?: 'MALE' | 'FEMALE' | null
     }[] = [{ id: STUDENT_ID, nis: '2024001', name: 'Ahmad Fauzi' }],
   ) {
     super()
   }
 
   refsByIds(ids: string[]) {
-    return Promise.resolve(this.refs.filter((ref) => ids.includes(ref.id)))
+    return Promise.resolve(
+      this.refs
+        .filter((ref) => ids.includes(ref.id))
+        .map((ref) => ({
+          ...ref,
+          userId: ref.userId ?? null,
+          gender: ref.gender ?? null,
+        })),
+    )
   }
 }

@@ -189,10 +189,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg">Rapor Siswa</CardTitle>
         </div>
@@ -255,23 +252,23 @@ onMounted(async () => {
           class="grid grid-cols-2 sm:grid-cols-4 gap-4"
         >
           <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-bold">{{ stats.total }}</p>
+            <p class="text-2xl font-semibold">{{ stats.total }}</p>
             <p class="text-xs text-muted-foreground">Total Siswa</p>
           </div>
           <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-bold text-green-600">
+            <p class="text-2xl font-semibold text-success">
               {{ stats.published }}
             </p>
             <p class="text-xs text-muted-foreground">Published</p>
           </div>
           <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-bold text-yellow-600">
+            <p class="text-2xl font-semibold text-warning">
               {{ stats.draft }}
             </p>
             <p class="text-xs text-muted-foreground">Draft</p>
           </div>
           <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-bold">
+            <p class="text-2xl font-semibold">
               {{ stats.avgAll !== null ? stats.avgAll.toFixed(2) : '-' }}
             </p>
             <p class="text-xs text-muted-foreground">Rata-rata Kelas</p>

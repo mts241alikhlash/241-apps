@@ -222,7 +222,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">
+          <p class="text-control">
             {{ listError }}
           </p>
           <Button
@@ -342,7 +342,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
             <template #mobile-chips>
               <div
                 v-if="activeFiltersCount"
-                class="flex flex-wrap gap-2 text-[length:var(--text-control,0.75rem)]"
+                class="flex flex-wrap gap-2 text-control"
               >
                 <Button
                   v-if="statusFilter !== 'ALL'"
@@ -391,7 +391,7 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
       <DialogContent size="md">
         <DialogHeader standard
           ><DialogTitle>Filter Gelombang</DialogTitle
-          ><DialogDescription class="sr-only"
+          ><DialogDescription
             >Pilih status dan tahun ajaran.</DialogDescription
           ></DialogHeader
         >

@@ -39,11 +39,7 @@ export const createTimeSlotTypeColumns = (
     header: 'Durasi',
     meta: { align: 'center' },
     cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'tabular-nums' },
-        `${row.original.defaultDurationMinutes} menit`,
-      ),
+      h('span', `${row.original.defaultDurationMinutes} menit`),
   },
   {
     id: 'days',
@@ -62,7 +58,7 @@ export const createTimeSlotTypeColumns = (
         'div',
         { class: 'flex flex-wrap justify-center gap-1' },
         days.map((d) =>
-          h(Badge, { variant: 'outline', class: 'text-[11px]' }, () =>
+          h(Badge, { variant: 'outline', class: 'text-xs' }, () =>
             dayShortLabel(d),
           ),
         ),

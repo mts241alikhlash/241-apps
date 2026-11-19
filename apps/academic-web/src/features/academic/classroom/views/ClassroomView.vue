@@ -97,10 +97,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Kelas </CardTitle>
         <Button
           v-if="can('classrooms.create')"
@@ -131,12 +128,12 @@ onMounted(async () => {
           @update:page-size="(limit) => fetchClassrooms({ limit, page: 1 })"
         >
           <template #filters>
-            <div class="flex items-center gap-2">
+            <div class="flex items-end gap-2">
               <Select
                 :model-value="selectedAcademicYearId"
                 @update:model-value="onAcademicYearChange"
               >
-                <SelectTrigger class="h-8 w-[150px] text-xs">
+                <SelectTrigger class="w-[150px]">
                   <SelectValue placeholder="Tahun Ajaran" />
                 </SelectTrigger>
                 <SelectContent>

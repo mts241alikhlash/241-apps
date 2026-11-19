@@ -12,7 +12,7 @@ const props = defineProps<{
     data-slot="menubar-shortcut"
     :class="
       cn(
-        'text-muted-foreground group-focus/menubar-item:text-accent-foreground text-[0.625rem] tracking-widest ml-auto',
+        'text-muted-foreground group-focus/menubar-item:text-accent-foreground text-xs tracking-widest ml-auto',
         props.class,
       )
     "

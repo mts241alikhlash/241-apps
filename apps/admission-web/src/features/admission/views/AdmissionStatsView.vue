@@ -140,10 +140,7 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Penerimaan Santri Baru </CardTitle>
       </CardHeader>
 
@@ -201,9 +198,7 @@ onMounted(async () => {
           </FloatingLabelField>
         </div>
         <div class="flex items-center justify-between gap-3 md:hidden">
-          <p
-            class="min-w-0 truncate text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <p class="min-w-0 truncate text-control text-muted-foreground">
             {{ scopeLabel }}
           </p>
           <Button
@@ -228,7 +223,7 @@ onMounted(async () => {
           class="space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-[length:var(--text-control,0.75rem)]">{{ error }}</p>
+          <p class="text-control">{{ error }}</p>
           <Button
             variant="outline"
             @click="loadStats()"
@@ -241,44 +236,36 @@ onMounted(async () => {
           <div class="grid gap-4 lg:grid-cols-3">
             <Card
               gap="none"
-              class="border-primary bg-primary p-6 text-primary-foreground lg:col-span-2"
+              class="border-primary bg-primary p-4 text-primary-foreground lg:col-span-2"
             >
-              <p
-                class="text-[length:var(--text-control,0.75rem)] font-medium text-primary-foreground"
-              >
+              <p class="text-control font-medium text-primary-foreground">
                 Total pendaftar
               </p>
-              <p
-                class="mt-2 text-5xl font-medium tabular-nums tracking-tight sm:text-6xl"
-              >
+              <p class="mt-2 text-5xl font-medium tracking-tight sm:text-6xl">
                 {{ stats.total }}
               </p>
-              <p
-                class="mt-2 text-[length:var(--text-control,0.75rem)] text-primary-foreground"
-              >
+              <p class="mt-2 text-control text-primary-foreground">
                 {{ scopeLabel }}
               </p>
             </Card>
 
             <Card
               gap="none"
-              class="p-6"
+              class="p-4"
             >
-              <p
-                class="text-[length:var(--text-control,0.75rem)] font-medium text-muted-foreground"
-              >
+              <p class="text-control font-medium text-muted-foreground">
                 Perlu tindakan
               </p>
               <p
-                class="mt-2 text-5xl font-medium tabular-nums tracking-tight"
-                :class="needsAction > 0 ? 'text-amber-700' : ''"
+                class="mt-2 text-5xl font-medium tracking-tight"
+                :class="needsAction > 0 ? 'text-warning' : ''"
               >
                 {{ needsAction }}
               </p>
               <p
-                class="mt-2 text-[length:var(--text-control,0.75rem)]"
+                class="mt-2 text-control"
                 :class="
-                  needsAction > 0 ? 'text-amber-700' : 'text-muted-foreground'
+                  needsAction > 0 ? 'text-warning' : 'text-muted-foreground'
                 "
               >
                 {{
@@ -308,17 +295,13 @@ onMounted(async () => {
                   <p class="text-xs font-medium text-muted-foreground">
                     {{ STATUS_LABELS[status] }}
                   </p>
-                  <p
-                    class="mt-1 text-2xl font-medium tabular-nums tracking-tight"
-                  >
+                  <p class="mt-1 text-2xl font-medium tracking-tight">
                     {{ countOf(status) }}
                   </p>
                   <div class="mt-3 h-1 overflow-hidden rounded-full bg-muted">
                     <div
                       class="h-full rounded-full transition-all"
-                      :class="
-                        isAttention(status) ? 'bg-amber-700' : 'bg-primary'
-                      "
+                      :class="isAttention(status) ? 'bg-warning' : 'bg-primary'"
                       :style="{ width: barWidth(status) }"
                     />
                   </div>
@@ -333,7 +316,7 @@ onMounted(async () => {
               <RouterLink
                 v-if="hasWaves"
                 :to="{ name: 'admin-applications' }"
-                class="inline-flex items-center gap-1 text-[length:var(--text-control,0.75rem)] font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                class="inline-flex items-center gap-1 text-control font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Lihat semua pendaftar
                 <ArrowRight class="size-3.5" />
@@ -342,7 +325,7 @@ onMounted(async () => {
             <CardContent class="pb-6">
               <p
                 v-if="!hasWaves"
-                class="rounded-md border p-4 text-center text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+                class="rounded-md border p-4 text-center text-control text-muted-foreground"
               >
                 Tidak ada data.
               </p>
@@ -369,12 +352,10 @@ onMounted(async () => {
                         </p>
                       </div>
                       <div class="shrink-0 text-right">
-                        <p
-                          class="text-2xl font-medium tabular-nums leading-none"
-                        >
+                        <p class="text-2xl font-medium leading-none">
                           {{ wave.filled }}
                           <span
-                            class="text-[length:var(--text-control,0.75rem)] font-normal text-muted-foreground"
+                            class="text-control font-normal text-muted-foreground"
                             >/ {{ wave.quota }} terisi</span
                           >
                         </p>
@@ -382,7 +363,7 @@ onMounted(async () => {
                           class="pt-1 text-xs font-medium"
                           :class="
                             wavePercent(wave.quotaFillRate) >= 100
-                              ? 'text-amber-700'
+                              ? 'text-warning'
                               : 'text-muted-foreground'
                           "
                         >
@@ -402,7 +383,7 @@ onMounted(async () => {
                         class="h-full rounded-full transition-all"
                         :class="
                           wavePercent(wave.quotaFillRate) >= 100
-                            ? 'bg-amber-700'
+                            ? 'bg-warning'
                             : 'bg-primary'
                         "
                         :style="{
@@ -423,7 +404,7 @@ onMounted(async () => {
       <DialogContent size="md">
         <DialogHeader standard
           ><DialogTitle>Filter Statistik</DialogTitle
-          ><DialogDescription class="sr-only"
+          ><DialogDescription
             >Pilih tahun ajaran dan gelombang.</DialogDescription
           ></DialogHeader
         >

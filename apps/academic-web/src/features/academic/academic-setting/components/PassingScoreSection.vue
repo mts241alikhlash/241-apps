@@ -37,7 +37,7 @@ function onInput(value: string | number) {
       <h3 class="text-base font-semibold text-foreground">Nilai</h3>
     </div>
 
-    <div class="space-y-2.5">
+    <div class="space-y-3">
       <label
         for="default-passing-score"
         class="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
@@ -48,7 +48,7 @@ function onInput(value: string | number) {
         id="default-passing-score"
         type="text"
         inputmode="numeric"
-        class="h-10 w-28"
+        class="w-28"
         :model-value="String(score)"
         :disabled="isSaving || !canEdit"
         :aria-invalid="Boolean(error)"

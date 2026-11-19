@@ -18,6 +18,7 @@ import {
   seedMonitorRoom,
   startSession,
 } from '../../room-monitor.test-support.js'
+import { FakeParticipantNumber } from '../../../../exam-session/application/exam-session.test-support.js'
 import { GetRoomMonitorUseCase } from './get-room-monitor.use-case.js'
 
 const SUPERVISOR_USER: RoomStaffUser = {
@@ -45,6 +46,7 @@ function build() {
       fixture.academic,
       fixture.authors,
       fixture.employees,
+      new FakeParticipantNumber(),
       new RoomAccessService(fixture.rooms),
       new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
       new SchoolTimeService({

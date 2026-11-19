@@ -209,10 +209,10 @@ onMounted(load)
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader
-        variant="muted"
-        class="flex min-h-12 flex-wrap items-center justify-between gap-2 px-4 py-2"
+        standard
+        class="flex min-h-[var(--control-h-lg,2.25rem)] flex-wrap items-center justify-between gap-2 px-4 py-2"
       >
-        <CardTitle class="min-w-0 truncate text-sm font-semibold">
+        <CardTitle class="min-w-0 truncate font-semibold">
           Konfigurasi Safe Exam Browser
         </CardTitle>
         <div class="flex flex-wrap gap-2">
@@ -236,7 +236,7 @@ onMounted(load)
         </div>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 sm:p-6"
+        class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 sm: p-4"
       >
         <p class="text-sm text-muted-foreground">
           Siswa hanya bisa memulai ujian web dari Safe Exam Browser yang memakai
@@ -283,7 +283,7 @@ onMounted(load)
           >
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium">{{ item.name }}</p>
-              <p class="font-mono text-xs text-muted-foreground tabular-nums">
+              <p class="text-xs text-muted-foreground">
                 {{ item.configKey.slice(0, 8) }}…
               </p>
             </div>
@@ -374,7 +374,7 @@ onMounted(load)
               data-test="seb-key"
               type="text"
               autocomplete="off"
-              class="w-full rounded-md border px-3 py-2 font-mono text-sm"
+              class="w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
           <div class="space-y-1">

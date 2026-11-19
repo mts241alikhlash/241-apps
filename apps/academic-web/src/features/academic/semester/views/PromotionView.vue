@@ -9,10 +9,12 @@ import { PromotionResultDialog, PromotionStudentTable } from '../components'
 import { RouterLink, useRouter } from 'vue-router'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@mts241alikhlash/ui/dialog'
 import {
   Table,
@@ -322,7 +324,7 @@ onMounted(async () => {
           <Button
             variant="outline"
             size="sm"
-            class="h-8 text-xs font-medium shrink-0 self-center sm:self-auto"
+            class="font-medium shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = true"
           >
             <Pencil class="size-3.5 text-muted-foreground" />
@@ -335,14 +337,14 @@ onMounted(async () => {
           class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border bg-muted/20 px-4 py-3 sm:py-2.5"
         >
           <div
-            class="flex flex-col sm:flex-row sm:items-center items-center gap-2 sm:gap-2.5"
+            class="flex flex-col sm:flex-row sm:items-center items-center gap-2 sm:gap-3"
           >
             <span class="text-xs font-medium text-muted-foreground shrink-0"
               >Siklus Kenaikan:</span
             >
-            <div class="flex items-center gap-2 sm:gap-2.5">
+            <div class="flex items-center gap-2 sm:gap-3">
               <Select v-model="sourceAcademicYearId">
-                <SelectTrigger class="h-8 w-36 sm:w-40 text-xs bg-background">
+                <SelectTrigger class="w-36 sm:w-40 bg-background">
                   <SelectValue placeholder="Tahun Asal" />
                 </SelectTrigger>
                 <SelectContent>
@@ -363,7 +365,7 @@ onMounted(async () => {
                 v-model="targetAcademicYearId"
                 :disabled="!sourceAcademicYearId"
               >
-                <SelectTrigger class="h-8 w-36 sm:w-40 text-xs bg-background">
+                <SelectTrigger class="w-36 sm:w-40 bg-background">
                   <SelectValue placeholder="Tahun Tujuan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -383,7 +385,7 @@ onMounted(async () => {
           <Button
             variant="secondary"
             size="sm"
-            class="h-8 text-xs font-medium px-3 shrink-0 self-center sm:self-auto"
+            class="font-medium px-3 shrink-0 self-center sm:self-auto"
             @click="isChoosingYears = false"
           >
             <Check class="size-3.5" />
@@ -393,12 +395,10 @@ onMounted(async () => {
 
         <div
           v-if="!isLoadingRecommendations && studentsWithoutTarget.length > 0"
-          class="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/70 p-3.5 text-xs dark:border-amber-900/60 dark:bg-amber-950/20"
+          class="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-warning/30 bg-warning/10 p-3.5 text-xs"
         >
           <div class="flex items-start gap-3">
-            <AlertCircle
-              class="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
-            />
+            <AlertCircle class="mt-0.5 size-4 shrink-0 text-warning" />
             <p class="leading-relaxed">
               <strong>{{ studentsWithoutTarget.length }} siswa</strong> belum
               punya kelas tujuan,
@@ -424,21 +424,19 @@ onMounted(async () => {
 
         <div
           v-if="!isLoadingRecommendations && excludedGraduatingCount > 0"
-          class="rounded-lg border border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/20 p-3.5 flex items-start gap-3 text-xs"
+          class="rounded-lg border border-info/30 bg-info/10 p-3.5 flex items-start gap-3 text-xs"
         >
-          <GraduationCap
-            class="size-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"
-          />
+          <GraduationCap class="size-4 text-info shrink-0 mt-0.5" />
           <div>
-            <span class="font-semibold text-blue-900 dark:text-blue-200">
+            <span class="font-semibold text-info">
               {{ excludedGraduatingCount }} siswa tingkat akhir tidak termasuk
               dalam kenaikan kelas ini.
             </span>
-            <span class="text-blue-800/80 dark:text-blue-300/80 ml-1">
+            <span class="text-info ml-1">
               Kelulusan mereka dicatat terpisah lewat menu
               <RouterLink
                 to="/academic/graduation"
-                class="font-semibold underline underline-offset-2 hover:text-blue-950 dark:hover:text-blue-100"
+                class="font-semibold underline underline-offset-2 hover:text-info"
               >
                 Kelulusan</RouterLink
               >.
@@ -463,7 +461,7 @@ onMounted(async () => {
         >
           <div class="flex items-center gap-4 text-xs">
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-green-500" />
+              <div class="size-2.5 rounded-full bg-success" />
               <span class="text-muted-foreground">
                 Naik Kelas:
                 <strong class="text-foreground">{{
@@ -472,7 +470,7 @@ onMounted(async () => {
               </span>
             </div>
             <div class="flex items-center gap-1.5">
-              <div class="size-2.5 rounded-full bg-amber-500" />
+              <div class="size-2.5 rounded-full bg-warning" />
               <span class="text-muted-foreground">
                 Tinggal Kelas:
                 <strong class="text-foreground">{{
@@ -508,11 +506,15 @@ onMounted(async () => {
     <DialogContent
       class="sm:max-w-3xl flex flex-col gap-0 p-0 overflow-hidden max-h-[90svh]"
     >
-      <DialogHeader class="px-6 py-4 border-b shrink-0">
+      <DialogHeader standard>
         <DialogTitle>Konfirmasi Kenaikan Kelas</DialogTitle>
+        <DialogDescription
+          >Periksa siswa yang naik dan yang tinggal, lalu
+          konfirmasi.</DialogDescription
+        >
       </DialogHeader>
 
-      <div class="overflow-y-auto px-6 py-4 space-y-4">
+      <DialogBody class="space-y-4">
         <div
           v-if="isPreviewing"
           class="flex items-center gap-2 text-sm text-muted-foreground"
@@ -526,21 +528,19 @@ onMounted(async () => {
             class="overflow-x-auto rounded-xl border bg-background shadow-xs"
           >
             <Table class="min-w-[600px]">
-              <TableHeader class="bg-muted/50">
+              <TableHeader>
                 <TableRow>
-                  <TableHead class="text-center text-xs font-semibold w-[100px]"
+                  <TableHead class="text-center text-xs w-[100px]"
                     >NIS</TableHead
                   >
-                  <TableHead class="text-xs font-semibold"
-                    >Nama Siswa</TableHead
-                  >
-                  <TableHead class="text-center text-xs font-semibold w-[90px]"
+                  <TableHead class="text-xs">Nama Siswa</TableHead>
+                  <TableHead class="text-center text-xs w-[90px]"
                     >Kelas Asal</TableHead
                   >
-                  <TableHead class="text-center text-xs font-semibold w-[170px]"
+                  <TableHead class="text-center text-xs w-[170px]"
                     >Kelas Tujuan</TableHead
                   >
-                  <TableHead class="text-center text-xs font-semibold w-[110px]"
+                  <TableHead class="text-center text-xs w-[110px]"
                     >Status</TableHead
                   >
                 </TableRow>
@@ -561,7 +561,7 @@ onMounted(async () => {
                     </div>
                     <div
                       v-if="row.declineReason"
-                      class="text-[11px] text-destructive italic mt-0.5"
+                      class="text-xs text-destructive italic mt-0.5"
                     >
                       Alasan: {{ row.declineReason }}
                     </div>
@@ -581,11 +581,7 @@ onMounted(async () => {
                   </TableCell>
                   <TableCell
                     class="text-center py-2 text-xs font-medium"
-                    :class="
-                      row.approved
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-destructive'
-                    "
+                    :class="row.approved ? 'text-success' : 'text-destructive'"
                   >
                     {{ row.approved ? 'Naik Kelas' : 'Tinggal Kelas' }}
                   </TableCell>
@@ -594,19 +590,20 @@ onMounted(async () => {
             </Table>
           </div>
         </template>
-      </div>
+      </DialogBody>
 
       <DialogFooter
-        class="px-6 py-3.5 border-t shrink-0 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3 w-full"
+        standard
+        class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3"
       >
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="
               (promotionPreview?.promotedCount ?? summaryStats.approved) > 0
             "
-            class="flex items-center gap-1.5 font-medium text-green-600 dark:text-green-400"
+            class="flex items-center gap-1.5 font-medium text-success"
           >
-            <div class="size-2 rounded-full bg-green-500" />
+            <div class="size-2 rounded-full bg-success" />
             {{ promotionPreview?.promotedCount ?? summaryStats.approved }} Naik
             Kelas
           </div>
@@ -614,9 +611,9 @@ onMounted(async () => {
             v-if="
               (promotionPreview?.repeatedCount ?? summaryStats.declined) > 0
             "
-            class="flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400"
+            class="flex items-center gap-1.5 font-medium text-warning"
           >
-            <div class="size-2 rounded-full bg-amber-500" />
+            <div class="size-2 rounded-full bg-warning" />
             {{ promotionPreview?.repeatedCount ?? summaryStats.declined }}
             Tinggal Kelas
           </div>

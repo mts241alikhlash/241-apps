@@ -20,6 +20,7 @@ import {
 } from '@mts241alikhlash/ui/select'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -188,18 +189,14 @@ onMounted(async () => {
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <div>
           <CardTitle size="lg">Daftar Aset</CardTitle>
         </div>
         <div class="flex items-center gap-2">
           <Button
             v-if="can('inventory-assets.create')"
-            size="sm"
-            class="sm:h-10 sm:px-4 text-xs sm:text-sm"
+            size="lg"
             @click="openAddForm"
           >
             <Plus class="size-4 sm:mr-2" />
@@ -318,7 +315,7 @@ onMounted(async () => {
                 Filter
                 <span
                   v-if="activeFiltersCount > 0"
-                  class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground"
+                  class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground"
                 >
                   {{ activeFiltersCount }}
                 </span>
@@ -339,12 +336,12 @@ onMounted(async () => {
 
   <Dialog v-model:open="isFilterDialogOpen">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>Filter Aset</DialogTitle>
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
-      <div class="p-6 space-y-4">
+      <DialogBody class="space-y-4">
         <div class="space-y-1.5">
           <label class="text-xs font-semibold text-muted-foreground"
             >Kategori</label
@@ -440,11 +437,9 @@ onMounted(async () => {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </DialogBody>
 
-      <DialogFooter
-        class="px-6 py-4 border-t bg-muted/20 flex flex-row items-center justify-end gap-2"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           size="sm"

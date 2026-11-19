@@ -24,6 +24,7 @@ import {
 import { buildSeatColumns } from './seatColumns'
 import { useSeatAssignment } from '../composables/useSeatAssignment'
 import type { ExamRoom } from '../types'
+import SeatGenerateDialog from './SeatGenerateDialog.vue'
 import type { SeatedStudent } from '../services/examEventService'
 import { examEventService } from '../services/examEventService'
 
@@ -41,7 +42,8 @@ const seat = useSeatAssignment(
 )
 
 const picked = ref<Set<string>>(new Set())
-const interleave = ref(true)
+const generateOpen = ref(false)
+const eventId = computed(() => props.rooms[0]?.eventId ?? '')
 const flagTarget = ref<SeatedStudent | null>(null)
 const flagReason = ref('')
 const flagSaving = ref(false)
@@ -93,14 +95,6 @@ function toggle(studentId: string) {
   if (next.has(studentId)) next.delete(studentId)
   else next.add(studentId)
   picked.value = next
-}
-
-async function distributeAll() {
-  const done = await seat.distribute(
-    props.rooms.map((room) => room.id),
-    interleave.value,
-  )
-  if (done) picked.value = new Set()
 }
 
 async function assignPicked() {
@@ -158,7 +152,7 @@ onMounted(() => {
       </FloatingLabelField>
       <p
         v-if="chosenRoom"
-        class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-control text-muted-foreground"
       >
         {{ seat.seats.value.length }} dari {{ chosenRoom.capacity }} kursi
         terisi
@@ -167,7 +161,7 @@ onMounted(() => {
 
     <div
       v-if="seat.error.value"
-      class="space-y-3 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+      class="space-y-3 rounded-md border p-3 text-control"
       role="alert"
     >
       <p>{{ seat.error.value }}</p>
@@ -201,36 +195,32 @@ onMounted(() => {
 
     <div
       v-if="canAssign && rooms.length > 0"
-      class="flex flex-wrap items-center justify-between gap-3 rounded-md border p-4"
+      class="flex flex-wrap items-center justify-end gap-3 rounded-md border p-4"
     >
-      <label
-        class="flex items-center gap-2 text-[length:var(--text-control,0.75rem)]"
-      >
-        <Checkbox
-          :model-value="interleave"
-          aria-label="Sebar bergiliran per kelas"
-          @update:model-value="interleave = Boolean($event)"
-        />
-        Sebar bergiliran per kelas
-      </label>
       <Button
         :disabled="seat.saving.value"
-        @click="distributeAll"
+        @click="generateOpen = true"
       >
-        Bagi Kursi Otomatis
+        Generate Kursi
       </Button>
     </div>
+
+    <SeatGenerateDialog
+      :open="generateOpen"
+      :event-id="eventId"
+      :students="seat.candidates.value"
+      @update:open="generateOpen = $event"
+      @saved="seat.load()"
+    />
 
     <div
       v-if="canAssign && seat.roomId.value"
       class="space-y-3 rounded-md border p-4"
     >
-      <p class="text-[length:var(--text-control,0.75rem)] font-medium">
-        Siswa belum berkursi
-      </p>
+      <p class="text-control font-medium">Siswa belum berkursi</p>
       <p
         v-if="seat.available.value.length === 0"
-        class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
+        class="text-control text-muted-foreground"
       >
         Semua siswa semester ini sudah mendapat kursi.
       </p>
@@ -239,7 +229,7 @@ onMounted(() => {
           <li
             v-for="row in seat.available.value"
             :key="row.studentId"
-            class="flex items-center gap-3 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="flex items-center gap-3 p-3 text-control"
           >
             <Checkbox
               :model-value="picked.has(row.studentId)"
@@ -250,7 +240,7 @@ onMounted(() => {
               {{ row.name ?? 'Siswa tidak ditemukan' }}
               <span
                 v-if="row.nis"
-                class="tabular-nums text-muted-foreground"
+                class="text-muted-foreground"
               >
                 · {{ row.nis }}
               </span>
@@ -261,9 +251,7 @@ onMounted(() => {
           </li>
         </ul>
         <div class="flex items-center justify-between gap-2">
-          <span
-            class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-          >
+          <span class="text-control text-muted-foreground">
             {{ picked.size }} siswa dipilih
           </span>
           <Button
@@ -291,7 +279,7 @@ onMounted(() => {
         <DialogBody class="space-y-4">
           <div
             v-if="flagError"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-[length:var(--text-control,0.75rem)]"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
             role="alert"
           >
             {{ flagError }}

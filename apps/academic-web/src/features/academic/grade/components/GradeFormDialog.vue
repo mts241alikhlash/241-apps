@@ -6,6 +6,7 @@ import type { Grade, GradeAcademicYear } from '../types'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -152,7 +153,7 @@ onMounted(async () => {
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{
             levelForm.isEditing.value
@@ -160,7 +161,7 @@ onMounted(async () => {
               : 'Tambah Tingkat Kelas'
           }}
         </DialogTitle>
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -244,7 +245,7 @@ onMounted(async () => {
 
         <template v-if="levelForm.isEditing.value">
           <Separator class="mx-6" />
-          <div class="px-6 py-4 space-y-3">
+          <DialogBody class="space-y-3">
             <div>
               <p class="text-sm font-medium">Kurikulum per Tahun Ajaran</p>
               <p class="text-xs text-muted-foreground mt-0.5">
@@ -275,7 +276,7 @@ onMounted(async () => {
                   }}</span>
                   <span
                     v-if="ay.isActive"
-                    class="text-xs text-emerald-600 font-medium"
+                    class="text-xs text-success font-medium"
                     >(Aktif)</span
                   >
                 </div>
@@ -286,7 +287,7 @@ onMounted(async () => {
                       (v) => (pendingCurriculum[ay.id] = String(v ?? ''))
                     "
                   >
-                    <SelectTrigger class="h-8 flex-1 text-xs">
+                    <SelectTrigger class="flex-1">
                       <SelectValue placeholder="Pilih kurikulum..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -305,7 +306,7 @@ onMounted(async () => {
                   <Button
                     v-if="hasPending(ay.id)"
                     size="sm"
-                    class="h-8 text-xs shrink-0"
+                    class="shrink-0"
                     :disabled="savingCurriculum[ay.id]"
                     @click="saveCurriculum(ay.id)"
                   >
@@ -319,7 +320,8 @@ onMounted(async () => {
                     v-if="hasPending(ay.id)"
                     variant="ghost"
                     size="icon"
-                    class="h-8 w-8 shrink-0"
+                    class="shrink-0"
+                    aria-label="Hapus mata pelajaran"
                     @click="delete pendingCurriculum[ay.id]"
                   >
                     ✕
@@ -333,12 +335,13 @@ onMounted(async () => {
                 Belum ada tahun ajaran.
               </p>
             </div>
-          </div>
+          </DialogBody>
         </template>
       </ScrollArea>
 
       <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background"
+        standard
+        class="sm:justify-between"
       >
         <Button
           type="button"

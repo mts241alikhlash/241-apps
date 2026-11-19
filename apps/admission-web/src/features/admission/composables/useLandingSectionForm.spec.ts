@@ -56,7 +56,7 @@ describe('useLandingSectionForm', () => {
   it('saves the converted content, clears the dirty flag and returns the overview', async () => {
     service.saveSection.mockResolvedValue({ overview })
     const form = useLandingSectionForm(faq, landingDefaults.faq)
-    form.setField('title', '  Tanya jawab  ')
+    form.setField('title', '  Tanya jawab ')
 
     expect(await form.save()).toEqual(overview)
 

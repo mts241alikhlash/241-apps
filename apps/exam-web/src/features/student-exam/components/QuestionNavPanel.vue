@@ -27,10 +27,10 @@ const emit = defineEmits<{
     class="flex min-h-0 flex-col gap-4 overflow-y-auto rounded-lg border border-border bg-card p-4"
   >
     <dl
-      class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-[length:var(--text-control)]"
+      class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-control"
     >
       <dt class="text-muted-foreground">Sisa waktu</dt>
-      <dd class="font-semibold tabular-nums">{{ remainingLabel }}</dd>
+      <dd class="font-semibold">{{ remainingLabel }}</dd>
       <dt class="text-muted-foreground">Sinkron</dt>
       <dd class="font-medium">{{ syncLabel }}</dd>
     </dl>
@@ -44,7 +44,7 @@ const emit = defineEmits<{
     />
 
     <Button
-      class="min-h-11 w-full bg-green-700 font-semibold text-white hover:bg-green-800"
+      class="min-h-[var(--control-h-lg,2.25rem)] w-full bg-success font-semibold text-white hover:bg-success"
       :disabled="submitDisabled"
       @click="emit('submit')"
     >

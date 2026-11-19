@@ -19,7 +19,12 @@ import {
   type ExamActivityStatus,
   type ExamLifecycle,
 } from '../../../domain/policies/exam-lifecycle.policy.js'
+import { effectiveMinSubmit } from '../../../domain/policies/effective-min-submit.policy.js'
 import { myExamStatus } from '../../../domain/policies/my-exam-status.policy.js'
+import {
+  DEFAULT_POLICIES,
+  tryParsePolicy,
+} from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 
 export interface MyExam {
@@ -147,7 +152,10 @@ export class ListMyExamsUseCase {
         startsAt: schedule.startsAt,
         endsAt: schedule.endsAt,
         durationMinutes: schedule.durationMinutes,
-        minSubmitMinutes: schedule.minSubmitMinutes,
+        minSubmitMinutes: effectiveMinSubmit(
+          tryParsePolicy(schedule.activityPolicy) ?? DEFAULT_POLICIES.MIDTERM,
+          schedule.minSubmitMinutes,
+        ),
         status: myExamStatus(schedule, session, now, lifecycle),
         sessionId: session?.id ?? null,
         activityId: activity?.id ?? null,

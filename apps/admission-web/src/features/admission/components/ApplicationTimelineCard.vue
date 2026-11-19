@@ -234,7 +234,7 @@ function circleClass(state: TimelineEvent['state']) {
 
               <div class="mt-3 w-32 sm:w-36 px-1">
                 <h4
-                  class="text-xs font-medium sm:text-[length:var(--text-control,0.75rem)] leading-snug"
+                  class="text-xs font-medium sm:text-control leading-snug"
                   :class="
                     event.state === 'rejected'
                       ? 'text-destructive'
@@ -245,12 +245,12 @@ function circleClass(state: TimelineEvent['state']) {
                 </h4>
                 <time
                   v-if="event.time"
-                  class="mt-1 block text-[11px] text-muted-foreground tabular-nums"
+                  class="mt-1 block text-xs text-muted-foreground"
                 >
                   {{ event.time }}
                 </time>
                 <p
-                  class="mt-1 text-[11px] text-muted-foreground line-clamp-2 leading-tight"
+                  class="mt-1 text-xs text-muted-foreground line-clamp-2 leading-tight"
                 >
                   {{ event.description }}
                 </p>
@@ -269,7 +269,7 @@ function circleClass(state: TimelineEvent['state']) {
       <div
         v-for="event in eventsWithNote"
         :key="`note-${event.key}`"
-        class="mt-4 rounded-md border p-3 text-[length:var(--text-control,0.75rem)]"
+        class="mt-4 rounded-md border p-3 text-control"
         :class="
           event.state === 'rejected'
             ? 'border-destructive/30 bg-destructive/10 text-destructive'

@@ -67,7 +67,7 @@ describe('RenamePackageDialog', () => {
   it('renames and closes', async () => {
     rename.mockResolvedValue({ success: true, data: { id: 'p1' } })
     const wrapper = open()
-    await wrapper.find('input').setValue('  UAS Genap  ')
+    await wrapper.find('input').setValue('  UAS Genap ')
 
     await buttonByText(wrapper, 'Simpan')!.trigger('click')
     await flushPromises()
@@ -80,7 +80,7 @@ describe('RenamePackageDialog', () => {
 
   it('refuses a blank title without calling the server', async () => {
     const wrapper = open()
-    await wrapper.find('input').setValue('   ')
+    await wrapper.find('input').setValue(' ')
 
     expect(
       buttonByText(wrapper, 'Simpan')!.attributes('disabled'),

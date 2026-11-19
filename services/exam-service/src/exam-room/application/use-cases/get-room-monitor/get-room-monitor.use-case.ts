@@ -7,6 +7,7 @@ import {
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IAuthorLookupPort } from '../../../../platform/author-lookup/author-lookup.port.js'
 import { IEmployeeIdentityReadPort } from '../../../../platform/employee-identity/employee-identity.port.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
@@ -89,6 +90,7 @@ export interface RoomMonitorSession {
 export interface RoomMonitorParticipant {
   seatNumber: number
   studentId: string
+  participantNumber: string | null
   studentName: string | null
   nis: string | null
   classroomName: string | null
@@ -176,6 +178,7 @@ export class GetRoomMonitorUseCase {
     private readonly academic: IAcademicLookupPort,
     private readonly authors: IAuthorLookupPort,
     private readonly employees: IEmployeeIdentityReadPort,
+    private readonly participantNumbers: IParticipantNumberPort,
     private readonly access: RoomAccessService,
     private readonly roomCodes: RoomAccessCodeService,
     private readonly schoolTime: SchoolTimeService,
@@ -289,6 +292,34 @@ export class GetRoomMonitorUseCase {
       scheduledSupervisorUserId: slot?.scheduledUserId ?? null,
     })
 
+    const semesterBySchedule = new Map(
+      schedules.map((row) => [row.id, row.semesterId]),
+    )
+    const event = await this.rooms.findEventById(room.eventId)
+    const fallbackSemesterId = event?.semesterId ?? null
+    const numbers = new Map<string, string | null>()
+    await Promise.all(
+      slice.map(async (row) => {
+        const semesterId =
+          semesterBySchedule.get(row.scheduleId) ?? fallbackSemesterId
+        if (semesterId === null) {
+          numbers.set(row.seat.studentId, null)
+          return
+        }
+        try {
+          numbers.set(
+            row.seat.studentId,
+            await this.participantNumbers.findNumber(
+              row.seat.studentId,
+              semesterId,
+            ),
+          )
+        } catch {
+          numbers.set(row.seat.studentId, null)
+        }
+      }),
+    )
+
     return {
       data: slice.map((row) => {
         const ref = refs.get(row.seat.studentId)
@@ -296,6 +327,7 @@ export class GetRoomMonitorUseCase {
         return {
           seatNumber: row.seat.seatNumber,
           studentId: row.seat.studentId,
+          participantNumber: numbers.get(row.seat.studentId) ?? null,
           studentName: ref?.name ?? null,
           nis: ref?.nis ?? null,
           classroomName: classroomNames.get(row.seat.classroomId) ?? null,

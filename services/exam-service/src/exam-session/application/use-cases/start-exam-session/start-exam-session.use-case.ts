@@ -112,10 +112,12 @@ export class StartExamSessionUseCase {
       this.whereabouts(eventId, studentId, enrollment.semesterId),
     )
 
+    const policy =
+      tryParsePolicy(schedule.activityPolicy) ?? DEFAULT_POLICIES.MIDTERM
     const platform = input.platform ?? 'native'
     const sebVerified =
       platform === 'web' && (await this.seb.verify(input.seb)).verified
-    assertClientVerified({ platform, sebVerified })
+    assertClientVerified({ platform, sebVerified, allowWeb: policy.allowWeb })
     const client: ExamClient = platform === 'web' ? 'SEB' : 'ISTIQRA'
 
     const state = await this.attempts.get(schedule.id, studentId)
@@ -144,7 +146,14 @@ export class StartExamSessionUseCase {
       schedule.id,
       studentId,
     )
-    await this.assertLate(eventId, existing ?? seat, now, existing?.startedAt)
+    this.assertLate(
+      eventId,
+      existing ?? seat,
+      now,
+      schedule.startsAt,
+      policy.lateToleranceMinutes,
+      existing?.startedAt,
+    )
     if (existing !== null) {
       return this.resume(
         await this.withClient(
@@ -175,7 +184,7 @@ export class StartExamSessionUseCase {
       seatNumber: seat?.seatNumber ?? null,
       client,
       allowLateEntry: seat?.allowLateEntry ?? false,
-      policy: tryParsePolicy(schedule.activityPolicy),
+      policy,
     })
     if (created !== null) return this.result(created, now)
 
@@ -214,19 +223,19 @@ export class StartExamSessionUseCase {
     }
   }
 
-  private async assertLate(
+  private assertLate(
     eventId: string | null,
     seat: { allowLateEntry: boolean } | null,
     now: Date,
+    scheduleStartsAt: Date,
+    lateToleranceMinutes: number,
     startedAt?: Date,
-  ): Promise<void> {
+  ): void {
     if (eventId === null) return
-    const event = await this.rooms.findEventById(eventId)
-    if (event === null) return
     assertNotLate({
       now,
-      eventStartsAt: event.startsAt,
-      lateToleranceMinutes: event.lateToleranceMinutes,
+      scheduleStartsAt,
+      lateToleranceMinutes,
       allowLateEntry: seat?.allowLateEntry ?? false,
       startedAt,
     })

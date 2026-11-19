@@ -24,9 +24,9 @@ const requiredDocuments = computed(() =>
 </script>
 
 <template>
-  <div class="space-y-5 text-[length:var(--text-control,0.75rem)]">
+  <div class="space-y-4 text-control">
     <Card gap="none">
-      <CardContent class="space-y-5 px-4 py-4 sm:px-5">
+      <CardContent class="space-y-4 px-4 py-4 sm: px-4">
         <section class="space-y-1 border-b pb-4">
           <p class="text-xs font-medium text-muted-foreground">
             Gelombang Pendaftaran

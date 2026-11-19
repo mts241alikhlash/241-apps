@@ -60,7 +60,7 @@ const academicYearForm = useAcademicYearForm({
 <template>
   <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-      <DialogHeader class="px-6 py-5 border-b shrink-0 bg-muted/20">
+      <DialogHeader standard>
         <DialogTitle>
           {{
             academicYearForm.isEditing.value
@@ -68,7 +68,7 @@ const academicYearForm = useAcademicYearForm({
               : 'Tambah Tahun Ajaran'
           }}
         </DialogTitle>
-        <DialogDescription class="sr-only"> </DialogDescription>
+        <DialogDescription> </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="flex-1 min-h-0">
@@ -125,7 +125,7 @@ const academicYearForm = useAcademicYearForm({
                 <div
                   role="button"
                   tabindex="0"
-                  class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors hover:bg-accent/50 cursor-pointer select-none"
+                  class="flex min-h-[var(--control-h-md,2rem)] w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-[length:var(--text-control,0.75rem)] shadow-xs transition-colors hover:bg-accent/50 cursor-pointer select-none"
                   :class="{
                     'opacity-50 pointer-events-none':
                       academicYearForm.isSaving.value,
@@ -162,7 +162,8 @@ const academicYearForm = useAcademicYearForm({
       </ScrollArea>
 
       <DialogFooter
-        class="px-6 py-4 border-t shrink-0 flex sm:justify-between w-full bg-background mt-auto"
+        standard
+        class="sm:justify-between mt-auto"
       >
         <Button
           type="button"

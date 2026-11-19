@@ -5,6 +5,7 @@ import {
 } from '../../../../core/filters/api-exception.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
+import { effectiveMinSubmit } from '../../../domain/policies/effective-min-submit.policy.js'
 import { FinalizeSessionService } from '../../finalize-session.service.js'
 import {
   SessionAccessService,
@@ -73,7 +74,10 @@ export class SubmitExamSessionUseCase {
         'Jadwal ujian tidak ditemukan',
       )
     }
-    const minSubmitMinutes = schedule.minSubmitMinutes
+    const minSubmitMinutes = effectiveMinSubmit(
+      session.policy,
+      schedule.minSubmitMinutes,
+    )
     if (minSubmitMinutes > 0) {
       const earliestSubmitAt = Math.min(
         session.startedAt.getTime() + minSubmitMinutes * 60_000,

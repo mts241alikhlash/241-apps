@@ -69,9 +69,9 @@ const hasFilters = computed(
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="space-y-6">
     <header class="space-y-1">
-      <h1 class="text-2xl font-bold tracking-tight">{{ heading }}</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">{{ heading }}</h1>
       <p class="text-sm text-muted-foreground">
         Kabar dan informasi terbaru dari MTs Persis 241 Al-Ikhlash.
       </p>

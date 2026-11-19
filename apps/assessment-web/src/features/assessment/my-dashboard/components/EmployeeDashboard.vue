@@ -72,17 +72,17 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Kelas Diampu
               </p>
-              <p class="mt-1 text-2xl font-bold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.load.classroomCount }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Kelas aktif semester ini
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info"
             >
-              <School class="size-4 text-blue-600" />
+              <School class="size-4 text-info" />
             </div>
           </div>
         </CardContent>
@@ -105,17 +105,17 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Mata Pelajaran
               </p>
-              <p class="mt-1 text-2xl font-bold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.load.subjectCount }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Mapel yang diajar
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success"
             >
-              <BookOpen class="size-4 text-emerald-600" />
+              <BookOpen class="size-4 text-success" />
             </div>
           </div>
         </CardContent>
@@ -138,17 +138,17 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Belum Dinilai
               </p>
-              <p class="mt-1 text-2xl font-bold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.ungradedTotal }}
               </p>
-              <p class="mt-0.5 text-[11px] text-muted-foreground">
+              <p class="mt-0.5 text-xs text-muted-foreground">
                 Penilaian perlu diselesaikan
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-warning"
             >
-              <PencilLine class="size-4 text-amber-600" />
+              <PencilLine class="size-4 text-warning" />
             </div>
           </div>
         </CardContent>
@@ -170,7 +170,7 @@ const hiddenUngraded = computed(
           </div>
         </div>
       </CardHeader>
-      <CardContent class="pt-4 px-5 pb-5">
+      <CardContent class="pt-4 px-4 pb-5">
         <DataTable
           :columns="todayLessonColumns"
           :data="data.todayLessons"
@@ -218,7 +218,7 @@ const hiddenUngraded = computed(
               </div>
               <Badge
                 variant="secondary"
-                class="shrink-0 tabular-nums"
+                class="shrink-0"
               >
                 {{ classroom.studentCount }} siswa
               </Badge>
@@ -257,7 +257,7 @@ const hiddenUngraded = computed(
             v-if="data.ungradedAssessments.length === 0"
             class="flex flex-col items-center gap-2 py-8 text-center text-sm text-muted-foreground"
           >
-            <CheckCircle2 class="size-8 text-emerald-500 opacity-70" />
+            <CheckCircle2 class="size-8 text-success opacity-70" />
             <p>Semua penilaian sudah lengkap.</p>
           </div>
 
@@ -293,9 +293,7 @@ const hiddenUngraded = computed(
                       {{ item.subjectName }} · {{ item.classroomCode }}
                     </p>
                   </div>
-                  <span
-                    class="shrink-0 text-xs tabular-nums text-muted-foreground"
-                  >
+                  <span class="shrink-0 text-xs text-muted-foreground">
                     {{ item.gradedCount }}/{{ item.studentCount }}
                   </span>
                 </div>

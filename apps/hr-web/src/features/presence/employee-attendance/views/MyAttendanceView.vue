@@ -34,10 +34,7 @@ onMounted(() => void employeeAttendanceService.fetchMine())
       gap="none"
       class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
     >
-      <CardHeader
-        standard
-        class="min-h-0 border-b-0 bg-transparent px-0 pt-0 pb-3 sm:px-0"
-      >
+      <CardHeader plain>
         <CardTitle size="lg"> Kehadiran Saya </CardTitle>
       </CardHeader>
 
@@ -48,11 +45,11 @@ onMounted(() => void employeeAttendanceService.fetchMine())
               class="text-muted-foreground flex items-center justify-between text-xs font-medium"
             >
               <span>Hadir</span>
-              <CheckCircle2
-                class="h-4 w-4 text-emerald-600 dark:text-emerald-400"
-              />
+              <CheckCircle2 class="h-4 w-4 text-success" />
             </div>
-            <p class="text-foreground mt-2 text-2xl font-bold tracking-tight">
+            <p
+              class="text-foreground mt-2 text-2xl font-semibold tracking-tight"
+            >
               {{ totals.present }}
             </p>
           </div>
@@ -62,9 +59,11 @@ onMounted(() => void employeeAttendanceService.fetchMine())
               class="text-muted-foreground flex items-center justify-between text-xs font-medium"
             >
               <span>Terlambat</span>
-              <Clock class="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <Clock class="h-4 w-4 text-warning" />
             </div>
-            <p class="text-foreground mt-2 text-2xl font-bold tracking-tight">
+            <p
+              class="text-foreground mt-2 text-2xl font-semibold tracking-tight"
+            >
               {{ totals.late }}
             </p>
           </div>
@@ -74,9 +73,11 @@ onMounted(() => void employeeAttendanceService.fetchMine())
               class="text-muted-foreground flex items-center justify-between text-xs font-medium"
             >
               <span>Alpa</span>
-              <XCircle class="h-4 w-4 text-rose-600 dark:text-rose-400" />
+              <XCircle class="h-4 w-4 text-destructive" />
             </div>
-            <p class="text-foreground mt-2 text-2xl font-bold tracking-tight">
+            <p
+              class="text-foreground mt-2 text-2xl font-semibold tracking-tight"
+            >
               {{ totals.absent }}
             </p>
           </div>
@@ -86,9 +87,11 @@ onMounted(() => void employeeAttendanceService.fetchMine())
               class="text-muted-foreground flex items-center justify-between text-xs font-medium"
             >
               <span>Total Menit Terlambat</span>
-              <Timer class="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              <Timer class="h-4 w-4 text-warning" />
             </div>
-            <p class="text-foreground mt-2 text-2xl font-bold tracking-tight">
+            <p
+              class="text-foreground mt-2 text-2xl font-semibold tracking-tight"
+            >
               {{ totals.lateMinutes }}
             </p>
           </div>

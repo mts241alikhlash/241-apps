@@ -96,11 +96,7 @@ const columns: ColumnDef<StudentScoreItem>[] = [
       const score = row.original.score
       return score === null || score === undefined
         ? h('span', { class: 'text-muted-foreground text-xs' }, 'Belum dinilai')
-        : h(
-            'span',
-            { class: 'font-semibold tabular-nums text-sm' },
-            String(score),
-          )
+        : h('span', { class: 'font-semibold text-sm' }, String(score))
     },
   },
 ]
@@ -139,7 +135,7 @@ onMounted(() => void load())
           v-if="!loading && sortedRows.length === 0"
           class="shadow-none"
         >
-          <CardContent class="py-10 text-center text-sm text-muted-foreground">
+          <CardContent class="py-10 text-center text-muted-foreground">
             Belum ada penilaian untuk Anda pada semester ini. Nilai muncul di
             sini setelah guru membuat penilaian dan mengisinya.
           </CardContent>
