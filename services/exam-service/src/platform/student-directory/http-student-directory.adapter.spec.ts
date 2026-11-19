@@ -21,7 +21,13 @@ describe('HttpStudentDirectoryAdapter.refsByIds', () => {
     )
 
     await expect(adapter.refsByIds(['s1'])).resolves.toEqual([
-      { id: 's1', nis: '2024001', name: 'Ahmad Fauzi', userId: 'u1' },
+      {
+        id: 's1',
+        nis: '2024001',
+        name: 'Ahmad Fauzi',
+        userId: 'u1',
+        gender: null,
+      },
     ])
     expect(postData).toHaveBeenCalledWith(
       'STUDENT_SERVICE_URL',
@@ -51,8 +57,38 @@ describe('HttpStudentDirectoryAdapter.refsByIds', () => {
     )
 
     await expect(adapter.refsByIds(['s1'])).resolves.toEqual([
-      { id: 's1', nis: '1', name: null, userId: 'u1' },
+      { id: 's1', nis: '1', name: null, userId: 'u1', gender: null },
     ])
+  })
+
+  it('reads the gender of the profile', async () => {
+    const { adapter } = build(
+      { data: [{ id: 's1', userId: 'u1', nis: '1' }] },
+      [{ userId: 'u1', name: 'Siti', gender: 'FEMALE' }],
+    )
+
+    await expect(adapter.refsByIds(['s1'])).resolves.toEqual([
+      { id: 's1', nis: '1', name: 'Siti', userId: 'u1', gender: 'FEMALE' },
+    ])
+  })
+
+  it('answers a null gender for a missing or unknown gender value', async () => {
+    const { adapter } = build(
+      {
+        data: [
+          { id: 's1', userId: 'u1', nis: '1' },
+          { id: 's2', userId: 'u2', nis: '2' },
+        ],
+      },
+      [
+        { userId: 'u1', name: 'A', gender: 'OTHER' },
+        { userId: 'u2', name: 'B' },
+      ],
+    )
+
+    const refs = await adapter.refsByIds(['s1', 's2'])
+
+    expect(refs.map((ref) => ref.gender)).toEqual([null, null])
   })
 
   it('drops ids the student service does not know', async () => {

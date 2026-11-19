@@ -3,6 +3,7 @@ import { Type } from 'class-transformer'
 import {
   ArrayMaxSize,
   IsArray,
+  IsBoolean,
   IsIn,
   IsInt,
   IsISO8601,
@@ -10,6 +11,7 @@ import {
   IsString,
   IsUUID,
   Length,
+  Max,
   Min,
   ValidateNested,
 } from 'class-validator'
@@ -22,6 +24,11 @@ import {
 } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import { EXAM_EVENT_STATUSES } from '../../../../exam-room/domain/entities/exam-event.entity.js'
+import type { GenerateSeatsResult } from '../../../application/use-cases/generate-seats/generate-seats.use-case.js'
+import type {
+  PlanStudent,
+  PlannedSeat,
+} from '../../../domain/policies/seat-generate.policy.js'
 
 export class CreateExamEventDto {
   @ApiProperty({ format: 'uuid' }) @IsUUID() semesterId!: string
@@ -270,4 +277,157 @@ export class RoomAccessCodeDto {
   @ApiProperty() accessCode!: string
   @ApiProperty() rotation!: number
   @ApiProperty({ format: 'date-time' }) expiresAt!: string
+}
+
+export class GenerateSeatStudentDto {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() studentId!: string
+  @ApiProperty({ format: 'uuid' }) @IsUUID() classroomId!: string
+}
+
+export class GenerateSeatRulesDto {
+  @ApiPropertyOptional({ enum: ['alphabetical', 'random'] })
+  @IsOptional()
+  @IsIn(['alphabetical', 'random'])
+  order?: 'alphabetical' | 'random'
+
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() separateGender?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() spreadGrades?: boolean
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() spreadClassrooms?: boolean
+
+  @ApiPropertyOptional({ minimum: 1, maximum: 10 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(10)
+  lanesPerSide?: number
+
+  @ApiPropertyOptional({ maxLength: 100 })
+  @IsOptional()
+  @IsString()
+  @Length(1, 100)
+  seed?: string
+}
+
+export class GenerateSeatsBodyDto {
+  @ApiProperty({ enum: ['preview', 'apply'] })
+  @IsIn(['preview', 'apply'])
+  mode!: 'preview' | 'apply'
+
+  @ApiPropertyOptional() @IsOptional() @IsBoolean() replaceExisting?: boolean
+
+  @ApiProperty({ type: [GenerateSeatStudentDto] })
+  @IsArray()
+  @ArrayMaxSize(1000)
+  @ValidateNested({ each: true })
+  @Type(() => GenerateSeatStudentDto)
+  students!: GenerateSeatStudentDto[]
+
+  @ApiPropertyOptional({ type: [String], format: 'uuid' })
+  @IsOptional()
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  roomIds?: string[]
+
+  @ApiPropertyOptional({ type: GenerateSeatRulesDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => GenerateSeatRulesDto)
+  rules?: GenerateSeatRulesDto
+}
+
+export class SeatPlanStudentDto {
+  @ApiProperty({ format: 'uuid' }) studentId!: string
+  @ApiProperty({ format: 'uuid' }) classroomId!: string
+  @ApiProperty() gradeLevel!: number
+  @ApiProperty({ enum: ['MALE', 'FEMALE'], nullable: true })
+  gender!: 'MALE' | 'FEMALE' | null
+  @ApiProperty() name!: string
+
+  static fromDomain(domain: PlanStudent): SeatPlanStudentDto {
+    const dto = new SeatPlanStudentDto()
+    dto.studentId = domain.studentId
+    dto.classroomId = domain.classroomId
+    dto.gradeLevel = domain.gradeLevel
+    dto.gender = domain.gender
+    dto.name = domain.name
+    return dto
+  }
+}
+
+export class SeatPlanSeatDto {
+  @ApiProperty({ format: 'uuid' }) roomId!: string
+  @ApiProperty() desk!: number
+  @ApiProperty({ format: 'uuid' }) studentId!: string
+  @ApiProperty({ format: 'uuid' }) classroomId!: string
+  @ApiProperty() gradeLevel!: number
+  @ApiProperty({ enum: ['MALE', 'FEMALE'], nullable: true })
+  gender!: 'MALE' | 'FEMALE' | null
+  @ApiProperty({ enum: ['LEFT', 'RIGHT'] }) side!: 'LEFT' | 'RIGHT'
+  @ApiProperty() row!: number
+  @ApiProperty() lane!: number
+
+  static fromDomain(domain: PlannedSeat): SeatPlanSeatDto {
+    const dto = new SeatPlanSeatDto()
+    dto.roomId = domain.roomId
+    dto.desk = domain.desk
+    dto.studentId = domain.studentId
+    dto.classroomId = domain.classroomId
+    dto.gradeLevel = domain.gradeLevel
+    dto.gender = domain.gender
+    dto.side = domain.side
+    dto.row = domain.row
+    dto.lane = domain.lane
+    return dto
+  }
+}
+
+export class SeatLayoutDto {
+  @ApiProperty() lanes!: number
+  @ApiProperty() rows!: number
+  @ApiProperty() left!: number
+  @ApiProperty() right!: number
+}
+
+export class GenerateSeatsRoomDto {
+  @ApiProperty({ format: 'uuid' }) roomId!: string
+  @ApiProperty() code!: string
+  @ApiProperty() capacity!: number
+  @ApiProperty({ type: SeatLayoutDto }) layout!: SeatLayoutDto
+}
+
+export class GenerateSeatsResponseDto {
+  @ApiProperty() applied!: boolean
+  @ApiProperty({ type: [GenerateSeatsRoomDto] }) rooms!: GenerateSeatsRoomDto[]
+  @ApiProperty({ type: [SeatPlanSeatDto] }) seats!: SeatPlanSeatDto[]
+  @ApiProperty({ type: [SeatPlanStudentDto] })
+  unseated!: SeatPlanStudentDto[]
+  @ApiProperty({ type: [SeatPlanStudentDto] })
+  unknownGender!: SeatPlanStudentDto[]
+  @ApiProperty() adjacentSameGrade!: number
+  @ApiProperty() adjacentSameClassroom!: number
+
+  static fromDomain(result: GenerateSeatsResult): GenerateSeatsResponseDto {
+    const dto = new GenerateSeatsResponseDto()
+    dto.applied = result.applied
+    dto.rooms = result.rooms.map((room) => {
+      const item = new GenerateSeatsRoomDto()
+      item.roomId = room.roomId
+      item.code = room.code
+      item.capacity = room.capacity
+      item.layout = { ...room.layout }
+      return item
+    })
+    dto.seats = result.plan.seats.map((seat) =>
+      SeatPlanSeatDto.fromDomain(seat),
+    )
+    dto.unseated = result.plan.unseated.map((student) =>
+      SeatPlanStudentDto.fromDomain(student),
+    )
+    dto.unknownGender = result.plan.unknownGender.map((student) =>
+      SeatPlanStudentDto.fromDomain(student),
+    )
+    dto.adjacentSameGrade = result.plan.adjacentSameGrade
+    dto.adjacentSameClassroom = result.plan.adjacentSameClassroom
+    return dto
+  }
 }

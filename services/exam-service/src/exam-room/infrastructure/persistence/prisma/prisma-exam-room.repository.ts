@@ -319,6 +319,32 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     return rows.map(toExamRoomSeat)
   }
 
+  async countSeatsByEvent(eventId: string): Promise<number> {
+    return this.prisma.examRoomSeat.count({ where: { eventId } })
+  }
+
+  async replaceSeats(
+    eventId: string,
+    roomIds: string[],
+    seats: {
+      roomId: string
+      seatNumber: number
+      studentId: string
+      classroomId: string
+    }[],
+  ): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.examRoomSeat.deleteMany({
+        where: { eventId, roomId: { in: roomIds } },
+      })
+      if (seats.length > 0) {
+        await tx.examRoomSeat.createMany({
+          data: seats.map((seat) => ({ eventId, ...seat })),
+        })
+      }
+    })
+  }
+
   async setSeatFlags(
     eventId: string,
     studentId: string,

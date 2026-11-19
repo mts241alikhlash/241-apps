@@ -214,6 +214,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-events/{id}/seats/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan the seats of an exam event; with mode apply, write them in place of the existing seats */
+        post: operations["ExamEventController_generateSeats"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-files": {
         parameters: {
             query?: never;
@@ -2059,6 +2076,45 @@ export interface components {
             minutes: number;
             reason: string;
         };
+        GenerateSeatRulesDto: {
+            lanesPerSide?: number;
+            /** @enum {string} */
+            order?: "alphabetical" | "random";
+            seed?: string;
+            separateGender?: boolean;
+            spreadClassrooms?: boolean;
+            spreadGrades?: boolean;
+        };
+        GenerateSeatsBodyDto: {
+            /** @enum {string} */
+            mode: "preview" | "apply";
+            replaceExisting?: boolean;
+            roomIds?: string[];
+            rules?: components["schemas"]["GenerateSeatRulesDto"];
+            students: components["schemas"]["GenerateSeatStudentDto"][];
+        };
+        GenerateSeatsResponseDto: {
+            adjacentSameClassroom: number;
+            adjacentSameGrade: number;
+            applied: boolean;
+            rooms: components["schemas"]["GenerateSeatsRoomDto"][];
+            seats: components["schemas"]["SeatPlanSeatDto"][];
+            unknownGender: components["schemas"]["SeatPlanStudentDto"][];
+            unseated: components["schemas"]["SeatPlanStudentDto"][];
+        };
+        GenerateSeatsRoomDto: {
+            capacity: number;
+            code: string;
+            layout: components["schemas"]["SeatLayoutDto"];
+            /** Format: uuid */
+            roomId: string;
+        };
+        GenerateSeatStudentDto: {
+            /** Format: uuid */
+            classroomId: string;
+            /** Format: uuid */
+            studentId: string;
+        };
         GenerateSebConfigDto: {
             name: string;
             /** @description Password a proctor types to quit SEB; stored only as its hash */
@@ -2829,6 +2885,38 @@ export interface components {
         };
         SeatFlagDto: {
             allowLateEntry: boolean;
+            /** Format: uuid */
+            studentId: string;
+        };
+        SeatLayoutDto: {
+            lanes: number;
+            left: number;
+            right: number;
+            rows: number;
+        };
+        SeatPlanSeatDto: {
+            /** Format: uuid */
+            classroomId: string;
+            desk: number;
+            /** @enum {string|null} */
+            gender: "MALE" | "FEMALE" | null;
+            gradeLevel: number;
+            lane: number;
+            /** Format: uuid */
+            roomId: string;
+            row: number;
+            /** @enum {string} */
+            side: "LEFT" | "RIGHT";
+            /** Format: uuid */
+            studentId: string;
+        };
+        SeatPlanStudentDto: {
+            /** Format: uuid */
+            classroomId: string;
+            /** @enum {string|null} */
+            gender: "MALE" | "FEMALE" | null;
+            gradeLevel: number;
+            name: string;
             /** Format: uuid */
             studentId: string;
         };
@@ -3605,6 +3693,37 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamRoomDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_generateSeats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateSeatsBodyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["GenerateSeatsResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

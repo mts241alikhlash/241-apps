@@ -24,6 +24,8 @@ import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
 import { ResetCredentialsBodyDto } from './dto/reset-credentials.dto.js'
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
+import { GenerateSeatsUseCase } from '../../application/use-cases/generate-seats/generate-seats.use-case.js'
+import { GenerateSeatsBodyDto } from './dto/exam-room.dto.js'
 import type { PrintPack } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 
 const UUID_A = '11111111-1111-4111-8111-111111111111'
@@ -124,6 +126,7 @@ const eventRoutes: Record<string, string[]> = {
   createRoom: ['exam-events.manage'],
   getPrintPack: ['exam-events.manage'],
   resetPasswords: ['exam-events.manage'],
+  generateSeats: ['exam-events.manage'],
 }
 
 const eventAnyRoutes: Record<string, string[]> = {
@@ -278,6 +281,7 @@ describe('ExamEventController print pack', () => {
       undefined as never,
       printPack,
       undefined as never,
+      undefined as never,
     )
     return { calls, controller }
   }
@@ -336,6 +340,7 @@ describe('PrintPackDto contract', () => {
         { provide: ManageExamRoomsUseCase, useValue: {} },
         { provide: GetPrintPackUseCase, useValue: {} },
         { provide: ResetEventCredentialsUseCase, useValue: {} },
+        { provide: GenerateSeatsUseCase, useValue: {} },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -727,6 +732,7 @@ describe('ExamEventController supervised listing', () => {
       undefined as never,
       undefined as never,
       undefined as never,
+      undefined as never,
     )
     const mine = await rooms.createEvent({
       semesterId: 'sem-1',
@@ -824,6 +830,7 @@ describe('ExamEventController credentials reset', () => {
       undefined as never,
       undefined as never,
       reset,
+      undefined as never,
     )
     const query = Object.assign(new PrintPackQueryDto(), { roomId: UUID_B })
 
@@ -841,5 +848,46 @@ describe('ExamEventController credentials reset', () => {
       ],
       skipped: [UUID_B],
     })
+  })
+})
+
+describe('GenerateSeatsBodyDto', () => {
+  const student = { studentId: UUID_A, classroomId: UUID_B }
+
+  it('accepts up to 1000 students', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: Array.from({ length: 1000 }, () => student),
+    })
+
+    expect(await validate(dto)).toHaveLength(0)
+  })
+
+  it('rejects more than 1000 students', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: Array.from({ length: 1001 }, () => student),
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
+  })
+
+  it('rejects more than 10 lanes per side', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'preview',
+      students: [],
+      rules: { lanesPerSide: 11 },
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
+  })
+
+  it('rejects an unknown mode', async () => {
+    const dto = plainToInstance(GenerateSeatsBodyDto, {
+      mode: 'print',
+      students: [],
+    })
+
+    expect(await validate(dto)).not.toHaveLength(0)
   })
 })

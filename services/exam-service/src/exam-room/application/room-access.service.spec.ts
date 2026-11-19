@@ -51,6 +51,8 @@ class StubRooms extends IExamRoomRepository {
   findSeatForStudent = vi.fn()
   listSeatsByRoom = vi.fn()
   listSeatsByEvent = vi.fn()
+  countSeatsByEvent = vi.fn()
+  replaceSeats = vi.fn()
   removeSeat = vi.fn()
   setSeatFlags = vi.fn()
   setSeatFlagsWithAudit = vi.fn()

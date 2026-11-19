@@ -15,6 +15,7 @@ import { ExtendRoomTimeUseCase } from './application/use-cases/extend-room-time/
 import { GetRoomMonitorUseCase } from './application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
 import { GetPrintPackUseCase } from './application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from './application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
+import { GenerateSeatsUseCase } from './application/use-cases/generate-seats/generate-seats.use-case.js'
 import { ListRoomReportsUseCase } from './application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from './application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
 import { GetSessionTimelineUseCase } from './application/use-cases/get-session-timeline/get-session-timeline.use-case.js'
@@ -86,6 +87,7 @@ import {
     GetRoomMonitorUseCase,
     GetPrintPackUseCase,
     ResetEventCredentialsUseCase,
+    GenerateSeatsUseCase,
     ListRoomsOverviewUseCase,
     ListRoomReportsUseCase,
     GetSessionTimelineUseCase,

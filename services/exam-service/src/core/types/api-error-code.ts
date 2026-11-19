@@ -18,6 +18,7 @@ export const API_ERROR_CODES = [
   'EVENT_NOT_ALLOWED',
   'EVENT_SEMESTER_MISMATCH',
   'EVENT_WINDOW_MISMATCH',
+  'SEATS_EXIST',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

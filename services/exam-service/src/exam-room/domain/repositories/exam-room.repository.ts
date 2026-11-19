@@ -91,6 +91,17 @@ export abstract class IExamRoomRepository {
   ): Promise<{ roomName: string; seatNumber: number } | null>
   abstract listSeatsByRoom(roomId: string): Promise<ExamRoomSeat[]>
   abstract listSeatsByEvent(eventId: string): Promise<ExamRoomSeat[]>
+  abstract countSeatsByEvent(eventId: string): Promise<number>
+  abstract replaceSeats(
+    eventId: string,
+    roomIds: string[],
+    seats: {
+      roomId: string
+      seatNumber: number
+      studentId: string
+      classroomId: string
+    }[],
+  ): Promise<void>
   abstract removeSeat(roomId: string, studentId: string): Promise<boolean>
   abstract setSeatFlags(
     eventId: string,

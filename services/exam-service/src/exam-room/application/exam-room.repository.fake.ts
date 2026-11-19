@@ -337,6 +337,40 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     )
   }
 
+  countSeatsByEvent(eventId: string) {
+    return Promise.resolve(
+      [...this.seats.values()].filter((row) => row.eventId === eventId).length,
+    )
+  }
+
+  replaceSeats(
+    eventId: string,
+    roomIds: string[],
+    seats: {
+      roomId: string
+      seatNumber: number
+      studentId: string
+      classroomId: string
+    }[],
+  ) {
+    for (const row of [...this.seats.values()]) {
+      if (row.eventId === eventId && roomIds.includes(row.roomId)) {
+        this.seats.delete(row.id)
+      }
+    }
+    for (const seat of seats) {
+      const row: ExamRoomSeat = {
+        id: randomUUID(),
+        eventId,
+        allowLateEntry: false,
+        createdAt: new Date(),
+        ...seat,
+      }
+      this.seats.set(row.id, row)
+    }
+    return Promise.resolve()
+  }
+
   setSeatFlags(eventId: string, studentId: string, patch: SeatFlagsPatch) {
     const found = [...this.seats.values()].find(
       (row) => row.eventId === eventId && row.studentId === studentId,

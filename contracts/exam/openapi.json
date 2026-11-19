@@ -3749,6 +3749,66 @@
         ]
       }
     },
+    "/exam-events/{id}/seats/generate": {
+      "post": {
+        "operationId": "ExamEventController_generateSeats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSeatsBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GenerateSeatsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Plan the seats of an exam event; with mode apply, write them in place of the existing seats",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
     "/exam-events/{id}/attendance-files": {
       "put": {
         "operationId": "ExamAttendanceFileController_upload",
@@ -10369,6 +10429,273 @@
         "required": [
           "items",
           "skipped"
+        ]
+      },
+      "GenerateSeatStudentDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "studentId",
+          "classroomId"
+        ]
+      },
+      "GenerateSeatRulesDto": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "enum": [
+              "alphabetical",
+              "random"
+            ],
+            "type": "string"
+          },
+          "separateGender": {
+            "type": "boolean"
+          },
+          "spreadGrades": {
+            "type": "boolean"
+          },
+          "spreadClassrooms": {
+            "type": "boolean"
+          },
+          "lanesPerSide": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "seed": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "GenerateSeatsBodyDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "enum": [
+              "preview",
+              "apply"
+            ],
+            "type": "string"
+          },
+          "replaceExisting": {
+            "type": "boolean"
+          },
+          "students": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GenerateSeatStudentDto"
+            }
+          },
+          "roomIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "rules": {
+            "$ref": "#/components/schemas/GenerateSeatRulesDto"
+          }
+        },
+        "required": [
+          "mode",
+          "students"
+        ]
+      },
+      "SeatLayoutDto": {
+        "type": "object",
+        "properties": {
+          "lanes": {
+            "type": "number"
+          },
+          "rows": {
+            "type": "number"
+          },
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "lanes",
+          "rows",
+          "left",
+          "right"
+        ]
+      },
+      "GenerateSeatsRoomDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "layout": {
+            "$ref": "#/components/schemas/SeatLayoutDto"
+          }
+        },
+        "required": [
+          "roomId",
+          "code",
+          "capacity",
+          "layout"
+        ]
+      },
+      "SeatPlanSeatDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "desk": {
+            "type": "number"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeLevel": {
+            "type": "number"
+          },
+          "gender": {
+            "nullable": true,
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ],
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "LEFT",
+              "RIGHT"
+            ],
+            "type": "string"
+          },
+          "row": {
+            "type": "number"
+          },
+          "lane": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "roomId",
+          "desk",
+          "studentId",
+          "classroomId",
+          "gradeLevel",
+          "gender",
+          "side",
+          "row",
+          "lane"
+        ]
+      },
+      "SeatPlanStudentDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeLevel": {
+            "type": "number"
+          },
+          "gender": {
+            "nullable": true,
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "studentId",
+          "classroomId",
+          "gradeLevel",
+          "gender",
+          "name"
+        ]
+      },
+      "GenerateSeatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "boolean"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GenerateSeatsRoomDto"
+            }
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanSeatDto"
+            }
+          },
+          "unseated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanStudentDto"
+            }
+          },
+          "unknownGender": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeatPlanStudentDto"
+            }
+          },
+          "adjacentSameGrade": {
+            "type": "number"
+          },
+          "adjacentSameClassroom": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "applied",
+          "rooms",
+          "seats",
+          "unseated",
+          "unknownGender",
+          "adjacentSameGrade",
+          "adjacentSameClassroom"
         ]
       },
       "AttendanceUploadBodyDto": {

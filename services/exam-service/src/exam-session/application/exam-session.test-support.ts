@@ -340,6 +340,7 @@ export class FakeStudentDirectory extends IStudentDirectoryPort {
       nis: string
       name: string | null
       userId?: string | null
+      gender?: 'MALE' | 'FEMALE' | null
     }[] = [{ id: STUDENT_ID, nis: '2024001', name: 'Ahmad Fauzi' }],
   ) {
     super()
@@ -349,7 +350,11 @@ export class FakeStudentDirectory extends IStudentDirectoryPort {
     return Promise.resolve(
       this.refs
         .filter((ref) => ids.includes(ref.id))
-        .map((ref) => ({ ...ref, userId: ref.userId ?? null })),
+        .map((ref) => ({
+          ...ref,
+          userId: ref.userId ?? null,
+          gender: ref.gender ?? null,
+        })),
     )
   }
 }

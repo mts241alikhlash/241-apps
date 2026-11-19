@@ -28,6 +28,7 @@ import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam
 import { ManageExamRoomsUseCase } from '../../application/use-cases/manage-exam-rooms/manage-exam-rooms.use-case.js'
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
+import { GenerateSeatsUseCase } from '../../application/use-cases/generate-seats/generate-seats.use-case.js'
 import {
   CreateExamEventDto,
   CreateExamRoomDto,
@@ -35,6 +36,8 @@ import {
   ExamEventDto,
   ExamEventListResponseDto,
   ExamEventQueryDto,
+  GenerateSeatsBodyDto,
+  GenerateSeatsResponseDto,
   UpdateExamEventDto,
 } from './dto/exam-room.dto.js'
 import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
@@ -53,6 +56,7 @@ export class ExamEventController {
     private readonly rooms: ManageExamRoomsUseCase,
     private readonly printPack: GetPrintPackUseCase,
     private readonly resetCredentials: ResetEventCredentialsUseCase,
+    private readonly seatGeneration: GenerateSeatsUseCase,
   ) {}
 
   @Get()
@@ -195,6 +199,31 @@ export class ExamEventController {
   ): Promise<ResetCredentialsDto> {
     return ResetCredentialsDto.fromDomain(
       await this.resetCredentials.execute(id, user.id, query.roomId),
+    )
+  }
+
+  @Post(':id/seats/generate')
+  @RequirePermissions('exam-events.manage')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Plan the seats of an exam event; with mode apply, write them in place of the existing seats',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: GenerateSeatsResponseDto })
+  async generateSeats(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: GenerateSeatsBodyDto,
+  ): Promise<GenerateSeatsResponseDto> {
+    return GenerateSeatsResponseDto.fromDomain(
+      await this.seatGeneration.execute({
+        eventId: id,
+        mode: dto.mode,
+        replaceExisting: dto.replaceExisting ?? false,
+        students: dto.students,
+        roomIds: dto.roomIds,
+        rules: dto.rules ?? {},
+      }),
     )
   }
 }
