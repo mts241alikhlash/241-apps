@@ -17,8 +17,7 @@ const capacityOf = (row: RoomSummary) =>
 const staffedOf = (row: RoomSummary) =>
   row.rooms.filter((room) => room.technicianUserId).length
 
-const number = (value: number | string) =>
-  h('span', { class: 'tabular-nums' }, String(value))
+const number = (value: number | string) => h('span', String(value))
 
 export function buildRoomSummaryColumns(options: {
   onOpen: (event: ExamEvent) => void

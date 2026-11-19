@@ -29,8 +29,7 @@ export function buildRoomColumns(
         mobileLabel: 'Kode',
         mobileValue: (row: ExamRoom) => row.code,
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, row.original.code),
+      cell: ({ row }) => h('span', row.original.code),
     },
     {
       id: 'name',
@@ -60,8 +59,7 @@ export function buildRoomColumns(
         mobileLabel: 'Kapasitas',
         mobileValue: (row: ExamRoom) => `${row.capacity} kursi`,
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, `${row.original.capacity}`),
+      cell: ({ row }) => h('span', `${row.original.capacity}`),
     },
     {
       id: 'technician',

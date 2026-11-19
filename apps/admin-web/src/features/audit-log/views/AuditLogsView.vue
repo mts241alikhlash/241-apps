@@ -145,7 +145,7 @@ const columns: ColumnDef<AuditLog>[] = [
         Badge,
         {
           variant: getActionVariant(action),
-          class: 'text-xs px-2 py-0.5 font-medium tabular-nums',
+          class: 'text-xs px-2 py-0.5 font-medium',
         },
         () => action,
       )
@@ -159,7 +159,7 @@ const columns: ColumnDef<AuditLog>[] = [
         Badge,
         {
           variant: 'secondary',
-          class: 'tabular-nums text-xs px-2 py-0.5 rounded-md border',
+          class: 'text-xs px-2 py-0.5 rounded-md border',
         },
         () => row.getValue<string>('resource'),
       ),

@@ -44,7 +44,7 @@ const deltaClass = computed(() => {
           </div>
           <div>
             <p class="text-xs font-medium text-muted-foreground">Total Siswa</p>
-            <p class="text-2xl font-semibold tabular-nums">
+            <p class="text-2xl font-semibold">
               {{ totalStudents }}
             </p>
           </div>
@@ -72,9 +72,7 @@ const deltaClass = computed(() => {
                 {{ monthDelta > 0 ? '+' : '' }}{{ monthDelta }}%
               </Badge>
             </div>
-            <p class="mt-1 text-2xl font-semibold tabular-nums">
-              {{ classPercentage }}%
-            </p>
+            <p class="mt-1 text-2xl font-semibold">{{ classPercentage }}%</p>
             <Progress
               :model-value="classPercentage"
               class="mt-2 h-1.5"
@@ -96,7 +94,7 @@ const deltaClass = computed(() => {
             <p class="text-xs font-medium text-muted-foreground">
               Total Alpha (Bulan Ini)
             </p>
-            <p class="text-2xl font-semibold tabular-nums">{{ totalAbsent }}</p>
+            <p class="text-2xl font-semibold">{{ totalAbsent }}</p>
           </div>
         </div>
       </CardContent>

@@ -241,9 +241,7 @@ onMounted(async () => {
               <p class="text-control font-medium text-primary-foreground">
                 Total pendaftar
               </p>
-              <p
-                class="mt-2 text-5xl font-medium tabular-nums tracking-tight sm:text-6xl"
-              >
+              <p class="mt-2 text-5xl font-medium tracking-tight sm:text-6xl">
                 {{ stats.total }}
               </p>
               <p class="mt-2 text-control text-primary-foreground">
@@ -259,7 +257,7 @@ onMounted(async () => {
                 Perlu tindakan
               </p>
               <p
-                class="mt-2 text-5xl font-medium tabular-nums tracking-tight"
+                class="mt-2 text-5xl font-medium tracking-tight"
                 :class="needsAction > 0 ? 'text-warning' : ''"
               >
                 {{ needsAction }}
@@ -297,9 +295,7 @@ onMounted(async () => {
                   <p class="text-xs font-medium text-muted-foreground">
                     {{ STATUS_LABELS[status] }}
                   </p>
-                  <p
-                    class="mt-1 text-2xl font-medium tabular-nums tracking-tight"
-                  >
+                  <p class="mt-1 text-2xl font-medium tracking-tight">
                     {{ countOf(status) }}
                   </p>
                   <div class="mt-3 h-1 overflow-hidden rounded-full bg-muted">
@@ -356,9 +352,7 @@ onMounted(async () => {
                         </p>
                       </div>
                       <div class="shrink-0 text-right">
-                        <p
-                          class="text-2xl font-medium tabular-nums leading-none"
-                        >
+                        <p class="text-2xl font-medium leading-none">
                           {{ wave.filled }}
                           <span
                             class="text-control font-normal text-muted-foreground"

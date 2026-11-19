@@ -138,14 +138,14 @@ watch(
         <p class="font-medium">
           {{ seat.name ?? 'Siswa tidak ditemukan' }}
         </p>
-        <p class="tabular-nums text-control">
+        <p class="text-control">
           NIS {{ seat.nis ?? '-' }} · {{ seat.classroomName ?? '-' }}
         </p>
         <div class="flex items-baseline justify-between pt-2">
           <span class="text-control text-muted-foreground">
             {{ room?.name ?? '-' }}
           </span>
-          <span class="text-xl font-semibold tabular-nums">
+          <span class="text-xl font-semibold">
             {{ seat.seatNumber }}
           </span>
         </div>

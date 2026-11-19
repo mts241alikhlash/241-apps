@@ -150,10 +150,10 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
               :key="pairIndex"
             >
               <tr>
-                <td class="col-no text-center tabular-nums">
+                <td class="col-no text-center">
                   {{ pair.oddNumber }}
                 </td>
-                <td class="col-number is-center tabular-nums">
+                <td class="col-number is-center">
                   {{ pair.odd.participantNumber ?? '-' }}
                 </td>
                 <td class="col-name">{{ pair.odd.name ?? '-' }}</td>
@@ -174,10 +174,10 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
                 </td>
               </tr>
               <tr v-if="pair.even !== null">
-                <td class="col-no text-center tabular-nums">
+                <td class="col-no text-center">
                   {{ pair.evenNumber }}
                 </td>
-                <td class="col-number is-center tabular-nums">
+                <td class="col-number is-center">
                   {{ pair.even.participantNumber ?? '-' }}
                 </td>
                 <td class="col-name">{{ pair.even.name ?? '-' }}</td>

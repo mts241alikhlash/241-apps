@@ -96,11 +96,7 @@ const columns: ColumnDef<StudentScoreItem>[] = [
       const score = row.original.score
       return score === null || score === undefined
         ? h('span', { class: 'text-muted-foreground text-xs' }, 'Belum dinilai')
-        : h(
-            'span',
-            { class: 'font-semibold tabular-nums text-sm' },
-            String(score),
-          )
+        : h('span', { class: 'font-semibold text-sm' }, String(score))
     },
   },
 ]

@@ -158,11 +158,7 @@ export function buildRoomParticipantColumns(
           `[${String(row.seatNumber).padStart(2, '0')}]`,
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          `[${String(row.original.seatNumber).padStart(2, '0')}]`,
-        ),
+        h('span', `[${String(row.original.seatNumber).padStart(2, '0')}]`),
     },
     {
       id: 'participant',
@@ -179,7 +175,6 @@ export function buildRoomParticipantColumns(
       cell: ({ row }) =>
         h(
           'span',
-          {},
           [
             row.original.studentName ?? 'Siswa tidak ditemukan',
             row.original.nis,
@@ -216,8 +211,7 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Progres',
         mobileValue: progressText,
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, progressText(row.original)),
+      cell: ({ row }) => h('span', progressText(row.original)),
     },
     {
       id: 'sync',
@@ -233,12 +227,7 @@ export function buildRoomParticipantColumns(
         if (session === null) return '-'
         return h(
           'span',
-          {
-            class:
-              session.unsyncedCount > 0
-                ? 'tabular-nums text-warning'
-                : 'tabular-nums',
-          },
+          session.unsyncedCount > 0 ? { class: 'text-warning' } : undefined,
           syncText(session),
         )
       },
@@ -265,19 +254,19 @@ export function buildRoomParticipantColumns(
         const session = row.original.session
         if (session === null) return '-'
         return h('div', { class: 'flex flex-col gap-1' }, [
-          h('span', { class: 'tabular-nums' }, activityText(session)),
+          h('span', activityText(session)),
           h(
             'span',
             {
               class: isLowBattery(session)
-                ? 'flex items-center gap-1 tabular-nums font-medium text-destructive'
-                : 'flex items-center gap-1 tabular-nums text-muted-foreground',
+                ? 'flex items-center gap-1 font-medium text-destructive'
+                : 'flex items-center gap-1 text-muted-foreground',
             },
             [
               isLowBattery(session)
                 ? h(BatteryWarning, { class: 'size-3.5' })
                 : null,
-              h('span', {}, batteryText(session)),
+              h('span', batteryText(session)),
             ],
           ),
         ])
@@ -316,7 +305,7 @@ export function buildRoomParticipantColumns(
           },
           [
             warnings.length > 0 ? h(ShieldAlert, { class: 'size-3.5' }) : null,
-            h('span', {}, readinessText(session)),
+            h('span', readinessText(session)),
           ],
         )
       },

@@ -30,7 +30,7 @@ const emit = defineEmits<{
       class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-control"
     >
       <dt class="text-muted-foreground">Sisa waktu</dt>
-      <dd class="font-semibold tabular-nums">{{ remainingLabel }}</dd>
+      <dd class="font-semibold">{{ remainingLabel }}</dd>
       <dt class="text-muted-foreground">Sinkron</dt>
       <dd class="font-medium">{{ syncLabel }}</dd>
     </dl>

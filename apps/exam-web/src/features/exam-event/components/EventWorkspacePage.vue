@@ -94,7 +94,7 @@ defineEmits<{
               {{ eventStatusLabel(event.status) }}
             </Badge>
             <Badge variant="outline">{{ examTypeLabel(event.type) }}</Badge>
-            <span class="tabular-nums text-control text-muted-foreground">
+            <span class="text-control text-muted-foreground">
               {{ formatDateRange(event.startsAt, event.endsAt) }}
             </span>
           </template>

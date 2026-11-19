@@ -285,7 +285,7 @@ async function save() {
               class="px-2"
             >
               <CardTitle>Daftar soal</CardTitle>
-              <span class="text-control text-muted-foreground tabular-nums">
+              <span class="text-control text-muted-foreground">
                 {{ dirtyCount }} diubah
               </span>
             </CardHeader>
@@ -333,7 +333,7 @@ async function save() {
                   </div>
                   <div class="flex items-baseline gap-1.5">
                     <dt class="text-muted-foreground">Posisi</dt>
-                    <dd class="font-medium tabular-nums">
+                    <dd class="font-medium">
                       {{ activeIndex + 1 }} dari {{ cards.length }}
                     </dd>
                   </div>

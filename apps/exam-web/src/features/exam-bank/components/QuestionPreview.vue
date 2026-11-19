@@ -75,7 +75,7 @@ const trueValue = computed(() =>
       class="px-2"
     >
       <CardTitle>Pratinjau</CardTitle>
-      <span class="shrink-0 text-control text-muted-foreground tabular-nums">
+      <span class="shrink-0 text-control text-muted-foreground">
         {{ points }} poin
       </span>
     </CardHeader>

@@ -289,7 +289,7 @@ function statusOf(question: PaperQuestion | null): string {
         class="flex min-w-0 items-center gap-2"
       >
         <span
-          class="rounded-md border border-border bg-muted px-2 py-1 text-control font-semibold tabular-nums"
+          class="rounded-md border border-border bg-muted px-2 py-1 text-control font-semibold"
           :class="
             remainingLabel <= '05:00' ? 'text-destructive' : 'text-foreground'
           "
@@ -605,9 +605,7 @@ function statusOf(question: PaperQuestion | null): string {
           <DialogTitle>Kumpulkan ujian?</DialogTitle>
         </DialogHeader>
         <div class="space-y-2 px-4 py-3">
-          <DialogDescription>
-            Konfirmasi pengumpulan ujian.
-          </DialogDescription>
+          <DialogDescription> Konfirmasi pengumpulan ujian. </DialogDescription>
           <p class="text-control">
             Masih ada {{ unanswered }} soal belum dijawab. Jawaban tidak bisa
             diubah setelah dikumpulkan.

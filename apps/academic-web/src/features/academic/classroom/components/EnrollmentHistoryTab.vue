@@ -141,9 +141,7 @@ function formatDate(value?: string | null) {
                 {{ enrollmentOutcome(row.status).label }}
               </Badge>
             </TableCell>
-            <TableCell
-              class="text-center py-2.5 text-xs text-muted-foreground tabular-nums"
-            >
+            <TableCell class="text-center py-2.5 text-xs text-muted-foreground">
               {{ formatDate(row.endedAt) }}
             </TableCell>
             <TableCell class="py-2.5 text-xs">

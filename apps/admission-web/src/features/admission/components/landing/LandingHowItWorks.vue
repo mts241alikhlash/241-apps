@@ -39,7 +39,7 @@ const COLUMNS = {
           class="grid grid-cols-[2.5rem_1fr] gap-x-4 border-b border-white/30 py-6 sm:block sm:pr-8 lg:border-r lg:pl-5 lg:first:pl-0 lg:last:border-r-0"
         >
           <span
-            class="row-span-2 block font-[Georgia,serif] text-3xl tabular-nums text-[#e5cc87] sm:text-4xl"
+            class="row-span-2 block font-[Georgia,serif] text-3xl text-[#e5cc87] sm:text-4xl"
           >
             {{ String(index + 1).padStart(2, '0') }}
           </span>

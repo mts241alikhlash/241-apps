@@ -116,7 +116,7 @@ watch(
             <Badge :variant="entry.isViolation ? 'destructive' : 'outline'">
               {{ labelOf(entry) }}
             </Badge>
-            <span class="tabular-nums text-muted-foreground">
+            <span class="text-muted-foreground">
               {{ dateTime.format(new Date(entry.occurredAt)) }}
             </span>
             <span v-if="entry.detail">{{ entry.detail }}</span>

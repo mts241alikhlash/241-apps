@@ -16,7 +16,7 @@ const query = useQuery({
     :loading="query.isPending.value"
     :error="query.isError.value"
   >
-    <p class="text-2xl font-semibold tabular-nums">
+    <p class="text-2xl font-semibold">
       {{ query.data.value?.total }}
     </p>
     <RouterLink

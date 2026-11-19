@@ -113,7 +113,6 @@ onMounted(() => void deviceService.fetch())
             <Input
               :model-value="lastIssued.token"
               readonly
-              class="tabular-nums"
             />
             <Button
               variant="outline"

@@ -283,9 +283,7 @@ onMounted(load)
           >
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium">{{ item.name }}</p>
-              <p
-                class="tabular-nums text-xs text-muted-foreground tabular-nums"
-              >
+              <p class="text-xs text-muted-foreground">
                 {{ item.configKey.slice(0, 8) }}…
               </p>
             </div>
@@ -376,7 +374,7 @@ onMounted(load)
               data-test="seb-key"
               type="text"
               autocomplete="off"
-              class="w-full rounded-md border px-3 py-2 tabular-nums text-sm"
+              class="w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
           <div class="space-y-1">

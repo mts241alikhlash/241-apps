@@ -165,7 +165,6 @@ watch(
             min="1"
             :max="extendLimit"
             :disabled="extendLimit === 0"
-            class="tabular-nums"
           />
         </FloatingLabelField>
         <p

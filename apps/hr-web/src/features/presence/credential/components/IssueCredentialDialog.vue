@@ -126,7 +126,6 @@ async function copyCode() {
               <Input
                 :model-value="store.lastIssued.code"
                 readonly
-                class="tabular-nums"
               />
               <Button
                 type="button"

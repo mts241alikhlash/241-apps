@@ -181,7 +181,7 @@ defineExpose({
               />
             </TableCell>
             <TableCell
-              class="text-center align-middle py-2 px-3 text-sm text-muted-foreground tabular-nums"
+              class="text-center align-middle py-2 px-3 text-sm text-muted-foreground"
             >
               {{ lengthLabel(row) }}
             </TableCell>

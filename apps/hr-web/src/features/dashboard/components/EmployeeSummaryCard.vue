@@ -17,10 +17,10 @@ const query = useQuery({
     :empty="query.data.value?.activeTotal === 0"
     empty-text="Belum ada pegawai aktif."
   >
-    <p class="text-2xl font-semibold tabular-nums">
+    <p class="text-2xl font-semibold">
       {{ query.data.value?.activeTotal }}
     </p>
-    <ul class="mt-2 space-y-1 tabular-nums">
+    <ul class="mt-2 space-y-1">
       <li
         v-for="row in query.data.value?.byEmploymentType"
         :key="`type-${row.name}`"
@@ -30,7 +30,7 @@ const query = useQuery({
         <span class="font-medium">{{ row.total }}</span>
       </li>
     </ul>
-    <ul class="mt-2 space-y-1 tabular-nums">
+    <ul class="mt-2 space-y-1">
       <li
         v-for="row in query.data.value?.byPositionCategory"
         :key="`category-${row.name}`"

@@ -57,8 +57,7 @@ export const createUnitColumns = (
   {
     id: 'unitNumber',
     header: 'No. Unit',
-    cell: ({ row }) =>
-      h('span', { class: 'tabular-nums' }, row.original.unitNumber),
+    cell: ({ row }) => h('span', row.original.unitNumber),
     accessorKey: 'unitNumber',
   },
   {

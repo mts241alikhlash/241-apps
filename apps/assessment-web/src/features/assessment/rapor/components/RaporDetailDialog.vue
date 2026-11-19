@@ -186,12 +186,10 @@ function formatType(type: string): string {
                   class="hover:bg-muted/20"
                 >
                   <td class="px-3 py-2">{{ subject.subjectName }}</td>
-                  <td
-                    class="px-3 py-2 text-right tabular-nums text-muted-foreground"
-                  >
+                  <td class="px-3 py-2 text-right text-muted-foreground">
                     {{ subject.passingScore }}
                   </td>
-                  <td class="px-3 py-2 text-right tabular-nums font-semibold">
+                  <td class="px-3 py-2 text-right font-semibold">
                     {{ Number(subject.score).toFixed(2) }}
                   </td>
                   <td class="px-3 py-2 text-center">
@@ -250,7 +248,7 @@ function formatType(type: string): string {
                   <td class="px-3 py-2">{{ score.subject }}</td>
                   <td class="px-3 py-2">{{ formatType(score.type) }}</td>
                   <td class="px-3 py-2 text-right">{{ score.weight }}</td>
-                  <td class="px-3 py-2 text-right tabular-nums">
+                  <td class="px-3 py-2 text-right">
                     {{ formatScore(score.score) }}
                   </td>
                 </tr>

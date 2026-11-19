@@ -138,7 +138,7 @@ const copyToClipboard = () => {
                   <FileJson class="size-3.5" /> Modul / Entitas
                 </span>
                 <span
-                  class="col-span-2 tabular-nums text-xs font-semibold bg-muted px-2 py-0.5 rounded-md w-fit border"
+                  class="col-span-2 text-xs font-semibold bg-muted px-2 py-0.5 rounded-md w-fit border"
                 >
                   {{ log.resource }}
                 </span>
@@ -154,7 +154,7 @@ const copyToClipboard = () => {
                   <CheckCircle2 class="size-3.5" /> ID Resource
                 </span>
                 <span
-                  class="col-span-2 tabular-nums text-xs text-muted-foreground break-all"
+                  class="col-span-2 text-xs text-muted-foreground break-all"
                 >
                   {{ log.resourceId }}
                 </span>
@@ -166,7 +166,7 @@ const copyToClipboard = () => {
                 >
                   <Network class="size-3.5" /> IP Address
                 </span>
-                <span class="col-span-2 tabular-nums text-xs">
+                <span class="col-span-2 text-xs">
                   {{ log.ipAddress ?? '-' }}
                 </span>
               </div>
@@ -210,7 +210,7 @@ const copyToClipboard = () => {
               <div class="rounded-xl border bg-muted/40 overflow-hidden">
                 <pre
                   v-if="formattedMetadata"
-                  class="p-4 text-xs tabular-nums overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
+                  class="p-4 text-xs overflow-auto max-h-[350px] leading-relaxed text-foreground select-all"
                   >{{ formattedMetadata }}</pre>
                 <div
                   v-else

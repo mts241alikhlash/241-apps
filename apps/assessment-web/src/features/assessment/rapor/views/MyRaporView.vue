@@ -48,7 +48,7 @@ onMounted(() => void raporService.fetchMine())
           <span class="text-xs text-muted-foreground font-medium"
             >Rata-rata:</span
           >
-          <span class="text-base font-semibold tabular-nums">
+          <span class="text-base font-semibold">
             {{ summary.averageScore.toFixed(2) }}
           </span>
         </div>

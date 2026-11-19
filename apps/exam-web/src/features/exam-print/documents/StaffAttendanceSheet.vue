@@ -121,13 +121,13 @@ const pageTitle = (page: SheetPage): string =>
                 v-for="(row, index) in page.supervisors"
                 :key="row.key"
               >
-                <td class="col-no is-center tabular-nums">
+                <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
                 <td class="col-name">{{ row.name ?? '-' }}</td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
                 <td class="col-subject">{{ row.subject }}</td>
-                <td class="col-time is-center tabular-nums">{{ row.time }}</td>
+                <td class="col-time is-center">{{ row.time }}</td>
                 <td class="col-sign" />
               </tr>
               <tr v-if="page.supervisors.length === 0">
@@ -165,12 +165,12 @@ const pageTitle = (page: SheetPage): string =>
                 v-for="(row, index) in page.technicians"
                 :key="row.key"
               >
-                <td class="col-no is-center tabular-nums">
+                <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
                 <td class="col-name">{{ row.name ?? '-' }}</td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
-                <td class="col-time is-center tabular-nums">{{ row.time }}</td>
+                <td class="col-time is-center">{{ row.time }}</td>
                 <td class="col-sign" />
               </tr>
             </tbody>

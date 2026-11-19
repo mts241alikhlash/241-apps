@@ -364,7 +364,7 @@ async function confirmSave() {
             </div>
             <div class="flex items-baseline gap-1.5">
               <dt class="text-muted-foreground">Versi</dt>
-              <dd class="font-medium tabular-nums">
+              <dd class="font-medium">
                 {{ detail.currentVersion }}
               </dd>
             </div>
@@ -665,7 +665,9 @@ async function confirmSave() {
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Simpan Soal</DialogTitle>
-        <DialogDescription>Periksa perubahan soal sebelum disimpan.</DialogDescription>
+          <DialogDescription
+            >Periksa perubahan soal sebelum disimpan.</DialogDescription
+          >
         </DialogHeader>
         <DialogBody class="space-y-3">
           <dl
@@ -678,10 +680,10 @@ async function confirmSave() {
             </dd>
             <dt class="text-muted-foreground">Jumlah soal</dt>
             <dd class="text-muted-foreground">:</dd>
-            <dd class="tabular-nums">{{ validCards.length }}</dd>
+            <dd>{{ validCards.length }}</dd>
             <dt class="text-muted-foreground">Total poin</dt>
             <dd class="text-muted-foreground">:</dd>
-            <dd class="tabular-nums">{{ validTotalPoints }}</dd>
+            <dd>{{ validTotalPoints }}</dd>
             <dt class="text-muted-foreground">Penulis</dt>
             <dd class="text-muted-foreground">:</dd>
             <dd class="min-w-0">

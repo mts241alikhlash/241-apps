@@ -56,8 +56,7 @@ export function buildReviewColumns(
         mobileLabel: 'Jumlah Soal',
         mobileValue: (row: ExamPackageSummary) => itemsLabel(row),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, itemsLabel(row.original)),
+      cell: ({ row }) => h('span', itemsLabel(row.original)),
     },
     {
       id: 'updated',
@@ -66,8 +65,7 @@ export function buildReviewColumns(
         mobileLabel: 'Diajukan',
         mobileValue: (row: ExamPackageSummary) => updatedLabel(row),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, updatedLabel(row.original)),
+      cell: ({ row }) => h('span', updatedLabel(row.original)),
     },
     {
       id: 'actions',

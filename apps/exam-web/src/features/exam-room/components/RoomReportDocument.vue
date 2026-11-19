@@ -131,7 +131,7 @@ const registeredWord = computed(() => spell(registered.value))
           <tr>
             <td class="pr-3 align-top">Jumlah peserta seharusnya</td>
             <td class="pr-3 align-top">:</td>
-            <td class="align-top tabular-nums">
+            <td class="align-top">
               {{ registered }} ({{ registeredWord }}) orang
             </td>
           </tr>
@@ -173,7 +173,6 @@ const registeredWord = computed(() => spell(registered.value))
             <li
               v-for="entry in report.auditLogs"
               :key="entry.id"
-              class="tabular-nums"
             >
               {{ dateTimeFormat.format(new Date(entry.createdAt)) }}:
               {{ eventLabel(entry.action) }} — {{ entry.reason }}
@@ -181,7 +180,6 @@ const registeredWord = computed(() => spell(registered.value))
             <li
               v-for="note in report.fieldNotes"
               :key="note.id"
-              class="tabular-nums"
             >
               {{ dateTimeFormat.format(new Date(note.recordedAt)) }}:
               {{ note.studentName ?? 'Siswa' }} ({{ note.category }}) —

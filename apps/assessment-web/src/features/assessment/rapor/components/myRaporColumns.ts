@@ -38,11 +38,7 @@ export const createMyRaporColumns = (
     cell: ({ row }) => {
       const val = row.original.totalAverage
       return val !== null && val !== undefined
-        ? h(
-            'span',
-            { class: 'font-semibold tabular-nums' },
-            Number(val).toFixed(2),
-          )
+        ? h('span', { class: 'font-semibold' }, Number(val).toFixed(2))
         : '-'
     },
   },
@@ -52,7 +48,7 @@ export const createMyRaporColumns = (
     meta: { align: 'center' },
     cell: ({ row }) =>
       row.original.rank !== null && row.original.rank !== undefined
-        ? h('span', { class: 'tabular-nums' }, String(row.original.rank))
+        ? h('span', String(row.original.rank))
         : '-',
   },
   {

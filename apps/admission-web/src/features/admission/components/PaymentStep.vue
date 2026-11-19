@@ -232,7 +232,7 @@ async function upload() {
                 />
                 <span class="min-w-0 flex-1 space-y-0.5">
                   <span class="block font-medium">{{ account.bankName }}</span>
-                  <span class="block break-all tabular-nums">{{
+                  <span class="block break-all">{{
                     account.accountNumber
                   }}</span>
                   <span class="block text-muted-foreground">

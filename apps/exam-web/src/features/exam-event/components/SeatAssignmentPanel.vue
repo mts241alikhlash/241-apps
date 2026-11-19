@@ -246,7 +246,7 @@ onMounted(() => {
               {{ row.name ?? 'Siswa tidak ditemukan' }}
               <span
                 v-if="row.nis"
-                class="tabular-nums text-muted-foreground"
+                class="text-muted-foreground"
               >
                 · {{ row.nis }}
               </span>

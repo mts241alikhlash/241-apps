@@ -21,7 +21,7 @@ const query = useQuery({
       <li
         v-for="row in query.data.value?.leaveBalance"
         :key="row.leaveTypeName"
-        class="flex justify-between tabular-nums"
+        class="flex justify-between"
       >
         <span>{{ row.leaveTypeName }}</span>
         <span class="font-medium">{{ row.remainingDays }} hari</span>

@@ -276,8 +276,7 @@ onMounted(load)
           >
             <h2 class="text-base font-semibold">
               {{ sheet.label }}
-              <span
-                class="ml-1 text-control font-normal text-muted-foreground tabular-nums"
+              <span class="ml-1 text-control font-normal text-muted-foreground"
                 >{{ sheet.rows.length }} peserta</span
               >
             </h2>

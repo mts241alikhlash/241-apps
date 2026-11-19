@@ -78,7 +78,6 @@ async function copyCredentials() {
               :id="registrationId"
               :model-value="credentials.registrationNumber"
               readonly
-              class="tabular-nums"
             />
           </FloatingLabelField>
           <FloatingLabelField

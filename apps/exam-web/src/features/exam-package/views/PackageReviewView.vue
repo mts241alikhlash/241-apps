@@ -126,7 +126,9 @@ onMounted(() => {
         </div>
       </CardHeader>
 
-      <CardContent class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-4 pt-2 pb-4">
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-4 pt-2 pb-4"
+      >
         <div
           v-if="review.loadFailed.value"
           class="flex flex-wrap items-center gap-3 rounded-md border p-4 text-control"
@@ -205,7 +207,7 @@ onMounted(() => {
                           @click="selectItem(index)"
                         >
                           <span
-                            class="w-4 shrink-0 text-right text-control text-muted-foreground tabular-nums"
+                            class="w-4 shrink-0 text-right text-control text-muted-foreground"
                           >
                             {{ item.position }}
                           </span>

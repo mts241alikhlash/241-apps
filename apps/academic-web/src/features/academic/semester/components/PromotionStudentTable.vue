@@ -413,9 +413,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
                   @update:model-value="toggleSelect(row.studentId)"
                 />
               </TableCell>
-              <TableCell
-                class="text-center py-2.5 text-xs text-foreground tabular-nums"
-              >
+              <TableCell class="text-center py-2.5 text-xs text-foreground">
                 {{ row.nis }}
               </TableCell>
               <TableCell class="py-2.5">
@@ -431,7 +429,7 @@ function getTargetClass(row: PromotionRecommendationItem): string {
               </TableCell>
               <TableCell class="text-center py-2.5">
                 <span
-                  class="font-semibold tabular-nums text-xs"
+                  class="font-semibold text-xs"
                   :class="{
                     'text-success':
                       scoreStanding(row.averageScore, passingScore) ===
@@ -547,7 +545,9 @@ function getTargetClass(row: PromotionRecommendationItem): string {
       >
         <DialogHeader standard>
           <DialogTitle>Alasan Penolakan</DialogTitle>
-        <DialogDescription>Tuliskan alasan siswa tidak dinaikkan.</DialogDescription>
+          <DialogDescription
+            >Tuliskan alasan siswa tidak dinaikkan.</DialogDescription
+          >
         </DialogHeader>
 
         <DialogBody class="space-y-3">

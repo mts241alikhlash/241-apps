@@ -99,7 +99,7 @@ watch(
         <p
           v-if="code"
           data-test="code"
-          class="text-center text-3xl font-semibold tracking-[0.3em] tabular-nums"
+          class="text-center text-3xl font-semibold tracking-[0.3em]"
         >
           <span class="sr-only">Token ujian: </span>{{ code }}
         </p>

@@ -138,7 +138,7 @@ useBreadcrumbs(() => {
               @click="openPayslip(slip.id)"
             >
               <TableCell>{{ slip.employee.displayName ?? '-' }}</TableCell>
-              <TableCell class="tabular-nums text-xs">
+              <TableCell class="text-xs">
                 {{ slip.employee.identifier }}
               </TableCell>
               <TableCell class="text-right">

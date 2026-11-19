@@ -76,9 +76,9 @@ function updateRowNote(index: number, note: string) {
   <div class="space-y-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <p class="text-sm text-muted-foreground text-center sm:text-left">
-        <strong class="text-foreground tabular-nums">{{ scoredCount }}</strong>
+        <strong class="text-foreground">{{ scoredCount }}</strong>
         dari
-        <strong class="text-foreground tabular-nums">{{ rows.length }}</strong>
+        <strong class="text-foreground">{{ rows.length }}</strong>
         siswa sudah dinilai
       </p>
       <SearchInput
@@ -130,9 +130,7 @@ function updateRowNote(index: number, note: string) {
             :key="row.enrollmentId"
             class="transition-colors hover:bg-muted/30"
           >
-            <TableCell
-              class="hidden sm:table-cell px-4 py-2.5 text-center tabular-nums"
-            >
+            <TableCell class="hidden sm:table-cell px-4 py-2.5 text-center">
               {{ row.nis }}
             </TableCell>
             <TableCell class="px-4 py-2.5">{{ row.studentName }}</TableCell>
@@ -143,7 +141,7 @@ function updateRowNote(index: number, note: string) {
                 :max="maxScore"
                 :model-value="row.score ?? ''"
                 :placeholder="`0 - ${maxScore}`"
-                class="min-w-[80px] text-center tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                class="min-w-[80px] text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 @update:model-value="
                   (val) => updateRowScore(index, String(val))
                 "

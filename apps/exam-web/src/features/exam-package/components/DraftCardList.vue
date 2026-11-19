@@ -38,7 +38,7 @@ const emit = defineEmits<{
           @click="emit('select', index)"
         >
           <span
-            class="w-5 shrink-0 text-right text-control text-muted-foreground tabular-nums"
+            class="w-5 shrink-0 text-right text-control text-muted-foreground"
           >
             {{ index + 1 }}
           </span>

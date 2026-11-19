@@ -56,7 +56,7 @@ async function pair() {
           v-model="token"
           type="password"
           autocomplete="off"
-          class="bg-slate-800 tabular-nums text-white"
+          class="bg-slate-800 text-white"
           @keyup.enter="pair"
         />
         <p

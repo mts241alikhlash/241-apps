@@ -240,12 +240,12 @@ watch(
           >
             Berkas terunggah
           </Badge>
-          <span class="tabular-nums text-control text-muted-foreground">
+          <span class="text-control text-muted-foreground">
             Sesi {{ timeFormat.format(new Date(report.slot.startsAt)) }}–{{
               timeFormat.format(new Date(report.slot.endsAt))
             }}
           </span>
-          <span class="tabular-nums text-control text-muted-foreground">
+          <span class="text-control text-muted-foreground">
             Hadir {{ totals.started }} dari {{ totals.registered }} · Terkumpul
             {{ totals.submitted }} · Tidak hadir {{ totals.absent }}
           </span>
@@ -311,16 +311,16 @@ watch(
                 {{ row.subjectName ?? row.packageTitle }}
               </TableCell>
               <TableCell>{{ row.classroomName ?? '-' }}</TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.registeredCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.startedCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.submittedCount }}
               </TableCell>
-              <TableCell class="text-center tabular-nums">
+              <TableCell class="text-center">
                 {{ row.absentCount }}
               </TableCell>
             </TableRow>
@@ -347,7 +347,7 @@ watch(
               class="flex flex-wrap items-center gap-2 p-3 text-control"
             >
               <span>{{ absence.studentName ?? 'Siswa tidak ditemukan' }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ absence.nis ?? '-' }}
               </span>
               <Badge variant="destructive">
@@ -378,7 +378,7 @@ watch(
               class="flex flex-wrap items-center gap-2 p-3 text-control"
             >
               <span>{{ eventLabel(entry.action) }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ dateTimeFormat.format(new Date(entry.createdAt)) }}
               </span>
               <span class="text-muted-foreground">{{ entry.reason }}</span>
@@ -405,7 +405,7 @@ watch(
               <span>{{ note.studentName ?? 'Siswa' }}</span>
               <Badge variant="outline">{{ note.category }}</Badge>
               <span>{{ note.note }}</span>
-              <span class="tabular-nums text-muted-foreground">
+              <span class="text-muted-foreground">
                 {{ dateTimeFormat.format(new Date(note.recordedAt)) }}
               </span>
             </li>

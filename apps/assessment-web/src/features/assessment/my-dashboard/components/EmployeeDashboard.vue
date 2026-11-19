@@ -72,7 +72,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Kelas Diampu
               </p>
-              <p class="mt-1 text-2xl font-semibold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.load.classroomCount }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -105,7 +105,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Mata Pelajaran
               </p>
-              <p class="mt-1 text-2xl font-semibold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.load.subjectCount }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -138,7 +138,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Belum Dinilai
               </p>
-              <p class="mt-1 text-2xl font-semibold tabular-nums">
+              <p class="mt-1 text-2xl font-semibold">
                 {{ data.ungradedTotal }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -218,7 +218,7 @@ const hiddenUngraded = computed(
               </div>
               <Badge
                 variant="secondary"
-                class="shrink-0 tabular-nums"
+                class="shrink-0"
               >
                 {{ classroom.studentCount }} siswa
               </Badge>
@@ -293,9 +293,7 @@ const hiddenUngraded = computed(
                       {{ item.subjectName }} · {{ item.classroomCode }}
                     </p>
                   </div>
-                  <span
-                    class="shrink-0 text-xs tabular-nums text-muted-foreground"
-                  >
+                  <span class="shrink-0 text-xs text-muted-foreground">
                     {{ item.gradedCount }}/{{ item.studentCount }}
                   </span>
                 </div>

@@ -213,20 +213,20 @@ onMounted(async () => {
             </div>
             <div class="flex flex-col gap-0.5">
               <dt class="text-muted-foreground">Soal</dt>
-              <dd class="font-medium tabular-nums">
+              <dd class="font-medium">
                 {{ pkg.items.length }}
               </dd>
             </div>
             <div class="flex flex-col gap-0.5">
               <dt class="text-muted-foreground">Poin</dt>
-              <dd class="font-medium tabular-nums">{{ totalPoints }}</dd>
+              <dd class="font-medium">{{ totalPoints }}</dd>
             </div>
             <div
               v-if="updatedLabel"
               class="flex flex-col gap-0.5"
             >
               <dt class="text-muted-foreground">Diperbarui</dt>
-              <dd class="font-medium tabular-nums">{{ updatedLabel }}</dd>
+              <dd class="font-medium">{{ updatedLabel }}</dd>
             </div>
           </dl>
           <DataTable

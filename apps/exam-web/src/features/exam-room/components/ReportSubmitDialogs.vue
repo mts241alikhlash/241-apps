@@ -73,7 +73,7 @@ function pick(row: RoomReportSummary, event: Event) {
                 @click="chooseSubject(choice.id)"
               >
                 <span class="truncate">{{ choice.name }}</span>
-                <span class="tabular-nums text-muted-foreground">
+                <span class="text-muted-foreground">
                   {{ choice.draftCount }} ruangan belum diserahkan
                 </span>
               </Button>

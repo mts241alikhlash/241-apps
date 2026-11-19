@@ -95,7 +95,7 @@ const identity = computed(() => [
             class="flex items-baseline justify-between gap-4"
           >
             <dt class="text-muted-foreground">{{ item.label }}</dt>
-            <dd class="flex items-baseline gap-4 tabular-nums">
+            <dd class="flex items-baseline gap-4">
               <span class="w-8 text-right">{{ item.count }}</span>
               <span class="w-8 text-right text-muted-foreground">
                 {{ item.points }}
@@ -106,7 +106,7 @@ const identity = computed(() => [
             class="flex items-baseline justify-between gap-4 border-t pt-1 font-medium"
           >
             <dt>Total</dt>
-            <dd class="flex items-baseline gap-4 tabular-nums">
+            <dd class="flex items-baseline gap-4">
               <span class="w-8 text-right">{{ preview.total }}</span>
               <span class="w-8 text-right">{{ preview.totalPoints }}</span>
             </dd>

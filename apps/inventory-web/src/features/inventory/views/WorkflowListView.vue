@@ -171,7 +171,7 @@ onMounted(() => {
                 <p class="text-xs text-muted-foreground mt-0.5">
                   Entity Target:
                   <span
-                    class="tabular-nums text-primary bg-primary/5 px-1.5 py-0.5 rounded-md"
+                    class="text-primary bg-primary/5 px-1.5 py-0.5 rounded-md"
                     >{{ wf.targetEntity }}</span
                   >
                 </p>
@@ -280,9 +280,8 @@ onMounted(() => {
           <Label>Tahapan</Label>
           <p class="text-xs text-muted-foreground">
             Isi dengan kode role, bukan nama orang, mis.
-            <span class="tabular-nums">ADMIN_INVENTARIS</span>,
-            <span class="tabular-nums">KEPALA_SEKOLAH</span>. Role dengan kode
-            itu harus ada di Manajemen Role.
+            <span>ADMIN_INVENTARIS</span>, <span>KEPALA_SEKOLAH</span>. Role
+            dengan kode itu harus ada di Manajemen Role.
           </p>
           <div
             v-for="(step, index) in form.steps"
@@ -298,7 +297,6 @@ onMounted(() => {
               <Input
                 v-model="step.approverRoleCode"
                 placeholder="Kode role penyetuju"
-                class="tabular-nums"
               />
               <Button
                 type="button"

@@ -443,9 +443,7 @@ function toggleAllVisible() {
                   @update:model-value="toggle(candidate.studentId)"
                 />
               </TableCell>
-              <TableCell
-                class="text-center py-2.5 text-xs text-foreground tabular-nums"
-              >
+              <TableCell class="text-center py-2.5 text-xs text-foreground">
                 {{ candidate.nis }}
               </TableCell>
               <TableCell class="py-2.5">

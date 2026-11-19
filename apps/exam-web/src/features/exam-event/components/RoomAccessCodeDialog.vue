@@ -113,7 +113,7 @@ onMounted(load)
                 : 'Token aktif saat ini'
             }}
           </p>
-          <p class="text-2xl font-semibold tabular-nums tracking-[0.3em]">
+          <p class="text-2xl font-semibold tracking-[0.3em]">
             {{ code?.accessCode ?? '······' }}
           </p>
           <p class="text-control text-muted-foreground">

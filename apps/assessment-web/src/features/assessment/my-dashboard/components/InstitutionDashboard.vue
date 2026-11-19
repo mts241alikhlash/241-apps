@@ -31,7 +31,7 @@ const percent = (filled: number, expected: number) =>
         :empty="completeness.length === 0"
         empty-text="Belum ada penilaian semester ini."
       >
-        <ul class="space-y-1 tabular-nums">
+        <ul class="space-y-1">
           <li
             v-for="row in completeness"
             :key="row.classroomId"
@@ -52,7 +52,7 @@ const percent = (filled: number, expected: number) =>
         :loading="query.isPending.value"
         :error="query.isError.value"
       >
-        <dl class="grid grid-cols-2 gap-2 tabular-nums">
+        <dl class="grid grid-cols-2 gap-2">
           <dt>Hadir</dt>
           <dd class="font-medium">
             {{ query.data.value?.attendanceToday.present }}
@@ -77,7 +77,7 @@ const percent = (filled: number, expected: number) =>
         :loading="query.isPending.value"
         :error="query.isError.value"
       >
-        <dl class="grid grid-cols-2 gap-2 tabular-nums">
+        <dl class="grid grid-cols-2 gap-2">
           <dt>Dipublikasikan</dt>
           <dd class="font-medium">
             {{ query.data.value?.examScores.published }}

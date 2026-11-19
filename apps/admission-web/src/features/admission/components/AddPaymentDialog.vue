@@ -227,9 +227,7 @@ watch(debouncedSearch, loadApplicants)
               />
               <span>
                 <span class="block font-medium">{{ account.bankName }}</span>
-                <span class="block tabular-nums">{{
-                  account.accountNumber
-                }}</span>
+                <span class="block">{{ account.accountNumber }}</span>
                 <span class="block text-muted-foreground">
                   a.n. {{ account.accountHolder }}
                 </span>

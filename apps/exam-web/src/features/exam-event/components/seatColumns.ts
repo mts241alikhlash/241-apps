@@ -32,8 +32,7 @@ export function buildSeatColumns(
         mobileLabel: 'Kursi',
         mobileValue: (row: SeatedStudent) => seatLabel(row.seatNumber),
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, `${row.original.seatNumber}`),
+      cell: ({ row }) => h('span', `${row.original.seatNumber}`),
     },
     {
       id: 'nis',
@@ -43,8 +42,7 @@ export function buildSeatColumns(
         mobileLabel: 'NIS',
         mobileValue: (row: SeatedStudent) => row.nis ?? '-',
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, row.original.nis ?? '-'),
+      cell: ({ row }) => h('span', row.original.nis ?? '-'),
     },
     {
       id: 'nisn',
@@ -54,8 +52,7 @@ export function buildSeatColumns(
         mobileLabel: 'NISN',
         mobileValue: (row: SeatedStudent) => row.nisn ?? '-',
       },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, row.original.nisn ?? '-'),
+      cell: ({ row }) => h('span', row.original.nisn ?? '-'),
     },
     {
       id: 'name',
@@ -122,8 +119,7 @@ export function buildSupervisorColumns(
       id: 'window',
       header: 'Jam',
       meta: { align: 'left', strong: true },
-      cell: ({ row }) =>
-        h('span', { class: 'tabular-nums' }, windowText(row.original)),
+      cell: ({ row }) => h('span', windowText(row.original)),
     },
     {
       id: 'scheduled',

@@ -39,11 +39,7 @@ export const createTimeSlotTypeColumns = (
     header: 'Durasi',
     meta: { align: 'center' },
     cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'tabular-nums' },
-        `${row.original.defaultDurationMinutes} menit`,
-      ),
+      h('span', `${row.original.defaultDurationMinutes} menit`),
   },
   {
     id: 'days',

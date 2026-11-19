@@ -197,7 +197,7 @@ const totalAttendance = computed(() =>
                   :class="item.iconColor"
                 />
                 <p
-                  class="text-xl font-semibold tabular-nums"
+                  class="text-xl font-semibold"
                   :class="item.valueColor"
                 >
                   {{ item.value }}
@@ -271,7 +271,7 @@ const totalAttendance = computed(() =>
                 </div>
                 <Badge
                   variant="secondary"
-                  class="shrink-0 tabular-nums"
+                  class="shrink-0"
                 >
                   {{ score.score ?? '-' }} / {{ score.maxScore }}
                 </Badge>

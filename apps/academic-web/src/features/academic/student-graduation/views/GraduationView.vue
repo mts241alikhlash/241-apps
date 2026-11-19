@@ -324,7 +324,10 @@ async function handleConfirmGraduate() {
     >
       <DialogHeader standard>
         <DialogTitle>Konfirmasi Kelulusan</DialogTitle>
-        <DialogDescription>Periksa siswa yang lulus dan yang belum, lalu konfirmasi.</DialogDescription>
+        <DialogDescription
+          >Periksa siswa yang lulus dan yang belum, lalu
+          konfirmasi.</DialogDescription
+        >
       </DialogHeader>
 
       <DialogBody class="space-y-4">
@@ -351,9 +354,7 @@ async function handleConfirmGraduate() {
                 :class="{ 'bg-destructive/5': !row.approved }"
                 class="transition-colors"
               >
-                <TableCell
-                  class="text-center py-2 text-xs text-foreground tabular-nums"
-                >
+                <TableCell class="text-center py-2 text-xs text-foreground">
                   {{ row.nis }}
                 </TableCell>
                 <TableCell class="py-2">
@@ -382,7 +383,10 @@ async function handleConfirmGraduate() {
         </div>
       </DialogBody>
 
-      <DialogFooter standard class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3">
+      <DialogFooter
+        standard
+        class="flex-col sm:flex-row sm:items-center justify-between sm:justify-between gap-3"
+      >
         <div class="flex flex-wrap items-center gap-3 text-xs mr-auto">
           <div
             v-if="summaryStats.approved > 0"

@@ -16,7 +16,7 @@ const query = useQuery({
     :loading="query.isPending.value"
     :error="query.isError.value"
   >
-    <p class="text-2xl font-semibold tabular-nums">{{ query.data.value }}</p>
+    <p class="text-2xl font-semibold">{{ query.data.value }}</p>
     <RouterLink
       to="/approvals"
       class="text-primary underline"

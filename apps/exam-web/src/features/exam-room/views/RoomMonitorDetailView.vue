@@ -298,12 +298,11 @@ onUnmounted(() => {
               <span class="text-control text-muted-foreground"
                 >Token masuk</span
               >
-              <span
-                class="text-lg leading-tight font-semibold tracking-wide tabular-nums"
-                >{{ token.accessCode }}</span
-              >
+              <span class="text-lg leading-tight font-semibold tracking-wide">{{
+                token.accessCode
+              }}</span>
             </div>
-            <span class="text-control text-muted-foreground tabular-nums"
+            <span class="text-control text-muted-foreground"
               >sisa {{ tokenMinutes }} mnt</span
             >
             <Button
@@ -315,7 +314,7 @@ onUnmounted(() => {
           </div>
           <div class="flex flex-col items-start gap-1.5 sm:items-end">
             <span
-              class="flex items-center gap-1.5 text-control text-muted-foreground tabular-nums"
+              class="flex items-center gap-1.5 text-control text-muted-foreground"
             >
               <span
                 class="size-1.5 rounded-full"

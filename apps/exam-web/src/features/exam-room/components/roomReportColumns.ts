@@ -19,8 +19,7 @@ const slotRange = (startsAt: string, endsAt: string): string =>
 
 const FILE_UPLOADED = 'Berkas terunggah'
 
-const num = (value: number) =>
-  h('span', { class: 'tabular-nums' }, String(value))
+const num = (value: number) => h('span', String(value))
 
 interface NodeActions<T> {
   onOpen: (row: T) => void
@@ -148,11 +147,7 @@ export function buildSubjectColumns(
         mobileValue: (row: SubjectGroup) => slotRange(row.startsAt, row.endsAt),
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          slotRange(row.original.startsAt, row.original.endsAt),
-        ),
+        h('span', slotRange(row.original.startsAt, row.original.endsAt)),
     },
     {
       id: 'rooms',
@@ -225,12 +220,7 @@ export function buildRoomReportColumns(
         mobileLabel: 'Peserta',
         mobileValue: (row: RoomReportSummary) => String(row.registeredCount),
       },
-      cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          String(row.original.registeredCount),
-        ),
+      cell: ({ row }) => h('span', String(row.original.registeredCount)),
     },
     {
       id: 'supervisor',

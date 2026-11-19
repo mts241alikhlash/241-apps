@@ -215,7 +215,7 @@ async function handleSave() {
               </span>
             </div>
             <span
-              class="font-semibold tabular-nums"
+              class="font-semibold"
               :class="
                 isBalanced
                   ? 'text-success'
@@ -251,7 +251,7 @@ async function handleSave() {
                 class="flex items-center justify-between text-muted-foreground"
               >
                 <span>{{ ASSESSMENT_TYPE_LABELS[type] }}</span>
-                <span class="tabular-nums">
+                <span>
                   {{ SAMPLE_SCORES[type] }} × {{ weights[type] }}% =
                   <span class="text-foreground font-medium">
                     {{
@@ -268,13 +268,16 @@ async function handleSave() {
               class="border-t pt-1.5 flex items-center justify-between text-sm"
             >
               <span class="font-medium">Nilai Akhir</span>
-              <span class="font-semibold tabular-nums">{{ sampleResult }}</span>
+              <span class="font-semibold">{{ sampleResult }}</span>
             </div>
           </div>
         </template>
       </DialogBody>
 
-      <DialogFooter standard class="sm:justify-between">
+      <DialogFooter
+        standard
+        class="sm:justify-between"
+      >
         <Button
           type="button"
           variant="outline"

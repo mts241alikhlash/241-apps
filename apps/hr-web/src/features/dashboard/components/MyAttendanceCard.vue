@@ -26,7 +26,7 @@ const time = (value: string | null) =>
     empty-text="Belum ada catatan presensi hari ini."
   >
     <p class="text-lg font-medium">{{ query.data.value?.today?.status }}</p>
-    <p class="text-muted-foreground tabular-nums">
+    <p class="text-muted-foreground">
       Masuk {{ time(query.data.value?.today?.clockIn ?? null) }} · Pulang
       {{ time(query.data.value?.today?.clockOut ?? null) }}
     </p>

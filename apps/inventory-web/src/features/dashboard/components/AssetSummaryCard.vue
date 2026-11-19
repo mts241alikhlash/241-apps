@@ -17,10 +17,8 @@ const query = useQuery({
     :empty="query.data.value?.total === 0"
     empty-text="Belum ada unit aset."
   >
-    <p class="text-2xl font-semibold tabular-nums">
-      {{ query.data.value?.total }} unit
-    </p>
-    <ul class="mt-2 space-y-1 tabular-nums">
+    <p class="text-2xl font-semibold">{{ query.data.value?.total }} unit</p>
+    <ul class="mt-2 space-y-1">
       <li
         v-for="row in query.data.value?.byStatus"
         :key="`status-${row.name}`"
@@ -30,7 +28,7 @@ const query = useQuery({
         <span class="font-medium">{{ row.total }}</span>
       </li>
     </ul>
-    <ul class="mt-2 space-y-1 tabular-nums">
+    <ul class="mt-2 space-y-1">
       <li
         v-for="row in query.data.value?.byCondition"
         :key="`condition-${row.name}`"

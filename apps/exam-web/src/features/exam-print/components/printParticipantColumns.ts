@@ -29,11 +29,7 @@ export function buildPrintParticipantColumns(options: {
         String(row.seatNumber).padStart(2, '0'),
     },
     cell: ({ row }) =>
-      h(
-        'span',
-        { class: 'tabular-nums' },
-        String(row.original.seatNumber).padStart(2, '0'),
-      ),
+      h('span', String(row.original.seatNumber).padStart(2, '0')),
   }
 
   const columns: ColumnDef<PrintParticipantRow>[] = [
@@ -46,12 +42,7 @@ export function buildPrintParticipantColumns(options: {
         mobileLabel: 'No. Peserta',
         mobileValue: (row: PrintParticipantRow) => row.participantNumber ?? '-',
       },
-      cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'tabular-nums' },
-          row.original.participantNumber ?? '-',
-        ),
+      cell: ({ row }) => h('span', row.original.participantNumber ?? '-'),
     },
     {
       id: 'name',

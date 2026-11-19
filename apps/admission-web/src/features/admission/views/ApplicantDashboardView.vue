@@ -269,7 +269,7 @@ onMounted(() => {
           </CardTitle>
           <CardDescription>
             No. Pendaftaran
-            <span class="tabular-nums font-medium text-foreground">
+            <span class="font-medium text-foreground">
               {{ application.registrationNumber }}
             </span>
             · {{ application.wave?.name }}

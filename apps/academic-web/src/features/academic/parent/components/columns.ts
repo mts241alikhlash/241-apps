@@ -16,8 +16,7 @@ export const createParentColumns = (
   {
     id: 'nik',
     header: 'NIK',
-    cell: ({ row }) =>
-      h('code', { class: 'tabular-nums text-xs' }, row.original.nik),
+    cell: ({ row }) => h('code', { class: 'text-xs' }, row.original.nik),
   },
   {
     id: 'birthPlaceDate',

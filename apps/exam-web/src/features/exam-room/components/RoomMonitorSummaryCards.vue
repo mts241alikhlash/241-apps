@@ -57,7 +57,7 @@ const cards = computed(() => {
         </CardTitle>
       </CardHeader>
       <CardContent variant="standard">
-        <p class="text-lg font-semibold tabular-nums">{{ card.value }}</p>
+        <p class="text-lg font-semibold">{{ card.value }}</p>
       </CardContent>
     </Card>
   </div>
