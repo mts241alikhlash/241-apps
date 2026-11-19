@@ -159,7 +159,7 @@ const OUTAGE_MESSAGES = new Set([
 ])
 
 const OUTAGE_PATTERN =
-  /^Layanan .+ (?:sedang tidak berjalan|terlalu lama merespons)\./
+  /^Layanan .+ (?:sedang tidak berjalan|terlalu lama merespons)[.,]/
 
 export function isOutageMessage(message: string): boolean {
   return OUTAGE_MESSAGES.has(message) || OUTAGE_PATTERN.test(message)
