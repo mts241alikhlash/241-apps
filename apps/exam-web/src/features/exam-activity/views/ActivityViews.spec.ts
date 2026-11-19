@@ -102,6 +102,11 @@ const sampleDetail = (
     gapTokenMs: 300000,
     gapViolationFrom: 2,
     tokenSlotSeconds: 900,
+    lateToleranceMinutes: 15,
+    minSubmitMinutes: 0,
+    shuffleQuestions: true,
+    shuffleChoices: true,
+    allowWeb: true,
   },
   schedules: [
     {

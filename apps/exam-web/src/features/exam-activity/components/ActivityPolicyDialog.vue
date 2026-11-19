@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Button } from '@mts241alikhlash/ui/button'
+import { Switch } from '@mts241alikhlash/ui/switch'
 import {
   Dialog,
   DialogBody,
@@ -32,6 +33,11 @@ const gapRecordedMs = ref(props.policy.gapRecordedMs ?? 60000)
 const gapTokenMs = ref(props.policy.gapTokenMs ?? 300000)
 const gapViolationFrom = ref(props.policy.gapViolationFrom ?? 2)
 const tokenSlotSeconds = ref(props.policy.tokenSlotSeconds ?? 900)
+const lateToleranceMinutes = ref(props.policy.lateToleranceMinutes ?? 15)
+const minSubmitMinutes = ref(props.policy.minSubmitMinutes ?? 0)
+const shuffleQuestions = ref(props.policy.shuffleQuestions ?? true)
+const shuffleChoices = ref(props.policy.shuffleChoices ?? true)
+const allowWeb = ref(props.policy.allowWeb ?? true)
 
 const saving = ref(false)
 const error = ref<string | null>(null)
@@ -46,6 +52,11 @@ watch(
     gapTokenMs.value = next.gapTokenMs ?? 300000
     gapViolationFrom.value = next.gapViolationFrom ?? 2
     tokenSlotSeconds.value = next.tokenSlotSeconds ?? 900
+    lateToleranceMinutes.value = next.lateToleranceMinutes ?? 15
+    minSubmitMinutes.value = next.minSubmitMinutes ?? 0
+    shuffleQuestions.value = next.shuffleQuestions ?? true
+    shuffleChoices.value = next.shuffleChoices ?? true
+    allowWeb.value = next.allowWeb ?? true
   },
 )
 
@@ -61,6 +72,11 @@ async function submit(): Promise<void> {
     gapTokenMs: gapTokenMs.value,
     gapViolationFrom: gapViolationFrom.value,
     tokenSlotSeconds: tokenSlotSeconds.value,
+    lateToleranceMinutes: lateToleranceMinutes.value,
+    minSubmitMinutes: minSubmitMinutes.value,
+    shuffleQuestions: shuffleQuestions.value,
+    shuffleChoices: shuffleChoices.value,
+    allowWeb: allowWeb.value,
   }
   try {
     const response = await examActivityApi.updatePolicy(
@@ -172,6 +188,47 @@ async function submit(): Promise<void> {
                 max="3600"
                 class="rounded-md border px-3 py-2"
               />
+            </label>
+            <label class="grid gap-1 text-control">
+              <span>Toleransi terlambat (menit)</span>
+              <input
+                v-model.number="lateToleranceMinutes"
+                type="number"
+                min="0"
+                max="120"
+                class="rounded-md border px-3 py-2"
+              />
+            </label>
+            <label class="grid gap-1 text-control">
+              <span>Minimal sebelum kumpul (menit)</span>
+              <input
+                v-model.number="minSubmitMinutes"
+                type="number"
+                min="0"
+                max="180"
+                class="rounded-md border px-3 py-2"
+              />
+            </label>
+            <label class="flex items-center gap-2 text-control">
+              <Switch
+                v-model="shuffleQuestions"
+                aria-label="Acak urutan soal"
+              />
+              <span>Acak urutan soal</span>
+            </label>
+            <label class="flex items-center gap-2 text-control">
+              <Switch
+                v-model="shuffleChoices"
+                aria-label="Acak urutan pilihan"
+              />
+              <span>Acak urutan pilihan</span>
+            </label>
+            <label class="flex items-center gap-2 text-control">
+              <Switch
+                v-model="allowWeb"
+                aria-label="Izinkan lewat web (SEB)"
+              />
+              <span>Izinkan lewat web (SEB)</span>
             </label>
           </div>
         </DialogBody>

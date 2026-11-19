@@ -226,6 +226,44 @@ onMounted(load)
                   {{ detail.policy.tokenSlotSeconds }} detik
                 </dd>
               </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Toleransi terlambat
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.lateToleranceMinutes }} menit
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Minimal sebelum kumpul
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.minSubmitMinutes }} menit
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">Acak urutan soal</dt>
+                <dd class="font-medium">
+                  {{ detail.policy.shuffleQuestions ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Acak urutan pilihan
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.shuffleChoices ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted-foreground">
+                  Izinkan lewat web (SEB)
+                </dt>
+                <dd class="font-medium">
+                  {{ detail.policy.allowWeb ? 'Ya' : 'Tidak' }}
+                </dd>
+              </div>
             </dl>
           </section>
 

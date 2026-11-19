@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Button } from '@mts241alikhlash/ui/button'
+import { Switch } from '@mts241alikhlash/ui/switch'
 import {
   Card,
   CardContent,
@@ -54,6 +55,11 @@ async function savePreset(preset: ExamPolicyPreset): Promise<void> {
       gapTokenMs: policy.gapTokenMs,
       gapViolationFrom: policy.gapViolationFrom,
       tokenSlotSeconds: policy.tokenSlotSeconds,
+      lateToleranceMinutes: policy.lateToleranceMinutes,
+      minSubmitMinutes: policy.minSubmitMinutes,
+      shuffleQuestions: policy.shuffleQuestions,
+      shuffleChoices: policy.shuffleChoices,
+      allowWeb: policy.allowWeb,
     })
     remember([response])
     presets.value = presets.value.map((item) =>
@@ -126,6 +132,13 @@ onMounted(load)
                 <th class="p-3 font-semibold">Jeda Token (ms)</th>
                 <th class="p-3 font-semibold">Putus Jadi Pelanggaran</th>
                 <th class="p-3 font-semibold">Slot Token (detik)</th>
+                <th class="p-3 font-semibold">Toleransi terlambat (menit)</th>
+                <th class="p-3 font-semibold">
+                  Minimal sebelum kumpul (menit)
+                </th>
+                <th class="p-3 font-semibold">Acak urutan soal</th>
+                <th class="p-3 font-semibold">Acak urutan pilihan</th>
+                <th class="p-3 font-semibold">Izinkan lewat web (SEB)</th>
                 <th class="p-3 font-semibold">Aksi</th>
               </tr>
             </thead>
@@ -208,6 +221,47 @@ onMounted(load)
                     max="3600"
                     :aria-label="`Slot token ${examTypeLabel(item.type)}`"
                     class="w-20 rounded border px-2 py-1"
+                  />
+                </td>
+                <td class="p-3">
+                  <input
+                    v-model.number="item.policy.lateToleranceMinutes"
+                    type="number"
+                    min="0"
+                    max="120"
+                    :aria-label="`Toleransi terlambat ${examTypeLabel(item.type)}`"
+                    class="w-20 rounded border px-2 py-1"
+                  />
+                </td>
+                <td class="p-3">
+                  <input
+                    v-model.number="item.policy.minSubmitMinutes"
+                    type="number"
+                    min="0"
+                    max="180"
+                    :aria-label="`Minimal sebelum kumpul ${examTypeLabel(item.type)}`"
+                    class="w-20 rounded border px-2 py-1"
+                  />
+                </td>
+                <td class="p-3">
+                  <Switch
+                    :model-value="item.policy.shuffleQuestions"
+                    :aria-label="`Acak urutan soal ${examTypeLabel(item.type)}`"
+                    @update:model-value="item.policy.shuffleQuestions = $event"
+                  />
+                </td>
+                <td class="p-3">
+                  <Switch
+                    :model-value="item.policy.shuffleChoices"
+                    :aria-label="`Acak urutan pilihan ${examTypeLabel(item.type)}`"
+                    @update:model-value="item.policy.shuffleChoices = $event"
+                  />
+                </td>
+                <td class="p-3">
+                  <Switch
+                    :model-value="item.policy.allowWeb"
+                    :aria-label="`Izinkan lewat web (SEB) ${examTypeLabel(item.type)}`"
+                    @update:model-value="item.policy.allowWeb = $event"
                   />
                 </td>
                 <td class="p-3">
