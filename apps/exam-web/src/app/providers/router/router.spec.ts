@@ -163,15 +163,6 @@ describe('menu', () => {
           ],
           ['/exam/grading', 'exam-grading.read', undefined],
           [
-            '/exam/prints/cards',
-            undefined,
-            [
-              'exam-rooms.supervise',
-              'exam-rooms.technician',
-              'exam-rooms.manage-all',
-            ],
-          ],
-          [
             '/exam/reports',
             undefined,
             [
@@ -180,15 +171,11 @@ describe('menu', () => {
               'exam-rooms.manage-all',
             ],
           ],
-          [
-            '/exam/prints/seats',
-            undefined,
-            [
-              'exam-rooms.supervise',
-              'exam-rooms.technician',
-              'exam-rooms.manage-all',
-            ],
-          ],
+          ['/exam/print/cards', 'exam-events.manage', undefined],
+          ['/exam/print/desks', 'exam-events.manage', undefined],
+          ['/exam/print/schedule', 'exam-events.manage', undefined],
+          ['/exam/print/student-attendance', 'exam-events.manage', undefined],
+          ['/exam/print/staff-attendance', 'exam-events.manage', undefined],
         ],
       ],
       [

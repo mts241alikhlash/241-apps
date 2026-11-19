@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { resetOutageNotifications } from '@mts241alikhlash/web-shared/utils/notify-outage'
 import { examPackageService } from './examPackageService'
 
 const { createPackage, renamePackage, getPackage, getPackages, error } =
@@ -20,7 +21,10 @@ const refused = (status: number, message: string) => ({
 })
 
 describe('examPackageService', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    resetOutageNotifications()
+  })
 
   it('hands the server message of a refused rename to the caller', async () => {
     renamePackage.mockRejectedValue(
@@ -113,6 +117,10 @@ describe('examPackageService', () => {
     getPackage.mockRejectedValue(refused(503, 'academic down'))
 
     await expect(examPackageService.loadPackage('p1')).rejects.toBeDefined()
-    expect(error).toHaveBeenCalledTimes(1)
+    expect(error).toHaveBeenCalledTimes(2)
+    expect(error).toHaveBeenCalledWith(
+      'Layanan sedang tidak tersedia',
+      expect.objectContaining({ description: expect.any(String) }),
+    )
   })
 })
