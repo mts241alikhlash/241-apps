@@ -134,7 +134,7 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
             <tr>
               <th class="col-no">No</th>
               <th class="col-number is-center">Nomor Peserta</th>
-              <th class="col-name">Nama Peserta</th>
+              <th class="col-name is-left">Nama Peserta</th>
               <th class="col-class">Kelas</th>
               <th
                 class="col-sign"
@@ -157,7 +157,9 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
                   {{ pair.odd.participantNumber ?? '-' }}
                 </td>
                 <td class="col-name">{{ pair.odd.name ?? '-' }}</td>
-                <td class="col-class">{{ pair.odd.classroomName ?? '-' }}</td>
+                <td class="col-class is-center">
+                  {{ pair.odd.classroomName ?? '-' }}
+                </td>
                 <td
                   class="sign-cell sign-left"
                   :rowspan="pair.even === null ? 1 : 2"
@@ -179,7 +181,9 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
                   {{ pair.even.participantNumber ?? '-' }}
                 </td>
                 <td class="col-name">{{ pair.even.name ?? '-' }}</td>
-                <td class="col-class">{{ pair.even.classroomName ?? '-' }}</td>
+                <td class="col-class is-center">
+                  {{ pair.even.classroomName ?? '-' }}
+                </td>
               </tr>
             </template>
           </tbody>
@@ -297,6 +301,10 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 
 .sheet-table .is-center {
   text-align: center;
+}
+
+.sheet-table .is-left {
+  text-align: left;
 }
 
 .sheet-table td.col-name {
