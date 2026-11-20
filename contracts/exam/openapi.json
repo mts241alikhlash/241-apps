@@ -301,6 +301,66 @@
         ]
       }
     },
+    "/exam-activities/{id}/package": {
+      "post": {
+        "operationId": "ExamActivityController_attach",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachActivityPackageRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Attach an approved package and create the classroom schedules",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
     "/exam-activities/{id}/policy": {
       "patch": {
         "operationId": "ExamActivityController_policy",
@@ -3809,6 +3869,56 @@
         ]
       }
     },
+    "/exam-events/{id}/supervisor-slots/generate": {
+      "post": {
+        "operationId": "ExamEventController_generateSupervisorSlots",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GenerateRoomSlotsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create one empty supervisor slot per room and timetable window of an exam event",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
     "/exam-events/{id}/attendance-files": {
       "put": {
         "operationId": "ExamAttendanceFileController_upload",
@@ -7169,6 +7279,7 @@
           },
           "packageId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "type": {
@@ -7297,6 +7408,7 @@
           },
           "packageId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "type": {
@@ -7424,6 +7536,7 @@
           },
           "packageId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "type": {
@@ -7436,7 +7549,6 @@
             "type": "string"
           },
           "classroomIds": {
-            "minItems": 1,
             "type": "array",
             "items": {
               "type": "string",
@@ -7477,13 +7589,32 @@
           "semesterId",
           "gradeId",
           "subjectId",
-          "packageId",
           "type",
-          "classroomIds",
           "tokenMode",
           "startsAt",
           "endsAt",
           "durationMinutes"
+        ]
+      },
+      "AttachActivityPackageRequestDto": {
+        "type": "object",
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "packageId",
+          "classroomIds"
         ]
       },
       "UpdateActivityPolicyRequestDto": {
@@ -10798,6 +10929,21 @@
           "adjacentSameClassroom"
         ]
       },
+      "GenerateRoomSlotsResponseDto": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "created",
+          "skipped"
+        ]
+      },
       "AttendanceUploadBodyDto": {
         "type": "object",
         "properties": {
@@ -11310,10 +11456,22 @@
         "properties": {
           "scheduleId": {
             "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "packageTitle": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "gradeId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
           },
           "subjectName": {
             "type": "string",
@@ -11346,7 +11504,9 @@
         },
         "required": [
           "scheduleId",
+          "activityId",
           "packageTitle",
+          "gradeId",
           "subjectName",
           "classroomName",
           "startsAt",
@@ -11802,10 +11962,12 @@
           },
           "scheduledUserId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "actualUserId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "startsAt": {
@@ -11849,7 +12011,6 @@
         },
         "required": [
           "reason",
-          "scheduledUserId",
           "startsAt",
           "endsAt"
         ]

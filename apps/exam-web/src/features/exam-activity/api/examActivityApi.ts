@@ -4,6 +4,7 @@ import type {
   ActivityCreatePayload,
   ActivityPolicyPayload,
   ActivityStatus,
+  AttachPackagePayload,
   ExamActivityQuery,
 } from '../types'
 
@@ -18,6 +19,14 @@ export const examActivityApi = {
 
   create: (body: ActivityCreatePayload) =>
     unwrap(examClient.POST('/exam-activities', { body })),
+
+  attachPackage: (id: string, body: AttachPackagePayload) =>
+    unwrap(
+      examClient.POST('/exam-activities/{id}/package', {
+        params: { path: { id } },
+        body,
+      }),
+    ),
 
   updateStatus: (id: string, status: ActivityStatus) =>
     unwrap(

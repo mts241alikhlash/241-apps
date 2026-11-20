@@ -25,6 +25,7 @@ import { ResetCredentialsBodyDto } from './dto/reset-credentials.dto.js'
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
 import { GenerateSeatsUseCase } from '../../application/use-cases/generate-seats/generate-seats.use-case.js'
+import { GenerateRoomSlotsUseCase } from '../../application/use-cases/generate-room-slots/generate-room-slots.use-case.js'
 import { GenerateSeatsBodyDto } from './dto/exam-room.dto.js'
 import type { PrintPack } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 
@@ -127,6 +128,7 @@ const eventRoutes: Record<string, string[]> = {
   getPrintPack: ['exam-events.manage'],
   resetPasswords: ['exam-events.manage'],
   generateSeats: ['exam-events.manage'],
+  generateSupervisorSlots: ['exam-events.manage'],
 }
 
 const eventAnyRoutes: Record<string, string[]> = {
@@ -282,6 +284,7 @@ describe('ExamEventController print pack', () => {
       printPack,
       undefined as never,
       undefined as never,
+      undefined as never,
     )
     return { calls, controller }
   }
@@ -341,6 +344,7 @@ describe('PrintPackDto contract', () => {
         { provide: GetPrintPackUseCase, useValue: {} },
         { provide: ResetEventCredentialsUseCase, useValue: {} },
         { provide: GenerateSeatsUseCase, useValue: {} },
+        { provide: GenerateRoomSlotsUseCase, useValue: {} },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -733,6 +737,7 @@ describe('ExamEventController supervised listing', () => {
       undefined as never,
       undefined as never,
       undefined as never,
+      undefined as never,
     )
     const mine = await rooms.createEvent({
       semesterId: 'sem-1',
@@ -830,6 +835,7 @@ describe('ExamEventController credentials reset', () => {
       undefined as never,
       undefined as never,
       reset,
+      undefined as never,
       undefined as never,
     )
     const query = Object.assign(new PrintPackQueryDto(), { roomId: UUID_B })

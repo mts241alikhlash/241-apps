@@ -47,6 +47,11 @@ export interface PackageOption {
   label: string
 }
 
+export interface SubjectOption {
+  id: string
+  label: string
+}
+
 export interface EventOption {
   id: string
   name: string
@@ -56,6 +61,8 @@ export interface EventOption {
 export type ActivityCreatePayload = Schemas['CreateActivityRequestDto']
 
 export type ActivityPolicyPayload = Schemas['UpdateActivityPolicyRequestDto']
+
+export type AttachPackagePayload = Schemas['AttachActivityPackageRequestDto']
 
 export type ExamPolicy = Schemas['ExamPolicyDto']
 

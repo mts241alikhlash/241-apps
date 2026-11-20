@@ -85,6 +85,13 @@ export const examEventApi = {
       }),
     ),
 
+  generateSupervisorSlots: (id: string) =>
+    unwrap(
+      examClient.POST('/exam-events/{id}/supervisor-slots/generate', {
+        params: { path: { id } },
+      }),
+    ),
+
   getSupervisors: (roomId: string) =>
     unwrap(
       examClient.GET('/exam-rooms/{roomId}/supervisors', roomPath(roomId)),

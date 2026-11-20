@@ -12,7 +12,12 @@ import type {
 } from '../entities/exam-activity.entity.js'
 
 export interface ActivityAuditEntry {
-  action: 'CREATE_ACTIVITY' | 'UPDATE_POLICY' | 'ROTATE_TOKEN' | 'UPDATE_STATUS'
+  action:
+    | 'CREATE_ACTIVITY'
+    | 'ATTACH_PACKAGE'
+    | 'UPDATE_POLICY'
+    | 'ROTATE_TOKEN'
+    | 'UPDATE_STATUS'
   before: unknown
   after: unknown
 }
@@ -47,6 +52,12 @@ export abstract class ExamActivityRepository {
     classroomIds: string[]
     actorId: string
   }): Promise<ExamActivity>
+  abstract attachPackage(input: {
+    activityId: string
+    packageId: string
+    classroomIds: string[]
+    actorId: string
+  }): Promise<ExamActivity | null>
   abstract findById(id: string): Promise<ExamActivity | null>
   abstract updatePolicy(
     id: string,

@@ -335,7 +335,7 @@ export function buildRoomParticipantColumns(
           {
             label: 'Catat Absen',
             icon: UserX,
-            disabled: target.session !== null,
+            disabled: target.session !== null || !target.scheduleId,
             onClick: () => options.onAbsence(target),
           },
           {

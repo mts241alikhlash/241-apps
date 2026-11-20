@@ -77,6 +77,16 @@ describe('examActivityApi', () => {
     )
   })
 
+  it('attaches a package with its classrooms', async () => {
+    POST.mockResolvedValue(ok({ id: 'a' }))
+    const body = { packageId: 'p', classroomIds: ['c'] }
+    await examActivityApi.attachPackage('a', body)
+    expect(POST).toHaveBeenCalledWith('/exam-activities/{id}/package', {
+      params: { path: { id: 'a' } },
+      body,
+    })
+  })
+
   it('rotates the token', async () => {
     POST.mockResolvedValue(ok({ id: 'a', tokenRotation: 2 }))
     await examActivityApi.rotateToken('a')

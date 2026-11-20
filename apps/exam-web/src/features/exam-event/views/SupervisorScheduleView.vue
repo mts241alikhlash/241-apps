@@ -41,6 +41,7 @@ useBreadcrumbs(() => [
     @back="router.push('/exam/supervisor-schedule')"
   >
     <SupervisorSchedulePanel
+      :event-id="event?.id ?? ''"
       :rooms="visibleRooms"
       :can-substitute="canManageAll"
       :can-supervise="canSupervise"

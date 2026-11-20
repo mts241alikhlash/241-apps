@@ -236,4 +236,16 @@ describe('examEventApi', () => {
       body,
     })
   })
+
+  it('generates the supervisor slots of an event', async () => {
+    POST.mockResolvedValue(ok({ created: 2, skipped: 1 }))
+    await expect(examEventApi.generateSupervisorSlots('e1')).resolves.toEqual({
+      created: 2,
+      skipped: 1,
+    })
+    expect(POST).toHaveBeenCalledWith(
+      '/exam-events/{id}/supervisor-slots/generate',
+      { params: { path: { id: 'e1' } } },
+    )
+  })
 })

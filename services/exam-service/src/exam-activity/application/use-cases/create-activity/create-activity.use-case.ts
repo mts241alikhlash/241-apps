@@ -18,7 +18,22 @@ import {
 import { assertActivityAllowed } from '../../../domain/policies/activity-rules.policy.js'
 
 const MAX_DURATION_MINUTES = 24 * 60
-const READY_PACKAGE_STATUSES = new Set(['APPROVED', 'LOCKED'])
+export const READY_PACKAGE_STATUSES = new Set(['APPROVED', 'LOCKED'])
+
+export async function assertPackageReady(
+  activities: ExamActivityRepository,
+  packageId: string,
+): Promise<void> {
+  const packageStatus = await activities.findPackageStatus(packageId)
+  if (packageStatus === null) {
+    throw new NotFoundException('Paket soal tidak ditemukan')
+  }
+  if (!READY_PACKAGE_STATUSES.has(packageStatus)) {
+    throw new UnprocessableEntityException(
+      'Paket soal belum disetujui. Ajukan dan minta persetujuan dulu',
+    )
+  }
+}
 
 export interface CreateActivityCommand {
   actorId: string
@@ -27,7 +42,7 @@ export interface CreateActivityCommand {
   eventId?: string | null
   gradeId: string
   subjectId: string
-  packageId: string
+  packageId?: string | null
   type: ExamType
   classroomIds: string[]
   presetName?: ExamPresetName
@@ -47,9 +62,6 @@ export class CreateActivityUseCase {
   ) {}
 
   async execute(command: CreateActivityCommand): Promise<ExamActivity> {
-    if (command.classroomIds.length === 0) {
-      throw new BadRequestException('Pilih minimal satu kelas')
-    }
     if (
       command.durationMinutes < 1 ||
       command.durationMinutes > MAX_DURATION_MINUTES
@@ -59,16 +71,12 @@ export class CreateActivityUseCase {
     if (command.endsAt.getTime() <= command.startsAt.getTime()) {
       throw new BadRequestException('Jendela kegiatan tidak masuk akal')
     }
-    const packageStatus = await this.activities.findPackageStatus(
-      command.packageId,
-    )
-    if (packageStatus === null) {
-      throw new NotFoundException('Paket soal tidak ditemukan')
-    }
-    if (!READY_PACKAGE_STATUSES.has(packageStatus)) {
-      throw new UnprocessableEntityException(
-        'Paket soal belum disetujui. Ajukan dan minta persetujuan dulu',
-      )
+    const packageId = command.packageId ?? null
+    if (packageId !== null) {
+      if (command.classroomIds.length === 0) {
+        throw new BadRequestException('Pilih minimal satu kelas')
+      }
+      await assertPackageReady(this.activities, packageId)
     }
     const presetName = command.presetName ?? command.type
     const event = command.eventId
@@ -95,7 +103,7 @@ export class CreateActivityUseCase {
         eventId: command.eventId ?? null,
         gradeId: command.gradeId,
         subjectId: command.subjectId,
-        packageId: command.packageId,
+        packageId,
         type: command.type,
         tokenMode: command.tokenMode,
         presetId: preset.id,
@@ -105,7 +113,7 @@ export class CreateActivityUseCase {
         durationMinutes: command.durationMinutes,
         createdById: command.actorId,
       },
-      classroomIds: command.classroomIds,
+      classroomIds: packageId === null ? [] : command.classroomIds,
       actorId: command.actorId,
     })
 

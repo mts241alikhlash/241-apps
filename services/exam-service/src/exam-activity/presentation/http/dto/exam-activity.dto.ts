@@ -39,17 +39,20 @@ export class CreateActivityRequestDto {
 
   @ApiProperty({ format: 'uuid' }) @IsUUID() subjectId!: string
 
-  @ApiProperty({ format: 'uuid' }) @IsUUID() packageId!: string
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @IsOptional()
+  @IsUUID()
+  packageId?: string | null
 
   @ApiProperty({ enum: EXAM_TYPES })
   @IsIn([...EXAM_TYPES])
   type!: ExamActivity['type']
 
-  @ApiProperty({ type: [String], format: 'uuid' })
+  @ApiPropertyOptional({ type: [String], format: 'uuid' })
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(1)
   @IsUUID('4', { each: true })
-  classroomIds!: string[]
+  classroomIds?: string[]
 
   @ApiPropertyOptional({ enum: EXAM_PRESET_NAMES })
   @IsOptional()
@@ -69,6 +72,16 @@ export class CreateActivityRequestDto {
   @Min(1)
   @Max(1440)
   durationMinutes!: number
+}
+
+export class AttachActivityPackageRequestDto {
+  @ApiProperty({ format: 'uuid' }) @IsUUID() packageId!: string
+
+  @ApiProperty({ type: [String], format: 'uuid' })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUUID('4', { each: true })
+  classroomIds!: string[]
 }
 
 export class UpdateActivityStatusRequestDto {
@@ -195,7 +208,7 @@ export class ExamActivityDto {
   @ApiProperty({ format: 'uuid', nullable: true }) eventId!: string | null
   @ApiProperty({ format: 'uuid' }) gradeId!: string
   @ApiProperty({ format: 'uuid' }) subjectId!: string
-  @ApiProperty({ format: 'uuid' }) packageId!: string
+  @ApiProperty({ format: 'uuid', nullable: true }) packageId!: string | null
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
   @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ enum: ACTIVITY_TOKEN_MODES })

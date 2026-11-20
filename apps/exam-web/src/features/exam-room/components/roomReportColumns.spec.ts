@@ -76,3 +76,16 @@ describe('report action cells', () => {
     ).toBe(true)
   })
 })
+
+describe('supervisor without a name', () => {
+  it('shows Belum ditentukan for a room whose supervisor is not set', () => {
+    const columns = buildRoomReportColumns(handlers())
+    const column = columns.find((item) => item.id === 'supervisor')
+    const cell = column?.cell as (ctx: {
+      row: { original: RoomReportSummary }
+    }) => string
+    expect(cell({ row: { original: report('DRAFT') } })).toBe(
+      'Belum ditentukan',
+    )
+  })
+})

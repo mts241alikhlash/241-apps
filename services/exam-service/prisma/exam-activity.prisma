@@ -28,7 +28,7 @@ model ExamActivity {
   eventId         String?           @map("event_id") @db.Uuid
   gradeId         String            @map("grade_id") @db.Uuid
   subjectId       String            @map("subject_id") @db.Uuid
-  packageId       String            @map("package_id") @db.Uuid
+  packageId       String?           @map("package_id") @db.Uuid
   type            ExamType
   tokenMode       ActivityTokenMode @default(ROTATING) @map("token_mode")
   tokenRotation   Int               @default(0) @map("token_rotation")

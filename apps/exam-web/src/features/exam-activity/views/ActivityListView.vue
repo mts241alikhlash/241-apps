@@ -14,12 +14,14 @@ import {
 } from '@mts241alikhlash/ui/card'
 import { examTypeLabel } from '@/features/exam-shared/examType'
 import { examActivityApi } from '../api/examActivityApi'
+import AttachPackageDialog from '../components/AttachPackageDialog.vue'
 import { activityStatusLabel, type ExamActivityRecord } from '../types'
 
 const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const { category, sectionPrefix } = useRouteCategory()
+const canManage = computed(() => hasPermission('exam-schedules.manage'))
 const heading = computed(() =>
   category.value === 'NON_EXAM' ? 'Kegiatan Non-ujian' : 'Kegiatan Ujian',
 )
@@ -27,6 +29,7 @@ const heading = computed(() =>
 const activities = ref<ExamActivityRecord[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const attachTarget = ref<ExamActivityRecord | null>(null)
 
 function formatWindow(item: ExamActivityRecord): string {
   const fmt = new Intl.DateTimeFormat('id-ID', {
@@ -125,6 +128,12 @@ onMounted(load)
                 >
                   {{ activityStatusLabel(item.status) }}
                 </span>
+                <span
+                  v-if="item.packageId === null"
+                  class="text-xs text-warning"
+                >
+                  Menunggu paket
+                </span>
               </div>
               <p class="text-control text-muted-foreground">
                 {{ formatWindow(item) }} · {{ item.durationMinutes }} menit ·
@@ -135,17 +144,31 @@ onMounted(load)
                 }}
               </p>
             </div>
-            <Button
-              variant="outline"
-              class="shrink-0 self-start sm:self-auto"
-              @click="router.push(`${sectionPrefix}/activities/${item.id}`)"
-            >
-              Detail
-            </Button>
+            <div class="flex shrink-0 flex-wrap gap-2 self-start sm:self-auto">
+              <Button
+                v-if="item.packageId === null && canManage"
+                variant="outline"
+                @click="attachTarget = item"
+              >
+                Pasang paket
+              </Button>
+              <Button
+                variant="outline"
+                @click="router.push(`${sectionPrefix}/activities/${item.id}`)"
+              >
+                Detail
+              </Button>
+            </div>
           </li>
         </ul>
       </CardContent>
       <CardFooter plain />
     </Card>
+    <AttachPackageDialog
+      :open="attachTarget !== null"
+      :activity="attachTarget"
+      @update:open="(value: boolean) => value || (attachTarget = null)"
+      @attached="load"
+    />
   </div>
 </template>

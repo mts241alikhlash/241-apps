@@ -266,3 +266,17 @@ describe('clientLabel', () => {
     expect(clientLabel(null)).toBe('-')
   })
 })
+
+describe('absence without a schedule', () => {
+  it('disables Catat Absen when the row has no schedule to attach it to', () => {
+    const node = cellOf('actions', { supervise: true })({
+      row: { original: participant({ scheduleId: '', session: null }) },
+    }) as VNode
+    const props = node.props as {
+      items: { label: string; disabled?: boolean }[]
+    }
+    expect(
+      props.items.find((item) => item.label === 'Catat Absen')?.disabled,
+    ).toBe(true)
+  })
+})

@@ -3,8 +3,8 @@ export interface ExamRoomSupervisor {
   roomId: string
   startsAt: Date
   endsAt: Date
-  scheduledUserId: string
-  actualUserId: string
+  scheduledUserId: string | null
+  actualUserId: string | null
   substitutedByAdminId: string | null
   substituteReason: string | null
   substitutedAt: Date | null
@@ -15,7 +15,7 @@ export interface NewExamRoomSupervisor {
   roomId: string
   startsAt: Date
   endsAt: Date
-  scheduledUserId: string
+  scheduledUserId: string | null
 }
 
 export interface NewSupervisorSlot extends NewExamRoomSupervisor {

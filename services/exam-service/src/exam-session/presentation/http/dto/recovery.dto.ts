@@ -227,9 +227,10 @@ export class SubstituteSupervisorDto {
 }
 
 export class AssignSupervisorDto extends RecoveryReasonDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({ format: 'uuid', required: false })
+  @IsOptional()
   @IsUUID()
-  scheduledUserId!: string
+  scheduledUserId?: string
 
   @ApiProperty({ format: 'date-time' })
   @IsISO8601()
@@ -278,16 +279,18 @@ export class AuditLogDto {
 export class SupervisorSlotDto {
   @ApiProperty({ format: 'uuid' }) slotId!: string
   @ApiProperty({ format: 'uuid' }) roomId!: string
-  @ApiProperty({ format: 'uuid' }) scheduledUserId!: string
-  @ApiProperty({ format: 'uuid' }) actualUserId!: string
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  scheduledUserId!: string | null
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  actualUserId!: string | null
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ format: 'date-time' }) endsAt!: string
 
   static fromDomain(domain: {
     id: string
     roomId: string
-    scheduledUserId: string
-    actualUserId: string
+    scheduledUserId: string | null
+    actualUserId: string | null
     startsAt: Date
     endsAt: Date
   }): SupervisorSlotDto {

@@ -38,8 +38,10 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
   )
 
   readonly packageStatuses = new Map<string, string>()
+  readonly missingPackages = new Set<string>()
 
-  findPackageStatus(packageId: string) {
+  findPackageStatus(packageId: string): Promise<string | null> {
+    if (this.missingPackages.has(packageId)) return Promise.resolve(null)
     return Promise.resolve(this.packageStatuses.get(packageId) ?? 'APPROVED')
   }
 
@@ -97,6 +99,39 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
       })),
     )
     return Promise.resolve(activity)
+  }
+
+  readonly attachments: {
+    activityId: string
+    packageId: string
+    classroomIds: string[]
+  }[] = []
+
+  attachPackage(input: {
+    activityId: string
+    packageId: string
+    classroomIds: string[]
+    actorId: string
+  }) {
+    const activity = this.activities.get(input.activityId)
+    if (activity === undefined) return Promise.resolve(null)
+    this.attachments.push({
+      activityId: input.activityId,
+      packageId: input.packageId,
+      classroomIds: input.classroomIds,
+    })
+    const updated: ExamActivity = { ...activity, packageId: input.packageId }
+    this.activities.set(input.activityId, updated)
+    this.activitySchedules.set(
+      input.activityId,
+      input.classroomIds.map((classroomId) => ({
+        id: randomUUID(),
+        classroomId,
+        startsAt: activity.startsAt,
+        endsAt: activity.endsAt,
+      })),
+    )
+    return Promise.resolve(updated)
   }
 
   findById(id: string) {

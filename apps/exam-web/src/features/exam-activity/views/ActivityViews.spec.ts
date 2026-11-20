@@ -136,6 +136,18 @@ describe('ActivityListView', () => {
     ])
   })
 
+  it('marks an activity without a package and offers to attach one', async () => {
+    list.mockResolvedValue([sampleDetail({ id: 'act-x', packageId: null })])
+    const wrapper = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Menunggu paket')
+    expect(
+      wrapper.findAll('button').some((b) => b.text() === 'Pasang paket'),
+    ).toBe(true)
+    wrapper.unmount()
+  })
+
   it('calls examActivityApi.list({ category }) with route.meta.category and navigates to the section create route', async () => {
     const wrapper = mount(ActivityListView, { global: { stubs } })
     await flushPromises()

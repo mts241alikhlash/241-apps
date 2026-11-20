@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { VNode } from 'vue'
-import { buildSeatColumns } from './seatColumns'
+import { buildSeatColumns, supervisorDisplayName } from './seatColumns'
 import type { SeatedStudent } from '../services/examEventService'
 
 const seat: SeatedStudent = {
@@ -39,5 +39,21 @@ describe('buildSeatColumns permissions', () => {
 
   it('renders no action cell for a room the caller does not own', () => {
     expect(actionNode({ canFlag: () => false, onFlag: vi.fn() })).toBeNull()
+  })
+})
+
+describe('supervisorDisplayName', () => {
+  it('names a person by identifier when the user is known', () => {
+    expect(
+      supervisorDisplayName('u1', [{ id: 'u1', identifier: 'Budi' }]),
+    ).toBe('Budi')
+  })
+
+  it('shows Belum ditentukan when no person is set', () => {
+    expect(supervisorDisplayName(null, [])).toBe('Belum ditentukan')
+  })
+
+  it('falls back to the id when the user is not in the list', () => {
+    expect(supervisorDisplayName('u2', [])).toBe('u2')
   })
 })

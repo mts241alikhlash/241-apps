@@ -95,6 +95,10 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve(this.stored)
   }
 
+  attachPackage() {
+    return Promise.resolve(null)
+  }
+
   findById(id: string) {
     return Promise.resolve(id === this.stored.id ? this.stored : null)
   }
@@ -327,6 +331,33 @@ describe('CreateActivityUseCase', () => {
       command,
     )
     expect(repo.created).toHaveLength(1)
+  })
+
+  it('creates a draft activity with no package and no schedules', async () => {
+    const repo = new FakeActivityRepository()
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+      ...command,
+      packageId: null,
+      classroomIds: [],
+    })
+
+    expect(repo.lastCreatedActivity?.packageId).toBeNull()
+    expect(repo.created).toEqual([
+      { classroomIds: [], activityId: 'activity-1' },
+    ])
+    expect(repo.audits).toEqual(['CREATE_ACTIVITY'])
+  })
+
+  it('still refuses an unapproved package when one is given', async () => {
+    const repo = new FakeActivityRepository()
+    repo.packageStatus = 'SUBMITTED'
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...command,
+        packageId: 'package-1',
+      }),
+    ).rejects.toBeInstanceOf(UnprocessableEntityException)
+    expect(repo.created).toEqual([])
   })
 
   it('refuses an unknown preset', async () => {

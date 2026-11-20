@@ -20,6 +20,7 @@ import type {
   SeatFlag,
   SeatGenerateBody,
   SeatGenerateResult,
+  SupervisorGenerateResult,
   SupervisorSlot,
   UserOption,
   AuditLogEntry,
@@ -139,6 +140,17 @@ export const examEventService = {
     }
   },
 
+  async loadSeatedIds(roomIds: string[]): Promise<string[]> {
+    try {
+      const lists = await Promise.all(
+        roomIds.map((id) => examEventApi.getSeats(id)),
+      )
+      return lists.flatMap((seats) => seats.map((seat) => seat.studentId))
+    } catch {
+      return []
+    }
+  },
+
   async loadSeats(
     roomId: string,
     semesterId: string,
@@ -212,6 +224,17 @@ export const examEventService = {
         error: messageOf(err, 'Gagal membuat kursi.'),
         code,
       }
+    }
+  },
+
+  async generateSupervisorSlots(
+    eventId: string,
+  ): Promise<Outcome<SupervisorGenerateResult>> {
+    try {
+      const response = await examEventApi.generateSupervisorSlots(eventId)
+      return { success: true, data: response }
+    } catch (err: unknown) {
+      return failure(err, 'Gagal membuat slot ruangan.')
     }
   },
 

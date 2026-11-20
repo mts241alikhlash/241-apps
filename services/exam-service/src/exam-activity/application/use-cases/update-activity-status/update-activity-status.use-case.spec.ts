@@ -79,6 +79,23 @@ describe('UpdateActivityStatusUseCase', () => {
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
 
+  it('refuses to activate an activity without a package', async () => {
+    const repo = seeded('DRAFT')
+    repo.activities.set('activity-1', {
+      ...repo.activities.get('activity-1')!,
+      packageId: null,
+    })
+    const { useCase, closeSessions } = build(repo)
+
+    await expect(
+      useCase.execute('admin-1', 'activity-1', 'SCHEDULED'),
+    ).rejects.toMatchObject({
+      message: 'Pasang paket soal dulu',
+    })
+    expect(repo.activities.get('activity-1')?.status).toBe('DRAFT')
+    expect(closeSessions.execute).not.toHaveBeenCalled()
+  })
+
   it('refuses an unknown activity', async () => {
     const repo = seeded('SCHEDULED')
     const { useCase, closeSessions } = build(repo)

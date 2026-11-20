@@ -502,11 +502,12 @@ describe('unique violation mapping', () => {
 describe('FakeExamRoomRepository reports', () => {
   it('keeps one report per supervisor slot and tracks the lifecycle', async () => {
     const { rooms, event: created, built } = await setup()
+    const supervisorId = randomUUID()
     const slot = await rooms.assignSupervisor({
       roomId: built[0].id,
       startsAt: new Date('2026-11-02T01:00:00Z'),
       endsAt: new Date('2026-11-02T02:00:00Z'),
-      scheduledUserId: randomUUID(),
+      scheduledUserId: supervisorId,
     })
     const report = await rooms.createReport({
       roomId: built[0].id,
@@ -536,7 +537,7 @@ describe('FakeExamRoomRepository reports', () => {
       scheduleId,
       reason: 'SICK',
       note: 'Demam tinggi',
-      recordedBy: slot.actualUserId,
+      recordedBy: supervisorId,
     })
     await rooms.recordAbsence({
       reportId: report.id,
@@ -544,7 +545,7 @@ describe('FakeExamRoomRepository reports', () => {
       scheduleId,
       reason: 'PERMITTED',
       note: 'Izin keluarga',
-      recordedBy: slot.actualUserId,
+      recordedBy: supervisorId,
     })
     const absences = await rooms.listAbsencesByScheduleStudent(
       scheduleId,
@@ -557,7 +558,7 @@ describe('FakeExamRoomRepository reports', () => {
       studentId,
       category: 'DEVICE',
       note: 'HP restarted',
-      recordedBy: slot.actualUserId,
+      recordedBy: supervisorId,
     })
     expect(note?.sessionId).toBeNull()
 
@@ -569,19 +570,14 @@ describe('FakeExamRoomRepository reports', () => {
       (
         await rooms.submitReport(
           report.id,
-          slot.actualUserId,
+          supervisorId,
           NOW,
           SAMPLE_ATTACHMENT,
         )
       )?.status,
     ).toBe('SUBMITTED')
     expect(
-      await rooms.submitReport(
-        report.id,
-        slot.actualUserId,
-        NOW,
-        SAMPLE_ATTACHMENT,
-      ),
+      await rooms.submitReport(report.id, supervisorId, NOW, SAMPLE_ATTACHMENT),
     ).toBeNull()
 
     expect(
@@ -598,11 +594,12 @@ describe('FakeExamRoomRepository reports', () => {
 
   it('leaves an undefined draft field alone and clears an explicit null', async () => {
     const { rooms, built } = await setup()
+    const supervisorId = randomUUID()
     const slot = await rooms.assignSupervisor({
       roomId: built[0].id,
       startsAt: new Date('2026-11-02T01:00:00Z'),
       endsAt: new Date('2026-11-02T02:00:00Z'),
-      scheduledUserId: randomUUID(),
+      scheduledUserId: supervisorId,
     })
     const report = await rooms.createReport({
       roomId: built[0].id,

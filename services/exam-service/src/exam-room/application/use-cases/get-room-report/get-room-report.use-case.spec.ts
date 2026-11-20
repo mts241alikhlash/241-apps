@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import {
   ConflictException,
   ForbiddenException,
@@ -14,7 +15,11 @@ import {
 import { RoomReportService } from '../../room-report.service.js'
 import {
   FOREIGN_STUDENT_ID,
+  LATER_SLOT_END,
+  LATER_SLOT_START,
   MONITOR_NOW,
+  SLOT_END,
+  SLOT_START,
   OTHER_SUPERVISOR_ID,
   SUPERVISOR_ID,
   TECHNICIAN_ID,
@@ -27,6 +32,9 @@ import {
   FakeRoomReportFileStorage,
   SAMPLE_ATTACHMENT,
 } from '../../room-report-file-storage.fake.js'
+import { FakeAcademicLookup } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
+import { CLASSROOM_7A } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
+import { CLASSROOM_8A } from '../../room-monitor.test-support.js'
 import { GetRoomReportUseCase } from '../get-room-report/get-room-report.use-case.js'
 import { SaveRoomReportUseCase } from '../save-room-report/save-room-report.use-case.js'
 import { SubmitRoomReportUseCase } from '../submit-room-report/submit-room-report.use-case.js'
@@ -946,5 +954,157 @@ describe('RoomReportService roster and slot guards', () => {
         'REOPEN_ROOM_REPORT',
       ]),
     )
+  })
+})
+
+const GRADE_7 = CLASSROOM_7A.gradeId
+const GRADE_9 = '33333333-3333-4333-8333-333333333333'
+const CLASSROOM_9A = {
+  id: '99999999-aaaa-4aaa-8aaa-999999999999',
+  gradeId: GRADE_9,
+  academicYearId: CLASSROOM_7A.academicYearId,
+  name: 'IX A',
+}
+const MATH_ID = '44444444-4444-4444-8444-444444444444'
+const IPA_ID = '55555555-5555-4555-8555-555555555555'
+
+async function timetableRoom() {
+  const fixture = await seedMonitorRoom(6)
+  await fixture.rooms.assignSeat({
+    roomId: fixture.room.id,
+    eventId: fixture.eventId,
+    studentId: randomUUID(),
+    classroomId: CLASSROOM_9A.id,
+    seatNumber: 50,
+  })
+  const academic = new FakeAcademicLookup({
+    classrooms: [CLASSROOM_7A, CLASSROOM_8A, CLASSROOM_9A],
+    subjects: [
+      { id: MATH_ID, name: 'Matematika' },
+      { id: IPA_ID, name: 'IPA' },
+    ],
+  })
+  const files = new FakeRoomReportFileStorage()
+  const reports = new RoomReportService(
+    fixture.rooms,
+    fixture.schedules,
+    fixture.sessions,
+    new RoomAccessService(fixture.rooms),
+    files,
+  )
+  const get = new GetRoomReportUseCase(
+    fixture.rooms,
+    fixture.sessions,
+    fixture.schedules,
+    fixture.students,
+    academic,
+    reports,
+  )
+  return { fixture, get }
+}
+
+function seedActivity(
+  fixture: MonitorFixture,
+  input: {
+    id: string
+    gradeId: string
+    subjectId: string
+    startsAt: Date
+    endsAt: Date
+  },
+) {
+  fixture.rooms.activities.set(input.id, { ...input, eventId: fixture.eventId })
+}
+
+describe('GetRoomReportUseCase timetable rows', () => {
+  it('gives one row per activity of a grade seated in the room when no schedules exist yet', async () => {
+    const { fixture, get } = await timetableRoom()
+    fixture.schedules.schedules.clear()
+    seedActivity(fixture, {
+      id: 'act-math-7',
+      gradeId: GRADE_7,
+      subjectId: MATH_ID,
+      startsAt: SLOT_START,
+      endsAt: SLOT_END,
+    })
+    seedActivity(fixture, {
+      id: 'act-ipa-9',
+      gradeId: GRADE_9,
+      subjectId: IPA_ID,
+      startsAt: SLOT_START,
+      endsAt: SLOT_END,
+    })
+
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    expect(report.schedules).toHaveLength(2)
+    expect(report.schedules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          scheduleId: null,
+          activityId: 'act-math-7',
+          subjectName: 'Matematika',
+          gradeId: GRADE_7,
+          registeredCount: 6,
+        }),
+        expect.objectContaining({
+          scheduleId: null,
+          activityId: 'act-ipa-9',
+          subjectName: 'IPA',
+          gradeId: GRADE_9,
+          registeredCount: 1,
+        }),
+      ]),
+    )
+  })
+
+  it('does not duplicate an activity whose classes already have schedules in the room', async () => {
+    const { fixture, get } = await timetableRoom()
+    for (const row of fixture.schedules.schedules.values()) {
+      fixture.schedules.schedules.set(row.id, {
+        ...row,
+        activityId: 'act-math-7',
+      })
+    }
+    seedActivity(fixture, {
+      id: 'act-math-7',
+      gradeId: GRADE_7,
+      subjectId: MATH_ID,
+      startsAt: SLOT_START,
+      endsAt: SLOT_END,
+    })
+
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    expect(report.schedules).toHaveLength(2)
+    expect(report.schedules.every((row) => row.scheduleId !== null)).toBe(true)
+  })
+
+  it('leaves out an activity outside the slot window', async () => {
+    const { fixture, get } = await timetableRoom()
+    fixture.schedules.schedules.clear()
+    seedActivity(fixture, {
+      id: 'act-later',
+      gradeId: GRADE_7,
+      subjectId: MATH_ID,
+      startsAt: LATER_SLOT_START,
+      endsAt: LATER_SLOT_END,
+    })
+
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    expect(report.schedules).toEqual([])
   })
 })

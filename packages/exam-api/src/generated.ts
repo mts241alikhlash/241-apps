@@ -40,6 +40,23 @@ export interface paths {
         patch: operations["ExamActivityController_changeStatus"];
         trace?: never;
     };
+    "/exam-activities/{id}/package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attach an approved package and create the classroom schedules */
+        post: operations["ExamActivityController_attach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-activities/{id}/participant-numbers/issue": {
         parameters: {
             query?: never;
@@ -225,6 +242,23 @@ export interface paths {
         put?: never;
         /** Plan the seats of an exam event; with mode apply, write them in place of the existing seats */
         post: operations["ExamEventController_generateSeats"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-events/{id}/supervisor-slots/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create one empty supervisor slot per room and timetable window of an exam event */
+        post: operations["ExamEventController_generateSupervisorSlots"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1648,9 +1682,14 @@ export interface components {
             endsAt: string;
             reason: string;
             /** Format: uuid */
-            scheduledUserId: string;
+            scheduledUserId?: string;
             /** Format: date-time */
             startsAt: string;
+        };
+        AttachActivityPackageRequestDto: {
+            classroomIds: string[];
+            /** Format: uuid */
+            packageId: string;
         };
         AttendanceFileDto: {
             /** @example 2026-11-18 */
@@ -1727,7 +1766,7 @@ export interface components {
             updatedAt: string;
         };
         CreateActivityRequestDto: {
-            classroomIds: string[];
+            classroomIds?: string[];
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1736,7 +1775,7 @@ export interface components {
             /** Format: uuid */
             gradeId: string;
             /** Format: uuid */
-            packageId: string;
+            packageId?: string | null;
             /** @enum {string} */
             presetName?: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
             /** Format: uuid */
@@ -1833,7 +1872,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
-            packageId: string;
+            packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
             schedules: components["schemas"]["ExamActivityScheduleDto"][];
             /** Format: uuid */
@@ -1863,7 +1902,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
-            packageId: string;
+            packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
             /** Format: uuid */
             semesterId: string;
@@ -2109,6 +2148,10 @@ export interface components {
         ExtendSessionTimeDto: {
             minutes: number;
             reason: string;
+        };
+        GenerateRoomSlotsResponseDto: {
+            created: number;
+            skipped: number;
         };
         GenerateSeatRulesDto: {
             lanesPerSide?: number;
@@ -2629,13 +2672,17 @@ export interface components {
         };
         ReportScheduleDto: {
             absentCount: number;
+            /** Format: uuid */
+            activityId: string | null;
             classroomName: string | null;
             /** Format: date-time */
             endsAt: string;
-            packageTitle: string;
+            /** Format: uuid */
+            gradeId: string | null;
+            packageTitle: string | null;
             registeredCount: number;
             /** Format: uuid */
-            scheduleId: string;
+            scheduleId: string | null;
             startedCount: number;
             /** Format: date-time */
             startsAt: string;
@@ -3123,13 +3170,13 @@ export interface components {
         };
         SupervisorSlotDto: {
             /** Format: uuid */
-            actualUserId: string;
+            actualUserId: string | null;
             /** Format: date-time */
             endsAt: string;
             /** Format: uuid */
             roomId: string;
             /** Format: uuid */
-            scheduledUserId: string;
+            scheduledUserId: string | null;
             /** Format: uuid */
             slotId: string;
             /** Format: date-time */
@@ -3327,6 +3374,37 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateActivityStatusRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_attach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachActivityPackageRequestDto"];
             };
         };
         responses: {
@@ -3781,6 +3859,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["GenerateSeatsResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_generateSupervisorSlots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["GenerateRoomSlotsResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

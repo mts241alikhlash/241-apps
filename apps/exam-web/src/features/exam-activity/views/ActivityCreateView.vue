@@ -13,6 +13,7 @@ import {
 } from '@mts241alikhlash/ui/card'
 import { classroomApi } from '@/features/lookup/classroom'
 import { semesterApi } from '@/features/lookup/semester'
+import { subjectApi } from '@/features/lookup/subject'
 import { examPackageApi } from '@/features/exam-package/api/examPackageApi'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examEventService } from '@/features/exam-event/services/examEventService'
@@ -25,6 +26,7 @@ import type {
   ExamActivityRecord,
   GradeOption,
   PackageOption,
+  SubjectOption,
 } from '../types'
 
 const route = useRoute()
@@ -37,6 +39,7 @@ const semesterId = ref('')
 const grades = ref<GradeOption[]>([])
 const classrooms = ref<ClassroomOption[]>([])
 const packages = ref<PackageOption[]>([])
+const subjects = ref<SubjectOption[]>([])
 const events = ref<EventOption[]>([])
 const isAdmin = computed(() => hasPermission('exam-schedules.manage-all'))
 const submitting = ref(false)
@@ -45,11 +48,16 @@ const activity = ref<ExamActivityRecord | null>(null)
 const loadingActivity = ref(editingId.value !== '')
 
 async function load(): Promise<void> {
-  const [semesters, rooms, packs] = await Promise.all([
+  const [semesters, rooms, packs, subjectPage] = await Promise.all([
     semesterApi.getSemesters({ page: 1, limit: 20 }),
     classroomApi.getClassrooms({ page: 1, limit: 200 }),
     examPackageApi.getPackages({ page: 1, limit: 200 }),
+    subjectApi.getSubjects({ page: 1, limit: 200 }),
   ])
+  subjects.value = subjectPage.data.map((item) => ({
+    id: item.id,
+    label: item.name,
+  }))
 
   const activeSemester =
     semesters.data.find((item) => item.isActive) ?? semesters.data[0]
@@ -174,6 +182,7 @@ onMounted(() => {
           :grades="grades"
           :classrooms="classrooms"
           :packages="packages"
+          :subjects="subjects"
           :events="events"
           :category="category"
           :is-admin="isAdmin"

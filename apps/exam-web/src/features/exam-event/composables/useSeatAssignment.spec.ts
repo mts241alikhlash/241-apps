@@ -1,16 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSeatAssignment } from './useSeatAssignment'
 
-const { loadSeats, loadCandidates, assignSeats, distributeSeats } = vi.hoisted(
-  () => ({
-    loadSeats: vi.fn(),
-    loadCandidates: vi.fn(),
-    assignSeats: vi.fn(),
-    distributeSeats: vi.fn(),
-  }),
-)
+const {
+  loadSeats,
+  loadSeatedIds,
+  loadCandidates,
+  assignSeats,
+  distributeSeats,
+} = vi.hoisted(() => ({
+  loadSeats: vi.fn(),
+  loadSeatedIds: vi.fn(),
+  loadCandidates: vi.fn(),
+  assignSeats: vi.fn(),
+  distributeSeats: vi.fn(),
+}))
 vi.mock('../services/examEventService', () => ({
-  examEventService: { loadSeats, loadCandidates, assignSeats, distributeSeats },
+  examEventService: {
+    loadSeats,
+    loadSeatedIds,
+    loadCandidates,
+    assignSeats,
+    distributeSeats,
+  },
 }))
 
 const rooms = [
@@ -58,6 +69,7 @@ describe('useSeatAssignment', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     loadSeats.mockResolvedValue({ success: true, data: seated })
+    loadSeatedIds.mockResolvedValue([])
     loadCandidates.mockResolvedValue(candidates)
   })
 
@@ -72,6 +84,19 @@ describe('useSeatAssignment', () => {
     expect(loadSeats).toHaveBeenCalledWith('r1', 'sem-1')
     expect(panel.available.value.map((row) => row.studentId)).toEqual(['s2'])
     expect(panel.nextSeatNumber.value).toBe(2)
+  })
+
+  it('does not offer students who sit in another room', async () => {
+    loadSeatedIds.mockResolvedValue(['s2'])
+    const panel = useSeatAssignment(
+      () => [...rooms, { ...rooms[0], id: 'r2', code: 'R02' }],
+      () => 'sem-1',
+    )
+
+    await panel.load('r1')
+
+    expect(loadSeatedIds).toHaveBeenCalledWith(['r2'])
+    expect(panel.available.value).toEqual([])
   })
 
   it('clears the seats when no room is chosen', async () => {

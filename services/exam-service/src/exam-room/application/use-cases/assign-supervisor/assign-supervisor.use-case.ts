@@ -10,7 +10,7 @@ import { assertRecoveryReason } from '../../../../exam-session/domain/policies/r
 
 export interface AssignSupervisorInput {
   roomId: string
-  scheduledUserId: string
+  scheduledUserId?: string
   startsAt: Date
   endsAt: Date
   reason: string
@@ -38,7 +38,7 @@ export class AssignSupervisorUseCase {
       roomId: room.id,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
-      scheduledUserId: input.scheduledUserId,
+      scheduledUserId: input.scheduledUserId ?? null,
     })
     await this.rooms.writeAuditLog({
       roomId: room.id,
@@ -47,7 +47,7 @@ export class AssignSupervisorUseCase {
       reason,
       metadata: {
         slotId: slot.id,
-        scheduledUserId: input.scheduledUserId,
+        scheduledUserId: input.scheduledUserId ?? null,
         startsAt: input.startsAt.toISOString(),
         endsAt: input.endsAt.toISOString(),
       },

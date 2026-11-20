@@ -8,9 +8,11 @@ import { RoomReportService } from '../../room-report.service.js'
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
 
 export interface ReportScheduleRow {
-  scheduleId: string
-  packageTitle: string
+  scheduleId: string | null
+  activityId: string | null
+  packageTitle: string | null
   subjectName: string | null
+  gradeId: string | null
   classroomName: string | null
   startsAt: string
   endsAt: string
@@ -96,6 +98,19 @@ export class GetRoomReportUseCase {
         row.startsAt.getTime() >= slot.startsAt.getTime() &&
         row.startsAt.getTime() < slot.endsAt.getTime(),
     )
+    const scheduledActivityIds = new Set(
+      overlapping
+        .filter((row) => roomClassrooms.has(row.classroomId))
+        .map((row) => row.activityId)
+        .filter((id): id is string => id !== undefined && id !== null),
+    )
+    const activities = (
+      await this.rooms.listActivitiesByEvent(room.eventId)
+    ).filter(
+      (row) =>
+        row.startsAt.getTime() < slot.endsAt.getTime() &&
+        row.endsAt.getTime() > slot.startsAt.getTime(),
+    )
     const absences = await this.rooms.listAbsencesByReport(report.id)
     const fieldNotes = await this.rooms.listFieldNotesByReport(report.id)
     const auditLogs = (await this.rooms.listAuditLogsByRoom(roomId)).filter(
@@ -113,17 +128,31 @@ export class GetRoomReportUseCase {
     const refs = new Map(
       (await this.students.refsByIds(studentIds)).map((ref) => [ref.id, ref]),
     )
-    const classroomNames = new Map(
-      (
-        await this.academic.classroomsByIds([
-          ...new Set(seats.map((seat) => seat.classroomId)),
-        ])
-      ).map((row) => [row.id, row.name]),
+    const classrooms = await this.academic.classroomsByIds([
+      ...new Set(seats.map((seat) => seat.classroomId)),
+    ])
+    const classroomNames = new Map(classrooms.map((row) => [row.id, row.name]))
+    const classroomGrades = new Map(
+      classrooms.map((row) => [row.id, row.gradeId]),
+    )
+    const seatedByGrade = new Map<string, number>()
+    for (const seat of seats) {
+      const gradeId = classroomGrades.get(seat.classroomId)
+      if (gradeId !== undefined) {
+        seatedByGrade.set(gradeId, (seatedByGrade.get(gradeId) ?? 0) + 1)
+      }
+    }
+    const derived = activities.filter(
+      (row) =>
+        !scheduledActivityIds.has(row.id) && seatedByGrade.has(row.gradeId),
     )
     const subjectNames = new Map(
       (
         await this.academic.subjectsByIds([
-          ...new Set(schedules.map((row) => row.subjectId)),
+          ...new Set([
+            ...schedules.map((row) => row.subjectId),
+            ...derived.map((row) => row.subjectId),
+          ]),
         ])
       ).map((row) => [row.id, row.name]),
     )
@@ -144,31 +173,50 @@ export class GetRoomReportUseCase {
         startsAt: slot.startsAt.toISOString(),
         endsAt: slot.endsAt.toISOString(),
       },
-      schedules: schedules.map((schedule) => {
-        const inClass = seats.filter(
-          (seat) => seat.classroomId === schedule.classroomId,
-        )
-        const classSessions = sessions.filter(
-          (session) =>
-            session.scheduleId === schedule.id &&
-            inClass.some((seat) => seat.studentId === session.studentId),
-        )
-        return {
-          scheduleId: schedule.id,
-          packageTitle: schedule.packageTitle,
-          subjectName: subjectNames.get(schedule.subjectId) ?? null,
-          classroomName: classroomNames.get(schedule.classroomId) ?? null,
-          startsAt: schedule.startsAt.toISOString(),
-          endsAt: schedule.endsAt.toISOString(),
-          registeredCount: inClass.length,
-          startedCount: classSessions.length,
-          submittedCount: classSessions.filter(
-            (session) => session.status !== 'IN_PROGRESS',
-          ).length,
-          absentCount: absences.filter((row) => row.scheduleId === schedule.id)
-            .length,
-        }
-      }),
+      schedules: [
+        ...schedules.map((schedule): ReportScheduleRow => {
+          const inClass = seats.filter(
+            (seat) => seat.classroomId === schedule.classroomId,
+          )
+          const classSessions = sessions.filter(
+            (session) =>
+              session.scheduleId === schedule.id &&
+              inClass.some((seat) => seat.studentId === session.studentId),
+          )
+          return {
+            scheduleId: schedule.id,
+            activityId: schedule.activityId ?? null,
+            packageTitle: schedule.packageTitle,
+            subjectName: subjectNames.get(schedule.subjectId) ?? null,
+            gradeId: classroomGrades.get(schedule.classroomId) ?? null,
+            classroomName: classroomNames.get(schedule.classroomId) ?? null,
+            startsAt: schedule.startsAt.toISOString(),
+            endsAt: schedule.endsAt.toISOString(),
+            registeredCount: inClass.length,
+            startedCount: classSessions.length,
+            submittedCount: classSessions.filter(
+              (session) => session.status !== 'IN_PROGRESS',
+            ).length,
+            absentCount: absences.filter(
+              (row) => row.scheduleId === schedule.id,
+            ).length,
+          }
+        }),
+        ...derived.map((activity): ReportScheduleRow => ({
+          scheduleId: null,
+          activityId: activity.id,
+          packageTitle: null,
+          subjectName: subjectNames.get(activity.subjectId) ?? null,
+          gradeId: activity.gradeId,
+          classroomName: null,
+          startsAt: activity.startsAt.toISOString(),
+          endsAt: activity.endsAt.toISOString(),
+          registeredCount: seatedByGrade.get(activity.gradeId) ?? 0,
+          startedCount: 0,
+          submittedCount: 0,
+          absentCount: 0,
+        })),
+      ].sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)),
       absences: absences
         .filter((row) => scheduleIds.has(row.scheduleId))
         .map((row) => ({

@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 
-const { generateSeats } = vi.hoisted(() => ({ generateSeats: vi.fn() }))
+const { generateSeats, generateSupervisorSlots } = vi.hoisted(() => ({
+  generateSeats: vi.fn(),
+  generateSupervisorSlots: vi.fn(),
+}))
 vi.mock('../api/examEventApi', () => ({
-  examEventApi: { generateSeats },
+  examEventApi: { generateSeats, generateSupervisorSlots },
 }))
 
 import { examEventService } from './examEventService'
@@ -51,5 +54,27 @@ describe('examEventService.generateSeats', () => {
       error: 'Kursi periode ini sudah ada. Konfirmasi untuk menimpa.',
       code: 'SEATS_EXIST',
     })
+  })
+})
+
+describe('examEventService.generateSupervisorSlots', () => {
+  it('returns the created and skipped counts', async () => {
+    generateSupervisorSlots.mockResolvedValue({ created: 3, skipped: 0 })
+
+    const result = await examEventService.generateSupervisorSlots('e1')
+
+    expect(generateSupervisorSlots).toHaveBeenCalledWith('e1')
+    expect(result).toEqual({
+      success: true,
+      data: { created: 3, skipped: 0 },
+    })
+  })
+
+  it('maps a failure to an error outcome', async () => {
+    generateSupervisorSlots.mockRejectedValue(new Error('x'))
+
+    const result = await examEventService.generateSupervisorSlots('e1')
+
+    expect(result).toEqual({ success: false, error: expect.any(String) })
   })
 })

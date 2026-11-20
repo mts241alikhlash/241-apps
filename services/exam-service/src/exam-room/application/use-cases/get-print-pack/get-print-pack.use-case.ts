@@ -101,7 +101,7 @@ export class GetPrintPackUseCase {
     for (const room of rooms) {
       if (room.technicianUserId !== null) userIds.add(room.technicianUserId)
       for (const slot of supervisorsOf.get(room.id) ?? []) {
-        userIds.add(slot.actualUserId)
+        if (slot.actualUserId !== null) userIds.add(slot.actualUserId)
       }
     }
     const nameOfUser = await this.namesOfUsers([...userIds])
@@ -135,7 +135,10 @@ export class GetPrintPackUseCase {
         supervisors: (supervisorsOf.get(room.id) ?? []).map((slot) => ({
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
-          name: nameOfUser.get(slot.actualUserId) ?? null,
+          name:
+            slot.actualUserId === null
+              ? null
+              : (nameOfUser.get(slot.actualUserId) ?? null),
         })),
         students,
       }
