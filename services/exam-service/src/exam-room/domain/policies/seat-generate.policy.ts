@@ -103,7 +103,7 @@ export function generateSeatPlan(
     const sizes = lists.map((list) => list.length)
     const caps = layouts.map((layout) => capacityOf(layout, group))
     const placed = Math.min(sumOf(sizes), sumOf(caps))
-    const quota = apportion(placed, caps)
+    const quota = fillInOrder(placed, caps)
     const rowTarget = apportion(placed, sizes)
     const ideal = rowTarget.map((target) =>
       quota.map((seats) => (placed === 0 ? 0 : (target * seats) / placed)),
@@ -233,6 +233,15 @@ function classroomQueues(
 
 function matchesGroup(student: PlanStudent, group: Group): boolean {
   return group === 'ALL' || student.gender === group
+}
+
+function fillInOrder(total: number, caps: number[]): number[] {
+  let left = total
+  return caps.map((cap) => {
+    const take = Math.min(cap, left)
+    left -= take
+    return take
+  })
 }
 
 function apportion(total: number, sizes: number[]): number[] {
