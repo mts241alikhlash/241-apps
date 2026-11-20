@@ -36,7 +36,11 @@ export class HttpIdentityCredentialsAdapter extends IIdentityCredentialsPort {
         '/accounts/passwords/reset',
         { userIds: chunk },
       )
-      const rows = isRecord(data) && Array.isArray(data.data) ? data.data : null
+      const rows = Array.isArray(data)
+        ? data
+        : isRecord(data) && Array.isArray(data.data)
+          ? data.data
+          : null
       if (rows === null) return this.client.malformed(URL_KEY)
       for (const row of rows as unknown[]) {
         if (!isCredential(row)) return this.client.malformed(URL_KEY)

@@ -38,6 +38,16 @@ describe('HttpIdentityCredentialsAdapter.resetPasswords', () => {
     ])
   })
 
+  it('reads rows that the response interceptor already unwrapped into an array', async () => {
+    const { adapter } = build((ids) => answerAll(ids).data)
+
+    const result = await adapter.resetPasswords(['u1'])
+
+    expect(result).toEqual([
+      { userId: 'u1', identifier: 'nis-u1', password: 'Abcdefghjk' },
+    ])
+  })
+
   it('sends at most 25 ids per call', async () => {
     const ids = Array.from({ length: 101 }, (_, i) => `u${i}`)
     const { adapter, postData } = build(answerAll)
