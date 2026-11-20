@@ -284,6 +284,23 @@ describe('generateSeatPlan', () => {
     expect(plan.seats.filter((s) => s.row === 4 && s.lane > 4)).toHaveLength(0)
   })
 
+  it('fills each room before the next one when every room has 32 desks', () => {
+    const rooms: PlanRoom[] = [32, 32, 32, 32, 32, 32].map((capacity, i) => ({
+      roomId: `room-${i + 1}`,
+      code: `R${i + 1}`,
+      capacity,
+    }))
+
+    const plan = generateSeatPlan(schoolStudents(), rooms, rules())
+
+    const seatsPerRoom = rooms.map(
+      (room) => plan.seats.filter((seat) => seat.roomId === room.roomId).length,
+    )
+    expect(seatsPerRoom).toEqual([32, 32, 32, 32, 32, 28])
+    expect(plan.unseated).toHaveLength(0)
+    expect(plan.adjacentSameClassroom).toBe(0)
+  })
+
   it('is deterministic for the same input and rules', () => {
     const first = generateSeatPlan(schoolStudents(), SCHOOL_ROOMS, rules())
     const second = generateSeatPlan(schoolStudents(), SCHOOL_ROOMS, rules())
