@@ -5,15 +5,12 @@ import { IStudentDirectoryPort } from '../../../../platform/student-directory/st
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
 import {
   DEFAULT_SEAT_RULES,
-  generateSeatPlan,
+  generateSeatPlanWithLayouts,
   type PlanStudent,
   type SeatPlan,
   type SeatRules,
 } from '../../../domain/policies/seat-generate.policy.js'
-import {
-  layoutOf,
-  type SeatLayout,
-} from '../../../domain/policies/seat-layout.policy.js'
+import { type SeatLayout } from '../../../domain/policies/seat-layout.policy.js'
 
 export interface GenerateSeatsCommand {
   eventId: string
@@ -116,7 +113,7 @@ export class GenerateSeatsUseCase {
       lanesPerSide: requested.lanesPerSide ?? DEFAULT_SEAT_RULES.lanesPerSide,
       seed: requested.seed ?? command.eventId,
     }
-    const generated = generateSeatPlan(
+    const { plan: generated, layouts } = generateSeatPlanWithLayouts(
       students,
       picked.map((room) => ({
         roomId: room.id,
@@ -156,11 +153,11 @@ export class GenerateSeatsUseCase {
 
     return {
       plan,
-      rooms: picked.map((room) => ({
+      rooms: picked.map((room, index) => ({
         roomId: room.id,
         code: room.code,
         capacity: room.capacity,
-        layout: layoutOf(room.capacity, rules.lanesPerSide),
+        layout: layouts[index],
       })),
       applied,
     }

@@ -89,9 +89,17 @@ export function generateSeatPlan(
   rooms: PlanRoom[],
   rules: SeatRules,
 ): SeatPlan {
+  return generateSeatPlanWithLayouts(students, rooms, rules).plan
+}
+
+export function generateSeatPlanWithLayouts(
+  students: PlanStudent[],
+  rooms: PlanRoom[],
+  rules: SeatRules,
+): { plan: SeatPlan; layouts: SeatLayout[] } {
   const queues = classroomQueues(students, rules)
   const classIds = [...queues.keys()]
-  const layouts = rooms.map((room) =>
+  const layouts: SeatLayout[] = rooms.map((room) =>
     layoutOf(room.capacity, rules.lanesPerSide),
   )
   const groups: Group[] = rules.separateGender ? ['FEMALE', 'MALE'] : ['ALL']
@@ -120,6 +128,19 @@ export function generateSeatPlan(
     rules.seed,
   )
 
+  rooms.forEach((room, r) => {
+    const count = (g: number) => sumOf(balanced[g].map((row) => row[r]))
+    const total = sumOf(plans.map((_, g) => count(g)))
+    if (total === 0 || total >= room.capacity) return
+    if (students.some((student) => student.gender === null)) return
+    const compact = layoutOf(total, rules.lanesPerSide)
+    const fits = plans.every(
+      (plan, g) =>
+        plan.group === 'ALL' || count(g) <= capacityOf(compact, plan.group),
+    )
+    if (fits) layouts[r] = compact
+  })
+
   const pools = plans.map((plan, g) => {
     const offsets = classIds.map(() => 0)
     return rooms.map((_, r) => {
@@ -142,8 +163,9 @@ export function generateSeatPlan(
     const pool = new Map<Group, PlanStudent[]>(
       plans.map((plan, g) => [plan.group, pools[g][r]]),
     )
-    const zones = zonesOf(room.capacity, layout, pool)
-    const grid = gridOf(room.capacity, layout)
+    const size = layout.left + layout.right
+    const zones = zonesOf(size, layout, pool)
+    const grid = gridOf(size, layout)
     const cells = improve(
       greedyFill(zones, pool, grid.neighbours, rules),
       zones,
@@ -198,11 +220,14 @@ export function generateSeatPlan(
   )
 
   return {
-    seats,
-    unseated,
-    unknownGender,
-    adjacentSameGrade: adjacency.sameGrade,
-    adjacentSameClassroom: adjacency.sameClassroom,
+    plan: {
+      seats,
+      unseated,
+      unknownGender,
+      adjacentSameGrade: adjacency.sameGrade,
+      adjacentSameClassroom: adjacency.sameClassroom,
+    },
+    layouts,
   }
 }
 
