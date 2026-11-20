@@ -1,5 +1,17 @@
 # exam-service
 
+## 0.8.0
+
+### Minor Changes
+
+- f3309b4: Room reports and rosters read the exam timetable when no per-class schedule exists yet, supervisor slots can be created without a supervisor name, and `POST /exam-events/:id/supervisor-slots/generate` creates one empty slot per room per timetable window.
+- f3309b4: An exam activity (jadwal mapel) can be created without a question package and given one later with `POST /exam-activities/:id/package`; scheduling or activating it still needs an approved package.
+- 334de86: Desk numbers snake across the full row of eight lanes (1 to 8, then 16 to 9), girls fill the left lanes and boys the right, and same class or grade neighbours are avoided across the aisle too.
+
+### Patch Changes
+
+- f3309b4: Report schedule rows in the room report contract allow a missing schedule and package title and carry the activity and grade.
+
 ## 0.7.1
 
 ### Patch Changes
