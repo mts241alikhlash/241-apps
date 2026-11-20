@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto'
 
 import {
+  deskOf,
   layoutOf,
   positionOf,
   type SeatLayout,
-  type SeatPosition,
 } from './seat-layout.policy.js'
 
 export interface PlanStudent {
@@ -59,6 +59,7 @@ export const DEFAULT_SEAT_RULES: Omit<SeatRules, 'seed'> = {
 }
 
 type Group = 'FEMALE' | 'MALE' | 'ALL'
+type Zone = Group | null
 
 interface Pair {
   a: number
@@ -66,24 +67,17 @@ interface Pair {
   orthogonal: boolean
 }
 
-interface BlockResult {
-  cells: PlanStudent[]
-  sameGrade: number
-  sameClassroom: number
+interface Grid {
+  pairs: Pair[]
+  neighbours: number[][]
 }
 
 const SWAP_ITERATIONS = 30000
 const COUNT_ITERATIONS = 300000
 const SAME_GRADE_ORTHOGONAL = 10
 const SAME_GRADE_DIAGONAL = 3
-const SAME_CLASSROOM_ORTHOGONAL = 0.4
-const NEIGHBOURS_BEFORE = [
-  [0, -1],
-  [-1, 0],
-  [-1, -1],
-  [-1, 1],
-] as const
-const NEIGHBOURS_ALL = [
+const SAME_CLASSROOM_ORTHOGONAL = 10
+const NEIGHBOURS = [
   [0, 1, true],
   [1, 0, true],
   [1, 1, false],
@@ -107,8 +101,9 @@ export function generateSeatPlan(
       queues.get(id)!.filter((student) => matchesGroup(student, group)),
     )
     const sizes = lists.map((list) => list.length)
-    const quota = quotaFor(rooms, layouts, group, sumOf(sizes))
-    const placed = sumOf(quota)
+    const caps = layouts.map((layout) => capacityOf(layout, group))
+    const placed = Math.min(sumOf(sizes), sumOf(caps))
+    const quota = apportion(placed, caps)
     const rowTarget = apportion(placed, sizes)
     const ideal = rowTarget.map((target) =>
       quota.map((seats) => (placed === 0 ? 0 : (target * seats) / placed)),
@@ -116,7 +111,6 @@ export function generateSeatPlan(
     return {
       group,
       lists,
-      quota,
       counts: roundToMarginals(ideal, rowTarget, quota),
     }
   })
@@ -144,25 +138,28 @@ export function generateSeatPlan(
   const adjacency = { sameGrade: 0, sameClassroom: 0 }
 
   rooms.forEach((room, r) => {
-    plans.forEach((plan, g) => {
-      const pool = pools[g][r]
-      if (pool.length === 0) return
-      const layout = layouts[r]
-      const start = plan.group === 'MALE' ? layout.left + 1 : 1
-      const block = seatBlock(
-        pool,
-        start,
-        layout,
-        rules,
-        generatorFor(`${rules.seed}|${room.roomId}|${plan.group}`),
-      )
-      adjacency.sameGrade += block.sameGrade
-      adjacency.sameClassroom += block.sameClassroom
-      block.cells.forEach((student, i) => {
-        const desk = start + i
-        occupied[r].add(desk)
-        roomSeats[r].push(seatOf(room, desk, student, layout))
-      })
+    const layout = layouts[r]
+    const pool = new Map<Group, PlanStudent[]>(
+      plans.map((plan, g) => [plan.group, pools[g][r]]),
+    )
+    const zones = zonesOf(room.capacity, layout, pool)
+    const grid = gridOf(room.capacity, layout)
+    const cells = improve(
+      greedyFill(zones, pool, grid.neighbours, rules),
+      zones,
+      grid.pairs,
+      rules,
+      generatorFor(`${rules.seed}|${room.roomId}`),
+    )
+    sortWithinClassroomGender(cells)
+    const counted = countAdjacency(cells, grid.pairs)
+    adjacency.sameGrade += counted.sameGrade
+    adjacency.sameClassroom += counted.sameClassroom
+    cells.forEach((student, i) => {
+      if (student === null) return
+      const desk = i + 1
+      occupied[r].add(desk)
+      roomSeats[r].push(seatOf(room, desk, student, layout))
     })
   })
 
@@ -236,26 +233,6 @@ function classroomQueues(
 
 function matchesGroup(student: PlanStudent, group: Group): boolean {
   return group === 'ALL' || student.gender === group
-}
-
-function quotaFor(
-  rooms: PlanRoom[],
-  layouts: SeatLayout[],
-  group: Group,
-  total: number,
-): number[] {
-  let remaining = total
-  return rooms.map((room, r) => {
-    const block =
-      group === 'FEMALE'
-        ? layouts[r].left
-        : group === 'MALE'
-          ? layouts[r].right
-          : room.capacity
-    const quota = Math.min(block, remaining)
-    remaining -= quota
-    return quota
-  })
 }
 
 function apportion(total: number, sizes: number[]): number[] {
@@ -365,44 +342,74 @@ function balance(matrices: number[][][], seed: string): number[][][] {
   return bestMatrices
 }
 
-function seatBlock(
-  pool: PlanStudent[],
-  start: number,
-  layout: SeatLayout,
-  rules: SeatRules,
-  next: () => number,
-): BlockResult {
-  const positions = pool.map((_, i) => positionOf(start + i, layout))
-  const indexOf = new Map(positions.map((p, i) => [keyOf(p), i]))
-  const pairs = adjacentPairs(positions, indexOf)
-  const greedy = greedyFill(pool, positions, indexOf, rules)
-  const cells = improve(greedy, pairs, rules, next)
-  sortWithinClassroomGender(cells)
-  let sameGrade = 0
-  let sameClassroom = 0
-  for (const pair of pairs) {
-    if (!pair.orthogonal) continue
-    if (cells[pair.a].gradeLevel === cells[pair.b].gradeLevel) sameGrade++
-    if (cells[pair.a].classroomId === cells[pair.b].classroomId) sameClassroom++
+function gridOf(capacity: number, layout: SeatLayout): Grid {
+  const pairs: Pair[] = []
+  const neighbours: number[][] = Array.from({ length: capacity }, () => [])
+  for (let desk = 1; desk <= capacity; desk++) {
+    const position = positionOf(desk, layout)
+    for (const [dr, dl, orthogonal] of NEIGHBOURS) {
+      const other = deskOf(position.row + dr, position.lane + dl, layout)
+      if (other === undefined) continue
+      pairs.push({ a: desk - 1, b: other - 1, orthogonal })
+      neighbours[desk - 1].push(other - 1)
+      neighbours[other - 1].push(desk - 1)
+    }
   }
-  return { cells, sameGrade, sameClassroom }
+  return { pairs, neighbours }
+}
+
+function capacityOf(layout: SeatLayout, group: Group): number {
+  if (group === 'FEMALE') return layout.left
+  if (group === 'MALE') return layout.right
+  return layout.left + layout.right
+}
+
+function zonesOf(
+  capacity: number,
+  layout: SeatLayout,
+  pool: Map<Group, PlanStudent[]>,
+): Zone[] {
+  const zones: Zone[] = Array.from({ length: capacity }, () => null)
+  for (const [group, list] of pool) {
+    const side = group === 'FEMALE' ? 'LEFT' : group === 'MALE' ? 'RIGHT' : null
+    const desks = Array.from({ length: capacity }, (_, i) => i + 1).filter(
+      (desk) => side === null || positionOf(desk, layout).side === side,
+    )
+    if (side !== null) {
+      desks.sort((a, b) => {
+        const pa = positionOf(a, layout)
+        const pb = positionOf(b, layout)
+        return pa.lane - pb.lane || pa.row - pb.row
+      })
+    }
+    list.forEach((_, k) => {
+      zones[desks[k] - 1] = group
+    })
+  }
+  return zones
 }
 
 function greedyFill(
-  pool: PlanStudent[],
-  positions: SeatPosition[],
-  indexOf: Map<string, number>,
+  zones: Zone[],
+  pool: Map<Group, PlanStudent[]>,
+  neighbours: number[][],
   rules: SeatRules,
-): PlanStudent[] {
-  const remaining = [...pool]
-  const cells: PlanStudent[] = []
-  positions.forEach((p, i) => {
-    const avoid = NEIGHBOURS_BEFORE.map(([dr, dl]) =>
-      indexOf.get(keyOf({ side: p.side, row: p.row + dr, lane: p.lane + dl })),
-    )
-      .filter((j): j is number => j !== undefined && j < i)
+): (PlanStudent | null)[] {
+  const remaining = new Map<Zone, PlanStudent[]>(
+    [...pool].map(([group, list]) => [group, [...list]]),
+  )
+  const cells: (PlanStudent | null)[] = []
+  zones.forEach((zone, i) => {
+    if (zone === null) {
+      cells.push(null)
+      return
+    }
+    const avoid = neighbours[i]
+      .filter((j) => j < i)
       .map((j) => cells[j])
-    cells.push(remaining.splice(bestCandidate(remaining, avoid, rules), 1)[0])
+      .filter((s): s is PlanStudent => s !== null)
+    const list = remaining.get(zone)!
+    cells.push(list.splice(bestCandidate(list, avoid, rules), 1)[0])
   })
   return cells
 }
@@ -445,36 +452,26 @@ function scoreIsBetter(score: number[], other: number[]): boolean {
   return false
 }
 
-function adjacentPairs(
-  positions: SeatPosition[],
-  indexOf: Map<string, number>,
-): Pair[] {
-  const pairs: Pair[] = []
-  positions.forEach((p, a) => {
-    for (const [dr, dl, orthogonal] of NEIGHBOURS_ALL) {
-      const b = indexOf.get(
-        keyOf({ side: p.side, row: p.row + dr, lane: p.lane + dl }),
-      )
-      if (b !== undefined) pairs.push({ a, b, orthogonal })
-    }
-  })
-  return pairs
-}
-
 function improve(
-  initial: PlanStudent[],
+  initial: (PlanStudent | null)[],
+  zones: Zone[],
   pairs: Pair[],
   rules: SeatRules,
   next: () => number,
-): PlanStudent[] {
+): (PlanStudent | null)[] {
   const cells = [...initial]
-  const n = cells.length
-  if (n < 2) return cells
+  const movable = zones.flatMap((zone, i) => (zone === null ? [] : [i]))
+  if (movable.length < 2) return cells
+  const cellsOfZone = new Map<Zone, number[]>()
+  for (const i of movable) {
+    cellsOfZone.set(zones[i], [...(cellsOfZone.get(zones[i]) ?? []), i])
+  }
   const costOf = () => {
     let cost = 0
     for (const pair of pairs) {
       const a = cells[pair.a]
       const b = cells[pair.b]
+      if (a === null || b === null) continue
       if (rules.spreadGrades && a.gradeLevel === b.gradeLevel) {
         cost += pair.orthogonal ? SAME_GRADE_ORTHOGONAL : SAME_GRADE_DIAGONAL
       }
@@ -492,8 +489,9 @@ function improve(
   let best = current
   let bestCells = [...cells]
   for (let it = 0; it < SWAP_ITERATIONS && best > 0; it++) {
-    const i = Math.floor(next() * n)
-    const j = Math.floor(next() * n)
+    const i = movable[Math.floor(next() * movable.length)]
+    const sameZone = cellsOfZone.get(zones[i])!
+    const j = sameZone[Math.floor(next() * sameZone.length)]
     if (i === j) continue
     ;[cells[i], cells[j]] = [cells[j], cells[i]]
     const candidate = costOf()
@@ -514,16 +512,33 @@ function improve(
   return bestCells
 }
 
-function sortWithinClassroomGender(cells: PlanStudent[]): void {
+function countAdjacency(
+  cells: (PlanStudent | null)[],
+  pairs: Pair[],
+): { sameGrade: number; sameClassroom: number } {
+  let sameGrade = 0
+  let sameClassroom = 0
+  for (const pair of pairs) {
+    const a = cells[pair.a]
+    const b = cells[pair.b]
+    if (!pair.orthogonal || a === null || b === null) continue
+    if (a.gradeLevel === b.gradeLevel) sameGrade++
+    if (a.classroomId === b.classroomId) sameClassroom++
+  }
+  return { sameGrade, sameClassroom }
+}
+
+function sortWithinClassroomGender(cells: (PlanStudent | null)[]): void {
   const groups = new Map<string, number[]>()
   cells.forEach((student, i) => {
+    if (student === null) return
     const key = `${student.classroomId}|${student.gender}`
     const indices = groups.get(key) ?? []
     indices.push(i)
     groups.set(key, indices)
   })
   for (const indices of groups.values()) {
-    const sorted = sortedByName(indices.map((i) => cells[i]))
+    const sorted = sortedByName(indices.map((i) => cells[i]!))
     indices.forEach((i, k) => {
       cells[i] = sorted[k]
     })
@@ -548,10 +563,6 @@ function seatOf(
     row: position.row,
     lane: position.lane,
   }
-}
-
-function keyOf(p: SeatPosition): string {
-  return `${p.side}:${p.row}:${p.lane}`
 }
 
 function byName(a: PlanStudent, b: PlanStudent): number {
