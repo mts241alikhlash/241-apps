@@ -140,8 +140,8 @@
       "healthPath": "/health"
     },
     "exam": {
-      "version": "0.8.1",
-      "image": "ghcr.io/mts241alikhlash/exam-service@sha256:865e5dfe5ec5da9755e50082261ccd68945ff9a12bcd806eeb81b0e5fffc0a83",
+      "version": "0.8.2",
+      "image": "ghcr.io/mts241alikhlash/exam-service@sha256:ac99280e2d030b55fba3d9e4bca25a2bbea6a83048cb5251b8dc1abffc74abe6",
       "upstream": "exam-service:4100",
       "healthPath": "/health"
     }
