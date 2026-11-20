@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.7.1
+
+### Patch Changes
+
+- 01473b3: Read the identity password reset answer as the plain array the response interceptor returns, so resetting event credentials no longer fails with 503.
+
 ## 0.7.0
 
 ### Minor Changes
