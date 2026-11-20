@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.7.1
+
+### Patch Changes
+
+- 88a1dbe: Route `/exam-participant-numbers` through the gateway so the Nomor Peserta page can issue and list participant numbers.
+
 ## 0.7.0
 
 ### Minor Changes
