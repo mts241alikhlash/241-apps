@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.8.3
+
+### Patch Changes
+
+- 19eb069: Room reports print as separate pages with the letterhead and the subject names, and the attendance sheet fits one A4 page with the subject name aligned to the signature column.
+
 ## 0.8.2
 
 ### Patch Changes
