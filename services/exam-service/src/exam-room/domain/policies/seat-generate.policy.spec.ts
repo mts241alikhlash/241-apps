@@ -301,6 +301,25 @@ describe('generateSeatPlan', () => {
     expect(plan.adjacentSameClassroom).toBe(0)
   })
 
+  it('leaves the empty desks at the back of the room, not in the last lane', () => {
+    const rooms: PlanRoom[] = [32, 32, 32, 32, 32, 32].map((capacity, i) => ({
+      roomId: `room-${i + 1}`,
+      code: `R${i + 1}`,
+      capacity,
+    }))
+
+    const plan = generateSeatPlan(schoolStudents(), rooms, rules())
+
+    const last = plan.seats.filter((seat) => seat.roomId === 'room-6')
+    for (const side of ['LEFT', 'RIGHT'] as const) {
+      const rows = last.filter((seat) => seat.side === side)
+      const deepest = Math.max(...rows.map((seat) => seat.row))
+      const perRow = (row: number) =>
+        rows.filter((seat) => seat.row === row).length
+      for (let row = 1; row < deepest; row++) expect(perRow(row)).toBe(4)
+    }
+  })
+
   it('is deterministic for the same input and rules', () => {
     const first = generateSeatPlan(schoolStudents(), SCHOOL_ROOMS, rules())
     const second = generateSeatPlan(schoolStudents(), SCHOOL_ROOMS, rules())
