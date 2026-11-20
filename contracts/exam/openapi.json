@@ -3869,6 +3869,56 @@
         ]
       }
     },
+    "/exam-events/{id}/supervisor-slots/generate": {
+      "post": {
+        "operationId": "ExamEventController_generateSupervisorSlots",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GenerateRoomSlotsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create one empty supervisor slot per room and timetable window of an exam event",
+        "tags": [
+          "Exam Events"
+        ]
+      }
+    },
     "/exam-events/{id}/attendance-files": {
       "put": {
         "operationId": "ExamAttendanceFileController_upload",
@@ -10879,6 +10929,21 @@
           "adjacentSameClassroom"
         ]
       },
+      "GenerateRoomSlotsResponseDto": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "created",
+          "skipped"
+        ]
+      },
       "AttendanceUploadBodyDto": {
         "type": "object",
         "properties": {
@@ -11883,10 +11948,12 @@
           },
           "scheduledUserId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "actualUserId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "startsAt": {
@@ -11930,7 +11997,6 @@
         },
         "required": [
           "reason",
-          "scheduledUserId",
           "startsAt",
           "endsAt"
         ]

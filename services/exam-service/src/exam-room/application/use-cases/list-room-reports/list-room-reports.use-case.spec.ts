@@ -9,6 +9,10 @@ import {
 } from '../../room-monitor.test-support.js'
 import { FakeAcademicLookup } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { ListRoomReportsUseCase } from './list-room-reports.use-case.js'
+import {
+  LATER_SLOT_END,
+  LATER_SLOT_START,
+} from '../../room-monitor.test-support.js'
 
 const COORDINATOR: RoomStaffUser = { id: 'koord-1', permissions: [MANAGE_ALL] }
 
@@ -141,5 +145,51 @@ describe('ListRoomReportsUseCase', () => {
     expect(
       after.find((row) => row.slotId === fixture.foreignSlotId)?.supervisorName,
     ).toBe('Ustadz Ahmad')
+  })
+
+  it('names the subject of an activity whose slot has no schedule yet', async () => {
+    const { fixture } = await build()
+    const ipaId = '55555555-5555-4555-8555-555555555555'
+    fixture.rooms.activities.set('act-ipa', {
+      id: 'act-ipa',
+      eventId: fixture.eventId,
+      gradeId: CLASSROOM_7A.gradeId,
+      subjectId: ipaId,
+      startsAt: LATER_SLOT_START,
+      endsAt: LATER_SLOT_END,
+    })
+    const reports = new ListRoomReportsUseCase(
+      fixture.rooms,
+      fixture.schedules,
+      new FakeAcademicLookup({
+        classrooms: [CLASSROOM_7A],
+        subjects: [{ id: ipaId, name: 'IPA' }],
+      }),
+      fixture.authors,
+      fixture.employees,
+    )
+
+    const rows = await reports.execute(COORDINATOR, {})
+
+    expect(
+      rows.find((row) => row.slotId === fixture.laterSlotId)?.subjectNames,
+    ).toEqual(['IPA'])
+  })
+
+  it('shows no supervisor name for a slot that has no supervisor', async () => {
+    const { fixture, reports } = await build()
+    const open = await fixture.rooms.assignSupervisor({
+      roomId: fixture.room.id,
+      startsAt: new Date('2026-11-02T09:00:00.000Z'),
+      endsAt: new Date('2026-11-02T10:00:00.000Z'),
+      scheduledUserId: null,
+    })
+
+    const rows = await reports.execute(COORDINATOR, {})
+
+    expect(rows.find((row) => row.slotId === open.id)).toMatchObject({
+      status: 'DRAFT',
+      supervisorName: null,
+    })
   })
 })

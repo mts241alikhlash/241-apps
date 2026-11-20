@@ -16,6 +16,7 @@ import { GetRoomMonitorUseCase } from './application/use-cases/get-room-monitor/
 import { GetPrintPackUseCase } from './application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from './application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
 import { GenerateSeatsUseCase } from './application/use-cases/generate-seats/generate-seats.use-case.js'
+import { GenerateRoomSlotsUseCase } from './application/use-cases/generate-room-slots/generate-room-slots.use-case.js'
 import { IssueSemesterParticipantNumbersUseCase } from './application/use-cases/issue-semester-participant-numbers/issue-semester-participant-numbers.use-case.js'
 import { LookupParticipantNumbersUseCase } from './application/use-cases/lookup-participant-numbers/lookup-participant-numbers.use-case.js'
 import { ListRoomReportsUseCase } from './application/use-cases/list-room-reports/list-room-reports.use-case.js'
@@ -92,6 +93,7 @@ import {
     GetPrintPackUseCase,
     ResetEventCredentialsUseCase,
     GenerateSeatsUseCase,
+    GenerateRoomSlotsUseCase,
     IssueSemesterParticipantNumbersUseCase,
     LookupParticipantNumbersUseCase,
     ListRoomsOverviewUseCase,

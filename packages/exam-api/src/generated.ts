@@ -248,6 +248,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-events/{id}/supervisor-slots/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create one empty supervisor slot per room and timetable window of an exam event */
+        post: operations["ExamEventController_generateSupervisorSlots"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-files": {
         parameters: {
             query?: never;
@@ -1665,7 +1682,7 @@ export interface components {
             endsAt: string;
             reason: string;
             /** Format: uuid */
-            scheduledUserId: string;
+            scheduledUserId?: string;
             /** Format: date-time */
             startsAt: string;
         };
@@ -2131,6 +2148,10 @@ export interface components {
         ExtendSessionTimeDto: {
             minutes: number;
             reason: string;
+        };
+        GenerateRoomSlotsResponseDto: {
+            created: number;
+            skipped: number;
         };
         GenerateSeatRulesDto: {
             lanesPerSide?: number;
@@ -3145,13 +3166,13 @@ export interface components {
         };
         SupervisorSlotDto: {
             /** Format: uuid */
-            actualUserId: string;
+            actualUserId: string | null;
             /** Format: date-time */
             endsAt: string;
             /** Format: uuid */
             roomId: string;
             /** Format: uuid */
-            scheduledUserId: string;
+            scheduledUserId: string | null;
             /** Format: uuid */
             slotId: string;
             /** Format: date-time */
@@ -3834,6 +3855,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["GenerateSeatsResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamEventController_generateSupervisorSlots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["GenerateRoomSlotsResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

@@ -52,6 +52,7 @@ import {
   IExamRoomRepository,
   type AssignSeatInput,
   type ExamEventListQuery,
+  type ExamRoomActivityRef,
 } from '../../../domain/repositories/exam-room.repository.js'
 import {
   toExamEvent,
@@ -150,6 +151,21 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
       }),
     ])
     return { data: rows.map(toExamEvent), total, page, limit }
+  }
+
+  async listActivitiesByEvent(eventId: string): Promise<ExamRoomActivityRef[]> {
+    const rows = await this.prisma.examActivity.findMany({
+      where: { eventId },
+      select: {
+        id: true,
+        gradeId: true,
+        subjectId: true,
+        startsAt: true,
+        endsAt: true,
+      },
+      orderBy: { startsAt: 'asc' },
+    })
+    return rows.map((row) => ({ ...row, eventId }))
   }
 
   async listEventIdsSupervisedBy(userId: string, at: Date): Promise<string[]> {

@@ -48,6 +48,15 @@ export interface ExamEventListQuery {
   limit?: number
 }
 
+export interface ExamRoomActivityRef {
+  id: string
+  eventId: string
+  gradeId: string
+  subjectId: string
+  startsAt: Date
+  endsAt: Date
+}
+
 export interface AssignSeatInput extends NewExamRoomSeat {
   roomId: string
   eventId: string
@@ -66,6 +75,9 @@ export abstract class IExamRoomRepository {
     query: ExamEventListQuery,
   ): Promise<PaginatedResult<ExamEvent>>
   abstract listEventIdsSupervisedBy(userId: string, at: Date): Promise<string[]>
+  abstract listActivitiesByEvent(
+    eventId: string,
+  ): Promise<ExamRoomActivityRef[]>
 
   abstract createRoom(input: NewExamRoom): Promise<ExamRoom>
   abstract updateRoom(id: string, edit: ExamRoomEdit): Promise<ExamRoom | null>

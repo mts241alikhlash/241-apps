@@ -72,8 +72,8 @@ model ExamRoomSupervisor {
   roomId               String    @map("room_id") @db.Uuid
   startsAt             DateTime  @map("starts_at")
   endsAt               DateTime  @map("ends_at")
-  scheduledUserId      String    @map("scheduled_user_id") @db.Uuid
-  actualUserId         String    @map("actual_user_id") @db.Uuid
+  scheduledUserId      String?   @map("scheduled_user_id") @db.Uuid
+  actualUserId         String?   @map("actual_user_id") @db.Uuid
   substitutedByAdminId String?   @map("substituted_by_admin_id") @db.Uuid
   substituteReason     String?   @map("substitute_reason") @db.VarChar(200)
   substitutedAt        DateTime? @map("substituted_at")

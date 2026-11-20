@@ -395,6 +395,21 @@ export class GenerateSeatsRoomDto {
   @ApiProperty({ type: SeatLayoutDto }) layout!: SeatLayoutDto
 }
 
+export class GenerateRoomSlotsResponseDto {
+  @ApiProperty() created!: number
+  @ApiProperty() skipped!: number
+
+  static fromDomain(result: {
+    created: number
+    skipped: number
+  }): GenerateRoomSlotsResponseDto {
+    const dto = new GenerateRoomSlotsResponseDto()
+    dto.created = result.created
+    dto.skipped = result.skipped
+    return dto
+  }
+}
+
 export class GenerateSeatsResponseDto {
   @ApiProperty() applied!: boolean
   @ApiProperty({ type: [GenerateSeatsRoomDto] }) rooms!: GenerateSeatsRoomDto[]

@@ -29,6 +29,7 @@ import { ManageExamRoomsUseCase } from '../../application/use-cases/manage-exam-
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
 import { ResetEventCredentialsUseCase } from '../../application/use-cases/reset-event-credentials/reset-event-credentials.use-case.js'
 import { GenerateSeatsUseCase } from '../../application/use-cases/generate-seats/generate-seats.use-case.js'
+import { GenerateRoomSlotsUseCase } from '../../application/use-cases/generate-room-slots/generate-room-slots.use-case.js'
 import {
   CreateExamEventDto,
   CreateExamRoomDto,
@@ -36,6 +37,7 @@ import {
   ExamEventDto,
   ExamEventListResponseDto,
   ExamEventQueryDto,
+  GenerateRoomSlotsResponseDto,
   GenerateSeatsBodyDto,
   GenerateSeatsResponseDto,
   UpdateExamEventDto,
@@ -57,6 +59,7 @@ export class ExamEventController {
     private readonly printPack: GetPrintPackUseCase,
     private readonly resetCredentials: ResetEventCredentialsUseCase,
     private readonly seatGeneration: GenerateSeatsUseCase,
+    private readonly roomSlotGeneration: GenerateRoomSlotsUseCase,
   ) {}
 
   @Get()
@@ -224,6 +227,23 @@ export class ExamEventController {
         roomIds: dto.roomIds,
         rules: dto.rules ?? {},
       }),
+    )
+  }
+
+  @Post(':id/supervisor-slots/generate')
+  @RequirePermissions('exam-events.manage')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Create one empty supervisor slot per room and timetable window of an exam event',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: GenerateRoomSlotsResponseDto })
+  async generateSupervisorSlots(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<GenerateRoomSlotsResponseDto> {
+    return GenerateRoomSlotsResponseDto.fromDomain(
+      await this.roomSlotGeneration.execute(id),
     )
   }
 }

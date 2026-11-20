@@ -36,7 +36,8 @@ export interface RoomReportSummary {
 
 interface SlotRow extends RoomReportSummary {
   classroomIds: Set<string>
-  actualUserId: string
+  gradeIds: Set<string>
+  actualUserId: string | null
   eventId: string
 }
 
@@ -84,10 +85,19 @@ export class ListRoomReportsUseCase {
         }),
       ),
     )
-    const subjectIds = [
-      ...new Set(
-        [...schedulesByEvent.values()].flat().map((row) => row.subjectId),
+    const activitiesByEvent = new Map(
+      await Promise.all(
+        eventIds.map(
+          async (eventId) =>
+            [eventId, await this.rooms.listActivitiesByEvent(eventId)] as const,
+        ),
       ),
+    )
+    const subjectIds = [
+      ...new Set([
+        ...[...schedulesByEvent.values()].flat().map((row) => row.subjectId),
+        ...[...activitiesByEvent.values()].flat().map((row) => row.subjectId),
+      ]),
     ]
     const subjectName = new Map(
       subjectIds.length === 0
@@ -98,7 +108,11 @@ export class ListRoomReportsUseCase {
           ]),
     )
     const userNames = new Map<string, string | null>()
-    for (const userId of new Set(rows.map((row) => row.actualUserId))) {
+    for (const userId of new Set(
+      rows
+        .map((row) => row.actualUserId)
+        .filter((id): id is string => id !== null),
+    )) {
       const names = await staffNames(this.authors, this.employees, {
         technicianUserId: null,
         currentSupervisorUserId: userId,
@@ -106,26 +120,40 @@ export class ListRoomReportsUseCase {
       })
       userNames.set(userId, names.currentSupervisorName)
     }
-    return rows.map(({ classroomIds, actualUserId, eventId, ...summary }) => {
-      const start = Date.parse(summary.startsAt)
-      const end = Date.parse(summary.endsAt)
-      const matching = (schedulesByEvent.get(eventId) ?? [])
-        .filter(
+    return rows.map(
+      ({ classroomIds, gradeIds, actualUserId, eventId, ...summary }) => {
+        const start = Date.parse(summary.startsAt)
+        const end = Date.parse(summary.endsAt)
+        const matching = (schedulesByEvent.get(eventId) ?? [])
+          .filter(
+            (row) =>
+              classroomIds.has(row.classroomId) &&
+              row.startsAt.getTime() >= start &&
+              row.startsAt.getTime() < end,
+          )
+          .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
+        const derived = (activitiesByEvent.get(eventId) ?? []).filter(
           (row) =>
-            classroomIds.has(row.classroomId) &&
-            row.startsAt.getTime() >= start &&
-            row.startsAt.getTime() < end,
+            gradeIds.has(row.gradeId) &&
+            row.startsAt.getTime() < end &&
+            row.endsAt.getTime() > start,
         )
-        .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())
-      const names = matching
-        .map((row) => subjectName.get(row.subjectId))
-        .filter((name): name is string => name !== undefined)
-      return {
-        ...summary,
-        subjectNames: [...new Set(names)],
-        supervisorName: userNames.get(actualUserId) ?? null,
-      }
-    })
+        const names = [
+          ...matching.map((row) => row.subjectId),
+          ...derived.map((row) => row.subjectId),
+        ]
+          .map((subjectId) => subjectName.get(subjectId))
+          .filter((name): name is string => name !== undefined)
+        return {
+          ...summary,
+          subjectNames: [...new Set(names)],
+          supervisorName:
+            actualUserId === null
+              ? null
+              : (userNames.get(actualUserId) ?? null),
+        }
+      },
+    )
   }
 
   private async roomRows(
@@ -137,6 +165,8 @@ export class ListRoomReportsUseCase {
       this.rooms.listSeatsByRoom(room.id),
     ])
     const classroomIds = new Set(seats.map((seat) => seat.classroomId))
+    const classrooms = await this.academic.classroomsByIds([...classroomIds])
+    const gradeIds = new Set(classrooms.map((row) => row.gradeId))
     const visible = this.visibleSlots(user, room, slots)
     return Promise.all(
       visible.map(async (slot) => {
@@ -156,6 +186,7 @@ export class ListRoomReportsUseCase {
           subjectNames: [],
           supervisorName: null,
           classroomIds,
+          gradeIds,
           actualUserId: slot.actualUserId,
           eventId: room.eventId,
         }

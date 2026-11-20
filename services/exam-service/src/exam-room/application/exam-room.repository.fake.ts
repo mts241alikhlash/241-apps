@@ -49,6 +49,7 @@ import {
   IExamRoomRepository,
   type AssignSeatInput,
   type ExamEventListQuery,
+  type ExamRoomActivityRef,
 } from '../domain/repositories/exam-room.repository.js'
 
 export class FakeExamRoomRepository extends IExamRoomRepository {
@@ -57,6 +58,7 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
   readonly rooms = new Map<string, ExamRoom>()
   readonly seats = new Map<string, ExamRoomSeat>()
   readonly supervisors = new Map<string, ExamRoomSupervisor>()
+  readonly activities = new Map<string, ExamRoomActivityRef>()
   readonly sessionEvents = new Map<string, ExamSessionEvent>()
   readonly auditLogs: ExamSessionAuditLog[] = []
   readonly reports = new Map<string, ExamRoomReport>()
@@ -452,6 +454,14 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
       })
     }
     return null
+  }
+
+  listActivitiesByEvent(eventId: string) {
+    return Promise.resolve(
+      [...this.activities.values()]
+        .filter((row) => row.eventId === eventId)
+        .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()),
+    )
   }
 
   assignSupervisor(input: NewExamRoomSupervisor) {
