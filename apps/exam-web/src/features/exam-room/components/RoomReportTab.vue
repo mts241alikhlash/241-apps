@@ -304,8 +304,8 @@ watch(
           </TableHeader>
           <TableBody>
             <TableRow
-              v-for="row in report.schedules"
-              :key="row.scheduleId"
+              v-for="(row, index) in report.schedules"
+              :key="row.scheduleId ?? index"
             >
               <TableCell>
                 {{ row.subjectName ?? row.packageTitle }}

@@ -222,4 +222,75 @@ describe('ActivityForm', () => {
     await wrapper.find('#activity-status').setValue('CLOSED')
     expect(wrapper.text()).not.toContain('di luar jendela')
   })
+
+  it('explains that the package can be attached later', () => {
+    expect(open().text()).toContain(
+      'Boleh dikosongkan, paket bisa dipasang nanti',
+    )
+  })
+
+  it('creates an activity without a package and without classrooms', async () => {
+    const wrapper = open({
+      subjects: [{ id: 'subject-mat', label: 'Matematika' }],
+    })
+    await wrapper.find('#activity-grade').setValue('grade-7')
+    await wrapper.find('#activity-subject').setValue('subject-mat')
+    await wrapper
+      .findAll('input[type="datetime-local"]')[0]
+      .setValue('2026-11-10T08:00')
+    await wrapper
+      .findAll('input[type="datetime-local"]')[1]
+      .setValue('2026-11-10T11:00')
+    await wrapper.find('form').trigger('submit')
+
+    const payload = wrapper.emitted('submit')?.[0]?.[0] as Record<
+      string,
+      unknown
+    >
+    expect(payload).toMatchObject({
+      gradeId: 'grade-7',
+      subjectId: 'subject-mat',
+      classroomIds: [],
+    })
+    expect(payload).not.toHaveProperty('packageId')
+  })
+
+  it('disables activation for an activity without a package', () => {
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: { ...pastActivity, packageId: null } },
+    })
+    const options = wrapper.find('#activity-status').findAll('option')
+    const disabled = (value: string) =>
+      options
+        .find(
+          (option) => (option.element as HTMLOptionElement).value === value,
+        )!
+        .attributes('disabled') !== undefined
+
+    expect(disabled('ACTIVE')).toBe(true)
+    expect(disabled('SCHEDULED')).toBe(true)
+    expect(disabled('CLOSED')).toBe(false)
+    expect(wrapper.find('#activity-status').attributes('title')).toBe(
+      'Pasang paket soal dulu',
+    )
+  })
+
+  it('shows the backend message when the status change is refused', async () => {
+    updateStatus.mockRejectedValueOnce({
+      response: {
+        status: 422,
+        data: { message: 'Pasang paket soal dulu sebelum mengaktifkan.' },
+      },
+    })
+    const wrapper = mount(ActivityForm, {
+      props: { ...props, activity: pastActivity },
+    })
+    await wrapper.find('#activity-status').setValue('ACTIVE')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('[role="alert"]').text()).toBe(
+      'Pasang paket soal dulu sebelum mengaktifkan.',
+    )
+  })
 })

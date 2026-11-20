@@ -11456,10 +11456,22 @@
         "properties": {
           "scheduleId": {
             "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "packageTitle": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "gradeId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
           },
           "subjectName": {
             "type": "string",
@@ -11492,7 +11504,9 @@
         },
         "required": [
           "scheduleId",
+          "activityId",
           "packageTitle",
+          "gradeId",
           "subjectName",
           "classroomName",
           "startsAt",

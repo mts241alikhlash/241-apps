@@ -21,11 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { buildSupervisorColumns } from '../components/seatColumns'
+import { toast } from 'vue-sonner'
+import { buildSupervisorColumns, supervisorDisplayName } from './seatColumns'
 import { examEventService } from '../services/examEventService'
 import type { ExamRoom, SupervisorSlot, UserOption } from '../types'
 
 const props = defineProps<{
+  eventId: string
   rooms: ExamRoom[]
   canSubstitute: boolean
   canSupervise: boolean
@@ -47,9 +49,10 @@ const newEndsAt = ref('')
 const addReason = ref('')
 const adding = ref(false)
 const addError = ref<string | null>(null)
+const generating = ref(false)
 
-const nameOf = (userId: string) =>
-  teachers.value.find((person) => person.id === userId)?.identifier ?? userId
+const nameOf = (userId: string | null) =>
+  supervisorDisplayName(userId, teachers.value)
 
 const columns = computed(() =>
   buildSupervisorColumns({
@@ -78,6 +81,21 @@ async function load(nextRoomId = roomId.value) {
   } else {
     slots.value = []
     error.value = result.error
+  }
+}
+
+async function generateSlots() {
+  if (generating.value || props.eventId === '') return
+  generating.value = true
+  const result = await examEventService.generateSupervisorSlots(props.eventId)
+  generating.value = false
+  if (result.success) {
+    toast.success(
+      `${result.data.created} slot dibuat, ${result.data.skipped} dilewati karena sudah ada`,
+    )
+    await load()
+  } else {
+    toast.error(result.error)
   }
 }
 
@@ -174,13 +192,26 @@ onMounted(async () => {
         </SelectContent>
       </Select>
     </FloatingLabelField>
-    <Button
-      v-if="canSubstitute && roomId"
-      class="shrink-0"
-      @click="openAdd"
+    <div
+      v-if="canSubstitute"
+      class="flex flex-wrap gap-2"
     >
-      Tambah Pengawas
-    </Button>
+      <Button
+        v-if="roomId"
+        class="shrink-0"
+        @click="openAdd"
+      >
+        Tambah Pengawas
+      </Button>
+      <Button
+        variant="outline"
+        class="shrink-0"
+        :disabled="generating || eventId === ''"
+        @click="generateSlots"
+      >
+        Buat slot ruangan
+      </Button>
+    </div>
 
     <div
       v-if="error"

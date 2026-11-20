@@ -17,8 +17,14 @@ export function useSeatAssignment(
   const error = ref<string | null>(null)
   const saving = ref(false)
 
+  const seatedElsewhere = ref<string[]>([])
+
   const seatedIds = computed(
-    () => new Set(seats.value.map((seat) => seat.studentId)),
+    () =>
+      new Set([
+        ...seatedElsewhere.value,
+        ...seats.value.map((seat) => seat.studentId),
+      ]),
   )
 
   const available = computed(() =>
@@ -35,13 +41,20 @@ export function useSeatAssignment(
     if (!nextRoomId) {
       seats.value = []
       candidates.value = []
+      seatedElsewhere.value = []
       return
     }
     loading.value = true
-    const [seated, people] = await Promise.all([
+    const [seated, people, others] = await Promise.all([
       examEventService.loadSeats(nextRoomId, semesterId()),
       examEventService.loadCandidates(semesterId()),
+      examEventService.loadSeatedIds(
+        rooms()
+          .map((room) => room.id)
+          .filter((id) => id !== nextRoomId),
+      ),
     ])
+    seatedElsewhere.value = others
     loading.value = false
     if (seated.success) {
       seats.value = seated.data

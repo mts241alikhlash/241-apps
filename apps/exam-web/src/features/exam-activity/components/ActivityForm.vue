@@ -18,18 +18,21 @@ import type {
   GradeOption,
   PackageOption,
   PresetName,
+  SubjectOption,
 } from '../types'
 import {
   ACTIVITY_STATUSES,
   ACTIVITY_TOKEN_MODES,
   activityStatusLabel,
 } from '../types'
+import { messageOf } from '@/features/exam-package/utils/messageOf'
 
 const props = defineProps<{
   semesterId: string
   grades: GradeOption[]
   classrooms: ClassroomOption[]
   packages: PackageOption[]
+  subjects?: SubjectOption[]
   events?: EventOption[]
   category?: ExamCategory
   isAdmin: boolean
@@ -51,6 +54,10 @@ const status = ref<ActivityStatus>(props.activity?.status ?? 'DRAFT')
 const savingStatus = ref(false)
 const issuingNumbers = ref(false)
 const statusError = ref<string | null>(null)
+const needsPackage = computed(
+  () => props.activity !== null && props.activity?.packageId === null,
+)
+const PACKAGE_REQUIRED_STATUSES: ActivityStatus[] = ['ACTIVE', 'SCHEDULED']
 
 const outsideWindow = computed(() => {
   const item = props.activity
@@ -87,6 +94,7 @@ const nonExamPresetTypes: readonly PresetName[] = ['DAILY', 'ASSIGNMENT']
 const gradeId = ref('')
 const classroomIds = ref<string[]>([])
 const packageId = ref('')
+const subjectId = ref('')
 const eventId = ref('')
 const type = ref<ExamType>(availableTypes.value[0] ?? 'DAILY')
 const presetName = ref<PresetName>(type.value)
@@ -142,8 +150,9 @@ const canSubmit = computed(
   () =>
     !noTypeAvailable.value &&
     gradeId.value !== '' &&
-    classroomIds.value.length > 0 &&
-    packageId.value !== '' &&
+    (packageId.value === ''
+      ? subjectId.value !== ''
+      : classroomIds.value.length > 0 && chosenPackage.value !== null) &&
     (!isExamType.value || eventId.value !== '') &&
     startsAt.value !== '' &&
     endsAt.value !== '' &&
@@ -177,8 +186,8 @@ async function saveStatus(): Promise<void> {
   try {
     await examActivityApi.updateStatus(item.id, status.value)
     emit('status-saved')
-  } catch {
-    statusError.value = 'Status kegiatan gagal disimpan.'
+  } catch (err: unknown) {
+    statusError.value = messageOf(err, 'Status kegiatan gagal disimpan.')
   } finally {
     savingStatus.value = false
   }
@@ -203,16 +212,16 @@ async function submit(): Promise<void> {
     await saveStatus()
     return
   }
+  if (!canSubmit.value) return
   const item = chosenPackage.value
-  if (!canSubmit.value || item === null) return
   emit('submit', {
     semesterId: props.semesterId,
     ...(isExamType.value && eventId.value !== ''
       ? { eventId: eventId.value }
       : {}),
     gradeId: gradeId.value,
-    subjectId: item.subjectId,
-    packageId: item.id,
+    subjectId: item?.subjectId ?? subjectId.value,
+    ...(item !== null ? { packageId: item.id } : {}),
     type: type.value,
     classroomIds: [...classroomIds.value],
     presetName: isExamType.value ? type.value : presetName.value,
@@ -235,11 +244,15 @@ async function submit(): Promise<void> {
         <select
           id="activity-status"
           v-model="status"
+          :title="needsPackage ? 'Pasang paket soal dulu' : undefined"
         >
           <option
             v-for="value in ACTIVITY_STATUSES"
             :key="value"
             :value="value"
+            :disabled="
+              needsPackage && PACKAGE_REQUIRED_STATUSES.includes(value)
+            "
           >
             {{ activityStatusLabel(value) }}
           </option>
@@ -323,6 +336,29 @@ async function submit(): Promise<void> {
           <option value="">Pilih paket</option>
           <option
             v-for="item in packages"
+            :key="item.id"
+            :value="item.id"
+          >
+            {{ item.label }}
+          </option>
+        </select>
+        <span class="text-control text-muted-foreground">
+          Boleh dikosongkan, paket bisa dipasang nanti
+        </span>
+      </label>
+
+      <label
+        v-if="packageId === ''"
+        class="grid gap-1"
+      >
+        <span>Mata pelajaran</span>
+        <select
+          id="activity-subject"
+          v-model="subjectId"
+        >
+          <option value="">Pilih mata pelajaran</option>
+          <option
+            v-for="item in subjects ?? []"
             :key="item.id"
             :value="item.id"
           >

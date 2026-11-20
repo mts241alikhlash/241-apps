@@ -5,8 +5,16 @@ import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import { TimerReset } from '@lucide/vue'
 import type { SeatedStudent } from '../services/examEventService'
-import type { SupervisorSlot } from '../types'
+import type { SupervisorSlot, UserOption } from '../types'
 import { seatLabel } from '../types'
+
+export const supervisorDisplayName = (
+  userId: string | null,
+  people: UserOption[],
+): string => {
+  if (userId === null) return 'Belum ditentukan'
+  return people.find((person) => person.id === userId)?.identifier ?? userId
+}
 
 const windowFormat = new Intl.DateTimeFormat('id-ID', {
   day: 'numeric',
@@ -104,7 +112,7 @@ export function buildSeatColumns(
 
 export interface SupervisorColumnOptions {
   canSubstitute: boolean
-  userName: (userId: string) => string
+  userName: (userId: string | null) => string
   onSubstitute: (slot: SupervisorSlot) => void
 }
 

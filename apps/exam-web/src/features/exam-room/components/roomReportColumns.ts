@@ -228,9 +228,10 @@ export function buildRoomReportColumns(
       meta: {
         align: 'center',
         mobileLabel: 'Pengawas',
-        mobileValue: (row: RoomReportSummary) => row.supervisorName,
+        mobileValue: (row: RoomReportSummary) =>
+          row.supervisorName ?? 'Belum ditentukan',
       },
-      cell: ({ row }) => row.original.supervisorName ?? '-',
+      cell: ({ row }) => row.original.supervisorName ?? 'Belum ditentukan',
     },
     {
       id: 'status',

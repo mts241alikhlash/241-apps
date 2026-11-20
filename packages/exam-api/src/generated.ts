@@ -2672,13 +2672,17 @@ export interface components {
         };
         ReportScheduleDto: {
             absentCount: number;
+            /** Format: uuid */
+            activityId: string | null;
             classroomName: string | null;
             /** Format: date-time */
             endsAt: string;
-            packageTitle: string;
+            /** Format: uuid */
+            gradeId: string | null;
+            packageTitle: string | null;
             registeredCount: number;
             /** Format: uuid */
-            scheduleId: string;
+            scheduleId: string | null;
             startedCount: number;
             /** Format: date-time */
             startsAt: string;

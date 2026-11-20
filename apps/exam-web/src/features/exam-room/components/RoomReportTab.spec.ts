@@ -85,6 +85,8 @@ const report = (overrides: Partial<RoomReport> = {}): RoomReport => ({
   schedules: [
     {
       scheduleId: 's1',
+      activityId: null,
+      gradeId: null,
       packageTitle: 'UAS Matematika',
       subjectName: 'Matematika',
       classroomName: 'VII A',

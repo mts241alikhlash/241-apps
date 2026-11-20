@@ -124,7 +124,7 @@ const pageTitle = (page: SheetPage): string =>
                 <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
-                <td class="col-name">{{ row.name ?? '-' }}</td>
+                <td class="col-name">{{ row.name ?? 'Belum ditentukan' }}</td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
                 <td class="col-subject">{{ row.subject }}</td>
                 <td class="col-time is-center">{{ row.time }}</td>
@@ -168,7 +168,7 @@ const pageTitle = (page: SheetPage): string =>
                 <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
-                <td class="col-name">{{ row.name ?? '-' }}</td>
+                <td class="col-name">{{ row.name ?? 'Belum ditentukan' }}</td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
                 <td class="col-time is-center">{{ row.time }}</td>
                 <td class="col-sign" />

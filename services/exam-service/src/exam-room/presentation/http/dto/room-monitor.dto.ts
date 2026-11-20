@@ -344,8 +344,13 @@ export class RecordRoomFieldNoteDto {
 }
 
 export class ReportScheduleDto {
-  @ApiProperty({ format: 'uuid' }) scheduleId!: string
-  @ApiProperty() packageTitle!: string
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  scheduleId!: string | null
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  activityId!: string | null
+  @ApiProperty({ type: String, nullable: true }) packageTitle!: string | null
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  gradeId!: string | null
   @ApiProperty({ type: String, nullable: true }) subjectName!: string | null
   @ApiProperty({ type: String, nullable: true }) classroomName!: string | null
   @ApiProperty({ format: 'date-time' }) startsAt!: string

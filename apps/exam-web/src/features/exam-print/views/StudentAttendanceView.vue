@@ -159,7 +159,7 @@ const packages = computed(() => {
     ...new Set(
       roster.value
         .map((row) => row.packageTitle)
-        .filter((name) => name.trim() !== ''),
+        .filter((name) => !!name && name.trim() !== ''),
     ),
   ]
   if (names.length > 0) return names.join(', ')

@@ -48,6 +48,8 @@ export type SeatGenerateRules = Schemas['GenerateSeatRulesDto']
 
 export type SeatGenerateResult = Schemas['GenerateSeatsResponseDto']
 
+export type SupervisorGenerateResult = Schemas['GenerateRoomSlotsResponseDto']
+
 export type SeatGenerateRoom = Schemas['GenerateSeatsRoomDto']
 
 export type PlannedSeat = Schemas['SeatPlanSeatDto']
