@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.8.1
+
+### Patch Changes
+
+- fe8b88b: Seat generation fills each room to capacity before the next one, per gender side, so only the last room takes the remainder.
+
 ## 0.8.0
 
 ### Minor Changes
