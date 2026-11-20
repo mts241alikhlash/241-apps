@@ -91,9 +91,13 @@ const endClock = computed(() =>
 )
 
 const subjects = computed(() =>
-  props.report.schedules
-    .map((row) => row.subjectName ?? row.packageTitle)
-    .join(', '),
+  [
+    ...new Set(
+      props.report.schedules
+        .map((row) => row.subjectName ?? row.packageTitle)
+        .filter((name): name is string => name !== null),
+    ),
+  ].join(', '),
 )
 
 const registered = computed(() =>
@@ -153,10 +157,10 @@ const registeredWord = computed(() => spell(registered.value))
       </table>
 
       <p class="text-justify leading-relaxed">
-        Ujian dilaksanakan menggunakan aplikasi ujian madrasah. Peserta membuka
-        paket soal {{ subjects }} melalui akun masing-masing dan mengumpulkan
-        jawaban secara daring. Token ujian diumumkan oleh pengawas ruangan pada
-        saat ujian dimulai.
+        Ujian dilaksanakan menggunakan aplikasi ujian madrasah. Peserta
+        mengerjakan ujian mata pelajaran {{ subjects }} melalui akun
+        masing-masing dan mengumpulkan jawaban secara daring. Token ujian
+        diumumkan oleh pengawas ruangan pada saat ujian dimulai.
       </p>
 
       <section class="space-y-1">

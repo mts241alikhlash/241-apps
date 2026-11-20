@@ -155,6 +155,8 @@ const columns = computed(() => {
 })
 
 const packages = computed(() => {
+  const subjects = previewRow.value?.subjectNames ?? []
+  if (subjects.length > 0) return subjects.join(', ')
   const names = [
     ...new Set(
       roster.value
@@ -162,8 +164,7 @@ const packages = computed(() => {
         .filter((name) => !!name && name.trim() !== ''),
     ),
   ]
-  if (names.length > 0) return names.join(', ')
-  return previewRow.value?.subjectNames.join(', ') ?? '-'
+  return names.length > 0 ? names.join(', ') : '-'
 })
 
 const sheetStudents = computed(() =>
