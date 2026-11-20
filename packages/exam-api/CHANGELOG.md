@@ -1,5 +1,11 @@
 # @mts241alikhlash/exam-api
 
+## 0.8.1
+
+### Patch Changes
+
+- 491c7d8: The Jadwal Ujian page lists the subject timetable (grouped by day and slot, printable) even before packages are attached, and activities carry their subject and grade names.
+
 ## 0.8.0
 
 ### Minor Changes
