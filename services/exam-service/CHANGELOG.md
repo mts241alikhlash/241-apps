@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.8.2
+
+### Patch Changes
+
+- d393fd3: Seat generation fills each gender side row by row from the front, so a partly filled room leaves its back desks empty instead of the last lane.
+
 ## 0.8.1
 
 ### Patch Changes
