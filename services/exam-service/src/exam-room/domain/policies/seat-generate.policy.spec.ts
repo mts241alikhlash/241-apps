@@ -1,6 +1,7 @@
 import {
   DEFAULT_SEAT_RULES,
   generateSeatPlan,
+  generateSeatPlanWithLayouts,
   type PlanRoom,
   type PlanStudent,
   type PlannedSeat,
@@ -318,6 +319,32 @@ describe('generateSeatPlan', () => {
         rows.filter((seat) => seat.row === row).length
       for (let row = 1; row < deepest; row++) expect(perRow(row)).toBe(4)
     }
+  })
+
+  it('numbers a partly filled last room compactly so girls take the last left desks', () => {
+    const rooms: PlanRoom[] = [32, 32, 32, 32, 32, 32].map((capacity, i) => ({
+      roomId: `room-${i + 1}`,
+      code: `R${i + 1}`,
+      capacity,
+    }))
+
+    const { plan, layouts } = generateSeatPlanWithLayouts(
+      schoolStudents(),
+      rooms,
+      rules(),
+    )
+
+    const last = plan.seats
+      .filter((seat) => seat.roomId === 'room-6')
+      .map((seat) => seat.desk)
+      .sort((a, b) => a - b)
+    expect(last).toEqual(Array.from({ length: 28 }, (_, i) => i + 1))
+    expect(layouts[5].left + layouts[5].right).toBe(28)
+    const row4 = plan.seats.filter(
+      (seat) => seat.roomId === 'room-6' && seat.row === 4,
+    )
+    expect(row4.every((seat) => seat.side === 'LEFT')).toBe(true)
+    expect(row4.map((seat) => seat.gender)).toEqual(row4.map(() => 'FEMALE'))
   })
 
   it('is deterministic for the same input and rules', () => {

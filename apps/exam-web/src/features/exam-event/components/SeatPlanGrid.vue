@@ -23,9 +23,10 @@ const seatAt = computed(
 
 function desksOf(room: SeatGenerateRoom) {
   const { lanes } = room.layout
-  return Array.from({ length: room.capacity }, (_, index) => {
+  const size = room.layout.left + room.layout.right
+  return Array.from({ length: size }, (_, index) => {
     const desk = index + 1
-    const { row, lane } = deskPosition(desk, lanes, room.capacity)
+    const { row, lane } = deskPosition(desk, lanes, size)
     return {
       desk,
       row,
