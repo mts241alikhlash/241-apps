@@ -1,5 +1,11 @@
 # @mts241alikhlash/exam-api
 
+## 0.8.0
+
+### Minor Changes
+
+- f3309b4: Generated client for activities without a package, empty supervisor slots and nullable report schedule rows.
+
 ## 0.7.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # exam-web
 
+## 0.8.0
+
+### Minor Changes
+
+- 334de86: Desk numbers snake across the full row of eight lanes (1 to 8, then 16 to 9), girls fill the left lanes and boys the right, and same class or grade neighbours are avoided across the aisle too.
+- f3309b4: Create an exam activity without a package and attach one later, create empty supervisor slots per room, and print room documents without supervisor names.
+
+### Patch Changes
+
+- f3309b4: List only students who have no seat in any room of the event under "Siswa belum berkursi", not just the selected room.
+
 ## 0.7.1
 
 ### Patch Changes
