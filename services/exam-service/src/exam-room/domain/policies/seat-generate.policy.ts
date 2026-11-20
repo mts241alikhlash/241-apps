@@ -388,7 +388,7 @@ function zonesOf(
       desks.sort((a, b) => {
         const pa = positionOf(a, layout)
         const pb = positionOf(b, layout)
-        return pa.lane - pb.lane || pa.row - pb.row
+        return pa.row - pb.row || pa.lane - pb.lane
       })
     }
     list.forEach((_, k) => {
