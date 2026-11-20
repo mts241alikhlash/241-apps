@@ -17,6 +17,12 @@ export interface ActivityDetail {
   schedules: ActivityDetailSchedule[]
 }
 
+export interface NamedActivity {
+  activity: ExamActivity
+  subjectName: string | null
+  gradeName: string | null
+}
+
 @Injectable()
 export class ListActivitiesUseCase {
   constructor(
@@ -28,6 +34,29 @@ export class ListActivitiesUseCase {
     const semester = await this.academic.activeSemester()
     if (semester === null) return []
     return this.activities.listBySemester(semester.id, category)
+  }
+
+  async listNamed(category?: ExamCategory): Promise<NamedActivity[]> {
+    const activities = await this.execute(category)
+    const subjects = new Map(
+      (
+        await this.academic.subjectsByIds([
+          ...new Set(activities.map((row) => row.subjectId)),
+        ])
+      ).map((row) => [row.id, row.name]),
+    )
+    const grades = new Map(
+      (
+        await this.academic.gradesByIds([
+          ...new Set(activities.map((row) => row.gradeId)),
+        ])
+      ).map((row) => [row.id, row.name ?? `Kelas ${row.level}`]),
+    )
+    return activities.map((activity) => ({
+      activity,
+      subjectName: subjects.get(activity.subjectId) ?? null,
+      gradeName: grades.get(activity.gradeId) ?? null,
+    }))
   }
 
   async findOne(id: string): Promise<ActivityDetail> {

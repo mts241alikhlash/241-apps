@@ -37,6 +37,8 @@ const pastActivity = {
   gradeId: 'grade-7',
   eventId: null,
   subjectId: 'subject-inf',
+  subjectName: 'Informatika',
+  gradeName: 'Kelas 7',
   packageId: 'package-1',
   type: 'DAILY' as const,
   category: 'EXAM' as const,

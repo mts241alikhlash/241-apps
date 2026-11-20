@@ -221,8 +221,19 @@ export class ExamActivityDto {
   @ApiProperty({ enum: ACTIVITY_STATUSES })
   status!: ExamActivity['status']
 
-  static of(activity: ExamActivity): ExamActivityDto {
+  @ApiProperty({ type: String, nullable: true }) subjectName!: string | null
+  @ApiProperty({ type: String, nullable: true }) gradeName!: string | null
+
+  static of(
+    activity: ExamActivity,
+    names: { subjectName: string | null; gradeName: string | null } = {
+      subjectName: null,
+      gradeName: null,
+    },
+  ): ExamActivityDto {
     const dto = new ExamActivityDto()
+    dto.subjectName = names.subjectName
+    dto.gradeName = names.gradeName
     dto.id = activity.id
     dto.semesterId = activity.semesterId
     dto.eventId = activity.eventId

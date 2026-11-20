@@ -1869,6 +1869,7 @@ export interface components {
             eventId: string | null;
             /** Format: uuid */
             gradeId: string;
+            gradeName: string | null;
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -1883,6 +1884,7 @@ export interface components {
             status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
+            subjectName: string | null;
             /** @enum {string} */
             tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
@@ -1899,6 +1901,7 @@ export interface components {
             eventId: string | null;
             /** Format: uuid */
             gradeId: string;
+            gradeName: string | null;
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -1912,6 +1915,7 @@ export interface components {
             status: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED";
             /** Format: uuid */
             subjectId: string;
+            subjectName: string | null;
             /** @enum {string} */
             tokenMode: "ROTATING" | "STATIC";
             tokenRotation: number;
