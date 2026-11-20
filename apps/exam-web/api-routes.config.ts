@@ -20,6 +20,7 @@ export const SERVICE_PREFIXES = {
     '/exam-grading',
     '/exam-imports',
     '/exam-packages',
+    '/exam-participant-numbers',
     '/exam-policy-presets',
     '/exam-questions',
     '/exam-schedules',
