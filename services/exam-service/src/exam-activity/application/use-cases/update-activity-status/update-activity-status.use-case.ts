@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common'
 import type {
   ActivityStatus,
   ExamActivity,
@@ -21,6 +25,12 @@ export class UpdateActivityStatusUseCase {
     const current = await this.activities.findById(activityId)
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
+    }
+    if (
+      current.packageId === null &&
+      (status === 'SCHEDULED' || status === 'ACTIVE')
+    ) {
+      throw new UnprocessableEntityException('Pasang paket soal dulu')
     }
     if (current.status === 'ACTIVE' && status !== 'ACTIVE') {
       await this.closeSessions.execute(activityId, actorId)

@@ -40,6 +40,23 @@ export interface paths {
         patch: operations["ExamActivityController_changeStatus"];
         trace?: never;
     };
+    "/exam-activities/{id}/package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attach an approved package and create the classroom schedules */
+        post: operations["ExamActivityController_attach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-activities/{id}/participant-numbers/issue": {
         parameters: {
             query?: never;
@@ -1652,6 +1669,11 @@ export interface components {
             /** Format: date-time */
             startsAt: string;
         };
+        AttachActivityPackageRequestDto: {
+            classroomIds: string[];
+            /** Format: uuid */
+            packageId: string;
+        };
         AttendanceFileDto: {
             /** @example 2026-11-18 */
             day: string;
@@ -1727,7 +1749,7 @@ export interface components {
             updatedAt: string;
         };
         CreateActivityRequestDto: {
-            classroomIds: string[];
+            classroomIds?: string[];
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1736,7 +1758,7 @@ export interface components {
             /** Format: uuid */
             gradeId: string;
             /** Format: uuid */
-            packageId: string;
+            packageId?: string | null;
             /** @enum {string} */
             presetName?: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
             /** Format: uuid */
@@ -1833,7 +1855,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
-            packageId: string;
+            packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
             schedules: components["schemas"]["ExamActivityScheduleDto"][];
             /** Format: uuid */
@@ -1863,7 +1885,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
-            packageId: string;
+            packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
             /** Format: uuid */
             semesterId: string;
@@ -3327,6 +3349,37 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateActivityStatusRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_attach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachActivityPackageRequestDto"];
             };
         };
         responses: {

@@ -21,6 +21,7 @@ import {
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
+import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
@@ -30,6 +31,7 @@ import {
   UpdateActivityPolicyUseCase,
 } from '../../application/use-cases/update-activity-policy/update-activity-policy.use-case.js'
 import {
+  AttachActivityPackageRequestDto,
   CreateActivityRequestDto,
   ExamActivityDetailDto,
   ExamActivityDto,
@@ -51,6 +53,7 @@ export class ExamActivityController {
     private readonly updatePolicy: UpdateActivityPolicyUseCase,
     private readonly rotateToken: RotateActivityTokenUseCase,
     private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
+    private readonly attachPackage: AttachActivityPackageUseCase,
   ) {}
 
   @Get()
@@ -118,14 +121,36 @@ export class ExamActivityController {
       eventId: dto.eventId ?? null,
       gradeId: dto.gradeId,
       subjectId: dto.subjectId,
-      packageId: dto.packageId,
+      packageId: dto.packageId ?? null,
       type: dto.type,
-      classroomIds: dto.classroomIds,
+      classroomIds: dto.classroomIds ?? [],
       presetName: dto.presetName,
       tokenMode: dto.tokenMode,
       startsAt: new Date(dto.startsAt),
       endsAt: new Date(dto.endsAt),
       durationMinutes: dto.durationMinutes,
+    })
+    return ExamActivityDto.of(activity)
+  }
+
+  @Post(':id/package')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({
+    summary: 'Attach an approved package and create the classroom schedules',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: ExamActivityDto })
+  async attach(
+    @CurrentUser() user: { id: string },
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AttachActivityPackageRequestDto,
+  ): Promise<ExamActivityDto> {
+    const activity = await this.attachPackage.execute({
+      actorId: user.id,
+      activityId: id,
+      packageId: dto.packageId,
+      classroomIds: dto.classroomIds,
     })
     return ExamActivityDto.of(activity)
   }

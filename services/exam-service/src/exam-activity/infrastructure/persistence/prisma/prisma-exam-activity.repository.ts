@@ -24,7 +24,7 @@ interface ActivityRow {
   eventId: string | null
   gradeId: string
   subjectId: string
-  packageId: string
+  packageId: string | null
   type: ExamActivity['type']
   tokenMode: ActivityTokenMode
   tokenRotation: number
@@ -56,6 +56,37 @@ function toEntity(row: ActivityRow): ExamActivity {
     status: row.status,
     createdById: row.createdById,
   }
+}
+
+async function createSchedules(
+  tx: Prisma.TransactionClient,
+  activity: {
+    id: string
+    semesterId: string
+    eventId: string | null
+    startsAt: Date
+    endsAt: Date
+    durationMinutes: number
+    type: ExamActivity['type']
+    createdById: string
+  },
+  packageId: string,
+  classroomIds: string[],
+) {
+  await tx.examSchedule.createMany({
+    data: classroomIds.map((classroomId) => ({
+      packageId,
+      classroomId,
+      semesterId: activity.semesterId,
+      eventId: activity.eventId,
+      startsAt: activity.startsAt,
+      endsAt: activity.endsAt,
+      durationMinutes: activity.durationMinutes,
+      type: activity.type,
+      createdById: activity.createdById,
+      activityId: activity.id,
+    })),
+  })
 }
 
 @Injectable()
@@ -152,20 +183,9 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
           createdById: activity.createdById,
         },
       })
-      await tx.examSchedule.createMany({
-        data: classroomIds.map((classroomId) => ({
-          packageId: activity.packageId,
-          classroomId,
-          semesterId: activity.semesterId,
-          eventId: activity.eventId,
-          startsAt: activity.startsAt,
-          endsAt: activity.endsAt,
-          durationMinutes: activity.durationMinutes,
-          type: activity.type,
-          createdById: activity.createdById,
-          activityId: created.id,
-        })),
-      })
+      if (activity.packageId !== null) {
+        await createSchedules(tx, created, activity.packageId, classroomIds)
+      }
       await tx.examActivityAuditLog.create({
         data: {
           activityId: created.id,
@@ -175,6 +195,33 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         },
       })
       return toEntity(created)
+    })
+  }
+
+  async attachPackage(
+    input: Parameters<ExamActivityRepository['attachPackage']>[0],
+  ) {
+    const { activityId, packageId, classroomIds, actorId } = input
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.examActivity.findUnique({
+        where: { id: activityId },
+      })
+      if (before === null) return null
+      const updated = await tx.examActivity.update({
+        where: { id: activityId },
+        data: { packageId },
+      })
+      await createSchedules(tx, updated, packageId, classroomIds)
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId,
+          actorId,
+          action: 'ATTACH_PACKAGE',
+          before: { packageId: before.packageId },
+          after: { packageId },
+        },
+      })
+      return toEntity(updated)
     })
   }
 

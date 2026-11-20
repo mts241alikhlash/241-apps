@@ -18,7 +18,7 @@ export interface ExamActivity {
   eventId: string | null
   gradeId: string
   subjectId: string
-  packageId: string
+  packageId: string | null
   type: ExamType
   tokenMode: ActivityTokenMode
   tokenRotation: number
@@ -36,7 +36,7 @@ export interface NewExamActivity {
   eventId: string | null
   gradeId: string
   subjectId: string
-  packageId: string
+  packageId: string | null
   type: ExamType
   tokenMode: ActivityTokenMode
   presetId: string | null

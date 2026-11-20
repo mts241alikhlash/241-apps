@@ -19,6 +19,7 @@ export const API_ERROR_CODES = [
   'EVENT_SEMESTER_MISMATCH',
   'EVENT_WINDOW_MISMATCH',
   'SEATS_EXIST',
+  'ACTIVITY_HAS_PACKAGE',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

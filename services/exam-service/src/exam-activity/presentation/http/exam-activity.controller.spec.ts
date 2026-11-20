@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import type { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import type { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import type { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import type { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
@@ -18,6 +19,7 @@ const controller = new ExamActivityController(
   {} as UpdateActivityPolicyUseCase,
   {} as RotateActivityTokenUseCase,
   { execute: issue } as unknown as IssueParticipantNumbersUseCase,
+  {} as AttachActivityPackageUseCase,
 )
 
 describe('ExamActivityController issueNumbers', () => {
