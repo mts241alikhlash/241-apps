@@ -7330,6 +7330,14 @@
               "CLOSED"
             ],
             "type": "string"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "gradeName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -7347,7 +7355,9 @@
           "startsAt",
           "endsAt",
           "durationMinutes",
-          "status"
+          "status",
+          "subjectName",
+          "gradeName"
         ]
       },
       "ExamActivityScheduleDto": {
@@ -7460,6 +7470,14 @@
             ],
             "type": "string"
           },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "gradeName": {
+            "type": "string",
+            "nullable": true
+          },
           "schedules": {
             "type": "array",
             "items": {
@@ -7483,6 +7501,8 @@
           "endsAt",
           "durationMinutes",
           "status",
+          "subjectName",
+          "gradeName",
           "schedules"
         ]
       },

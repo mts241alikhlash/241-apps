@@ -61,8 +61,8 @@ export class ExamActivityController {
   @ApiOperation({ summary: 'List the activities of the active semester' })
   @ApiResponse({ status: 200, type: [ExamActivityDto] })
   async list(@Query() query: ExamActivityQueryDto): Promise<ExamActivityDto[]> {
-    const activities = await this.listActivities.execute(query.category)
-    return activities.map((activity) => ExamActivityDto.of(activity))
+    const rows = await this.listActivities.listNamed(query.category)
+    return rows.map((row) => ExamActivityDto.of(row.activity, row))
   }
 
   @Get(':id')

@@ -85,6 +85,8 @@ const sampleDetail = (
   eventId: 'ev-1',
   gradeId: 'grade-7',
   subjectId: 'sub-1',
+  subjectName: 'Matematika',
+  gradeName: 'Kelas 7',
   packageId: 'pkg-1',
   type: 'MIDTERM',
   category: 'EXAM',

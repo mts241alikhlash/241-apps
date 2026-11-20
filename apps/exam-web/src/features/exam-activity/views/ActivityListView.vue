@@ -135,6 +135,13 @@ onMounted(load)
                   Menunggu paket
                 </span>
               </div>
+              <p
+                v-if="item.subjectName"
+                class="text-control font-medium"
+              >
+                {{ item.subjectName
+                }}{{ item.gradeName ? ' · ' + item.gradeName : '' }}
+              </p>
               <p class="text-control text-muted-foreground">
                 {{ formatWindow(item) }} · {{ item.durationMinutes }} menit ·
                 {{

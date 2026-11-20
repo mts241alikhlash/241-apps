@@ -81,6 +81,27 @@ describe('ListActivitiesUseCase', () => {
     expect(exams.map((row) => row.id)).toEqual(['a-pts'])
   })
 
+  it('names the subject and grade of every activity', async () => {
+    const repo = new FakeExamActivityRepository()
+    repo.activities.set(
+      'a-1',
+      activity('a-1', SEMESTER_ID, '2026-11-10T01:00:00Z'),
+    )
+
+    const rows = await new ListActivitiesUseCase(
+      repo,
+      new FakeAcademicLookup({
+        semesterId: SEMESTER_ID,
+        subjects: [{ id: 'subject-inf', name: 'Informatika' }],
+      }),
+    ).listNamed()
+
+    expect(rows.map((row) => [row.activity.id, row.subjectName])).toEqual([
+      ['a-1', 'Informatika'],
+    ])
+    expect(rows[0].gradeName).toBeNull()
+  })
+
   it('returns nothing when no semester is active', async () => {
     const repo = new FakeExamActivityRepository()
     repo.activities.set(

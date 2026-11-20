@@ -45,6 +45,7 @@ import MakeupDialog from '../components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '../components/MakeupParticipantsDialog.vue'
 import AccessCodeDialog from '../components/AccessCodeDialog.vue'
 import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
+import TimetablePanel from '@/features/exam-activity/components/TimetablePanel.vue'
 import { useScheduleList } from '../composables/useScheduleList'
 import { examScheduleService } from '../services/examScheduleService'
 import { SCHEDULE_STATUSES, scheduleStatusLabel } from '../types'
@@ -169,6 +170,10 @@ const columns = computed(() =>
       <CardContent
         class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
       >
+        <TimetablePanel
+          v-if="hasPermission('exam-schedules.manage')"
+          :category="category"
+        />
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"
