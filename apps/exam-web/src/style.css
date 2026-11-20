@@ -89,6 +89,16 @@
     break-before: page;
   }
 
+  body.printing-report:has(> .report-print-root) > *:not(.report-print-root) {
+    display: none !important;
+  }
+
+  body.printing-report > .report-print-root {
+    position: static;
+    display: block !important;
+    width: 100%;
+  }
+
   body.printing-sheet * {
     visibility: hidden;
   }

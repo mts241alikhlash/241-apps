@@ -4,6 +4,7 @@ import LetterheadKop from '@/features/exam-room/components/LetterheadKop.vue'
 import { CARD_HEADER } from '@/features/exam-room/components/cardHeader'
 
 const ROWS_PER_PAGE = 26
+const SINGLE_PAGE_MAX = 36
 
 interface AttendanceStudent {
   studentId: string
@@ -39,7 +40,7 @@ const props = withDefaults(
 )
 
 const sheets = computed<Sheet[]>(() => {
-  if (!props.paginate) {
+  if (!props.paginate || props.students.length <= SINGLE_PAGE_MAX) {
     return [
       {
         students: props.students,
@@ -97,12 +98,20 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
           </div>
 
           <table class="sheet-meta">
+            <colgroup>
+              <col class="meta-label" />
+              <col class="meta-colon" />
+              <col class="meta-value" />
+              <col class="meta-label-right" />
+              <col class="meta-colon" />
+              <col class="meta-value-right" />
+            </colgroup>
             <tbody>
               <tr>
                 <td class="sheet-label">Hari, Tanggal</td>
                 <td class="sheet-colon">:</td>
                 <td class="sheet-value">{{ date }}</td>
-                <td class="sheet-label">Paket Soal</td>
+                <td class="sheet-label">Mata Pelajaran</td>
                 <td class="sheet-colon">:</td>
                 <td class="sheet-value">{{ packages }}</td>
               </tr>
@@ -234,6 +243,7 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 
 .sheet-meta {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 11pt;
 }
@@ -243,36 +253,40 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
   vertical-align: top;
 }
 
-.sheet-label {
-  width: 26mm;
+.sheet-meta .meta-label {
+  width: 16%;
 }
 
-.sheet-colon {
-  width: 3mm;
+.sheet-meta .meta-colon {
+  width: 2%;
 }
 
-.sheet-value {
-  width: 56mm;
+.sheet-meta .meta-value {
+  width: 50%;
 }
 
-.sheet-meta td.sheet-label:nth-child(4) {
-  padding-left: 10mm;
+.sheet-meta .meta-label-right {
+  width: 15%;
+}
+
+.sheet-meta .meta-value-right {
+  width: 15%;
 }
 
 .sheet-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 10pt;
+  font-size: 9pt;
 }
 
 .sheet-table th,
 .sheet-table td {
   border: 1px solid currentColor;
-  padding: 1px 4px;
+  padding: 2px 3px;
   text-align: left;
   white-space: nowrap;
-  line-height: 1.25;
+  line-height: 1.15;
 }
 
 .sheet-table th {
@@ -328,7 +342,7 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
   display: flex;
   justify-content: space-between;
   gap: 10mm;
-  padding-top: 4mm;
+  padding-top: 3mm;
 }
 
 .sheet-signature {
@@ -337,7 +351,7 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 }
 
 .sheet-signature-space {
-  height: 16mm;
+  height: 18mm;
 }
 
 .sheet-signature-line {

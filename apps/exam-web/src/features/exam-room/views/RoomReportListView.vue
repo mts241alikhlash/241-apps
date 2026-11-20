@@ -228,15 +228,35 @@ async function loadPrintDocs(rows: RoomReportSummary[] = printTargets()) {
   }
 }
 
+async function waitForImages(): Promise<void> {
+  const images = [
+    ...document.querySelectorAll<HTMLImageElement>('.report-print-root img'),
+  ]
+  await Promise.all(
+    images.map((image) =>
+      image.complete
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => {
+            image.addEventListener('load', () => resolve(), { once: true })
+            image.addEventListener('error', () => resolve(), { once: true })
+          }),
+    ),
+  )
+}
+
+async function runPrint(): Promise<void> {
+  await nextTick()
+  await waitForImages()
+  document.body.classList.add('printing-report')
+  window.print()
+  document.body.classList.remove('printing-report')
+}
+
 async function printPreview() {
   if (previewDoc.value === null) return
   printDocs.value = [{ key: 'preview', ...previewDoc.value }]
   previewOpen.value = false
-  await nextTick()
-  await new Promise((resolve) => setTimeout(resolve, 250))
-  document.body.classList.add('printing-report')
-  window.print()
-  document.body.classList.remove('printing-report')
+  await runPrint()
   printDocs.value = []
 }
 
@@ -246,20 +266,14 @@ async function printRoomReport(row: RoomReportSummary) {
     toast.error(printError.value ?? 'Dokumen tidak dapat dimuat.')
     return
   }
-  await nextTick()
-  document.body.classList.add('printing-report')
-  window.print()
-  document.body.classList.remove('printing-report')
+  await runPrint()
   printDocs.value = []
 }
 
 async function confirmPrint() {
   await loadPrintDocs()
   if (printDocs.value.length === 0) return
-  await nextTick()
-  document.body.classList.add('printing-report')
-  window.print()
-  document.body.classList.remove('printing-report')
+  await runPrint()
   printOpen.value = false
 }
 
@@ -918,16 +932,18 @@ onMounted(load)
       @confirm="replaceFile"
     />
 
-    <div
-      v-if="printDocs.length > 0"
-      class="print-only"
-    >
-      <RoomReportDocument
-        v-for="doc in printDocs"
-        :key="doc.key"
-        :report="doc.report"
-        :room="doc.room"
-      />
-    </div>
+    <Teleport to="body">
+      <div
+        v-if="printDocs.length > 0"
+        class="print-only report-print-root"
+      >
+        <RoomReportDocument
+          v-for="doc in printDocs"
+          :key="doc.key"
+          :report="doc.report"
+          :room="doc.room"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
