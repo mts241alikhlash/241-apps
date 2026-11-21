@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.8.4
+
+### Patch Changes
+
+- 20bdd06: Wait for Safe Exam Browser to attach its API before deciding the browser is not SEB, and recognise it by its user agent.
+
 ## 0.8.3
 
 ### Patch Changes
