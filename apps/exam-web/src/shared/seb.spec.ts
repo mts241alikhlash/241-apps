@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { SebOutdatedError, isInSeb, readSebProof, sebVersion } from './seb'
+import {
+  SebOutdatedError,
+  isInSeb,
+  readSebProof,
+  sebVersion,
+  waitForSeb,
+} from './seb'
 
 interface SebGlobal {
   version?: string
@@ -94,5 +100,26 @@ describe('seb', () => {
 
   it('is an Error subclass', () => {
     expect(new SebOutdatedError()).toBeInstanceOf(Error)
+  })
+
+  it('does not wait when the browser is not SEB', async () => {
+    expect(await waitForSeb(50, 10)).toBe(false)
+  })
+
+  it('waits for a late SEB object when the user agent says SEB', async () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 SEB/3.10.3',
+    )
+    setTimeout(() => stubSeb({ security: { configKey: 'k' } }), 30)
+    expect(await waitForSeb(500, 10)).toBe(true)
+    expect(isInSeb()).toBe(true)
+  })
+
+  it('lets a SEB user agent through when the object never appears', async () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 SEB/3.10.3',
+    )
+    expect(await waitForSeb(40, 10)).toBe(true)
+    expect(isInSeb()).toBe(false)
   })
 })

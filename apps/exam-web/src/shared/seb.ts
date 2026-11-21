@@ -34,6 +34,24 @@ export function isInSeb(): boolean {
   return sebGlobal() !== undefined
 }
 
+function userAgentLooksLikeSeb(): boolean {
+  return /\bSEB\//.test(navigator.userAgent)
+}
+
+export async function waitForSeb(
+  timeoutMs = 3000,
+  intervalMs = 100,
+): Promise<boolean> {
+  if (isInSeb()) return true
+  if (!userAgentLooksLikeSeb()) return false
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, intervalMs))
+    if (isInSeb()) return true
+  }
+  return true
+}
+
 export function sebVersion(): string | null {
   return sebGlobal()?.version ?? null
 }

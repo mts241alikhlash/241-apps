@@ -1,8 +1,8 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { isInSeb } from '@/shared/seb'
+import { waitForSeb } from '@/shared/seb'
 
-const sebGated = (load: () => Promise<unknown>) => () =>
-  isInSeb() ? load() : import('./views/SebRequiredView.vue')
+const sebGated = (load: () => Promise<unknown>) => async () =>
+  (await waitForSeb()) ? load() : import('./views/SebRequiredView.vue')
 
 export const studentExamRoutes: RouteRecordRaw[] = [
   {

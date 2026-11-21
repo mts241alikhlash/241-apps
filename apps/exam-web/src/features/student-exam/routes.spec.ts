@@ -12,7 +12,7 @@ const { listExams, activeSebConfigs } = vi.hoisted(() => ({
 vi.mock('./api/studentExamApi', () => ({
   studentExamApi: { listExams, activeSebConfigs },
 }))
-vi.mock('@/shared/seb', () => ({ isInSeb: () => false }))
+vi.mock('@/shared/seb', () => ({ waitForSeb: () => Promise.resolve(false) }))
 
 import { studentExamRoutes } from './routes'
 import SebRequiredView from './views/SebRequiredView.vue'
