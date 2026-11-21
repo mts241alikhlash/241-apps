@@ -125,7 +125,7 @@ services:
     image: ghcr.io/mts241alikhlash/exam-web@sha256:85a60f2b9e144f9936ea68143134ef47002af9377541d9eecc68339052a06a81
   identity-service:
     <<: *service-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:82b1543ffd8c343c074a432fb8adffb660aa07f57ed500b6a8ee1d7ead14ccf3
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:79f9e8ec3845c2c7932a80e9f8bd454b472c68f100ad17eb31d24feba7fbbbb6
     env_file:
       - path: env/identity-service.env
     expose:
@@ -265,7 +265,7 @@ services:
 
   identity-service-migrate:
     <<: *migrate-defaults
-    image: ghcr.io/mts241alikhlash/identity-service@sha256:82b1543ffd8c343c074a432fb8adffb660aa07f57ed500b6a8ee1d7ead14ccf3
+    image: ghcr.io/mts241alikhlash/identity-service@sha256:79f9e8ec3845c2c7932a80e9f8bd454b472c68f100ad17eb31d24feba7fbbbb6
     profiles: ['migrate']
     env_file:
       - path: env/identity-service.env

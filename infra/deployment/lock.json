@@ -86,8 +86,8 @@
   },
   "services": {
     "identity": {
-      "version": "0.3.0",
-      "image": "ghcr.io/mts241alikhlash/identity-service@sha256:82b1543ffd8c343c074a432fb8adffb660aa07f57ed500b6a8ee1d7ead14ccf3",
+      "version": "0.3.1",
+      "image": "ghcr.io/mts241alikhlash/identity-service@sha256:79f9e8ec3845c2c7932a80e9f8bd454b472c68f100ad17eb31d24feba7fbbbb6",
       "upstream": "identity-service:3000",
       "healthPath": "/health"
     },
