@@ -512,7 +512,9 @@ export const DEFAULT_ROLES: DefaultRole[] = [
       {
         codes: [
           'exam-events.read',
+          'exam-rooms.supervise',
           'exam-rooms.technician',
+          'exam-schedules.access-code',
           'exam-schedules.read',
           'exam-sessions.read',
           'exam-sessions.release',
