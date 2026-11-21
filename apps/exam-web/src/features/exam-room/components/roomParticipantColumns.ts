@@ -155,10 +155,10 @@ export function buildRoomParticipantColumns(
         align: 'center',
         mobileLabel: 'Kursi',
         mobileValue: (row: RoomMonitorParticipant) =>
-          `[${String(row.seatNumber).padStart(2, '0')}]`,
+          String(row.seatNumber).padStart(2, '0'),
       },
       cell: ({ row }) =>
-        h('span', `[${String(row.original.seatNumber).padStart(2, '0')}]`),
+        h('span', String(row.original.seatNumber).padStart(2, '0')),
     },
     {
       id: 'participant',
@@ -187,6 +187,7 @@ export function buildRoomParticipantColumns(
       id: 'subject',
       header: 'Mapel',
       meta: {
+        mobile: 'hide',
         align: 'left',
         mobileLabel: 'Mapel',
         mobileValue: (row: RoomMonitorParticipant) => row.subjectName ?? '-',
@@ -244,38 +245,47 @@ export function buildRoomParticipantColumns(
     },
     {
       id: 'activity',
-      header: 'Aktivitas & Baterai',
+      header: 'Aktivitas',
       meta: {
+        align: 'center',
         mobileLabel: 'Aktivitas',
+        mobileValue: (row: RoomMonitorParticipant) => activityText(row.session),
+      },
+      cell: ({ row }) => activityText(row.original.session),
+    },
+    {
+      id: 'battery',
+      header: 'Baterai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Baterai',
         mobileValue: (row: RoomMonitorParticipant) =>
-          `${activityText(row.session)} · ${row.session === null ? '-' : batteryText(row.session)}`,
+          row.session === null ? '-' : batteryText(row.session),
       },
       cell: ({ row }) => {
         const session = row.original.session
         if (session === null) return '-'
-        return h('div', { class: 'flex flex-col gap-1' }, [
-          h('span', activityText(session)),
-          h(
-            'span',
-            {
-              class: isLowBattery(session)
-                ? 'flex items-center gap-1 font-medium text-destructive'
-                : 'flex items-center gap-1 text-muted-foreground',
-            },
-            [
-              isLowBattery(session)
-                ? h(BatteryWarning, { class: 'size-3.5' })
-                : null,
-              h('span', batteryText(session)),
-            ],
-          ),
-        ])
+        return h(
+          'span',
+          {
+            class: isLowBattery(session)
+              ? 'flex items-center justify-center gap-1 font-medium text-destructive'
+              : 'flex items-center justify-center gap-1 text-muted-foreground',
+          },
+          [
+            isLowBattery(session)
+              ? h(BatteryWarning, { class: 'size-3.5' })
+              : null,
+            h('span', batteryText(session)),
+          ],
+        )
       },
     },
     {
       id: 'client',
       header: 'Aplikasi',
       meta: {
+        mobile: 'hide',
         align: 'center',
         mobileLabel: 'Aplikasi',
         mobileValue: (row: RoomMonitorParticipant) => clientLabel(row.session),
@@ -286,6 +296,7 @@ export function buildRoomParticipantColumns(
       id: 'readiness',
       header: 'Perangkat',
       meta: {
+        mobile: 'hide',
         align: 'center',
         mobileLabel: 'Perangkat',
         mobileValue: (row: RoomMonitorParticipant) =>
@@ -300,8 +311,8 @@ export function buildRoomParticipantColumns(
           {
             class:
               warnings.length > 0
-                ? 'flex items-center gap-1 font-medium text-destructive'
-                : 'flex items-center gap-1 text-muted-foreground',
+                ? 'flex items-center justify-center gap-1 font-medium text-destructive'
+                : 'flex items-center justify-center gap-1 text-muted-foreground',
           },
           [
             warnings.length > 0 ? h(ShieldAlert, { class: 'size-3.5' }) : null,

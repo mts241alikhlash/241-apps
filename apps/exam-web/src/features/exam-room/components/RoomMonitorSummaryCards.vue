@@ -10,11 +10,10 @@ import type { RoomMonitorSummary } from '../types'
 
 const props = defineProps<{ summary: RoomMonitorSummary | null }>()
 
-const cards = computed(() => {
+const items = computed(() => {
   const summary = props.summary
   if (summary === null) return []
   return [
-    { key: 'total', label: 'Total', value: summary.totalRegistered },
     {
       key: 'not-started',
       label: 'Belum Mulai',
@@ -29,11 +28,13 @@ const cards = computed(() => {
       key: 'unsynced',
       label: 'Menunggu Sinkron',
       value: summary.offlineOrUnsyncedCount,
+      tone: 'text-warning',
     },
     {
       key: 'locked',
       label: 'Perlu Tindakan',
       value: summary.lockedOrViolationCount,
+      tone: 'text-destructive',
     },
     { key: 'finished', label: 'Selesai', value: summary.finishedCount },
     { key: 'absent', label: 'Tidak Hadir', value: summary.absentMarkedCount },
@@ -42,23 +43,23 @@ const cards = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
-    <Card
-      v-for="card in cards"
-      :key="card.key"
-      gap="none"
-    >
-      <CardHeader standard>
-        <CardTitle
-          size="md"
-          class="text-muted-foreground"
+  <Card gap="none">
+    <CardHeader standard>
+      <CardTitle size="md">Ringkasan</CardTitle>
+    </CardHeader>
+    <CardContent variant="standard">
+      <dl class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+        <div
+          v-for="item in items"
+          :key="item.key"
+          class="flex flex-col gap-0.5"
         >
-          {{ card.label }}
-        </CardTitle>
-      </CardHeader>
-      <CardContent variant="standard">
-        <p class="text-lg font-semibold">{{ card.value }}</p>
-      </CardContent>
-    </Card>
-  </div>
+          <dt class="text-control text-muted-foreground">{{ item.label }}</dt>
+          <dd :class="['font-medium', item.value > 0 && item.tone]">
+            {{ item.value }}
+          </dd>
+        </div>
+      </dl>
+    </CardContent>
+  </Card>
 </template>
