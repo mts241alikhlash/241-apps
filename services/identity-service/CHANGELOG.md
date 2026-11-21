@@ -1,5 +1,11 @@
 # identity-service
 
+## 0.3.1
+
+### Patch Changes
+
+- 907920d: Give the exam technician role the access code and supervise permissions so a technician can read the token and recover sessions that have no room.
+
 ## 0.3.0
 
 ### Minor Changes
