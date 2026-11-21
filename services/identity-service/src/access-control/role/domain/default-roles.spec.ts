@@ -395,6 +395,7 @@ describe('default roles', () => {
       expect(holders.sort()).toEqual([
         'ACADEMIC_ADMIN',
         'CURRICULUM_STAFF',
+        'EXAM_TECHNICIAN',
         'TEACHER',
         'VICE_PRINCIPAL_CURRICULUM',
       ])
@@ -550,18 +551,23 @@ describe('default roles', () => {
       expect(codesOf('EXAM_TECHNICIAN')).not.toContain('users.read')
     })
 
-    it('gives supervise to teachers only', () => {
-      expect(holders('exam-rooms.supervise')).toEqual(['TEACHER'])
+    it('gives supervise to teachers and the technician only', () => {
+      expect(holders('exam-rooms.supervise')).toEqual([
+        'EXAM_TECHNICIAN',
+        'TEACHER',
+      ])
     })
 
     it('gives the technician code to the technician role only', () => {
       expect(holders('exam-rooms.technician')).toEqual(['EXAM_TECHNICIAN'])
     })
 
-    it('defines the technician role with exactly its five codes', () => {
+    it('defines the technician role with exactly its seven codes', () => {
       expect(resolveGrants('EXAM_TECHNICIAN')).toEqual([
         'exam-events.read',
+        'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-schedules.access-code',
         'exam-schedules.read',
         'exam-sessions.read',
         'exam-sessions.release',
