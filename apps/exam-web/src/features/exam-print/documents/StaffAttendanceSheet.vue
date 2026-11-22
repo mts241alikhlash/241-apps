@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import LetterheadKop from '@/features/exam-room/components/LetterheadKop.vue'
-import { CARD_HEADER } from '@/features/exam-room/components/cardHeader'
+import {
+  CARD_HEADER,
+  SCHOOL_SIGNERS,
+} from '@/features/exam-room/components/cardHeader'
 
-const SUPERVISORS_PER_PAGE = 12
+const SUPERVISORS_PER_PAGE = 20
 
 interface SupervisorRow {
   key: string
@@ -185,13 +188,13 @@ const pageTitle = (page: SheetPage): string =>
             <p>Mengetahui,</p>
             <p>Kepala Madrasah</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ SCHOOL_SIGNERS.principal }}</p>
           </div>
           <div class="sheet-signature">
             <p class="sheet-signature-blank">&nbsp;</p>
             <p>Wakamad Kurikulum</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ SCHOOL_SIGNERS.curriculum }}</p>
           </div>
         </div>
       </div>
@@ -272,7 +275,7 @@ const pageTitle = (page: SheetPage): string =>
 }
 
 .sheet-table .col-name {
-  width: 48mm;
+  width: 54mm;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -284,7 +287,7 @@ const pageTitle = (page: SheetPage): string =>
 }
 
 .sheet-table .col-subject {
-  width: 42mm;
+  width: 36mm;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -295,7 +298,7 @@ const pageTitle = (page: SheetPage): string =>
 
 .sheet-table .col-sign {
   width: 32mm;
-  height: 7mm;
+  height: 6.5mm;
 }
 
 .sheet-table .is-center {
@@ -325,9 +328,7 @@ const pageTitle = (page: SheetPage): string =>
   height: 16mm;
 }
 
-.sheet-signature-line {
-  border-bottom: 1px solid currentColor;
-  width: 70%;
-  margin-inline: auto;
+.sheet-signature-name {
+  font-weight: 700;
 }
 </style>
