@@ -1,5 +1,16 @@
 # exam-web
 
+## 0.8.5
+
+### Patch Changes
+
+- 4fa9fa9: Print attendance sheets from the row action at every level (day, subject, room) on the student and staff attendance pages, and print the supervisor and technician names under the signature lines of the student attendance sheet.
+- 599987c: Add the Pengawas Ujian role (supervise rooms and release sessions) and take both permissions away from the Guru role, so only people given the new role can supervise exam rooms. The supervisor schedule picker now lists holders of that role.
+- 4bb8539: Rework the room monitoring page into separate cards (room, summary, token and time, actions needed, notes, participants) with every participant shown at once, split activity and battery into their own columns, list silent participants under actions needed, and add a searchable participant picker for physical violation notes. The exam card shows only the room number, and the command search field is no longer tinted.
+- Updated dependencies [4bb8539]
+  - @mts241alikhlash/ui@0.2.1
+  - @mts241alikhlash/platform@0.2.2
+
 ## 0.8.4
 
 ### Patch Changes

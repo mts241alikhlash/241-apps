@@ -1,5 +1,14 @@
 # portal-web
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [4bb8539]
+  - @mts241alikhlash/ui@0.2.1
+  - @mts241alikhlash/platform@0.2.2
+  - @mts241alikhlash/reference-data@0.1.5
+
 ## 0.1.6
 
 ### Patch Changes
