@@ -78,10 +78,10 @@
       "host": "exam.localhost",
       "sslHost": "exam.mts241alikhlash.sch.id",
       "root": "/usr/share/nginx/html/exam",
-      "webVersion": "0.8.6",
-      "webImage": "ghcr.io/mts241alikhlash/exam-web@sha256:a1dd23ab9f764af9edb7f9956e46b3c7b0c6875344013ab3cd0e3f207bf7b5b9",
-      "routesVersion": "0.8.6",
-      "routesSha256": "3e5163f41330cb11f5a571b9a3bcd14ee1f7da606fae4e90b85f12d41906000c"
+      "webVersion": "0.8.7",
+      "webImage": "ghcr.io/mts241alikhlash/exam-web@sha256:5674e53a6cdcdb24158b40675c0f83c2ce1c1b251c6a67a24b3bb16e76707b59",
+      "routesVersion": "0.8.7",
+      "routesSha256": "a7941e014e0cd8b12db6e2d4770171141474dff7d5f1c33a260077f60de4aba2"
     }
   },
   "services": {
