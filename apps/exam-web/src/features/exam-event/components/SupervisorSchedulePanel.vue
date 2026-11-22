@@ -156,7 +156,7 @@ async function submitAdd() {
 }
 
 onMounted(async () => {
-  teachers.value = await examEventService.loadStaff('TEACHER')
+  teachers.value = await examEventService.loadStaff('EXAM_SUPERVISOR')
   const first = props.rooms[0]
   if (first && props.canSupervise) await load(first.id)
 })
