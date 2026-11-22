@@ -38,22 +38,47 @@ const range = computed(() =>
       },
 )
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
+const phase = computed<'none' | 'upcoming' | 'running' | 'ended'>(() => {
+  const r = range.value
+  if (r === null) return 'none'
+  if (props.nowMs < r.start) return 'upcoming'
+  return props.nowMs < r.end ? 'running' : 'ended'
+})
+
+const label = computed(
+  () =>
+    ({
+      none: 'Sisa waktu',
+      upcoming: 'Mulai dalam',
+      running: 'Sisa waktu',
+      ended: 'Sesi berakhir',
+    })[phase.value],
+)
+
 const remaining = computed(() => {
   const r = range.value
   if (r === null) return '-'
-  const left = Math.max(0, Math.floor((r.end - props.nowMs) / 1000))
-  const pad = (n: number) => String(n).padStart(2, '0')
+  if (phase.value === 'ended') return '00:00:00'
+  const target = phase.value === 'upcoming' ? r.start : r.end
+  const left = Math.floor((target - props.nowMs) / 1000)
+  if (phase.value === 'upcoming' && left >= 86_400) {
+    return `${Math.floor(left / 86_400)} hari ${Math.floor((left % 86_400) / 3600)} jam`
+  }
   return `${pad(Math.floor(left / 3600))}:${pad(Math.floor((left % 3600) / 60))}:${pad(left % 60)}`
 })
 
 const urgent = computed(() => {
   const r = range.value
-  return r !== null && r.end - props.nowMs < 300_000
+  return (
+    phase.value === 'running' && r !== null && r.end - props.nowMs < 300_000
+  )
 })
 
 const percent = computed(() => {
   const r = range.value
-  if (r === null) return 0
+  if (r === null || phase.value === 'upcoming') return 0
   return Math.min(
     100,
     Math.max(0, ((props.nowMs - r.start) / (r.end - r.start)) * 100),
@@ -109,7 +134,7 @@ const connection = computed(() =>
       </div>
 
       <div class="space-y-1">
-        <p class="text-control text-muted-foreground">Sisa waktu</p>
+        <p class="text-control text-muted-foreground">{{ label }}</p>
         <p
           :class="[
             'text-3xl font-semibold tabular-nums',
