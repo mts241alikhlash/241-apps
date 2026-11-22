@@ -35,8 +35,16 @@ const props = withDefaults(
     timeRange: string
     students: AttendanceStudent[]
     paginate?: boolean
+    stacked?: boolean
+    supervisorName?: string | null
+    technicianName?: string | null
   }>(),
-  { paginate: true },
+  {
+    paginate: true,
+    stacked: false,
+    supervisorName: null,
+    technicianName: null,
+  },
 )
 
 const sheets = computed<Sheet[]>(() => {
@@ -82,7 +90,13 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 </script>
 
 <template>
-  <div class="print-stack space-y-6">
+  <div
+    :class="
+      stacked
+        ? 'space-y-6 break-after-page last:break-after-auto'
+        : 'print-stack space-y-6'
+    "
+  >
     <section
       v-for="(sheet, sheetIndex) in sheets"
       :key="sheetIndex"
@@ -206,11 +220,13 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
             <p>Pengawas Ruangan</p>
             <div class="sheet-signature-space" />
             <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ supervisorName ?? '' }}</p>
           </div>
           <div class="sheet-signature">
             <p>Teknisi Ruangan</p>
             <div class="sheet-signature-space" />
             <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ technicianName ?? '' }}</p>
           </div>
         </div>
       </div>
@@ -358,5 +374,10 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
   border-bottom: 1px solid currentColor;
   width: 80%;
   margin-inline: auto;
+}
+
+.sheet-signature-name {
+  min-height: 1.4em;
+  margin-top: 1mm;
 }
 </style>
