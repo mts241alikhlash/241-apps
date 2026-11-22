@@ -19,6 +19,10 @@ import type {
   RoomMonitorSession,
 } from '../types'
 import { reasonLabel } from '../types'
+import {
+  classOfClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 
 export interface RoomParticipantColumnOptions extends MonitorAbilities {
   onTimeline: (row: RoomMonitorParticipant) => void
@@ -161,27 +165,52 @@ export function buildRoomParticipantColumns(
         h('span', String(row.original.seatNumber).padStart(2, '0')),
     },
     {
+      id: 'participantNumber',
+      header: 'No. Peserta',
+      meta: {
+        align: 'center',
+        mobileLabel: 'No. Peserta',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          row.participantNumber ?? '-',
+      },
+      cell: ({ row }) => h('span', row.original.participantNumber ?? '-'),
+    },
+    {
       id: 'participant',
-      header: 'Peserta',
+      header: 'Nama',
       meta: {
         align: 'left',
         strong: true,
-        mobileLabel: 'Peserta',
+        mobileLabel: 'Nama',
         mobileValue: (row: RoomMonitorParticipant) =>
-          [row.studentName ?? 'Siswa tidak ditemukan', row.nis]
-            .filter(Boolean)
-            .join(' · '),
+          row.studentName ?? 'Siswa tidak ditemukan',
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          [
-            row.original.studentName ?? 'Siswa tidak ditemukan',
-            row.original.nis,
-          ]
-            .filter(Boolean)
-            .join(' · '),
-        ),
+        h('span', row.original.studentName ?? 'Siswa tidak ditemukan'),
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        mobile: 'hide',
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          gradeOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => gradeOfClassroom(row.original.classroomName),
+    },
+    {
+      id: 'classroom',
+      header: 'Kelas',
+      meta: {
+        mobile: 'hide',
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          classOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => classOfClassroom(row.original.classroomName),
     },
     {
       id: 'subject',
@@ -195,16 +224,6 @@ export function buildRoomParticipantColumns(
       cell: ({ row }) => row.original.subjectName ?? '-',
     },
     {
-      id: 'status',
-      header: 'Status',
-      meta: {
-        align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: statusText,
-      },
-      cell: ({ row }) => statusNode(row.original),
-    },
-    {
       id: 'progress',
       header: 'Progres',
       meta: {
@@ -212,7 +231,8 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Progres',
         mobileValue: progressText,
       },
-      cell: ({ row }) => h('span', progressText(row.original)),
+      cell: ({ row }) =>
+        h('span', { class: 'whitespace-nowrap' }, progressText(row.original)),
     },
     {
       id: 'sync',
@@ -228,7 +248,12 @@ export function buildRoomParticipantColumns(
         if (session === null) return '-'
         return h(
           'span',
-          session.unsyncedCount > 0 ? { class: 'text-warning' } : undefined,
+          {
+            class:
+              session.unsyncedCount > 0
+                ? 'whitespace-nowrap text-warning'
+                : 'whitespace-nowrap',
+          },
           syncText(session),
         )
       },
@@ -241,7 +266,12 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Gangguan',
         mobileValue: disturbanceText,
       },
-      cell: ({ row }) => disturbanceText(row.original),
+      cell: ({ row }) =>
+        h(
+          'span',
+          { class: 'whitespace-nowrap' },
+          disturbanceText(row.original),
+        ),
     },
     {
       id: 'activity',
@@ -251,7 +281,12 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Aktivitas',
         mobileValue: (row: RoomMonitorParticipant) => activityText(row.session),
       },
-      cell: ({ row }) => activityText(row.original.session),
+      cell: ({ row }) =>
+        h(
+          'span',
+          { class: 'whitespace-nowrap' },
+          activityText(row.original.session),
+        ),
     },
     {
       id: 'battery',
@@ -269,8 +304,8 @@ export function buildRoomParticipantColumns(
           'span',
           {
             class: isLowBattery(session)
-              ? 'flex items-center justify-center gap-1 font-medium text-destructive'
-              : 'flex items-center justify-center gap-1 text-muted-foreground',
+              ? 'flex items-center justify-center gap-1 whitespace-nowrap font-medium text-destructive'
+              : 'flex items-center justify-center gap-1 whitespace-nowrap text-muted-foreground',
           },
           [
             isLowBattery(session)
@@ -311,8 +346,8 @@ export function buildRoomParticipantColumns(
           {
             class:
               warnings.length > 0
-                ? 'flex items-center justify-center gap-1 font-medium text-destructive'
-                : 'flex items-center justify-center gap-1 text-muted-foreground',
+                ? 'flex items-center justify-center gap-1 whitespace-nowrap font-medium text-destructive'
+                : 'flex items-center justify-center gap-1 whitespace-nowrap text-muted-foreground',
           },
           [
             warnings.length > 0 ? h(ShieldAlert, { class: 'size-3.5' }) : null,
@@ -320,6 +355,16 @@ export function buildRoomParticipantColumns(
           ],
         )
       },
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: statusText,
+      },
+      cell: ({ row }) => statusNode(row.original),
     },
     {
       id: 'actions',

@@ -121,7 +121,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/exam/supervisor-schedule/:id',
+    path: '/exam/supervisor-schedule/:id/:dayId?/:subjectId?',
     name: 'ExamSupervisorScheduleDetail',
     component: () => import('./views/SupervisorScheduleView.vue'),
     meta: {
@@ -133,39 +133,6 @@ export const examEventRoutes: RouteRecordRaw[] = [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
         { title: 'Jadwal Pengawas', href: '/exam/supervisor-schedule' },
-      ],
-    },
-  },
-  {
-    path: '/exam/room-cards',
-    name: 'ExamRoomCards',
-    component: () => import('./views/EventRoomSummaryView.vue'),
-    props: { title: 'Kartu per Ruangan', detailBase: '/exam/room-cards' },
-    meta: {
-      title: 'Kartu per Ruangan',
-      category: 'EXAM',
-      requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
-      breadcrumbs: [
-        { title: 'Ujian', href: '#' },
-        { title: 'Persiapan', href: '#' },
-        { title: 'Kartu per Ruangan', href: '/exam/room-cards' },
-      ],
-    },
-  },
-  {
-    path: '/exam/room-cards/:id',
-    name: 'ExamRoomCardsDetail',
-    component: () => import('./views/RoomCardView.vue'),
-    meta: {
-      title: 'Kartu per Ruangan',
-      category: 'EXAM',
-      requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
-      breadcrumbs: [
-        { title: 'Ujian', href: '#' },
-        { title: 'Persiapan', href: '#' },
-        { title: 'Kartu per Ruangan', href: '/exam/room-cards' },
       ],
     },
   },

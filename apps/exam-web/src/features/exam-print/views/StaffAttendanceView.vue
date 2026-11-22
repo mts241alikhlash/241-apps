@@ -6,6 +6,7 @@ import {
   DataTable,
   SearchInput,
   ServiceUnavailable,
+  DataTableEmpty,
 } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -55,7 +56,7 @@ const state = usePrintPack({ withSchedules: true })
 const eventFieldId = 'staff-attendance-event'
 const search = ref('')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 function changePageSize(size: number) {
   pageSize.value = size
@@ -122,9 +123,7 @@ const filteredDays = computed(() => {
   )
 })
 
-const daySheet = computed(() => {
-  const day = previewDay.value
-  if (day === null) return null
+function sheetOf(day: DayEntry) {
   const ownRooms = new Set(day.rooms.map((room) => room.id))
   const rows = [
     ...new Map(
@@ -188,7 +187,37 @@ const daySheet = computed(() => {
     supervisors,
     technicians,
   }
-})
+}
+
+const daySheet = computed(() =>
+  previewDay.value === null ? null : sheetOf(previewDay.value),
+)
+
+const stackDays = ref<DayEntry[]>([])
+const stackSheets = computed(() => stackDays.value.map(sheetOf))
+const printList = computed(() =>
+  stackSheets.value.length > 0
+    ? stackSheets.value
+    : daySheet.value === null
+      ? []
+      : [daySheet.value],
+)
+const printingAll = ref(false)
+
+async function printAll() {
+  if (printingAll.value || filteredDays.value.length === 0) return
+  printingAll.value = true
+  try {
+    stackDays.value = filteredDays.value
+    await loadReports()
+    await nextTick()
+    await waitForPrintImages()
+    printSheets()
+  } finally {
+    stackDays.value = []
+    printingAll.value = false
+  }
+}
 
 async function loadReports() {
   const eventId = state.eventId.value
@@ -302,6 +331,16 @@ useBreadcrumbs(() => [
         <CardTitle class="font-semibold">
           Daftar Hadir Pengawas dan Teknisi
         </CardTitle>
+        <Button
+          class="shrink-0"
+          :disabled="
+            state.loading.value || filteredDays.length === 0 || printingAll
+          "
+          @click="printAll"
+        >
+          <Printer class="size-4" />
+          {{ printingAll ? 'Menyiapkan…' : 'Cetak' }}
+        </Button>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
@@ -384,13 +423,13 @@ useBreadcrumbs(() => [
               />
             </template>
             <template #empty>
-              <p class="text-center">
-                {{
+              <DataTableEmpty
+                :message="
                   search
                     ? 'Tidak ada hari yang cocok dengan pencarian.'
                     : 'Belum ada jadwal pengawas pada periode ini.'
-                }}
-              </p>
+                "
+              />
             </template>
           </DataTable>
         </template>
@@ -427,16 +466,7 @@ useBreadcrumbs(() => [
             Pilih hari untuk melihat pratinjau.
           </p>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
-          <Button
-            variant="outline"
-            @click="previewOpen = false"
-          >
-            Tutup
-          </Button>
+        <DialogFooter standard>
           <Button
             :disabled="daySheet === null"
             @click="printSheets"
@@ -449,14 +479,20 @@ useBreadcrumbs(() => [
     </Dialog>
 
     <div
-      v-if="daySheet"
+      v-if="printList.length > 0"
       class="print-only"
     >
-      <StaffAttendanceSheet
-        :date="daySheet.date"
-        :supervisors="daySheet.supervisors"
-        :technicians="daySheet.technicians"
-      />
+      <div
+        v-for="sheet in printList"
+        :key="sheet.key"
+        class="break-after-page last:break-after-auto"
+      >
+        <StaffAttendanceSheet
+          :date="sheet.date"
+          :supervisors="sheet.supervisors"
+          :technicians="sheet.technicians"
+        />
+      </div>
     </div>
   </div>
 </template>

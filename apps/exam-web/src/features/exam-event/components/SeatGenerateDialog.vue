@@ -225,10 +225,7 @@ function setOrder(value: AcceptableValue) {
           />
         </template>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="close"

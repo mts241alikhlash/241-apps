@@ -2,25 +2,27 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { ActionCell } from '@mts241alikhlash/ui'
 import ActivityListView from './ActivityListView.vue'
 import ActivityDetailView from './ActivityDetailView.vue'
 import ActivityPolicyDialog from '../components/ActivityPolicyDialog.vue'
 import type { ExamActivityDetail } from '../types'
 
-const { list, get, updatePolicy, rotateToken, permissions, push, routeState } =
-  vi.hoisted(() => ({
+const { list, get, updatePolicy, permissions, push, routeState } = vi.hoisted(
+  () => ({
     list: vi.fn(),
     get: vi.fn(),
     updatePolicy: vi.fn(),
-    rotateToken: vi.fn(),
     permissions: new Set<string>(),
     push: vi.fn(),
     routeState: {
       meta: { category: 'NON_EXAM' },
       params: { id: 'act-1' },
       path: '/classwork/activities',
+      query: {},
     },
-  }))
+  }),
+)
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
@@ -33,12 +35,17 @@ vi.mock('@mts241alikhlash/platform/auth', () => ({
   }),
 }))
 
+vi.mock('@/features/exam-event/services/examEventService', () => ({
+  examEventService: {
+    loadEvents: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  },
+}))
+
 vi.mock('../api/examActivityApi', () => ({
   examActivityApi: {
     list,
     get,
     updatePolicy,
-    rotateToken,
   },
 }))
 
@@ -75,6 +82,10 @@ const stubs = {
   AlertDialogCancel: button,
   AlertDialogAction: button,
   Plus: true,
+  Tooltip: passthrough,
+  TooltipProvider: passthrough,
+  TooltipTrigger: passthrough,
+  TooltipContent: passthrough,
 }
 
 const sampleDetail = (
@@ -144,9 +155,10 @@ describe('ActivityListView', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Menunggu paket')
-    expect(
-      wrapper.findAll('button').some((b) => b.text() === 'Pasang paket'),
-    ).toBe(true)
+    const labels = (
+      wrapper.findComponent(ActionCell).props('items') as { label: string }[]
+    ).map((item) => item.label)
+    expect(labels).toContain('Pasang Paket')
     wrapper.unmount()
   })
 
@@ -159,9 +171,11 @@ describe('ActivityListView', () => {
 
     const createBtn = wrapper
       .findAll('button')
-      .find((b) => b.text().includes('Buat kegiatan'))
+      .find((b) => b.text().includes('Tambah'))
     await createBtn!.trigger('click')
-    expect(push).toHaveBeenCalledWith('/classwork/activities/new')
+    expect(push).toHaveBeenCalledWith(
+      expect.objectContaining({ path: '/classwork/activities/new' }),
+    )
     wrapper.unmount()
   })
 })
@@ -177,43 +191,34 @@ describe('ActivityDetailView', () => {
     get.mockResolvedValue(sampleDetail())
   })
 
-  it('renders preset/type, token mode, and schedules per class, hiding manage-all buttons for regular teachers', async () => {
+  it('renders type, token mode and schedules per class, hiding the policy edit for regular teachers', async () => {
     const wrapper = mount(ActivityDetailView, { global: { stubs } })
     await flushPromises()
 
     expect(get).toHaveBeenCalledWith('act-1')
+    expect(wrapper.text()).toContain('Matematika')
     expect(wrapper.text()).toContain('UTS')
-    expect(wrapper.text()).toContain('Token berputar')
+    expect(wrapper.text()).toContain('Berputar')
     expect(wrapper.text()).toContain('VII A')
-    expect(wrapper.text()).not.toContain('Ubah kebijakan')
+    expect(wrapper.text()).not.toContain('Ubah')
     expect(wrapper.text()).not.toContain('Ganti token')
     wrapper.unmount()
   })
 
-  it('shows Ubah kebijakan and Ganti token for manage-all and requires confirmation before rotating token', async () => {
+  it('shows the policy edit in the policy card for manage-all and opens the dialog', async () => {
     permissions.add('exam-schedules.manage-all')
-    rotateToken.mockResolvedValue(sampleDetail({ tokenRotation: 2 }))
     const wrapper = mount(ActivityDetailView, { global: { stubs } })
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Ubah kebijakan')
-    const rotateBtn = wrapper
+    expect(wrapper.text()).not.toContain('Ganti token')
+    expect(wrapper.findComponent(ActivityPolicyDialog).exists()).toBe(false)
+    await wrapper
       .findAll('button')
-      .find((b) => b.text().includes('Ganti token'))
-    expect(rotateBtn).toBeDefined()
-
-    await rotateBtn!.trigger('click')
-    await flushPromises()
-    expect(rotateToken).not.toHaveBeenCalled()
-    expect(wrapper.find('[data-test="confirm-dialog"]').exists()).toBe(true)
-
-    const confirmBtn = wrapper
-      .findAll('button')
-      .find((b) => b.text().includes('Ya, ganti token'))
-    await confirmBtn!.trigger('click')
+      .find((b) => b.text().includes('Ubah'))!
+      .trigger('click')
     await flushPromises()
 
-    expect(rotateToken).toHaveBeenCalledWith('act-1')
+    expect(wrapper.findComponent(ActivityPolicyDialog).exists()).toBe(true)
     wrapper.unmount()
   })
 })
@@ -244,6 +249,7 @@ describe('ActivityPolicyDialog', () => {
     })
 
     await wrapper.get('form').trigger('submit')
+    await new Promise((resolve) => setTimeout(resolve, 30))
     await flushPromises()
 
     expect(updatePolicy).toHaveBeenCalled()

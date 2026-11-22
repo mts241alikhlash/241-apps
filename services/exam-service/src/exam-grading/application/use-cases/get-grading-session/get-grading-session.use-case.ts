@@ -9,11 +9,7 @@ import { IExamScheduleRepository } from '../../../../exam-schedule/domain/reposi
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
-import {
-  isManual,
-  toGradingItem,
-  type GradingItem,
-} from '../../grading-item.js'
+import { toGradingItem, type GradingItem } from '../../grading-item.js'
 import {
   GradingScopeService,
   type GradingUser,
@@ -82,10 +78,9 @@ export class GetGradingSessionUseCase {
 
     const items: GradingItem[] = []
     sources.forEach((source, index) => {
-      if (!isManual(source.type)) return
       items.push(
         toGradingItem(
-          { ...source, type: source.type },
+          source,
           index + 1,
           answerOf.get(source.questionId) ?? null,
         ),

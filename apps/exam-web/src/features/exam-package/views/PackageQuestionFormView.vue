@@ -720,10 +720,7 @@ async function confirmSave() {
             {{ formError }}
           </p>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             @click="confirmOpen = false"

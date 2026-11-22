@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -24,7 +24,7 @@ const subjectId = ref('ALL')
 const gradeId = ref('ALL')
 const status = ref('SUBMITTED')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 const { packages, totalItems, loading, listError, filtersPending, refresh } =
   usePackageList({ search, subjectId, gradeId, status }, page, pageSize)
@@ -106,13 +106,13 @@ onMounted(() => examPackageService.loadReferences())
             />
           </template>
           <template #empty>
-            <p>
-              {{
+            <DataTableEmpty
+              :message="
                 search
-                  ? 'Tidak ada paket yang cocok.'
+                  ? 'Tidak ada paket yang cocok dengan pencarian.'
                   : 'Tidak ada paket yang menunggu tinjauan.'
-              }}
-            </p>
+              "
+            />
           </template>
         </DataTable>
       </CardContent>

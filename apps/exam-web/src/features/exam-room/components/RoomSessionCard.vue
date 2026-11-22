@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
+import { Copy } from '@lucide/vue'
+import { TooltipButton } from '@mts241alikhlash/ui'
 import {
   Card,
   CardContent,
@@ -99,20 +100,23 @@ const connection = computed(() =>
   <Card gap="none">
     <CardHeader standard>
       <CardTitle size="md">Token &amp; Waktu</CardTitle>
-      <Button
-        variant="outline"
-        :disabled="!token"
-        @click="$emit('copy')"
-      >
-        Salin Token
-      </Button>
     </CardHeader>
     <CardContent
       variant="standard"
       class="grid gap-4 sm:grid-cols-2"
     >
       <div class="space-y-1">
-        <p class="text-control text-muted-foreground">Token masuk</p>
+        <div class="flex items-center gap-1">
+          <p class="text-control text-muted-foreground">Token masuk</p>
+          <TooltipButton
+            label="Salin token"
+            class="size-6"
+            :disabled="!token"
+            @click="$emit('copy')"
+          >
+            <Copy class="size-3.5" />
+          </TooltipButton>
+        </div>
         <p
           v-if="token"
           class="text-3xl font-semibold tracking-widest"

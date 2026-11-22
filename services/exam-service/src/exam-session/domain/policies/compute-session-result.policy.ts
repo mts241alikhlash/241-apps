@@ -29,6 +29,8 @@ export function computeSessionResult(
 
     if (source.resolution === 'BONUS_ALL') {
       score = source.points
+    } else if (answer?.gradedAt != null && answer.score !== null) {
+      score = answer.score
     } else {
       const content =
         source.resolution === 'KEY_OVERRIDE' && source.overrideContent != null
@@ -42,6 +44,7 @@ export function computeSessionResult(
       ).score
       if (auto === null) {
         if (answer === null || isBlank(answer)) score = 0
+        else if (source.type === 'SHORT_ANSWER') score = null
         else score = answer.score
       } else {
         score = auto

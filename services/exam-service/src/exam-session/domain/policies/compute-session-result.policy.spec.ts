@@ -180,4 +180,35 @@ describe('computeSessionResult', () => {
       computeSessionResult([mc], [answer('mc', { key: 'B' })]),
     ).toMatchObject({ rawScore: 2 })
   })
+
+  it('scores a matching short answer and keeps no manual work pending', () => {
+    expect(
+      computeSessionResult([short], [answer('short', { text: 'X' })]),
+    ).toMatchObject({ rawScore: 3, pendingManual: 0 })
+  })
+
+  it('waits for the teacher on a short answer that does not match', () => {
+    expect(
+      computeSessionResult([short], [answer('short', { text: 'y' })]),
+    ).toMatchObject({ rawScore: 0, pendingManual: 1 })
+  })
+
+  it('lets a teacher grade win over a matching short answer', () => {
+    const graded = {
+      ...answer('short', { text: 'x' }, 1),
+      gradedById: 'teacher',
+      gradedAt: new Date(1),
+    }
+
+    expect(computeSessionResult([short], [graded])).toMatchObject({
+      rawScore: 1,
+      pendingManual: 0,
+    })
+  })
+
+  it('does not keep a stale automatic score once the key stops matching', () => {
+    expect(
+      computeSessionResult([short], [answer('short', { text: 'y' }, 3)]),
+    ).toMatchObject({ pendingManual: 1 })
+  })
 })

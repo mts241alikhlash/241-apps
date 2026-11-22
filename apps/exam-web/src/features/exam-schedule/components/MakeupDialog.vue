@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, useId } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { toast } from 'vue-sonner'
 import { DatePicker, FormattedNumberInput } from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
@@ -12,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
 import {
   Select,
@@ -26,6 +31,8 @@ import { useMakeupForm } from '../composables/useMakeupForm'
 import { examScheduleService } from '../services/examScheduleService'
 import type { MakeupOrigin, MakeupReason } from '../types'
 import { MAKEUP_REASONS, reasonLabel, refusalLabel } from '../types'
+import { toInstant } from '../utils/instant'
+import { validateSchedule } from '../utils/validateSchedule'
 
 const props = defineProps<{ open: boolean; schedule: MakeupOrigin }>()
 
@@ -36,7 +43,86 @@ const emit = defineEmits<{
 
 const form = useMakeupForm(props.schedule)
 const packages = ref<ExamPackageSummary[]>([])
-const fieldId = useId()
+
+const formSchema = toTypedSchema(
+  z
+    .object({
+      reason: z.string(),
+      packageId: z.string().min(1, 'Paket wajib dipilih'),
+      startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
+      startTime: z.string().min(1, 'Jam mulai wajib diisi'),
+      endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
+      endTime: z.string().min(1, 'Jam selesai wajib diisi'),
+      durationMinutes: z
+        .number({ invalid_type_error: 'Durasi minimal 1 menit' })
+        .int('Durasi minimal 1 menit')
+        .min(1, 'Durasi minimal 1 menit')
+        .max(1440, 'Durasi maksimal 1440 menit'),
+    })
+    .superRefine((value, ctx) => {
+      if (
+        !value.startDate ||
+        !value.startTime ||
+        !value.endDate ||
+        !value.endTime
+      ) {
+        return
+      }
+      const problem = validateSchedule({
+        startDate: value.startDate,
+        startTime: value.startTime,
+        endDate: value.endDate,
+        endTime: value.endTime,
+        durationMinutes: value.durationMinutes,
+      })
+      if (problem !== null) {
+        ctx.addIssue({ code: 'custom', path: ['endTime'], message: problem })
+        return
+      }
+      if (
+        new Date(toInstant(value.startDate, value.startTime)).getTime() <
+        new Date(props.schedule.endsAt).getTime()
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['startTime'],
+          message: 'Susulan harus dimulai setelah ujian utama berakhir',
+        })
+      }
+    }),
+)
+
+const { handleSubmit, isSubmitting, values, setFieldValue } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    reason: form.reason.value,
+    packageId: props.schedule.packageId,
+    startDate: '',
+    startTime: '',
+    endDate: '',
+    endTime: '',
+    durationMinutes: props.schedule.durationMinutes,
+  },
+})
+
+watch(
+  values,
+  (next) => {
+    form.reason.value = (next.reason ?? 'SICK') as MakeupReason
+    form.packageId.value = next.packageId ?? ''
+    form.startDate.value = next.startDate ?? ''
+    form.startTime.value = next.startTime ?? ''
+    form.endDate.value = next.endDate ?? ''
+    form.endTime.value = next.endTime ?? ''
+    form.durationMinutes.value = next.durationMinutes ?? null
+  },
+  { deep: true, immediate: true },
+)
+
+watch(
+  () => form.reason.value,
+  (next) => setFieldValue('reason', next),
+)
 
 onMounted(async () => {
   void form.load()
@@ -51,13 +137,18 @@ onMounted(async () => {
     : all
 })
 
-async function create() {
+const onSubmit = handleSubmit(async () => {
+  if (form.selected.value.size === 0) {
+    form.error.value = 'Pilih minimal satu siswa'
+    return
+  }
   const created = await form.submit()
   if (created) {
+    toast.success('Ujian susulan dibuat.')
     emit('created', created.id)
     emit('update:open', false)
   }
-}
+})
 </script>
 
 <template>
@@ -73,21 +164,19 @@ async function create() {
         </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
-        <div
+        <Alert
           v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
-          role="alert"
+          variant="destructive"
         >
-          {{ form.error.value }}
-        </div>
+          <AlertDescription>{{ form.error.value }}</AlertDescription>
+        </Alert>
 
-        <div
+        <Alert
           v-if="form.loadError.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
-          role="alert"
+          variant="destructive"
         >
-          {{ form.loadError.value }}
-        </div>
+          <AlertDescription>{{ form.loadError.value }}</AlertDescription>
+        </Alert>
         <p
           v-else-if="!form.loading.value && form.absentees.value.length === 0"
           class="text-control text-muted-foreground"
@@ -175,126 +264,155 @@ async function create() {
           </ul>
         </template>
 
-        <div class="grid gap-4 sm:grid-cols-2">
-          <FloatingLabelField
+        <form
+          id="makeup-form"
+          class="grid gap-4 sm:grid-cols-2"
+          @submit.prevent="onSubmit"
+        >
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="reason"
             label="Alasan untuk semua"
-            :for="`${fieldId}-reason`"
-            floating
           >
-            <Select v-model="form.reason.value">
-              <SelectTrigger
-                :id="`${fieldId}-reason`"
-                class="w-full"
+            <div class="content-start">
+              <Select
+                :model-value="value"
+                @update:model-value="handleChange"
               >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="option in MAKEUP_REASONS"
-                  :key="option"
-                  :value="option"
-                >
-                  {{ reasonLabel(option) }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
-          <FloatingLabelField
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem
+                    v-for="option in MAKEUP_REASONS"
+                    :key="option"
+                    :value="option"
+                  >
+                    {{ reasonLabel(option) }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="packageId"
             label="Paket"
-            :for="`${fieldId}-package`"
-            floating
+            required
           >
-            <Select v-model="form.packageId.value">
-              <SelectTrigger
-                :id="`${fieldId}-package`"
-                class="w-full"
+            <div class="content-start">
+              <Select
+                :model-value="value || undefined"
+                @update:model-value="handleChange"
               >
-                <SelectValue placeholder="Pilih paket" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="item in packages"
-                  :key="item.id"
-                  :value="item.id"
-                >
-                  {{ item.title }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
-          <FloatingLabelField
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem
+                    v-for="item in packages"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.title }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="startDate"
             label="Tanggal mulai"
-            :for="`${fieldId}-start-date`"
-            floating
+            required
           >
-            <DatePicker
-              :id="`${fieldId}-start-date`"
-              v-model="form.startDate.value"
-              allow-future-dates
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Tanggal selesai"
-            :for="`${fieldId}-end-date`"
-            floating
-          >
-            <DatePicker
-              :id="`${fieldId}-end-date`"
-              v-model="form.endDate.value"
-              allow-future-dates
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Durasi"
-            :for="`${fieldId}-duration`"
-            floating
-          >
-            <FormattedNumberInput
-              :id="`${fieldId}-duration`"
-              v-model="form.durationMinutes.value"
-              numeric
-              suffix=" menit"
-              :max-digits="4"
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
+            <div class="content-start">
+              <FormControl>
+                <DatePicker
+                  :model-value="value"
+                  allow-future-dates
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="startTime"
             label="Jam mulai"
-            :for="`${fieldId}-start`"
-            floating
+            required
+            always-float
           >
-            <Input
-              :id="`${fieldId}-start`"
-              v-model="form.startTime.value"
-              type="time"
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="time"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="endDate"
+            label="Tanggal selesai"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <DatePicker
+                  :model-value="value"
+                  allow-future-dates
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="endTime"
             label="Jam selesai"
-            :for="`${fieldId}-end`"
-            floating
+            required
+            always-float
           >
-            <Input
-              :id="`${fieldId}-end`"
-              v-model="form.endTime.value"
-              type="time"
-            />
-          </FloatingLabelField>
-        </div>
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="time"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="durationMinutes"
+            label="Durasi"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <FormattedNumberInput
+                  :model-value="value"
+                  numeric
+                  suffix=" menit"
+                  :max-digits="4"
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+        </form>
         <p class="text-control text-muted-foreground">
           Untuk UTS dan UAS, salin paketnya dan ganti sebagian soal agar soal
           susulan berbeda dari ujian utama.
         </p>
-        <p
-          v-if="form.problem.value"
-          class="text-control text-muted-foreground"
-        >
-          {{ form.problem.value }}
-        </p>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"
@@ -303,9 +421,9 @@ async function create() {
           Batal
         </Button>
         <Button
-          type="button"
-          :disabled="form.problem.value !== null || form.saving.value"
-          @click="create"
+          type="submit"
+          form="makeup-form"
+          :disabled="isSubmitting || form.saving.value"
         >
           {{
             form.selected.value.size > 0

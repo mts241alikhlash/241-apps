@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { usePrintPack } from '../composables/usePrintPack'
 import {
   usePrintScope,
   type PrintScopeGroup,
   type PrintScopeOption,
 } from '../composables/usePrintScope'
+import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
 import PrintShell from '../components/PrintShell.vue'
 import { PRINT_DOCUMENTS } from '../documents'
 import { gradeOf } from '../format'
@@ -64,15 +73,14 @@ const scopes = computed<PrintScopeOption[]>(() => {
   ]
 })
 
-const documentBindings = computed(() => ({
-  ...definition.value.componentProps,
-  ...(props.doc === 'cards'
-    ? {
-        resetting: state.resetting.value,
-        onResetCredentials: state.resetCredentials,
-      }
-    : {}),
-}))
+const documentBindings = computed(() => definition.value.componentProps)
+
+const confirmingReset = ref(false)
+
+function confirmReset() {
+  confirmingReset.value = false
+  void state.resetCredentials()
+}
 
 const showShellFilters = computed(
   () => definition.value.inlineFilters !== true || state.error.value !== null,
@@ -130,6 +138,18 @@ const printedRooms = computed(() => {
     @print="printWith"
     @retry="state.loadPack"
   >
+    <template
+      v-if="doc === 'cards'"
+      #header-actions
+    >
+      <Button
+        variant="outline"
+        :disabled="state.resetting.value || !state.hasContent.value"
+        @click="confirmingReset = true"
+      >
+        Reset password
+      </Button>
+    </template>
     <template v-if="state.pack.value">
       <component
         :is="definition.component"
@@ -155,4 +175,32 @@ const printedRooms = computed(() => {
       />
     </template>
   </PrintShell>
+
+  <Dialog v-model:open="confirmingReset">
+    <DialogContent size="md">
+      <DialogHeader standard>
+        <DialogTitle>Reset password siswa?</DialogTitle>
+        <DialogDescription>
+          Kata sandi lama semua siswa pada tampilan ini tidak berlaku lagi.
+          Kartu yang sudah tercetak sebelumnya ikut tidak berlaku. Kata sandi
+          baru hanya tampil di halaman ini dan hilang bila halaman dimuat ulang,
+          jadi cetak sebelum meninggalkannya.
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter standard>
+        <Button
+          variant="outline"
+          @click="confirmingReset = false"
+        >
+          Batal
+        </Button>
+        <Button
+          :disabled="state.resetting.value"
+          @click="confirmReset"
+        >
+          Reset password
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>

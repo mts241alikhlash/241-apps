@@ -3,14 +3,16 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { UserRoundPlus, Users } from '@lucide/vue'
-import { Button } from '@mts241alikhlash/ui/button'
 import {
   examTypeLabel,
   sessionStatusLabel,
 } from '@/features/exam-schedule/types'
-import { formatWindow } from '@/features/exam-schedule/utils/formatWindow'
+import {
+  formatDay,
+  formatTime,
+} from '@/features/exam-schedule/utils/formatWindow'
 import type { GradingSchedule, GradingSessionRow } from '../types'
-import { publicationLabel } from '../types'
+import { formatScore, publicationLabel } from '../types'
 
 const typeText = (row: GradingSchedule) =>
   row.kind === 'MAKEUP'
@@ -19,10 +21,9 @@ const typeText = (row: GradingSchedule) =>
 const exitText = (row: GradingSessionRow) =>
   row.violationCount > 0 ? `${row.violationCount}×` : '-'
 const classroomText = (row: GradingSchedule) => row.classroomName ?? '-'
-const windowText = (row: GradingSchedule) =>
-  formatWindow(row.startsAt, row.endsAt)
 
 export function buildGradingScheduleColumns(options: {
+  subjectName?: (schedule: GradingSchedule) => string
   onOpen: (schedule: GradingSchedule) => void
   canMakeup?: boolean
   canParticipants?: boolean
@@ -31,45 +32,74 @@ export function buildGradingScheduleColumns(options: {
 }): ColumnDef<GradingSchedule>[] {
   return [
     {
-      id: 'title',
-      header: 'Ujian',
-      meta: { align: 'left', strong: true },
-      cell: ({ row }) => row.original.title,
-    },
-    {
       id: 'type',
       header: 'Jenis',
-      meta: { mobileLabel: 'Jenis', mobileValue: typeText },
+      meta: { align: 'center', mobileLabel: 'Jenis', mobileValue: typeText },
       cell: ({ row }) => typeText(row.original),
+    },
+    {
+      id: 'title',
+      header: 'Mata Pelajaran',
+      meta: { align: 'left', strong: true, mobile: 'title' },
+      cell: ({ row }) =>
+        options.subjectName?.(row.original) ?? row.original.title,
     },
     {
       id: 'classroom',
       header: 'Kelas',
-      meta: { mobileLabel: 'Kelas', mobileValue: classroomText },
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: classroomText,
+      },
       cell: ({ row }) => classroomText(row.original),
     },
     {
-      id: 'window',
-      header: 'Waktu',
-      meta: { mobileLabel: 'Waktu', mobileValue: windowText },
-      cell: ({ row }) => windowText(row.original),
+      id: 'date',
+      header: 'Tanggal',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tanggal',
+        mobileValue: (row: GradingSchedule) => formatDay(row.startsAt),
+      },
+      cell: ({ row }) => formatDay(row.original.startsAt),
+    },
+    {
+      id: 'start',
+      header: 'Jam Mulai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jam Mulai',
+        mobileValue: (row: GradingSchedule) => formatTime(row.startsAt),
+      },
+      cell: ({ row }) => formatTime(row.original.startsAt),
+    },
+    {
+      id: 'end',
+      header: 'Jam Selesai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jam Selesai',
+        mobileValue: (row: GradingSchedule) => formatTime(row.endsAt),
+      },
+      cell: ({ row }) => formatTime(row.original.endsAt),
     },
     {
       id: 'sessions',
-      header: 'Siswa',
+      header: 'Jumlah Siswa',
       meta: {
         align: 'center',
-        mobileLabel: 'Siswa',
+        mobileLabel: 'Jumlah Siswa',
         mobileValue: (row: GradingSchedule) => String(row.sessions),
       },
       cell: ({ row }) => String(row.original.sessions),
     },
     {
       id: 'awaiting',
-      header: 'Perlu dinilai',
+      header: 'Perlu Dinilai',
       meta: {
         align: 'center',
-        mobileLabel: 'Perlu dinilai',
+        mobileLabel: 'Perlu Dinilai',
         mobileValue: (row: GradingSchedule) => String(row.awaitingGrading),
       },
       cell: ({ row }) =>
@@ -96,6 +126,7 @@ export function buildGradingScheduleColumns(options: {
       id: 'actions',
       header: 'Aksi',
       enableSorting: false,
+      meta: { align: 'center' },
       cell: ({ row }) => {
         const items = []
         if (options.canMakeup && row.original.kind === 'REGULAR') {
@@ -111,17 +142,6 @@ export function buildGradingScheduleColumns(options: {
             icon: Users,
             onClick: () => options.onParticipants?.(row.original),
           })
-        }
-        if (items.length === 0) {
-          return h(
-            Button,
-            {
-              size: 'sm',
-              variant: 'outline',
-              onClick: () => options.onOpen(row.original),
-            },
-            () => 'Buka',
-          )
         }
         return h(ActionCell, {
           viewLabel: 'Buka',
@@ -142,7 +162,7 @@ const studentText = (row: GradingSessionRow) =>
 const scoreText = (row: GradingSessionRow) =>
   row.rawScore === null || row.maxScore === null
     ? '-'
-    : `${row.rawScore} / ${row.maxScore}`
+    : `${formatScore(row.rawScore)} / ${formatScore(row.maxScore)}`
 
 export function buildGradingSessionColumns(options: {
   onOpen: (session: GradingSessionRow) => void
@@ -165,21 +185,6 @@ export function buildGradingSessionColumns(options: {
       cell: ({ row }) => exitText(row.original),
     },
     {
-      id: 'status',
-      header: 'Status',
-      meta: {
-        align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: (row: GradingSessionRow) => sessionStatusLabel(row.status),
-      },
-      cell: ({ row }) =>
-        h(
-          Badge,
-          { variant: row.original.awaitingGrading ? 'destructive' : 'outline' },
-          () => sessionStatusLabel(row.original.status),
-        ),
-    },
-    {
       id: 'score',
       header: 'Nilai',
       meta: { align: 'center', mobileLabel: 'Nilai', mobileValue: scoreText },
@@ -197,19 +202,32 @@ export function buildGradingSessionColumns(options: {
       cell: ({ row }) => publicationLabel(row.original.publication),
     },
     {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: (row: GradingSessionRow) => sessionStatusLabel(row.status),
+      },
+      cell: ({ row }) =>
+        h(
+          Badge,
+          { variant: row.original.awaitingGrading ? 'destructive' : 'outline' },
+          () => sessionStatusLabel(row.original.status),
+        ),
+    },
+    {
       id: 'actions',
       header: 'Aksi',
       enableSorting: false,
+      meta: { align: 'center' },
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            size: 'sm',
-            variant: row.original.awaitingGrading ? 'default' : 'outline',
-            onClick: () => options.onOpen(row.original),
-          },
-          () => (row.original.awaitingGrading ? 'Nilai' : 'Lihat'),
-        ),
+        h(ActionCell, {
+          viewLabel: row.original.awaitingGrading ? 'Nilai' : 'Lihat',
+          hideEdit: true,
+          hideDelete: true,
+          onView: () => options.onOpen(row.original),
+        }),
     },
   ]
 }

@@ -124,10 +124,7 @@ watch(
           Bagikan token ini kepada siswa saat ujian dimulai.
         </p>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           :disabled="busy || !code"

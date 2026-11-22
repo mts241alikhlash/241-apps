@@ -1,7 +1,10 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Button } from '@mts241alikhlash/ui/button'
-import { Eye } from '@lucide/vue'
+import { ActionCell } from '@mts241alikhlash/ui'
+import {
+  classOfClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 
 export interface PrintParticipantRow {
   studentId: string
@@ -48,10 +51,23 @@ export function buildPrintParticipantColumns(options: {
       id: 'name',
       header: 'Nama',
       meta: {
+        align: 'left',
+        strong: true,
         mobileLabel: 'Nama',
         mobileValue: (row: PrintParticipantRow) => row.name ?? '-',
       },
       cell: ({ row }) => row.original.name ?? '-',
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: PrintParticipantRow) =>
+          gradeOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => gradeOfClassroom(row.original.classroomName),
     },
     {
       id: 'classroom',
@@ -59,9 +75,10 @@ export function buildPrintParticipantColumns(options: {
       meta: {
         align: 'center',
         mobileLabel: 'Kelas',
-        mobileValue: (row: PrintParticipantRow) => row.classroomName ?? '-',
+        mobileValue: (row: PrintParticipantRow) =>
+          classOfClassroom(row.classroomName),
       },
-      cell: ({ row }) => row.original.classroomName ?? '-',
+      cell: ({ row }) => classOfClassroom(row.original.classroomName),
     },
     {
       id: 'room',
@@ -78,17 +95,12 @@ export function buildPrintParticipantColumns(options: {
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            size: 'icon',
-            variant: 'ghost',
-            'aria-label': 'Pratinjau',
-            title: 'Pratinjau',
-            onClick: () => options.onPreview(row.original),
-          },
-          () => h(Eye),
-        ),
+        h(ActionCell, {
+          viewLabel: 'Pratinjau',
+          hideEdit: true,
+          hideDelete: true,
+          onView: () => options.onPreview(row.original),
+        }),
     },
   ]
 

@@ -2212,9 +2212,17 @@ export interface components {
                 [key: string]: unknown;
             } | null;
             bodyHtml: string;
+            choices: {
+                html: string;
+                key: string;
+            }[] | null;
+            correctKeys: string[] | null;
+            correctValue: boolean | null;
             /** Format: date-time */
             gradedAt: string | null;
             guideHtml: string | null;
+            /** @description True when a teacher scores it by hand */
+            manual: boolean;
             needsGrading: boolean;
             note: string | null;
             /** @description Position on the package, from 1 */
@@ -2224,7 +2232,7 @@ export interface components {
             questionId: string;
             score: number | null;
             /** @enum {string} */
-            type: "SHORT_ANSWER" | "ESSAY";
+            type: "MULTIPLE_CHOICE" | "MULTIPLE_RESPONSE" | "TRUE_FALSE" | "SHORT_ANSWER" | "ESSAY";
         };
         GradingScheduleDto: {
             awaitingGrading: number;
@@ -2960,6 +2968,7 @@ export interface components {
             /** @description False once a supervisor released the device */
             deviceBound: boolean;
             maxScore: number | null;
+            participantNumber: string | null;
             rawScore: number | null;
             /** Format: uuid */
             sessionId: string;

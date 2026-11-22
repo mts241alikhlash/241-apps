@@ -144,10 +144,7 @@ async function copy() {
           </ul>
         </template>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

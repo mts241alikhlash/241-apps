@@ -376,18 +376,31 @@ defineExpose({ table })
       "
       class="flex flex-col gap-2 md:hidden"
     >
-      <slot name="mobile-toolbar" />
       <div
-        v-if="$slots['mobile-filter'] || $slots['header-left'] || !hidePerPage"
-        class="grid grid-cols-[1fr_auto_1fr] items-center gap-2"
+        v-if="$slots['mobile-filter'] || $slots['mobile-toolbar']"
+        class="flex items-center gap-2"
       >
-        <div class="flex items-center gap-2 justify-self-start">
-          <slot name="header-left" />
-        </div>
-        <div class="flex items-center gap-2 justify-self-center">
+        <div
+          v-if="$slots['mobile-filter']"
+          class="shrink-0"
+        >
           <slot name="mobile-filter" />
         </div>
-        <div class="flex items-center gap-1.5 justify-self-end">
+        <div
+          v-if="$slots['mobile-toolbar']"
+          class="min-w-0 flex-1"
+        >
+          <slot name="mobile-toolbar" />
+        </div>
+      </div>
+      <div
+        v-if="$slots['header-left'] || (!hidePerPage && !hidePagination)"
+        class="flex items-center justify-between gap-2"
+      >
+        <div class="flex items-center gap-2">
+          <slot name="header-left" />
+        </div>
+        <div class="flex items-center gap-1.5">
           <template v-if="!hidePerPage && !hidePagination">
             <Select
               :model-value="String(pagination.pageSize)"
@@ -601,33 +614,43 @@ defineExpose({ table })
               :props="cardParts(row).select!.getContext()"
             />
           </div>
-          <div class="min-w-0 flex-1 space-y-0.5 px-3 py-2">
+          <div class="min-w-0 flex-1 space-y-0.5 py-2 pl-3 pr-2">
             <div
-              v-if="cardParts(row).title"
-              class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-medium"
+              v-if="cardParts(row).title || cardParts(row).actions"
+              class="flex min-w-0 items-center justify-between gap-2"
             >
-              <span class="min-w-0 break-words">
+              <div
+                v-if="cardParts(row).title"
+                class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-medium"
+              >
+                <span class="min-w-0 break-words">
+                  <FlexRender
+                    :render="cardParts(row).title!.column.columnDef.cell"
+                    :props="cardParts(row).title!.getContext()"
+                  />
+                </span>
+              </div>
+              <span v-else />
+              <div
+                v-if="cardParts(row).actions"
+                class="shrink-0"
+              >
                 <FlexRender
-                  :render="cardParts(row).title!.column.columnDef.cell"
-                  :props="cardParts(row).title!.getContext()"
+                  :render="cardParts(row).actions!.column.columnDef.cell"
+                  :props="cardParts(row).actions!.getContext()"
                 />
-              </span>
+              </div>
             </div>
             <dl
               v-if="cardParts(row).details.length"
-              class="grid grid-cols-[max-content_auto_minmax(0,1fr)] gap-x-1.5 gap-y-0.5 text-control"
+              class="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-0.5 text-control"
             >
               <template
                 v-for="detail in cardParts(row).details"
                 :key="detail.id"
               >
                 <dt class="text-muted-foreground">{{ cellLabel(detail) }}</dt>
-                <span
-                  class="text-muted-foreground"
-                  aria-hidden="true"
-                  >:</span
-                >
-                <dd class="min-w-0 break-words">
+                <dd class="min-w-0 break-words text-right">
                   <template v-if="cellText(detail) !== null">{{
                     cellText(detail)
                   }}</template>
@@ -639,15 +662,6 @@ defineExpose({ table })
                 </dd>
               </template>
             </dl>
-          </div>
-          <div
-            v-if="cardParts(row).actions"
-            class="shrink-0 py-1.5 pr-2"
-          >
-            <FlexRender
-              :render="cardParts(row).actions!.column.columnDef.cell"
-              :props="cardParts(row).actions!.getContext()"
-            />
           </div>
         </li>
       </ul>

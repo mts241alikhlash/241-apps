@@ -30,3 +30,16 @@ export function formatWindow(startsAt: string, endsAt: string): string {
       : `${dayFormat.format(end)} `
   return `${startPart} – ${endDay}${timeFormat.format(end)} WIB`
 }
+
+const fullDayFormat = new Intl.DateTimeFormat('id-ID', {
+  timeZone: TZ,
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
+
+export const formatDay = (iso: string): string =>
+  fullDayFormat.format(new Date(iso))
+
+export const formatTime = (iso: string): string =>
+  timeFormat.format(new Date(iso)).replace(':', '.')

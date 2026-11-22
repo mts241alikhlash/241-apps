@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { toast } from 'vue-sonner'
 import { AppCombobox } from '@mts241alikhlash/ui'
 import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -12,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { examRoomService } from '../services/examRoomService'
@@ -28,12 +32,35 @@ const props = defineProps<{
 
 const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
-const category = ref('')
-const note = ref('')
-const busy = ref(false)
+const formSchema = toTypedSchema(
+  z
+    .object({
+      studentId: z.string(),
+      category: z.string().trim().min(1, 'Kategori wajib diisi').max(50),
+      note: z
+        .string()
+        .trim()
+        .min(1, 'Catatan wajib diisi')
+        .max(300, 'Catatan maksimal 300 karakter'),
+    })
+    .superRefine((value, ctx) => {
+      if (props.participant === null && value.studentId === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['studentId'],
+          message: 'Peserta wajib dipilih',
+        })
+      }
+    }),
+)
+
+const { handleSubmit, isSubmitting, values, resetForm } = useForm({
+  validationSchema: formSchema,
+  initialValues: { studentId: '', category: '', note: '' },
+})
+
 const error = ref<string | null>(null)
 
-const chosenId = ref<string | null>('')
 const studentOptions = computed(() =>
   (props.participants ?? []).map((row) => ({
     value: row.studentId,
@@ -43,21 +70,14 @@ const studentOptions = computed(() =>
 const target = computed(
   () =>
     props.participant ??
-    props.participants?.find((row) => row.studentId === chosenId.value) ??
+    props.participants?.find((row) => row.studentId === values.studentId) ??
     null,
 )
 const studentName = computed(() => target.value?.studentName ?? 'Pilih peserta')
-const valid = computed(
-  () =>
-    target.value !== null &&
-    category.value.trim().length > 0 &&
-    note.value.trim().length > 0,
-)
 
-async function submit() {
+const onSubmit = handleSubmit(async (form) => {
   const chosen = target.value
-  if (!chosen || !valid.value || busy.value) return
-  busy.value = true
+  if (chosen === null) return
   error.value = null
   const sessionId = chosen.session?.sessionId
   const result = await examRoomService.recordFieldNote(
@@ -66,26 +86,24 @@ async function submit() {
     {
       studentId: chosen.studentId,
       ...(sessionId === undefined ? {} : { sessionId }),
-      category: category.value.trim(),
-      note: note.value.trim(),
+      category: form.category.trim(),
+      note: form.note.trim(),
     },
   )
-  busy.value = false
   if (result.success) {
+    toast.success('Catatan disimpan.')
     emit('saved')
     emit('update:open', false)
   } else {
     error.value = result.error
   }
-}
+})
 
 watch(
   () => props.open,
   (open) => {
     if (!open) return
-    chosenId.value = ''
-    category.value = ''
-    note.value = ''
+    resetForm({ values: { studentId: '', category: '', note: '' } })
     error.value = null
   },
 )
@@ -96,7 +114,10 @@ watch(
     :open="open"
     @update:open="emit('update:open', $event)"
   >
-    <DialogContent size="md">
+    <DialogContent
+      size="md"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>Catat Pelanggaran Fisik</DialogTitle>
         <DialogDescription>{{ studentName }}</DialogDescription>
@@ -105,65 +126,83 @@ watch(
         <Alert
           v-if="error"
           variant="destructive"
-          role="alert"
         >
           <AlertDescription>{{ error }}</AlertDescription>
         </Alert>
-        <FloatingLabelField
-          v-if="!participant"
-          label="Peserta"
-          for="field-note-student"
-          floating
+        <form
+          id="field-note-form"
+          class="grid gap-4"
+          @submit.prevent="onSubmit"
         >
-          <AppCombobox
-            v-model="chosenId"
-            :options="studentOptions"
-            placeholder="Pilih peserta"
-            search-placeholder="Cari nama peserta..."
-            empty-text="Peserta tidak ditemukan."
-          />
-        </FloatingLabelField>
-        <FloatingLabelField
-          label="Kategori"
-          :for="'field-note-category'"
-          floating
-        >
-          <Input
-            id="field-note-category"
-            v-model="category"
-            maxlength="50"
-            placeholder="Membawa catatan, berbicara, alat komunikasi"
-          />
-        </FloatingLabelField>
-        <FloatingLabelField
-          label="Catatan"
-          :for="'field-note-note'"
-          floating
-        >
-          <Textarea
-            id="field-note-note"
-            v-model="note"
-            maxlength="300"
-            rows="3"
-          />
-        </FloatingLabelField>
+          <FloatingField
+            v-if="!participant"
+            v-slot="{ value, handleChange }"
+            name="studentId"
+            label="Peserta"
+            required
+            always-float
+          >
+            <div class="content-start">
+              <FormControl>
+                <AppCombobox
+                  :model-value="value"
+                  :options="studentOptions"
+                  placeholder="Pilih peserta"
+                  search-placeholder="Cari nama peserta..."
+                  empty-text="Peserta tidak ditemukan."
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="category"
+            label="Kategori"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  maxlength="50"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="note"
+            label="Catatan"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <Textarea
+                  v-bind="componentField"
+                  maxlength="300"
+                  rows="3"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+        </form>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
+          type="button"
           variant="outline"
-          :disabled="busy"
+          :disabled="isSubmitting"
           @click="emit('update:open', false)"
         >
           Batal
         </Button>
         <Button
-          :disabled="busy || !valid"
-          @click="submit"
+          type="submit"
+          form="field-note-form"
+          :disabled="isSubmitting"
         >
-          {{ busy ? 'Menyimpan...' : 'Simpan' }}
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
         </Button>
       </DialogFooter>
     </DialogContent>

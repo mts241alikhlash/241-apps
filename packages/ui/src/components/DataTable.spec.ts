@@ -117,7 +117,7 @@ describe('DataTable mobile cards', () => {
     const cards = mountCards().get('[data-slot="data-table-cards"]')
     const first = cards.findAll('li')[0]!
     expect(first.text()).toContain('Ahmad')
-    expect(first.text()).toContain('Gelombang:')
+    expect(first.text()).toContain('Gelombang')
     expect(first.text()).toContain('G1')
     expect(first.text()).toContain('Diterima')
     expect(first.text()).toContain('menu')
@@ -127,7 +127,7 @@ describe('DataTable mobile cards', () => {
     const first = mountCards().get('[data-slot="data-table-cards"] li')
     expect(first.text()).not.toContain('No:')
     expect(first.text()).not.toContain('Rahasia')
-    expect(first.text()).toContain('Status:')
+    expect(first.text()).toContain('Status')
   })
 
   it('never makes a card a link', () => {
@@ -183,12 +183,12 @@ describe('DataTable mobile cards', () => {
       props: { columns, data: rows, mobile: 'cards' },
     })
     const text = w.get('[data-slot="data-table-cards"] li').text()
-    expect(text).toContain('Info:')
+    expect(text).toContain('Info')
     expect(text).toContain('plain')
     expect(text).not.toContain('rich')
   })
 
-  it('keeps the filter slot in the middle column of the phone toolbar', () => {
+  it('puts the phone filter beside the toolbar and the header actions below', () => {
     const w = mount(DataTable, {
       props: {
         columns: cardColumns,
@@ -197,17 +197,16 @@ describe('DataTable mobile cards', () => {
         totalItems: 40,
         pageSize: 10,
       },
-      slots: { 'header-left': 'Tambah', 'mobile-filter': 'Filter' },
+      slots: {
+        'header-left': 'Tambah',
+        'mobile-filter': 'Filter',
+        'mobile-toolbar': 'Cari',
+      },
     })
-    const toolbar = w
-      .findAll('div')
-      .find((d) => d.classes().includes('grid-cols-[1fr_auto_1fr]'))!
-    expect(toolbar).toBeDefined()
-    const [left, middle, right] = toolbar.element.children
-    expect(left!.textContent).toContain('Tambah')
-    expect(middle!.textContent).toContain('Filter')
-    expect(middle!.className).toContain('justify-self-center')
-    expect(right!.className).toContain('justify-self-end')
+    const bar = w.findAll('div').find((d) => d.classes().includes('md:hidden'))!
+    expect(bar.text()).toContain('Filter')
+    expect(bar.text()).toContain('Cari')
+    expect(bar.text()).toContain('Tambah')
   })
 })
 

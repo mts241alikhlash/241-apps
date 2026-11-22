@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
 import {
@@ -183,13 +183,13 @@ onMounted(() => {
       item-label="kursi"
     >
       <template #empty>
-        <p>
-          {{
+        <DataTableEmpty
+          :message="
             seat.roomId.value
               ? 'Belum ada siswa yang duduk di ruangan ini.'
               : 'Pilih ruangan untuk melihat kursi.'
-          }}
-        </p>
+          "
+        />
       </template>
     </DataTable>
 
@@ -297,10 +297,7 @@ onMounted(() => {
             />
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             @click="flagTarget = null"

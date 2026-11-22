@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { BackButton } from '@mts241alikhlash/ui'
+import { BackButton, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -11,10 +11,20 @@ import {
   CardTitle,
   CardFooter,
 } from '@mts241alikhlash/ui/card'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@mts241alikhlash/ui/select'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
-import ItemGradeCard from '../components/ItemGradeCard.vue'
+import GradeItemDialog from '../components/GradeItemDialog.vue'
+import { buildGradingItemColumns } from '../components/gradingItemColumns'
 import { examGradingService } from '../services/examGradingService'
+import { formatScore } from '../types'
 import type { GradingDetail, GradingItem } from '../types'
 
 const route = useRoute()
@@ -39,15 +49,8 @@ let request = 0
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-const studentLabel = computed(() =>
-  detail.value
-    ? [
-        detail.value.session.studentName ?? 'Siswa',
-        detail.value.session.studentNis,
-      ]
-        .filter(Boolean)
-        .join(' · ')
-    : 'Siswa',
+const studentLabel = computed(
+  () => detail.value?.session.studentName ?? 'Siswa',
 )
 const finished = computed(() => detail.value?.session.status !== 'IN_PROGRESS')
 const canGrade = computed(
@@ -94,6 +97,48 @@ async function onGraded(item: GradingItem) {
   if (current === request && result.success) detail.value = result.data
 }
 
+const filter = ref('ALL')
+const filterFieldId = useId()
+const openId = ref<string | null>(null)
+
+const TYPE_ORDER: GradingItem['type'][] = [
+  'MULTIPLE_CHOICE',
+  'MULTIPLE_RESPONSE',
+  'TRUE_FALSE',
+  'SHORT_ANSWER',
+  'ESSAY',
+]
+
+const shown = computed(() => {
+  const items = detail.value?.items ?? []
+  const rows =
+    filter.value === 'WAITING'
+      ? items.filter((item) => item.needsGrading)
+      : items
+  return [...rows].sort(
+    (left, right) =>
+      TYPE_ORDER.indexOf(left.type) - TYPE_ORDER.indexOf(right.type) ||
+      left.number - right.number,
+  )
+})
+const opened = computed(
+  () =>
+    detail.value?.items.find((item) => item.questionId === openId.value) ??
+    null,
+)
+const columns = computed(() =>
+  buildGradingItemColumns({
+    sessionId: sessionId.value,
+    canGrade: canGrade.value,
+    onOpen: (item) => {
+      openId.value = item.questionId
+    },
+    onGraded: (item) => {
+      void onGraded(item)
+    },
+  }),
+)
+
 watch(sessionId, load)
 onMounted(load)
 </script>
@@ -105,30 +150,16 @@ onMounted(load)
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <BackButton
-              label="Kembali ke Daftar Siswa"
-              @click="router.push(sessionsLocation)"
-            />
-            <CardTitle class="font-semibold">{{ studentLabel }}</CardTitle>
-          </div>
-          <span
-            v-if="detail"
-            class="text-control text-muted-foreground"
-          >
-            {{
-              waiting > 0
-                ? `${waiting} jawaban belum dinilai`
-                : detail.session.rawScore !== null
-                  ? `Nilai: ${detail.session.rawScore} / ${detail.session.maxScore}`
-                  : 'Semua jawaban sudah dinilai'
-            }}
-          </span>
+        <div class="flex items-center gap-3">
+          <BackButton
+            label="Kembali ke Daftar Siswa"
+            @click="router.push(sessionsLocation)"
+          />
+          <CardTitle class="font-semibold">{{ studentLabel }}</CardTitle>
         </div>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto space-y-4 pt-2 px-4 pb-4"
       >
         <p v-if="loading">Memuat…</p>
         <div
@@ -145,33 +176,93 @@ onMounted(load)
           </Button>
         </div>
         <template v-else-if="detail">
-          <p v-if="detail.items.length === 0">
-            Ujian ini tidak punya soal isian singkat atau uraian.
-          </p>
+          <p v-if="detail.items.length === 0">Ujian ini tidak punya soal.</p>
           <p
             v-if="!finished"
-            class="rounded-md border p-3"
+            class="shrink-0 rounded-md border p-3"
           >
             Siswa ini masih mengerjakan. Jawaban bisa dinilai setelah ujian
             selesai.
           </p>
           <p
             v-else-if="!hasPermission('exam-grading.grade')"
-            class="rounded-md border p-3"
+            class="shrink-0 rounded-md border p-3"
           >
             Anda hanya bisa melihat jawaban; menilai butuh izin penilaian.
           </p>
-          <ItemGradeCard
-            v-for="item in detail.items"
-            :key="item.questionId"
-            :session-id="detail.session.sessionId"
-            :item="item"
-            :can-grade="canGrade"
-            @graded="onGraded"
-          />
+          <dl
+            v-if="detail.items.length > 0"
+            class="flex shrink-0 flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+          >
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Nilai</dt>
+              <dd class="font-medium">
+                {{
+                  detail.session.rawScore !== null
+                    ? `${formatScore(detail.session.rawScore)} / ${formatScore(detail.session.maxScore ?? 0)}`
+                    : '-'
+                }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Jumlah Soal</dt>
+              <dd class="font-medium">{{ detail.items.length }}</dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Belum Dinilai</dt>
+              <dd :class="['font-medium', waiting > 0 && 'text-destructive']">
+                {{ waiting }}
+              </dd>
+            </div>
+          </dl>
+          <DataTable
+            v-if="detail.items.length > 0"
+            mobile="cards"
+            hide-pagination
+            hide-per-page
+            :columns="columns"
+            :data="shown"
+            :page-size="1000"
+            :total-items="shown.length"
+            item-label="soal"
+          >
+            <template #filters>
+              <FloatingLabelField
+                label="Tampilkan"
+                :for="filterFieldId"
+                class="w-fit min-w-36"
+                floating
+              >
+                <Select v-model="filter">
+                  <SelectTrigger
+                    :id="filterFieldId"
+                    class="w-full"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Semua soal</SelectItem>
+                    <SelectItem value="WAITING">Perlu dinilai</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FloatingLabelField>
+            </template>
+            <template #empty>
+              <DataTableEmpty message="Tidak ada soal yang perlu dinilai." />
+            </template>
+          </DataTable>
         </template>
       </CardContent>
       <CardFooter plain />
     </Card>
+
+    <GradeItemDialog
+      :open="opened !== null"
+      :session-id="detail?.session.sessionId ?? sessionId"
+      :item="opened"
+      :can-grade="canGrade"
+      @update:open="(value: boolean) => value || (openId = null)"
+      @graded="onGraded"
+    />
   </div>
 </template>

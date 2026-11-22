@@ -8712,6 +8712,10 @@
             "type": "string",
             "nullable": true
           },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "status": {
             "enum": [
               "IN_PROGRESS",
@@ -8759,6 +8763,7 @@
           "studentId",
           "studentName",
           "studentNis",
+          "participantNumber",
           "status",
           "client",
           "startedAt",
@@ -12919,10 +12924,17 @@
           },
           "type": {
             "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
               "SHORT_ANSWER",
               "ESSAY"
             ],
             "type": "string"
+          },
+          "manual": {
+            "type": "boolean",
+            "description": "True when a teacher scores it by hand"
           },
           "bodyHtml": {
             "type": "string"
@@ -12940,6 +12952,36 @@
             "items": {
               "type": "string"
             }
+          },
+          "choices": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "html": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "html"
+              ]
+            }
+          },
+          "correctKeys": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correctValue": {
+            "type": "boolean",
+            "nullable": true
           },
           "answer": {
             "type": "object",
@@ -12967,10 +13009,14 @@
           "questionId",
           "number",
           "type",
+          "manual",
           "bodyHtml",
           "points",
           "guideHtml",
           "acceptedAnswers",
+          "choices",
+          "correctKeys",
+          "correctValue",
           "answer",
           "score",
           "note",

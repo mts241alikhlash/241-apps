@@ -99,7 +99,7 @@ it('shows essential mobile wave information and confirms deletion', async () => 
   state.deleteWave.mockReset().mockResolvedValue({ success: true })
   const wrapper = mountView()
   const mobile = wrapper.get(CARDS)
-  expect(mobile.text()).toContain('Kuota:30 / 30 · Penuh')
+  expect(mobile.text()).toContain('Kuota30 / 30 · Penuh')
   expect(mobile.text()).toContain('Gelombang Satu')
   expect(mobile.text()).toContain('Aktif')
   expect(mobile.text()).toContain('30')

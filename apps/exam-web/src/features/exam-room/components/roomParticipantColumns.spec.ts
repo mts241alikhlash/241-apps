@@ -125,6 +125,28 @@ describe('syncText', () => {
   })
 })
 
+describe('participant columns', () => {
+  it('puts the participant number before the name', () => {
+    const ids = buildRoomParticipantColumns(base).map((item) => item.id)
+
+    expect(ids.indexOf('participantNumber')).toBe(
+      ids.indexOf('participant') - 1,
+    )
+  })
+
+  it('shows the participant number and the name without the NIS', () => {
+    const row = participant({ participantNumber: '25-007' })
+
+    expect(cellText('participantNumber', row)).toBe('25-007')
+    expect(cellText('participant', row)).toBe('Ahmad Fauzi')
+    expect(cellText('participant', row)).not.toContain('2024001')
+  })
+
+  it('shows a dash when the participant has no number yet', () => {
+    expect(cellText('participantNumber', participant())).toBe('-')
+  })
+})
+
 describe('low battery', () => {
   it('warns below 15 percent while unplugged', () => {
     expect(isLowBattery(session({ batteryLevel: 14, isCharging: false }))).toBe(

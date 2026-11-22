@@ -147,16 +147,14 @@ function pick(key: string, event: Event) {
           </ul>
         </template>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
+          v-if="!finished"
           variant="outline"
           :disabled="running"
           @click="close"
         >
-          {{ finished ? 'Tutup' : 'Batal' }}
+          Batal
         </Button>
         <Button
           v-if="finished && failures.length > 0"

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useId } from 'vue'
-import { DataTable, FormattedNumberInput } from '@mts241alikhlash/ui'
+import {
+  DataTable,
+  FormattedNumberInput,
+  DataTableEmpty,
+} from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -153,7 +157,7 @@ onMounted(async () => {
       item-label="ruangan"
     >
       <template #empty>
-        <p>Belum ada ruangan pada periode ini.</p>
+        <DataTableEmpty message="Belum ada ruangan pada periode ini." />
       </template>
     </DataTable>
 
@@ -220,10 +224,7 @@ onMounted(async () => {
             />
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             @click="extendTarget = null"

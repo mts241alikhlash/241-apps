@@ -133,10 +133,7 @@ async function save() {
           </FloatingLabelField>
         </form>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

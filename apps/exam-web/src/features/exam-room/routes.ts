@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const crumbs = (title: string, href: string) => [
   { title: 'Ujian', href: '#' },
-  { title: 'Ruang Ujian', href: '/exam/rooms' },
+  { title: 'Monitoring', href: '/exam/rooms' },
   { title, href },
 ]
 
@@ -12,14 +12,14 @@ export const examRoomRoutes: RouteRecordRaw[] = [
     name: 'ExamRoomOverview',
     component: () => import('./views/RoomOverviewListView.vue'),
     meta: {
-      title: 'Ruang Ujian',
+      title: 'Monitoring',
       requiresAuth: true,
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
         'exam-rooms.manage-all',
       ],
-      breadcrumbs: crumbs('Ruang Ujian', '/exam/rooms'),
+      breadcrumbs: crumbs('Monitoring', '/exam/rooms'),
     },
   },
   {
@@ -65,38 +65,6 @@ export const examRoomRoutes: RouteRecordRaw[] = [
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Cetak Berita Acara', '#'),
-    },
-  },
-  {
-    path: '/exam/rooms/:roomId/cards',
-    name: 'ExamRoomCardsPrint',
-    component: () => import('./views/RoomPrintView.vue'),
-    props: { kind: 'cards' },
-    meta: {
-      title: 'Cetak Kartu Peserta',
-      requiresAuth: true,
-      requiredAnyPermission: [
-        'exam-rooms.supervise',
-        'exam-rooms.technician',
-        'exam-rooms.manage-all',
-      ],
-      breadcrumbs: crumbs('Cetak Kartu Peserta', '#'),
-    },
-  },
-  {
-    path: '/exam/rooms/:roomId/seats',
-    name: 'ExamRoomLabelsPrint',
-    component: () => import('./views/RoomPrintView.vue'),
-    props: { kind: 'labels' },
-    meta: {
-      title: 'Cetak Daftar Meja',
-      requiresAuth: true,
-      requiredAnyPermission: [
-        'exam-rooms.supervise',
-        'exam-rooms.technician',
-        'exam-rooms.manage-all',
-      ],
-      breadcrumbs: crumbs('Cetak Daftar Meja', '#'),
     },
   },
   {

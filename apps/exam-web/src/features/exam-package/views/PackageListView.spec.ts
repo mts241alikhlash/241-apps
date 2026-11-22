@@ -237,7 +237,7 @@ describe('PackageListView', () => {
     manager.unmount()
   })
 
-  it('shows the empty state, and a reset button when filters match nothing', async () => {
+  it('shows the empty state, and no reset button when filters match nothing', async () => {
     listState.packages.value = []
     listState.totalItems.value = 0
     const wrapper = mount(PackageListView, { global: { stubs } })
@@ -250,7 +250,7 @@ describe('PackageListView', () => {
     expect(wrapper.text()).toContain(
       'Tidak ada paket yang cocok dengan filter.',
     )
-    expect(wrapper.text()).toContain('Atur Ulang')
+    expect(wrapper.text()).not.toContain('Atur Ulang')
     wrapper.unmount()
   })
 

@@ -314,7 +314,7 @@ describe('ApplicationDetailView', () => {
     expect(rows[1].text()).toContain('Ditolak')
     expect(rows[1].text()).not.toContain('Catatan:')
     expect(wrapper.get('[data-slot="data-table-cards"]').text()).toContain(
-      'Status:Ditolak. Buram',
+      'StatusDitolak. Buram',
     )
     expect(rows[1].text()).toContain('Setujui')
     expect(rows[1].text()).toContain('Tolak')

@@ -224,9 +224,9 @@ it('marks an applicant without placement or NIS', async () => {
   const wrapper = mountView()
   await flushPromises()
 
-  expect(rowOf(wrapper).text()).toContain('Jenis:-')
-  expect(rowOf(wrapper).text()).toContain('Kelas:-')
-  expect(rowOf(wrapper).text()).toContain('NIS:-')
+  expect(rowOf(wrapper).text()).toContain('Jenis-')
+  expect(rowOf(wrapper).text()).toContain('Kelas-')
+  expect(rowOf(wrapper).text()).toContain('NIS-')
 })
 
 it('lets TU type a missing NISN and sends it when processing', async () => {

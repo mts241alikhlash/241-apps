@@ -2,7 +2,6 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
 import { TimerReset } from '@lucide/vue'
 import type { SeatedStudent } from '../services/examEventService'
 import type { SupervisorSlot, UserOption } from '../types'
@@ -164,15 +163,11 @@ export function buildSupervisorColumns(
       enableSorting: false,
       cell: ({ row }) =>
         options.canSubstitute
-          ? h(
-              Button,
-              {
-                size: 'sm',
-                variant: 'outline',
-                onClick: () => options.onSubstitute(row.original),
-              },
-              () => 'Ganti',
-            )
+          ? h(ActionCell, {
+              editLabel: 'Ganti',
+              hideDelete: true,
+              onEdit: () => options.onSubstitute(row.original),
+            })
           : null,
     },
   ]

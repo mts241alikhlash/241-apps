@@ -36,6 +36,10 @@ const stubs = {
   SelectTrigger: passthrough,
   SelectValue: passthrough,
   Button: passthrough,
+  Tooltip: passthrough,
+  TooltipProvider: passthrough,
+  TooltipTrigger: passthrough,
+  TooltipContent: passthrough,
 }
 
 const student = (n: number) => ({

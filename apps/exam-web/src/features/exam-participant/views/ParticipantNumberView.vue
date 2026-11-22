@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, h, ref, watch } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -25,8 +25,6 @@ import type { IssueParticipantNumbersResult } from '../api/participantNumberApi'
 
 type Row = CandidateStudent & { number: string | null }
 
-const PAGE_SIZE = 20
-
 const semesterId = ref('')
 const candidates = ref<CandidateStudent[]>([])
 const numbers = ref(new Map<string, string>())
@@ -34,6 +32,7 @@ const loading = ref(false)
 const issuing = ref(false)
 const search = ref('')
 const page = ref(1)
+const pageSize = ref(25)
 const lastIssue = ref<IssueParticipantNumbersResult | null>(null)
 
 let requestId = 0
@@ -60,8 +59,8 @@ const filteredRows = computed(() => {
 })
 
 const pagedRows = computed(() => {
-  const start = (page.value - 1) * PAGE_SIZE
-  return filteredRows.value.slice(start, start + PAGE_SIZE)
+  const start = (page.value - 1) * pageSize.value
+  return filteredRows.value.slice(start, start + pageSize.value)
 })
 
 const skippedNames = computed(() => {
@@ -74,10 +73,16 @@ const skippedNames = computed(() => {
 
 const columns: ColumnDef<Row>[] = [
   {
-    id: 'nis',
-    header: 'NIS',
-    meta: { align: 'left', mobileLabel: 'NIS' },
-    cell: ({ row }) => row.original.nis ?? '-',
+    id: 'number',
+    header: 'No. Peserta',
+    meta: {
+      align: 'center',
+      mobileLabel: 'No. Peserta',
+      mobileValue: (row: Row) => row.number ?? 'Belum diterbitkan',
+    },
+    cell: ({ row }) =>
+      row.original.number ??
+      h(Badge, { variant: 'warning' }, () => 'Belum diterbitkan'),
   },
   {
     id: 'name',
@@ -86,18 +91,29 @@ const columns: ColumnDef<Row>[] = [
     cell: ({ row }) => row.original.name ?? '-',
   },
   {
-    id: 'classroom',
-    header: 'Kelas',
-    meta: { align: 'left', mobileLabel: 'Kelas' },
-    cell: ({ row }) => row.original.classroomName ?? '-',
+    id: 'nis',
+    header: 'NIS',
+    meta: { align: 'left', mobileLabel: 'NIS' },
+    cell: ({ row }) => row.original.nis ?? '-',
   },
   {
-    id: 'number',
-    header: 'Nomor Peserta',
-    meta: { align: 'left', mobileLabel: 'Nomor Peserta' },
-    cell: ({ row }) => row.original.number ?? 'Belum diterbitkan',
+    id: 'grade',
+    header: 'Tingkat',
+    meta: { align: 'center', mobileLabel: 'Tingkat' },
+    cell: ({ row }) => row.original.gradeName ?? '-',
+  },
+  {
+    id: 'class',
+    header: 'Kelas',
+    meta: { align: 'center', mobileLabel: 'Kelas' },
+    cell: ({ row }) => row.original.className ?? '-',
   },
 ]
+
+function changePageSize(size: number) {
+  pageSize.value = size
+  page.value = 1
+}
 
 async function load(id: string) {
   const current = ++requestId
@@ -169,22 +185,31 @@ watch(search, () => {
         </Button>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col gap-3 overflow-auto px-4 pb-4 pt-2"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
-        <div class="flex flex-wrap items-end gap-2">
-          <AcademicPeriodFilter v-model:semester-id="semesterId" />
-          <SearchInput
-            v-model="search"
-            label="Cari nama atau NIS"
-          />
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <Badge variant="outline">Terdaftar {{ rows.length }}</Badge>
-          <Badge variant="outline">Sudah bernomor {{ issuedCount }}</Badge>
-          <Badge variant="outline">
-            Belum bernomor {{ rows.length - issuedCount }}
-          </Badge>
-        </div>
+        <dl
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+        >
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Terdaftar</dt>
+            <dd class="font-medium">{{ rows.length }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Sudah bernomor</dt>
+            <dd class="font-medium">{{ issuedCount }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Belum bernomor</dt>
+            <dd
+              :class="[
+                'font-medium',
+                rows.length - issuedCount > 0 && 'text-warning',
+              ]"
+            >
+              {{ rows.length - issuedCount }}
+            </dd>
+          </div>
+        </dl>
         <Alert
           v-if="lastIssue && skippedNames.length"
           variant="destructive"
@@ -202,14 +227,38 @@ watch(search, () => {
           :columns="columns"
           :data="pagedRows"
           :page="page"
-          :page-size="PAGE_SIZE"
+          :page-size="pageSize"
           :total-items="filteredRows.length"
           :is-loading="loading"
           item-label="siswa"
           @update:page="page = $event"
+          @update:page-size="changePageSize"
         >
+          <template #filters>
+            <AcademicPeriodFilter v-model:semester-id="semesterId" />
+          </template>
+          <template #header-right>
+            <SearchInput
+              v-model="search"
+              class="sm:w-40"
+              label="Cari nama atau NIS"
+            />
+          </template>
+          <template #mobile-toolbar>
+            <SearchInput
+              v-model="search"
+              label="Cari nama atau NIS"
+              class="w-full"
+            />
+          </template>
           <template #empty>
-            <p>Belum ada siswa terdaftar pada semester ini.</p>
+            <DataTableEmpty
+              :message="
+                search
+                  ? 'Tidak ada siswa yang cocok dengan pencarian.'
+                  : 'Belum ada siswa terdaftar pada semester ini.'
+              "
+            />
           </template>
         </DataTable>
       </CardContent>

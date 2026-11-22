@@ -8,17 +8,19 @@ export function useGradingSchedules(
   page: Ref<number>,
   pageSize: Ref<number>,
   category?: Ref<ExamCategory | undefined>,
+  semesterId?: Ref<string>,
 ) {
   const list = usePagedList({
     page,
     pageSize,
     scope: ['exam-grading', 'schedules'],
-    filters: { category },
+    filters: { category, semesterId },
     fetchPage: (current, limit) =>
       examGradingApi.getSchedules({
         page: current,
         limit,
         category: category?.value,
+        semesterId: semesterId?.value || undefined,
       }),
     errorMessage: 'Gagal memuat daftar ujian.',
   })

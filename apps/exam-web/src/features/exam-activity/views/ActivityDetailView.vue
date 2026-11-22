@@ -3,17 +3,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
+import { SquarePen } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@mts241alikhlash/ui/alert-dialog'
+import { BackButton, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
+import type { ColumnDef } from '@tanstack/vue-table'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -24,6 +17,10 @@ import {
 } from '@mts241alikhlash/ui/card'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examTypeLabel } from '@/features/exam-shared/examType'
+import {
+  classOfClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 import ActivityPolicyDialog from '../components/ActivityPolicyDialog.vue'
 import { examActivityApi } from '../api/examActivityApi'
 import {
@@ -44,19 +41,92 @@ const detail = ref<ExamActivityDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const policyOpen = ref(false)
-const confirmRotateOpen = ref(false)
-const rotating = ref(false)
 
-function formatWindow(startsAt: string, endsAt: string): string {
-  const fmt = new Intl.DateTimeFormat('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+type ScheduleRow = ExamActivityDetail['schedules'][number]
+
+const dateOf = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    dateStyle: 'long',
+  }).format(new Date(iso))
+
+const clock = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
-  })
-  return `${fmt.format(new Date(startsAt))} – ${fmt.format(new Date(endsAt))}`
-}
+    hour12: false,
+  }).format(new Date(iso))
+
+const scheduleColumns: ColumnDef<ScheduleRow>[] = [
+  {
+    id: 'grade',
+    header: 'Tingkat',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Tingkat',
+      mobileValue: (row: ScheduleRow) => gradeOfClassroom(row.classroomName),
+    },
+    cell: ({ row }) => gradeOfClassroom(row.original.classroomName),
+  },
+  {
+    id: 'classroom',
+    header: 'Kelas',
+    meta: {
+      align: 'center',
+      mobile: 'title',
+      mobileValue: (row: ScheduleRow) => classOfClassroom(row.classroomName),
+    },
+    cell: ({ row }) => classOfClassroom(row.original.classroomName),
+  },
+  {
+    id: 'date',
+    header: 'Tanggal',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Tanggal',
+      mobileValue: (row: ScheduleRow) => dateOf(row.startsAt),
+    },
+    cell: ({ row }) => dateOf(row.original.startsAt),
+  },
+  {
+    id: 'start',
+    header: 'Jam Mulai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Mulai',
+      mobileValue: (row: ScheduleRow) => clock(row.startsAt),
+    },
+    cell: ({ row }) => clock(row.original.startsAt),
+  },
+  {
+    id: 'end',
+    header: 'Jam Selesai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Selesai',
+      mobileValue: (row: ScheduleRow) => clock(row.endsAt),
+    },
+    cell: ({ row }) => clock(row.original.endsAt),
+  },
+]
+
+const sortedSchedules = computed<ScheduleRow[]>(() =>
+  [...(detail.value?.schedules ?? [])].sort((left, right) => {
+    const grade = (name: string | null): number =>
+      Number(/(\d+)/.exec(name ?? '')?.[1] ?? Number.MAX_SAFE_INTEGER)
+    return (
+      grade(left.classroomName) - grade(right.classroomName) ||
+      (left.classroomName ?? '').localeCompare(
+        right.classroomName ?? '',
+        'id',
+        {
+          numeric: true,
+        },
+      )
+    )
+  }),
+)
 
 async function load(): Promise<void> {
   if (!activityId.value) return
@@ -69,24 +139,6 @@ async function load(): Promise<void> {
     error.value = messageOf(err, 'Gagal memuat detail kegiatan.')
   } finally {
     loading.value = false
-  }
-}
-
-async function confirmRotateToken(): Promise<void> {
-  if (!detail.value || rotating.value) return
-  rotating.value = true
-  try {
-    const response = await examActivityApi.rotateToken(detail.value.id)
-    detail.value = {
-      ...detail.value,
-      tokenRotation: response.tokenRotation,
-    }
-    confirmRotateOpen.value = false
-    toast.success('Token kegiatan berhasil diganti.')
-  } catch (err: unknown) {
-    toast.error(messageOf(err, 'Gagal mengganti token kegiatan.'))
-  } finally {
-    rotating.value = false
   }
 }
 
@@ -110,40 +162,19 @@ onMounted(load)
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex min-w-0 items-center gap-3">
+          <BackButton
+            label="Kembali ke Kegiatan"
+            @click="router.push(`${sectionPrefix}/activities`)"
+          />
           <CardTitle class="font-semibold">
-            Detail Kegiatan
-            <template v-if="detail?.type">
-              · {{ examTypeLabel(detail.type) }}
-            </template>
+            {{ detail?.subjectName ?? 'Detail Kegiatan' }}
           </CardTitle>
-          <div class="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              @click="router.push(`${sectionPrefix}/activities`)"
-            >
-              Kembali ke Daftar
-            </Button>
-            <template v-if="canManageAll && detail">
-              <Button
-                variant="outline"
-                @click="policyOpen = true"
-              >
-                Ubah kebijakan
-              </Button>
-              <Button
-                variant="outline"
-                @click="confirmRotateOpen = true"
-              >
-                Ganti token
-              </Button>
-            </template>
-          </div>
         </div>
       </CardHeader>
 
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-6"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
         <div
           v-if="error !== null"
@@ -167,132 +198,179 @@ onMounted(load)
         </p>
 
         <template v-else-if="detail">
-          <div class="grid gap-4 rounded-md border p-4 sm:grid-cols-3">
-            <div>
-              <p class="text-xs text-muted-foreground">Jenis & Preset</p>
-              <p class="font-medium">
+          <dl
+            class="flex shrink-0 flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+          >
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Jenis</dt>
+              <dd class="font-medium">
                 {{ detail.type ? examTypeLabel(detail.type) : '-' }}
-              </p>
+              </dd>
             </div>
-            <div>
-              <p class="text-xs text-muted-foreground">Status</p>
-              <p class="font-medium">
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Tingkat</dt>
+              <dd class="font-medium">{{ detail.gradeName ?? '-' }}</dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Status</dt>
+              <dd class="font-medium">
                 {{ activityStatusLabel(detail.status) }}
-              </p>
+              </dd>
             </div>
-            <div>
-              <p class="text-xs text-muted-foreground">Mode token</p>
-              <p class="font-medium">
-                {{
-                  detail.tokenMode === 'ROTATING'
-                    ? 'Token berputar'
-                    : 'Token tetap'
-                }}
-                (rotasi #{{ detail.tokenRotation }})
-              </p>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Tanggal Mulai</dt>
+              <dd class="font-medium">{{ dateOf(detail.startsAt) }}</dd>
             </div>
-            <div class="sm:col-span-2">
-              <p class="text-xs text-muted-foreground">Jendela waktu</p>
-              <p class="font-medium">
-                {{ formatWindow(detail.startsAt, detail.endsAt) }}
-              </p>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">
+                Tanggal Selesai
+              </dt>
+              <dd class="font-medium">{{ dateOf(detail.endsAt) }}</dd>
             </div>
-            <div>
-              <p class="text-xs text-muted-foreground">Durasi</p>
-              <p class="font-medium">{{ detail.durationMinutes }} menit</p>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Jam</dt>
+              <dd class="font-medium">
+                {{ clock(detail.startsAt) }} - {{ clock(detail.endsAt) }}
+              </dd>
             </div>
-          </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Durasi</dt>
+              <dd class="font-medium">{{ detail.durationMinutes }} menit</dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Token</dt>
+              <dd class="font-medium">
+                {{ detail.tokenMode === 'ROTATING' ? 'Berputar' : 'Tetap' }}
+              </dd>
+            </div>
+          </dl>
 
-          <section class="space-y-2">
-            <h2 class="text-sm font-semibold">Kebijakan Pengawasan</h2>
-            <dl class="grid gap-3 rounded-md border p-4 sm:grid-cols-4">
-              <div>
-                <dt class="text-xs text-muted-foreground">Batas pelanggaran</dt>
-                <dd class="font-medium">{{ detail.policy.violationLimit }}</dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Ambang hilang fokus
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.focusThresholdMs }} ms
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Slot token berputar
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.tokenSlotSeconds }} detik
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Toleransi terlambat
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.lateToleranceMinutes }} menit
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Minimal sebelum kumpul
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.minSubmitMinutes }} menit
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">Acak urutan soal</dt>
-                <dd class="font-medium">
-                  {{ detail.policy.shuffleQuestions ? 'Ya' : 'Tidak' }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Acak urutan pilihan
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.shuffleChoices ? 'Ya' : 'Tidak' }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">
-                  Izinkan lewat web (SEB)
-                </dt>
-                <dd class="font-medium">
-                  {{ detail.policy.allowWeb ? 'Ya' : 'Tidak' }}
-                </dd>
-              </div>
-            </dl>
-          </section>
-
-          <section class="space-y-2">
-            <h2 class="text-sm font-semibold">Jadwal per Kelas</h2>
-            <p
-              v-if="detail.schedules.length === 0"
-              class="text-control text-muted-foreground"
-            >
-              Belum ada jadwal kelas pada kegiatan ini.
-            </p>
-            <ul
-              v-else
-              class="divide-y rounded-md border"
-            >
-              <li
-                v-for="item in detail.schedules"
-                :key="item.scheduleId"
-                class="flex flex-col gap-1 p-3 sm:flex-row sm:items-center sm:justify-between"
+          <Card
+            gap="none"
+            class="shrink-0"
+          >
+            <CardHeader standard>
+              <CardTitle size="md">Kebijakan</CardTitle>
+              <Button
+                v-if="canManageAll"
+                class="shrink-0"
+                @click="policyOpen = true"
               >
-                <span class="font-medium">
-                  {{ item.classroomName ?? item.classroomId }}
-                </span>
-                <span class="text-control text-muted-foreground">
-                  {{ formatWindow(item.startsAt, item.endsAt) }}
-                </span>
-              </li>
-            </ul>
-          </section>
+                <SquarePen class="size-4" />
+                Ubah
+              </Button>
+            </CardHeader>
+            <CardContent variant="standard">
+              <div class="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <p class="mb-2 text-control font-medium">Pengawasan</p>
+                  <dl class="grid gap-y-2">
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Batas pelanggaran
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.violationLimit }}
+                      </dd>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Ambang hilang fokus
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.focusThresholdMs }} ms
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div>
+                  <p class="mb-2 text-control font-medium">Waktu</p>
+                  <dl class="grid gap-y-2">
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Toleransi terlambat
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.lateToleranceMinutes }} menit
+                      </dd>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Minimal sebelum kumpul
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.minSubmitMinutes }} menit
+                      </dd>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Slot token berputar
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.tokenSlotSeconds }} detik
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div>
+                  <p class="mb-2 text-control font-medium">Soal</p>
+                  <dl class="grid gap-y-2">
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Acak urutan soal
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.shuffleQuestions ? 'Ya' : 'Tidak' }}
+                      </dd>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Acak urutan pilihan
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.shuffleChoices ? 'Ya' : 'Tidak' }}
+                      </dd>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                      <dt class="text-control text-muted-foreground">
+                        Izinkan lewat web (SEB)
+                      </dt>
+                      <dd class="font-medium">
+                        {{ detail.policy.allowWeb ? 'Ya' : 'Tidak' }}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card
+            gap="none"
+            class="shrink-0"
+          >
+            <CardHeader standard>
+              <CardTitle size="md">Jadwal per Kelas</CardTitle>
+            </CardHeader>
+            <CardContent variant="standard">
+              <DataTable
+                mobile="cards"
+                hide-pagination
+                hide-per-page
+                :columns="scheduleColumns"
+                :data="sortedSchedules"
+                :page-size="1000"
+                :total-items="sortedSchedules.length"
+                item-label="kelas"
+              >
+                <template #empty>
+                  <DataTableEmpty
+                    message="Belum ada jadwal kelas pada kegiatan ini."
+                  />
+                </template>
+              </DataTable>
+            </CardContent>
+          </Card>
         </template>
       </CardContent>
       <CardFooter plain />
@@ -305,29 +383,5 @@ onMounted(load)
       :policy="detail.policy"
       @saved="onPolicySaved"
     />
-
-    <AlertDialog
-      :open="confirmRotateOpen"
-      @update:open="(value: boolean) => !value && (confirmRotateOpen = false)"
-    >
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Ganti token kegiatan?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Token lama tidak berlaku lagi dan siswa yang baru masuk harus
-            memakai token baru.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction
-            :disabled="rotating"
-            @click="confirmRotateToken"
-          >
-            Ya, ganti token
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
   </div>
 </template>

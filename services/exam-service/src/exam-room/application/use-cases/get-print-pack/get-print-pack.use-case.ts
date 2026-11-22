@@ -6,6 +6,7 @@ import { IParticipantNumberPort } from '../../../../platform/participant-number/
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import type { ExamRoomSeat } from '../../../domain/entities/exam-room-seat.entity.js'
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
+import { employeeIdsOf } from '../../room-staff-names.js'
 
 export interface PrintPackStudent {
   seatNumber: number
@@ -157,11 +158,7 @@ export class GetPrintPackUseCase {
   }
 
   private async namesOfUsers(userIds: string[]): Promise<Map<string, string>> {
-    const employeeOf = new Map<string, string>()
-    for (const userId of userIds) {
-      const employeeId = await this.employees.findEmployeeIdByUserId(userId)
-      if (employeeId !== null) employeeOf.set(userId, employeeId)
-    }
+    const employeeOf = await employeeIdsOf(this.employees, userIds)
     if (employeeOf.size === 0) return new Map()
     const names = await this.authors.namesOf([...employeeOf.values()])
     const result = new Map<string, string>()

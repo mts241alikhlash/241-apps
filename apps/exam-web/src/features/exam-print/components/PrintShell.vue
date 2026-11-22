@@ -152,14 +152,16 @@ function confirmPrint() {
     >
       <CardHeader standard>
         <CardTitle class="font-semibold">{{ title }}</CardTitle>
-        <Button
-          class="shrink-0"
-          :disabled="loading || !hasContent"
-          @click="openPrint"
-        >
-          <Printer class="size-4" />
-          Cetak
-        </Button>
+        <div class="flex shrink-0 items-center gap-2">
+          <slot name="header-actions" />
+          <Button
+            :disabled="loading || !hasContent"
+            @click="openPrint"
+          >
+            <Printer class="size-4" />
+            Cetak
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent
@@ -280,10 +282,7 @@ function confirmPrint() {
             </Select>
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             @click="printOpen = false"

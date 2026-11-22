@@ -5,6 +5,7 @@ import { defineComponent, ref, type Ref } from 'vue'
 import ScheduleListView from './ScheduleListView.vue'
 import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
+import { ActionCell } from '@mts241alikhlash/ui'
 import { CARDS, cardRows, rowActionProps } from '@/test/dataTableCards'
 
 const { filters, refresh, permissions, cancelSchedule, push, routeMeta } =
@@ -27,7 +28,11 @@ const listState = {
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
-  useRoute: () => ({ meta: routeMeta, path: '/exam/schedules' }),
+  useRoute: () => ({
+    meta: routeMeta,
+    path: '/exam/schedules',
+    query: { hari: '2030-11-02' },
+  }),
 }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
@@ -43,6 +48,16 @@ vi.mock('../composables/useScheduleList', () => ({
     Object.assign(filters, state, { page, pageSize })
     return { ...listState, refresh }
   },
+}))
+vi.mock('@/features/exam-event/services/examEventService', () => ({
+  examEventService: {
+    loadEvents: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  },
+}))
+vi.mock('@/features/exam-shared/usePackageSubjects', () => ({
+  usePackageSubjects: () => ({
+    subjectOf: (_id: string, title: string) => title,
+  }),
 }))
 vi.mock('../services/examScheduleService', () => ({
   examScheduleService: { cancelSchedule },
@@ -189,26 +204,26 @@ describe('ScheduleListView', () => {
     expect(cardRows(wrapper)).toHaveLength(1)
     expect(text).toContain('UTS Matematika')
     expect(text).toContain('VII A')
-    expect(text).toContain('2 Nov 08:00 – 11:00 WIB')
+    expect(text).toContain('08.00')
+    expect(text).toContain('11.00')
     expect(text).toContain('90 menit')
     expect(text).toContain('Belum mulai')
     wrapper.unmount()
   })
 
-  it('opens the schedule dialog from Tambah only with exam-schedules.create', async () => {
+  it('sends Tambah to the activity form, only with exam-schedules.manage', async () => {
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
-    expect(wrapper.find('[data-test="schedule-dialog"]').exists()).toBe(false)
 
     await wrapper
       .findAll('button')
       .find((candidate) => candidate.text().includes('Tambah'))!
       .trigger('click')
 
-    expect(wrapper.find('[data-test="schedule-dialog"]').exists()).toBe(true)
+    expect(push).toHaveBeenCalledWith('/exam/activities/new')
     wrapper.unmount()
 
-    permissions.delete('exam-schedules.create')
+    permissions.delete('exam-schedules.manage')
     const without = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
     expect(without.text()).not.toContain('Tambah')
@@ -253,29 +268,21 @@ describe('ScheduleListView', () => {
   })
 
   it('offers no actions on a cancelled schedule', async () => {
+    listState.schedules.value = [schedule({ status: 'CANCELLED' })]
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
 
-    const props = rowActionProps(wrapper, schedule({ status: 'CANCELLED' }))
-
-    expect(props.hideEdit).toBe(true)
-    expect(props.items).toEqual([])
+    expect(wrapper.findAllComponents(ActionCell)).toHaveLength(0)
     wrapper.unmount()
   })
 
-  it('shows the empty state, and a reset button when a filter matches nothing', async () => {
+  it('shows the empty state', async () => {
     listState.schedules.value = []
     listState.totalItems.value = 0
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
-    expect(wrapper.text()).toContain('Belum ada jadwal ujian.')
 
-    filters.status.value = 'CANCELLED'
-    await flushPromises()
-    expect(wrapper.text()).toContain(
-      'Tidak ada jadwal yang cocok dengan filter.',
-    )
-    expect(wrapper.text()).toContain('Atur Ulang')
+    expect(wrapper.text()).toContain('Belum ada jadwal ujian.')
     wrapper.unmount()
   })
 
@@ -294,6 +301,7 @@ describe('ScheduleListView', () => {
   })
 
   it('opens the access code dialog for the schedule when Token is chosen', async () => {
+    routeMeta.category = 'NON_EXAM'
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
     expect(wrapper.find('[data-test="access-dialog"]').exists()).toBe(false)
@@ -312,6 +320,7 @@ describe('ScheduleListView', () => {
   })
 
   it('offers no Token action without exam-schedules.access-code', async () => {
+    routeMeta.category = 'NON_EXAM'
     permissions.delete('exam-schedules.access-code')
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
@@ -323,87 +332,8 @@ describe('ScheduleListView', () => {
     wrapper.unmount()
   })
 
-  it('opens the activity status screen from the schedule row following the active section', async () => {
-    listState.schedules.value = [schedule({ activityId: 'activity-1' })]
-    const wrapper = mount(ScheduleListView, { global: { stubs } })
-    await flushPromises()
-
-    const items = rowActionProps(
-      wrapper,
-      schedule({ activityId: 'activity-1' }),
-    ).items as unknown as {
-      label: string
-      onClick: () => void
-    }[]
-    items.find((entry) => entry.label === 'Ubah status')!.onClick()
-    await flushPromises()
-
-    expect(push).toHaveBeenCalledWith({
-      path: '/exam/activities/new',
-      query: { id: 'activity-1' },
-    })
-    wrapper.unmount()
-
-    routeMeta.category = 'NON_EXAM'
-    const classwork = mount(ScheduleListView, { global: { stubs } })
-    await flushPromises()
-    const classworkItems = rowActionProps(
-      classwork,
-      schedule({ activityId: 'activity-1' }),
-    ).items as unknown as {
-      label: string
-      onClick: () => void
-    }[]
-    classworkItems.find((entry) => entry.label === 'Ubah status')!.onClick()
-    await flushPromises()
-
-    expect(push).toHaveBeenCalledWith({
-      path: '/classwork/activities/new',
-      query: { id: 'activity-1' },
-    })
-    classwork.unmount()
-  })
-
-  it('offers no status action without exam-schedules.manage', async () => {
-    listState.schedules.value = [schedule({ activityId: 'activity-1' })]
-    permissions.delete('exam-schedules.manage')
-    const wrapper = mount(ScheduleListView, { global: { stubs } })
-    await flushPromises()
-
-    const items = rowActionProps(
-      wrapper,
-      schedule({ activityId: 'activity-1' }),
-    ).items as unknown as { label: string }[]
-
-    expect(items.map((entry) => entry.label)).not.toContain('Ubah status')
-    wrapper.unmount()
-  })
-
-  it('offers no status action on a schedule without an activity', async () => {
-    const wrapper = mount(ScheduleListView, { global: { stubs } })
-    await flushPromises()
-
-    const items = rowActionProps(wrapper, schedule()).items as unknown as {
-      label: string
-    }[]
-
-    expect(items.map((entry) => entry.label)).not.toContain('Ubah status')
-    wrapper.unmount()
-  })
-
-  it('offers the status filter on a phone too', async () => {
-    const wrapper = mount(ScheduleListView, { global: { stubs } })
-    await flushPromises()
-
-    expect(
-      wrapper
-        .findAll('button')
-        .some((candidate) => candidate.text().includes('Filter')),
-    ).toBe(true)
-    wrapper.unmount()
-  })
-
   it('opens the makeup dialog for the schedule when Susulan is chosen, and refreshes after it is made', async () => {
+    routeMeta.category = 'NON_EXAM'
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
     expect(wrapper.find('[data-test="makeup-dialog"]').exists()).toBe(false)
@@ -437,6 +367,7 @@ describe('ScheduleListView', () => {
   })
 
   it('opens the participants of a makeup when Peserta is chosen', async () => {
+    routeMeta.category = 'NON_EXAM'
     const makeup = schedule({ id: 'm1', kind: 'MAKEUP', makeupOfId: 's1' })
     listState.schedules.value = [makeup]
     const wrapper = mount(ScheduleListView, { global: { stubs } })

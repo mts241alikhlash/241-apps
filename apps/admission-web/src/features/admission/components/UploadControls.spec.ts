@@ -65,7 +65,7 @@ it('marks required documents and shows each status with the reviewer note', asyn
   await flushPromises()
 
   expect(wrapper.text()).toContain('Ditolak')
-  expect(wrapper.text()).toContain('Status:Ditolak. Foto buram')
+  expect(wrapper.text()).toContain('StatusDitolak. Foto buram')
   expect(wrapper.text()).not.toContain('Catatan:')
   expect(wrapper.text()).toContain('Belum diunggah')
   expect(wrapper.findAll('tbody [aria-label="wajib"]')).toHaveLength(1)

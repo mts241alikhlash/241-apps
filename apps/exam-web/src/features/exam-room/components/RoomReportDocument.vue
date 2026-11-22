@@ -269,9 +269,7 @@ const registeredWord = computed(() => spell(registered.value))
 
 .blank-name {
   display: block;
-  width: 80%;
-  margin-inline: auto;
-  border-bottom: 1px solid currentColor;
+  min-height: 1.4em;
 }
 
 .report-heading {

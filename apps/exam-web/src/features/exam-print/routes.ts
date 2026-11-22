@@ -8,7 +8,9 @@ const crumbs = (title: string, href: string) => [
   { title, href },
 ]
 
-const documentRoutes: RouteRecordRaw[] = PRINT_DOCUMENT_KEYS.map((doc) => {
+const documentRoutes: RouteRecordRaw[] = PRINT_DOCUMENT_KEYS.filter(
+  (doc) => doc !== 'schedule',
+).map((doc) => {
   const { title } = PRINT_DOCUMENTS[doc]
   const path = `/exam/print/${doc}`
   return {
@@ -52,6 +54,17 @@ export const examPrintRoutes: RouteRecordRaw[] = [
         'Daftar Hadir Pengawas dan Teknisi',
         '/exam/print/staff-attendance',
       ),
+    },
+  },
+  {
+    path: '/exam/print/schedule/:eventId?',
+    name: 'ExamPrint-schedule',
+    component: () => import('./views/ExamScheduleView.vue'),
+    meta: {
+      title: 'Jadwal Ujian',
+      requiresAuth: true,
+      requiredAnyPermission: ['exam-events.manage'],
+      breadcrumbs: crumbs('Jadwal Ujian', '/exam/print/schedule'),
     },
   },
   ...documentRoutes,

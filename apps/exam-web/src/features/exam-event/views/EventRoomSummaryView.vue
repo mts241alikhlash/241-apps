@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -82,7 +82,9 @@ onMounted(() => {
       <CardContent
         class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 sm:p-4"
       >
-        <AcademicPeriodFilter v-model:semester-id="semesterId" />
+        <div class="flex flex-wrap items-end gap-2">
+          <AcademicPeriodFilter v-model:semester-id="semesterId" />
+        </div>
         <div
           v-if="loadFailed"
           class="space-y-3"
@@ -106,7 +108,7 @@ onMounted(() => {
           item-label="periode ujian"
         >
           <template #empty>
-            <p>Belum ada periode ujian.</p>
+            <DataTableEmpty message="Belum ada periode ujian." />
           </template>
         </DataTable>
       </CardContent>

@@ -59,54 +59,52 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-end gap-2">
-    <FloatingLabelField
-      label="Tahun ajaran"
-      for="period-year"
-      class="w-fit min-w-40"
-      floating
-    >
-      <Select v-model="yearId">
-        <SelectTrigger
-          id="period-year"
-          class="w-full"
+  <FloatingLabelField
+    label="Tahun ajaran"
+    for="period-year"
+    class="w-fit min-w-40"
+    floating
+  >
+    <Select v-model="yearId">
+      <SelectTrigger
+        id="period-year"
+        class="w-full"
+      >
+        <SelectValue placeholder="Pilih tahun ajaran" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="year in years"
+          :key="year.id"
+          :value="year.id"
         >
-          <SelectValue placeholder="Pilih tahun ajaran" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem
-            v-for="year in years"
-            :key="year.id"
-            :value="year.id"
-          >
-            {{ year.name }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </FloatingLabelField>
-    <FloatingLabelField
-      label="Semester"
-      for="period-semester"
-      class="w-fit min-w-40"
-      floating
-    >
-      <Select v-model="semesterId">
-        <SelectTrigger
-          id="period-semester"
-          class="w-full"
+          {{ year.name }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </FloatingLabelField>
+  <FloatingLabelField
+    label="Semester"
+    for="period-semester"
+    class="w-fit min-w-40"
+    floating
+  >
+    <Select v-model="semesterId">
+      <SelectTrigger
+        id="period-semester"
+        class="w-full"
+      >
+        <SelectValue placeholder="Pilih semester" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="item in yearSemesters"
+          :key="item.id"
+          :value="item.id"
         >
-          <SelectValue placeholder="Pilih semester" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem
-            v-for="item in yearSemesters"
-            :key="item.id"
-            :value="item.id"
-          >
-            {{ semesterLabel(item) }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </FloatingLabelField>
-  </div>
+          {{ semesterLabel(item) }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </FloatingLabelField>
 </template>

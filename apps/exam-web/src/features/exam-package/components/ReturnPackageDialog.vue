@@ -69,10 +69,7 @@ const fieldId = useId()
           }}
         </p>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

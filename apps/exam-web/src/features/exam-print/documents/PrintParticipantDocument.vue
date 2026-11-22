@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -29,14 +29,12 @@ const props = defineProps<{
   roomId: string
   roomOptions: { id: string; label: string }[]
   showRoomFilter: boolean
-  resetting?: boolean
 }>()
 
 const emit = defineEmits<{
   printOne: [studentId: string]
   'update:eventId': [value: string]
   'update:roomId': [value: string]
-  resetCredentials: []
 }>()
 
 defineOptions({ inheritAttrs: false })
@@ -59,7 +57,7 @@ const printedSheets = computed(() =>
 
 const search = ref('')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 function changePageSize(size: number) {
   pageSize.value = size
@@ -67,7 +65,6 @@ function changePageSize(size: number) {
 }
 const preview = ref<PrintParticipantRow | null>(null)
 const previewOpen = ref(false)
-const confirmingReset = ref(false)
 
 const unit = computed(() => (props.kind === 'card' ? 'peserta' : 'meja'))
 
@@ -153,11 +150,6 @@ watch(filtered, () => {
   if (page.value > lastPage) page.value = lastPage
 })
 
-function confirmReset() {
-  confirmingReset.value = false
-  emit('resetCredentials')
-}
-
 function printOne() {
   if (preview.value === null) return
   const studentId = preview.value.studentId
@@ -192,14 +184,6 @@ function printOne() {
         />
       </template>
       <template #header-right>
-        <Button
-          v-if="kind === 'card'"
-          variant="outline"
-          :disabled="resetting || rows.length === 0"
-          @click="confirmingReset = true"
-        >
-          Reset password
-        </Button>
         <SearchInput
           v-model="search"
           class="sm:w-48"
@@ -214,13 +198,13 @@ function printOne() {
         />
       </template>
       <template #empty>
-        <p class="text-center">
-          {{
+        <DataTableEmpty
+          :message="
             search
               ? 'Tidak ada peserta yang cocok dengan pencarian.'
               : `Belum ada ${unit} pada periode ini.`
-          }}
-        </p>
+          "
+        />
       </template>
     </DataTable>
 
@@ -258,37 +242,6 @@ function printOne() {
       </section>
     </div>
 
-    <Dialog v-model:open="confirmingReset">
-      <DialogContent size="md">
-        <DialogHeader standard>
-          <DialogTitle>Reset password siswa?</DialogTitle>
-          <DialogDescription>
-            Kata sandi lama semua siswa pada tampilan ini tidak berlaku lagi.
-            Kartu yang sudah tercetak sebelumnya ikut tidak berlaku. Kata sandi
-            baru hanya tampil di halaman ini dan hilang bila halaman dimuat
-            ulang, jadi cetak sebelum meninggalkannya.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
-          <Button
-            variant="outline"
-            @click="confirmingReset = false"
-          >
-            Batal
-          </Button>
-          <Button
-            :disabled="resetting"
-            @click="confirmReset"
-          >
-            Reset password
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-
     <Dialog v-model:open="previewOpen">
       <DialogContent size="xl">
         <DialogHeader standard>
@@ -312,16 +265,7 @@ function printOne() {
             />
           </div>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
-          <Button
-            variant="outline"
-            @click="previewOpen = false"
-          >
-            Tutup
-          </Button>
+        <DialogFooter standard>
           <Button @click="printOne">
             Cetak {{ kind === 'card' ? 'kartu ini' : 'nomor ini' }}
           </Button>

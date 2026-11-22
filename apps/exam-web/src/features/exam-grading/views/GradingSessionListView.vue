@@ -2,7 +2,7 @@
 import { computed, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { BackButton, DataTable } from '@mts241alikhlash/ui'
+import { BackButton, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -36,7 +36,7 @@ const examTitle = computed(() =>
 )
 const status = ref('ALL')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 const statusFieldId = useId()
 
 useBreadcrumbs(() => [
@@ -143,7 +143,13 @@ function changePageSize(size: number) {
             </FloatingLabelField>
           </template>
           <template #empty>
-            <p>Tidak ada siswa yang cocok.</p>
+            <DataTableEmpty
+              :message="
+                status !== 'ALL'
+                  ? 'Tidak ada siswa yang cocok dengan filter.'
+                  : 'Belum ada siswa yang mengerjakan ujian ini.'
+              "
+            />
           </template>
         </DataTable>
       </CardContent>

@@ -75,7 +75,7 @@ describe('FinalizeSessionService', () => {
     points: 4,
   }
 
-  it('scores every objective type and leaves manual types ungraded', async () => {
+  it('scores every objective type and a matching short answer', async () => {
     const [mc, mr, tf, short] = await start([
       choiceSpec('B'),
       multipleResponse,
@@ -95,13 +95,32 @@ describe('FinalizeSessionService', () => {
     const closed = await service.finalize('a', 'SUBMITTED', NOW)
 
     expect(closed).toMatchObject({
-      status: 'SUBMITTED',
-      rawScore: 4,
+      status: 'GRADED',
+      rawScore: 6,
       maxScore: 10,
     })
     expect(sessions.answers.get(mc)?.score).toBe(2)
     expect(sessions.answers.get(mr)?.score).toBe(0)
     expect(sessions.answers.get(tf)?.score).toBe(2)
+    expect(sessions.answers.get(short)?.score).toBe(2)
+  })
+
+  it('leaves a short answer that does not match for the teacher', async () => {
+    const [mc, short] = await start([
+      choiceSpec('B'),
+      {
+        type: 'SHORT_ANSWER',
+        content: {
+          answer: { accepted: ['x'], ignoreCase: true, ignoreHarakat: true },
+        },
+      },
+    ])
+    answer(mc, { key: 'B' })
+    answer(short, { text: 'y' })
+
+    const closed = await service.finalize('a', 'SUBMITTED', NOW)
+
+    expect(closed).toMatchObject({ status: 'SUBMITTED', rawScore: 2 })
     expect(sessions.answers.get(short)?.score).toBeNull()
     expect(closed.submittedAt).toEqual(NOW)
   })

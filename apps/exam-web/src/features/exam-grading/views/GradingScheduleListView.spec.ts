@@ -119,7 +119,7 @@ describe('GradingScheduleListView', () => {
     const dialog = wrapper.get('[data-test="makeup-dialog"]')
     expect(dialog.attributes('data-package')).toBe('p1')
     expect(dialog.attributes('data-duration')).toBe('90')
-    expect(dialog.attributes('data-title')).toBe('UTS Matematika')
+    expect(dialog.attributes('data-title')).toBe('Matematika')
     await wrapper.get('[data-test="made"]').trigger('click')
     expect(refresh).toHaveBeenCalled()
     wrapper.unmount()

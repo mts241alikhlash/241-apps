@@ -127,18 +127,15 @@ onMounted(load)
         </p>
       </DialogBody>
       <DialogFooter
+        v-if="canRotate"
         standard
-        class="justify-between"
       >
         <Button
-          v-if="canRotate"
           variant="outline"
           @click="((confirmOpen = true), (reason = ''))"
         >
           Putar Token
         </Button>
-        <span v-else />
-        <Button @click="emit('update:open', false)">Tutup</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

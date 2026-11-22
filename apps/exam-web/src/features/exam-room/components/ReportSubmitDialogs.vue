@@ -117,10 +117,7 @@ function pick(row: RoomReportSummary, event: Event) {
           </p>
         </template>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           :disabled="running"
@@ -169,16 +166,7 @@ function pick(row: RoomReportSummary, event: Event) {
           </li>
         </ul>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
-        <Button
-          variant="outline"
-          @click="resultOpen = false"
-        >
-          Tutup
-        </Button>
+      <DialogFooter standard>
         <Button
           v-if="failures.length > 0"
           @click="retryFailed"

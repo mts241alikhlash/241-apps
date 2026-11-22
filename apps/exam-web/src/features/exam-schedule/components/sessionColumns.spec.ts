@@ -11,6 +11,7 @@ const session = (
   studentId: 'st1',
   studentName: 'Ahmad Fauzi',
   studentNis: '2024001',
+  participantNumber: null,
   status: 'IN_PROGRESS',
   startedAt: '2026-11-02T01:05:00.000Z',
   submittedAt: null,
@@ -37,31 +38,27 @@ const action = (canRelease: boolean, row: ScheduleSession) =>
       .cell as (ctx: { row: { original: ScheduleSession } }) => VNode | null
   )({ row: { original: row } })
 
-const childText = (node: VNode | null): string[] => {
-  if (node === null) return []
-  const children = (node.children as VNode[] | undefined) ?? []
-  return children.map((child) => {
-    const slots = child.children
-    const text =
-      slots !== null && !Array.isArray(slots) && typeof slots === 'object'
-        ? (slots as { default?: () => unknown }).default?.()
-        : slots
-    if (Array.isArray(text)) return text.join('')
-    return typeof text === 'string' ? text : ''
-  })
+interface Item {
+  label: string
+  onClick: () => void
 }
 
-describe('buildSessionColumns', () => {
-  it('shows the student name with the nis and tolerates a missing student', () => {
-    const cell = columns().find((column) => column.id === 'student')!
-      .cell as (ctx: { row: { original: ScheduleSession } }) => string
+const items = (node: VNode | null): Item[] =>
+  node === null ? [] : (node.props as { items: Item[] }).items
 
-    expect(cell({ row: { original: session() } })).toBe('Ahmad Fauzi · 2024001')
+const labelsOf = (node: VNode | null): string[] =>
+  items(node).map((item) => item.label)
+
+describe('buildSessionColumns', () => {
+  it('shows the participant number and the name, and tolerates a missing student', () => {
+    expect(mobile('participantNumber', session())).toBe('-')
     expect(
-      cell({
-        row: { original: session({ studentName: null, studentNis: null }) },
-      }),
-    ).toBe('Siswa tidak ditemukan')
+      mobile('participantNumber', session({ participantNumber: '25-007' })),
+    ).toBe('25-007')
+    expect(mobile('name', session())).toBe('Ahmad Fauzi')
+    expect(mobile('name', session({ studentName: null }))).toBe(
+      'Siswa tidak ditemukan',
+    )
   })
 
   it('shows the status, the score and the state of the device', () => {
@@ -78,7 +75,7 @@ describe('buildSessionColumns', () => {
   })
 
   it('offers the release only for a session in progress and with the permission', () => {
-    expect(childText(action(true, session()))).toContain('Lepas Sesi')
+    expect(labelsOf(action(true, session()))).toContain('Lepas Sesi')
     expect(action(true, session({ status: 'SUBMITTED' }))).toBeNull()
     expect(action(false, session())).toBeNull()
   })
@@ -97,7 +94,7 @@ describe('buildSessionColumns', () => {
       }) => VNode | null
     )({ row: { original: session({ status: 'SUBMITTED' }) } })
 
-    expect(childText(cell)).toEqual(['Reset', 'Riwayat'])
+    expect(labelsOf(cell)).toEqual(['Reset', 'Riwayat'])
   })
 
   it('releases the session of the row', () => {
@@ -105,11 +102,8 @@ describe('buildSessionColumns', () => {
     const cell = columns(true, onRelease).find(
       (column) => column.id === 'actions',
     )!.cell as (ctx: { row: { original: ScheduleSession } }) => VNode
-    const node = cell({ row: { original: session() } })
-    const buttons = node.children as VNode[]
-    const button = buttons[0]
 
-    ;(button.props as { onClick: () => void }).onClick()
+    items(cell({ row: { original: session() } }))[0].onClick()
 
     expect(onRelease).toHaveBeenCalledWith(session())
   })
