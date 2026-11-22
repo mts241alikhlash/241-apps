@@ -40,6 +40,7 @@ import { usePrintPack } from '../composables/usePrintPack'
 import { examRoomService } from '@/features/exam-room/services/examRoomService'
 import type { RoomReportSummary } from '@/features/exam-room/types'
 import { formatPrintDate, formatPrintRange } from '../format'
+import { waitForPrintImages } from '../printImages'
 import StaffAttendanceSheet from '../documents/StaffAttendanceSheet.vue'
 import type { PrintPackRoom } from '../types'
 
@@ -264,6 +265,7 @@ async function printDay(day: DayEntry) {
   previewDay.value = day
   await loadReports()
   await nextTick()
+  await waitForPrintImages()
   printSheets()
 }
 

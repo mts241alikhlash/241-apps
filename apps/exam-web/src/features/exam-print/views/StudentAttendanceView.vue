@@ -56,6 +56,7 @@ import type {
 import { examEventService } from '@/features/exam-event/services/examEventService'
 import AttendanceSheet from '../documents/AttendanceSheet.vue'
 import { formatPrintDate, formatPrintRange } from '../format'
+import { waitForPrintImages } from '../printImages'
 
 const route = useRoute()
 const router = useRouter()
@@ -253,9 +254,12 @@ async function loadRoster() {
   }
 }
 
+const PRINT_PARALLEL = 4
+
 async function printRows(rows: RoomReportSummary[]) {
   if (printing.value) return
   printing.value = true
+  const notice = toast.loading('Menyiapkan daftar hadir...')
   try {
     const targets = [
       ...new Map(
@@ -266,37 +270,46 @@ async function printRows(rows: RoomReportSummary[]) {
         a.startsAt.localeCompare(b.startsAt) ||
         a.roomName.localeCompare(b.roomName, 'id'),
     )
-    const loaded = await Promise.all(
-      targets.map(async (row): Promise<BatchSheet> => {
-        const result = await examRoomService.loadRoster(row.roomId, row.slotId)
-        return {
-          key: `${row.roomId}-${row.slotId}`,
-          roomName: row.roomName,
-          date: formatPrintDate(row.startsAt),
-          packages:
-            row.subjectNames.length > 0 ? row.subjectNames.join(', ') : '-',
-          timeRange: formatPrintRange(row.startsAt, row.endsAt),
-          students: result.data.map((student) => ({
-            studentId: student.studentId,
-            name: student.studentName,
-            classroomName: student.classroomName,
-            participantNumber: student.participantNumber,
-          })),
-          supervisorName: result.meta?.room.currentSupervisorName ?? null,
-          technicianName: result.meta?.room.technicianName ?? null,
-        }
-      }),
-    )
+    const loadSheet = async (row: RoomReportSummary): Promise<BatchSheet> => {
+      const result = await examRoomService.loadRoster(row.roomId, row.slotId)
+      return {
+        key: `${row.roomId}-${row.slotId}`,
+        roomName: row.roomName,
+        date: formatPrintDate(row.startsAt),
+        packages:
+          row.subjectNames.length > 0 ? row.subjectNames.join(', ') : '-',
+        timeRange: formatPrintRange(row.startsAt, row.endsAt),
+        students: result.data.map((student) => ({
+          studentId: student.studentId,
+          name: student.studentName,
+          classroomName: student.classroomName,
+          participantNumber: student.participantNumber,
+        })),
+        supervisorName: result.meta?.room.currentSupervisorName ?? null,
+        technicianName: result.meta?.room.technicianName ?? null,
+      }
+    }
+    const loaded: BatchSheet[] = []
+    for (let start = 0; start < targets.length; start += PRINT_PARALLEL) {
+      loaded.push(
+        ...(await Promise.all(
+          targets.slice(start, start + PRINT_PARALLEL).map(loadSheet),
+        )),
+      )
+    }
     batch.value = loaded.filter((sheet) => sheet.students.length > 0)
     if (batch.value.length === 0) {
       toast.error('Tidak ada daftar hadir yang dapat dimuat.')
       return
     }
     await nextTick()
+    await waitForPrintImages()
+    toast.dismiss(notice)
     printSheet()
   } catch {
     toast.error('Dokumen tidak dapat dimuat. Periksa koneksi lalu coba lagi.')
   } finally {
+    toast.dismiss(notice)
     batch.value = []
     printing.value = false
   }
