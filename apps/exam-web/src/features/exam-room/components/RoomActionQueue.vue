@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { DataTable } from '@mts241alikhlash/ui'
+import { ActionCell, DataTable } from '@mts241alikhlash/ui'
+import { History, Laptop, Undo2 } from '@lucide/vue'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
@@ -29,15 +29,14 @@ interface Entry {
   row: RoomMonitorParticipant
   reason: string
   tone: 'destructive' | 'warning'
-  action: string
-  run: () => void
+  primary: 'reopen' | 'release' | 'timeline'
 }
 
 const OFFLINE_MS = 60_000
 
 const entries = computed<Entry[]>(() => {
   const now = Date.now()
-  return props.participants.flatMap((row): Entry[] => {
+  const found = props.participants.flatMap((row): Entry[] => {
     const session = row.session
     if (session === null || row.absence !== null) return []
     const base = { id: row.studentId, row }
@@ -47,8 +46,7 @@ const entries = computed<Entry[]>(() => {
           ...base,
           reason: 'Terkunci pelanggaran',
           tone: 'destructive',
-          action: 'Buka Kembali',
-          run: () => emit('reopen', row),
+          primary: 'reopen',
         },
       ]
     }
@@ -57,9 +55,8 @@ const entries = computed<Entry[]>(() => {
         {
           ...base,
           reason: 'Menunggu token ulang',
-          tone: 'warning',
-          action: 'Lepas Perangkat',
-          run: () => emit('release', row),
+          tone: 'destructive',
+          primary: 'release',
         },
       ]
     }
@@ -79,8 +76,7 @@ const entries = computed<Entry[]>(() => {
               ? 'Tidak ada kabar'
               : `Tidak ada kabar ${minutes} menit`,
           tone: 'warning',
-          action: 'Riwayat',
-          run: () => emit('timeline', row),
+          primary: 'timeline',
         },
       ]
     }
@@ -90,8 +86,7 @@ const entries = computed<Entry[]>(() => {
           ...base,
           reason: `${session.unsyncedCount} jawaban tertunda di HP`,
           tone: 'warning',
-          action: 'Riwayat',
-          run: () => emit('timeline', row),
+          primary: 'timeline',
         },
       ]
     }
@@ -101,13 +96,16 @@ const entries = computed<Entry[]>(() => {
           ...base,
           reason: `Baterai ${session.batteryLevel}%`,
           tone: 'warning',
-          action: 'Riwayat',
-          run: () => emit('timeline', row),
+          primary: 'timeline',
         },
       ]
     }
     return []
   })
+  return [
+    ...found.filter((entry) => entry.tone === 'destructive'),
+    ...found.filter((entry) => entry.tone === 'warning'),
+  ]
 })
 
 const seat = (entry: Entry) => String(entry.row.seatNumber).padStart(2, '0')
@@ -122,6 +120,16 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
       mobileValue: seat,
     },
     cell: ({ row }) => h('span', seat(row.original)),
+  },
+  {
+    id: 'number',
+    header: 'No. Peserta',
+    meta: {
+      align: 'center',
+      mobileLabel: 'No. Peserta',
+      mobileValue: (entry: Entry) => entry.row.participantNumber ?? '-',
+    },
+    cell: ({ row }) => h('span', row.original.row.participantNumber ?? '-'),
   },
   {
     id: 'participant',
@@ -149,34 +157,41 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
     id: 'actions',
     header: 'Aksi',
     enableSorting: false,
+    meta: { align: 'center' },
     cell: ({ row }) => {
       const entry = row.original
-      if (!props.canRecover && entry.action !== 'Riwayat') return null
-      return h(
-        Button,
-        { variant: 'outline', onClick: () => entry.run() },
-        () => entry.action,
-      )
+      const items = []
+      if (props.canRecover && entry.primary === 'reopen') {
+        items.push({
+          label: 'Buka Kembali Sesi',
+          icon: Undo2,
+          onClick: () => emit('reopen', entry.row),
+        })
+      }
+      if (props.canRecover && entry.primary === 'release') {
+        items.push({
+          label: 'Lepas Perangkat',
+          icon: Laptop,
+          onClick: () => emit('release', entry.row),
+        })
+      }
+      items.push({
+        label: 'Riwayat Kejadian',
+        icon: History,
+        onClick: () => emit('timeline', entry.row),
+      })
+      return h(ActionCell, { hideEdit: true, hideDelete: true, items })
     },
   },
 ])
-
-const title = computed(() =>
-  entries.value.length > 0
-    ? `Perlu Tindakan (${entries.value.length})`
-    : 'Perlu Tindakan',
-)
 </script>
 
 <template>
   <Card gap="none">
     <CardHeader standard>
-      <CardTitle size="md">{{ title }}</CardTitle>
+      <CardTitle size="md">Perlu Tindakan</CardTitle>
     </CardHeader>
-    <CardContent
-      variant="standard"
-      class="sm:max-h-80 sm:overflow-y-auto"
-    >
+    <CardContent variant="standard">
       <DataTable
         mobile="cards"
         :columns="columns"

@@ -142,7 +142,7 @@ const tokenMinutes = computed(() => {
 })
 
 useBreadcrumbs(() => [
-  { title: 'Ruang Ujian', href: '/exam/rooms' },
+  { title: 'Monitoring', href: '/exam/rooms' },
   { title: title.value },
 ])
 
@@ -240,7 +240,7 @@ onUnmounted(() => {
       <CardHeader standard>
         <div class="flex min-w-0 items-center gap-3">
           <BackButton
-            label="Kembali ke Ruang Ujian"
+            label="Kembali ke Monitoring"
             @click="router.push('/exam/rooms')"
           />
           <CardTitle class="truncate font-semibold">{{
@@ -301,6 +301,7 @@ onUnmounted(() => {
           <RoomNotesCard
             :room-id="roomId"
             :slot-id="slotId"
+            :participants="participants"
             :can-add="abilities.supervise || abilities.recover"
             :refresh-key="noteRefresh"
             @add="notePicker = true"

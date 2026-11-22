@@ -161,6 +161,17 @@ export function buildRoomParticipantColumns(
         h('span', String(row.original.seatNumber).padStart(2, '0')),
     },
     {
+      id: 'participantNumber',
+      header: 'No. Peserta',
+      meta: {
+        align: 'center',
+        mobileLabel: 'No. Peserta',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          row.participantNumber ?? '-',
+      },
+      cell: ({ row }) => h('span', row.original.participantNumber ?? '-'),
+    },
+    {
       id: 'participant',
       header: 'Peserta',
       meta: {
@@ -168,20 +179,10 @@ export function buildRoomParticipantColumns(
         strong: true,
         mobileLabel: 'Peserta',
         mobileValue: (row: RoomMonitorParticipant) =>
-          [row.studentName ?? 'Siswa tidak ditemukan', row.nis]
-            .filter(Boolean)
-            .join(' · '),
+          row.studentName ?? 'Siswa tidak ditemukan',
       },
       cell: ({ row }) =>
-        h(
-          'span',
-          [
-            row.original.studentName ?? 'Siswa tidak ditemukan',
-            row.original.nis,
-          ]
-            .filter(Boolean)
-            .join(' · '),
-        ),
+        h('span', row.original.studentName ?? 'Siswa tidak ditemukan'),
     },
     {
       id: 'subject',
@@ -212,7 +213,8 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Progres',
         mobileValue: progressText,
       },
-      cell: ({ row }) => h('span', progressText(row.original)),
+      cell: ({ row }) =>
+        h('span', { class: 'whitespace-nowrap' }, progressText(row.original)),
     },
     {
       id: 'sync',
@@ -228,7 +230,12 @@ export function buildRoomParticipantColumns(
         if (session === null) return '-'
         return h(
           'span',
-          session.unsyncedCount > 0 ? { class: 'text-warning' } : undefined,
+          {
+            class:
+              session.unsyncedCount > 0
+                ? 'whitespace-nowrap text-warning'
+                : 'whitespace-nowrap',
+          },
           syncText(session),
         )
       },
@@ -241,7 +248,12 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Gangguan',
         mobileValue: disturbanceText,
       },
-      cell: ({ row }) => disturbanceText(row.original),
+      cell: ({ row }) =>
+        h(
+          'span',
+          { class: 'whitespace-nowrap' },
+          disturbanceText(row.original),
+        ),
     },
     {
       id: 'activity',
@@ -251,7 +263,12 @@ export function buildRoomParticipantColumns(
         mobileLabel: 'Aktivitas',
         mobileValue: (row: RoomMonitorParticipant) => activityText(row.session),
       },
-      cell: ({ row }) => activityText(row.original.session),
+      cell: ({ row }) =>
+        h(
+          'span',
+          { class: 'whitespace-nowrap' },
+          activityText(row.original.session),
+        ),
     },
     {
       id: 'battery',
@@ -269,8 +286,8 @@ export function buildRoomParticipantColumns(
           'span',
           {
             class: isLowBattery(session)
-              ? 'flex items-center justify-center gap-1 font-medium text-destructive'
-              : 'flex items-center justify-center gap-1 text-muted-foreground',
+              ? 'flex items-center justify-center gap-1 whitespace-nowrap font-medium text-destructive'
+              : 'flex items-center justify-center gap-1 whitespace-nowrap text-muted-foreground',
           },
           [
             isLowBattery(session)
@@ -311,8 +328,8 @@ export function buildRoomParticipantColumns(
           {
             class:
               warnings.length > 0
-                ? 'flex items-center justify-center gap-1 font-medium text-destructive'
-                : 'flex items-center justify-center gap-1 text-muted-foreground',
+                ? 'flex items-center justify-center gap-1 whitespace-nowrap font-medium text-destructive'
+                : 'flex items-center justify-center gap-1 whitespace-nowrap text-muted-foreground',
           },
           [
             warnings.length > 0 ? h(ShieldAlert, { class: 'size-3.5' }) : null,

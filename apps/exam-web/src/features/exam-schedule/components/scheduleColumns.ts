@@ -5,7 +5,7 @@ import { Badge } from '@mts241alikhlash/ui/badge'
 import { Ban, KeyRound, SquarePen, UserRoundPlus, Users } from '@lucide/vue'
 import type { ExamSchedule } from '../types'
 import { examTypeLabel, phaseLabel, phaseTone } from '../types'
-import { formatWindow } from '../utils/formatWindow'
+import { formatDay, formatTime } from '../utils/formatWindow'
 import { schedulePhase } from '../utils/schedulePhase'
 
 export interface ScheduleColumnOptions {
@@ -28,9 +28,9 @@ export interface ScheduleColumnOptions {
 
 const BADGE_VARIANT = {
   neutral: 'outline',
-  info: 'secondary',
-  success: 'default',
-  warning: 'destructive',
+  info: 'info',
+  success: 'success',
+  warning: 'warning',
 } as const
 
 const typeText = (schedule: ExamSchedule) =>
@@ -38,8 +38,6 @@ const typeText = (schedule: ExamSchedule) =>
     ? `${examTypeLabel(schedule.type)} · Susulan`
     : examTypeLabel(schedule.type)
 const classroomText = (schedule: ExamSchedule) => schedule.classroomName ?? '-'
-const windowText = (schedule: ExamSchedule) =>
-  formatWindow(schedule.startsAt, schedule.endsAt)
 const durationText = (schedule: ExamSchedule) =>
   `${schedule.durationMinutes} menit`
 
@@ -51,9 +49,19 @@ export function buildScheduleColumns(
 
   return [
     {
+      id: 'type',
+      header: 'Jenis',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jenis',
+        mobileValue: typeText,
+      },
+      cell: ({ row }) => typeText(row.original),
+    },
+    {
       id: 'package',
       header: 'Paket',
-      meta: { align: 'left', strong: true },
+      meta: { align: 'left', strong: true, mobile: 'title' },
       cell: ({ row }) =>
         row.original.kind === 'MAKEUP'
           ? h('span', { class: 'flex items-center gap-2' }, [
@@ -63,22 +71,44 @@ export function buildScheduleColumns(
           : row.original.packageTitle,
     },
     {
-      id: 'type',
-      header: 'Jenis',
-      meta: { mobileLabel: 'Jenis', mobileValue: typeText },
-      cell: ({ row }) => typeText(row.original),
-    },
-    {
       id: 'classroom',
       header: 'Kelas',
-      meta: { mobileLabel: 'Kelas', mobileValue: classroomText },
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: classroomText,
+      },
       cell: ({ row }) => classroomText(row.original),
     },
     {
-      id: 'window',
-      header: 'Waktu',
-      meta: { mobileLabel: 'Waktu', mobileValue: windowText },
-      cell: ({ row }) => windowText(row.original),
+      id: 'date',
+      header: 'Tanggal',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tanggal',
+        mobileValue: (row: ExamSchedule) => formatDay(row.startsAt),
+      },
+      cell: ({ row }) => formatDay(row.original.startsAt),
+    },
+    {
+      id: 'start',
+      header: 'Jam Mulai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jam Mulai',
+        mobileValue: (row: ExamSchedule) => formatTime(row.startsAt),
+      },
+      cell: ({ row }) => formatTime(row.original.startsAt),
+    },
+    {
+      id: 'end',
+      header: 'Jam Selesai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jam Selesai',
+        mobileValue: (row: ExamSchedule) => formatTime(row.endsAt),
+      },
+      cell: ({ row }) => formatTime(row.original.endsAt),
     },
     {
       id: 'duration',

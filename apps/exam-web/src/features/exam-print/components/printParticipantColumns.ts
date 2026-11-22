@@ -1,7 +1,6 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Button } from '@mts241alikhlash/ui/button'
-import { Eye } from '@lucide/vue'
+import { ActionCell } from '@mts241alikhlash/ui'
 
 export interface PrintParticipantRow {
   studentId: string
@@ -78,17 +77,12 @@ export function buildPrintParticipantColumns(options: {
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) =>
-        h(
-          Button,
-          {
-            size: 'icon',
-            variant: 'ghost',
-            'aria-label': 'Pratinjau',
-            title: 'Pratinjau',
-            onClick: () => options.onPreview(row.original),
-          },
-          () => h(Eye),
-        ),
+        h(ActionCell, {
+          viewLabel: 'Pratinjau',
+          hideEdit: true,
+          hideDelete: true,
+          onView: () => options.onPreview(row.original),
+        }),
     },
   ]
 

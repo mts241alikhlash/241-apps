@@ -169,11 +169,6 @@ describe('menu', () => {
             undefined,
             ['exam-events.read', 'exam-rooms.supervise'],
           ],
-          [
-            '/exam/room-cards',
-            undefined,
-            ['exam-events.read', 'exam-rooms.supervise'],
-          ],
           ['/exam/participant-numbers', 'exam-events.manage', undefined],
           ['/exam/activities', 'exam-schedules.manage', undefined],
           ['/exam/schedules', 'exam-schedules.read', undefined],

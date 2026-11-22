@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, h, onMounted, ref, useId, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { Plus } from '@lucide/vue'
+import type { ColumnDef } from '@tanstack/vue-table'
+import { Filter, PackagePlus, Plus } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { ActionCell, DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -12,10 +14,33 @@ import {
   CardTitle,
   CardFooter,
 } from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@mts241alikhlash/ui/select'
+import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { examTypeLabel } from '@/features/exam-shared/examType'
 import { examActivityApi } from '../api/examActivityApi'
 import AttachPackageDialog from '../components/AttachPackageDialog.vue'
-import { activityStatusLabel, type ExamActivityRecord } from '../types'
+import {
+  ACTIVITY_STATUSES,
+  activityStatusLabel,
+  type ActivityStatus,
+  type ExamActivityRecord,
+} from '../types'
 
 const router = useRouter()
 const { hasPermission } = useAuthSession()
@@ -31,16 +56,207 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const attachTarget = ref<ExamActivityRecord | null>(null)
 
-function formatWindow(item: ExamActivityRecord): string {
-  const fmt = new Intl.DateTimeFormat('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+const search = ref('')
+const statusFilter = ref<'ALL' | ActivityStatus>('ALL')
+const statusFieldId = useId()
+const mobileStatusFieldId = useId()
+const filterOpen = ref(false)
+const page = ref(1)
+const pageSize = ref(25)
+
+const STATUS_VARIANT = {
+  DRAFT: 'outline',
+  SCHEDULED: 'info',
+  ACTIVE: 'success',
+  CLOSED: 'secondary',
+} as const satisfies Record<ActivityStatus, string>
+
+const dateOnly = new Intl.DateTimeFormat('id-ID', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
+const timeOnly = new Intl.DateTimeFormat('id-ID', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+})
+const dateOf = (iso: string): string => dateOnly.format(new Date(iso))
+const timeOf = (iso: string): string => timeOnly.format(new Date(iso))
+
+const filtered = computed(() => {
+  const keyword = search.value.trim().toLocaleLowerCase('id')
+  return activities.value.filter((item) => {
+    if (statusFilter.value !== 'ALL' && item.status !== statusFilter.value) {
+      return false
+    }
+    if (!keyword) return true
+    return [
+      item.subjectName ?? '',
+      item.gradeName ?? '',
+      item.type ? examTypeLabel(item.type) : '',
+    ].some((value) => value.toLocaleLowerCase('id').includes(keyword))
   })
-  return `${fmt.format(new Date(item.startsAt))} – ${fmt.format(new Date(item.endsAt))}`
+})
+
+const paged = computed(() => {
+  const start = (page.value - 1) * pageSize.value
+  return filtered.value.slice(start, start + pageSize.value)
+})
+
+const activeFilters = computed(() => Number(statusFilter.value !== 'ALL'))
+
+function open(item: ExamActivityRecord) {
+  void router.push(`${sectionPrefix.value}/activities/${item.id}`)
 }
+
+const columns = computed<ColumnDef<ExamActivityRecord>[]>(() => [
+  {
+    id: 'type',
+    header: 'Jenis',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jenis',
+      mobileValue: (row: ExamActivityRecord) =>
+        row.type ? examTypeLabel(row.type) : '-',
+    },
+    cell: ({ row }) =>
+      row.original.type ? examTypeLabel(row.original.type) : '-',
+  },
+  {
+    id: 'subject',
+    header: 'Mata Pelajaran',
+    meta: {
+      mobile: 'title',
+      mobileValue: (row: ExamActivityRecord) => row.subjectName ?? 'Kegiatan',
+    },
+    cell: ({ row }) => row.original.subjectName ?? 'Kegiatan',
+  },
+  {
+    id: 'grade',
+    header: 'Tingkat',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Tingkat',
+      mobileValue: (row: ExamActivityRecord) => row.gradeName ?? '-',
+    },
+    cell: ({ row }) => row.original.gradeName ?? '-',
+  },
+  {
+    id: 'startDate',
+    header: 'Tanggal Mulai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Tanggal Mulai',
+      mobileValue: (row: ExamActivityRecord) => dateOf(row.startsAt),
+    },
+    cell: ({ row }) => dateOf(row.original.startsAt),
+  },
+  {
+    id: 'startTime',
+    header: 'Jam Mulai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Mulai',
+      mobileValue: (row: ExamActivityRecord) => timeOf(row.startsAt),
+    },
+    cell: ({ row }) => timeOf(row.original.startsAt),
+  },
+  {
+    id: 'endDate',
+    header: 'Tanggal Selesai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Tanggal Selesai',
+      mobileValue: (row: ExamActivityRecord) => dateOf(row.endsAt),
+    },
+    cell: ({ row }) => dateOf(row.original.endsAt),
+  },
+  {
+    id: 'endTime',
+    header: 'Jam Selesai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Selesai',
+      mobileValue: (row: ExamActivityRecord) => timeOf(row.endsAt),
+    },
+    cell: ({ row }) => timeOf(row.original.endsAt),
+  },
+  {
+    id: 'duration',
+    header: 'Durasi',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Durasi',
+      mobileValue: (row: ExamActivityRecord) => `${row.durationMinutes} menit`,
+    },
+    cell: ({ row }) => `${row.original.durationMinutes} menit`,
+  },
+  {
+    id: 'token',
+    header: 'Token',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Token',
+      mobileValue: (row: ExamActivityRecord) =>
+        row.tokenMode === 'ROTATING' ? 'Berputar' : 'Tetap',
+    },
+    cell: ({ row }) =>
+      row.original.tokenMode === 'ROTATING' ? 'Berputar' : 'Tetap',
+  },
+  {
+    id: 'package',
+    header: 'Paket',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Paket',
+      mobileValue: (row: ExamActivityRecord) =>
+        row.packageId === null ? 'Menunggu paket' : 'Terpasang',
+    },
+    cell: ({ row }) =>
+      row.original.packageId === null
+        ? h(Badge, { variant: 'warning' }, () => 'Menunggu paket')
+        : h(Badge, { variant: 'success' }, () => 'Terpasang'),
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Status',
+      mobileValue: (row: ExamActivityRecord) => activityStatusLabel(row.status),
+    },
+    cell: ({ row }) =>
+      h(Badge, { variant: STATUS_VARIANT[row.original.status] }, () =>
+        activityStatusLabel(row.original.status),
+      ),
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(ActionCell, {
+        manageLabel: 'Detail',
+        hideEdit: true,
+        hideDelete: true,
+        items:
+          row.original.packageId === null && canManage.value
+            ? [
+                {
+                  label: 'Pasang Paket',
+                  icon: PackagePlus,
+                  onClick: () => {
+                    attachTarget.value = row.original
+                  },
+                },
+              ]
+            : [],
+        onManage: () => open(row.original),
+      }),
+  },
+])
 
 async function load(): Promise<void> {
   loading.value = true
@@ -57,6 +273,23 @@ async function load(): Promise<void> {
   }
 }
 
+function changePageSize(size: number) {
+  pageSize.value = size
+  page.value = 1
+}
+
+function resetAll() {
+  search.value = ''
+  statusFilter.value = 'ALL'
+}
+
+watch(
+  [search, statusFilter],
+  () => {
+    page.value = 1
+  },
+  { flush: 'sync' },
+)
 watch(category, () => void load())
 onMounted(load)
 </script>
@@ -70,16 +303,16 @@ onMounted(load)
       <CardHeader standard>
         <CardTitle class="font-semibold">{{ heading }}</CardTitle>
         <Button
-          v-if="hasPermission('exam-schedules.manage')"
+          v-if="canManage"
           class="shrink-0"
           @click="router.push(`${sectionPrefix}/activities/new`)"
         >
           <Plus class="size-4" />
-          Buat kegiatan
+          Tambah
         </Button>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
         <div
           v-if="error !== null"
@@ -95,82 +328,148 @@ onMounted(load)
           </Button>
         </div>
 
-        <p
-          v-else-if="loading"
-          class="text-control text-muted-foreground"
-        >
-          Memuat daftar kegiatan…
-        </p>
-
-        <p
-          v-else-if="activities.length === 0"
-          class="py-8 text-center text-control text-muted-foreground"
-        >
-          Belum ada kegiatan pada seksi ini.
-        </p>
-
-        <ul
+        <DataTable
           v-else
-          class="divide-y rounded-md border"
+          mobile="cards"
+          :columns="columns"
+          :data="paged"
+          :page="page"
+          :page-size="pageSize"
+          :total-items="filtered.length"
+          :is-loading="loading"
+          item-label="kegiatan"
+          @update:page="page = $event"
+          @update:page-size="changePageSize"
         >
-          <li
-            v-for="item in activities"
-            :key="item.id"
-            class="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div class="min-w-0 space-y-1">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="font-medium">
-                  {{ item.type ? examTypeLabel(item.type) : 'Kegiatan' }}
-                </span>
-                <span
-                  class="rounded border px-2 py-0.5 text-xs text-muted-foreground"
+          <template #filters>
+            <FloatingLabelField
+              label="Status"
+              :for="statusFieldId"
+              class="w-fit min-w-28"
+              floating
+            >
+              <Select v-model="statusFilter">
+                <SelectTrigger
+                  :id="statusFieldId"
+                  class="w-full"
                 >
-                  {{ activityStatusLabel(item.status) }}
-                </span>
-                <span
-                  v-if="item.packageId === null"
-                  class="text-xs text-warning"
-                >
-                  Menunggu paket
-                </span>
-              </div>
-              <p
-                v-if="item.subjectName"
-                class="text-control font-medium"
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua</SelectItem>
+                  <SelectItem
+                    v-for="status in ACTIVITY_STATUSES"
+                    :key="status"
+                    :value="status"
+                  >
+                    {{ activityStatusLabel(status) }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+          </template>
+          <template #header-right>
+            <SearchInput
+              v-model="search"
+              class="sm:w-40"
+              label="Cari mapel atau tingkat"
+            />
+          </template>
+          <template #mobile-toolbar>
+            <SearchInput
+              v-model="search"
+              label="Cari mapel atau tingkat"
+              class="w-full"
+            />
+          </template>
+          <template #mobile-filter>
+            <Button
+              variant="outline"
+              class="relative shrink-0"
+              @click="filterOpen = true"
+            >
+              <Filter class="size-4" />
+              Filter
+              <span
+                v-if="activeFilters"
+                class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
               >
-                {{ item.subjectName
-                }}{{ item.gradeName ? ' · ' + item.gradeName : '' }}
-              </p>
-              <p class="text-control text-muted-foreground">
-                {{ formatWindow(item) }} · {{ item.durationMinutes }} menit ·
+                {{ activeFilters }}
+              </span>
+            </Button>
+          </template>
+          <template #empty>
+            <div class="space-y-3 text-center">
+              <p>
                 {{
-                  item.tokenMode === 'ROTATING'
-                    ? 'Token berputar'
-                    : 'Token tetap'
+                  search || activeFilters
+                    ? 'Tidak ada kegiatan yang cocok dengan filter.'
+                    : 'Belum ada kegiatan pada seksi ini.'
                 }}
               </p>
-            </div>
-            <div class="flex shrink-0 flex-wrap gap-2 self-start sm:self-auto">
               <Button
-                v-if="item.packageId === null && canManage"
+                v-if="search || activeFilters"
                 variant="outline"
-                @click="attachTarget = item"
+                @click="resetAll"
               >
-                Pasang paket
-              </Button>
-              <Button
-                variant="outline"
-                @click="router.push(`${sectionPrefix}/activities/${item.id}`)"
-              >
-                Detail
+                Atur Ulang
               </Button>
             </div>
-          </li>
-        </ul>
+          </template>
+        </DataTable>
       </CardContent>
       <CardFooter plain />
     </Card>
+
+    <Dialog v-model:open="filterOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Filter Kegiatan</DialogTitle>
+          <DialogDescription>
+            Filter kegiatan berdasarkan status
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <FloatingLabelField
+            label="Status"
+            :for="mobileStatusFieldId"
+            floating
+          >
+            <Select v-model="statusFilter">
+              <SelectTrigger
+                :id="mobileStatusFieldId"
+                class="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Semua</SelectItem>
+                <SelectItem
+                  v-for="status in ACTIVITY_STATUSES"
+                  :key="status"
+                  :value="status"
+                >
+                  {{ activityStatusLabel(status) }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
+        >
+          <Button
+            variant="outline"
+            @click="statusFilter = 'ALL'"
+          >
+            Atur Ulang
+          </Button>
+          <Button @click="filterOpen = false">Tutup</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     <AttachPackageDialog
       :open="attachTarget !== null"
       :activity="attachTarget"

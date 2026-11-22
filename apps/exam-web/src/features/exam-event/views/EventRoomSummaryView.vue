@@ -82,7 +82,9 @@ onMounted(() => {
       <CardContent
         class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 sm:p-4"
       >
-        <AcademicPeriodFilter v-model:semester-id="semesterId" />
+        <div class="flex flex-wrap items-end gap-2">
+          <AcademicPeriodFilter v-model:semester-id="semesterId" />
+        </div>
         <div
           v-if="loadFailed"
           class="space-y-3"

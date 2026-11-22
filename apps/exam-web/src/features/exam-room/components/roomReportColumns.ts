@@ -14,8 +14,7 @@ const timeFormat = new Intl.DateTimeFormat('id-ID', {
   hour12: false,
 })
 
-const slotRange = (startsAt: string, endsAt: string): string =>
-  `${timeFormat.format(new Date(startsAt))} - ${timeFormat.format(new Date(endsAt))}`
+const clock = (iso: string): string => timeFormat.format(new Date(iso))
 
 const FILE_UPLOADED = 'Berkas terunggah'
 
@@ -95,7 +94,7 @@ export function buildDayColumns(
     },
     {
       id: 'rooms',
-      header: 'Ruangan',
+      header: 'Jumlah Ruang',
       meta: {
         align: 'center',
         mobileValue: (row: DayGroup) => row.roomCount,
@@ -140,18 +139,26 @@ export function buildSubjectColumns(
       cell: ({ row }) => row.original.subjectName,
     },
     {
-      id: 'time',
-      header: 'Waktu',
+      id: 'start',
+      header: 'Jam Mulai',
       meta: {
         align: 'center',
-        mobileValue: (row: SubjectGroup) => slotRange(row.startsAt, row.endsAt),
+        mobileValue: (row: SubjectGroup) => clock(row.startsAt),
       },
-      cell: ({ row }) =>
-        h('span', slotRange(row.original.startsAt, row.original.endsAt)),
+      cell: ({ row }) => h('span', clock(row.original.startsAt)),
+    },
+    {
+      id: 'end',
+      header: 'Jam Selesai',
+      meta: {
+        align: 'center',
+        mobileValue: (row: SubjectGroup) => clock(row.endsAt),
+      },
+      cell: ({ row }) => h('span', clock(row.original.endsAt)),
     },
     {
       id: 'rooms',
-      header: 'Ruangan',
+      header: 'Jumlah Ruang',
       meta: {
         align: 'center',
         mobileValue: (row: SubjectGroup) => row.roomCount,
@@ -160,7 +167,7 @@ export function buildSubjectColumns(
     },
     {
       id: 'participants',
-      header: 'Peserta',
+      header: 'Jumlah Peserta',
       meta: {
         align: 'center',
         mobileValue: (row: SubjectGroup) => row.participantCount,
@@ -214,10 +221,10 @@ export function buildRoomReportColumns(
     },
     {
       id: 'registered',
-      header: 'Peserta',
+      header: 'Jumlah Peserta',
       meta: {
         align: 'center',
-        mobileLabel: 'Peserta',
+        mobileLabel: 'Jumlah Peserta',
         mobileValue: (row: RoomReportSummary) => String(row.registeredCount),
       },
       cell: ({ row }) => h('span', String(row.original.registeredCount)),

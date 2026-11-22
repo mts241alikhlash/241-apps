@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, h, onMounted, ref, useId } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { ColumnDef } from '@tanstack/vue-table'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { DataTable } from '@mts241alikhlash/ui'
+import { ActionCell, BackButton, DataTable } from '@mts241alikhlash/ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,16 +39,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { Filter, Plus } from '@lucide/vue'
+import { Filter, Plus, Printer } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
+import { examEventService } from '@/features/exam-event/services/examEventService'
 import { buildScheduleColumns } from '../components/scheduleColumns'
 import MakeupDialog from '../components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '../components/MakeupParticipantsDialog.vue'
 import AccessCodeDialog from '../components/AccessCodeDialog.vue'
 import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
-import TimetablePanel from '@/features/exam-activity/components/TimetablePanel.vue'
+import { examActivityApi } from '@/features/exam-activity/api/examActivityApi'
+import {
+  buildTimetable,
+  timetableHtml,
+} from '@/features/exam-activity/utils/buildTimetable'
 import { useScheduleList } from '../composables/useScheduleList'
 import { examScheduleService } from '../services/examScheduleService'
+import {
+  NO_PERIOD,
+  dayKeyOf,
+  groupDays,
+  groupPeriods,
+  periodKeyOf,
+  type DayGroup,
+  type PeriodGroup,
+} from '../utils/groupSchedules'
 import { SCHEDULE_STATUSES, scheduleStatusLabel } from '../types'
 import type { ExamSchedule } from '../types'
 
@@ -56,20 +73,105 @@ const { hasPermission } = useAuthSession()
 
 const { category, sectionPrefix } = useRouteCategory()
 
+const route = useRoute()
+
 const status = ref('ALL')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(1000)
 
-const { schedules, totalItems, loading, listError, filtersPending, refresh } =
+const { schedules, loading, listError, filtersPending, refresh } =
   useScheduleList({ status, category }, page, pageSize)
 
-watch(
-  status,
-  () => {
-    page.value = 1
-  },
-  { flush: 'sync' },
+const periodNames = ref(new Map<string, string>())
+
+const queryValue = (name: string): string | null => {
+  const raw = route.query[name]
+  const value = Array.isArray(raw) ? raw[0] : raw
+  return typeof value === 'string' && value !== '' ? value : null
+}
+
+const periodId = computed(() => queryValue('periode'))
+const dayId = computed(() => queryValue('hari'))
+
+const hasPeriods = computed(() =>
+  schedules.value.some((item) => item.eventId !== null),
 )
+
+const level = computed<'period' | 'day' | 'schedule'>(() => {
+  if (hasPeriods.value && periodId.value === null) return 'period'
+  if (dayId.value === null) return 'day'
+  return 'schedule'
+})
+
+const inPeriod = computed(() =>
+  hasPeriods.value && periodId.value !== null
+    ? schedules.value.filter((item) => periodKeyOf(item) === periodId.value)
+    : schedules.value,
+)
+
+const periodName = (id: string): string =>
+  id === NO_PERIOD
+    ? 'Tanpa periode'
+    : (periodNames.value.get(id) ?? 'Periode ujian')
+
+const dateText = new Intl.DateTimeFormat('id-ID', {
+  timeZone: 'Asia/Jakarta',
+  dateStyle: 'long',
+})
+
+const levelTitle = computed(() => {
+  if (level.value === 'period') return 'Jadwal Ujian'
+  if (level.value === 'day') {
+    return periodId.value !== null ? periodName(periodId.value) : 'Jadwal Ujian'
+  }
+  const day = inPeriod.value.find(
+    (item) => dayKeyOf(item.startsAt) === dayId.value,
+  )
+  return day ? dateText.format(new Date(day.startsAt)) : 'Jadwal Ujian'
+})
+
+const itemLabel = computed(() =>
+  level.value === 'period'
+    ? 'periode'
+    : level.value === 'day'
+      ? 'hari'
+      : 'jadwal',
+)
+
+function go(periode: string | null, hari: string | null = null) {
+  const query: Record<string, string> = {}
+  if (periode !== null) query.periode = periode
+  if (periode !== null && hari !== null) query.hari = hari
+  if (periode === null && hari !== null) query.hari = hari
+  void router.push({ path: route.path, query })
+}
+
+function goBack() {
+  if (level.value === 'schedule') {
+    go(hasPeriods.value ? periodId.value : null)
+  } else if (level.value === 'day' && hasPeriods.value) go(null)
+}
+
+const backLabel = computed(() =>
+  level.value === 'schedule'
+    ? 'Kembali ke daftar hari'
+    : 'Kembali ke semua periode',
+)
+
+useBreadcrumbs(() => [
+  { title: 'Ujian', href: '#' },
+  { title: 'Jadwal Ujian', href: route.path },
+  ...(levelTitle.value !== 'Jadwal Ujian' ? [{ title: levelTitle.value }] : []),
+])
+
+onMounted(async () => {
+  const result = await examEventService.loadEvents({ limit: 1000 })
+  if (result.success) {
+    periodNames.value = new Map(
+      result.data.map((event) => [event.id, event.name]),
+    )
+  }
+})
 
 const statusFieldId = useId()
 const formOpen = ref(false)
@@ -103,12 +205,26 @@ async function confirmCancel() {
   }
 }
 
-function changePageSize(size: number) {
-  pageSize.value = size
-  page.value = 1
+async function printTimetable() {
+  const popup = window.open('', '_blank')
+  if (popup === null) return
+  try {
+    const activities = await examActivityApi.list(
+      category.value ? { category: category.value } : undefined,
+    )
+    popup.document.write(
+      timetableHtml(buildTimetable(activities), 'Jadwal Ujian'),
+    )
+    popup.document.close()
+    popup.focus()
+    popup.print()
+  } catch {
+    popup.close()
+    toast.error('Jadwal mapel tidak dapat dimuat.')
+  }
 }
 
-const columns = computed(() =>
+const scheduleColumns = computed(() =>
   buildScheduleColumns({
     canUpdate: hasPermission('exam-schedules.update'),
     canCancel: hasPermission('exam-schedules.cancel'),
@@ -148,6 +264,104 @@ const columns = computed(() =>
     },
   }),
 )
+
+const manageCell = (open: () => void) =>
+  h(ActionCell, {
+    manageLabel: 'Lihat',
+    hideEdit: true,
+    hideDelete: true,
+    onManage: open,
+  })
+
+const periodColumns: ColumnDef<PeriodGroup>[] = [
+  {
+    id: 'name',
+    header: 'Periode Ujian',
+    meta: {
+      mobile: 'title',
+      mobileValue: (row: PeriodGroup) => periodName(row.id),
+    },
+    cell: ({ row }) => periodName(row.original.id),
+  },
+  {
+    id: 'days',
+    header: 'Jumlah Hari',
+    meta: { align: 'center', mobileValue: (row: PeriodGroup) => row.dayCount },
+    cell: ({ row }) => String(row.original.dayCount),
+  },
+  {
+    id: 'count',
+    header: 'Jumlah Jadwal',
+    meta: {
+      align: 'center',
+      mobileValue: (row: PeriodGroup) => row.scheduleCount,
+    },
+    cell: ({ row }) => String(row.original.scheduleCount),
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) => manageCell(() => go(row.original.id)),
+  },
+]
+
+const dayColumns: ColumnDef<DayGroup>[] = [
+  {
+    id: 'date',
+    header: 'Tanggal',
+    meta: {
+      mobile: 'title',
+      mobileValue: (row: DayGroup) => dateText.format(new Date(row.startsAt)),
+    },
+    cell: ({ row }) => dateText.format(new Date(row.original.startsAt)),
+  },
+  {
+    id: 'subjects',
+    header: 'Jumlah Mapel',
+    meta: { align: 'center', mobileValue: (row: DayGroup) => row.subjectCount },
+    cell: ({ row }) => String(row.original.subjectCount),
+  },
+  {
+    id: 'count',
+    header: 'Jumlah Jadwal',
+    meta: {
+      align: 'center',
+      mobileValue: (row: DayGroup) => row.scheduleCount,
+    },
+    cell: ({ row }) => String(row.original.scheduleCount),
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      manageCell(() =>
+        go(hasPeriods.value ? periodId.value : null, row.original.id),
+      ),
+  },
+]
+
+const rows = computed<(PeriodGroup | DayGroup | ExamSchedule)[]>(() => {
+  if (level.value === 'period') return groupPeriods(schedules.value)
+  if (level.value === 'day') return groupDays(inPeriod.value)
+  return inPeriod.value.filter(
+    (item) => dayKeyOf(item.startsAt) === dayId.value,
+  )
+})
+
+const columns = computed(
+  () =>
+    (level.value === 'period'
+      ? periodColumns
+      : level.value === 'day'
+        ? dayColumns
+        : scheduleColumns.value.filter(
+            (column) => column.id !== 'date',
+          )) as unknown as ColumnDef<PeriodGroup | DayGroup | ExamSchedule>[],
+)
 </script>
 
 <template>
@@ -157,23 +371,35 @@ const columns = computed(() =>
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle class="font-semibold">Jadwal Ujian</CardTitle>
-        <Button
-          v-if="hasPermission('exam-schedules.create')"
-          class="shrink-0"
-          @click="openCreate"
-        >
-          <Plus class="size-4" />
-          Tambah
-        </Button>
+        <div class="flex items-center gap-3">
+          <BackButton
+            v-if="level !== 'period' && (level === 'schedule' || hasPeriods)"
+            :label="backLabel"
+            @click="goBack"
+          />
+          <CardTitle class="font-semibold">{{ levelTitle }}</CardTitle>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <Button
+            v-if="hasPermission('exam-schedules.manage')"
+            variant="outline"
+            @click="printTimetable"
+          >
+            <Printer class="size-4" />
+            Cetak
+          </Button>
+          <Button
+            v-if="hasPermission('exam-schedules.create')"
+            @click="openCreate"
+          >
+            <Plus class="size-4" />
+            Tambah
+          </Button>
+        </div>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
-        <TimetablePanel
-          v-if="hasPermission('exam-schedules.manage')"
-          :category="category"
-        />
         <div
           v-if="listError"
           class="space-y-3 rounded-md border p-4"
@@ -193,17 +419,14 @@ const columns = computed(() =>
           v-else
           mobile="cards"
           :columns="columns"
-          :data="filtersPending ? [] : schedules"
-          :page="page"
-          :page-size="pageSize"
-          :total-items="totalItems"
+          :data="filtersPending ? [] : rows"
+          hide-pagination
           :is-loading="loading || filtersPending"
-          item-label="jadwal"
-          @update:page="page = $event"
-          @update:page-size="changePageSize"
+          :item-label="itemLabel"
         >
           <template #filters>
             <FloatingLabelField
+              v-if="level === 'schedule'"
               label="Status"
               :for="statusFieldId"
               class="w-fit min-w-28"
@@ -231,6 +454,7 @@ const columns = computed(() =>
           </template>
           <template #mobile-filter>
             <Button
+              v-if="level === 'schedule'"
               variant="outline"
               class="relative shrink-0"
               @click="filterOpen = true"
@@ -320,6 +544,12 @@ const columns = computed(() =>
       v-model:open="formOpen"
       :schedule="editing"
       :category="category"
+      :event-id="
+        hasPeriods && periodId !== null && periodId !== NO_PERIOD
+          ? periodId
+          : undefined
+      "
+      :date="level === 'schedule' ? (dayId ?? undefined) : undefined"
       @saved="refresh()"
     />
 

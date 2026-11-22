@@ -1,7 +1,8 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
+import { ActionCell } from '@mts241alikhlash/ui'
+import { Trash2 } from '@lucide/vue'
 import type { MakeupParticipant } from '../types'
 import { participantStatusLabel, reasonLabel } from '../types'
 
@@ -60,15 +61,18 @@ export function buildParticipantColumns(
         options.canRemove &&
         (row.original.status === 'WAITING' ||
           row.original.status === 'SAT_REGULAR')
-          ? h(
-              Button,
-              {
-                size: 'sm',
-                variant: 'outline',
-                onClick: () => options.onRemove(row.original),
-              },
-              () => 'Hapus',
-            )
+          ? h(ActionCell, {
+              hideEdit: true,
+              hideDelete: true,
+              items: [
+                {
+                  label: 'Hapus',
+                  icon: Trash2,
+                  destructive: true,
+                  onClick: () => options.onRemove(row.original),
+                },
+              ],
+            })
           : null,
     },
   ]

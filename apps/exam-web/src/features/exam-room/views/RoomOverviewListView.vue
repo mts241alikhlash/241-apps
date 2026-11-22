@@ -49,7 +49,7 @@ const pageSize = ref(10)
 
 useBreadcrumbs(() => [
   { title: 'Ujian', href: '#' },
-  { title: 'Ruang Ujian', href: '/exam/rooms' },
+  { title: 'Monitoring', href: '/exam/rooms' },
 ])
 
 const activeFiltersCount = computed(() => Number(statusFilter.value !== 'ALL'))
@@ -142,7 +142,7 @@ onMounted(load)
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle class="font-semibold">Ruang Ujian</CardTitle>
+        <CardTitle class="font-semibold">Monitoring</CardTitle>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"

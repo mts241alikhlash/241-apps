@@ -70,11 +70,6 @@ export const menuSections: MenuSection[] = [
             requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
           },
           {
-            title: 'menu.examRoomCards',
-            url: '/exam/room-cards',
-            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
-          },
-          {
             title: 'menu.examParticipantNumbers',
             url: '/exam/participant-numbers',
             requiredPermission: 'exam-events.manage',

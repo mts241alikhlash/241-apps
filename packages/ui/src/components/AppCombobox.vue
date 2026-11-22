@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
 } from '@mts241alikhlash/ui/popover'
 import { cn } from '@mts241alikhlash/web-shared/utils/utils'
-import { Check, ChevronsUpDown } from '@lucide/vue'
+import { Check, ChevronDown } from '@lucide/vue'
 import { computed, ref } from 'vue'
 
 export interface ComboboxOption {
@@ -73,7 +73,7 @@ function onSelect(val: string) {
         "
       >
         <span class="truncate">{{ selectedLabel || placeholder }}</span>
-        <ChevronsUpDown
+        <ChevronDown
           class="ml-2 size-[var(--icon-control,0.875rem)] shrink-0 opacity-50"
         />
       </Button>

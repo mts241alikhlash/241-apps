@@ -1,7 +1,8 @@
 import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Button } from '@mts241alikhlash/ui/button'
+import { ActionCell } from '@mts241alikhlash/ui'
+import { History, Laptop, RefreshCw } from '@lucide/vue'
 import type { ScheduleSession } from '../types'
 import { sessionStatusLabel } from '../types'
 
@@ -109,49 +110,32 @@ export function buildSessionColumns(
       enableSorting: false,
       cell: ({ row }) => {
         const session = row.original
-        const buttons = []
+        const items = []
         if (options.canRelease && session.status === 'IN_PROGRESS') {
-          buttons.push(
-            h(
-              Button,
-              {
-                size: 'sm',
-                variant: 'outline',
-                onClick: () => options.onRelease(session),
-              },
-              () => 'Lepas Sesi',
-            ),
-          )
+          items.push({
+            label: 'Lepas Sesi',
+            icon: Laptop,
+            onClick: () => options.onRelease(session),
+          })
         }
         if (options.canRecover && options.onReset) {
-          buttons.push(
-            h(
-              Button,
-              {
-                size: 'sm',
-                variant: 'outline',
-                onClick: () => options.onReset?.(session),
-              },
-              () => 'Reset',
-            ),
-          )
+          items.push({
+            label: 'Reset',
+            icon: RefreshCw,
+            destructive: true,
+            onClick: () => options.onReset?.(session),
+          })
         }
         if (options.canReadHistory && options.onHistory) {
-          buttons.push(
-            h(
-              Button,
-              {
-                size: 'sm',
-                variant: 'ghost',
-                onClick: () => options.onHistory?.(session),
-              },
-              () => 'Riwayat',
-            ),
-          )
+          items.push({
+            label: 'Riwayat',
+            icon: History,
+            onClick: () => options.onHistory?.(session),
+          })
         }
-        return buttons.length === 0
+        return items.length === 0
           ? null
-          : h('div', { class: 'flex flex-wrap gap-2' }, buttons)
+          : h(ActionCell, { hideEdit: true, hideDelete: true, items })
       },
     },
   ]

@@ -1,5 +1,42 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import {
+  AppCombobox,
+  FormattedNumberInput,
+  DatePicker,
+} from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
+import { Button } from '@mts241alikhlash/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@mts241alikhlash/ui/command'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@mts241alikhlash/ui/popover'
+import { Check, ChevronDown } from '@lucide/vue'
+import {
+  FloatingField,
+  FloatingLabelField,
+  FormControl,
+} from '@mts241alikhlash/ui/form'
+import { Input } from '@mts241alikhlash/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@mts241alikhlash/ui/select'
 import {
   categoryOf,
   examTypeLabel,
@@ -7,6 +44,7 @@ import {
   type ExamCategory,
   type ExamType,
 } from '@/features/exam-shared/examType'
+import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
@@ -25,7 +63,6 @@ import {
   ACTIVITY_TOKEN_MODES,
   activityStatusLabel,
 } from '../types'
-import { messageOf } from '@/features/exam-package/utils/messageOf'
 
 const props = defineProps<{
   semesterId: string
@@ -91,83 +128,189 @@ const noTypeAvailable = computed(() => availableTypes.value.length === 0)
 
 const nonExamPresetTypes: readonly PresetName[] = ['DAILY', 'ASSIGNMENT']
 
-const gradeId = ref('')
-const classroomIds = ref<string[]>([])
-const packageId = ref('')
-const subjectId = ref('')
-const eventId = ref('')
-const type = ref<ExamType>(availableTypes.value[0] ?? 'DAILY')
-const presetName = ref<PresetName>(type.value)
-const tokenMode = ref<ActivityTokenMode>('ROTATING')
-const startsAt = ref('')
-const endsAt = ref('')
-const durationMinutes = ref(90)
+const combine = (date: string, time: string): number =>
+  new Date(`${date}T${time}`).getTime()
 
-const isExamType = computed(() => categoryOf(type.value) === 'EXAM')
+const formSchema = toTypedSchema(
+  z
+    .object({
+      gradeId: z.string().min(1, 'Tingkat wajib dipilih'),
+      classroomIds: z.array(z.string()),
+      packageId: z.string(),
+      subjectId: z.string().min(1, 'Mata pelajaran wajib dipilih'),
+      type: z.string().min(1, 'Jenis wajib dipilih'),
+      eventId: z.string(),
+      presetName: z.string(),
+      tokenMode: z.string(),
+      startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
+      startTime: z.string().min(1, 'Jam mulai wajib diisi'),
+      endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
+      endTime: z.string().min(1, 'Jam selesai wajib diisi'),
+      durationMinutes: z
+        .number({ invalid_type_error: 'Durasi minimal 1 menit' })
+        .int('Durasi minimal 1 menit')
+        .min(1, 'Durasi minimal 1 menit')
+        .max(1440, 'Durasi maksimal 1440 menit'),
+    })
+    .superRefine((value, ctx) => {
+      if (value.packageId !== '' && value.classroomIds.length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['classroomIds'],
+          message: 'Pilih minimal satu kelas',
+        })
+      }
+      if (
+        value.type !== '' &&
+        categoryOf(value.type as ExamType) === 'EXAM' &&
+        value.eventId === ''
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['eventId'],
+          message: 'Periode ujian wajib dipilih',
+        })
+      }
+      if (
+        value.startDate !== '' &&
+        value.startTime !== '' &&
+        value.endDate !== '' &&
+        value.endTime !== '' &&
+        combine(value.endDate, value.endTime) <=
+          combine(value.startDate, value.startTime)
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['endTime'],
+          message: 'Waktu selesai harus setelah waktu mulai',
+        })
+      }
+    }),
+)
+
+const { handleSubmit, values, setFieldValue } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    gradeId: '',
+    classroomIds: [] as string[],
+    packageId: '',
+    subjectId: '',
+    type: availableTypes.value[0] ?? 'DAILY',
+    eventId: '',
+    presetName: availableTypes.value[0] ?? 'DAILY',
+    tokenMode: 'ROTATING',
+    startDate: '',
+    startTime: '',
+    endDate: '',
+    endTime: '',
+    durationMinutes: 90,
+  },
+})
+
+const isExamType = computed(
+  () => categoryOf(values.type as ExamType) === 'EXAM',
+)
 
 const filteredEvents = computed(() =>
-  (props.events ?? []).filter((event) => event.type === type.value),
+  (props.events ?? []).filter((event) => event.type === values.type),
+)
+
+const visibleClassrooms = computed(() =>
+  props.classrooms.filter((room) => room.gradeId === values.gradeId),
+)
+
+const chosenPackage = computed(
+  () => props.packages.find((item) => item.id === values.packageId) ?? null,
 )
 
 watch(
   availableTypes,
   (options) => {
-    if (options.length > 0 && !options.includes(type.value)) {
-      type.value = options[0]
+    if (options.length > 0 && !options.includes(values.type as ExamType)) {
+      setFieldValue('type', options[0])
     }
   },
   { immediate: true },
 )
 
 watch(
-  type,
+  () => values.type,
   (nextType) => {
-    presetName.value = nextType
-    if (categoryOf(nextType) === 'EXAM') {
-      tokenMode.value = 'ROTATING'
+    setFieldValue('presetName', nextType ?? 'DAILY')
+    if (categoryOf(nextType as ExamType) === 'EXAM') {
+      setFieldValue('tokenMode', 'ROTATING')
       const matching = (props.events ?? []).filter(
         (event) => event.type === nextType,
       )
-      if (!matching.some((event) => event.id === eventId.value)) {
-        eventId.value = matching[0]?.id ?? ''
+      if (!matching.some((event) => event.id === values.eventId)) {
+        setFieldValue('eventId', matching[0]?.id ?? '')
       }
     } else {
-      eventId.value = ''
+      setFieldValue('eventId', '')
     }
   },
   { immediate: true },
 )
 
-const visibleClassrooms = computed(() =>
-  props.classrooms.filter((room) => room.gradeId === gradeId.value),
+watch(
+  () => values.subjectId,
+  () => setFieldValue('packageId', ''),
 )
 
-const chosenPackage = computed(
-  () => props.packages.find((item) => item.id === packageId.value) ?? null,
+watch(
+  () => values.gradeId,
+  () => setFieldValue('classroomIds', []),
 )
 
-const canSubmit = computed(
-  () =>
-    !noTypeAvailable.value &&
-    gradeId.value !== '' &&
-    (packageId.value === ''
-      ? subjectId.value !== ''
-      : classroomIds.value.length > 0 && chosenPackage.value !== null) &&
-    (!isExamType.value || eventId.value !== '') &&
-    startsAt.value !== '' &&
-    endsAt.value !== '' &&
-    durationMinutes.value > 0,
+const periodOptions = computed(() =>
+  filteredEvents.value.map((event) => ({ value: event.id, label: event.name })),
+)
+const packageOptions = computed(() =>
+  props.packages
+    .filter((item) => !values.subjectId || item.subjectId === values.subjectId)
+    .map((item) => ({ value: item.id, label: item.label })),
+)
+const subjectOptions = computed(() =>
+  (props.subjects ?? []).map((item) => ({ value: item.id, label: item.label })),
 )
 
-watch(gradeId, () => {
-  classroomIds.value = []
-})
-
-function toggleClassroom(id: string, checked: boolean): void {
-  classroomIds.value = checked
-    ? [...classroomIds.value, id]
-    : classroomIds.value.filter((item) => item !== id)
+function classroomSummary(ids: string[]): string {
+  if (values.gradeId === '') return 'Pilih tingkat dulu'
+  if (visibleClassrooms.value.length === 0) return 'Belum ada kelas aktif'
+  if (ids.length === 0) return 'Pilih kelas'
+  return props.classrooms
+    .filter((room) => ids.includes(room.id))
+    .map((room) => room.label)
+    .join(', ')
 }
+
+function toggleClassroom(
+  current: string[],
+  id: string,
+  checked: boolean,
+  update: (next: string[]) => void,
+) {
+  update(checked ? [...current, id] : current.filter((item) => item !== id))
+}
+
+const onSubmit = handleSubmit((form) => {
+  const item = chosenPackage.value
+  const exam = categoryOf(form.type as ExamType) === 'EXAM'
+  emit('submit', {
+    semesterId: props.semesterId,
+    ...(exam && form.eventId !== '' ? { eventId: form.eventId } : {}),
+    gradeId: form.gradeId,
+    subjectId: item?.subjectId ?? form.subjectId,
+    ...(item !== null ? { packageId: item.id } : {}),
+    type: form.type as ExamType,
+    classroomIds: [...form.classroomIds],
+    presetName: (exam ? form.type : form.presetName) as PresetName,
+    tokenMode: (exam ? 'ROTATING' : form.tokenMode) as ActivityTokenMode,
+    startsAt: new Date(`${form.startDate}T${form.startTime}`).toISOString(),
+    endsAt: new Date(`${form.endDate}T${form.endTime}`).toISOString(),
+    durationMinutes: form.durationMinutes,
+  })
+})
 
 async function saveStatus(): Promise<void> {
   const item = props.activity
@@ -206,47 +349,31 @@ async function issueNumbers(): Promise<void> {
     issuingNumbers.value = false
   }
 }
-
-async function submit(): Promise<void> {
-  if (isEdit.value) {
-    await saveStatus()
-    return
-  }
-  if (!canSubmit.value) return
-  const item = chosenPackage.value
-  emit('submit', {
-    semesterId: props.semesterId,
-    ...(isExamType.value && eventId.value !== ''
-      ? { eventId: eventId.value }
-      : {}),
-    gradeId: gradeId.value,
-    subjectId: item?.subjectId ?? subjectId.value,
-    ...(item !== null ? { packageId: item.id } : {}),
-    type: type.value,
-    classroomIds: [...classroomIds.value],
-    presetName: isExamType.value ? type.value : presetName.value,
-    tokenMode: isExamType.value ? 'ROTATING' : tokenMode.value,
-    startsAt: new Date(startsAt.value).toISOString(),
-    endsAt: new Date(endsAt.value).toISOString(),
-    durationMinutes: durationMinutes.value,
-  })
-}
 </script>
 
 <template>
   <form
-    class="grid gap-4"
-    @submit.prevent="submit"
+    v-if="isEdit"
+    id="activity-form"
+    class="grid gap-4 sm:grid-cols-2"
+    @submit.prevent="saveStatus"
   >
-    <template v-if="isEdit">
-      <label class="grid gap-1">
-        <span>Status kegiatan</span>
-        <select
+    <FloatingLabelField
+      label="Status kegiatan"
+      for="activity-status"
+      class="sm:col-span-2"
+      floating
+    >
+      <Select v-model="status">
+        <SelectTrigger
           id="activity-status"
-          v-model="status"
+          class="w-full"
           :title="needsPackage ? 'Pasang paket soal dulu' : undefined"
         >
-          <option
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem
             v-for="value in ACTIVITY_STATUSES"
             :key="value"
             :value="value"
@@ -255,262 +382,417 @@ async function submit(): Promise<void> {
             "
           >
             {{ activityStatusLabel(value) }}
-          </option>
-        </select>
-      </label>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </FloatingLabelField>
 
-      <p
-        v-if="statusWarning"
-        role="status"
-      >
+    <Alert
+      v-if="statusWarning"
+      class="sm:col-span-2"
+    >
+      <AlertDescription>
         Kegiatan aktif, tetapi sekarang di luar jendela waktu. Siswa belum bisa
         masuk sampai jendela dibuka.
-      </p>
+      </AlertDescription>
+    </Alert>
 
-      <p
-        v-if="statusError !== null"
-        role="alert"
-      >
-        {{ statusError }}
-      </p>
+    <Alert
+      v-if="statusError !== null"
+      variant="destructive"
+      class="sm:col-span-2"
+    >
+      <AlertDescription>{{ statusError }}</AlertDescription>
+    </Alert>
 
-      <button
+    <div class="flex gap-2 sm:col-span-2">
+      <Button
         type="button"
+        variant="outline"
         :disabled="issuingNumbers"
         @click="issueNumbers"
       >
         {{ issuingNumbers ? 'Menerbitkan…' : 'Terbitkan nomor peserta' }}
-      </button>
-    </template>
+      </Button>
+    </div>
+  </form>
 
-    <template v-else>
-      <label class="grid gap-1">
-        <span>Tingkat</span>
-        <select
-          id="activity-grade"
-          v-model="gradeId"
-        >
-          <option value="">Pilih tingkat</option>
-          <option
-            v-for="grade in grades"
-            :key="grade.id"
-            :value="grade.id"
-          >
-            {{ grade.label }}
-          </option>
-        </select>
-      </label>
-
-      <fieldset class="grid gap-1">
-        <legend>Kelas yang ikut</legend>
-        <p v-if="gradeId === ''">Pilih tingkat dulu.</p>
-        <p v-else-if="visibleClassrooms.length === 0">
-          Belum ada kelas aktif pada tingkat ini.
-        </p>
-        <label
-          v-for="room in visibleClassrooms"
-          :key="room.id"
-          class="flex items-center gap-2"
-        >
-          <input
-            type="checkbox"
-            :value="room.id"
-            :checked="classroomIds.includes(room.id)"
-            @change="
-              toggleClassroom(
-                room.id,
-                ($event.target as HTMLInputElement).checked,
-              )
-            "
-          />
-          <span>{{ room.label }}</span>
-        </label>
-      </fieldset>
-
-      <label class="grid gap-1">
-        <span>Paket soal</span>
-        <select
-          id="activity-package"
-          v-model="packageId"
-        >
-          <option value="">Pilih paket</option>
-          <option
-            v-for="item in packages"
-            :key="item.id"
-            :value="item.id"
-          >
-            {{ item.label }}
-          </option>
-        </select>
-        <span class="text-control text-muted-foreground">
-          Boleh dikosongkan, paket bisa dipasang nanti
-        </span>
-      </label>
-
-      <label
-        v-if="packageId === ''"
-        class="grid gap-1"
-      >
-        <span>Mata pelajaran</span>
-        <select
-          id="activity-subject"
-          v-model="subjectId"
-        >
-          <option value="">Pilih mata pelajaran</option>
-          <option
-            v-for="item in subjects ?? []"
-            :key="item.id"
-            :value="item.id"
-          >
-            {{ item.label }}
-          </option>
-        </select>
-      </label>
-
-      <p
-        v-if="noTypeAvailable"
-        role="alert"
-      >
+  <form
+    v-else
+    id="activity-form"
+    class="grid gap-4 sm:grid-cols-2"
+    @submit.prevent="onSubmit"
+  >
+    <Alert
+      v-if="noTypeAvailable"
+      variant="destructive"
+      class="sm:col-span-2"
+    >
+      <AlertDescription>
         Belum ada periode UTS yang aktif. Minta tata usaha atau kurikulum
         membuka periode UTS sebelum membuat kegiatan ujian.
-      </p>
+      </AlertDescription>
+    </Alert>
 
-      <label class="grid gap-1">
-        <span>Jenis</span>
-        <select
-          id="activity-type"
-          v-model="type"
-        >
-          <option
-            v-for="value in availableTypes"
-            :key="value"
-            :value="value"
-          >
-            {{ examTypeLabel(value) }}
-          </option>
-        </select>
-      </label>
-
-      <label
-        v-if="isExamType"
-        class="grid gap-1"
-      >
-        <span>Periode ujian</span>
-        <select
-          id="activity-event"
-          v-model="eventId"
-        >
-          <option value="">Pilih periode ujian</option>
-          <option
-            v-for="event in filteredEvents"
-            :key="event.id"
-            :value="event.id"
-          >
-            {{ event.name }}
-          </option>
-        </select>
-      </label>
-
-      <div
-        v-if="isExamType"
-        class="grid gap-1"
-      >
-        <span>Preset kebijakan</span>
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
-          Kebijakan {{ examTypeLabel(type) }}
-        </p>
-      </div>
-      <label
-        v-else
-        class="grid gap-1"
-      >
-        <span>Preset kebijakan</span>
-        <select
-          id="activity-preset"
-          v-model="presetName"
-        >
-          <option
-            v-for="name in nonExamPresetTypes"
-            :key="name"
-            :value="name"
-          >
-            {{ examTypeLabel(name) }}
-          </option>
-        </select>
-      </label>
-
-      <div
-        v-if="isExamType"
-        class="grid gap-1"
-      >
-        <span>Jenis token</span>
-        <p
-          class="text-[length:var(--text-control,0.75rem)] text-muted-foreground"
-        >
-          Token berputar
-        </p>
-      </div>
-      <label
-        v-else
-        class="grid gap-1"
-      >
-        <span>Jenis token</span>
-        <select
-          id="activity-token-mode"
-          v-model="tokenMode"
-        >
-          <option
-            v-for="value in ACTIVITY_TOKEN_MODES"
-            :key="value"
-            :value="value"
-          >
-            {{ value === 'ROTATING' ? 'Token berputar' : 'Token tetap' }}
-          </option>
-        </select>
-      </label>
-
-      <div class="grid gap-4 sm:grid-cols-3">
-        <label class="grid gap-1">
-          <span>Mulai</span>
-          <input
-            v-model="startsAt"
-            type="datetime-local"
-          />
-        </label>
-        <label class="grid gap-1">
-          <span>Selesai</span>
-          <input
-            v-model="endsAt"
-            type="datetime-local"
-          />
-        </label>
-        <label class="grid gap-1">
-          <span>Durasi (menit)</span>
-          <input
-            v-model.number="durationMinutes"
-            type="number"
-            min="1"
-            max="1440"
-          />
-        </label>
-      </div>
-
-      <fieldset
-        v-if="isAdmin"
-        class="grid gap-1"
-      >
-        <legend>Lanjutan (admin)</legend>
-        <p>Angka penegakan diubah lewat preset atau sesudah kegiatan dibuat.</p>
-      </fieldset>
-    </template>
-
-    <button
-      type="submit"
-      :disabled="isEdit ? savingStatus : !canSubmit || submitting === true"
+    <FloatingField
+      v-if="isExamType"
+      v-slot="{ value, handleChange }"
+      name="eventId"
+      label="Periode ujian"
+      required
     >
-      {{ isEdit ? 'Simpan status' : 'Simpan kegiatan' }}
-    </button>
+      <div class="content-start">
+        <FormControl>
+          <AppCombobox
+            :model-value="value"
+            :options="periodOptions"
+            placeholder="Pilih periode ujian"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="type"
+      label="Jenis"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="option in availableTypes"
+              :key="option"
+              :value="option"
+            >
+              {{ examTypeLabel(option) }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-if="!isExamType"
+      v-slot="{ value, handleChange }"
+      name="presetName"
+      label="Preset kebijakan"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="name in nonExamPresetTypes"
+              :key="name"
+              :value="name"
+            >
+              {{ examTypeLabel(name) }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="gradeId"
+      label="Tingkat"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value || undefined"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="grade in grades"
+              :key="grade.id"
+              :value="grade.id"
+            >
+              {{ grade.label }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="classroomIds"
+      label="Kelas yang ikut"
+      always-float
+    >
+      <div class="content-start">
+        <Popover>
+          <PopoverTrigger as-child>
+            <FormControl>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                :disabled="visibleClassrooms.length === 0"
+                :class="[
+                  'h-[var(--control-h-md,2rem)] w-full justify-between border-input bg-transparent font-normal hover:bg-transparent',
+                  (value ?? []).length === 0 && 'text-muted-foreground',
+                ]"
+              >
+                <span class="truncate">{{
+                  classroomSummary(value ?? [])
+                }}</span>
+                <ChevronDown class="ml-2 size-3.5 shrink-0 opacity-50" />
+              </Button>
+            </FormControl>
+          </PopoverTrigger>
+          <PopoverContent
+            class="w-[var(--reka-popover-trigger-width)] p-0"
+            align="start"
+          >
+            <Command>
+              <CommandInput placeholder="Cari kelas..." />
+              <CommandList>
+                <CommandEmpty>Tidak ditemukan.</CommandEmpty>
+                <CommandGroup>
+                  <CommandItem
+                    value="Pilih semua"
+                    @select.prevent="
+                      handleChange(
+                        (value ?? []).length === visibleClassrooms.length
+                          ? []
+                          : visibleClassrooms.map((room) => room.id),
+                      )
+                    "
+                  >
+                    <Check
+                      :class="[
+                        'size-3.5',
+                        visibleClassrooms.length > 0 &&
+                        (value ?? []).length === visibleClassrooms.length
+                          ? 'opacity-100'
+                          : 'opacity-0',
+                      ]"
+                    />
+                    Pilih semua
+                  </CommandItem>
+                  <CommandItem
+                    v-for="room in visibleClassrooms"
+                    :key="room.id"
+                    :value="room.label"
+                    @select.prevent="
+                      toggleClassroom(
+                        value ?? [],
+                        room.id,
+                        !(value ?? []).includes(room.id),
+                        handleChange,
+                      )
+                    "
+                  >
+                    <Check
+                      :class="[
+                        'size-3.5',
+                        (value ?? []).includes(room.id)
+                          ? 'opacity-100'
+                          : 'opacity-0',
+                      ]"
+                    />
+                    {{ room.label }}
+                  </CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="subjectId"
+      label="Mata pelajaran"
+      required
+      always-float
+    >
+      <div class="content-start">
+        <FormControl>
+          <AppCombobox
+            :model-value="value"
+            :options="subjectOptions"
+            placeholder="Pilih mata pelajaran"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="packageId"
+      label="Paket soal"
+      always-float
+    >
+      <div class="content-start">
+        <FormControl>
+          <AppCombobox
+            :model-value="value"
+            :options="packageOptions"
+            placeholder="Boleh dikosongkan, paket bisa dipasang nanti"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="startDate"
+      label="Tanggal mulai"
+      required
+    >
+      <div class="content-start">
+        <FormControl>
+          <DatePicker
+            :model-value="value"
+            allow-future-dates
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ componentField }"
+      name="startTime"
+      label="Jam mulai"
+      required
+      always-float
+    >
+      <div class="content-start">
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="time"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="endDate"
+      label="Tanggal selesai"
+      required
+    >
+      <div class="content-start">
+        <FormControl>
+          <DatePicker
+            :model-value="value"
+            allow-future-dates
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ componentField }"
+      name="endTime"
+      label="Jam selesai"
+      required
+      always-float
+    >
+      <div class="content-start">
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="time"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="durationMinutes"
+      label="Durasi"
+      required
+    >
+      <div class="content-start">
+        <FormControl>
+          <FormattedNumberInput
+            :model-value="value"
+            numeric
+            suffix=" menit"
+            :max-digits="4"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
+      </div>
+    </FloatingField>
+
+    <FloatingLabelField
+      v-if="isExamType"
+      label="Jenis token"
+      for="activity-token-fixed"
+      floating
+    >
+      <Input
+        id="activity-token-fixed"
+        model-value="Token berputar"
+        disabled
+      />
+    </FloatingLabelField>
+    <FloatingField
+      v-else
+      v-slot="{ value, handleChange }"
+      name="tokenMode"
+      label="Jenis token"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="mode in ACTIVITY_TOKEN_MODES"
+              :key="mode"
+              :value="mode"
+            >
+              {{ mode === 'ROTATING' ? 'Token berputar' : 'Token tetap' }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
   </form>
 </template>

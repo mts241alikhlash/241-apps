@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
   CardContent,
@@ -76,7 +77,7 @@ async function load(): Promise<void> {
   classrooms.value = rooms.data.map((room) => ({
     id: room.id,
     gradeId: room.gradeId,
-    label: room.displayName,
+    label: room.name ?? room.displayName,
   }))
 
   const seen = new Map<string, GradeOption>()
@@ -154,9 +155,18 @@ onMounted(() => {
               : 'Buat Kegiatan Ujian atau Tugas'
           }}
         </CardTitle>
+        <Button
+          v-if="activity !== null || semesterId !== ''"
+          type="submit"
+          form="activity-form"
+          class="shrink-0"
+          :disabled="submitting"
+        >
+          Simpan
+        </Button>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
         <p
           v-if="error !== null"

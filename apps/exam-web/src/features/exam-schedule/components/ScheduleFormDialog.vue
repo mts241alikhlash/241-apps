@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useId, watch } from 'vue'
-import { DatePicker, FormattedNumberInput } from '@mts241alikhlash/ui'
+import { computed, onMounted, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { toast } from 'vue-sonner'
+import {
+  AppCombobox,
+  DatePicker,
+  FormattedNumberInput,
+} from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -11,7 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import {
+  FloatingField,
+  FloatingLabelField,
+  FormControl,
+} from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
 import {
   Select,
@@ -29,18 +42,29 @@ import {
   examTypeLabel,
   type ExamCategory,
 } from '@/features/exam-shared/examType'
-import { useScheduleForm } from '../composables/useScheduleForm'
 import { examScheduleService } from '../services/examScheduleService'
 import type { ExamSchedule, ExamType } from '../types'
+import { fromInstant, toInstant } from '../utils/instant'
+import { validateSchedule } from '../utils/validateSchedule'
 
 const props = defineProps<{
   open: boolean
   schedule?: ExamSchedule | null
   category?: ExamCategory
+  eventId?: string
+  date?: string
   packageId?: string
   packageGradeId?: string
   packageTitle?: string
 }>()
+
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  saved: [type: ExamType]
+}>()
+
+const existing = computed(() => props.schedule ?? null)
+const isEdit = computed(() => existing.value !== null)
 
 const allowedTypes = computed(() =>
   props.category
@@ -48,45 +72,120 @@ const allowedTypes = computed(() =>
     : EXAM_TYPES,
 )
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  saved: [type: ExamType]
-}>()
+const typeLocked =
+  props.schedule !== null &&
+  props.schedule !== undefined &&
+  (props.schedule.hasSessions || props.schedule.kind === 'MAKEUP')
 
-const isEdit = computed(() => Boolean(props.schedule))
-const form = useScheduleForm(
-  props.schedule
-    ? { mode: 'edit', schedule: props.schedule }
-    : { mode: 'create' },
+const start = existing.value ? fromInstant(existing.value.startsAt) : null
+const end = existing.value ? fromInstant(existing.value.endsAt) : null
+
+const formSchema = toTypedSchema(
+  z
+    .object({
+      eventId: z.string(),
+      type: z.string().min(1, 'Jenis wajib dipilih'),
+      packageId: z.string(),
+      classroomId: z.string(),
+      startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
+      startTime: z.string().min(1, 'Jam mulai wajib diisi'),
+      endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
+      endTime: z.string().min(1, 'Jam selesai wajib diisi'),
+      durationMinutes: z
+        .number({ invalid_type_error: 'Durasi minimal 1 menit' })
+        .int('Durasi minimal 1 menit')
+        .min(1, 'Durasi minimal 1 menit')
+        .max(1440, 'Durasi maksimal 1440 menit'),
+    })
+    .superRefine((value, ctx) => {
+      if (!isEdit.value && value.packageId === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['packageId'],
+          message: 'Paket wajib dipilih',
+        })
+      }
+      if (!isEdit.value && value.classroomId === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['classroomId'],
+          message: 'Kelas wajib dipilih',
+        })
+      }
+      if (
+        value.type !== '' &&
+        categoryOf(value.type as ExamType) === 'EXAM' &&
+        value.eventId === ''
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['eventId'],
+          message: 'Periode ujian wajib dipilih',
+        })
+      }
+      if (
+        value.startDate &&
+        value.startTime &&
+        value.endDate &&
+        value.endTime
+      ) {
+        const problem = validateSchedule({
+          startDate: value.startDate,
+          startTime: value.startTime,
+          endDate: value.endDate,
+          endTime: value.endTime,
+          durationMinutes: value.durationMinutes,
+        })
+        if (problem !== null) {
+          ctx.addIssue({ code: 'custom', path: ['endTime'], message: problem })
+        }
+      }
+    }),
 )
-const {
-  packageId: chosenPackageId,
-  classroomId,
-  eventId,
-  type,
-  startDate,
-  startTime,
-  endDate,
-  endTime,
-  durationMinutes,
-} = form
+
+const { handleSubmit, isSubmitting, values, setFieldValue, resetForm } =
+  useForm({
+    validationSchema: formSchema,
+    initialValues: {
+      eventId: existing.value?.eventId ?? props.eventId ?? '',
+      type: existing.value?.type ?? allowedTypes.value[0] ?? '',
+      packageId: '',
+      classroomId: '',
+      startDate: start?.date ?? props.date ?? '',
+      startTime: start?.time ?? '',
+      endDate: end?.date ?? props.date ?? '',
+      endTime: end?.time ?? '',
+      durationMinutes: existing.value?.durationMinutes ?? 90,
+    },
+  })
 
 const packages = ref<ExamPackageSummary[]>([])
 const classrooms = ref<Classroom[]>([])
 const events = ref<ExamEvent[]>([])
-const NO_EVENT = '__none__'
 const classroomsLoaded = ref(false)
+const saveError = ref<string | null>(null)
 let classroomRequest = 0
 
-const chosenPackage = computed(() =>
-  packages.value.find((item) => item.id === chosenPackageId.value),
+const isExamType = computed(
+  () => values.type !== '' && categoryOf(values.type as ExamType) === 'EXAM',
+)
+
+const periodOptions = computed(() =>
+  events.value
+    .filter((item) => item.type === values.type)
+    .map((item) => ({ value: item.id, label: item.name })),
+)
+
+const packageOptions = computed(() =>
+  packages.value.map((item) => ({ value: item.id, label: item.title })),
 )
 
 const packageName = computed(
-  () => chosenPackage.value?.title ?? props.packageTitle ?? '',
+  () =>
+    packages.value.find((item) => item.id === values.packageId)?.title ??
+    props.packageTitle ??
+    '',
 )
-
-const fieldId = useId()
 
 function gradeOf(id: string): string | undefined {
   if (id === props.packageId && props.packageGradeId) {
@@ -95,37 +194,97 @@ function gradeOf(id: string): string | undefined {
   return packages.value.find((item) => item.id === id)?.gradeId
 }
 
-watch(chosenPackageId, async (id) => {
-  const request = ++classroomRequest
-  classrooms.value = []
-  classroomsLoaded.value = false
-  const gradeId = gradeOf(id)
-  if (!gradeId) return
-  const loaded = await examScheduleService.loadClassrooms(gradeId)
-  if (request !== classroomRequest) return
-  classrooms.value = loaded
-  classroomsLoaded.value = true
-})
+watch(
+  () => values.type,
+  (next) => {
+    if (props.eventId && !isEdit.value) return
+    if (next && categoryOf(next as ExamType) === 'EXAM') {
+      const matching = events.value.filter((item) => item.type === next)
+      if (!matching.some((item) => item.id === values.eventId)) {
+        setFieldValue('eventId', matching[0]?.id ?? '')
+      }
+    } else if (!isEdit.value) {
+      setFieldValue('eventId', '')
+    }
+  },
+)
+
+watch(
+  () => values.packageId,
+  async (id) => {
+    const request = ++classroomRequest
+    setFieldValue('classroomId', '')
+    classrooms.value = []
+    classroomsLoaded.value = false
+    const gradeId = gradeOf(id ?? '')
+    if (!gradeId) return
+    const loaded = await examScheduleService.loadClassrooms(gradeId)
+    if (request !== classroomRequest) return
+    classrooms.value = loaded
+    classroomsLoaded.value = true
+  },
+)
 
 onMounted(async () => {
-  void examScheduleService.loadEvents().then((rows) => {
-    events.value = rows
-  })
+  events.value = await examScheduleService.loadEvents()
+  const fixed = events.value.find((item) => item.id === props.eventId)
+  if (fixed && !isEdit.value) setFieldValue('type', fixed.type)
+  if (isExamType.value && values.eventId === '') {
+    setFieldValue(
+      'eventId',
+      events.value.find((item) => item.type === values.type)?.id ?? '',
+    )
+  }
   if (isEdit.value) return
   if (props.packageId && props.packageGradeId) {
-    chosenPackageId.value = props.packageId
+    setFieldValue('packageId', props.packageId)
     return
   }
   packages.value = await examScheduleService.loadPackages()
-  if (props.packageId) chosenPackageId.value = props.packageId
+  if (props.packageId) setFieldValue('packageId', props.packageId)
 })
 
-async function save() {
-  const saved = await form.submit()
-  if (saved) {
-    emit('saved', type.value as ExamType)
-    emit('update:open', false)
+const onSubmit = handleSubmit(async (form) => {
+  saveError.value = null
+  const window = {
+    type: (typeLocked && existing.value
+      ? existing.value.type
+      : form.type) as ExamType,
+    startsAt: toInstant(form.startDate, form.startTime),
+    endsAt: toInstant(form.endDate, form.endTime),
+    durationMinutes: form.durationMinutes,
+    ...(form.eventId !== '' || isEdit.value
+      ? { eventId: form.eventId || null }
+      : {}),
   }
+  const result = existing.value
+    ? await examScheduleService.saveSchedule(
+        { mode: 'edit', id: existing.value.id },
+        window,
+      )
+    : await examScheduleService.saveSchedule(
+        { mode: 'create' },
+        {
+          packageId: form.packageId,
+          classroomId: form.classroomId,
+          ...window,
+        },
+      )
+  if (!result.success) {
+    saveError.value = result.error
+    return
+  }
+  toast.success(
+    existing.value ? 'Perubahan jadwal disimpan.' : 'Jadwal ditambahkan.',
+  )
+  emit('saved', form.type as ExamType)
+  emit('update:open', false)
+})
+
+function close() {
+  resetForm()
+  saveError.value = null
+  emit('update:open', false)
 }
 </script>
 
@@ -134,89 +293,144 @@ async function save() {
     :open="open"
     @update:open="emit('update:open', $event)"
   >
-    <DialogContent :size="isEdit ? 'md' : 'xl'">
+    <DialogContent
+      size="xl"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>{{
           isEdit ? 'Ubah Jadwal' : 'Tambah Jadwal'
         }}</DialogTitle>
         <DialogDescription>
-          Atur paket, kelas, waktu, dan durasi ujian.
+          Atur periode, paket, kelas, waktu, dan durasi ujian.
         </DialogDescription>
       </DialogHeader>
       <DialogBody class="space-y-4">
-        <div
-          v-if="form.error.value"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
-          role="alert"
+        <Alert
+          v-if="saveError"
+          variant="destructive"
         >
-          {{ form.error.value }}
-        </div>
+          <AlertDescription>{{ saveError }}</AlertDescription>
+        </Alert>
 
-        <p
-          v-if="isEdit"
-          class="text-control"
+        <form
+          id="schedule-form"
+          class="grid gap-4 sm:grid-cols-2"
+          @submit.prevent="onSubmit"
         >
-          {{ schedule?.packageTitle }} · {{ schedule?.classroomName ?? '-' }}
-        </p>
+          <FloatingField
+            v-if="isExamType"
+            v-slot="{ value, handleChange }"
+            name="eventId"
+            label="Periode ujian"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <AppCombobox
+                  :model-value="value"
+                  :options="periodOptions"
+                  :disabled="!isEdit && Boolean(props.eventId)"
+                  placeholder="Pilih periode ujian"
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
 
-        <div class="grid gap-4 sm:grid-cols-2">
-          <template v-if="!isEdit">
-            <p
-              v-if="props.packageId"
-              class="self-center text-control sm:col-span-2"
-            >
-              {{ packageName }}
-            </p>
-            <FloatingLabelField
-              v-else
-              label="Paket"
-              :for="`${fieldId}-package`"
-              floating
-            >
-              <Select v-model="chosenPackageId">
-                <SelectTrigger
-                  :id="`${fieldId}-package`"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Pilih paket" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="item in packages"
-                    :key="item.id"
-                    :value="item.id"
-                  >
-                    {{ item.title }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
-            <FloatingLabelField
-              label="Kelas"
-              :for="`${fieldId}-classroom`"
-              floating
-            >
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="type"
+            label="Jenis"
+            required
+            :class="isExamType ? '' : 'sm:col-span-2'"
+          >
+            <div class="content-start">
               <Select
-                v-model="classroomId"
-                :disabled="!chosenPackageId"
+                :model-value="value || undefined"
+                :disabled="typeLocked || (!isEdit && Boolean(props.eventId))"
+                @update:model-value="handleChange"
               >
-                <SelectTrigger
-                  :id="`${fieldId}-classroom`"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Pilih kelas" />
-                </SelectTrigger>
+                <FormControl>
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Pilih jenis" />
+                  </SelectTrigger>
+                </FormControl>
                 <SelectContent>
                   <SelectItem
-                    v-for="classroom in classrooms"
-                    :key="classroom.id"
-                    :value="classroom.id"
+                    v-for="option in allowedTypes"
+                    :key="option"
+                    :value="option"
                   >
-                    {{ classroom.displayName }}
+                    {{ examTypeLabel(option) }}
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </FloatingField>
+
+          <template v-if="!isEdit">
+            <FloatingLabelField
+              v-if="props.packageId"
+              label="Paket"
+              for="schedule-package-fixed"
+              floating
+            >
+              <Input
+                id="schedule-package-fixed"
+                :model-value="packageName"
+                disabled
+              />
             </FloatingLabelField>
+            <FloatingField
+              v-else
+              v-slot="{ value, handleChange }"
+              name="packageId"
+              label="Paket"
+              required
+              always-float
+            >
+              <div class="content-start">
+                <FormControl>
+                  <AppCombobox
+                    :model-value="value"
+                    :options="packageOptions"
+                    placeholder="Pilih paket"
+                    @update:model-value="handleChange"
+                  />
+                </FormControl>
+              </div>
+            </FloatingField>
+
+            <FloatingField
+              v-slot="{ value, handleChange }"
+              name="classroomId"
+              label="Kelas"
+              required
+            >
+              <div class="content-start">
+                <Select
+                  :model-value="value || undefined"
+                  :disabled="!values.packageId"
+                  @update:model-value="handleChange"
+                >
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue placeholder="Pilih kelas" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem
+                      v-for="classroom in classrooms"
+                      :key="classroom.id"
+                      :value="classroom.id"
+                    >
+                      {{ classroom.name ?? classroom.displayName }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </FloatingField>
             <p
               v-if="classroomsLoaded && classrooms.length === 0"
               class="text-control text-muted-foreground sm:col-span-2"
@@ -226,130 +440,94 @@ async function save() {
             </p>
           </template>
 
-          <FloatingLabelField
-            label="Kegiatan ujian"
-            :for="`${fieldId}-event`"
-            class="sm:col-span-2"
-            floating
-          >
-            <Select
-              :model-value="eventId || NO_EVENT"
-              @update:model-value="
-                eventId = $event === NO_EVENT ? '' : String($event)
-              "
-            >
-              <SelectTrigger
-                :id="`${fieldId}-event`"
-                class="w-full"
-              >
-                <SelectValue placeholder="Tanpa ruangan (Ulangan Harian)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem :value="NO_EVENT">
-                  Tanpa kegiatan (Ulangan Harian atau Tugas di kelas)
-                </SelectItem>
-                <SelectItem
-                  v-for="item in events"
-                  :key="item.id"
-                  :value="item.id"
-                >
-                  {{ item.name }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
-
-          <FloatingLabelField
-            label="Jenis ujian"
-            :for="`${fieldId}-type`"
-            floating
-          >
-            <Select
-              v-model="type"
-              :disabled="form.typeLocked"
-            >
-              <SelectTrigger
-                :id="`${fieldId}-type`"
-                class="w-full"
-              >
-                <SelectValue placeholder="Pilih jenis ujian" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="option in allowedTypes"
-                  :key="option"
-                  :value="option"
-                >
-                  {{ examTypeLabel(option) }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
-          <FloatingLabelField
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="startDate"
             label="Tanggal mulai"
-            :for="`${fieldId}-start-date`"
-            floating
+            required
           >
-            <DatePicker
-              :id="`${fieldId}-start-date`"
-              v-model="startDate"
-              allow-future-dates
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Tanggal selesai"
-            :for="`${fieldId}-end-date`"
-            floating
-          >
-            <DatePicker
-              :id="`${fieldId}-end-date`"
-              v-model="endDate"
-              allow-future-dates
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Durasi"
-            :for="`${fieldId}-duration`"
-            floating
-          >
-            <FormattedNumberInput
-              :id="`${fieldId}-duration`"
-              v-model="durationMinutes"
-              numeric
-              suffix=" menit"
-              :max-digits="4"
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Jam mulai"
-            :for="`${fieldId}-start`"
-            floating
-          >
-            <Input
-              :id="`${fieldId}-start`"
-              v-model="startTime"
-              type="time"
-            />
-          </FloatingLabelField>
-          <FloatingLabelField
-            label="Jam selesai"
-            :for="`${fieldId}-end`"
-            floating
-          >
-            <Input
-              :id="`${fieldId}-end`"
-              v-model="endTime"
-              type="time"
-            />
-          </FloatingLabelField>
-        </div>
+            <div class="content-start">
+              <FormControl>
+                <DatePicker
+                  :model-value="value"
+                  :disabled="!isEdit && Boolean(props.date)"
+                  allow-future-dates
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
 
-        <p
-          v-if="form.problem.value"
-          class="text-control text-muted-foreground"
-        >
-          {{ form.problem.value }}
-        </p>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="startTime"
+            label="Jam mulai"
+            required
+            always-float
+          >
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="time"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="endDate"
+            label="Tanggal selesai"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <DatePicker
+                  :model-value="value"
+                  allow-future-dates
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+
+          <FloatingField
+            v-slot="{ componentField }"
+            name="endTime"
+            label="Jam selesai"
+            required
+            always-float
+          >
+            <div class="content-start">
+              <FormControl>
+                <Input
+                  v-bind="componentField"
+                  type="time"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="durationMinutes"
+            label="Durasi"
+            required
+          >
+            <div class="content-start">
+              <FormControl>
+                <FormattedNumberInput
+                  :model-value="value"
+                  numeric
+                  suffix=" menit"
+                  :max-digits="4"
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+        </form>
       </DialogBody>
       <DialogFooter
         standard
@@ -358,16 +536,16 @@ async function save() {
         <Button
           type="button"
           variant="outline"
-          @click="emit('update:open', false)"
+          @click="close"
         >
           Batal
         </Button>
         <Button
-          type="button"
-          :disabled="form.problem.value !== null || form.saving.value"
-          @click="save"
+          type="submit"
+          form="schedule-form"
+          :disabled="isSubmitting"
         >
-          {{ form.saving.value ? 'Menyimpan…' : 'Simpan' }}
+          {{ isSubmitting ? 'Menyimpan…' : 'Simpan' }}
         </Button>
       </DialogFooter>
     </DialogContent>
