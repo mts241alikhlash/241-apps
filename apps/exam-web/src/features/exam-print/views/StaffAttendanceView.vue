@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { computed, h, ref } from 'vue'
+import { computed, h, nextTick, ref } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { DataTable, SearchInput, ServiceUnavailable } from '@mts241alikhlash/ui'
+import {
+  ActionCell,
+  DataTable,
+  SearchInput,
+  ServiceUnavailable,
+} from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -28,7 +33,7 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
-import { Eye, Printer } from '@lucide/vue'
+import { Printer } from '@lucide/vue'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { isOutageMessage } from '@mts241alikhlash/web-shared/utils/service-error'
 import { usePrintPack } from '../composables/usePrintPack'
@@ -239,19 +244,28 @@ const dayColumns: ColumnDef<DayEntry>[] = [
     enableSorting: false,
     meta: { align: 'center' },
     cell: ({ row }) =>
-      h(
-        Button,
-        {
-          variant: 'ghost',
-          size: 'icon-sm',
-          title: 'Pratinjau daftar hadir',
-          'aria-label': `Pratinjau ${dayLabelOf(row.original.startsAt)}`,
-          onClick: () => openPreview(row.original),
-        },
-        () => h(Eye),
-      ),
+      h(ActionCell, {
+        manageLabel: 'Pratinjau',
+        hideEdit: true,
+        hideDelete: true,
+        items: [
+          {
+            label: 'Cetak',
+            icon: Printer,
+            onClick: () => void printDay(row.original),
+          },
+        ],
+        onManage: () => openPreview(row.original),
+      }),
   },
 ]
+
+async function printDay(day: DayEntry) {
+  previewDay.value = day
+  await loadReports()
+  await nextTick()
+  printSheets()
+}
 
 function printSheets() {
   document.body.classList.add('printing-stack')

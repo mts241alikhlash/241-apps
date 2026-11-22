@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import {
@@ -35,6 +35,7 @@ import {
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { Printer } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { isOutageMessage } from '@mts241alikhlash/web-shared/utils/service-error'
 import {
@@ -83,6 +84,29 @@ const paramValue = (name: string): string | null => {
 const dayId = computed(() => paramValue('dayId'))
 const subjectId = computed(() => paramValue('subjectId'))
 const previewRow = ref<RoomReportSummary | null>(null)
+const rosterRoom = ref<{
+  currentSupervisorName: string | null
+  technicianName: string | null
+} | null>(null)
+
+interface BatchSheet {
+  key: string
+  roomName: string
+  date: string
+  packages: string
+  timeRange: string
+  students: {
+    studentId: string
+    name: string | null
+    classroomName: string | null
+    participantNumber: string | null
+  }[]
+  supervisorName: string | null
+  technicianName: string | null
+}
+
+const batch = ref<BatchSheet[]>([])
+const printing = ref(false)
 
 const filteredReports = computed(() => {
   const keyword = search.value.trim().toLocaleLowerCase('id')
@@ -142,15 +166,19 @@ const columns = computed(() => {
   if (activeSubject.value) {
     return buildRoomReportColumns({
       onOpen: (row) => openPreview(row),
+      onPrint: (row) => void printRows([row]),
     }) as unknown as ColumnDef<ReportRow>[]
   }
   if (activeDay.value) {
     return buildSubjectColumns({
       onOpen: (row) => goTo(row.dayKey, row.id),
+      onPrint: (row) => void printRows(row.rooms),
     }) as unknown as ColumnDef<ReportRow>[]
   }
   return buildDayColumns({
     onOpen: (row) => goTo(row.id),
+    onPrint: (row) =>
+      void printRows(row.subjects.flatMap((subject) => subject.rooms)),
   }) as unknown as ColumnDef<ReportRow>[]
 })
 
@@ -215,12 +243,62 @@ async function loadRoster() {
   try {
     const result = await examRoomService.loadRoster(row.roomId, row.slotId)
     roster.value = result.data
+    rosterRoom.value = result.meta?.room ?? null
   } catch {
     roster.value = []
     rosterError.value =
       'Daftar peserta tidak dapat dimuat. Periksa koneksi lalu coba lagi.'
   } finally {
     rosterLoading.value = false
+  }
+}
+
+async function printRows(rows: RoomReportSummary[]) {
+  if (printing.value) return
+  printing.value = true
+  try {
+    const targets = [
+      ...new Map(
+        rows.map((row) => [`${row.roomId}-${row.slotId}`, row]),
+      ).values(),
+    ].sort(
+      (a, b) =>
+        a.startsAt.localeCompare(b.startsAt) ||
+        a.roomName.localeCompare(b.roomName, 'id'),
+    )
+    const loaded = await Promise.all(
+      targets.map(async (row): Promise<BatchSheet> => {
+        const result = await examRoomService.loadRoster(row.roomId, row.slotId)
+        return {
+          key: `${row.roomId}-${row.slotId}`,
+          roomName: row.roomName,
+          date: formatPrintDate(row.startsAt),
+          packages:
+            row.subjectNames.length > 0 ? row.subjectNames.join(', ') : '-',
+          timeRange: formatPrintRange(row.startsAt, row.endsAt),
+          students: result.data.map((student) => ({
+            studentId: student.studentId,
+            name: student.studentName,
+            classroomName: student.classroomName,
+            participantNumber: student.participantNumber,
+          })),
+          supervisorName: result.meta?.room.currentSupervisorName ?? null,
+          technicianName: result.meta?.room.technicianName ?? null,
+        }
+      }),
+    )
+    batch.value = loaded.filter((sheet) => sheet.students.length > 0)
+    if (batch.value.length === 0) {
+      toast.error('Tidak ada daftar hadir yang dapat dimuat.')
+      return
+    }
+    await nextTick()
+    printSheet()
+  } catch {
+    toast.error('Dokumen tidak dapat dimuat. Periksa koneksi lalu coba lagi.')
+  } finally {
+    batch.value = []
+    printing.value = false
   }
 }
 
@@ -494,6 +572,8 @@ onMounted(load)
               :time-range="sheetRange"
               :students="sheetStudents"
               :paginate="false"
+              :supervisor-name="rosterRoom?.currentSupervisorName ?? null"
+              :technician-name="rosterRoom?.technicianName ?? null"
             />
           </div>
         </DialogBody>
@@ -519,7 +599,9 @@ onMounted(load)
     </Dialog>
 
     <div
-      v-if="previewRow !== null && sheetStudents.length > 0"
+      v-if="
+        batch.length === 0 && previewRow !== null && sheetStudents.length > 0
+      "
       class="print-only"
     >
       <AttendanceSheet
@@ -528,7 +610,29 @@ onMounted(load)
         :packages="packages"
         :time-range="sheetRange"
         :students="sheetStudents"
+        :supervisor-name="rosterRoom?.currentSupervisorName ?? null"
+        :technician-name="rosterRoom?.technicianName ?? null"
       />
+    </div>
+
+    <div
+      v-if="batch.length > 0"
+      class="print-only"
+    >
+      <div class="print-stack">
+        <AttendanceSheet
+          v-for="sheet in batch"
+          :key="sheet.key"
+          stacked
+          :room-name="sheet.roomName"
+          :date="sheet.date"
+          :packages="sheet.packages"
+          :time-range="sheet.timeRange"
+          :students="sheet.students"
+          :supervisor-name="sheet.supervisorName"
+          :technician-name="sheet.technicianName"
+        />
+      </div>
     </div>
   </div>
 </template>
