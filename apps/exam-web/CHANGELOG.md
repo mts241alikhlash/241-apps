@@ -1,5 +1,14 @@
 # exam-web
 
+## 0.8.8
+
+### Patch Changes
+
+- 77a3a27: Standardize the exam pages (activities by period, status dialog, policy dialog, schedules, print documents, monitoring and grading), grade every question type in the grading session with short answers scored automatically, show the participant number in the sessions, tolerate hr-service throttling with a cache, and align the shared table, card header and dialog footer.
+- Updated dependencies [77a3a27]
+  - @mts241alikhlash/ui@0.2.2
+  - @mts241alikhlash/platform@0.2.3
+
 ## 0.8.7
 
 ### Patch Changes
