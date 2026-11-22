@@ -18,7 +18,7 @@ describe('default roles', () => {
   })
 
   it('defines the default roles and four structural grants', () => {
-    expect(DEFAULT_ROLES.filter((role) => !role.structural)).toHaveLength(22)
+    expect(DEFAULT_ROLES.filter((role) => !role.structural)).toHaveLength(23)
     expect(
       DEFAULT_ROLES.filter((role) => role.structural)
         .map((role) => role.code)
@@ -418,12 +418,12 @@ describe('default roles', () => {
       expect(holders('exam-sessions.take')).toEqual(['STUDENT'])
     })
 
-    it('gives release to curriculum staff, the deputy, the academic admin, the technician and the supervising teacher', () => {
+    it('gives release to curriculum staff, the deputy, the academic admin, the technician and the supervisor', () => {
       expect(holders('exam-sessions.release')).toEqual([
         'ACADEMIC_ADMIN',
         'CURRICULUM_STAFF',
+        'EXAM_SUPERVISOR',
         'EXAM_TECHNICIAN',
-        'TEACHER',
         'VICE_PRINCIPAL_CURRICULUM',
       ])
     })
@@ -448,12 +448,12 @@ describe('default roles', () => {
       }
     })
 
-    it('lets a teacher release only, never read or take', () => {
+    it('gives a teacher no session code', () => {
       expect(
-        [...codesOf('TEACHER')]
-          .filter((code) => code.startsWith('exam-sessions.'))
-          .sort(),
-      ).toEqual(['exam-sessions.release'])
+        [...codesOf('TEACHER')].filter((code) =>
+          code.startsWith('exam-sessions.'),
+        ),
+      ).toEqual([])
     })
   })
 
@@ -551,10 +551,18 @@ describe('default roles', () => {
       expect(codesOf('EXAM_TECHNICIAN')).not.toContain('users.read')
     })
 
-    it('gives supervise to teachers and the technician only', () => {
+    it('gives supervise to the supervisor and the technician only', () => {
       expect(holders('exam-rooms.supervise')).toEqual([
+        'EXAM_SUPERVISOR',
         'EXAM_TECHNICIAN',
-        'TEACHER',
+      ])
+      expect(codesOf('TEACHER')).not.toContain('exam-rooms.supervise')
+    })
+
+    it('defines the supervisor role with exactly supervise and release', () => {
+      expect(resolveGrants('EXAM_SUPERVISOR')).toEqual([
+        'exam-rooms.supervise',
+        'exam-sessions.release',
       ])
     })
 

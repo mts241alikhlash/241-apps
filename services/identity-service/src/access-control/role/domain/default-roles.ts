@@ -60,8 +60,6 @@ const TEACHER_CODES = (): string[] => [
   'exam-grading.read',
   'exam-grading.grade',
   'exam-scores.read',
-  'exam-rooms.supervise',
-  'exam-sessions.release',
   'report-cards.read',
   'report-cards.create',
   'report-cards.publish',
@@ -501,6 +499,16 @@ export const DEFAULT_ROLES: DefaultRole[] = [
           'student-scores.read',
           'classrooms.read',
         ],
+      },
+    ],
+  ),
+  role(
+    'EXAM_SUPERVISOR',
+    'Pengawas Ujian',
+    'Mengawasi ruang ujian yang ditugaskan',
+    [
+      {
+        codes: ['exam-rooms.supervise', 'exam-sessions.release'],
       },
     ],
   ),
