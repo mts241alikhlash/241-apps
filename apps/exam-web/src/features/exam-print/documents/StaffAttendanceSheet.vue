@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import LetterheadKop from '@/features/exam-room/components/LetterheadKop.vue'
-import { CARD_HEADER } from '@/features/exam-room/components/cardHeader'
+import {
+  CARD_HEADER,
+  SCHOOL_SIGNERS,
+} from '@/features/exam-room/components/cardHeader'
 
-const SUPERVISORS_PER_PAGE = 12
+const SUPERVISORS_PER_PAGE = 20
+const NAME_FULL_SIZE_CHARS = 30
 
 interface SupervisorRow {
   key: string
@@ -22,17 +26,20 @@ interface TechnicianRow {
 
 interface SheetPage {
   kind: 'supervisors' | 'technicians'
-  isLast: boolean
   startNumber: number
   supervisors: SupervisorRow[]
   technicians: TechnicianRow[]
 }
 
-const props = defineProps<{
-  date: string
-  supervisors: SupervisorRow[]
-  technicians: TechnicianRow[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    date: string
+    supervisors: SupervisorRow[]
+    technicians: TechnicianRow[]
+    stacked?: boolean
+  }>(),
+  { stacked: false },
+)
 
 const pages = computed<SheetPage[]>(() => {
   const chunks: SupervisorRow[][] = []
@@ -47,7 +54,6 @@ const pages = computed<SheetPage[]>(() => {
 
   const result: SheetPage[] = chunks.map((supervisors, index) => ({
     kind: 'supervisors',
-    isLast: false,
     startNumber: index * SUPERVISORS_PER_PAGE + 1,
     supervisors,
     technicians: [],
@@ -56,23 +62,36 @@ const pages = computed<SheetPage[]>(() => {
   if (props.technicians.length > 0) {
     result.push({
       kind: 'technicians',
-      isLast: false,
       startNumber: 1,
       supervisors: [],
       technicians: props.technicians,
     })
   }
 
-  result[result.length - 1].isLast = true
   return result
 })
+
+const nameSize = (name: string | null): string => {
+  const length = (name ?? 'Belum ditentukan').length
+  const points =
+    length <= NAME_FULL_SIZE_CHARS
+      ? 10
+      : Math.max(7.5, (10 * NAME_FULL_SIZE_CHARS) / length)
+  return `${points.toFixed(1)}pt`
+}
 
 const pageTitle = (page: SheetPage): string =>
   page.kind === 'supervisors' ? 'Daftar Hadir Pengawas' : 'Daftar Hadir Teknisi'
 </script>
 
 <template>
-  <div class="print-stack space-y-1">
+  <div
+    :class="
+      stacked
+        ? 'space-y-1 break-after-page last:break-after-auto'
+        : 'print-stack space-y-1'
+    "
+  >
     <section
       v-for="(page, pageIndex) in pages"
       :key="pageIndex"
@@ -111,8 +130,8 @@ const pageTitle = (page: SheetPage): string =>
                 <th class="col-no">No</th>
                 <th class="col-name">Nama Pengawas</th>
                 <th class="col-room is-center">Ruang</th>
-                <th class="col-subject">Mapel</th>
-                <th class="col-time">Jam Ke</th>
+                <th class="col-subject is-center">Mata Pelajaran</th>
+                <th class="col-time">Pukul</th>
                 <th class="col-sign">Tanda Tangan</th>
               </tr>
             </thead>
@@ -124,9 +143,14 @@ const pageTitle = (page: SheetPage): string =>
                 <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
-                <td class="col-name">{{ row.name ?? 'Belum ditentukan' }}</td>
+                <td
+                  class="col-name"
+                  :style="{ fontSize: nameSize(row.name) }"
+                >
+                  {{ row.name ?? 'Belum ditentukan' }}
+                </td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
-                <td class="col-subject">{{ row.subject }}</td>
+                <td class="col-subject is-center">{{ row.subject }}</td>
                 <td class="col-time is-center">{{ row.time }}</td>
                 <td class="col-sign" />
               </tr>
@@ -156,7 +180,7 @@ const pageTitle = (page: SheetPage): string =>
                 <th class="col-no">No</th>
                 <th class="col-name">Nama Teknisi</th>
                 <th class="col-room is-center">Ruang</th>
-                <th class="col-time">Jam Ke</th>
+                <th class="col-time">Pukul</th>
                 <th class="col-sign">Tanda Tangan</th>
               </tr>
             </thead>
@@ -168,7 +192,12 @@ const pageTitle = (page: SheetPage): string =>
                 <td class="col-no is-center">
                   {{ page.startNumber + index }}
                 </td>
-                <td class="col-name">{{ row.name ?? 'Belum ditentukan' }}</td>
+                <td
+                  class="col-name"
+                  :style="{ fontSize: nameSize(row.name) }"
+                >
+                  {{ row.name ?? 'Belum ditentukan' }}
+                </td>
                 <td class="col-room is-center">{{ row.roomName }}</td>
                 <td class="col-time is-center">{{ row.time }}</td>
                 <td class="col-sign" />
@@ -177,21 +206,18 @@ const pageTitle = (page: SheetPage): string =>
           </table>
         </template>
 
-        <div
-          v-if="page.isLast"
-          class="sheet-signatures"
-        >
+        <div class="sheet-signatures">
           <div class="sheet-signature">
             <p>Mengetahui,</p>
             <p>Kepala Madrasah</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ SCHOOL_SIGNERS.principal }}</p>
           </div>
           <div class="sheet-signature">
             <p class="sheet-signature-blank">&nbsp;</p>
             <p>Wakamad Kurikulum</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
+            <p class="sheet-signature-name">{{ SCHOOL_SIGNERS.curriculum }}</p>
           </div>
         </div>
       </div>
@@ -272,13 +298,13 @@ const pageTitle = (page: SheetPage): string =>
 }
 
 .sheet-table .col-name {
-  width: 48mm;
+  width: 58mm;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sheet-table .col-room {
-  width: 30mm;
+  width: 20mm;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -290,23 +316,26 @@ const pageTitle = (page: SheetPage): string =>
 }
 
 .sheet-table .col-time {
-  width: 25mm;
+  width: 27mm;
+  white-space: nowrap;
 }
 
 .sheet-table .col-sign {
-  width: 32mm;
-  height: 7mm;
+  width: 30mm;
+  height: 6.5mm;
 }
 
 .sheet-table .is-center {
   text-align: center;
 }
 
-.sheet-table .col-subject,
-.sheet-table .col-name,
-.sheet-table .col-room {
+.sheet-table .col-subject {
   white-space: normal;
   word-break: break-word;
+}
+
+.sheet-table .col-room {
+  white-space: nowrap;
 }
 
 .sheet-signatures {
@@ -325,9 +354,8 @@ const pageTitle = (page: SheetPage): string =>
   height: 16mm;
 }
 
-.sheet-signature-line {
-  border-bottom: 1px solid currentColor;
-  width: 70%;
-  margin-inline: auto;
+.sheet-signature-name {
+  font-weight: 700;
+  white-space: nowrap;
 }
 </style>
