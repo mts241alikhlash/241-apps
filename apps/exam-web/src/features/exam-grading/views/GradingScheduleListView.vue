@@ -2,7 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { DataTable } from '@mts241alikhlash/ui'
+import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -25,12 +26,15 @@ const { hasPermission } = useAuthSession()
 const makeupTarget = ref<MakeupOrigin | null>(null)
 const participantsTarget = ref<GradingSchedule | null>(null)
 const { category, sectionPrefix } = useRouteCategory()
+const { subjectOf } = usePackageSubjects()
+const subjectName = (schedule: GradingSchedule) =>
+  subjectOf(schedule.packageId, schedule.title)
 
 function originOf(schedule: GradingSchedule): MakeupOrigin {
   return {
     id: schedule.id,
     packageId: schedule.packageId,
-    packageTitle: schedule.title,
+    packageTitle: subjectName(schedule),
     classroomName: schedule.classroomName,
     durationMinutes: schedule.durationMinutes,
     endsAt: schedule.endsAt,
@@ -47,6 +51,7 @@ watch(semesterId, () => (page.value = 1), { flush: 'sync' })
 
 const columns = computed(() =>
   buildGradingScheduleColumns({
+    subjectName,
     canMakeup: hasPermission('exam-grading.grade'),
     canParticipants: hasPermission('exam-grading.read'),
     onMakeup: (schedule) => {
@@ -58,7 +63,7 @@ const columns = computed(() =>
     onOpen: (schedule) =>
       void router.push({
         path: `${sectionPrefix.value}/grading/${schedule.id}`,
-        query: { judul: schedule.title },
+        query: { judul: subjectName(schedule) },
       }),
   }),
 )
@@ -113,7 +118,9 @@ function changePageSize(size: number) {
             <AcademicPeriodFilter v-model:semester-id="semesterId" />
           </template>
           <template #empty>
-            <p>Belum ada ujian yang dikerjakan siswa kelas Anda.</p>
+            <DataTableEmpty
+              message="Belum ada ujian yang dikerjakan siswa kelas Anda."
+            />
           </template>
         </DataTable>
       </CardContent>
@@ -132,7 +139,7 @@ function changePageSize(size: number) {
       v-if="participantsTarget"
       :open="true"
       :schedule-id="participantsTarget.id"
-      :title="`${participantsTarget.title} · ${participantsTarget.classroomName ?? '-'}`"
+      :title="`${subjectName(participantsTarget)} · ${participantsTarget.classroomName ?? '-'}`"
       @update:open="(value: boolean) => !value && (participantsTarget = null)"
     />
   </div>

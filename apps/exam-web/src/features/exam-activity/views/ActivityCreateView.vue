@@ -24,18 +24,17 @@ import type {
   ActivityCreatePayload,
   ClassroomOption,
   EventOption,
-  ExamActivityRecord,
   GradeOption,
   PackageOption,
   SubjectOption,
 } from '../types'
 
-const route = useRoute()
 const { hasPermission } = useAuthSession()
-const editingId = computed(() =>
-  typeof route.query.id === 'string' ? route.query.id : '',
-)
+const route = useRoute()
 const { category } = useRouteCategory()
+const fixedEventId = computed(() =>
+  typeof route.query.periode === 'string' ? route.query.periode : '',
+)
 const semesterId = ref('')
 const grades = ref<GradeOption[]>([])
 const classrooms = ref<ClassroomOption[]>([])
@@ -45,8 +44,6 @@ const events = ref<EventOption[]>([])
 const isAdmin = computed(() => hasPermission('exam-schedules.manage-all'))
 const submitting = ref(false)
 const error = ref<string | null>(null)
-const activity = ref<ExamActivityRecord | null>(null)
-const loadingActivity = ref(editingId.value !== '')
 
 async function load(): Promise<void> {
   const [semesters, rooms, packs, subjectPage] = await Promise.all([
@@ -114,31 +111,7 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
   }
 }
 
-async function loadActivity(): Promise<void> {
-  loadingActivity.value = true
-  try {
-    const response = await examActivityApi.get(editingId.value)
-    activity.value = response
-  } catch {
-    error.value = 'Kegiatan gagal dimuat.'
-  } finally {
-    loadingActivity.value = false
-  }
-}
-
-function statusSaved(): void {
-  toast.success('Status kegiatan disimpan')
-}
-
-function numbersIssued(issued: boolean): void {
-  if (issued) toast.success('Nomor peserta diterbitkan')
-  else toast.error('Nomor peserta belum bisa diterbitkan')
-}
-
-onMounted(() => {
-  if (editingId.value !== '') void loadActivity()
-  else void load()
-})
+onMounted(load)
 </script>
 
 <template>
@@ -148,15 +121,9 @@ onMounted(() => {
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle class="font-semibold">
-          {{
-            editingId !== ''
-              ? 'Status Kegiatan Ujian'
-              : 'Buat Kegiatan Ujian atau Tugas'
-          }}
-        </CardTitle>
+        <CardTitle class="font-semibold">Buat Kegiatan</CardTitle>
         <Button
-          v-if="activity !== null || semesterId !== ''"
+          v-if="semesterId !== ''"
           type="submit"
           form="activity-form"
           class="shrink-0"
@@ -176,18 +143,7 @@ onMounted(() => {
           {{ error }}
         </p>
         <ActivityForm
-          v-if="activity !== null"
-          :semester-id="activity.semesterId"
-          :grades="[]"
-          :classrooms="[]"
-          :packages="[]"
-          :is-admin="isAdmin"
-          :activity="activity"
-          @status-saved="statusSaved"
-          @numbers-issued="numbersIssued"
-        />
-        <ActivityForm
-          v-else-if="semesterId !== ''"
+          v-if="semesterId !== ''"
           :semester-id="semesterId"
           :grades="grades"
           :classrooms="classrooms"
@@ -195,11 +151,11 @@ onMounted(() => {
           :subjects="subjects"
           :events="events"
           :category="category"
+          :fixed-event-id="fixedEventId"
           :is-admin="isAdmin"
           :submitting="submitting"
           @submit="submit"
         />
-        <p v-else-if="loadingActivity">Memuat kegiatan…</p>
         <p v-else>Memuat data tingkat, kelas, dan paket soal…</p>
       </CardContent>
       <CardFooter plain />

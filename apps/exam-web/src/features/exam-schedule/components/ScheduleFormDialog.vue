@@ -83,7 +83,7 @@ const end = existing.value ? fromInstant(existing.value.endsAt) : null
 const formSchema = toTypedSchema(
   z
     .object({
-      eventId: z.string(),
+      eventId: z.string().optional(),
       type: z.string().min(1, 'Jenis wajib dipilih'),
       packageId: z.string(),
       classroomId: z.string(),
@@ -115,7 +115,7 @@ const formSchema = toTypedSchema(
       if (
         value.type !== '' &&
         categoryOf(value.type as ExamType) === 'EXAM' &&
-        value.eventId === ''
+        !value.eventId
       ) {
         ctx.addIssue({
           code: 'custom',
@@ -253,9 +253,7 @@ const onSubmit = handleSubmit(async (form) => {
     startsAt: toInstant(form.startDate, form.startTime),
     endsAt: toInstant(form.endDate, form.endTime),
     durationMinutes: form.durationMinutes,
-    ...(form.eventId !== '' || isEdit.value
-      ? { eventId: form.eventId || null }
-      : {}),
+    ...(form.eventId || isEdit.value ? { eventId: form.eventId || null } : {}),
   }
   const result = existing.value
     ? await examScheduleService.saveSchedule(
@@ -529,10 +527,7 @@ function close() {
           </FloatingField>
         </form>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

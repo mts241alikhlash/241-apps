@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Plus } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -66,7 +66,7 @@ const columns = computed<ColumnDef<Note>[]>(() => [
   },
   {
     id: 'student',
-    header: 'Peserta',
+    header: 'Nama',
     meta: {
       align: 'left',
       strong: true,
@@ -135,7 +135,7 @@ watch(() => [props.roomId, props.slotId, props.refreshKey], loadNotes, {
         item-label="catatan"
       >
         <template #empty>
-          <p>Belum ada catatan.</p>
+          <DataTableEmpty message="Belum ada catatan." />
         </template>
       </DataTable>
     </CardContent>

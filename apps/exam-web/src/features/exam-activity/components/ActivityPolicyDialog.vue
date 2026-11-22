@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { FormattedNumberInput } from '@mts241alikhlash/ui'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Switch } from '@mts241alikhlash/ui/switch'
 import {
   Dialog,
   DialogBody,
@@ -11,9 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
+import { Switch } from '@mts241alikhlash/ui/switch'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { examActivityApi } from '../api/examActivityApi'
-import type { ActivityPolicyPayload, ExamPolicy } from '../types'
+import type { ExamPolicy } from '../types'
 
 const props = defineProps<{
   open: boolean
@@ -26,71 +32,170 @@ const emit = defineEmits<{
   saved: [policy: ExamPolicy]
 }>()
 
-const violationLimit = ref(props.policy.violationLimit ?? 3)
-const focusThresholdMs = ref(props.policy.focusThresholdMs ?? 15000)
-const heartbeatIntervalMs = ref(props.policy.heartbeatIntervalMs ?? 30000)
-const gapRecordedMs = ref(props.policy.gapRecordedMs ?? 60000)
-const gapTokenMs = ref(props.policy.gapTokenMs ?? 300000)
-const gapViolationFrom = ref(props.policy.gapViolationFrom ?? 2)
-const tokenSlotSeconds = ref(props.policy.tokenSlotSeconds ?? 900)
-const lateToleranceMinutes = ref(props.policy.lateToleranceMinutes ?? 15)
-const minSubmitMinutes = ref(props.policy.minSubmitMinutes ?? 0)
-const shuffleQuestions = ref(props.policy.shuffleQuestions ?? true)
-const shuffleChoices = ref(props.policy.shuffleChoices ?? true)
-const allowWeb = ref(props.policy.allowWeb ?? true)
+type NumberKey =
+  | 'violationLimit'
+  | 'focusThresholdMs'
+  | 'heartbeatIntervalMs'
+  | 'gapRecordedMs'
+  | 'gapTokenMs'
+  | 'gapViolationFrom'
+  | 'tokenSlotSeconds'
+  | 'lateToleranceMinutes'
+  | 'minSubmitMinutes'
 
-const saving = ref(false)
-const error = ref<string | null>(null)
+type SwitchKey = 'shuffleQuestions' | 'shuffleChoices' | 'allowWeb'
+
+interface NumberField {
+  key: NumberKey
+  label: string
+  suffix: string
+  min: number
+  max: number
+  fallback: number
+}
+
+const NUMBER_FIELDS: NumberField[] = [
+  {
+    key: 'violationLimit',
+    label: 'Batas pelanggaran',
+    suffix: '',
+    min: 1,
+    max: 10,
+    fallback: 3,
+  },
+  {
+    key: 'focusThresholdMs',
+    label: 'Ambang hilang fokus',
+    suffix: ' ms',
+    min: 3000,
+    max: 60000,
+    fallback: 15000,
+  },
+  {
+    key: 'heartbeatIntervalMs',
+    label: 'Interval detak sesi',
+    suffix: ' ms',
+    min: 10000,
+    max: 120000,
+    fallback: 30000,
+  },
+  {
+    key: 'gapRecordedMs',
+    label: 'Jeda tercatat putus',
+    suffix: ' ms',
+    min: 30000,
+    max: 600000,
+    fallback: 60000,
+  },
+  {
+    key: 'gapTokenMs',
+    label: 'Jeda wajib token ulang',
+    suffix: ' ms',
+    min: 30000,
+    max: 3600000,
+    fallback: 300000,
+  },
+  {
+    key: 'gapViolationFrom',
+    label: 'Putus ke-berapa jadi pelanggaran',
+    suffix: '',
+    min: 1,
+    max: 5,
+    fallback: 2,
+  },
+  {
+    key: 'tokenSlotSeconds',
+    label: 'Masa berlaku slot token',
+    suffix: ' detik',
+    min: 300,
+    max: 3600,
+    fallback: 900,
+  },
+  {
+    key: 'lateToleranceMinutes',
+    label: 'Toleransi terlambat',
+    suffix: ' menit',
+    min: 0,
+    max: 120,
+    fallback: 15,
+  },
+  {
+    key: 'minSubmitMinutes',
+    label: 'Minimal sebelum kumpul',
+    suffix: ' menit',
+    min: 0,
+    max: 180,
+    fallback: 0,
+  },
+]
+
+const SWITCH_FIELDS: { key: SwitchKey; label: string }[] = [
+  { key: 'shuffleQuestions', label: 'Acak urutan soal' },
+  { key: 'shuffleChoices', label: 'Acak urutan pilihan' },
+  { key: 'allowWeb', label: 'Izinkan lewat web (SEB)' },
+]
+
+const rangeOf = (field: NumberField) =>
+  z.coerce
+    .number({ invalid_type_error: `${field.label} wajib diisi` })
+    .int(`${field.label} harus bilangan bulat`)
+    .min(field.min, `Minimal ${field.min}`)
+    .max(field.max, `Maksimal ${field.max}`)
+
+const formSchema = toTypedSchema(
+  z.object({
+    ...(Object.fromEntries(
+      NUMBER_FIELDS.map((field) => [field.key, rangeOf(field)]),
+    ) as Record<NumberKey, ReturnType<typeof rangeOf>>),
+    shuffleQuestions: z.boolean(),
+    shuffleChoices: z.boolean(),
+    allowWeb: z.boolean(),
+  }),
+)
+
+function initialValues(policy: ExamPolicy) {
+  const numbers = Object.fromEntries(
+    NUMBER_FIELDS.map((field) => [
+      field.key,
+      policy[field.key] ?? field.fallback,
+    ]),
+  ) as Record<NumberKey, number>
+  return {
+    ...numbers,
+    shuffleQuestions: policy.shuffleQuestions ?? true,
+    shuffleChoices: policy.shuffleChoices ?? true,
+    allowWeb: policy.allowWeb ?? true,
+  }
+}
+
+const { handleSubmit, isSubmitting, values, setFieldValue, resetForm } =
+  useForm({
+    validationSchema: formSchema,
+    initialValues: initialValues(props.policy),
+  })
+
+const saveError = ref<string | null>(null)
 
 watch(
-  () => props.policy,
-  (next) => {
-    violationLimit.value = next.violationLimit ?? 3
-    focusThresholdMs.value = next.focusThresholdMs ?? 15000
-    heartbeatIntervalMs.value = next.heartbeatIntervalMs ?? 30000
-    gapRecordedMs.value = next.gapRecordedMs ?? 60000
-    gapTokenMs.value = next.gapTokenMs ?? 300000
-    gapViolationFrom.value = next.gapViolationFrom ?? 2
-    tokenSlotSeconds.value = next.tokenSlotSeconds ?? 900
-    lateToleranceMinutes.value = next.lateToleranceMinutes ?? 15
-    minSubmitMinutes.value = next.minSubmitMinutes ?? 0
-    shuffleQuestions.value = next.shuffleQuestions ?? true
-    shuffleChoices.value = next.shuffleChoices ?? true
-    allowWeb.value = next.allowWeb ?? true
+  () => [props.open, props.policy] as const,
+  () => {
+    saveError.value = null
+    resetForm({ values: initialValues(props.policy) })
   },
 )
 
-async function submit(): Promise<void> {
-  if (saving.value) return
-  saving.value = true
-  error.value = null
-  const payload: ActivityPolicyPayload = {
-    violationLimit: violationLimit.value,
-    focusThresholdMs: focusThresholdMs.value,
-    heartbeatIntervalMs: heartbeatIntervalMs.value,
-    gapRecordedMs: gapRecordedMs.value,
-    gapTokenMs: gapTokenMs.value,
-    gapViolationFrom: gapViolationFrom.value,
-    tokenSlotSeconds: tokenSlotSeconds.value,
-    lateToleranceMinutes: lateToleranceMinutes.value,
-    minSubmitMinutes: minSubmitMinutes.value,
-    shuffleQuestions: shuffleQuestions.value,
-    shuffleChoices: shuffleChoices.value,
-    allowWeb: allowWeb.value,
-  }
+const onSubmit = handleSubmit(async (form) => {
+  saveError.value = null
   try {
-    const response = await examActivityApi.updatePolicy(
-      props.activityId,
-      payload,
-    )
+    const response = await examActivityApi.updatePolicy(props.activityId, {
+      ...form,
+    })
     emit('saved', response.policy)
     emit('update:open', false)
   } catch (err: unknown) {
-    error.value = messageOf(err, 'Kebijakan kegiatan gagal disimpan.')
-  } finally {
-    saving.value = false
+    saveError.value = messageOf(err, 'Kebijakan kegiatan gagal disimpan.')
   }
-}
+})
 </script>
 
 <template>
@@ -98,159 +203,79 @@ async function submit(): Promise<void> {
     :open="open"
     @update:open="emit('update:open', $event)"
   >
-    <DialogContent size="xl">
+    <DialogContent
+      size="xl"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>Ubah Kebijakan Kegiatan</DialogTitle>
         <DialogDescription>
           Sesuaikan angka pengawasan dan batas pelanggaran untuk kegiatan ini.
         </DialogDescription>
       </DialogHeader>
-      <form
-        class="space-y-4"
-        @submit.prevent="submit"
-      >
-        <DialogBody class="space-y-4">
-          <div
-            v-if="error !== null"
-            role="alert"
-            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
-          >
-            {{ error }}
-          </div>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <label class="grid gap-1 text-control">
-              <span>Batas pelanggaran (1–10)</span>
-              <input
-                v-model.number="violationLimit"
-                type="number"
-                min="1"
-                max="10"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Ambang hilang fokus (ms)</span>
-              <input
-                v-model.number="focusThresholdMs"
-                type="number"
-                min="3000"
-                max="60000"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Interval detak sesi (ms)</span>
-              <input
-                v-model.number="heartbeatIntervalMs"
-                type="number"
-                min="10000"
-                max="120000"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Jeda tercatat putus (ms)</span>
-              <input
-                v-model.number="gapRecordedMs"
-                type="number"
-                min="30000"
-                max="600000"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Jeda wajib token ulang (ms)</span>
-              <input
-                v-model.number="gapTokenMs"
-                type="number"
-                min="30000"
-                max="3600000"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Putus ke-berapa jadi pelanggaran</span>
-              <input
-                v-model.number="gapViolationFrom"
-                type="number"
-                min="1"
-                max="5"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Masa berlaku slot token (detik)</span>
-              <input
-                v-model.number="tokenSlotSeconds"
-                type="number"
-                min="300"
-                max="3600"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Toleransi terlambat (menit)</span>
-              <input
-                v-model.number="lateToleranceMinutes"
-                type="number"
-                min="0"
-                max="120"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="grid gap-1 text-control">
-              <span>Minimal sebelum kumpul (menit)</span>
-              <input
-                v-model.number="minSubmitMinutes"
-                type="number"
-                min="0"
-                max="180"
-                class="rounded-md border px-3 py-2"
-              />
-            </label>
-            <label class="flex items-center gap-2 text-control">
-              <Switch
-                v-model="shuffleQuestions"
-                aria-label="Acak urutan soal"
-              />
-              <span>Acak urutan soal</span>
-            </label>
-            <label class="flex items-center gap-2 text-control">
-              <Switch
-                v-model="shuffleChoices"
-                aria-label="Acak urutan pilihan"
-              />
-              <span>Acak urutan pilihan</span>
-            </label>
-            <label class="flex items-center gap-2 text-control">
-              <Switch
-                v-model="allowWeb"
-                aria-label="Izinkan lewat web (SEB)"
-              />
-              <span>Izinkan lewat web (SEB)</span>
-            </label>
-          </div>
-        </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
+      <DialogBody class="space-y-4">
+        <Alert
+          v-if="saveError"
+          variant="destructive"
         >
-          <Button
-            type="button"
-            variant="outline"
-            @click="emit('update:open', false)"
+          <AlertDescription>{{ saveError }}</AlertDescription>
+        </Alert>
+
+        <form
+          id="activity-policy-form"
+          class="grid gap-4 sm:grid-cols-2"
+          @submit.prevent="onSubmit"
+        >
+          <FloatingField
+            v-for="field in NUMBER_FIELDS"
+            :key="field.key"
+            v-slot="{ value, handleChange }"
+            :name="field.key"
+            :label="field.label"
+            required
           >
-            Batal
-          </Button>
-          <Button
-            type="submit"
-            :disabled="saving"
+            <div class="content-start">
+              <FormControl>
+                <FormattedNumberInput
+                  :model-value="value"
+                  :suffix="field.suffix"
+                  @update:model-value="handleChange"
+                />
+              </FormControl>
+            </div>
+          </FloatingField>
+
+          <label
+            v-for="field in SWITCH_FIELDS"
+            :key="field.key"
+            class="flex items-center gap-2 text-control"
           >
-            {{ saving ? 'Menyimpan…' : 'Simpan kebijakan' }}
-          </Button>
-        </DialogFooter>
-      </form>
+            <Switch
+              :model-value="values[field.key]"
+              :aria-label="field.label"
+              @update:model-value="setFieldValue(field.key, $event)"
+            />
+            <span>{{ field.label }}</span>
+          </label>
+        </form>
+      </DialogBody>
+      <DialogFooter standard>
+        <Button
+          type="button"
+          variant="outline"
+          :disabled="isSubmitting"
+          @click="emit('update:open', false)"
+        >
+          Batal
+        </Button>
+        <Button
+          type="submit"
+          form="activity-policy-form"
+          :disabled="isSubmitting"
+        >
+          {{ isSubmitting ? 'Menyimpan…' : 'Simpan' }}
+        </Button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>

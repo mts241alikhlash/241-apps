@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
 import { mount } from '@vue/test-utils'
+import { defineComponent } from 'vue'
 import { describe, expect, it } from 'vitest'
+import { ActionCell } from '@mts241alikhlash/ui'
 import RoomActionQueue from './RoomActionQueue.vue'
 import type { RoomMonitorParticipant, RoomMonitorSession } from '../types'
+
+const passthrough = defineComponent({ template: '<div><slot /></div>' })
 
 const session = (
   overrides: Partial<RoomMonitorSession> = {},
@@ -52,7 +56,17 @@ const participant = (
 })
 
 const mountQueue = (participants: RoomMonitorParticipant[]) =>
-  mount(RoomActionQueue, { props: { participants, canRecover: true } })
+  mount(RoomActionQueue, {
+    props: { participants, canRecover: true },
+    global: {
+      stubs: {
+        Tooltip: passthrough,
+        TooltipProvider: passthrough,
+        TooltipTrigger: passthrough,
+        TooltipContent: passthrough,
+      },
+    },
+  })
 
 describe('RoomActionQueue', () => {
   it('lists a participant who has not been heard from for over a minute', () => {
@@ -62,7 +76,6 @@ describe('RoomActionQueue', () => {
       participant('b', 'Budi', {}),
     ])
 
-    expect(wrapper.text()).toContain('Perlu Tindakan (1)')
     expect(wrapper.text()).toContain('Ahmad')
     expect(wrapper.text()).toContain('Tidak ada kabar 5 menit')
     expect(wrapper.text()).not.toContain('Budi')
@@ -75,8 +88,8 @@ describe('RoomActionQueue', () => {
       participant('b', 'Budi', null),
     ])
 
-    expect(wrapper.text()).toContain('Perlu Tindakan')
-    expect(wrapper.text()).not.toContain('Perlu Tindakan (')
+    expect(wrapper.text()).toContain('Tidak ada peserta yang perlu ditangani.')
+    expect(wrapper.text()).not.toContain('Ahmad')
   })
 
   it('lists locked participants with the reopen action', () => {
@@ -85,6 +98,9 @@ describe('RoomActionQueue', () => {
     ])
 
     expect(wrapper.text()).toContain('Terkunci pelanggaran')
-    expect(wrapper.text()).toContain('Buka Kembali')
+    const labels = (
+      wrapper.findComponent(ActionCell).props('items') as { label: string }[]
+    ).map((item) => item.label)
+    expect(labels).toContain('Buka Kembali Sesi')
   })
 })

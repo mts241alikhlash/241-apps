@@ -219,13 +219,11 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
           <div class="sheet-signature">
             <p>Pengawas Ruangan</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
             <p class="sheet-signature-name">{{ supervisorName ?? '' }}</p>
           </div>
           <div class="sheet-signature">
             <p>Teknisi Ruangan</p>
             <div class="sheet-signature-space" />
-            <p class="sheet-signature-line" />
             <p class="sheet-signature-name">{{ technicianName ?? '' }}</p>
           </div>
         </div>
@@ -368,12 +366,6 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 
 .sheet-signature-space {
   height: 18mm;
-}
-
-.sheet-signature-line {
-  border-bottom: 1px solid currentColor;
-  width: 80%;
-  margin-inline: auto;
 }
 
 .sheet-signature-name {

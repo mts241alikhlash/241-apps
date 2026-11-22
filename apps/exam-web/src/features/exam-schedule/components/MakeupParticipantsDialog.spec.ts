@@ -112,12 +112,10 @@ describe('MakeupParticipantsDialog', () => {
     wrapper.unmount()
   })
 
-  it('closes with Tutup', async () => {
+  it('has no Tutup button, the dialog closes with the corner button', async () => {
     const wrapper = await open()
 
-    await buttonByText(wrapper, 'Tutup')!.trigger('click')
-
-    expect(wrapper.emitted('update:open')?.at(-1)).toEqual([false])
+    expect(buttonByText(wrapper, 'Tutup')).toBeUndefined()
     wrapper.unmount()
   })
 })

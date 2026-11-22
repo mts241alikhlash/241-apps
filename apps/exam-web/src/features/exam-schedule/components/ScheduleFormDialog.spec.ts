@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { floatingFieldStub } from '@/test-support/floatingFieldStub'
 import ScheduleFormDialog from './ScheduleFormDialog.vue'
 import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
@@ -35,6 +36,13 @@ const button = defineComponent({
 const floatingField = defineComponent({
   props: { label: String, for: String, floating: Boolean, error: String },
   template: '<div><label :for="$props.for">{{ label }}</label><slot /></div>',
+})
+const combo = defineComponent({
+  name: 'ComboStub',
+  props: { modelValue: String, options: Array, disabled: Boolean },
+  emits: ['update:modelValue'],
+  template:
+    '<div><span v-for="option in options" :key="option.value">{{ option.label }}</span></div>',
 })
 const select = defineComponent({
   name: 'SelectStub',
@@ -72,6 +80,9 @@ const stubs = {
   DialogFooter: passthrough,
   Button: button,
   FloatingLabelField: floatingField,
+  FloatingField: floatingFieldStub,
+  FormControl: passthrough,
+  AppCombobox: combo,
   Select: select,
   SelectContent: passthrough,
   SelectItem: item,
@@ -145,26 +156,30 @@ function open(props: Record<string, unknown> = {}) {
   })
 }
 
-const buttonByText = (host: unknown, text: string) =>
-  (host as VueWrapper)
-    .findAll('button')
-    .find(
-      (candidateButton) =>
-        candidateButton.text() === text ||
-        candidateButton.attributes('aria-label') === text,
-    )
-
-async function choose(host: unknown, index: number, value: string) {
-  const selects = (host as VueWrapper).findAllComponents({
-    name: 'SelectStub',
-  })
+async function choose(host: unknown, field: string, value: string) {
+  const target = (host as VueWrapper)
+    .get(`[data-field="${field}"]`)
+    .findComponent({
+      name:
+        field === 'packageId' || field === 'eventId'
+          ? 'ComboStub'
+          : 'SelectStub',
+    })
   ;(
-    selects[index].vm as unknown as {
+    target.vm as unknown as {
       $emit: (event: string, value?: unknown) => void
     }
   ).$emit('update:modelValue', value)
   await flushPromises()
 }
+
+async function submitForm(host: unknown) {
+  await (host as VueWrapper).get('#schedule-form').trigger('submit')
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  await flushPromises()
+}
+
+const editable = { ...existing, eventId: 'e1' }
 
 describe('ScheduleFormDialog', () => {
   beforeEach(() => {
@@ -179,7 +194,7 @@ describe('ScheduleFormDialog', () => {
     await flushPromises()
     expect(loadClassrooms).not.toHaveBeenCalled()
 
-    await choose(wrapper, 0, 'p1')
+    await choose(wrapper, 'packageId', 'p1')
 
     expect(loadClassrooms).toHaveBeenCalledWith('g7')
     expect(wrapper.text()).toContain('VII A')
@@ -191,61 +206,66 @@ describe('ScheduleFormDialog', () => {
     await flushPromises()
 
     expect(loadClassrooms).toHaveBeenCalledWith('g8')
-    expect(wrapper.text()).toContain('UTS IPA')
-    expect(wrapper.findAllComponents({ name: 'SelectStub' })).toHaveLength(3)
+    expect(
+      (wrapper.get('#schedule-package-fixed').element as HTMLInputElement)
+        .value,
+    ).toBe('UTS IPA')
+    expect(wrapper.findAllComponents({ name: 'SelectStub' })).toHaveLength(2)
     wrapper.unmount()
   })
 
   it('hides the package and the classroom when editing', async () => {
-    const wrapper = open({ schedule: existing })
+    const wrapper = open({ schedule: editable })
     await flushPromises()
 
     expect(loadPackages).not.toHaveBeenCalled()
-    expect(wrapper.findAllComponents({ name: 'SelectStub' })).toHaveLength(2)
+    expect(wrapper.findAllComponents({ name: 'SelectStub' })).toHaveLength(1)
     expect(wrapper.text()).toContain('Ubah Jadwal')
-    expect(wrapper.text()).toContain('UTS Matematika')
+    expect(wrapper.find('[data-field="packageId"]').exists()).toBe(false)
+    expect(wrapper.find('[data-field="classroomId"]').exists()).toBe(false)
     wrapper.unmount()
   })
 
-  it('shows what is missing and keeps Simpan disabled', async () => {
+  it('shows what is missing when saving an empty form', async () => {
     const wrapper = open()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Pilih paket')
-    expect(
-      buttonByText(wrapper, 'Simpan')!.attributes('disabled'),
-    ).toBeDefined()
+    await submitForm(wrapper)
+
+    expect(wrapper.text()).toContain('Paket wajib dipilih')
+    expect(wrapper.text()).toContain('Kelas wajib dipilih')
+    expect(saveSchedule).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
   it('offers the four exam types and sends the chosen one', async () => {
     saveSchedule.mockResolvedValue({ success: true, data: existing })
-    const wrapper = open({ schedule: existing })
+    const wrapper = open({ schedule: editable })
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Jenis ujian')
+    expect(wrapper.text()).toContain('Jenis')
     for (const label of ['Ulangan Harian', 'Tugas', 'UTS', 'UAS']) {
       expect(wrapper.text()).toContain(label)
     }
 
-    await choose(wrapper, 1, 'FINAL')
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
-    await flushPromises()
+    await choose(wrapper, 'type', 'DAILY')
+    await submitForm(wrapper)
 
     expect(saveSchedule).toHaveBeenCalledWith(
       { mode: 'edit', id: 's1' },
-      expect.objectContaining({ type: 'FINAL' }),
+      expect.objectContaining({ type: 'DAILY' }),
     )
     wrapper.unmount()
   })
 
   it('locks the type once students have started', async () => {
-    const wrapper = open({ schedule: { ...existing, hasSessions: true } })
+    const wrapper = open({ schedule: { ...editable, hasSessions: true } })
     await flushPromises()
 
     expect(
       wrapper
-        .findAllComponents({ name: 'SelectStub' })[1]
+        .get('[data-field="type"]')
+        .findComponent({ name: 'SelectStub' })
         .attributes('disabled'),
     ).toBeDefined()
     wrapper.unmount()
@@ -253,11 +273,10 @@ describe('ScheduleFormDialog', () => {
 
   it('saves, announces it and closes', async () => {
     saveSchedule.mockResolvedValue({ success: true, data: existing })
-    const wrapper = open({ schedule: existing })
+    const wrapper = open({ schedule: editable })
     await flushPromises()
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
-    await flushPromises()
+    await submitForm(wrapper)
 
     expect(saveSchedule).toHaveBeenCalledWith(
       { mode: 'edit', id: 's1' },
@@ -273,11 +292,10 @@ describe('ScheduleFormDialog', () => {
       success: false,
       error: 'Kelas bukan kelas tahun ajaran aktif',
     })
-    const wrapper = open({ schedule: existing })
+    const wrapper = open({ schedule: editable })
     await flushPromises()
 
-    await buttonByText(wrapper, 'Simpan')!.trigger('click')
-    await flushPromises()
+    await submitForm(wrapper)
 
     expect(wrapper.get('[role="alert"]').text()).toContain(
       'Kelas bukan kelas tahun ajaran aktif',
@@ -298,8 +316,8 @@ describe('ScheduleFormDialog', () => {
     const wrapper = open()
     await flushPromises()
 
-    await choose(wrapper, 0, 'p1')
-    await choose(wrapper, 0, 'p2')
+    await choose(wrapper, 'packageId', 'p1')
+    await choose(wrapper, 'packageId', 'p2')
     slow([{ id: 'c7', displayName: 'VII A' }])
     await flushPromises()
 
@@ -313,7 +331,7 @@ describe('ScheduleFormDialog', () => {
     const wrapper = open()
     await flushPromises()
 
-    await choose(wrapper, 0, 'p1')
+    await choose(wrapper, 'packageId', 'p1')
 
     expect(wrapper.text()).toContain('Tidak ada kelas aktif untuk tingkat ini')
     wrapper.unmount()
@@ -329,7 +347,10 @@ describe('ScheduleFormDialog', () => {
 
     expect(loadPackages).not.toHaveBeenCalled()
     expect(loadClassrooms).toHaveBeenCalledWith('g9')
-    expect(wrapper.text()).toContain('UTS Fiqih')
+    expect(
+      (wrapper.get('#schedule-package-fixed').element as HTMLInputElement)
+        .value,
+    ).toBe('UTS Fiqih')
     wrapper.unmount()
   })
 
@@ -337,8 +358,8 @@ describe('ScheduleFormDialog', () => {
     const wrapper = open()
     await flushPromises()
 
-    expect(wrapper.findAll('input[id$="-start-date"]')).toHaveLength(1)
-    expect(wrapper.findAll('input[id$="-end-date"]')).toHaveLength(1)
+    expect(wrapper.findAll('[data-field="startDate"] input')).toHaveLength(1)
+    expect(wrapper.findAll('[data-field="endDate"] input')).toHaveLength(1)
     wrapper.unmount()
   })
 

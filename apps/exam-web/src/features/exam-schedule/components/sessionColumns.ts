@@ -5,8 +5,13 @@ import { ActionCell } from '@mts241alikhlash/ui'
 import { History, Laptop, RefreshCw } from '@lucide/vue'
 import type { ScheduleSession } from '../types'
 import { sessionStatusLabel } from '../types'
+import {
+  classOfClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 
 export interface SessionColumnOptions {
+  classroomName?: string | null
   canRelease: boolean
   onRelease: (session: ScheduleSession) => void
   canRecover?: boolean
@@ -20,16 +25,18 @@ const timeFormat = new Intl.DateTimeFormat('id-ID', {
   minute: '2-digit',
 })
 
-const studentText = (session: ScheduleSession) =>
-  [session.studentName ?? 'Siswa tidak ditemukan', session.studentNis]
-    .filter(Boolean)
-    .join(' · ')
 const startedText = (session: ScheduleSession) =>
-  timeFormat.format(new Date(session.startedAt))
+  timeFormat.format(new Date(session.startedAt)).replace('.', ':')
+const finishedText = (session: ScheduleSession) =>
+  session.submittedAt === null
+    ? '-'
+    : timeFormat.format(new Date(session.submittedAt)).replace('.', ':')
+const number = (value: number) =>
+  value.toLocaleString('id-ID', { maximumFractionDigits: 2 })
 const scoreText = (session: ScheduleSession) =>
   session.rawScore === null || session.maxScore === null
     ? '-'
-    : `${session.rawScore} / ${session.maxScore}`
+    : `${number(session.rawScore)} / ${number(session.maxScore)}`
 const exitText = (session: ScheduleSession) =>
   session.violationCount > 0 ? `${session.violationCount}×` : '-'
 const deviceText = (session: ScheduleSession) =>
@@ -44,35 +51,67 @@ export function buildSessionColumns(
 ): ColumnDef<ScheduleSession>[] {
   return [
     {
-      id: 'student',
-      header: 'Siswa',
-      meta: { align: 'left', strong: true },
-      cell: ({ row }) => studentText(row.original),
-    },
-    {
-      id: 'status',
-      header: 'Status',
+      id: 'participantNumber',
+      header: 'No. Peserta',
       meta: {
         align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: (row: ScheduleSession) => sessionStatusLabel(row.status),
+        strong: true,
+        mobileLabel: 'No. Peserta',
+        mobileValue: (row: ScheduleSession) => row.participantNumber ?? '-',
       },
-      cell: ({ row }) =>
-        h(
-          Badge,
-          { variant: row.original.status === 'GRADED' ? 'default' : 'outline' },
-          () => sessionStatusLabel(row.original.status),
-        ),
+      cell: ({ row }) => row.original.participantNumber ?? '-',
+    },
+    {
+      id: 'name',
+      header: 'Nama',
+      meta: {
+        align: 'left',
+        strong: true,
+        mobile: 'title',
+        mobileValue: (row: ScheduleSession) =>
+          row.studentName ?? 'Siswa tidak ditemukan',
+      },
+      cell: ({ row }) => row.original.studentName ?? 'Siswa tidak ditemukan',
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: () => gradeOfClassroom(options.classroomName ?? null),
+      },
+      cell: () => gradeOfClassroom(options.classroomName ?? null),
+    },
+    {
+      id: 'classroom',
+      header: 'Kelas',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: () => classOfClassroom(options.classroomName ?? null),
+      },
+      cell: () => classOfClassroom(options.classroomName ?? null),
     },
     {
       id: 'started',
-      header: 'Mulai',
+      header: 'Jam Mulai',
       meta: {
         align: 'center',
-        mobileLabel: 'Mulai',
+        mobileLabel: 'Jam Mulai',
         mobileValue: startedText,
       },
       cell: ({ row }) => startedText(row.original),
+    },
+    {
+      id: 'finished',
+      header: 'Jam Selesai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Jam Selesai',
+        mobileValue: finishedText,
+      },
+      cell: ({ row }) => finishedText(row.original),
     },
     {
       id: 'score',
@@ -103,6 +142,21 @@ export function buildSessionColumns(
         mobileValue: deviceText,
       },
       cell: ({ row }) => deviceText(row.original),
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: (row: ScheduleSession) => sessionStatusLabel(row.status),
+      },
+      cell: ({ row }) =>
+        h(
+          Badge,
+          { variant: row.original.status === 'GRADED' ? 'default' : 'outline' },
+          () => sessionStatusLabel(row.original.status),
+        ),
     },
     {
       id: 'actions',

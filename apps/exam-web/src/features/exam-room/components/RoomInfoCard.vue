@@ -21,22 +21,30 @@ defineProps<{
       <CardTitle size="md">Ruang</CardTitle>
     </CardHeader>
     <CardContent variant="standard">
-      <dl class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-5">
-        <div class="flex flex-col gap-0.5">
+      <dl
+        class="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-1 sm:grid-cols-5 sm:gap-x-4 sm:gap-y-2"
+      >
+        <div class="contents sm:flex sm:flex-col sm:gap-0.5">
           <dt class="text-control text-muted-foreground">Kapasitas</dt>
-          <dd class="font-medium">{{ room?.capacity ?? '-' }} kursi</dd>
+          <dd class="min-w-0 break-words text-right font-medium sm:text-left">
+            {{ room?.capacity ?? '-' }} kursi
+          </dd>
         </div>
-        <div class="flex flex-col gap-0.5">
+        <div class="contents sm:flex sm:flex-col sm:gap-0.5">
           <dt class="text-control text-muted-foreground">Peserta</dt>
-          <dd class="font-medium">{{ registered ?? '-' }} siswa</dd>
+          <dd class="min-w-0 break-words text-right font-medium sm:text-left">
+            {{ registered ?? '-' }} siswa
+          </dd>
         </div>
-        <div class="flex flex-col gap-0.5">
+        <div class="contents sm:flex sm:flex-col sm:gap-0.5">
           <dt class="text-control text-muted-foreground">Mapel</dt>
-          <dd class="font-medium">{{ subject ?? '-' }}</dd>
+          <dd class="min-w-0 break-words text-right font-medium sm:text-left">
+            {{ subject ?? '-' }}
+          </dd>
         </div>
-        <div class="flex flex-col gap-0.5">
+        <div class="contents sm:flex sm:flex-col sm:gap-0.5">
           <dt class="text-control text-muted-foreground">Pengawas</dt>
-          <dd class="font-medium">
+          <dd class="min-w-0 break-words text-right font-medium sm:text-left">
             {{ room?.currentSupervisorName ?? 'Belum ditugaskan' }}
             <Badge
               v-if="room?.isSubstituted"
@@ -45,9 +53,11 @@ defineProps<{
             >
           </dd>
         </div>
-        <div class="flex flex-col gap-0.5">
+        <div class="contents sm:flex sm:flex-col sm:gap-0.5">
           <dt class="text-control text-muted-foreground">Teknisi</dt>
-          <dd class="font-medium">{{ room?.technicianName ?? '-' }}</dd>
+          <dd class="min-w-0 break-words text-right font-medium sm:text-left">
+            {{ room?.technicianName ?? '-' }}
+          </dd>
         </div>
       </dl>
     </CardContent>

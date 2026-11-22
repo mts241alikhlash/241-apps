@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Filter } from '@lucide/vue'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -45,7 +45,7 @@ const mobileStatusFilterId = useId()
 const filterOpen = ref(false)
 
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 useBreadcrumbs(() => [
   { title: 'Ujian', href: '#' },
@@ -53,15 +53,6 @@ useBreadcrumbs(() => [
 ])
 
 const activeFiltersCount = computed(() => Number(statusFilter.value !== 'ALL'))
-
-function resetFilters() {
-  statusFilter.value = 'ALL'
-}
-
-function resetAllFilters() {
-  resetFilters()
-  search.value = ''
-}
 
 const filteredRooms = computed(() => {
   const keyword = search.value.trim().toLocaleLowerCase('id')
@@ -249,22 +240,13 @@ onMounted(load)
             </template>
 
             <template #empty>
-              <div class="space-y-3 text-center">
-                <p>
-                  {{
-                    activeFiltersCount || search
-                      ? 'Tidak ada ruangan yang cocok dengan filter.'
-                      : 'Belum ada ruangan aktif untuk Anda.'
-                  }}
-                </p>
-                <Button
-                  v-if="activeFiltersCount || search"
-                  variant="outline"
-                  @click="resetAllFilters"
-                >
-                  Atur Ulang
-                </Button>
-              </div>
+              <DataTableEmpty
+                :message="
+                  activeFiltersCount || search
+                    ? 'Tidak ada ruangan yang cocok dengan filter.'
+                    : 'Belum ada ruangan aktif untuk Anda.'
+                "
+              />
             </template>
           </DataTable>
         </template>
@@ -301,17 +283,14 @@ onMounted(load)
             </Select>
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
+            :disabled="statusFilter === 'ALL'"
             @click="statusFilter = 'ALL'"
           >
             Atur Ulang
           </Button>
-          <Button @click="filterOpen = false">Tutup</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -180,10 +180,7 @@ async function submit(): Promise<void> {
           </label>
         </fieldset>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="emit('update:open', false)"

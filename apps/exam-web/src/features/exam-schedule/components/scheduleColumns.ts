@@ -2,20 +2,21 @@ import { h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
-import { Ban, KeyRound, SquarePen, UserRoundPlus, Users } from '@lucide/vue'
+import { Ban, KeyRound, UserRoundPlus, Users } from '@lucide/vue'
 import type { ExamSchedule } from '../types'
 import { examTypeLabel, phaseLabel, phaseTone } from '../types'
 import { formatDay, formatTime } from '../utils/formatWindow'
 import { schedulePhase } from '../utils/schedulePhase'
+import { gradeOfClassroom } from '@/features/exam-shared/classroomName'
 
 export interface ScheduleColumnOptions {
+  subjectName?: (schedule: ExamSchedule) => string
   canUpdate: boolean
   canCancel: boolean
   canAccessCode: boolean
   canSessions: boolean
   canMakeup?: boolean
   canParticipants?: boolean
-  canManageActivity?: boolean
   now: () => Date
   onEdit: (schedule: ExamSchedule) => void
   onCancel: (schedule: ExamSchedule) => void
@@ -23,7 +24,6 @@ export interface ScheduleColumnOptions {
   onSessions: (schedule: ExamSchedule) => void
   onMakeup?: (schedule: ExamSchedule) => void
   onParticipants?: (schedule: ExamSchedule) => void
-  onStatus?: (schedule: ExamSchedule) => void
 }
 
 const BADGE_VARIANT = {
@@ -41,9 +41,75 @@ const classroomText = (schedule: ExamSchedule) => schedule.classroomName ?? '-'
 const durationText = (schedule: ExamSchedule) =>
   `${schedule.durationMinutes} menit`
 
+export function scheduleActions(
+  schedule: ExamSchedule,
+  options: ScheduleColumnOptions,
+  now: Date,
+) {
+  const current = schedulePhase(schedule, now)
+  const canChange = current === 'UPCOMING' || current === 'RUNNING'
+  const items = []
+  if (canChange && options.canAccessCode) {
+    items.push({
+      label: 'Token',
+      icon: KeyRound,
+      onClick: () => options.onAccessCode(schedule),
+    })
+  }
+  if ((schedule.hasSessions || current === 'RUNNING') && options.canSessions) {
+    items.push({
+      label: 'Sesi',
+      icon: Users,
+      onClick: () => options.onSessions(schedule),
+    })
+  }
+  if (current === 'UPCOMING' && options.canCancel && !schedule.hasSessions) {
+    items.push({
+      label: 'Batalkan',
+      icon: Ban,
+      destructive: true,
+      onClick: () => options.onCancel(schedule),
+    })
+  }
+  if (
+    schedule.kind === 'REGULAR' &&
+    schedule.status === 'SCHEDULED' &&
+    options.canMakeup
+  ) {
+    items.push({
+      label: 'Susulan',
+      icon: UserRoundPlus,
+      onClick: () => options.onMakeup?.(schedule),
+    })
+  }
+  if (
+    schedule.kind === 'MAKEUP' &&
+    schedule.status === 'SCHEDULED' &&
+    options.canParticipants
+  ) {
+    items.push({
+      label: 'Peserta',
+      icon: Users,
+      onClick: () => options.onParticipants?.(schedule),
+    })
+  }
+  return { canEdit: canChange && options.canUpdate, items }
+}
+
+export const scheduleHasActions = (
+  schedule: ExamSchedule,
+  options: ScheduleColumnOptions,
+): boolean => {
+  const { canEdit, items } = scheduleActions(schedule, options, options.now())
+  return canEdit || items.length > 0
+}
+
 export function buildScheduleColumns(
   options: ScheduleColumnOptions,
 ): ColumnDef<ExamSchedule>[] {
+  const subjectOf = (schedule: ExamSchedule) =>
+    options.subjectName?.(schedule) ?? schedule.packageTitle
+
   const phase = (schedule: ExamSchedule) =>
     schedulePhase(schedule, options.now())
 
@@ -60,15 +126,25 @@ export function buildScheduleColumns(
     },
     {
       id: 'package',
-      header: 'Paket',
+      header: 'Mata Pelajaran',
       meta: { align: 'left', strong: true, mobile: 'title' },
       cell: ({ row }) =>
         row.original.kind === 'MAKEUP'
           ? h('span', { class: 'flex items-center gap-2' }, [
-              row.original.packageTitle,
+              subjectOf(row.original),
               h(Badge, { variant: 'outline' }, () => 'Susulan'),
             ])
-          : row.original.packageTitle,
+          : subjectOf(row.original),
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: ExamSchedule) => gradeOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => gradeOfClassroom(row.original.classroomName),
     },
     {
       id: 'classroom',
@@ -140,70 +216,15 @@ export function buildScheduleColumns(
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) => {
-        const current = phase(row.original)
-        const canChange = current === 'UPCOMING' || current === 'RUNNING'
-        const items = []
-        if (canChange && options.canAccessCode) {
-          items.push({
-            label: 'Token',
-            icon: KeyRound,
-            onClick: () => options.onAccessCode(row.original),
-          })
-        }
-        if (
-          (row.original.hasSessions || current === 'RUNNING') &&
-          options.canSessions
-        ) {
-          items.push({
-            label: 'Sesi',
-            icon: Users,
-            onClick: () => options.onSessions(row.original),
-          })
-        }
-        if (
-          current === 'UPCOMING' &&
-          options.canCancel &&
-          !row.original.hasSessions
-        ) {
-          items.push({
-            label: 'Batalkan',
-            icon: Ban,
-            destructive: true,
-            onClick: () => options.onCancel(row.original),
-          })
-        }
-        if (
-          row.original.kind === 'REGULAR' &&
-          row.original.status === 'SCHEDULED' &&
-          options.canMakeup
-        ) {
-          items.push({
-            label: 'Susulan',
-            icon: UserRoundPlus,
-            onClick: () => options.onMakeup?.(row.original),
-          })
-        }
-        if (
-          row.original.kind === 'MAKEUP' &&
-          row.original.status === 'SCHEDULED' &&
-          options.canParticipants
-        ) {
-          items.push({
-            label: 'Peserta',
-            icon: Users,
-            onClick: () => options.onParticipants?.(row.original),
-          })
-        }
-        if (row.original.activityId !== null && options.canManageActivity) {
-          items.push({
-            label: 'Ubah status',
-            icon: SquarePen,
-            onClick: () => options.onStatus?.(row.original),
-          })
-        }
+        const { canEdit, items } = scheduleActions(
+          row.original,
+          options,
+          options.now(),
+        )
+        if (!canEdit && items.length === 0) return null
         return h(ActionCell, {
           editLabel: 'Ubah',
-          hideEdit: !canChange || !options.canUpdate,
+          hideEdit: !canEdit,
           hideDelete: true,
           items,
           onEdit: () => options.onEdit(row.original),

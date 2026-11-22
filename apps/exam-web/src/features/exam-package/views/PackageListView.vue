@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -54,7 +54,7 @@ const subjectId = ref('ALL')
 const gradeId = ref('ALL')
 const status = ref('ALL')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 const filterOpen = ref(false)
 const copying = ref(false)
 const createOpen = ref(false)
@@ -85,11 +85,6 @@ function resetFilters() {
   subjectId.value = 'ALL'
   gradeId.value = 'ALL'
   status.value = 'ALL'
-}
-
-function resetAllFilters() {
-  resetFilters()
-  search.value = ''
 }
 
 function changePageSize(size: number) {
@@ -255,22 +250,13 @@ onMounted(() => examPackageService.loadReferences())
             </Button>
           </template>
           <template #empty>
-            <div class="space-y-3">
-              <p>
-                {{
-                  activeFiltersCount || search
-                    ? 'Tidak ada paket yang cocok dengan filter.'
-                    : 'Belum ada paket soal.'
-                }}
-              </p>
-              <Button
-                v-if="activeFiltersCount || search"
-                variant="outline"
-                @click="resetAllFilters"
-              >
-                Atur Ulang
-              </Button>
-            </div>
+            <DataTableEmpty
+              :message="
+                activeFiltersCount || search
+                  ? 'Tidak ada paket yang cocok dengan filter.'
+                  : 'Belum ada paket soal.'
+              "
+            />
           </template>
         </DataTable>
       </CardContent>
@@ -294,17 +280,14 @@ onMounted(() => examPackageService.loadReferences())
             :grades="gradeOptions"
           />
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
+            :disabled="activeFiltersCount === 0"
             @click="resetFilters"
           >
             Atur Ulang
           </Button>
-          <Button @click="filterOpen = false">Tutup</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

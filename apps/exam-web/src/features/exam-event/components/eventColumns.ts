@@ -5,7 +5,13 @@ import { Badge } from '@mts241alikhlash/ui/badge'
 import type { ExamEvent } from '../types'
 import { eventStatusLabel, eventStatusVariant } from '../types'
 import { examTypeLabel } from '@/features/exam-schedule/types'
-import { formatDateRange } from '@/features/exam-schedule/utils/formatDateRange'
+
+const dateFormat = new Intl.DateTimeFormat('id-ID', {
+  timeZone: 'Asia/Jakarta',
+  dateStyle: 'long',
+})
+
+const formatDate = (iso: string): string => dateFormat.format(new Date(iso))
 
 export interface EventColumnOptions {
   canManage: boolean
@@ -17,12 +23,6 @@ export function buildEventColumns(
 ): ColumnDef<ExamEvent>[] {
   return [
     {
-      id: 'name',
-      header: 'Periode Ujian',
-      meta: { align: 'left', strong: true, mobileLabel: 'Periode Ujian' },
-      cell: ({ row }) => row.original.name,
-    },
-    {
       id: 'type',
       header: 'Jenis',
       meta: {
@@ -33,16 +33,30 @@ export function buildEventColumns(
       cell: ({ row }) => examTypeLabel(row.original.type),
     },
     {
-      id: 'window',
-      header: 'Waktu',
+      id: 'name',
+      header: 'Periode Ujian',
+      meta: { align: 'left', strong: true, mobileLabel: 'Periode Ujian' },
+      cell: ({ row }) => row.original.name,
+    },
+    {
+      id: 'startDate',
+      header: 'Tanggal Mulai',
       meta: {
         align: 'center',
-        mobileLabel: 'Waktu',
-        mobileValue: (row: ExamEvent) =>
-          formatDateRange(row.startsAt, row.endsAt),
+        mobileLabel: 'Tanggal Mulai',
+        mobileValue: (row: ExamEvent) => formatDate(row.startsAt),
       },
-      cell: ({ row }) =>
-        formatDateRange(row.original.startsAt, row.original.endsAt),
+      cell: ({ row }) => formatDate(row.original.startsAt),
+    },
+    {
+      id: 'endDate',
+      header: 'Tanggal Selesai',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Tanggal Selesai',
+        mobileValue: (row: ExamEvent) => formatDate(row.endsAt),
+      },
+      cell: ({ row }) => formatDate(row.original.endsAt),
     },
     {
       id: 'status',

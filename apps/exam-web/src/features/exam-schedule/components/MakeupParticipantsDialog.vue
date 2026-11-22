@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +11,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@mts241alikhlash/ui/alert-dialog'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
   DialogBody,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
@@ -105,26 +105,26 @@ watch(
         <DialogDescription>{{ title }}</DialogDescription>
       </DialogHeader>
       <DialogBody>
-        <div
+        <Alert
           v-if="removeError"
-          class="mb-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control"
-          role="alert"
+          variant="destructive"
+          class="mb-3"
         >
-          {{ removeError }}
-        </div>
-        <div
+          <AlertDescription>{{ removeError }}</AlertDescription>
+        </Alert>
+        <Alert
           v-if="error"
-          class="space-y-3 rounded-md border p-3 text-control"
-          role="alert"
+          variant="destructive"
+          class="space-y-3"
         >
-          <p>{{ error }}</p>
+          <AlertDescription>{{ error }}</AlertDescription>
           <Button
             variant="outline"
             @click="load"
           >
             Coba lagi
           </Button>
-        </div>
+        </Alert>
         <DataTable
           v-else
           mobile="cards"
@@ -135,18 +135,10 @@ watch(
           item-label="siswa"
         >
           <template #empty>
-            <p>Belum ada peserta.</p>
+            <DataTableEmpty message="Belum ada peserta." />
           </template>
         </DataTable>
       </DialogBody>
-      <DialogFooter standard>
-        <Button
-          variant="outline"
-          @click="emit('update:open', false)"
-        >
-          Tutup
-        </Button>
-      </DialogFooter>
     </DialogContent>
   </Dialog>
 

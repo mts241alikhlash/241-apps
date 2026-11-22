@@ -60,28 +60,15 @@ export const menuSections: MenuSection[] = [
             requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
           },
           {
-            title: 'menu.examSeatAssignment',
-            url: '/exam/seat-assignment',
-            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
-          },
-          {
-            title: 'menu.examSupervisorSchedule',
-            url: '/exam/supervisor-schedule',
-            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
-          },
-          {
             title: 'menu.examParticipantNumbers',
             url: '/exam/participant-numbers',
             requiredPermission: 'exam-events.manage',
           },
-        ],
-      },
-      {
-        key: 'exam-run',
-        title: 'menu.examRun',
-        url: '#',
-        icon: CalendarClock,
-        items: [
+          {
+            title: 'menu.examSeatAssignment',
+            url: '/exam/seat-assignment',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
           {
             title: 'menu.examActivities',
             url: '/exam/activities',
@@ -92,6 +79,19 @@ export const menuSections: MenuSection[] = [
             url: '/exam/schedules',
             requiredPermission: 'exam-schedules.read',
           },
+          {
+            title: 'menu.examSupervisorSchedule',
+            url: '/exam/supervisor-schedule',
+            requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+          },
+        ],
+      },
+      {
+        key: 'exam-run',
+        title: 'menu.examRun',
+        url: '#',
+        icon: CalendarClock,
+        items: [
           {
             title: 'menu.examRooms',
             url: '/exam/rooms',
@@ -126,6 +126,11 @@ export const menuSections: MenuSection[] = [
         icon: Printer,
         items: [
           {
+            title: 'menu.examPrintSchedule',
+            url: '/exam/print/schedule',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
             title: 'menu.examCards',
             url: '/exam/print/cards',
             requiredPermission: 'exam-events.manage',
@@ -133,11 +138,6 @@ export const menuSections: MenuSection[] = [
           {
             title: 'menu.examSeatLabels',
             url: '/exam/print/desks',
-            requiredPermission: 'exam-events.manage',
-          },
-          {
-            title: 'menu.examPrintSchedule',
-            url: '/exam/print/schedule',
             requiredPermission: 'exam-events.manage',
           },
           {

@@ -74,7 +74,9 @@ describe('buildParticipantColumns', () => {
     const onRemove = vi.fn()
     const row = participant()
 
-    ;(action(true, row, onRemove)!.props as { onClick: () => void }).onClick()
+    ;(
+      action(true, row, onRemove)!.props as { items: { onClick: () => void }[] }
+    ).items[0].onClick()
 
     expect(onRemove).toHaveBeenCalledWith(row)
   })

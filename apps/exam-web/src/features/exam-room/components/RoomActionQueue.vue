@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { ActionCell, DataTable } from '@mts241alikhlash/ui'
+import { ActionCell, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { History, Laptop, Undo2 } from '@lucide/vue'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import {
@@ -133,11 +133,11 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
   },
   {
     id: 'participant',
-    header: 'Peserta',
+    header: 'Nama',
     meta: {
       align: 'left',
       strong: true,
-      mobileLabel: 'Peserta',
+      mobileLabel: 'Nama',
       mobileValue: (entry: Entry) => entry.row.studentName ?? '-',
     },
     cell: ({ row }) => h('span', row.original.row.studentName ?? '-'),
@@ -203,7 +203,7 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
         item-label="peserta"
       >
         <template #empty>
-          <p>Tidak ada peserta yang perlu ditangani.</p>
+          <DataTableEmpty message="Tidak ada peserta yang perlu ditangani." />
         </template>
       </DataTable>
     </CardContent>

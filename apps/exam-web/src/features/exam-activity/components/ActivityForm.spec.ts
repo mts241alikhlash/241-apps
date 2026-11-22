@@ -1,15 +1,75 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { flushPromises, mount } from '@vue/test-utils'
+import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
+import { defineComponent } from 'vue'
+import { floatingFieldStub } from '@/test-support/floatingFieldStub'
 import ActivityForm from './ActivityForm.vue'
 
-const { updateStatus, issueParticipantNumbers } = vi.hoisted(() => ({
-  updateStatus: vi.fn(),
-  issueParticipantNumbers: vi.fn(),
-}))
-vi.mock('../api/examActivityApi', () => ({
-  examActivityApi: { updateStatus, issueParticipantNumbers },
-}))
+const passthrough = defineComponent({ template: '<div><slot /></div>' })
+const button = defineComponent({
+  props: { variant: String, disabled: Boolean, type: String },
+  template:
+    '<button :type="type || \'button\'" :disabled="disabled"><slot /></button>',
+})
+const select = defineComponent({
+  name: 'SelectStub',
+  props: { modelValue: String, disabled: Boolean },
+  emits: ['update:modelValue'],
+  template: '<div :disabled="disabled"><slot /></div>',
+})
+const item = defineComponent({
+  props: { value: String },
+  template: '<option :value="value"><slot /></option>',
+})
+const combo = defineComponent({
+  name: 'ComboStub',
+  props: { modelValue: String, options: Array, disabled: Boolean },
+  emits: ['update:modelValue'],
+  template: '<div :disabled="disabled" />',
+})
+const commandItem = defineComponent({
+  props: { value: String },
+  emits: ['select'],
+  template:
+    '<button type="button" @click="$emit(\'select\', $event)"><slot /></button>',
+})
+const textInput = defineComponent({
+  props: { modelValue: [String, Number], type: String },
+  emits: ['update:modelValue'],
+  template:
+    '<input :type="type" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+})
+const numberInput = defineComponent({
+  props: { modelValue: [String, Number] },
+  emits: ['update:modelValue'],
+  template:
+    '<input :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
+})
+
+const stubs = {
+  FloatingField: floatingFieldStub,
+  FloatingLabelField: passthrough,
+  FormControl: passthrough,
+  Button: button,
+  Select: select,
+  SelectContent: passthrough,
+  SelectItem: item,
+  SelectTrigger: passthrough,
+  SelectValue: passthrough,
+  AppCombobox: combo,
+  DatePicker: textInput,
+  Input: textInput,
+  FormattedNumberInput: numberInput,
+  Popover: passthrough,
+  PopoverTrigger: passthrough,
+  PopoverContent: passthrough,
+  Command: passthrough,
+  CommandInput: passthrough,
+  CommandList: passthrough,
+  CommandEmpty: passthrough,
+  CommandGroup: passthrough,
+  CommandItem: commandItem,
+}
 
 const props = {
   semesterId: 'sem-1',
@@ -26,106 +86,109 @@ const props = {
   packages: [
     { id: 'package-1', subjectId: 'subject-inf', label: 'Informatika' },
   ],
+  subjects: [{ id: 'subject-inf', label: 'Informatika' }],
 }
 
 const open = (overrides: Record<string, unknown> = {}) =>
-  mount(ActivityForm, { props: { ...props, ...overrides } })
+  mount(ActivityForm, {
+    props: { ...props, ...overrides },
+    global: { stubs },
+  })
 
-const pastActivity = {
-  id: 'activity-1',
-  semesterId: 'sem-1',
-  gradeId: 'grade-7',
-  eventId: null,
-  subjectId: 'subject-inf',
-  subjectName: 'Informatika',
-  gradeName: 'Kelas 7',
-  packageId: 'package-1',
-  type: 'DAILY' as const,
-  category: 'EXAM' as const,
-  status: 'DRAFT' as const,
-  tokenMode: 'ROTATING' as const,
-  tokenRotation: 1,
-  durationMinutes: 90,
-  policy: {
-    focusThresholdMs: 1,
-    gapRecordedMs: 1,
-    gapTokenMs: 1,
-    gapViolationFrom: 1,
-    heartbeatIntervalMs: 1,
-    tokenSlotSeconds: 1,
-    lateToleranceMinutes: 15,
-    minSubmitMinutes: 0,
-    shuffleQuestions: true,
-    shuffleChoices: true,
-    allowWeb: true,
-    violationLimit: 1,
-  },
-  startsAt: '2020-11-10T01:00:00.000Z',
-  endsAt: '2020-11-10T04:00:00.000Z',
+const emitFrom = async (
+  host: VueWrapper,
+  field: string,
+  name: 'SelectStub' | 'ComboStub',
+  value: string,
+) => {
+  ;(
+    host.get(`[data-field="${field}"]`).findComponent({ name })
+      .vm as unknown as {
+      $emit: (event: string, value?: unknown) => void
+    }
+  ).$emit('update:modelValue', value)
+  await flushPromises()
 }
+
+const typeInto = async (host: VueWrapper, field: string, value: string) => {
+  await host.get(`[data-field="${field}"] input`).setValue(value)
+}
+
+const submitForm = async (host: VueWrapper) => {
+  await host.get('#activity-form').trigger('submit')
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  await flushPromises()
+}
+
+const classroomButtons = (host: VueWrapper) =>
+  host.findAll('[data-field="classroomIds"] button[type="button"]')
 
 describe('ActivityForm', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('only offers the classrooms of the chosen grade', async () => {
     const wrapper = open()
-    await wrapper.find('#activity-grade').setValue('grade-7')
+    await emitFrom(wrapper, 'gradeId', 'SelectStub', 'grade-7')
 
     expect(wrapper.text()).toContain('VII-A')
     expect(wrapper.text()).toContain('VII-B')
     expect(wrapper.text()).not.toContain('IX-A')
+    wrapper.unmount()
   })
 
   it('clears the chosen classrooms when the grade changes', async () => {
     const wrapper = open()
-    await wrapper.find('#activity-grade').setValue('grade-7')
-    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
-    await wrapper.find('#activity-grade').setValue('grade-9')
+    await emitFrom(wrapper, 'gradeId', 'SelectStub', 'grade-7')
+    await classroomButtons(wrapper)[1].trigger('click')
+    await flushPromises()
+    expect(
+      wrapper.get('[data-field="classroomIds"] [role="combobox"]').text(),
+    ).toContain('VII-A')
+
+    await emitFrom(wrapper, 'gradeId', 'SelectStub', 'grade-9')
 
     expect(
-      wrapper
-        .findAll('input[type="checkbox"]')
-        .filter((box) => (box.element as HTMLInputElement).checked),
-    ).toHaveLength(0)
+      wrapper.get('[data-field="classroomIds"] [role="combobox"]').text(),
+    ).toBe('Pilih kelas')
+    wrapper.unmount()
   })
 
-  it('locks preset and token mode to Token berputar when MIDTERM is selected', async () => {
+  it('locks the token to Token berputar when an exam type is chosen', async () => {
     const wrapper = open({
       isAdmin: true,
       events: [{ id: 'ev-1', name: 'UTS Ganjil', type: 'MIDTERM' }],
     })
-    await wrapper.find('#activity-type').setValue('MIDTERM')
+    await emitFrom(wrapper, 'type', 'SelectStub', 'MIDTERM')
 
-    expect(wrapper.text()).toContain('Kebijakan UTS')
-    expect(wrapper.text()).toContain('Token berputar')
-    expect(wrapper.find('#activity-preset').exists()).toBe(false)
-    expect(wrapper.find('#activity-token-mode').exists()).toBe(false)
+    expect(wrapper.find('[data-field="presetName"]').exists()).toBe(false)
+    expect(wrapper.find('[data-field="tokenMode"]').exists()).toBe(false)
+    expect(wrapper.find('[data-field="eventId"]').exists()).toBe(true)
+    wrapper.unmount()
   })
 
-  it('lets DAILY activities choose between DAILY and ASSIGNMENT presets', async () => {
+  it('lets non-exam activities choose between the daily and assignment presets', () => {
     const wrapper = open()
-    await wrapper.find('#activity-type').setValue('DAILY')
 
-    const presetOptions = wrapper
-      .find('#activity-preset')
+    const options = wrapper
+      .get('[data-field="presetName"]')
       .findAll('option')
       .map((opt) => (opt.element as HTMLOptionElement).value)
-    expect(presetOptions).toEqual(['DAILY', 'ASSIGNMENT'])
+    expect(options).toEqual(['DAILY', 'ASSIGNMENT'])
+    wrapper.unmount()
   })
 
   it('submits the chosen classrooms and the package subject', async () => {
     const wrapper = open()
-    await wrapper.find('#activity-grade').setValue('grade-7')
-    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
-    await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
-    await wrapper.find('#activity-package').setValue('package-1')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[0]
-      .setValue('2026-11-10T08:00')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[1]
-      .setValue('2026-11-10T11:00')
-    await wrapper.find('form').trigger('submit')
+    await emitFrom(wrapper, 'gradeId', 'SelectStub', 'grade-7')
+    await classroomButtons(wrapper)[1].trigger('click')
+    await flushPromises()
+    await emitFrom(wrapper, 'subjectId', 'ComboStub', 'subject-inf')
+    await emitFrom(wrapper, 'packageId', 'ComboStub', 'package-1')
+    await typeInto(wrapper, 'startDate', '2026-11-10')
+    await typeInto(wrapper, 'startTime', '08:00')
+    await typeInto(wrapper, 'endDate', '2026-11-10')
+    await typeInto(wrapper, 'endTime', '11:00')
+    await submitForm(wrapper)
 
     expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
       gradeId: 'grade-7',
@@ -134,116 +197,21 @@ describe('ActivityForm', () => {
       subjectId: 'subject-inf',
       type: 'DAILY',
       presetName: 'DAILY',
-      tokenMode: 'ROTATING' as const,
+      tokenMode: 'ROTATING',
       durationMinutes: 90,
     })
-  })
-
-  it('blocks the form and explains when a teacher has no active midterm period', async () => {
-    const wrapper = open({ category: 'EXAM', events: [] })
-    await wrapper.find('#activity-grade').setValue('grade-7')
-    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
-    await wrapper.find('#activity-package').setValue('package-1')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[0]
-      .setValue('2026-11-10T08:00')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[1]
-      .setValue('2026-11-10T11:00')
-
-    expect(wrapper.text()).toContain('Belum ada periode UTS yang aktif')
-    expect(
-      wrapper.find('button[type="submit"]').attributes('disabled'),
-    ).toBeDefined()
-    await wrapper.find('form').trigger('submit')
-    expect(wrapper.emitted('submit')).toBeUndefined()
-  })
-
-  it('keeps the admin section hidden from teachers', () => {
-    expect(open().text()).not.toContain('Lanjutan (admin)')
-    const admin = open({ isAdmin: true })
-    expect(admin.text()).toContain('Lanjutan (admin)')
-  })
-
-  it('patches the chosen status for an existing activity', async () => {
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: pastActivity },
-    })
-    await wrapper.find('#activity-status').setValue('ACTIVE')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(updateStatus).toHaveBeenCalledWith('activity-1', 'ACTIVE')
-  })
-
-  it('confirms before leaving ACTIVE', async () => {
-    const confirm = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true)
-    vi.stubGlobal('confirm', confirm)
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: { ...pastActivity, status: 'ACTIVE' } },
-    })
-    await wrapper.find('#activity-status').setValue('CLOSED')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(confirm).toHaveBeenCalledWith(
-      expect.stringContaining('sesi yang masih berjalan'),
-    )
-    expect(updateStatus).not.toHaveBeenCalled()
-
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(updateStatus).toHaveBeenCalledWith('activity-1', 'CLOSED')
-    vi.unstubAllGlobals()
-  })
-
-  it('asks the registry to issue participant numbers', async () => {
-    issueParticipantNumbers.mockResolvedValueOnce({ issued: true })
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: pastActivity },
-    })
-
-    await wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Terbitkan nomor peserta')!
-      .trigger('click')
-    await flushPromises()
-
-    expect(issueParticipantNumbers).toHaveBeenCalledWith('activity-1')
-    expect(wrapper.emitted('numbers-issued')?.[0]).toEqual([true])
-  })
-
-  it('warns when the activity is activated outside its window', async () => {
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: pastActivity },
-    })
-    expect(wrapper.text()).not.toContain('di luar jendela')
-    await wrapper.find('#activity-status').setValue('ACTIVE')
-    expect(wrapper.text()).toContain('di luar jendela')
-    await wrapper.find('#activity-status').setValue('CLOSED')
-    expect(wrapper.text()).not.toContain('di luar jendela')
-  })
-
-  it('explains that the package can be attached later', () => {
-    expect(open().text()).toContain(
-      'Boleh dikosongkan, paket bisa dipasang nanti',
-    )
+    wrapper.unmount()
   })
 
   it('creates an activity without a package and without classrooms', async () => {
-    const wrapper = open({
-      subjects: [{ id: 'subject-mat', label: 'Matematika' }],
-    })
-    await wrapper.find('#activity-grade').setValue('grade-7')
-    await wrapper.find('#activity-subject').setValue('subject-mat')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[0]
-      .setValue('2026-11-10T08:00')
-    await wrapper
-      .findAll('input[type="datetime-local"]')[1]
-      .setValue('2026-11-10T11:00')
-    await wrapper.find('form').trigger('submit')
+    const wrapper = open()
+    await emitFrom(wrapper, 'gradeId', 'SelectStub', 'grade-7')
+    await emitFrom(wrapper, 'subjectId', 'ComboStub', 'subject-inf')
+    await typeInto(wrapper, 'startDate', '2026-11-10')
+    await typeInto(wrapper, 'startTime', '08:00')
+    await typeInto(wrapper, 'endDate', '2026-11-10')
+    await typeInto(wrapper, 'endTime', '11:00')
+    await submitForm(wrapper)
 
     const payload = wrapper.emitted('submit')?.[0]?.[0] as Record<
       string,
@@ -251,48 +219,53 @@ describe('ActivityForm', () => {
     >
     expect(payload).toMatchObject({
       gradeId: 'grade-7',
-      subjectId: 'subject-mat',
+      subjectId: 'subject-inf',
       classroomIds: [],
     })
     expect(payload).not.toHaveProperty('packageId')
+    wrapper.unmount()
   })
 
-  it('disables activation for an activity without a package', () => {
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: { ...pastActivity, packageId: null } },
-    })
-    const options = wrapper.find('#activity-status').findAll('option')
-    const disabled = (value: string) =>
-      options
-        .find(
-          (option) => (option.element as HTMLOptionElement).value === value,
-        )!
-        .attributes('disabled') !== undefined
+  it('blocks the form and explains when a teacher has no active midterm period', async () => {
+    const wrapper = open({ category: 'EXAM', events: [] })
 
-    expect(disabled('ACTIVE')).toBe(true)
-    expect(disabled('SCHEDULED')).toBe(true)
-    expect(disabled('CLOSED')).toBe(false)
-    expect(wrapper.find('#activity-status').attributes('title')).toBe(
-      'Pasang paket soal dulu',
-    )
+    expect(wrapper.text()).toContain('Belum ada periode UTS yang aktif')
+    await submitForm(wrapper)
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    wrapper.unmount()
   })
 
-  it('shows the backend message when the status change is refused', async () => {
-    updateStatus.mockRejectedValueOnce({
-      response: {
-        status: 422,
-        data: { message: 'Pasang paket soal dulu sebelum mengaktifkan.' },
-      },
+  it('locks the period and the type to the period it was opened from', () => {
+    const wrapper = open({
+      category: 'EXAM',
+      isAdmin: true,
+      events: [{ id: 'ev-1', name: 'UAS Ganjil', type: 'FINAL' }],
+      fixedEventId: 'ev-1',
     })
-    const wrapper = mount(ActivityForm, {
-      props: { ...props, activity: pastActivity },
-    })
-    await wrapper.find('#activity-status').setValue('ACTIVE')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
 
-    expect(wrapper.find('[role="alert"]').text()).toBe(
-      'Pasang paket soal dulu sebelum mengaktifkan.',
-    )
+    expect(
+      wrapper
+        .get('[data-field="eventId"]')
+        .findComponent({ name: 'ComboStub' })
+        .attributes('disabled'),
+    ).toBeDefined()
+    expect(
+      wrapper
+        .get('[data-field="type"]')
+        .findComponent({ name: 'SelectStub' })
+        .attributes('disabled'),
+    ).toBeDefined()
+    wrapper.unmount()
+  })
+
+  it('shows what is missing when the form is empty', async () => {
+    const wrapper = open()
+
+    await submitForm(wrapper)
+
+    expect(wrapper.text()).toContain('Tingkat wajib dipilih')
+    expect(wrapper.text()).toContain('Mata pelajaran wajib dipilih')
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    wrapper.unmount()
   })
 })

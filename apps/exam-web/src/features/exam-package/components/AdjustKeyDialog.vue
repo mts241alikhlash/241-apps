@@ -246,10 +246,7 @@ async function submit() {
           Sesi yang sudah selesai dihitung ulang dan nilainya dikirim ulang.
         </p>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           @click="emit('update:open', false)"

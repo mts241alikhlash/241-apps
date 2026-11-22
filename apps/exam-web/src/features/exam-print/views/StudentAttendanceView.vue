@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
+import { computed, h, nextTick, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import {
+  ActionCell,
   BackButton,
   DataTable,
+  DataTableEmpty,
   SearchInput,
   ServiceUnavailable,
 } from '@mts241alikhlash/ui'
@@ -35,46 +37,34 @@ import {
 } from '@mts241alikhlash/ui/select'
 import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { Printer } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { isOutageMessage } from '@mts241alikhlash/web-shared/utils/service-error'
-import {
-  buildDayColumns,
-  buildRoomReportColumns,
-  buildSubjectColumns,
-} from '@/features/exam-room/components/roomReportColumns'
-import {
-  groupReports,
-  type DayGroup,
-  type SubjectGroup,
-} from '@/features/exam-room/composables/useReportHierarchy'
-import { examRoomService } from '@/features/exam-room/services/examRoomService'
-import type {
-  RoomMonitorParticipant,
-  RoomReportSummary,
-} from '@/features/exam-room/types'
-import { examEventService } from '@/features/exam-event/services/examEventService'
+import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
 import AttendanceSheet from '../documents/AttendanceSheet.vue'
+import { usePrintPack } from '../composables/usePrintPack'
 import { formatPrintDate, formatPrintRange } from '../format'
 import { waitForPrintImages } from '../printImages'
+import {
+  buildAttendanceDays,
+  filterAttendanceDays,
+  type AttendanceDay,
+  type AttendanceRoom,
+  type AttendanceSubject,
+} from '../utils/attendanceUnits'
 
 const route = useRoute()
 const router = useRouter()
+const state = usePrintPack({ withSchedules: true })
+const { subjectOf } = usePackageSubjects()
 
-const reports = ref<RoomReportSummary[]>([])
-const events = ref<{ id: string; name: string; status: string }[]>([])
-const eventId = ref('')
 const eventFieldId = useId()
 const search = ref('')
-const loading = ref(false)
-const error = ref<string | null>(null)
 const page = ref(1)
-const pageSize = ref(10)
-
+const pageSize = ref(25)
 const previewOpen = ref(false)
-const roster = ref<RoomMonitorParticipant[]>([])
-const rosterLoading = ref(false)
-const rosterError = ref<string | null>(null)
+const previewRoom = ref<AttendanceRoom | null>(null)
+const batch = ref<AttendanceRoom[]>([])
+const printing = ref(false)
 
 const paramValue = (name: string): string | null => {
   const value = route.params[name]
@@ -84,42 +74,15 @@ const paramValue = (name: string): string | null => {
 
 const dayId = computed(() => paramValue('dayId'))
 const subjectId = computed(() => paramValue('subjectId'))
-const previewRow = ref<RoomReportSummary | null>(null)
-const rosterRoom = ref<{
-  currentSupervisorName: string | null
-  technicianName: string | null
-} | null>(null)
 
-interface BatchSheet {
-  key: string
-  roomName: string
-  date: string
-  packages: string
-  timeRange: string
-  students: {
-    studentId: string
-    name: string | null
-    classroomName: string | null
-    participantNumber: string | null
-  }[]
-  supervisorName: string | null
-  technicianName: string | null
-}
-
-const batch = ref<BatchSheet[]>([])
-const printing = ref(false)
-
-const filteredReports = computed(() => {
-  const keyword = search.value.trim().toLocaleLowerCase('id')
-  if (!keyword) return reports.value
-  return reports.value.filter((row) =>
-    [row.roomCode, row.roomName, ...row.subjectNames].some((value) =>
-      value.toLocaleLowerCase('id').includes(keyword),
-    ),
-  )
-})
-
-const days = computed(() => groupReports(filteredReports.value))
+const allDays = computed(() =>
+  state.pack.value === null
+    ? []
+    : buildAttendanceDays(state.pack.value, state.schedules.value, (item) =>
+        subjectOf(item.packageId, item.packageTitle),
+      ),
+)
+const days = computed(() => filterAttendanceDays(allDays.value, search.value))
 
 const activeDay = computed(
   () => days.value.find((day) => day.id === dayId.value) ?? null,
@@ -130,9 +93,9 @@ const activeSubject = computed(
     null,
 )
 
-type ReportRow = DayGroup | SubjectGroup | RoomReportSummary
+type Row = AttendanceDay | AttendanceSubject | AttendanceRoom
 
-const levelRows = computed<ReportRow[]>(() => {
+const levelRows = computed<Row[]>(() => {
   if (activeSubject.value) return activeSubject.value.rooms
   if (activeDay.value) return activeDay.value.subjects
   return days.value
@@ -143,76 +106,36 @@ const paginatedRows = computed(() => {
   return levelRows.value.slice(start, start + pageSize.value)
 })
 
-const dayLabel = (day: DayGroup): string =>
-  new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(
-    new Date(day.startsAt),
-  )
+const printTargets = computed<AttendanceRoom[]>(() => {
+  if (activeSubject.value) return activeSubject.value.rooms
+  if (activeDay.value) {
+    return activeDay.value.subjects.flatMap((item) => item.rooms)
+  }
+  return days.value.flatMap((day) => day.subjects.flatMap((item) => item.rooms))
+})
+
+const dateOf = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(iso))
+
+const clock = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso))
 
 const pageTitle = computed(() => {
-  if (activeSubject.value) return activeSubject.value.subjectName
-  if (activeDay.value) return dayLabel(activeDay.value)
+  if (activeSubject.value) return activeSubject.value.subject
+  if (activeDay.value) return dateOf(activeDay.value.startsAt)
   return 'Daftar Hadir Peserta'
 })
 
-const backLabel = computed(() => {
-  if (activeSubject.value) return 'Kembali ke daftar mapel'
-  return 'Kembali ke semua hari'
-})
+const backLabel = computed(() =>
+  activeSubject.value ? 'Kembali ke daftar mapel' : 'Kembali ke semua hari',
+)
 
 const itemLabel = computed(() =>
   activeSubject.value ? 'ruangan' : activeDay.value ? 'mapel' : 'hari',
-)
-
-const columns = computed(() => {
-  if (activeSubject.value) {
-    return buildRoomReportColumns({
-      onOpen: (row) => openPreview(row),
-      onPrint: (row) => void printRows([row]),
-    }) as unknown as ColumnDef<ReportRow>[]
-  }
-  if (activeDay.value) {
-    return buildSubjectColumns({
-      onOpen: (row) => goTo(row.dayKey, row.id),
-      onPrint: (row) => void printRows(row.rooms),
-    }) as unknown as ColumnDef<ReportRow>[]
-  }
-  return buildDayColumns({
-    onOpen: (row) => goTo(row.id),
-    onPrint: (row) =>
-      void printRows(row.subjects.flatMap((subject) => subject.rooms)),
-  }) as unknown as ColumnDef<ReportRow>[]
-})
-
-const packages = computed(() => {
-  const subjects = previewRow.value?.subjectNames ?? []
-  if (subjects.length > 0) return subjects.join(', ')
-  const names = [
-    ...new Set(
-      roster.value
-        .map((row) => row.packageTitle)
-        .filter((name) => !!name && name.trim() !== ''),
-    ),
-  ]
-  return names.length > 0 ? names.join(', ') : '-'
-})
-
-const sheetStudents = computed(() =>
-  roster.value.map((row) => ({
-    studentId: row.studentId,
-    name: row.studentName,
-    classroomName: row.classroomName,
-    participantNumber: row.participantNumber,
-  })),
-)
-
-const sheetDate = computed(() =>
-  previewRow.value === null ? '-' : formatPrintDate(previewRow.value.startsAt),
-)
-
-const sheetRange = computed(() =>
-  previewRow.value === null
-    ? '-'
-    : formatPrintRange(previewRow.value.startsAt, previewRow.value.endsAt),
 )
 
 function goTo(day: string | null, subject: string | null = null) {
@@ -227,89 +150,24 @@ function goBack() {
   else goTo(null)
 }
 
-function openPreview(row: RoomReportSummary) {
-  previewRow.value = row
+function openPreview(room: AttendanceRoom) {
+  previewRoom.value = room
   previewOpen.value = true
-  void loadRoster()
 }
 
-async function loadRoster() {
-  const row = previewRow.value
-  if (row === null) {
-    roster.value = []
-    return
-  }
-  rosterLoading.value = true
-  rosterError.value = null
-  try {
-    const result = await examRoomService.loadRoster(row.roomId, row.slotId)
-    roster.value = result.data
-    rosterRoom.value = result.meta?.room ?? null
-  } catch {
-    roster.value = []
-    rosterError.value =
-      'Daftar peserta tidak dapat dimuat. Periksa koneksi lalu coba lagi.'
-  } finally {
-    rosterLoading.value = false
-  }
-}
-
-const PRINT_PARALLEL = 4
-
-async function printRows(rows: RoomReportSummary[]) {
-  if (printing.value) return
+async function printRooms(rooms: AttendanceRoom[]) {
+  if (printing.value || rooms.length === 0) return
   printing.value = true
-  const notice = toast.loading('Menyiapkan daftar hadir...')
   try {
-    const targets = [
-      ...new Map(
-        rows.map((row) => [`${row.roomId}-${row.slotId}`, row]),
-      ).values(),
-    ].sort(
-      (a, b) =>
-        a.startsAt.localeCompare(b.startsAt) ||
-        a.roomName.localeCompare(b.roomName, 'id'),
+    batch.value = [...rooms].sort(
+      (left, right) =>
+        left.startsAt.localeCompare(right.startsAt) ||
+        left.roomName.localeCompare(right.roomName, 'id'),
     )
-    const loadSheet = async (row: RoomReportSummary): Promise<BatchSheet> => {
-      const result = await examRoomService.loadRoster(row.roomId, row.slotId)
-      return {
-        key: `${row.roomId}-${row.slotId}`,
-        roomName: row.roomName,
-        date: formatPrintDate(row.startsAt),
-        packages:
-          row.subjectNames.length > 0 ? row.subjectNames.join(', ') : '-',
-        timeRange: formatPrintRange(row.startsAt, row.endsAt),
-        students: result.data.map((student) => ({
-          studentId: student.studentId,
-          name: student.studentName,
-          classroomName: student.classroomName,
-          participantNumber: student.participantNumber,
-        })),
-        supervisorName: result.meta?.room.currentSupervisorName ?? null,
-        technicianName: result.meta?.room.technicianName ?? null,
-      }
-    }
-    const loaded: BatchSheet[] = []
-    for (let start = 0; start < targets.length; start += PRINT_PARALLEL) {
-      loaded.push(
-        ...(await Promise.all(
-          targets.slice(start, start + PRINT_PARALLEL).map(loadSheet),
-        )),
-      )
-    }
-    batch.value = loaded.filter((sheet) => sheet.students.length > 0)
-    if (batch.value.length === 0) {
-      toast.error('Tidak ada daftar hadir yang dapat dimuat.')
-      return
-    }
     await nextTick()
     await waitForPrintImages()
-    toast.dismiss(notice)
     printSheet()
-  } catch {
-    toast.error('Dokumen tidak dapat dimuat. Periksa koneksi lalu coba lagi.')
   } finally {
-    toast.dismiss(notice)
     batch.value = []
     printing.value = false
   }
@@ -321,42 +179,203 @@ function printSheet() {
   document.body.classList.remove('printing-stack')
 }
 
-async function loadReports() {
-  loading.value = true
-  const result = await examRoomService.loadReports(eventId.value || undefined)
-  loading.value = false
-  if (result.success) {
-    reports.value = result.data
-    error.value = null
-  } else {
-    reports.value = []
-    error.value = result.error
-  }
-}
+const printItem = (action: () => void) => ({
+  label: 'Cetak',
+  icon: Printer,
+  onClick: action,
+})
+
+const dayColumns: ColumnDef<AttendanceDay>[] = [
+  {
+    id: 'date',
+    header: 'Tanggal',
+    meta: {
+      mobile: 'title',
+      mobileValue: (row: AttendanceDay) => dateOf(row.startsAt),
+    },
+    cell: ({ row }) => dateOf(row.original.startsAt),
+  },
+  {
+    id: 'subjects',
+    header: 'Jumlah Mapel',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceDay) => row.subjectCount,
+    },
+    cell: ({ row }) => String(row.original.subjectCount),
+  },
+  {
+    id: 'rooms',
+    header: 'Jumlah Ruang',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceDay) => row.roomCount,
+    },
+    cell: ({ row }) => String(row.original.roomCount),
+  },
+  {
+    id: 'students',
+    header: 'Jumlah Peserta',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceDay) => row.studentCount,
+    },
+    cell: ({ row }) => String(row.original.studentCount),
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(ActionCell, {
+        manageLabel: 'Lihat',
+        hideEdit: true,
+        hideDelete: true,
+        items: [
+          printItem(
+            () =>
+              void printRooms(
+                row.original.subjects.flatMap((item) => item.rooms),
+              ),
+          ),
+        ],
+        onManage: () => goTo(row.original.id),
+      }),
+  },
+]
+
+const subjectColumns: ColumnDef<AttendanceSubject>[] = [
+  {
+    id: 'subject',
+    header: 'Mata Pelajaran',
+    meta: {
+      mobile: 'title',
+      mobileValue: (row: AttendanceSubject) => row.subject,
+    },
+    cell: ({ row }) => row.original.subject,
+  },
+  {
+    id: 'start',
+    header: 'Jam Mulai',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceSubject) => clock(row.startsAt),
+    },
+    cell: ({ row }) => clock(row.original.startsAt),
+  },
+  {
+    id: 'end',
+    header: 'Jam Selesai',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceSubject) => clock(row.endsAt),
+    },
+    cell: ({ row }) => clock(row.original.endsAt),
+  },
+  {
+    id: 'rooms',
+    header: 'Jumlah Ruang',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceSubject) => row.roomCount,
+    },
+    cell: ({ row }) => String(row.original.roomCount),
+  },
+  {
+    id: 'students',
+    header: 'Jumlah Peserta',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceSubject) => row.studentCount,
+    },
+    cell: ({ row }) => String(row.original.studentCount),
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(ActionCell, {
+        manageLabel: 'Lihat',
+        hideEdit: true,
+        hideDelete: true,
+        items: [printItem(() => void printRooms(row.original.rooms))],
+        onManage: () => goTo(row.original.dayKey, row.original.id),
+      }),
+  },
+]
+
+const roomColumns: ColumnDef<AttendanceRoom>[] = [
+  {
+    id: 'room',
+    header: 'Ruangan',
+    meta: {
+      align: 'center',
+      mobile: 'title',
+      mobileValue: (row: AttendanceRoom) => row.roomName,
+    },
+    cell: ({ row }) => row.original.roomName,
+  },
+  {
+    id: 'students',
+    header: 'Jumlah Peserta',
+    meta: {
+      align: 'center',
+      mobileValue: (row: AttendanceRoom) => row.students.length,
+    },
+    cell: ({ row }) => String(row.original.students.length),
+  },
+  {
+    id: 'supervisor',
+    header: 'Pengawas',
+    meta: {
+      mobileValue: (row: AttendanceRoom) => row.supervisorName ?? '-',
+    },
+    cell: ({ row }) => row.original.supervisorName ?? '-',
+  },
+  {
+    id: 'actions',
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' },
+    cell: ({ row }) =>
+      h(ActionCell, {
+        viewLabel: 'Pratinjau',
+        hideEdit: true,
+        hideDelete: true,
+        items: [printItem(() => void printRooms([row.original]))],
+        onView: () => openPreview(row.original),
+      }),
+  },
+]
+
+const columns = computed(
+  () =>
+    (activeSubject.value
+      ? roomColumns
+      : activeDay.value
+        ? subjectColumns
+        : dayColumns) as unknown as ColumnDef<Row>[],
+)
+
+const sheetDate = computed(() =>
+  previewRoom.value === null
+    ? '-'
+    : formatPrintDate(previewRoom.value.startsAt),
+)
+const sheetRange = computed(() =>
+  previewRoom.value === null
+    ? '-'
+    : formatPrintRange(previewRoom.value.startsAt, previewRoom.value.endsAt),
+)
 
 async function changeEvent(value: AcceptableValue) {
-  eventId.value = typeof value === 'string' ? value : ''
+  if (typeof value !== 'string' || value === '') return
+  previewOpen.value = false
   goTo(null)
-  await loadReports()
-}
-
-async function load() {
-  loading.value = true
-  try {
-    const result = await examEventService.loadEvents({ limit: 200 })
-    if (result.success) {
-      events.value = result.data.map((event) => ({
-        id: event.id,
-        name: event.name,
-        status: event.status,
-      }))
-      const active = result.data.find((event) => event.status === 'ACTIVE')
-      eventId.value = active?.id ?? result.data[0]?.id ?? ''
-    }
-  } catch {
-    error.value = 'Periode ujian tidak dapat dimuat.'
-  }
-  await loadReports()
+  await state.changeEvent(value)
 }
 
 watch(
@@ -376,7 +395,7 @@ watch(
 )
 
 watch([days, () => route.params.dayId], () => {
-  if (loading.value) return
+  if (state.loading.value) return
   if (dayId.value !== null && activeDay.value === null) goTo(null)
   else if (
     dayId.value !== null &&
@@ -385,15 +404,6 @@ watch([days, () => route.params.dayId], () => {
   ) {
     goTo(dayId.value)
   }
-})
-
-watch([levelRows, loading], () => {
-  if (loading.value) return
-  const lastPage = Math.max(
-    1,
-    Math.ceil(levelRows.value.length / pageSize.value),
-  )
-  if (page.value > lastPage) page.value = lastPage
 })
 
 function changePageSize(size: number) {
@@ -407,17 +417,15 @@ useBreadcrumbs(() => [
   ...(activeDay.value
     ? [
         {
-          title: dayLabel(activeDay.value),
+          title: dateOf(activeDay.value.startsAt),
           href: `/exam/print/student-attendance/${activeDay.value.id}`,
         },
       ]
     : []),
   ...(activeSubject.value
-    ? [{ title: activeSubject.value.subjectName, href: '#' }]
+    ? [{ title: activeSubject.value.subject, href: '#' }]
     : []),
 ])
-
-onMounted(load)
 </script>
 
 <template>
@@ -437,27 +445,37 @@ onMounted(load)
             {{ pageTitle }}
           </CardTitle>
         </div>
+        <Button
+          class="shrink-0"
+          :disabled="
+            state.loading.value || printing || printTargets.length === 0
+          "
+          @click="printRooms(printTargets)"
+        >
+          <Printer class="size-4" />
+          Cetak
+        </Button>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
       >
         <ServiceUnavailable
-          v-if="error && isOutageMessage(error)"
+          v-if="state.error.value && isOutageMessage(state.error.value)"
           class="mx-4"
           subject="Daftar hadir peserta"
-          :message="error"
-          :retry="loadReports"
-          :is-retrying="loading"
+          :message="state.error.value"
+          :retry="state.loadPack"
+          :is-retrying="state.loading.value"
         />
         <div
-          v-else-if="error"
+          v-else-if="state.error.value"
           class="m-4 space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-control">{{ error }}</p>
+          <p class="text-control">{{ state.error.value }}</p>
           <Button
             variant="outline"
-            @click="loadReports"
+            @click="state.loadPack"
           >
             Coba lagi
           </Button>
@@ -470,7 +488,7 @@ onMounted(load)
             :page="page"
             :page-size="pageSize"
             :total-items="levelRows.length"
-            :is-loading="loading"
+            :is-loading="state.loading.value"
             :item-label="itemLabel"
             @update:page="page = $event"
             @update:page-size="changePageSize"
@@ -483,7 +501,7 @@ onMounted(load)
                 floating
               >
                 <Select
-                  :model-value="eventId"
+                  :model-value="state.eventId.value"
                   @update:model-value="changeEvent"
                 >
                   <SelectTrigger
@@ -494,7 +512,7 @@ onMounted(load)
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem
-                      v-for="event in events"
+                      v-for="event in state.events.value"
                       :key="event.id"
                       :value="event.id"
                     >
@@ -519,22 +537,13 @@ onMounted(load)
               />
             </template>
             <template #empty>
-              <div class="space-y-3 text-center">
-                <p>
-                  {{
-                    search
-                      ? 'Tidak ada daftar hadir yang cocok dengan pencarian.'
-                      : 'Belum ada jadwal pada periode ini.'
-                  }}
-                </p>
-                <Button
-                  v-if="search"
-                  variant="outline"
-                  @click="search = ''"
-                >
-                  Atur Ulang
-                </Button>
-              </div>
+              <DataTableEmpty
+                :message="
+                  search
+                    ? 'Tidak ada daftar hadir yang cocok dengan pencarian.'
+                    : 'Belum ada jadwal pada periode ini.'
+                "
+              />
             </template>
           </DataTable>
         </template>
@@ -554,54 +563,25 @@ onMounted(load)
           </DialogDescription>
         </DialogHeader>
         <DialogBody class="space-y-4 overflow-x-hidden">
-          <p
-            v-if="rosterLoading"
-            class="text-control text-muted-foreground"
-          >
-            Menyiapkan dokumen...
-          </p>
-          <ServiceUnavailable
-            v-else-if="rosterError && isOutageMessage(rosterError)"
-            subject="Peserta ruangan"
-            :message="rosterError"
-            :retry="loadRoster"
-            :is-retrying="rosterLoading"
-          />
           <div
-            v-else-if="rosterError"
-            class="rounded-md border p-3 text-control"
-            role="alert"
-          >
-            {{ rosterError }}
-          </div>
-          <div
-            v-else
+            v-if="previewRoom"
             class="mx-auto w-full max-w-[190mm] rounded-md border p-2 print:hidden"
           >
             <AttendanceSheet
-              :room-name="previewRow?.roomName ?? '-'"
+              :room-name="previewRoom.roomName"
               :date="sheetDate"
-              :packages="packages"
+              :packages="previewRoom.subject"
               :time-range="sheetRange"
-              :students="sheetStudents"
+              :students="previewRoom.students"
               :paginate="false"
-              :supervisor-name="rosterRoom?.currentSupervisorName ?? null"
-              :technician-name="rosterRoom?.technicianName ?? null"
+              :supervisor-name="previewRoom.supervisorName"
+              :technician-name="previewRoom.technicianName"
             />
           </div>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
-            variant="outline"
-            @click="previewOpen = false"
-          >
-            Tutup
-          </Button>
-          <Button
-            :disabled="rosterLoading || roster.length === 0"
+            :disabled="previewRoom === null"
             @click="printSheet"
           >
             <Printer class="size-4" />
@@ -612,19 +592,17 @@ onMounted(load)
     </Dialog>
 
     <div
-      v-if="
-        batch.length === 0 && previewRow !== null && sheetStudents.length > 0
-      "
+      v-if="batch.length === 0 && previewRoom !== null && previewOpen"
       class="print-only"
     >
       <AttendanceSheet
-        :room-name="previewRow?.roomName ?? '-'"
+        :room-name="previewRoom.roomName"
         :date="sheetDate"
-        :packages="packages"
+        :packages="previewRoom.subject"
         :time-range="sheetRange"
-        :students="sheetStudents"
-        :supervisor-name="rosterRoom?.currentSupervisorName ?? null"
-        :technician-name="rosterRoom?.technicianName ?? null"
+        :students="previewRoom.students"
+        :supervisor-name="previewRoom.supervisorName"
+        :technician-name="previewRoom.technicianName"
       />
     </div>
 
@@ -634,16 +612,16 @@ onMounted(load)
     >
       <div class="print-stack">
         <AttendanceSheet
-          v-for="sheet in batch"
-          :key="sheet.key"
+          v-for="room in batch"
+          :key="room.key"
           stacked
-          :room-name="sheet.roomName"
-          :date="sheet.date"
-          :packages="sheet.packages"
-          :time-range="sheet.timeRange"
-          :students="sheet.students"
-          :supervisor-name="sheet.supervisorName"
-          :technician-name="sheet.technicianName"
+          :room-name="room.roomName"
+          :date="formatPrintDate(room.startsAt)"
+          :packages="room.subject"
+          :time-range="formatPrintRange(room.startsAt, room.endsAt)"
+          :students="room.students"
+          :supervisor-name="room.supervisorName"
+          :technician-name="room.technicianName"
         />
       </div>
     </div>

@@ -64,10 +64,7 @@ function confirm() {
         </FloatingLabelField>
         <MathPreview :latex="latex" />
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           type="button"

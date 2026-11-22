@@ -48,14 +48,21 @@ const items = computed(() => {
       <CardTitle size="md">Ringkasan</CardTitle>
     </CardHeader>
     <CardContent variant="standard">
-      <dl class="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+      <dl
+        class="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-1 sm:grid-cols-3 sm:gap-y-2"
+      >
         <div
           v-for="item in items"
           :key="item.key"
-          class="flex flex-col gap-0.5"
+          class="contents sm:flex sm:flex-col sm:gap-0.5"
         >
           <dt class="text-control text-muted-foreground">{{ item.label }}</dt>
-          <dd :class="['font-medium', item.value > 0 && item.tone]">
+          <dd
+            :class="[
+              'text-right font-medium sm:text-left',
+              item.value > 0 && item.tone,
+            ]"
+          >
             {{ item.value }}
           </dd>
         </div>

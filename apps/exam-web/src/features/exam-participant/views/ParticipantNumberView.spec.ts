@@ -76,7 +76,7 @@ const button = defineComponent({
 const dataTable = defineComponent({
   props: { data: Array },
   template:
-    '<div><div v-for="row in data" :key="row.studentId" data-test="row">{{ row.name }} {{ row.number }}</div></div>',
+    '<div><slot name="filters" /><slot name="header-right" /><div v-for="row in data" :key="row.studentId" data-test="row">{{ row.name }} {{ row.number }}</div><slot name="empty" /></div>',
 })
 const stubs = {
   Card: passthrough,
@@ -116,9 +116,9 @@ describe('ParticipantNumberView', () => {
     expect(loadCandidates).toHaveBeenCalledWith('sem1')
     expect(loadNumbers).toHaveBeenCalledWith('sem1', ['s1', 's2', 's3'])
     const text = wrapper.text()
-    expect(text).toContain('Terdaftar 3')
-    expect(text).toContain('Sudah bernomor 1')
-    expect(text).toContain('Belum bernomor 2')
+    expect(text).toMatch(/Terdaftar\s*3/)
+    expect(text).toMatch(/Sudah bernomor\s*1/)
+    expect(text).toMatch(/Belum bernomor\s*2/)
   })
 
   it('issues numbers then reloads the roster', async () => {

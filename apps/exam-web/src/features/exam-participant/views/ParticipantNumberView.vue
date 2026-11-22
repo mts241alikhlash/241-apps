@@ -2,7 +2,7 @@
 import { computed, h, ref, watch } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { toast } from 'vue-sonner'
-import { DataTable, SearchInput } from '@mts241alikhlash/ui'
+import { DataTable, SearchInput, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -73,16 +73,28 @@ const skippedNames = computed(() => {
 
 const columns: ColumnDef<Row>[] = [
   {
-    id: 'nis',
-    header: 'NIS',
-    meta: { align: 'left', mobileLabel: 'NIS' },
-    cell: ({ row }) => row.original.nis ?? '-',
+    id: 'number',
+    header: 'No. Peserta',
+    meta: {
+      align: 'center',
+      mobileLabel: 'No. Peserta',
+      mobileValue: (row: Row) => row.number ?? 'Belum diterbitkan',
+    },
+    cell: ({ row }) =>
+      row.original.number ??
+      h(Badge, { variant: 'warning' }, () => 'Belum diterbitkan'),
   },
   {
     id: 'name',
     header: 'Nama',
     meta: { align: 'left', strong: true, mobileLabel: 'Nama' },
     cell: ({ row }) => row.original.name ?? '-',
+  },
+  {
+    id: 'nis',
+    header: 'NIS',
+    meta: { align: 'left', mobileLabel: 'NIS' },
+    cell: ({ row }) => row.original.nis ?? '-',
   },
   {
     id: 'grade',
@@ -95,18 +107,6 @@ const columns: ColumnDef<Row>[] = [
     header: 'Kelas',
     meta: { align: 'center', mobileLabel: 'Kelas' },
     cell: ({ row }) => row.original.className ?? '-',
-  },
-  {
-    id: 'number',
-    header: 'Nomor Peserta',
-    meta: {
-      align: 'center',
-      mobileLabel: 'Nomor Peserta',
-      mobileValue: (row: Row) => row.number ?? 'Belum diterbitkan',
-    },
-    cell: ({ row }) =>
-      row.original.number ??
-      h(Badge, { variant: 'warning' }, () => 'Belum diterbitkan'),
   },
 ]
 
@@ -252,22 +252,13 @@ watch(search, () => {
             />
           </template>
           <template #empty>
-            <div class="space-y-3 text-center">
-              <p>
-                {{
-                  search
-                    ? 'Tidak ada siswa yang cocok dengan pencarian.'
-                    : 'Belum ada siswa terdaftar pada semester ini.'
-                }}
-              </p>
-              <Button
-                v-if="search"
-                variant="outline"
-                @click="search = ''"
-              >
-                Atur Ulang
-              </Button>
-            </div>
+            <DataTableEmpty
+              :message="
+                search
+                  ? 'Tidak ada siswa yang cocok dengan pencarian.'
+                  : 'Belum ada siswa terdaftar pada semester ini.'
+              "
+            />
           </template>
         </DataTable>
       </CardContent>

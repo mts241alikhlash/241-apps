@@ -26,6 +26,8 @@ export interface PeriodGroup {
 export interface DayGroup {
   id: string
   startsAt: string
+  endsAt: string
+  schedules: ExamSchedule[]
   subjectCount: number
   scheduleCount: number
 }
@@ -56,6 +58,11 @@ export function groupDays(schedules: ExamSchedule[]): DayGroup[] {
         (first, row) => (row.startsAt < first ? row.startsAt : first),
         rows[0].startsAt,
       ),
+      endsAt: rows.reduce(
+        (last, row) => (row.endsAt > last ? row.endsAt : last),
+        rows[0].endsAt,
+      ),
+      schedules: rows,
       subjectCount: new Set(rows.map((row) => row.packageId)).size,
       scheduleCount: rows.length,
     }))

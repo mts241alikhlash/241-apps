@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -31,7 +31,7 @@ const { hasPermission } = useAuthSession()
 const status = ref('ALL')
 const semesterId = ref('')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 const formOpen = ref(false)
 const editing = ref<ExamEvent | null>(null)
 
@@ -150,7 +150,9 @@ onMounted(refresh)
             </div>
           </template>
           <template #empty>
-            <p>Belum ada periode ujian pada semester ini.</p>
+            <DataTableEmpty
+              message="Belum ada periode ujian pada semester ini."
+            />
           </template>
         </DataTable>
       </CardContent>

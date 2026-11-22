@@ -165,10 +165,7 @@ watch(
           </FloatingField>
         </form>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           type="button"
           variant="outline"

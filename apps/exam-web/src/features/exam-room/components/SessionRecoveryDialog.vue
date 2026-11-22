@@ -186,10 +186,7 @@ watch(
           />
         </FloatingLabelField>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           :disabled="busy"

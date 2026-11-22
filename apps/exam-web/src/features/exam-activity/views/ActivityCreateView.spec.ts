@@ -4,13 +4,12 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import ActivityCreateView from './ActivityCreateView.vue'
 
-const { list, get, permissions, routeState } = vi.hoisted(() => ({
-  list: vi.fn(),
-  get: vi.fn(),
+const { create, permissions, routeState } = vi.hoisted(() => ({
+  create: vi.fn(),
   permissions: new Set<string>(),
   routeState: {
     meta: { category: 'EXAM' },
-    query: { id: 'act-1' },
+    query: {},
   },
 }))
 
@@ -21,13 +20,36 @@ vi.mock('@mts241alikhlash/platform/auth', () => ({
   }),
 }))
 vi.mock('../api/examActivityApi', () => ({
-  examActivityApi: { list, get },
+  examActivityApi: { create },
+}))
+vi.mock('@/features/lookup/semester', () => ({
+  semesterApi: {
+    getSemesters: vi
+      .fn()
+      .mockResolvedValue({ data: [{ id: 'sem-1', isActive: true }] }),
+  },
+}))
+vi.mock('@/features/lookup/classroom', () => ({
+  classroomApi: { getClassrooms: vi.fn().mockResolvedValue({ data: [] }) },
+}))
+vi.mock('@/features/lookup/subject', () => ({
+  subjectApi: { getSubjects: vi.fn().mockResolvedValue({ data: [] }) },
+}))
+vi.mock('@/features/exam-package/api/examPackageApi', () => ({
+  examPackageApi: { getPackages: vi.fn().mockResolvedValue({ data: [] }) },
+}))
+vi.mock('@/features/exam-event/services/examEventService', () => ({
+  examEventService: {
+    loadEventOptions: vi
+      .fn()
+      .mockResolvedValue([{ id: 'ev-1', name: 'UAS', type: 'FINAL' }]),
+  },
 }))
 
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const formStub = defineComponent({
   name: 'ActivityForm',
-  props: { isAdmin: Boolean, activity: Object },
+  props: { isAdmin: Boolean, fixedEventId: String },
   template: '<div data-test="form" />',
 })
 
@@ -40,25 +62,32 @@ const stubs = {
   ActivityForm: formStub,
 }
 
-describe('ActivityCreateView in edit mode', () => {
+describe('ActivityCreateView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     permissions.clear()
-    get.mockResolvedValue({ id: 'act-1', semesterId: 'sem-1' })
+    routeState.query = {}
   })
 
-  it('loads the one activity instead of the whole list', async () => {
-    mount(ActivityCreateView, { global: { stubs } })
+  it('does not hand admin rights to a teacher, and admin rights to a manager', async () => {
+    const teacher = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
+    expect(teacher.findComponent(formStub).props('isAdmin')).toBe(false)
+    teacher.unmount()
 
-    expect(get).toHaveBeenCalledWith('act-1')
-    expect(list).not.toHaveBeenCalled()
+    permissions.add('exam-schedules.manage-all')
+    const manager = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(manager.findComponent(formStub).props('isAdmin')).toBe(true)
+    manager.unmount()
   })
 
-  it('does not hand admin rights to a teacher', async () => {
+  it('fixes the period of the page it was opened from', async () => {
+    routeState.query = { periode: 'ev-1' }
     const wrapper = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
 
-    expect(wrapper.findComponent(formStub).props('isAdmin')).toBe(false)
+    expect(wrapper.findComponent(formStub).props('fixedEventId')).toBe('ev-1')
+    wrapper.unmount()
   })
 })

@@ -19,6 +19,10 @@ import type {
   RoomMonitorSession,
 } from '../types'
 import { reasonLabel } from '../types'
+import {
+  classOfClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 
 export interface RoomParticipantColumnOptions extends MonitorAbilities {
   onTimeline: (row: RoomMonitorParticipant) => void
@@ -173,16 +177,40 @@ export function buildRoomParticipantColumns(
     },
     {
       id: 'participant',
-      header: 'Peserta',
+      header: 'Nama',
       meta: {
         align: 'left',
         strong: true,
-        mobileLabel: 'Peserta',
+        mobileLabel: 'Nama',
         mobileValue: (row: RoomMonitorParticipant) =>
           row.studentName ?? 'Siswa tidak ditemukan',
       },
       cell: ({ row }) =>
         h('span', row.original.studentName ?? 'Siswa tidak ditemukan'),
+    },
+    {
+      id: 'grade',
+      header: 'Tingkat',
+      meta: {
+        mobile: 'hide',
+        align: 'center',
+        mobileLabel: 'Tingkat',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          gradeOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => gradeOfClassroom(row.original.classroomName),
+    },
+    {
+      id: 'classroom',
+      header: 'Kelas',
+      meta: {
+        mobile: 'hide',
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          classOfClassroom(row.classroomName),
+      },
+      cell: ({ row }) => classOfClassroom(row.original.classroomName),
     },
     {
       id: 'subject',
@@ -194,16 +222,6 @@ export function buildRoomParticipantColumns(
         mobileValue: (row: RoomMonitorParticipant) => row.subjectName ?? '-',
       },
       cell: ({ row }) => row.original.subjectName ?? '-',
-    },
-    {
-      id: 'status',
-      header: 'Status',
-      meta: {
-        align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: statusText,
-      },
-      cell: ({ row }) => statusNode(row.original),
     },
     {
       id: 'progress',
@@ -337,6 +355,16 @@ export function buildRoomParticipantColumns(
           ],
         )
       },
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: statusText,
+      },
+      cell: ({ row }) => statusNode(row.original),
     },
     {
       id: 'actions',

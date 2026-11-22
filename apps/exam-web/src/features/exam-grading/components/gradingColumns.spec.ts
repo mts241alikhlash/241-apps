@@ -74,7 +74,7 @@ describe('grading columns', () => {
       )({ row: { original: row } }) as VNode
 
     it('keeps one Buka button when nothing else is offered', () => {
-      expect(actions({}, schedule).props).toHaveProperty('onClick')
+      expect(actions({}, schedule).props).toMatchObject({ viewLabel: 'Buka' })
     })
 
     it('offers Susulan on a regular exam and Peserta on a makeup, only with the permission', () => {
@@ -138,9 +138,9 @@ describe('grading columns', () => {
 
     ;(
       (cell({ row: { original: schedule } }) as VNode).props as {
-        onClick: () => void
+        onView: () => void
       }
-    ).onClick()
+    ).onView()
 
     expect(onOpen).toHaveBeenCalledWith(schedule)
   })
@@ -150,11 +150,7 @@ describe('grading columns', () => {
       (column) => column.id === 'actions',
     )!.cell as Cell<GradingSessionRow>
     const label = (row: GradingSessionRow) =>
-      (
-        (cell({ row: { original: row } }) as VNode).children as {
-          default: () => string
-        }
-      ).default()
+      (cell({ row: { original: row } }) as VNode).props!.viewLabel as string
 
     expect(label(session())).toBe('Nilai')
     expect(label(session({ awaitingGrading: false, status: 'GRADED' }))).toBe(

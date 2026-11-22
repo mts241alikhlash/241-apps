@@ -57,8 +57,11 @@ function actionProps(
   const column = columns(options).find((item) => item.id === 'actions')!
   const cell = column.cell as (ctx: {
     row: { original: ExamSchedule }
-  }) => VNode
-  return cell({ row: { original: row } }).props as Record<string, unknown>
+  }) => VNode | null
+  const node = cell({ row: { original: row } })
+  return node === null
+    ? { hideEdit: true, items: [] }
+    : (node.props as Record<string, unknown>)
 }
 
 const labels = (props: Record<string, unknown>) =>
@@ -75,17 +78,28 @@ describe('buildScheduleColumns', () => {
       ).mobileValue(schedule())
 
     expect(built.map((column) => column.id)).toEqual([
-      'package',
       'type',
+      'package',
+      'grade',
       'classroom',
-      'window',
+      'date',
+      'start',
+      'end',
       'duration',
       'phase',
       'actions',
     ])
     expect(mobile('type')).toBe('UTS')
     expect(mobile('classroom')).toBe('VII A')
-    expect(mobile('window')).toContain('2 Nov 08:00 – 11:00 WIB')
+    expect(
+      (
+        built.find((column) => column.id === 'grade')!.meta as {
+          mobileValue: (row: ExamSchedule) => string
+        }
+      ).mobileValue(schedule({ classroomName: 'Kelas 7-A' })),
+    ).toBe('Kelas 7')
+    expect(mobile('start')).toBe('08.00')
+    expect(mobile('end')).toBe('11.00')
     expect(mobile('duration')).toBe('90 menit')
     expect(mobile('phase')).toBe('Berlangsung')
   })
@@ -162,27 +176,9 @@ describe('buildScheduleColumns', () => {
     ])
   })
 
-  it('offers the activity status entry for a schedule with an activity', () => {
-    const props = actionProps(
-      {
-        canManageActivity: true,
-        onStatus: vi.fn(),
-        now: () => new Date(toInstant('2026-11-02', '07:00')),
-      },
-      schedule({ activityId: 'activity-1' }),
-    )
-
-    expect(labels(props)).toContain('Ubah status')
+  it('has no status entry, the status lives on the activity', () => {
     expect(
-      labels(
-        actionProps(
-          { canManageActivity: false },
-          schedule({ activityId: 'activity-1' }),
-        ),
-      ),
-    ).not.toContain('Ubah status')
-    expect(
-      labels(actionProps({ canManageActivity: true }, schedule())),
+      labels(actionProps({}, schedule({ activityId: 'activity-1' }))),
     ).not.toContain('Ubah status')
   })
 

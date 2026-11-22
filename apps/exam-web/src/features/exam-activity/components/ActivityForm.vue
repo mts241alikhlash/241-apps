@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
@@ -44,25 +44,17 @@ import {
   type ExamCategory,
   type ExamType,
 } from '@/features/exam-shared/examType'
-import { messageOf } from '@/features/exam-package/utils/messageOf'
-import { examActivityApi } from '../api/examActivityApi'
 import type {
   ActivityCreatePayload,
-  ActivityStatus,
   ActivityTokenMode,
   ClassroomOption,
   EventOption,
-  ExamActivityRecord,
   GradeOption,
   PackageOption,
   PresetName,
   SubjectOption,
 } from '../types'
-import {
-  ACTIVITY_STATUSES,
-  ACTIVITY_TOKEN_MODES,
-  activityStatusLabel,
-} from '../types'
+import { ACTIVITY_TOKEN_MODES } from '../types'
 
 const props = defineProps<{
   semesterId: string
@@ -72,43 +64,14 @@ const props = defineProps<{
   subjects?: SubjectOption[]
   events?: EventOption[]
   category?: ExamCategory
+  fixedEventId?: string
   isAdmin: boolean
-  activity?: ExamActivityRecord | null
   submitting?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [payload: ActivityCreatePayload]
-  'status-saved': []
-  'numbers-issued': [issued: boolean]
 }>()
-
-const isEdit = computed(
-  () => props.activity !== null && props.activity !== undefined,
-)
-
-const status = ref<ActivityStatus>(props.activity?.status ?? 'DRAFT')
-const savingStatus = ref(false)
-const issuingNumbers = ref(false)
-const statusError = ref<string | null>(null)
-const needsPackage = computed(
-  () => props.activity !== null && props.activity?.packageId === null,
-)
-const PACKAGE_REQUIRED_STATUSES: ActivityStatus[] = ['ACTIVE', 'SCHEDULED']
-
-const outsideWindow = computed(() => {
-  const item = props.activity
-  if (item === null || item === undefined) return false
-  const now = Date.now()
-  return (
-    now < new Date(item.startsAt).getTime() ||
-    now >= new Date(item.endsAt).getTime()
-  )
-})
-
-const statusWarning = computed(
-  () => status.value === 'ACTIVE' && outsideWindow.value,
-)
 
 const midtermEventActive = computed(() =>
   (props.events ?? []).some((event) => event.type === 'MIDTERM'),
@@ -139,7 +102,7 @@ const formSchema = toTypedSchema(
       packageId: z.string(),
       subjectId: z.string().min(1, 'Mata pelajaran wajib dipilih'),
       type: z.string().min(1, 'Jenis wajib dipilih'),
-      eventId: z.string(),
+      eventId: z.string().optional(),
       presetName: z.string(),
       tokenMode: z.string(),
       startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
@@ -163,7 +126,7 @@ const formSchema = toTypedSchema(
       if (
         value.type !== '' &&
         categoryOf(value.type as ExamType) === 'EXAM' &&
-        value.eventId === ''
+        !value.eventId
       ) {
         ctx.addIssue({
           code: 'custom',
@@ -196,7 +159,7 @@ const { handleSubmit, values, setFieldValue } = useForm({
     packageId: '',
     subjectId: '',
     type: availableTypes.value[0] ?? 'DAILY',
-    eventId: '',
+    eventId: props.fixedEventId ?? '',
     presetName: availableTypes.value[0] ?? 'DAILY',
     tokenMode: 'ROTATING',
     startDate: '',
@@ -233,9 +196,27 @@ watch(
   { immediate: true },
 )
 
+const fixedEvent = computed(
+  () =>
+    (props.events ?? []).find((event) => event.id === props.fixedEventId) ??
+    null,
+)
+
+watch(
+  fixedEvent,
+  (event) => {
+    if (event !== null) {
+      setFieldValue('type', event.type)
+      setFieldValue('eventId', event.id)
+    }
+  },
+  { immediate: true },
+)
+
 watch(
   () => values.type,
   (nextType) => {
+    if (fixedEvent.value !== null) return
     setFieldValue('presetName', nextType ?? 'DAILY')
     if (categoryOf(nextType as ExamType) === 'EXAM') {
       setFieldValue('tokenMode', 'ROTATING')
@@ -298,7 +279,7 @@ const onSubmit = handleSubmit((form) => {
   const exam = categoryOf(form.type as ExamType) === 'EXAM'
   emit('submit', {
     semesterId: props.semesterId,
-    ...(exam && form.eventId !== '' ? { eventId: form.eventId } : {}),
+    ...(exam && form.eventId ? { eventId: form.eventId } : {}),
     gradeId: form.gradeId,
     subjectId: item?.subjectId ?? form.subjectId,
     ...(item !== null ? { packageId: item.id } : {}),
@@ -311,114 +292,10 @@ const onSubmit = handleSubmit((form) => {
     durationMinutes: form.durationMinutes,
   })
 })
-
-async function saveStatus(): Promise<void> {
-  const item = props.activity
-  if (item === null || item === undefined || savingStatus.value) return
-  if (
-    item.status === 'ACTIVE' &&
-    status.value !== 'ACTIVE' &&
-    !window.confirm(
-      'Menghentikan kegiatan aktif akan mengumpulkan sesi yang masih berjalan. Lanjutkan?',
-    )
-  ) {
-    return
-  }
-  savingStatus.value = true
-  statusError.value = null
-  try {
-    await examActivityApi.updateStatus(item.id, status.value)
-    emit('status-saved')
-  } catch (err: unknown) {
-    statusError.value = messageOf(err, 'Status kegiatan gagal disimpan.')
-  } finally {
-    savingStatus.value = false
-  }
-}
-
-async function issueNumbers(): Promise<void> {
-  const item = props.activity
-  if (item === null || item === undefined || issuingNumbers.value) return
-  issuingNumbers.value = true
-  try {
-    const response = await examActivityApi.issueParticipantNumbers(item.id)
-    emit('numbers-issued', response.issued)
-  } catch {
-    emit('numbers-issued', false)
-  } finally {
-    issuingNumbers.value = false
-  }
-}
 </script>
 
 <template>
   <form
-    v-if="isEdit"
-    id="activity-form"
-    class="grid gap-4 sm:grid-cols-2"
-    @submit.prevent="saveStatus"
-  >
-    <FloatingLabelField
-      label="Status kegiatan"
-      for="activity-status"
-      class="sm:col-span-2"
-      floating
-    >
-      <Select v-model="status">
-        <SelectTrigger
-          id="activity-status"
-          class="w-full"
-          :title="needsPackage ? 'Pasang paket soal dulu' : undefined"
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem
-            v-for="value in ACTIVITY_STATUSES"
-            :key="value"
-            :value="value"
-            :disabled="
-              needsPackage && PACKAGE_REQUIRED_STATUSES.includes(value)
-            "
-          >
-            {{ activityStatusLabel(value) }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </FloatingLabelField>
-
-    <Alert
-      v-if="statusWarning"
-      class="sm:col-span-2"
-    >
-      <AlertDescription>
-        Kegiatan aktif, tetapi sekarang di luar jendela waktu. Siswa belum bisa
-        masuk sampai jendela dibuka.
-      </AlertDescription>
-    </Alert>
-
-    <Alert
-      v-if="statusError !== null"
-      variant="destructive"
-      class="sm:col-span-2"
-    >
-      <AlertDescription>{{ statusError }}</AlertDescription>
-    </Alert>
-
-    <div class="flex gap-2 sm:col-span-2">
-      <Button
-        type="button"
-        variant="outline"
-        :disabled="issuingNumbers"
-        @click="issueNumbers"
-      >
-        {{ issuingNumbers ? 'Menerbitkan…' : 'Terbitkan nomor peserta' }}
-      </Button>
-    </div>
-  </form>
-
-  <form
-    v-else
     id="activity-form"
     class="grid gap-4 sm:grid-cols-2"
     @submit.prevent="onSubmit"
@@ -446,6 +323,7 @@ async function issueNumbers(): Promise<void> {
           <AppCombobox
             :model-value="value"
             :options="periodOptions"
+            :disabled="fixedEvent !== null"
             placeholder="Pilih periode ujian"
             @update:model-value="handleChange"
           />
@@ -462,6 +340,7 @@ async function issueNumbers(): Promise<void> {
       <div class="content-start">
         <Select
           :model-value="value"
+          :disabled="fixedEvent !== null"
           @update:model-value="handleChange"
         >
           <FormControl>

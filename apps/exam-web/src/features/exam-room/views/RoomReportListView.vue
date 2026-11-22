@@ -9,6 +9,7 @@ import {
   DataTable,
   SearchInput,
   ServiceUnavailable,
+  DataTableEmpty,
 } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -67,7 +68,7 @@ const search = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 const previewOpen = ref(false)
 const previewDoc = ref<{
@@ -659,22 +660,13 @@ onMounted(load)
               </div>
             </template>
             <template #empty>
-              <div class="space-y-3 text-center">
-                <p>
-                  {{
-                    search
-                      ? 'Tidak ada berita acara yang cocok dengan pencarian.'
-                      : 'Belum ada jadwal pengawasan pada periode ini.'
-                  }}
-                </p>
-                <Button
-                  v-if="search"
-                  variant="outline"
-                  @click="search = ''"
-                >
-                  Atur Ulang
-                </Button>
-              </div>
+              <DataTableEmpty
+                :message="
+                  search
+                    ? 'Tidak ada berita acara yang cocok dengan pencarian.'
+                    : 'Belum ada jadwal pengawasan pada periode ini.'
+                "
+              />
             </template>
           </DataTable>
         </template>
@@ -723,14 +715,6 @@ onMounted(load)
             </Select>
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter standard>
-          <Button
-            variant="outline"
-            @click="filterOpen = false"
-          >
-            Tutup
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
 
@@ -762,16 +746,7 @@ onMounted(load)
             />
           </div>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
-          <Button
-            variant="outline"
-            @click="previewOpen = false"
-          >
-            Tutup
-          </Button>
+        <DialogFooter standard>
           <Button
             :disabled="previewLoading || previewDoc === null"
             @click="printPreview"
@@ -898,10 +873,7 @@ onMounted(load)
             Menyiapkan dokumen...
           </p>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
             @click="printOpen = false"

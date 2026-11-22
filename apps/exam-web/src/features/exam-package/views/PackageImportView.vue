@@ -275,10 +275,7 @@ onMounted(init)
                     />
                   </FloatingLabelField>
                 </DialogBody>
-                <DialogFooter
-                  standard
-                  class="justify-between"
-                >
+                <DialogFooter standard>
                   <Button
                     type="button"
                     variant="outline"
@@ -389,10 +386,7 @@ onMounted(init)
                   :preview="preview"
                 />
               </DialogBody>
-              <DialogFooter
-                standard
-                class="justify-between"
-              >
+              <DialogFooter standard>
                 <Button
                   type="button"
                   variant="outline"

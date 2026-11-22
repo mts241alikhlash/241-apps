@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { floatingFieldStub } from '@/test-support/floatingFieldStub'
 import MakeupDialog from './MakeupDialog.vue'
 import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
@@ -65,6 +66,8 @@ const stubs = {
   Button: button,
   Checkbox: checkbox,
   FloatingLabelField: field,
+  FloatingField: floatingFieldStub,
+  FormControl: passthrough,
   Select: select,
   SelectContent: passthrough,
   SelectItem: passthrough,
@@ -111,11 +114,17 @@ async function open() {
   return wrapper
 }
 
+async function submitForm(wrapper: Wrapper) {
+  await wrapper.get('#makeup-form').trigger('submit')
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  await flushPromises()
+}
+
 async function fillWindow(wrapper: Wrapper) {
-  await wrapper.get('input[id$="-start-date"]').setValue('2026-11-04')
-  await wrapper.get('input[id$="-end-date"]').setValue('2026-11-04')
-  await wrapper.get('input[id$="-start"]').setValue('08:00')
-  await wrapper.get('input[id$="-end"]').setValue('11:00')
+  await wrapper.get('[data-field="startDate"] input').setValue('2026-11-04')
+  await wrapper.get('[data-field="endDate"] input').setValue('2026-11-04')
+  await wrapper.get('[data-field="startTime"] input').setValue('08:00')
+  await wrapper.get('[data-field="endTime"] input').setValue('11:00')
 }
 
 describe('MakeupDialog', () => {
@@ -149,21 +158,19 @@ describe('MakeupDialog', () => {
     wrapper.unmount()
   })
 
-  it('keeps the button disabled until a student and a valid window are chosen, and counts them', async () => {
+  it('asks for a student, then counts the chosen ones on the button', async () => {
     const wrapper = await open()
-    expect(
-      buttonByText(wrapper, 'Buat susulan')!.attributes('disabled'),
-    ).toBeDefined()
+    expect(buttonByText(wrapper, 'Buat susulan')).toBeDefined()
+
+    await fillWindow(wrapper)
+    await submitForm(wrapper)
+    await flushPromises()
+    expect(wrapper.text()).toContain('Pilih minimal satu siswa')
+    expect(createMakeup).not.toHaveBeenCalled()
 
     await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
-    expect(
-      buttonByText(wrapper, 'Buat susulan')!.attributes('disabled'),
-    ).toBeDefined()
-    await fillWindow(wrapper)
 
-    expect(
-      buttonByText(wrapper, 'Buat susulan (1)')!.attributes('disabled'),
-    ).toBeUndefined()
+    expect(buttonByText(wrapper, 'Buat susulan (1)')).toBeDefined()
     wrapper.unmount()
   })
 
@@ -173,7 +180,7 @@ describe('MakeupDialog', () => {
     await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
     await fillWindow(wrapper)
 
-    await buttonByText(wrapper, 'Buat susulan')!.trigger('click')
+    await submitForm(wrapper)
     await flushPromises()
 
     expect(createMakeup).toHaveBeenCalledWith(
@@ -197,7 +204,7 @@ describe('MakeupDialog', () => {
     await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
     await fillWindow(wrapper)
 
-    await buttonByText(wrapper, 'Buat susulan')!.trigger('click')
+    await submitForm(wrapper)
     await flushPromises()
 
     expect(wrapper.text()).toContain('Ani sudah terdaftar di susulan lain')
@@ -241,7 +248,7 @@ describe('MakeupDialog', () => {
       .get('input[placeholder="Catatan (opsional)"]')
       .setValue('Demam')
     await fillWindow(wrapper)
-    await buttonByText(wrapper, 'Buat susulan')!.trigger('click')
+    await submitForm(wrapper)
     await flushPromises()
 
     expect(createMakeup).toHaveBeenCalledWith(

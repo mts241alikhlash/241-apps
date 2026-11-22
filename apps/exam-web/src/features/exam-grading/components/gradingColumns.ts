@@ -12,7 +12,7 @@ import {
   formatTime,
 } from '@/features/exam-schedule/utils/formatWindow'
 import type { GradingSchedule, GradingSessionRow } from '../types'
-import { publicationLabel } from '../types'
+import { formatScore, publicationLabel } from '../types'
 
 const typeText = (row: GradingSchedule) =>
   row.kind === 'MAKEUP'
@@ -23,6 +23,7 @@ const exitText = (row: GradingSessionRow) =>
 const classroomText = (row: GradingSchedule) => row.classroomName ?? '-'
 
 export function buildGradingScheduleColumns(options: {
+  subjectName?: (schedule: GradingSchedule) => string
   onOpen: (schedule: GradingSchedule) => void
   canMakeup?: boolean
   canParticipants?: boolean
@@ -38,9 +39,10 @@ export function buildGradingScheduleColumns(options: {
     },
     {
       id: 'title',
-      header: 'Ujian',
+      header: 'Mata Pelajaran',
       meta: { align: 'left', strong: true, mobile: 'title' },
-      cell: ({ row }) => row.original.title,
+      cell: ({ row }) =>
+        options.subjectName?.(row.original) ?? row.original.title,
     },
     {
       id: 'classroom',
@@ -160,7 +162,7 @@ const studentText = (row: GradingSessionRow) =>
 const scoreText = (row: GradingSessionRow) =>
   row.rawScore === null || row.maxScore === null
     ? '-'
-    : `${row.rawScore} / ${row.maxScore}`
+    : `${formatScore(row.rawScore)} / ${formatScore(row.maxScore)}`
 
 export function buildGradingSessionColumns(options: {
   onOpen: (session: GradingSessionRow) => void
@@ -183,21 +185,6 @@ export function buildGradingSessionColumns(options: {
       cell: ({ row }) => exitText(row.original),
     },
     {
-      id: 'status',
-      header: 'Status',
-      meta: {
-        align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: (row: GradingSessionRow) => sessionStatusLabel(row.status),
-      },
-      cell: ({ row }) =>
-        h(
-          Badge,
-          { variant: row.original.awaitingGrading ? 'destructive' : 'outline' },
-          () => sessionStatusLabel(row.original.status),
-        ),
-    },
-    {
       id: 'score',
       header: 'Nilai',
       meta: { align: 'center', mobileLabel: 'Nilai', mobileValue: scoreText },
@@ -213,6 +200,21 @@ export function buildGradingSessionColumns(options: {
           publicationLabel(row.publication),
       },
       cell: ({ row }) => publicationLabel(row.original.publication),
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: (row: GradingSessionRow) => sessionStatusLabel(row.status),
+      },
+      cell: ({ row }) =>
+        h(
+          Badge,
+          { variant: row.original.awaitingGrading ? 'destructive' : 'outline' },
+          () => sessionStatusLabel(row.original.status),
+        ),
     },
     {
       id: 'actions',

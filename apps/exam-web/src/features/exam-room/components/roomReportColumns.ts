@@ -241,19 +241,6 @@ export function buildRoomReportColumns(
       cell: ({ row }) => row.original.supervisorName ?? 'Belum ditentukan',
     },
     {
-      id: 'status',
-      header: 'Status',
-      meta: {
-        align: 'center',
-        mobileLabel: 'Status',
-        mobileValue: (row: RoomReportSummary) => reportStatusLabel(row.status),
-      },
-      cell: ({ row }) =>
-        h(Badge, { variant: statusVariant(row.original.status) }, () =>
-          reportStatusLabel(row.original.status),
-        ),
-    },
-    {
       id: 'file',
       header: 'Berkas',
       meta: {
@@ -266,6 +253,19 @@ export function buildRoomReportColumns(
         row.original.hasAttachment
           ? h(Badge, { variant: 'secondary' }, () => FILE_UPLOADED)
           : '-',
+    },
+    {
+      id: 'status',
+      header: 'Status',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Status',
+        mobileValue: (row: RoomReportSummary) => reportStatusLabel(row.status),
+      },
+      cell: ({ row }) =>
+        h(Badge, { variant: statusVariant(row.original.status) }, () =>
+          reportStatusLabel(row.original.status),
+        ),
     },
     {
       id: 'actions',

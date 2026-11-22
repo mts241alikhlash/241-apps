@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { BackButton, DataTable } from '@mts241alikhlash/ui'
+import { BackButton, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Card,
@@ -61,6 +61,8 @@ const canReadHistory = computed(
 
 const columns = computed(() =>
   buildSessionColumns({
+    classroomName:
+      typeof route.query.kelas === 'string' ? route.query.kelas : null,
     canRelease: canRelease.value,
     onRelease: (session) => {
       recoverySession.value = session
@@ -136,7 +138,7 @@ onMounted(load)
           item-label="sesi"
         >
           <template #empty>
-            <p>Belum ada siswa yang memulai ujian ini.</p>
+            <DataTableEmpty message="Belum ada siswa yang memulai ujian ini." />
           </template>
         </DataTable>
       </CardContent>

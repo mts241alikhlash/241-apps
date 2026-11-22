@@ -2,7 +2,12 @@
 import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Filter } from '@lucide/vue'
-import { BackButton, DataTable, SearchInput } from '@mts241alikhlash/ui'
+import {
+  BackButton,
+  DataTable,
+  SearchInput,
+  DataTableEmpty,
+} from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -390,7 +395,9 @@ onUnmounted(() => {
                   </Button>
                 </template>
                 <template #empty>
-                  <p>Tidak ada peserta yang cocok dengan filter.</p>
+                  <DataTableEmpty
+                    message="Tidak ada peserta yang cocok dengan filter."
+                  />
                 </template>
               </DataTable>
             </CardContent>
@@ -433,17 +440,14 @@ onUnmounted(() => {
             </Select>
           </FloatingLabelField>
         </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
+        <DialogFooter standard>
           <Button
             variant="outline"
+            :disabled="status === 'ALL'"
             @click="status = 'ALL'"
           >
             Atur Ulang
           </Button>
-          <Button @click="filterOpen = false">Tutup</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

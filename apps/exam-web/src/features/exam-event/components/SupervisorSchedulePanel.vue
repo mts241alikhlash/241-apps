@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, h, onMounted, ref, watch } from 'vue'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { ActionCell, DataTable } from '@mts241alikhlash/ui'
+import { ActionCell, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import { toast } from 'vue-sonner'
@@ -360,13 +360,13 @@ onMounted(async () => {
       :item-label="itemLabel"
     >
       <template #empty>
-        <p>
-          {{
+        <DataTableEmpty
+          :message="
             canSubstitute && !activeDay
               ? 'Belum ada slot pengawas. Buat slot ruangan dulu.'
               : 'Belum ada jadwal pengawas.'
-          }}
-        </p>
+          "
+        />
       </template>
     </DataTable>
 

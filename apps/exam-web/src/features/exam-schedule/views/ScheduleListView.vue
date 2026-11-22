@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { computed, h, onMounted, ref, useId } from 'vue'
+import { computed, h, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
-import { ActionCell, BackButton, DataTable } from '@mts241alikhlash/ui'
+import {
+  ActionCell,
+  BackButton,
+  DataTable,
+  DataTableEmpty,
+} from '@mts241alikhlash/ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,33 +27,23 @@ import {
   CardTitle,
   CardFooter,
 } from '@mts241alikhlash/ui/card'
-import {
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@mts241alikhlash/ui/dialog'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@mts241alikhlash/ui/select'
-import { Filter, Plus, Printer } from '@lucide/vue'
+import { Plus, Printer } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examEventService } from '@/features/exam-event/services/examEventService'
-import { buildScheduleColumns } from '../components/scheduleColumns'
+import type { ExamEvent } from '@/features/exam-event/types'
+import { examTypeLabel } from '../types'
+import {
+  buildScheduleColumns,
+  scheduleHasActions,
+  type ScheduleColumnOptions,
+} from '../components/scheduleColumns'
 import MakeupDialog from '../components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '../components/MakeupParticipantsDialog.vue'
 import AccessCodeDialog from '../components/AccessCodeDialog.vue'
 import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
+import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
 import { examActivityApi } from '@/features/exam-activity/api/examActivityApi'
 import {
   buildTimetable,
@@ -65,7 +60,6 @@ import {
   type DayGroup,
   type PeriodGroup,
 } from '../utils/groupSchedules'
-import { SCHEDULE_STATUSES, scheduleStatusLabel } from '../types'
 import type { ExamSchedule } from '../types'
 
 const router = useRouter()
@@ -74,6 +68,9 @@ const { hasPermission } = useAuthSession()
 const { category, sectionPrefix } = useRouteCategory()
 
 const route = useRoute()
+const { subjectOf } = usePackageSubjects()
+const subjectName = (schedule: ExamSchedule) =>
+  subjectOf(schedule.packageId, schedule.packageTitle)
 
 const status = ref('ALL')
 const page = ref(1)
@@ -83,6 +80,7 @@ const { schedules, loading, listError, filtersPending, refresh } =
   useScheduleList({ status, category }, page, pageSize)
 
 const periodNames = ref(new Map<string, string>())
+const periodEvents = ref(new Map<string, ExamEvent>())
 
 const queryValue = (name: string): string | null => {
   const raw = route.query[name]
@@ -170,12 +168,11 @@ onMounted(async () => {
     periodNames.value = new Map(
       result.data.map((event) => [event.id, event.name]),
     )
+    periodEvents.value = new Map(result.data.map((event) => [event.id, event]))
   }
 })
 
-const statusFieldId = useId()
 const formOpen = ref(false)
-const filterOpen = ref(false)
 const editing = ref<ExamSchedule | null>(null)
 const cancelTarget = ref<ExamSchedule | null>(null)
 const accessTarget = ref<ExamSchedule | null>(null)
@@ -184,8 +181,7 @@ const participantsTarget = ref<ExamSchedule | null>(null)
 const cancelling = ref(false)
 
 function openCreate() {
-  editing.value = null
-  formOpen.value = true
+  void router.push(`${sectionPrefix.value}/activities/new`)
 }
 
 function openEdit(schedule: ExamSchedule) {
@@ -224,45 +220,44 @@ async function printTimetable() {
   }
 }
 
+const isClasswork = computed(() => category.value === 'NON_EXAM')
+
+const scheduleOptions = computed<ScheduleColumnOptions>(() => ({
+  subjectName,
+  canUpdate: hasPermission('exam-schedules.update'),
+  canCancel: hasPermission('exam-schedules.cancel'),
+  canAccessCode:
+    isClasswork.value && hasPermission('exam-schedules.access-code'),
+  canSessions: isClasswork.value && hasPermission('exam-sessions.read'),
+  canMakeup: isClasswork.value && hasPermission('exam-grading.grade'),
+  canParticipants: isClasswork.value && hasPermission('exam-grading.read'),
+  now: () => new Date(),
+  onEdit: openEdit,
+  onCancel: (schedule) => {
+    cancelTarget.value = schedule
+  },
+  onAccessCode: (schedule) => {
+    accessTarget.value = schedule
+  },
+  onSessions: (schedule) => {
+    void router.push({
+      path: `${sectionPrefix.value}/schedules/${schedule.id}/sessions`,
+      query: {
+        judul: `${subjectName(schedule)} · ${schedule.classroomName ?? '-'}`,
+        ...(schedule.classroomName ? { kelas: schedule.classroomName } : {}),
+      },
+    })
+  },
+  onMakeup: (schedule) => {
+    makeupTarget.value = schedule
+  },
+  onParticipants: (schedule) => {
+    participantsTarget.value = schedule
+  },
+}))
+
 const scheduleColumns = computed(() =>
-  buildScheduleColumns({
-    canUpdate: hasPermission('exam-schedules.update'),
-    canCancel: hasPermission('exam-schedules.cancel'),
-    canAccessCode: hasPermission('exam-schedules.access-code'),
-    canSessions: hasPermission('exam-sessions.read'),
-    canMakeup: hasPermission('exam-grading.grade'),
-    canParticipants: hasPermission('exam-grading.read'),
-    canManageActivity: hasPermission('exam-schedules.manage'),
-    now: () => new Date(),
-    onEdit: openEdit,
-    onCancel: (schedule) => {
-      cancelTarget.value = schedule
-    },
-    onAccessCode: (schedule) => {
-      accessTarget.value = schedule
-    },
-    onSessions: (schedule) => {
-      void router.push({
-        path: `${sectionPrefix.value}/schedules/${schedule.id}/sessions`,
-        query: {
-          judul: `${schedule.packageTitle} · ${schedule.classroomName ?? '-'}`,
-        },
-      })
-    },
-    onMakeup: (schedule) => {
-      makeupTarget.value = schedule
-    },
-    onParticipants: (schedule) => {
-      participantsTarget.value = schedule
-    },
-    onStatus: (schedule) => {
-      if (schedule.activityId === null) return
-      void router.push({
-        path: `${sectionPrefix.value}/activities/new`,
-        query: { id: schedule.activityId },
-      })
-    },
-  }),
+  buildScheduleColumns(scheduleOptions.value),
 )
 
 const manageCell = (open: () => void) =>
@@ -273,11 +268,46 @@ const manageCell = (open: () => void) =>
     onManage: open,
   })
 
+const clock = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso))
+
+const fullDate = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    dateStyle: 'full',
+  }).format(new Date(iso))
+
+const eventOf = (id: string): ExamEvent | undefined =>
+  periodEvents.value.get(id)
+
 const periodColumns: ColumnDef<PeriodGroup>[] = [
+  {
+    id: 'type',
+    header: 'Jenis',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jenis',
+      mobileValue: (row: PeriodGroup) => {
+        const event = eventOf(row.id)
+        return event ? examTypeLabel(event.type) : '-'
+      },
+    },
+    cell: ({ row }) => {
+      const event = eventOf(row.original.id)
+      return event ? examTypeLabel(event.type) : '-'
+    },
+  },
   {
     id: 'name',
     header: 'Periode Ujian',
     meta: {
+      align: 'left',
+      strong: true,
       mobile: 'title',
       mobileValue: (row: PeriodGroup) => periodName(row.id),
     },
@@ -286,7 +316,11 @@ const periodColumns: ColumnDef<PeriodGroup>[] = [
   {
     id: 'days',
     header: 'Jumlah Hari',
-    meta: { align: 'center', mobileValue: (row: PeriodGroup) => row.dayCount },
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jumlah Hari',
+      mobileValue: (row: PeriodGroup) => row.dayCount,
+    },
     cell: ({ row }) => String(row.original.dayCount),
   },
   {
@@ -294,6 +328,7 @@ const periodColumns: ColumnDef<PeriodGroup>[] = [
     header: 'Jumlah Jadwal',
     meta: {
       align: 'center',
+      mobileLabel: 'Jumlah Jadwal',
       mobileValue: (row: PeriodGroup) => row.scheduleCount,
     },
     cell: ({ row }) => String(row.original.scheduleCount),
@@ -307,27 +342,55 @@ const periodColumns: ColumnDef<PeriodGroup>[] = [
   },
 ]
 
+const subjectCountOf = (day: DayGroup): number =>
+  new Set(day.schedules.map((item) => subjectName(item))).size
+
 const dayColumns: ColumnDef<DayGroup>[] = [
   {
     id: 'date',
-    header: 'Tanggal',
+    header: 'Hari, Tanggal',
     meta: {
       mobile: 'title',
-      mobileValue: (row: DayGroup) => dateText.format(new Date(row.startsAt)),
+      mobileValue: (row: DayGroup) => fullDate(row.startsAt),
     },
-    cell: ({ row }) => dateText.format(new Date(row.original.startsAt)),
+    cell: ({ row }) => fullDate(row.original.startsAt),
+  },
+  {
+    id: 'start',
+    header: 'Jam Mulai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Mulai',
+      mobileValue: (row: DayGroup) => clock(row.startsAt),
+    },
+    cell: ({ row }) => clock(row.original.startsAt),
+  },
+  {
+    id: 'end',
+    header: 'Jam Selesai',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jam Selesai',
+      mobileValue: (row: DayGroup) => clock(row.endsAt),
+    },
+    cell: ({ row }) => clock(row.original.endsAt),
   },
   {
     id: 'subjects',
     header: 'Jumlah Mapel',
-    meta: { align: 'center', mobileValue: (row: DayGroup) => row.subjectCount },
-    cell: ({ row }) => String(row.original.subjectCount),
+    meta: {
+      align: 'center',
+      mobileLabel: 'Jumlah Mapel',
+      mobileValue: (row: DayGroup) => subjectCountOf(row),
+    },
+    cell: ({ row }) => String(subjectCountOf(row.original)),
   },
   {
     id: 'count',
     header: 'Jumlah Jadwal',
     meta: {
       align: 'center',
+      mobileLabel: 'Jumlah Jadwal',
       mobileValue: (row: DayGroup) => row.scheduleCount,
     },
     cell: ({ row }) => String(row.original.scheduleCount),
@@ -344,12 +407,23 @@ const dayColumns: ColumnDef<DayGroup>[] = [
   },
 ]
 
+const gradeNumber = (name: string | null): number =>
+  Number(/(\d+)/.exec(name ?? '')?.[1] ?? Number.MAX_SAFE_INTEGER)
+
+const byClassroom = (left: ExamSchedule, right: ExamSchedule): number =>
+  gradeNumber(left.classroomName) - gradeNumber(right.classroomName) ||
+  (left.classroomName ?? '').localeCompare(right.classroomName ?? '', 'id', {
+    numeric: true,
+  }) ||
+  left.startsAt.localeCompare(right.startsAt) ||
+  left.packageTitle.localeCompare(right.packageTitle, 'id')
+
 const rows = computed<(PeriodGroup | DayGroup | ExamSchedule)[]>(() => {
   if (level.value === 'period') return groupPeriods(schedules.value)
   if (level.value === 'day') return groupDays(inPeriod.value)
-  return inPeriod.value.filter(
-    (item) => dayKeyOf(item.startsAt) === dayId.value,
-  )
+  return inPeriod.value
+    .filter((item) => dayKeyOf(item.startsAt) === dayId.value)
+    .sort(byClassroom)
 })
 
 const columns = computed(
@@ -359,7 +433,12 @@ const columns = computed(
       : level.value === 'day'
         ? dayColumns
         : scheduleColumns.value.filter(
-            (column) => column.id !== 'date',
+            (column) =>
+              column.id !== 'date' &&
+              (column.id !== 'actions' ||
+                (rows.value as ExamSchedule[]).some((item) =>
+                  scheduleHasActions(item, scheduleOptions.value),
+                )),
           )) as unknown as ColumnDef<PeriodGroup | DayGroup | ExamSchedule>[],
 )
 </script>
@@ -389,7 +468,7 @@ const columns = computed(
             Cetak
           </Button>
           <Button
-            v-if="hasPermission('exam-schedules.create')"
+            v-if="hasPermission('exam-schedules.manage')"
             @click="openCreate"
           >
             <Plus class="size-4" />
@@ -424,120 +503,13 @@ const columns = computed(
           :is-loading="loading || filtersPending"
           :item-label="itemLabel"
         >
-          <template #filters>
-            <FloatingLabelField
-              v-if="level === 'schedule'"
-              label="Status"
-              :for="statusFieldId"
-              class="w-fit min-w-28"
-              floating
-            >
-              <Select v-model="status">
-                <SelectTrigger
-                  :id="statusFieldId"
-                  class="w-full"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Semua</SelectItem>
-                  <SelectItem
-                    v-for="option in SCHEDULE_STATUSES"
-                    :key="option"
-                    :value="option"
-                  >
-                    {{ scheduleStatusLabel(option) }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
-          </template>
-          <template #mobile-filter>
-            <Button
-              v-if="level === 'schedule'"
-              variant="outline"
-              class="relative shrink-0"
-              @click="filterOpen = true"
-            >
-              <Filter class="size-4" />
-              Filter
-              <span
-                v-if="status !== 'ALL'"
-                class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
-              >
-                1
-              </span>
-            </Button>
-          </template>
           <template #empty>
-            <div class="space-y-3">
-              <p>
-                {{
-                  status !== 'ALL'
-                    ? 'Tidak ada jadwal yang cocok dengan filter.'
-                    : 'Belum ada jadwal ujian.'
-                }}
-              </p>
-              <Button
-                v-if="status !== 'ALL'"
-                variant="outline"
-                @click="status = 'ALL'"
-              >
-                Atur Ulang
-              </Button>
-            </div>
+            <DataTableEmpty message="Belum ada jadwal ujian." />
           </template>
         </DataTable>
       </CardContent>
       <CardFooter plain />
     </Card>
-
-    <Dialog v-model:open="filterOpen">
-      <DialogContent size="md">
-        <DialogHeader standard>
-          <DialogTitle>Filter Jadwal</DialogTitle>
-          <DialogDescription> Pilih status jadwal. </DialogDescription>
-        </DialogHeader>
-        <DialogBody class="space-y-4">
-          <FloatingLabelField
-            label="Status"
-            :for="`${statusFieldId}-dialog`"
-            floating
-          >
-            <Select v-model="status">
-              <SelectTrigger
-                :id="`${statusFieldId}-dialog`"
-                class="w-full"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">Semua</SelectItem>
-                <SelectItem
-                  v-for="option in SCHEDULE_STATUSES"
-                  :key="option"
-                  :value="option"
-                >
-                  {{ scheduleStatusLabel(option) }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </FloatingLabelField>
-        </DialogBody>
-        <DialogFooter
-          standard
-          class="justify-between"
-        >
-          <Button
-            variant="outline"
-            @click="status = 'ALL'"
-          >
-            Atur Ulang
-          </Button>
-          <Button @click="filterOpen = false">Tutup</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
 
     <ScheduleFormDialog
       v-if="formOpen"
@@ -557,14 +529,14 @@ const columns = computed(
       v-if="accessTarget"
       :open="true"
       :schedule-id="accessTarget.id"
-      :title="`${accessTarget.packageTitle} · ${accessTarget.classroomName ?? '-'}`"
+      :title="`${subjectName(accessTarget)} · ${accessTarget.classroomName ?? '-'}`"
       @update:open="(value: boolean) => !value && (accessTarget = null)"
     />
 
     <MakeupDialog
       v-if="makeupTarget"
       :open="true"
-      :schedule="makeupTarget"
+      :schedule="{ ...makeupTarget, packageTitle: subjectName(makeupTarget) }"
       @update:open="(value: boolean) => !value && (makeupTarget = null)"
       @created="refresh()"
     />
@@ -573,7 +545,7 @@ const columns = computed(
       v-if="participantsTarget"
       :open="true"
       :schedule-id="participantsTarget.id"
-      :title="`${participantsTarget.packageTitle} · ${participantsTarget.classroomName ?? '-'}`"
+      :title="`${subjectName(participantsTarget)} · ${participantsTarget.classroomName ?? '-'}`"
       @update:open="(value: boolean) => !value && (participantsTarget = null)"
     />
 
@@ -585,7 +557,7 @@ const columns = computed(
         <AlertDialogHeader>
           <AlertDialogTitle>Batalkan jadwal?</AlertDialogTitle>
           <AlertDialogDescription>
-            Jadwal {{ cancelTarget?.packageTitle }} untuk
+            Jadwal {{ cancelTarget ? subjectName(cancelTarget) : '' }} untuk
             {{ cancelTarget?.classroomName ?? 'kelas ini' }} dibatalkan dan
             tokennya tidak berlaku lagi.
           </AlertDialogDescription>

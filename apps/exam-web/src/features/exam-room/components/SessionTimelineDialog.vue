@@ -148,12 +148,6 @@ watch(
           >
             {{ showAll ? 'Hanya pelanggaran' : 'Tampilkan semua' }}
           </Button>
-          <Button
-            variant="outline"
-            @click="emit('update:open', false)"
-          >
-            Tutup
-          </Button>
         </div>
       </DialogFooter>
     </DialogContent>

@@ -29,3 +29,6 @@ export const publicationLabel = (state: PublicationState): string => {
 export function answerText(answer: GradingItem['answer']): string {
   return typeof answer?.text === 'string' ? answer.text : ''
 }
+
+export const formatScore = (value: number): string =>
+  value.toLocaleString('id-ID', { maximumFractionDigits: 2 })

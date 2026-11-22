@@ -79,10 +79,7 @@ function pick(event: Event) {
           {{ problem ?? error }}
         </p>
       </DialogBody>
-      <DialogFooter
-        standard
-        class="justify-between"
-      >
+      <DialogFooter standard>
         <Button
           variant="outline"
           :disabled="busy"
