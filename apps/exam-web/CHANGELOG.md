@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.8.9
+
+### Patch Changes
+
+- dc23a2b: Print every day of the staff attendance sheets without the days overlapping each other, keep the supervisors of a day on one page with one-line names, a centered Mata Pelajaran column and a Pukul column, and show the principal and the curriculum deputy names under the signatures on every page.
+
 ## 0.8.8
 
 ### Patch Changes
