@@ -1,5 +1,11 @@
 # identity-service
 
+## 0.3.2
+
+### Patch Changes
+
+- 599987c: Add the Pengawas Ujian role (supervise rooms and release sessions) and take both permissions away from the Guru role, so only people given the new role can supervise exam rooms. The supervisor schedule picker now lists holders of that role.
+
 ## 0.3.1
 
 ### Patch Changes
