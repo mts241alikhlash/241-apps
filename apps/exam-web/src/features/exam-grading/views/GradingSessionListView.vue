@@ -36,7 +36,7 @@ const examTitle = computed(() =>
 )
 const status = ref('ALL')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 const statusFieldId = useId()
 
 useBreadcrumbs(() => [

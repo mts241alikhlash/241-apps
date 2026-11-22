@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { QUESTION_TYPES } from '../../../../question/domain/value-objects/question-content.js'
 import {
   EXAM_CATEGORIES,
   EXAM_SCHEDULE_KINDS,
@@ -137,12 +138,28 @@ export class GradingItemDto {
   @ApiProperty({ format: 'uuid' }) questionId!: string
   @ApiProperty({ description: 'Position on the package, from 1' })
   number!: number
-  @ApiProperty({ enum: ['SHORT_ANSWER', 'ESSAY'] }) type!: GradingItem['type']
+  @ApiProperty({ enum: QUESTION_TYPES }) type!: GradingItem['type']
+  @ApiProperty({ description: 'True when a teacher scores it by hand' })
+  manual!: boolean
   @ApiProperty() bodyHtml!: string
   @ApiProperty() points!: number
   @ApiProperty({ type: String, nullable: true }) guideHtml!: string | null
   @ApiProperty({ type: String, isArray: true, nullable: true })
   acceptedAnswers!: string[] | null
+  @ApiProperty({
+    type: 'array',
+    nullable: true,
+    items: {
+      type: 'object',
+      properties: { key: { type: 'string' }, html: { type: 'string' } },
+      required: ['key', 'html'],
+    },
+  })
+  choices!: { key: string; html: string }[] | null
+  @ApiProperty({ type: String, isArray: true, nullable: true })
+  correctKeys!: string[] | null
+  @ApiProperty({ type: Boolean, nullable: true })
+  correctValue!: boolean | null
   @ApiProperty({ type: 'object', additionalProperties: true, nullable: true })
   answer!: Record<string, unknown> | null
   @ApiProperty({ type: Number, nullable: true }) score!: number | null
@@ -156,10 +173,14 @@ export class GradingItemDto {
     dto.questionId = domain.questionId
     dto.number = domain.number
     dto.type = domain.type
+    dto.manual = domain.manual
     dto.bodyHtml = domain.bodyHtml
     dto.points = domain.points
     dto.guideHtml = domain.guideHtml
     dto.acceptedAnswers = domain.acceptedAnswers
+    dto.choices = domain.choices
+    dto.correctKeys = domain.correctKeys
+    dto.correctValue = domain.correctValue
     dto.answer = domain.answer ? { ...domain.answer } : null
     dto.score = domain.score
     dto.note = domain.note

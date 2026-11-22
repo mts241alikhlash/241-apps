@@ -128,7 +128,7 @@ onMounted(load)
         </div>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
+        class="flex min-h-0 flex-1 flex-col overflow-auto space-y-4 pt-2 px-4 pb-4"
       >
         <p v-if="loading">Memuat…</p>
         <div
@@ -145,9 +145,7 @@ onMounted(load)
           </Button>
         </div>
         <template v-else-if="detail">
-          <p v-if="detail.items.length === 0">
-            Ujian ini tidak punya soal isian singkat atau uraian.
-          </p>
+          <p v-if="detail.items.length === 0">Ujian ini tidak punya soal.</p>
           <p
             v-if="!finished"
             class="rounded-md border p-3"

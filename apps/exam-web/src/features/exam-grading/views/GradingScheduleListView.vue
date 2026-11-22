@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { DataTable } from '@mts241alikhlash/ui'
@@ -12,6 +12,7 @@ import {
   CardFooter,
 } from '@mts241alikhlash/ui/card'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import MakeupDialog from '@/features/exam-schedule/components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '@/features/exam-schedule/components/MakeupParticipantsDialog.vue'
 import type { MakeupOrigin } from '@/features/exam-schedule/types'
@@ -35,11 +36,14 @@ function originOf(schedule: GradingSchedule): MakeupOrigin {
     endsAt: schedule.endsAt,
   }
 }
+const semesterId = ref('')
 const page = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(25)
 
 const { schedules, totalItems, loading, listError, refresh } =
-  useGradingSchedules(page, pageSize, category)
+  useGradingSchedules(page, pageSize, category, semesterId)
+
+watch(semesterId, () => (page.value = 1), { flush: 'sync' })
 
 const columns = computed(() =>
   buildGradingScheduleColumns({
@@ -75,7 +79,7 @@ function changePageSize(size: number) {
         <CardTitle class="font-semibold">Penilaian Ujian</CardTitle>
       </CardHeader>
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
         <div
           v-if="listError"
@@ -105,6 +109,9 @@ function changePageSize(size: number) {
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
+          <template #filters>
+            <AcademicPeriodFilter v-model:semester-id="semesterId" />
+          </template>
           <template #empty>
             <p>Belum ada ujian yang dikerjakan siswa kelas Anda.</p>
           </template>

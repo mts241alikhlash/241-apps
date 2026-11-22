@@ -102,10 +102,6 @@ export class GradeAnswerUseCase {
       throw new NotFoundException('Sesi ujian tidak ditemukan')
     }
 
-    return toGradingItem(
-      { ...source, type: source.type },
-      index + 1,
-      applied.answer,
-    )
+    return toGradingItem(source, index + 1, applied.answer)
   }
 }

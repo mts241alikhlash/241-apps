@@ -247,10 +247,10 @@ describe('grading queries', () => {
   })
 
   describe('one session', () => {
-    it('shows only the manual items in paper order with the reference for the grader', async () => {
+    it('shows every item in paper order and marks the manual ones for the grader', async () => {
       const w = build()
       const { schedule, questionIds } = await paperWithManual(w)
-      const [, essay, short] = questionIds
+      const [choice, essay, short] = questionIds
       submitted(w, schedule, {
         [essay]: { text: 'uraian siswa' },
         [short]: { text: 'Bandung' },
@@ -259,10 +259,22 @@ describe('grading queries', () => {
       const detail = await getSession(w).execute(TEACHER, 'ses-1')
 
       expect(detail.items.map((item) => item.questionId)).toEqual([
+        choice,
         essay,
         short,
       ])
+      expect(detail.items.map((item) => item.manual)).toEqual([
+        false,
+        true,
+        true,
+      ])
       expect(detail.items[0]).toMatchObject({
+        number: 1,
+        manual: false,
+        needsGrading: false,
+        score: 0,
+      })
+      expect(detail.items[1]).toMatchObject({
         number: 2,
         type: 'ESSAY',
         points: 10,
@@ -272,7 +284,7 @@ describe('grading queries', () => {
         score: null,
         needsGrading: true,
       })
-      expect(detail.items[1]).toMatchObject({
+      expect(detail.items[2]).toMatchObject({
         number: 3,
         acceptedAnswers: ['jakarta'],
         needsGrading: true,
@@ -291,6 +303,7 @@ describe('grading queries', () => {
       const detail = await getSession(w).execute(TEACHER, 'ses-1')
 
       expect(detail.items.map((item) => item.needsGrading)).toEqual([
+        false,
         false,
         false,
       ])

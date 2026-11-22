@@ -13,7 +13,7 @@ import { Input } from '@mts241alikhlash/ui/input'
 import QuestionHtml from '@/features/exam-bank/components/QuestionHtml.vue'
 import { examGradingService } from '../services/examGradingService'
 import type { GradingItem } from '../types'
-import { answerText, itemTypeLabel } from '../types'
+import { answerText, booleanLabel, chosenKeys, itemTypeLabel } from '../types'
 
 const props = defineProps<{
   sessionId: string
@@ -36,6 +36,18 @@ watch(
 )
 
 const answer = computed(() => answerText(props.item.answer))
+const chosen = computed(() => new Set(chosenKeys(props.item.answer)))
+const correct = computed(() => new Set(props.item.correctKeys ?? []))
+const autoState = computed(() => {
+  const score = props.item.score ?? 0
+  if (!hasAnswer.value)
+    return { label: 'Tidak dijawab (0)', variant: 'outline' as const }
+  if (score >= props.item.points) {
+    return { label: `Benar (${score})`, variant: 'success' as const }
+  }
+  if (score <= 0) return { label: 'Salah (0)', variant: 'destructive' as const }
+  return { label: `Sebagian (${score})`, variant: 'warning' as const }
+})
 const hasAnswer = computed(
   () =>
     props.item.answer !== null &&
@@ -86,7 +98,16 @@ async function save() {
           Soal {{ item.number }} · {{ itemTypeLabel(item.type) }} ·
           {{ item.points }} poin
         </CardTitle>
-        <Badge :variant="item.needsGrading ? 'destructive' : 'outline'">
+        <Badge
+          v-if="!item.manual"
+          :variant="autoState.variant"
+        >
+          {{ autoState.label }}
+        </Badge>
+        <Badge
+          v-else
+          :variant="item.needsGrading ? 'destructive' : 'outline'"
+        >
           {{
             !hasAnswer
               ? 'Tidak dijawab (0)'
@@ -116,7 +137,59 @@ async function save() {
           <p>{{ item.acceptedAnswers.join(', ') }}</p>
         </div>
 
-        <div class="rounded-md bg-muted/40 p-3">
+        <ul
+          v-if="item.choices"
+          class="space-y-1.5"
+        >
+          <li
+            v-for="choice in item.choices"
+            :key="choice.key"
+            :class="[
+              'flex items-start gap-2 rounded-md border p-2',
+              correct.has(choice.key) && 'border-success/50 bg-success/5',
+              chosen.has(choice.key) &&
+                !correct.has(choice.key) &&
+                'border-destructive/50 bg-destructive/5',
+            ]"
+          >
+            <span class="w-5 shrink-0 font-medium">{{ choice.key }}.</span>
+            <QuestionHtml
+              class="min-w-0 flex-1"
+              :html="choice.html"
+            />
+            <span
+              v-if="correct.has(choice.key)"
+              class="shrink-0 text-control text-success"
+            >
+              Kunci
+            </span>
+            <span
+              v-if="chosen.has(choice.key)"
+              :class="[
+                'shrink-0 text-control',
+                correct.has(choice.key) ? 'text-success' : 'text-destructive',
+              ]"
+            >
+              Dipilih
+            </span>
+          </li>
+        </ul>
+        <div
+          v-else-if="item.type === 'TRUE_FALSE'"
+          class="rounded-md bg-muted/40 p-3"
+        >
+          <p>Kunci: {{ booleanLabel(item.correctValue) }}</p>
+          <p>
+            Jawaban siswa:
+            {{
+              hasAnswer ? booleanLabel(item.answer?.value) : 'Tidak dijawab.'
+            }}
+          </p>
+        </div>
+        <div
+          v-else
+          class="rounded-md bg-muted/40 p-3"
+        >
           <p class="mb-1 font-medium">Jawaban siswa</p>
           <p
             v-if="hasAnswer"
@@ -134,7 +207,7 @@ async function save() {
         </div>
 
         <div
-          v-if="hasAnswer && canGrade"
+          v-if="item.manual && hasAnswer && canGrade"
           class="grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-start"
         >
           <FloatingLabelField
