@@ -482,12 +482,11 @@ useBreadcrumbs(() => [
       v-if="printList.length > 0"
       class="print-only"
     >
-      <div
-        v-for="sheet in printList"
-        :key="sheet.key"
-        class="break-after-page last:break-after-auto"
-      >
+      <div class="print-stack">
         <StaffAttendanceSheet
+          v-for="sheet in printList"
+          :key="sheet.key"
+          stacked
           :date="sheet.date"
           :supervisors="sheet.supervisors"
           :technicians="sheet.technicians"
