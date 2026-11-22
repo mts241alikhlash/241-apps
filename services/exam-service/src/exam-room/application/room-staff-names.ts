@@ -1,3 +1,4 @@
+import { ServiceUnavailableException } from '@nestjs/common'
 import { IAuthorLookupPort } from '../../platform/author-lookup/author-lookup.port.js'
 import { IEmployeeIdentityReadPort } from '../../platform/employee-identity/employee-identity.port.js'
 
@@ -5,6 +6,22 @@ export interface StaffNames {
   technicianName: string | null
   currentSupervisorName: string | null
   scheduledSupervisorName: string | null
+}
+
+export async function employeeIdsOf(
+  employees: IEmployeeIdentityReadPort,
+  userIds: Iterable<string>,
+): Promise<Map<string, string>> {
+  const employeeOf = new Map<string, string>()
+  for (const userId of new Set(userIds)) {
+    try {
+      const employeeId = await employees.findEmployeeIdByUserId(userId)
+      if (employeeId !== null) employeeOf.set(userId, employeeId)
+    } catch (error) {
+      if (!(error instanceof ServiceUnavailableException)) throw error
+    }
+  }
+  return employeeOf
 }
 
 export async function staffNames(
@@ -28,11 +45,7 @@ export async function staffNames(
       scheduledSupervisorName: null,
     }
   }
-  const employeeOf = new Map<string, string>()
-  for (const userId of new Set(userIds)) {
-    const employeeId = await employees.findEmployeeIdByUserId(userId)
-    if (employeeId !== null) employeeOf.set(userId, employeeId)
-  }
+  const employeeOf = await employeeIdsOf(employees, userIds)
   const names = await authors.namesOf([...employeeOf.values()])
   const nameOf = (userId: string | null): string | null => {
     if (userId === null) return null

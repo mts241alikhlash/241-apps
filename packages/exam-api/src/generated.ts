@@ -2968,6 +2968,7 @@ export interface components {
             /** @description False once a supervisor released the device */
             deviceBound: boolean;
             maxScore: number | null;
+            participantNumber: string | null;
             rawScore: number | null;
             /** Format: uuid */
             sessionId: string;

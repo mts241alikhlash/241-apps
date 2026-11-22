@@ -8,6 +8,8 @@ export class ScheduleSessionDto {
   @ApiProperty({ format: 'uuid' }) studentId!: string
   @ApiProperty({ type: String, nullable: true }) studentName!: string | null
   @ApiProperty({ type: String, nullable: true }) studentNis!: string | null
+  @ApiProperty({ type: String, nullable: true })
+  participantNumber!: string | null
   @ApiProperty({ enum: ['IN_PROGRESS', 'SUBMITTED', 'EXPIRED', 'GRADED'] })
   status!: ExamSession['status']
   @ApiProperty({ enum: ['ISTIQRA', 'SEB'] }) client!: ExamSession['client']
@@ -27,6 +29,7 @@ export class ScheduleSessionDto {
     domain: ExamSession & {
       studentName?: string | null
       studentNis?: string | null
+      participantNumber?: string | null
     },
   ): ScheduleSessionDto {
     const dto = new ScheduleSessionDto()
@@ -34,6 +37,7 @@ export class ScheduleSessionDto {
     dto.studentId = domain.studentId
     dto.studentName = domain.studentName ?? null
     dto.studentNis = domain.studentNis ?? null
+    dto.participantNumber = domain.participantNumber ?? null
     dto.status = domain.status
     dto.client = domain.client
     dto.startedAt = domain.startedAt.toISOString()

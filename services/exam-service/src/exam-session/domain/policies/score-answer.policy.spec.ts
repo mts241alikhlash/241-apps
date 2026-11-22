@@ -75,18 +75,77 @@ describe('scoreAnswer', () => {
     expect(scoreAnswer('TRUE_FALSE', tf, null, 3)).toEqual({ score: 0 })
   })
 
-  it('leaves a short answer and an essay for the teacher', () => {
-    const short: QuestionContent = {
-      answer: { accepted: ['x'], ignoreCase: true, ignoreHarakat: false },
-    }
-
-    expect(scoreAnswer('SHORT_ANSWER', short, { text: 'x' }, 3)).toEqual({
-      score: null,
-    })
-    expect(scoreAnswer('ESSAY', { guideHtml: null }, { text: 'x' }, 3)).toEqual(
-      {
-        score: null,
+  describe('short answer', () => {
+    const short = (
+      options: { ignoreCase?: boolean; ignoreHarakat?: boolean } = {},
+    ): QuestionContent => ({
+      answer: {
+        accepted: ['Jakarta', 'DKI Jakarta'],
+        ignoreCase: options.ignoreCase ?? true,
+        ignoreHarakat: options.ignoreHarakat ?? false,
       },
+    })
+
+    it('gives full points when the text matches an accepted answer', () => {
+      expect(
+        scoreAnswer('SHORT_ANSWER', short(), { text: 'dki jakarta' }, 3),
+      ).toEqual({ score: 3 })
+    })
+
+    it('ignores surrounding and repeated spaces', () => {
+      expect(
+        scoreAnswer('SHORT_ANSWER', short(), { text: '  DKI   Jakarta ' }, 3),
+      ).toEqual({ score: 3 })
+    })
+
+    it('respects the case setting', () => {
+      expect(
+        scoreAnswer(
+          'SHORT_ANSWER',
+          short({ ignoreCase: false }),
+          { text: 'jakarta' },
+          3,
+        ),
+      ).toEqual({ score: null })
+    })
+
+    it('ignores Arabic vowel marks only when asked to', () => {
+      const arabic: QuestionContent = {
+        answer: {
+          accepted: ['كَتَبَ'],
+          ignoreCase: true,
+          ignoreHarakat: true,
+        },
+      }
+      expect(scoreAnswer('SHORT_ANSWER', arabic, { text: 'كتب' }, 2)).toEqual({
+        score: 2,
+      })
+      expect(
+        scoreAnswer(
+          'SHORT_ANSWER',
+          { answer: { ...arabic.answer, ignoreHarakat: false } as never },
+          { text: 'كتب' },
+          2,
+        ),
+      ).toEqual({ score: null })
+    })
+
+    it('leaves a different or blank answer for the teacher', () => {
+      expect(
+        scoreAnswer('SHORT_ANSWER', short(), { text: 'Bandung' }, 3),
+      ).toEqual({ score: null })
+      expect(scoreAnswer('SHORT_ANSWER', short(), { text: '   ' }, 3)).toEqual({
+        score: null,
+      })
+      expect(scoreAnswer('SHORT_ANSWER', short(), null, 3)).toEqual({
+        score: null,
+      })
+    })
+  })
+
+  it('leaves an essay for the teacher', () => {
+    expect(scoreAnswer('ESSAY', { guideHtml: null }, { text: 'x' }, 3)).toEqual(
+      { score: null },
     )
     expect(scoreAnswer('ESSAY', { guideHtml: null }, null, 3)).toEqual({
       score: null,

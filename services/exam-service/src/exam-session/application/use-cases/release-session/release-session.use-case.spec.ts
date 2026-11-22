@@ -156,6 +156,7 @@ describe('ReleaseSessionUseCase', () => {
       schedules,
       sessions,
       new FakeStudentDirectory(),
+      new FakeParticipantNumber(),
     )
 
     expect(await list.execute(schedule.id, 1, 10)).toMatchObject({
@@ -173,11 +174,13 @@ describe('ReleaseSessionUseCase', () => {
       schedules,
       sessions,
       new FakeStudentDirectory(),
+      new FakeParticipantNumber(),
     ).execute(schedule.id)
     const missing = await new ListScheduleSessionsUseCase(
       schedules,
       sessions,
       new FakeStudentDirectory([]),
+      new FakeParticipantNumber(),
     ).execute(schedule.id)
 
     expect(known.data[0]).toMatchObject({
@@ -188,6 +191,29 @@ describe('ReleaseSessionUseCase', () => {
       studentName: null,
       studentNis: null,
     })
+  })
+
+  it('carries the participant number and survives the number service failing', async () => {
+    const { schedule, schedules, sessions } = await setup()
+    const studentId = [...sessions.sessions.values()][0].studentId
+
+    const numbered = await new ListScheduleSessionsUseCase(
+      schedules,
+      sessions,
+      new FakeStudentDirectory(),
+      new FakeParticipantNumber({
+        numbers: new Map([[studentId, '25-007']]),
+      }),
+    ).execute(schedule.id)
+    const failing = await new ListScheduleSessionsUseCase(
+      schedules,
+      sessions,
+      new FakeStudentDirectory(),
+      new FakeParticipantNumber({ failWith: new Error('student down') }),
+    ).execute(schedule.id)
+
+    expect(numbered.data[0].participantNumber).toBe('25-007')
+    expect(failing.data[0].participantNumber).toBeNull()
   })
 
   it('refuses a technician of another room and allows the one on duty', async () => {
