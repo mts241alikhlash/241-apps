@@ -122,7 +122,7 @@ services:
 
   exam-web:
     <<: *web-defaults
-    image: ghcr.io/mts241alikhlash/exam-web@sha256:c5ff97263d5de0261fc33d27949f185ddffd2b5377929a395a24dafd1149ddca
+    image: ghcr.io/mts241alikhlash/exam-web@sha256:a1dd23ab9f764af9edb7f9956e46b3c7b0c6875344013ab3cd0e3f207bf7b5b9
   identity-service:
     <<: *service-defaults
     image: ghcr.io/mts241alikhlash/identity-service@sha256:fedccca48b42c3a0703e09a58df84327e3515e1bea97b1426bf15737551a347d
