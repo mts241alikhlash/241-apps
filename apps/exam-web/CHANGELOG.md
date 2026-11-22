@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.8.6
+
+### Patch Changes
+
+- 067f87b: The room monitoring time card counts down to the start of a slot that has not begun, and shows that the session ended once the slot is over, instead of counting down to the end from days away.
+
 ## 0.8.5
 
 ### Patch Changes
