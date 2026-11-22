@@ -12,7 +12,7 @@ const props = defineProps<{
   password?: string | null
 }>()
 
-const roomCode = computed(() => props.roomCode.trim().replace(/^[A-Za-z]+/, ''))
+const roomCode = computed(() => props.roomCode.trim().replace(/^\D+/, ''))
 
 const shortName = computed(() => {
   const parts = props.name.trim().split(/\s+/)

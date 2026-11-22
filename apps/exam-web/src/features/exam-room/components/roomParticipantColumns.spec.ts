@@ -142,18 +142,16 @@ describe('low battery', () => {
     expect(isLowBattery(session({ batteryLevel: null }))).toBe(false)
   })
 
-  it('paints the battery destructive in the activity cell', () => {
-    const node = cellOf('activity')({
+  it('paints the battery destructive in the battery cell', () => {
+    const node = cellOf('battery')({
       row: {
         original: participant({
           session: session({ batteryLevel: 9, isCharging: false }),
         }),
       },
     }) as VNode
-    const children = node.children as VNode[]
-    const battery = children[1]
 
-    expect(String(battery.props?.class)).toContain('text-destructive')
+    expect(String(node.props?.class)).toContain('text-destructive')
   })
 })
 

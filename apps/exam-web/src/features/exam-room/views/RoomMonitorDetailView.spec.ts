@@ -4,14 +4,15 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, ref } from 'vue'
 import RoomMonitorDetailView from './RoomMonitorDetailView.vue'
 
-const { loadRoster, loadSupervisors, push } = vi.hoisted(() => ({
+const { loadReport, loadRoster, loadSupervisors, push } = vi.hoisted(() => ({
+  loadReport: vi.fn(),
   loadRoster: vi.fn(),
   loadSupervisors: vi.fn(),
   push: vi.fn(),
 }))
 
 vi.mock('../services/examRoomService', () => ({
-  examRoomService: { loadRoster, loadSupervisors },
+  examRoomService: { loadReport, loadRoster, loadSupervisors },
   abilitiesFor: () => ({ supervise: true, recover: true }),
 }))
 
@@ -120,6 +121,8 @@ function mountView() {
 
 beforeEach(() => {
   loadRoster.mockReset()
+  loadReport.mockReset()
+  loadReport.mockResolvedValue({ success: false, error: 'tidak ada' })
   loadSupervisors.mockReset()
   loadSupervisors.mockResolvedValue([])
 })

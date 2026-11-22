@@ -1,15 +1,26 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Filter } from '@lucide/vue'
 import { BackButton, DataTable, SearchInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@mts241alikhlash/ui/card'
+import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
@@ -18,17 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@mts241alikhlash/ui/tabs'
 import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import RoomActionQueue from '../components/RoomActionQueue.vue'
+import RoomInfoCard from '../components/RoomInfoCard.vue'
+import RoomNotesCard from '../components/RoomNotesCard.vue'
 import RoomMonitorSummaryCards from '../components/RoomMonitorSummaryCards.vue'
-import RoomReportTab from '../components/RoomReportTab.vue'
+import RoomSessionCard from '../components/RoomSessionCard.vue'
 import RecordAbsenceDialog from '../components/RecordAbsenceDialog.vue'
 import RecordFieldNoteDialog from '../components/RecordFieldNoteDialog.vue'
 import SessionRecoveryDialog from '../components/SessionRecoveryDialog.vue'
@@ -39,6 +47,8 @@ import { abilitiesFor, examRoomService } from '../services/examRoomService'
 import type { RoomMonitorParticipant } from '../types'
 import { MONITOR_STATUSES, monitorStatusLabel } from '../types'
 import type { MonitorStatus, RecoveryAction } from '../types'
+
+const MONITOR_ALL = 100
 
 const route = useRoute()
 const router = useRouter()
@@ -56,7 +66,6 @@ const slotId = computed(() =>
 const {
   participants,
   summary,
-  page,
   pageSize,
   search,
   status,
@@ -64,7 +73,6 @@ const {
   loading,
   room,
   token,
-  lastUpdatedServerTime,
   secondsSinceLastSuccess,
   nowMs,
   failed,
@@ -74,9 +82,19 @@ const {
   start,
   stop,
 } = useRoomMonitor({ roomId, slotId })
+pageSize.value = MONITOR_ALL
 const abilities = computed(() => abilitiesFor(hasPermission))
 
-const tab = ref('participants')
+const notePicker = ref(false)
+const filterOpen = ref(false)
+const mobileStatusFieldId = useId()
+const noteRefresh = ref(0)
+const activeSlot = ref<{ startsAt: string; endsAt: string } | null>(null)
+
+function changed() {
+  void refresh()
+  noteRefresh.value += 1
+}
 
 const timelineTarget = ref<RoomMonitorParticipant | null>(null)
 const absenceTarget = ref<RoomMonitorParticipant | null>(null)
@@ -115,45 +133,6 @@ const title = computed(() => {
   const current = room.value
   return current === null ? 'Ruang Ujian' : `${current.code} · ${current.name}`
 })
-
-const roomSubtitle = computed(() => {
-  const current = room.value
-  if (current === null) return null
-  return [
-    current.currentSupervisorName
-      ? `Pengawas ${current.currentSupervisorName}`
-      : 'Pengawas belum ditugaskan',
-    current.technicianName ? `Teknisi ${current.technicianName}` : null,
-    current.isSubstituted ? 'Pengawas pengganti' : null,
-  ]
-    .filter(Boolean)
-    .join(' · ')
-})
-
-const freshnessText = computed(() => {
-  const seconds = secondsSinceLastSuccess.value
-  const stamp = lastUpdatedServerTime.value
-  if (staleness.value !== 'fresh') {
-    return `Koneksi terputus: data terakhir ${seconds} detik lalu`
-  }
-  const clock =
-    stamp === null
-      ? ''
-      : ` • ${new Date(stamp).toLocaleTimeString('id-ID', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })}`
-  return `Diperbarui ${seconds} detik lalu${clock} (Otomatis tiap 5 dtk)`
-})
-
-const freshnessDotClass = computed(() =>
-  staleness.value === 'fresh'
-    ? 'bg-primary'
-    : staleness.value === 'warning'
-      ? 'bg-warning'
-      : 'bg-destructive',
-)
 
 const tokenMinutes = computed(() => {
   const current = token.value
@@ -202,13 +181,6 @@ const columns = computed(() =>
   }),
 )
 
-function printRoute(kind: 'kartu' | 'meja') {
-  void router.push({
-    path: `/exam/rooms/${roomId.value}/${kind === 'kartu' ? 'cards' : 'seats'}`,
-    query: slotId.value === '' ? {} : { slot: slotId.value },
-  })
-}
-
 async function copyToken() {
   const current = token.value
   if (current === null) return
@@ -218,11 +190,6 @@ async function copyToken() {
   } catch {
     toast.error('Token tidak dapat disalin.')
   }
-}
-
-function changePageSize(size: number) {
-  pageSize.value = size
-  page.value = 1
 }
 
 const noSlotAssigned = ref(false)
@@ -250,6 +217,8 @@ async function loadActiveSlot() {
   const fallback = abilities.value.recover ? (current ?? slots[0]) : undefined
   activeSlotId.value =
     mineNow?.slotId ?? next?.slotId ?? past?.slotId ?? fallback?.slotId ?? ''
+  activeSlot.value =
+    slots.find((slot) => slot.slotId === activeSlotId.value) ?? null
   noSlotAssigned.value = activeSlotId.value === ''
 }
 
@@ -269,196 +238,214 @@ onUnmounted(() => {
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <div class="flex items-center gap-3">
+        <div class="flex min-w-0 items-center gap-3">
           <BackButton
             label="Kembali ke Ruang Ujian"
             @click="router.push('/exam/rooms')"
           />
-          <div class="flex min-w-0 flex-col">
-            <CardTitle class="truncate font-semibold">{{ title }}</CardTitle>
-            <span
-              v-if="roomSubtitle"
-              class="truncate text-control text-muted-foreground"
-            >
-              {{ roomSubtitle }}
-            </span>
-          </div>
+          <CardTitle class="truncate font-semibold">{{
+            room?.name ?? 'Ruang Ujian'
+          }}</CardTitle>
         </div>
       </CardHeader>
-
       <CardContent
-        class="flex min-h-0 flex-1 flex-col overflow-auto p-4 sm: p-4 space-y-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto p-4"
       >
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div
-            v-if="token"
-            class="flex items-baseline gap-2"
-          >
-            <div class="flex flex-col">
-              <span class="text-control text-muted-foreground"
-                >Token masuk</span
-              >
-              <span class="text-lg leading-tight font-semibold tracking-wide">{{
-                token.accessCode
-              }}</span>
-            </div>
-            <span class="text-control text-muted-foreground"
-              >sisa {{ tokenMinutes }} mnt</span
-            >
-            <Button
-              variant="ghost"
-              size="sm"
-              @click="copyToken"
-              >Salin</Button
-            >
-          </div>
-          <div class="flex flex-col items-start gap-1.5 sm:items-end">
-            <span
-              class="flex items-center gap-1.5 text-control text-muted-foreground"
-            >
-              <span
-                class="size-1.5 rounded-full"
-                :class="freshnessDotClass"
-                aria-hidden="true"
-              />
-              {{ freshnessText }}
-            </span>
-            <div class="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                @click="printRoute('kartu')"
-              >
-                Kartu Peserta
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                @click="printRoute('meja')"
-              >
-                Daftar Meja
-              </Button>
-            </div>
-          </div>
+        <Alert
+          v-if="failed && error"
+          variant="destructive"
+          role="alert"
+        >
+          <AlertDescription>{{ error }}</AlertDescription>
+        </Alert>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <RoomInfoCard
+            class="md:col-span-2"
+            :room="room"
+            :subject="participants[0]?.subjectName ?? null"
+            :registered="summary?.totalRegistered ?? null"
+          />
+          <RoomMonitorSummaryCards :summary="summary" />
+          <RoomSessionCard
+            :token="token"
+            :minutes-left="tokenMinutes"
+            :starts-at="activeSlot?.startsAt ?? null"
+            :ends-at="activeSlot?.endsAt ?? null"
+            :now-ms="nowMs"
+            :staleness="staleness"
+            :seconds-since="secondsSinceLastSuccess"
+            @copy="copyToken"
+          />
         </div>
 
-        <RoomMonitorSummaryCards :summary="summary" />
+        <div class="grid gap-4">
+          <RoomActionQueue
+            :participants="participants"
+            :can-recover="abilities.recover"
+            @reopen="
+              (row) => {
+                recoveryTarget = row
+                recoveryAction = 'reopen'
+              }
+            "
+            @release="
+              (row) => {
+                recoveryTarget = row
+                recoveryAction = 'release'
+              }
+            "
+            @timeline="(row) => (timelineTarget = row)"
+          />
 
-        <Tabs v-model="tab">
-          <TabsList>
-            <TabsTrigger value="participants"
-              >Peserta &amp; Progres</TabsTrigger
-            >
-            <TabsTrigger value="report">Berita Acara</TabsTrigger>
-          </TabsList>
+          <RoomNotesCard
+            :room-id="roomId"
+            :slot-id="slotId"
+            :can-add="abilities.supervise || abilities.recover"
+            :refresh-key="noteRefresh"
+            @add="notePicker = true"
+          />
 
-          <TabsContent value="participants">
-            <p
-              v-if="noSlotAssigned"
-              class="mb-4 text-control text-muted-foreground"
-            >
-              Anda tidak bertugas pada jam ini.
-            </p>
-            <div
-              v-if="failed && error"
-              class="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
-              role="alert"
-            >
-              {{ error }}
-            </div>
-            <DataTable
-              mobile="cards"
-              :columns="columns"
-              :data="participants"
-              :page="page"
-              :page-size="pageSize"
-              :total-items="totalItems"
-              :is-loading="loading && participants.length === 0"
-              item-label="peserta"
-              @update:page="page = $event"
-              @update:page-size="changePageSize"
-            >
-              <template #filters>
-                <div
-                  class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
-                >
-                  <FloatingLabelField
-                    label="Status"
-                    :for="statusFieldId"
-                    class="w-fit min-w-28"
-                    floating
+          <Card gap="none">
+            <CardHeader standard>
+              <CardTitle size="md">Peserta</CardTitle>
+            </CardHeader>
+            <CardContent variant="standard">
+              <p
+                v-if="noSlotAssigned"
+                class="mb-4 text-control text-muted-foreground"
+              >
+                Anda tidak bertugas pada jam ini.
+              </p>
+              <DataTable
+                mobile="cards"
+                :columns="columns"
+                :data="participants"
+                :page-size="MONITOR_ALL"
+                :total-items="totalItems"
+                hide-pagination
+                hide-per-page
+                :is-loading="loading && participants.length === 0"
+                item-label="peserta"
+              >
+                <template #filters>
+                  <div
+                    class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
                   >
-                    <Select v-model="status">
-                      <SelectTrigger
-                        :id="statusFieldId"
-                        class="w-full"
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem
-                          v-for="option in MONITOR_STATUSES"
-                          :key="option"
-                          :value="option"
+                    <FloatingLabelField
+                      label="Status"
+                      :for="statusFieldId"
+                      class="w-fit min-w-28"
+                      floating
+                    >
+                      <Select v-model="status">
+                        <SelectTrigger
+                          :id="statusFieldId"
+                          class="w-full"
                         >
-                          {{ monitorStatusLabel(option as MonitorStatus) }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FloatingLabelField>
-                </div>
-              </template>
-              <template #header-right>
-                <SearchInput
-                  v-model="search"
-                  class="sm:w-40"
-                  label="Cari nama atau NIS"
-                />
-              </template>
-              <template #mobile-toolbar>
-                <div class="flex items-end gap-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem
+                            v-for="option in MONITOR_STATUSES"
+                            :key="option"
+                            :value="option"
+                          >
+                            {{ monitorStatusLabel(option as MonitorStatus) }}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FloatingLabelField>
+                  </div>
+                </template>
+                <template #header-right>
+                  <SearchInput
+                    v-model="search"
+                    class="sm:w-40"
+                    label="Cari nama atau NIS"
+                  />
+                </template>
+                <template #mobile-toolbar>
                   <SearchInput
                     v-model="search"
                     label="Cari nama atau NIS"
-                    class="flex-1"
+                    class="w-full"
                   />
-                  <Select v-model="status">
-                    <SelectTrigger
-                      class="w-fit min-w-28"
-                      aria-label="Filter status"
+                </template>
+                <template #mobile-filter>
+                  <Button
+                    variant="outline"
+                    class="relative shrink-0"
+                    @click="filterOpen = true"
+                  >
+                    <Filter class="size-4" />
+                    Filter
+                    <span
+                      v-if="status !== 'ALL'"
+                      class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
                     >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        v-for="option in MONITOR_STATUSES"
-                        :key="option"
-                        :value="option"
-                      >
-                        {{ monitorStatusLabel(option as MonitorStatus) }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </template>
-              <template #empty>
-                <p>Tidak ada peserta yang cocok dengan filter.</p>
-              </template>
-            </DataTable>
-          </TabsContent>
-
-          <TabsContent value="report">
-            <RoomReportTab
-              :room-id="roomId"
-              :slot-id="slotId"
-              :can-verify="hasPermission('exam-rooms.manage-all')"
-              :can-submit="abilities.supervise"
-            />
-          </TabsContent>
-        </Tabs>
+                      1
+                    </span>
+                  </Button>
+                </template>
+                <template #empty>
+                  <p>Tidak ada peserta yang cocok dengan filter.</p>
+                </template>
+              </DataTable>
+            </CardContent>
+          </Card>
+        </div>
       </CardContent>
       <CardFooter plain />
     </Card>
+
+    <Dialog v-model:open="filterOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Filter Peserta</DialogTitle>
+          <DialogDescription
+            >Filter peserta berdasarkan status</DialogDescription
+          >
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <FloatingLabelField
+            label="Status"
+            :for="mobileStatusFieldId"
+            floating
+          >
+            <Select v-model="status">
+              <SelectTrigger
+                :id="mobileStatusFieldId"
+                class="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="option in MONITOR_STATUSES"
+                  :key="option"
+                  :value="option"
+                >
+                  {{ monitorStatusLabel(option as MonitorStatus) }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
+        >
+          <Button
+            variant="outline"
+            @click="status = 'ALL'"
+          >
+            Atur Ulang
+          </Button>
+          <Button @click="filterOpen = false">Tutup</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     <SessionTimelineDialog
       :open="timelineTarget !== null"
@@ -473,16 +460,23 @@ onUnmounted(() => {
       :slot-id="slotId"
       :participant="absenceTarget"
       @update:open="(value: boolean) => value || (absenceTarget = null)"
-      @saved="refresh()"
+      @saved="changed()"
     />
 
     <RecordFieldNoteDialog
-      :open="fieldNoteTarget !== null"
+      :open="fieldNoteTarget !== null || notePicker"
       :room-id="roomId"
       :slot-id="slotId"
       :participant="fieldNoteTarget"
-      @update:open="(value: boolean) => value || (fieldNoteTarget = null)"
-      @saved="refresh()"
+      :participants="participants"
+      @update:open="
+        (value: boolean) => {
+          if (value) return
+          fieldNoteTarget = null
+          notePicker = false
+        }
+      "
+      @saved="changed()"
     />
 
     <SessionRecoveryDialog
@@ -495,7 +489,7 @@ onUnmounted(() => {
       :max-extend-minutes="recoveryMaxExtendMinutes"
       :window-open="recoveryWindowOpen"
       @update:open="(value: boolean) => value || (recoveryTarget = null)"
-      @done="refresh()"
+      @done="changed()"
     />
   </div>
 </template>
