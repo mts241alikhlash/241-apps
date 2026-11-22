@@ -23,7 +23,7 @@ const props = withDefaults(
       cn(
         'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
         props.standard &&
-          'min-h-[calc(var(--control-h-md,2rem)+1rem)] shrink-0 flex-row items-center bg-card px-4 py-0.5',
+          'min-h-[calc(var(--control-h-md,2rem)+1rem)] shrink-0 flex-row items-center justify-end bg-card px-4 py-0.5',
         props.class,
       )
     "

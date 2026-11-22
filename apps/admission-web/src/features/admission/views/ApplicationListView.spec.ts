@@ -177,7 +177,7 @@ describe('ApplicationListView', () => {
     const mobile = wrapper.get(CARDS)
     expect(mobile.text()).toContain('Contoh Panjang')
     expect(mobile.text()).toContain('REG-001')
-    expect(mobile.text()).toContain('Pendaftaran:Draft')
+    expect(mobile.text()).toContain('PendaftaranDraft')
     expect(cardRow(wrapper).find('[role="link"]').exists()).toBe(false)
 
     const search = wrapper.get('input[aria-label="Cari pendaftar"]')

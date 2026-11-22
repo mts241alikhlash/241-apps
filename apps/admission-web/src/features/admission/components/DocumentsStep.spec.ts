@@ -136,7 +136,7 @@ it('puts the reviewer note next to the status on the phone card', async () => {
   await flushPromises()
 
   const card = wrapper.get('[data-slot="data-table-cards"] li')
-  expect(card.text()).toContain('Status:Ditolak. Foto buram')
+  expect(card.text()).toContain('StatusDitolak. Foto buram')
 })
 
 it('shows no tooltip trigger for a document without a note', async () => {

@@ -11,6 +11,7 @@ const props = defineProps<{
 <template>
   <h3
     data-slot="card-title"
+    :data-size="props.size"
     :class="
       cn(
         'text-base leading-none font-medium min-w-0',
