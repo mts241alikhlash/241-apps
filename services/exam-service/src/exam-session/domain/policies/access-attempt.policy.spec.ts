@@ -24,9 +24,9 @@ describe('access attempts', () => {
     }
 
     expect(MAX_FAILURES).toBe(5)
-    expect(LOCK_MINUTES).toBe(5)
+    expect(LOCK_MINUTES).toBe(2)
     expect(state.failures).toBe(0)
-    expect(state.lockedUntil).toEqual(new Date('2026-11-02T01:05:00.000Z'))
+    expect(state.lockedUntil).toEqual(new Date('2026-11-02T01:02:00.000Z'))
     expect(isLocked(state, now)).toBe(true)
   })
 

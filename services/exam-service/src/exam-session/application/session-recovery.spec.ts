@@ -38,6 +38,7 @@ import { ResetSessionUseCase } from './use-cases/reset-session/reset-session.use
 import { ExtendSessionTimeUseCase } from './use-cases/extend-session-time/extend-session-time.use-case.js'
 import { AllowLateEntryUseCase } from './use-cases/allow-late-entry/allow-late-entry.use-case.js'
 import { ResumeExamSessionUseCase } from './use-cases/resume-exam-session/resume-exam-session.use-case.js'
+import { DEFAULT_POLICIES } from '../../exam-activity/domain/policies/exam-policy.policy.js'
 import { RecordSessionEventsUseCase } from './use-cases/record-session-events/record-session-events.use-case.js'
 import { SessionHeartbeatUseCase } from './use-cases/session-heartbeat/session-heartbeat.use-case.js'
 import { SuspendSessionUseCase } from './use-cases/suspend-session/suspend-session.use-case.js'
@@ -201,6 +202,9 @@ function answer(
     updatedAt: NOW,
   })
 }
+
+const roomRotationOf = (f: Fixtures): number =>
+  f.rooms.rooms.get(f.roomA.id)?.tokenRotation ?? 0
 
 describe('reopen', () => {
   it('restores a submitted session, keeps every answer and drops the publication', async () => {
@@ -649,6 +653,7 @@ describe('allow flags before the session starts', () => {
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
       sebVerifier(),
+      new RoomAccessCodeService(SECRET),
     )
   }
 
@@ -663,9 +668,9 @@ describe('allow flags before the session starts', () => {
         STUDENT_USER,
         row.id,
         {
-          accessCode: new AccessCodeService(SECRET).codeFor(
-            row.id,
-            row.tokenRotation,
+          accessCode: new RoomAccessCodeService(SECRET).codeFor(
+            f.roomA.id,
+            roomRotationOf(f),
             NOW,
           ).code,
           deviceId: 'device-1',
@@ -686,9 +691,9 @@ describe('allow flags before the session starts', () => {
         STUDENT_USER,
         row.id,
         {
-          accessCode: new AccessCodeService(SECRET).codeFor(
-            row.id,
-            row.tokenRotation,
+          accessCode: new RoomAccessCodeService(SECRET).codeFor(
+            f.roomA.id,
+            roomRotationOf(f),
             NOW,
           ).code,
           deviceId: 'device-1',
@@ -905,6 +910,37 @@ describe('record session events', () => {
       NOW,
     )
     expect(replay.violationCount).toBe(3)
+  })
+
+  it('locks only at the violation limit of the policy of the session', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id, {
+      policy: { ...DEFAULT_POLICIES.MIDTERM, violationLimit: 5 },
+    })
+    const actor = { id: STUDENT_USER.id, deviceId: 'device-1' }
+    const useCase = build(f)
+    const violations = (from: number, count: number) =>
+      Array.from({ length: count }, (_, index) =>
+        event(`v-${from + index}`, 'LEFT_APP', true),
+      )
+
+    const fourth = await useCase.execute(
+      actor,
+      session.id,
+      { events: violations(1, 4) },
+      NOW,
+    )
+    expect(fourth.violationCount).toBe(4)
+    expect(fourth.lockedByViolation).toBe(false)
+
+    const fifth = await useCase.execute(
+      actor,
+      session.id,
+      { events: violations(5, 1) },
+      NOW,
+    )
+    expect(fifth.violationCount).toBe(5)
+    expect(fifth.lockedByViolation).toBe(true)
   })
 
   it('records the absence start from the LEFT_APP event', async () => {
@@ -1279,7 +1315,6 @@ describe('seated sessions in production', () => {
       new Date('2026-10-30T00:00:00.000Z'),
     )
     expect(scheduled.eventId).toBe(f.roomA.eventId)
-    const scheduleRow = f.schedules.schedules.get(scheduled.id)!
     await f.rooms.assignSeat({
       roomId: f.roomA.id,
       eventId: f.roomA.eventId,
@@ -1302,13 +1337,14 @@ describe('seated sessions in production', () => {
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
       sebVerifier(),
+      new RoomAccessCodeService(SECRET),
     ).execute(
       STUDENT_USER,
       scheduled.id,
       {
-        accessCode: new AccessCodeService(SECRET).codeFor(
-          scheduled.id,
-          scheduleRow.tokenRotation,
+        accessCode: new RoomAccessCodeService(SECRET).codeFor(
+          f.roomA.id,
+          roomRotationOf(f),
           NOW,
         ).code,
         deviceId: 'device-1',
@@ -1380,6 +1416,7 @@ describe('client gates', () => {
       new FakeParticipantNumber(),
       new LifecycleGate(f.schedules, new FakeExamActivityRepository()),
       sebVerifier(),
+      new RoomAccessCodeService(SECRET),
     )
   }
 
@@ -1418,16 +1455,24 @@ describe('client gates', () => {
       STUDENT_USER,
       scheduleId,
       {
-        accessCode: new AccessCodeService(SECRET).codeFor(
-          scheduleId,
-          rotation,
-          NOW,
-        ).code,
+        accessCode: seatedRoomOf(f)
+          ? new RoomAccessCodeService(SECRET).codeFor(
+              f.roomA.id,
+              roomRotationOf(f),
+              NOW,
+            ).code
+          : new AccessCodeService(SECRET).codeFor(scheduleId, rotation, NOW)
+              .code,
         deviceId: 'device-1',
         platform,
         seb: proof,
       },
       NOW,
+    )
+
+  const seatedRoomOf = (f: Fixtures): boolean =>
+    [...f.rooms.seats.values()].some(
+      (seat) => seat.studentId === STUDENT_ID && seat.roomId === f.roomA.id,
     )
 
   it('refuses a browser without a verified Safe Exam Browser', async () => {

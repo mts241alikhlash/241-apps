@@ -1,3 +1,4 @@
+import { RoomAccessCodeService } from '../../../../exam-room/application/room-access-code.service.js'
 import {
   ConflictException,
   ForbiddenException,
@@ -123,6 +124,7 @@ describe('ReleaseSessionUseCase', () => {
       new FakeParticipantNumber(),
       new LifecycleGate(schedules, new FakeExamActivityRepository()),
       new SebVerifier(new FakeSebConfigRepository(), []),
+      new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
     )
     const input = (deviceId: string) => ({
       accessCode: codes.codeFor(schedule.id, schedule.tokenRotation, NOW).code,

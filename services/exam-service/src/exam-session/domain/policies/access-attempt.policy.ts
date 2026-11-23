@@ -1,5 +1,5 @@
 export const MAX_FAILURES = 5
-export const LOCK_MINUTES = 5
+export const LOCK_MINUTES = 2
 
 export interface AttemptState {
   failures: number

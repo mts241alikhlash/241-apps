@@ -25,6 +25,7 @@ const meta = (overrides: Partial<RoomMonitorMeta> = {}): RoomMonitorMeta => ({
     isSubstituted: false,
   },
   token: null,
+  window: null,
   summary: {
     totalRegistered: 34,
     notStartedCount: 2,

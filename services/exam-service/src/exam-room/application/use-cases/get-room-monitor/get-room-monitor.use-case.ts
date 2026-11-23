@@ -118,6 +118,7 @@ export interface RoomMonitorMeta {
     isSubstituted: boolean
   }
   token: { accessCode: string; expiresAt: string; rotation: number } | null
+  window: { startsAt: string; endsAt: string } | null
   summary: RoomMonitorSummary
 }
 
@@ -165,6 +166,18 @@ function matchesStatus(row: RosterRow, status: MonitorStatus): boolean {
     return row.session !== null && row.session.status === 'IN_PROGRESS'
   }
   return row.session !== null && row.session.status !== 'IN_PROGRESS'
+}
+
+export function examWindowOf(
+  schedules: { startsAt: Date; endsAt: Date }[],
+): { startsAt: string; endsAt: string } | null {
+  if (schedules.length === 0) return null
+  const starts = Math.min(...schedules.map((row) => row.startsAt.getTime()))
+  const ends = Math.max(...schedules.map((row) => row.endsAt.getTime()))
+  return {
+    startsAt: new Date(starts).toISOString(),
+    endsAt: new Date(ends).toISOString(),
+  }
 }
 
 @Injectable()
@@ -393,6 +406,7 @@ export class GetRoomMonitorUseCase {
             slot !== null && slot.actualUserId !== slot.scheduledUserId,
         },
         token: this.tokenFor(user, room, now),
+        window: examWindowOf(schedules),
         summary,
       },
     }

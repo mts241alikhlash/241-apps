@@ -377,9 +377,40 @@ defineExpose({ table })
       class="flex flex-col gap-2 md:hidden"
     >
       <div
-        v-if="$slots['mobile-filter'] || $slots['mobile-toolbar']"
+        v-if="
+          $slots['mobile-filter'] ||
+          $slots['mobile-toolbar'] ||
+          (!hidePerPage && !hidePagination)
+        "
         class="flex items-center gap-2"
       >
+        <div
+          v-if="!hidePerPage && !hidePagination"
+          class="flex shrink-0 items-center gap-1.5"
+        >
+          <Select
+            :model-value="String(pagination.pageSize)"
+            @update:model-value="(val) => setPageSize(Number(val))"
+          >
+            <SelectTrigger
+              class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
+            >
+              <SelectValue :placeholder="String(pagination.pageSize)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                v-for="size in [5, 10, 25, 50, 100]"
+                :key="size"
+                :value="String(size)"
+              >
+                {{ size }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <span class="text-xs text-muted-foreground whitespace-nowrap"
+            >baris</span
+          >
+        </div>
         <div
           v-if="$slots['mobile-filter']"
           class="shrink-0"
@@ -394,38 +425,10 @@ defineExpose({ table })
         </div>
       </div>
       <div
-        v-if="$slots['header-left'] || (!hidePerPage && !hidePagination)"
-        class="flex items-center justify-between gap-2"
+        v-if="$slots['header-left']"
+        class="flex items-center gap-2"
       >
-        <div class="flex items-center gap-2">
-          <slot name="header-left" />
-        </div>
-        <div class="flex items-center gap-1.5">
-          <template v-if="!hidePerPage && !hidePagination">
-            <Select
-              :model-value="String(pagination.pageSize)"
-              @update:model-value="(val) => setPageSize(Number(val))"
-            >
-              <SelectTrigger
-                class="h-[var(--control-h-md,2rem)] data-[size=default]:h-[var(--control-h-md,2rem)] w-fit justify-center px-2.5 [&>svg]:hidden"
-              >
-                <SelectValue :placeholder="String(pagination.pageSize)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="size in [5, 10, 25, 50, 100]"
-                  :key="size"
-                  :value="String(size)"
-                >
-                  {{ size }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <span class="text-xs text-muted-foreground whitespace-nowrap"
-              >baris</span
-            >
-          </template>
-        </div>
+        <slot name="header-left" />
       </div>
       <slot name="mobile-chips" />
     </div>

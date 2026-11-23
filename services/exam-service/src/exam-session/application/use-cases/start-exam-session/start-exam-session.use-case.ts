@@ -14,6 +14,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { AccessCodeService } from '../../../../exam-schedule/application/access-code.service.js'
+import { RoomAccessCodeService } from '../../../../exam-room/application/room-access-code.service.js'
 import type { ExamSchedule } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { loadSittings } from '../../../../exam-schedule/application/student-sittings.js'
 import { assessMakeupEligibility } from '../../../../exam-schedule/domain/policies/makeup-eligibility.policy.js'
@@ -66,6 +67,7 @@ export class StartExamSessionUseCase {
     private readonly participants: IParticipantNumberPort,
     private readonly lifecycle: LifecycleGate,
     private readonly seb: SebVerifier,
+    private readonly roomCodes: RoomAccessCodeService,
   ) {}
 
   async execute(
@@ -127,14 +129,25 @@ export class StartExamSessionUseCase {
         HttpStatus.TOO_MANY_REQUESTS,
       )
     }
+    const seatRoom =
+      seat === null ? null : await this.rooms.findRoomById(seat.roomId)
     const codeScope = codeScopeOf(schedule, now)
-    const correct = this.codes.matches(
-      codeScope.scope,
-      codeScope.rotation,
-      input.accessCode,
-      codeScope.at,
-      codeScope.allowPreviousSlotGrace,
-    )
+    const correct =
+      seatRoom === null
+        ? this.codes.matches(
+            codeScope.scope,
+            codeScope.rotation,
+            input.accessCode,
+            codeScope.at,
+            codeScope.allowPreviousSlotGrace,
+          )
+        : this.roomCodes.matches(
+            seatRoom.id,
+            seatRoom.tokenRotation,
+            input.accessCode,
+            now,
+            true,
+          )
     if (correct) {
       if (state.failures > 0) await this.attempts.clear(schedule.id, studentId)
     } else {

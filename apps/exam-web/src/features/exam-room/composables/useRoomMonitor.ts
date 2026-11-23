@@ -54,6 +54,7 @@ export function useRoomMonitor(options: RoomMonitorOptions) {
   const totalItems = computed(() => meta.value?.total ?? 0)
   const room = computed(() => meta.value?.room ?? null)
   const token = computed(() => meta.value?.token ?? null)
+  const examWindow = computed(() => meta.value?.window ?? null)
   const staleness = computed<StalenessTone>(() => {
     if (lastSuccessAt.value === null && failed.value) return 'danger'
     if (secondsSinceLastSuccess.value >= STALE_DANGER_SECONDS) return 'danger'
@@ -153,6 +154,7 @@ export function useRoomMonitor(options: RoomMonitorOptions) {
     slotId,
     participants,
     meta,
+    examWindow,
     room,
     token,
     summary,

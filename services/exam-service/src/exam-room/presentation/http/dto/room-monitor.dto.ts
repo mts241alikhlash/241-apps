@@ -200,6 +200,11 @@ export class RoomMonitorSummaryDto {
   @ApiProperty() absentMarkedCount!: number
 }
 
+export class RoomMonitorWindowDto {
+  @ApiProperty({ format: 'date-time' }) startsAt!: string
+  @ApiProperty({ format: 'date-time' }) endsAt!: string
+}
+
 export class RoomMonitorMetaDto {
   @ApiProperty() page!: number
   @ApiProperty() limit!: number
@@ -208,6 +213,8 @@ export class RoomMonitorMetaDto {
   @ApiProperty({ type: () => RoomMonitorRoomDto }) room!: RoomMonitorRoomDto
   @ApiProperty({ type: () => RoomMonitorTokenDto, nullable: true })
   token!: RoomMonitorTokenDto | null
+  @ApiProperty({ type: () => RoomMonitorWindowDto, nullable: true })
+  window!: RoomMonitorWindowDto | null
   @ApiProperty({ type: () => RoomMonitorSummaryDto })
   summary!: RoomMonitorSummaryDto
 
@@ -222,6 +229,10 @@ export class RoomMonitorMetaDto {
       domain.token === null
         ? null
         : Object.assign(new RoomMonitorTokenDto(), domain.token)
+    dto.window =
+      domain.window === null
+        ? null
+        : Object.assign(new RoomMonitorWindowDto(), domain.window)
     dto.summary = Object.assign(new RoomMonitorSummaryDto(), domain.summary)
     return dto
   }

@@ -78,6 +78,7 @@ const {
   loading,
   room,
   token,
+  examWindow,
   secondsSinceLastSuccess,
   nowMs,
   failed,
@@ -219,9 +220,20 @@ async function loadActiveSlot() {
     .sort(
       (a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime(),
     )[0]
-  const fallback = abilities.value.recover ? (current ?? slots[0]) : undefined
+  const byStart = [...slots].sort(
+    (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+  )
+  const upcoming = byStart.find(
+    (slot) => new Date(slot.startsAt).getTime() > now,
+  )
+  const latest = byStart
+    .filter((slot) => new Date(slot.endsAt).getTime() <= now)
+    .at(-1)
+  const overview = abilities.value.recover
+    ? (current ?? upcoming ?? latest ?? slots[0])
+    : undefined
   activeSlotId.value =
-    mineNow?.slotId ?? next?.slotId ?? past?.slotId ?? fallback?.slotId ?? ''
+    overview?.slotId ?? mineNow?.slotId ?? next?.slotId ?? past?.slotId ?? ''
   activeSlot.value =
     slots.find((slot) => slot.slotId === activeSlotId.value) ?? null
   noSlotAssigned.value = activeSlotId.value === ''
@@ -275,8 +287,8 @@ onUnmounted(() => {
           <RoomSessionCard
             :token="token"
             :minutes-left="tokenMinutes"
-            :starts-at="activeSlot?.startsAt ?? null"
-            :ends-at="activeSlot?.endsAt ?? null"
+            :starts-at="examWindow?.startsAt ?? activeSlot?.startsAt ?? null"
+            :ends-at="examWindow?.endsAt ?? activeSlot?.endsAt ?? null"
             :now-ms="nowMs"
             :staleness="staleness"
             :seconds-since="secondsSinceLastSuccess"

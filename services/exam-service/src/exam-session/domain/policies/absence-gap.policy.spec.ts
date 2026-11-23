@@ -43,6 +43,12 @@ describe('evaluateAbsenceGap', () => {
     expect(at(360, 1).countsAsViolation).toBe(true)
   })
 
+  it('never punishes a gap shorter than two minutes, however often it repeats', () => {
+    expect(at(90, 1).countsAsViolation).toBe(false)
+    expect(at(119, 5).countsAsViolation).toBe(false)
+    expect(at(120, 1).countsAsViolation).toBe(true)
+  })
+
   it('ignores a session that never reported', () => {
     expect(
       evaluateAbsenceGap({ lastSeenAt: null, now: seen, policy, priorGaps: 0 })

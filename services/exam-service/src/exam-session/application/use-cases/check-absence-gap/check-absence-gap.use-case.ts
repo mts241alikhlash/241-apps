@@ -6,7 +6,7 @@ import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/e
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { evaluateAbsenceGap } from '../../../domain/policies/absence-gap.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
-import { VIOLATION_LOCK_THRESHOLD } from '../record-session-events/record-session-events.use-case.js'
+import { violationLimitOf } from '../record-session-events/record-session-events.use-case.js'
 
 @Injectable()
 export class CheckAbsenceGapUseCase {
@@ -45,7 +45,8 @@ export class CheckAbsenceGapUseCase {
       requiresTokenReentry:
         session.requiresTokenReentry || evaluation.requireToken,
       lockedByViolation:
-        session.lockedByViolation || violationCount >= VIOLATION_LOCK_THRESHOLD,
+        session.lockedByViolation ||
+        violationCount >= violationLimitOf(session),
       violationCount,
       absentSince: evaluation.requireToken ? now : session.absentSince,
     })

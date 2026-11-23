@@ -131,7 +131,14 @@ const EVENT_LABELS: Record<string, string> = {
   REPLACE_ROOM_REPORT_FILE: 'Ganti berkas berita acara',
   CLOSED_BY_ADMIN: 'Ditutup admin',
   CALL_SUSPENDED: 'Ujian dijeda karena panggilan',
-  ABSENCE_GAP: 'Hilang sementara',
+  ABSENCE_GAP: 'Tidak ada kabar dari perangkat',
+  PERMISSION_DIALOG: 'Dialog izin muncul',
+  FOCUS_LOST_BRIEF: 'Fokus hilang sebentar',
+  OVERLAY_OR_SHADE: 'Panel atau overlay terbuka',
+  CALL_OR_MIC_ACTIVE: 'Panggilan atau mikrofon aktif',
+  SCREEN_SHARE_DETECTED: 'Berbagi layar terdeteksi',
+  LEFT_APP: 'Keluar aplikasi',
+  VIOLATION_LOCKED: 'Terkunci karena pelanggaran',
 }
 
 export const monitorStatusLabel = (status: MonitorStatus): string =>

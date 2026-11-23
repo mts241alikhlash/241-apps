@@ -18,7 +18,7 @@ import type {
   RoomMonitorParticipant,
   RoomMonitorSession,
 } from '../types'
-import { reasonLabel } from '../types'
+import { eventLabel, reasonLabel } from '../types'
 import {
   classOfClassroom,
   gradeOfClassroom,
@@ -82,16 +82,17 @@ const readinessText = (session: RoomMonitorSession | null): string => {
   return warnings.length === 0 ? 'Siap' : `Belum siap: ${warnings.join(' · ')}`
 }
 
-const activityText = (session: RoomMonitorSession | null): string => {
-  if (session === null) return '-'
-  const seen =
-    session.lastSeenAt === null
-      ? 'Belum ada aktivitas'
-      : `Aktif ${timeFormat.format(new Date(session.lastSeenAt))}`
-  return session.submittedAt === null
-    ? seen
-    : `${seen} · Kumpul ${timeFormat.format(new Date(session.submittedAt))}`
-}
+const clockText = (iso: string | null): string =>
+  iso === null ? '-' : timeFormat.format(new Date(iso))
+
+const startedText = (session: RoomMonitorSession | null): string =>
+  session === null ? '-' : clockText(session.startedAt)
+
+const lastSeenText = (session: RoomMonitorSession | null): string =>
+  session === null ? '-' : clockText(session.lastSeenAt)
+
+const submittedText = (session: RoomMonitorSession | null): string =>
+  session === null ? '-' : clockText(session.submittedAt)
 
 const disturbanceText = (row: RoomMonitorParticipant): string => {
   const session = row.session
@@ -100,7 +101,7 @@ const disturbanceText = (row: RoomMonitorParticipant): string => {
   if (session.violationCount > 0) parts.push(`${session.violationCount}×`)
   if (session.lastEvent !== null) {
     parts.push(
-      `${session.lastEvent.type} ${timeFormat.format(new Date(session.lastEvent.occurredAt))}`,
+      `${eventLabel(session.lastEvent.type)} ${timeFormat.format(new Date(session.lastEvent.occurredAt))}`,
     )
   }
   return parts.length === 0 ? '-' : parts.join(' · ')
@@ -274,19 +275,35 @@ export function buildRoomParticipantColumns(
         ),
     },
     {
-      id: 'activity',
-      header: 'Aktivitas',
+      id: 'startedAt',
+      header: 'Mulai',
       meta: {
         align: 'center',
-        mobileLabel: 'Aktivitas',
-        mobileValue: (row: RoomMonitorParticipant) => activityText(row.session),
+        mobileLabel: 'Mulai',
+        mobileValue: (row: RoomMonitorParticipant) => startedText(row.session),
       },
-      cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'whitespace-nowrap' },
-          activityText(row.original.session),
-        ),
+      cell: ({ row }) => startedText(row.original.session),
+    },
+    {
+      id: 'lastSeenAt',
+      header: 'Terakhir Aktif',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Terakhir Aktif',
+        mobileValue: (row: RoomMonitorParticipant) => lastSeenText(row.session),
+      },
+      cell: ({ row }) => lastSeenText(row.original.session),
+    },
+    {
+      id: 'submittedAt',
+      header: 'Kumpul',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kumpul',
+        mobileValue: (row: RoomMonitorParticipant) =>
+          submittedText(row.session),
+      },
+      cell: ({ row }) => submittedText(row.original.session),
     },
     {
       id: 'battery',

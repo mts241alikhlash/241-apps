@@ -157,7 +157,9 @@ const subjectChoices = computed(() =>
 
 function printTargets(): RoomReportSummary[] {
   if (printScope.value === 'room') {
-    return reports.value.filter((row) => row.roomId === printRoomId.value)
+    return reports.value
+      .filter((row) => row.roomId === printRoomId.value)
+      .sort((left, right) => left.startsAt.localeCompare(right.startsAt))
   }
   if (printScope.value === 'day') {
     return (
@@ -170,7 +172,9 @@ function printTargets(): RoomReportSummary[] {
       .filter((subject) => subject.id === printSubjectId.value)
       .flatMap((subject) => subject.rooms)
   }
-  return reports.value
+  return days.value.flatMap((day) =>
+    day.subjects.flatMap((subject) => subject.rooms),
+  )
 }
 
 function openPrint(
