@@ -4,14 +4,13 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import PrintDocumentView from './PrintDocumentView.vue'
 
-const { loadEvents, loadLetterhead, loadPack, loadSchedules } = vi.hoisted(
-  () => ({
+const { loadEvents, loadLetterhead, loadPack, loadActivitySchedules } =
+  vi.hoisted(() => ({
     loadEvents: vi.fn(),
     loadLetterhead: vi.fn(),
     loadPack: vi.fn(),
-    loadSchedules: vi.fn(),
-  }),
-)
+    loadActivitySchedules: vi.fn(),
+  }))
 
 vi.mock('@/features/exam-event/services/examEventService', () => ({
   examEventService: { loadEvents },
@@ -20,7 +19,7 @@ vi.mock('@/features/exam-room/services/examRoomService', () => ({
   examRoomService: { loadLetterhead },
 }))
 vi.mock('../services/examPrintService', () => ({
-  examPrintService: { loadPack, loadSchedules },
+  examPrintService: { loadPack, loadActivitySchedules },
 }))
 
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
@@ -89,7 +88,7 @@ beforeEach(() => {
   })
   loadLetterhead.mockResolvedValue({ name: 'MTs Persis 241' })
   loadPack.mockResolvedValue({ success: true, data: pack })
-  loadSchedules.mockResolvedValue({ success: true, data: [] })
+  loadActivitySchedules.mockResolvedValue({ success: true, data: [] })
 })
 
 const mountView = (doc: string) =>
@@ -108,7 +107,7 @@ describe('PrintDocumentView', () => {
   })
 
   it('loads schedules for the schedule document', async () => {
-    loadSchedules.mockResolvedValue({
+    loadActivitySchedules.mockResolvedValue({
       success: true,
       data: [
         {
@@ -122,7 +121,7 @@ describe('PrintDocumentView', () => {
     })
     const wrapper = mountView('schedule')
     await flushPromises()
-    expect(loadSchedules).toHaveBeenCalledWith({
+    expect(loadActivitySchedules).toHaveBeenCalledWith({
       id: 'e1',
       name: 'UAS',
       startsAt: '2026-11-23T00:00:00.000Z',

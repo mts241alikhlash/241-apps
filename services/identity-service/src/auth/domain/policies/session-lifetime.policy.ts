@@ -39,3 +39,15 @@ export function withinReuseGrace(
     !!rotatedAt && now.getTime() - rotatedAt.getTime() <= REFRESH_REUSE_GRACE_MS
   )
 }
+
+export const REFRESH_RECOVERY_GRACE_MS = 300_000
+
+export function withinRecoveryGrace(
+  rotatedAt: Date | null | undefined,
+  now: Date,
+): boolean {
+  return (
+    !!rotatedAt &&
+    now.getTime() - rotatedAt.getTime() <= REFRESH_RECOVERY_GRACE_MS
+  )
+}

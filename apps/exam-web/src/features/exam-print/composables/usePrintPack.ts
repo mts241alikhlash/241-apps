@@ -65,7 +65,7 @@ export function usePrintPack(options: { withSchedules: boolean }) {
     }
     pack.value = packResult.data
     if (options.withSchedules) {
-      const scheduleResult = await examPrintService.loadSchedules(
+      const scheduleResult = await examPrintService.loadActivitySchedules(
         packResult.data.event,
       )
       if (!scheduleResult.success) error.value = scheduleResult.error

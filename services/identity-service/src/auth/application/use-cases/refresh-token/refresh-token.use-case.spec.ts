@@ -205,6 +205,46 @@ describe('RefreshTokenUseCase', () => {
         )
       })
 
+      it('recovers an app that lost the answer of a rotation, by rotating again from the replaced token', async () => {
+        raced(120_000)
+        mockTokenManagerService.generateTokenPair.mockResolvedValue({
+          accessToken: 'recovered-access-token',
+          refreshToken: 'recovered-refresh-token',
+        })
+        mockAuthRepository.updateSessionToken.mockResolvedValue(true)
+
+        const result = await useCase.execute('previous-token', {
+          recoverLostRotation: true,
+        })
+
+        expect(result).toMatchObject({
+          accessToken: 'recovered-access-token',
+          refreshToken: 'recovered-refresh-token',
+        })
+        expect(mockAuthRepository.revokeSession).not.toHaveBeenCalled()
+        expect(mockAuthRepository.updateSessionToken).toHaveBeenCalledWith(
+          mockSession.id,
+          'current-hash',
+          expect.objectContaining({ previousTokenHash: 'current-hash' }),
+        )
+      })
+
+      it('does not recover a lost rotation for a web session, or after five minutes', async () => {
+        raced(120_000)
+        await expect(useCase.execute('previous-token')).rejects.toThrow(
+          UnauthorizedException,
+        )
+
+        mockAuthRepository.revokeSession.mockClear()
+        raced(301_000)
+        await expect(
+          useCase.execute('previous-token', { recoverLostRotation: true }),
+        ).rejects.toThrow(UnauthorizedException)
+        expect(mockAuthRepository.revokeSession).toHaveBeenCalledWith(
+          mockSession.id,
+        )
+      })
+
       it('still revokes the session when a replaced token is presented but nothing was ever rotated', async () => {
         raced(null)
 
