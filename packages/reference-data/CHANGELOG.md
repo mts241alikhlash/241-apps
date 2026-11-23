@@ -1,5 +1,12 @@
 # @mts241alikhlash/reference-data
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [77e82c9]
+  - @mts241alikhlash/ui@0.2.4
+
 ## 0.1.7
 
 ### Patch Changes
