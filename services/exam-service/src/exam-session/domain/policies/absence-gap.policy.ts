@@ -1,5 +1,7 @@
 import type { ExamPolicy } from '../../../exam-activity/domain/policies/exam-policy.policy.js'
 
+export const GAP_VIOLATION_MIN_MS = 120_000
+
 export interface AbsenceGapEvaluation {
   record: boolean
   seconds: number
@@ -31,6 +33,8 @@ export function evaluateAbsenceGap(
     record: true,
     seconds,
     requireToken: gapMs >= input.policy.gapTokenMs,
-    countsAsViolation: input.priorGaps + 1 >= input.policy.gapViolationFrom,
+    countsAsViolation:
+      gapMs >= GAP_VIOLATION_MIN_MS &&
+      input.priorGaps + 1 >= input.policy.gapViolationFrom,
   }
 }

@@ -25,13 +25,16 @@ function sebGlobal(): SafeExamBrowserGlobal | undefined {
     .SafeExamBrowser
 }
 
-export function sebQuitUrl(): string | null {
-  const url = import.meta.env.VITE_SEB_QUIT_URL.trim()
-  return url ? url : null
-}
+export const SEB_EXIT_PATH = '/seb-keluar'
 
 export function isInSeb(): boolean {
   return sebGlobal() !== undefined
+}
+
+export function sebQuitUrl(): string | null {
+  const url = import.meta.env.VITE_SEB_QUIT_URL.trim()
+  if (url) return url
+  return isInSeb() ? `${window.location.origin}${SEB_EXIT_PATH}` : null
 }
 
 function userAgentLooksLikeSeb(): boolean {

@@ -8,6 +8,10 @@ import { IExamSessionRepository } from '../../../domain/repositories/exam-sessio
 import { SessionAccessService } from '../../session-access.service.js'
 
 export const VIOLATION_LOCK_THRESHOLD = 3
+
+export const violationLimitOf = (session: {
+  policy?: { violationLimit: number } | null
+}): number => session.policy?.violationLimit ?? VIOLATION_LOCK_THRESHOLD
 export const ABSENCE_LOCK_MS = 5 * 60 * 1000
 
 export interface RecordSessionEventsInput {
@@ -52,7 +56,7 @@ export class RecordSessionEventsUseCase {
     const violations = fresh.filter((event) => event.isViolation).length
     const violationCount = session.violationCount + violations
     const locked =
-      session.lockedByViolation || violationCount >= VIOLATION_LOCK_THRESHOLD
+      session.lockedByViolation || violationCount >= violationLimitOf(session)
     const leftApp = fresh.find((event) => event.type === 'LEFT_APP')
     const reentry = session.requiresTokenReentry || leftApp !== undefined
     const absentSince = leftApp?.occurredAt ?? session.absentSince

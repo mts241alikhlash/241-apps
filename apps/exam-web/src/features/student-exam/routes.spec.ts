@@ -12,7 +12,10 @@ const { listExams, activeSebConfigs } = vi.hoisted(() => ({
 vi.mock('./api/studentExamApi', () => ({
   studentExamApi: { listExams, activeSebConfigs },
 }))
-vi.mock('@/shared/seb', () => ({ waitForSeb: () => Promise.resolve(false) }))
+vi.mock('@/shared/seb', () => ({
+  SEB_EXIT_PATH: '/seb-keluar',
+  waitForSeb: () => Promise.resolve(false),
+}))
 
 import { studentExamRoutes } from './routes'
 import SebRequiredView from './views/SebRequiredView.vue'
@@ -39,5 +42,16 @@ describe('student exam routes outside Safe Exam Browser', () => {
 
     expect(wrapper.findComponent(SebRequiredView).exists()).toBe(true)
     expect(listExams).not.toHaveBeenCalled()
+  })
+})
+
+describe('the Safe Exam Browser exit page', () => {
+  it('is reachable without a session and never asks for Safe Exam Browser', async () => {
+    const { studentExamFocusRoutes } = await import('./routes')
+    const exit = studentExamFocusRoutes.find(
+      (route) => route.path === '/seb-keluar',
+    )
+
+    expect(exit?.meta?.requiresAuth).toBe(false)
   })
 })

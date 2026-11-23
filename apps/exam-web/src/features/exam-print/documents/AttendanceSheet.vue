@@ -309,6 +309,7 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
 
 .sheet-table .col-no {
   width: 9mm;
+  text-align: center;
 }
 
 .sheet-table .col-number {

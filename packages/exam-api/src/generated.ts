@@ -2766,6 +2766,7 @@ export interface components {
             summary: components["schemas"]["RoomMonitorSummaryDto"];
             token: components["schemas"]["RoomMonitorTokenDto"] | null;
             total: number;
+            window: components["schemas"]["RoomMonitorWindowDto"] | null;
         };
         RoomMonitorParticipantDto: {
             absence: components["schemas"]["RoomMonitorAbsenceDto"] | null;
@@ -2844,6 +2845,12 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
             rotation: number;
+        };
+        RoomMonitorWindowDto: {
+            /** Format: date-time */
+            endsAt: string;
+            /** Format: date-time */
+            startsAt: string;
         };
         RoomOverviewDto: {
             building: string | null;

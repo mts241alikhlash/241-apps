@@ -1,3 +1,4 @@
+import { RoomAccessCodeService } from '../../../../exam-room/application/room-access-code.service.js'
 import { createHash } from 'node:crypto'
 import {
   ConflictException,
@@ -57,6 +58,9 @@ const sebConfig: SebConfig = {
   updatedAt: NOW,
 }
 
+const roomCodes = new RoomAccessCodeService(
+  'unit-test-secret-of-at-least-32-characters',
+)
 const codes = new AccessCodeService(
   'unit-test-secret-of-at-least-32-characters',
 )
@@ -102,6 +106,7 @@ describe('StartExamSessionUseCase', () => {
       participants,
       new LifecycleGate(schedules, activities),
       new SebVerifier(sebConfigs, ['https://exam.example']),
+      new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
     )
 
   const start = (
@@ -254,12 +259,56 @@ describe('StartExamSessionUseCase', () => {
     })
     schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
 
+    const at = new Date('2026-11-02T01:05:00.000Z')
     const started = await start(build(), {
-      now: new Date('2026-11-02T01:05:00.000Z'),
+      now: at,
+      code: roomCodes.codeFor(room.id, room.tokenRotation, at).code,
     })
     const stored = await sessions.findById(started.sessionId)
 
     expect(stored).toMatchObject({ roomId: room.id, seatNumber: 12 })
+  })
+
+  it('asks a seated student for the room token and refuses the schedule token', async () => {
+    const event = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: new Date('2026-11-02T01:45:00.000Z'),
+      endsAt: ENDS,
+      createdById: 'admin-1',
+    })
+    const room = await rooms.createRoom({
+      eventId: event.id,
+      code: 'R01',
+      name: 'Ruang 01',
+      capacity: 30,
+    })
+    await rooms.assignSeat({
+      roomId: room.id,
+      eventId: event.id,
+      studentId: STUDENT_ID,
+      classroomId: 'class-1',
+      seatNumber: 12,
+    })
+    schedules.schedules.set(schedule.id, { ...schedule, eventId: event.id })
+    const at = new Date('2026-11-02T01:05:00.000Z')
+
+    await expect(start(build(), { now: at })).rejects.toThrow(
+      'Token ujian salah',
+    )
+    await expect(
+      start(build(), {
+        now: at,
+        code: roomCodes.codeFor('another-room', 0, at).code,
+      }),
+    ).rejects.toThrow('Token ujian salah')
+    await expect(
+      start(build(), {
+        now: at,
+        code: roomCodes.codeFor(room.id, room.tokenRotation, at).code,
+      }),
+    ).resolves.toMatchObject({ sessionId: expect.any(String) })
   })
 
   describe('the late cutoff', () => {
@@ -731,7 +780,16 @@ describe('StartExamSessionUseCase', () => {
       const makeup = await withMakeup()
       schedules.schedules.set(makeup.id, { ...makeup, startsAt: MAKEUP_NOW })
 
-      const started = await startMakeup(makeup)
+      const started = await build().execute(
+        STUDENT_USER,
+        makeup.id,
+        {
+          accessCode: roomCodes.codeFor(room.id, room.tokenRotation, MAKEUP_NOW)
+            .code,
+          deviceId: 'device-1',
+        },
+        MAKEUP_NOW,
+      )
 
       expect(await sessions.findById(started.sessionId)).toMatchObject({
         roomId: room.id,

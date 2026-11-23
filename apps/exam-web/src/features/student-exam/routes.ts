@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { waitForSeb } from '@/shared/seb'
+import { SEB_EXIT_PATH, waitForSeb } from '@/shared/seb'
 
 const sebGated = (load: () => Promise<unknown>) => async () =>
   (await waitForSeb()) ? load() : import('./views/SebRequiredView.vue')
@@ -33,6 +33,15 @@ export const studentExamRoutes: RouteRecordRaw[] = [
 ]
 
 export const studentExamFocusRoutes: RouteRecordRaw[] = [
+  {
+    path: SEB_EXIT_PATH,
+    name: 'student-exam-seb-exit',
+    component: () => import('./views/SebExitView.vue'),
+    meta: {
+      requiresAuth: false,
+      title: 'Selesai',
+    },
+  },
   {
     path: '/my-exams/sessions/:sessionId',
     name: 'student-exam-sheet',
