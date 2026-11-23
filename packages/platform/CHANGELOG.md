@@ -1,5 +1,12 @@
 # @mts241alikhlash/platform
 
+## 0.2.5
+
+### Patch Changes
+
+- Updated dependencies [77e82c9]
+  - @mts241alikhlash/ui@0.2.4
+
 ## 0.2.4
 
 ### Patch Changes

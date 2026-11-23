@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.8.7
+
+### Patch Changes
+
+- 77e82c9: Add a page that monitors every room at once for the proctors, print the essay answers for manual grading per day, subject, class or student, start the exam grading from the exam period list, join every group of filters in one frame, rebuild the session recovery dialog with vee-validate, write Mata Pelajaran in full across the exam pages, draw the attendance sheet borders inside the table so they print, and ignore the violation events a device queued before the last reopen or reset of its session so a reopened student is no longer locked again by the old events.
+
 ## 0.8.6
 
 ### Patch Changes
