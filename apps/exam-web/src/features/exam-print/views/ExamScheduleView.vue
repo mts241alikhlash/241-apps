@@ -208,7 +208,7 @@ const columns: ColumnDef<DayEntry>[] = [
   },
   {
     id: 'subjects',
-    header: 'Jumlah Mapel',
+    header: 'Jumlah Mata Pelajaran',
     meta: { align: 'center', mobileValue: (row: DayEntry) => row.subjectCount },
     cell: ({ row }) => String(row.original.subjectCount),
   },

@@ -28,6 +28,7 @@ const props = defineProps<{
   slotId: string
   participant: RoomMonitorParticipant | null
   participants?: RoomMonitorParticipant[]
+  place?: (studentId: string) => { roomId: string; slotId: string } | null
 }>()
 
 const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
@@ -80,9 +81,13 @@ const onSubmit = handleSubmit(async (form) => {
   if (chosen === null) return
   error.value = null
   const sessionId = chosen.session?.sessionId
+  const where = props.place?.(chosen.studentId) ?? {
+    roomId: props.roomId,
+    slotId: props.slotId,
+  }
   const result = await examRoomService.recordFieldNote(
-    props.roomId,
-    props.slotId,
+    where.roomId,
+    where.slotId,
     {
       studentId: chosen.studentId,
       ...(sessionId === undefined ? {} : { sessionId }),

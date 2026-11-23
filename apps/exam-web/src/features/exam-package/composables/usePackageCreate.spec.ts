@@ -38,7 +38,7 @@ describe('usePackageCreate', () => {
 
     form.title.value = 'UAS'
     await form.submit()
-    expect(form.errors.value.subjectId).toBe('Mapel wajib dipilih.')
+    expect(form.errors.value.subjectId).toBe('Mata pelajaran wajib dipilih.')
     expect(form.errors.value.title).toBeNull()
 
     form.subjectId.value = 'math'

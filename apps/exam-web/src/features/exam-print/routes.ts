@@ -43,6 +43,39 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/exam/print/grading-sheet/:dayId?/:subjectId?/:classId?',
+    name: 'ExamPrintGradingSheet',
+    component: () => import('./views/GradingSheetView.vue'),
+    meta: {
+      title: 'Lembar Pemeriksaan Uraian',
+      category: 'EXAM',
+      requiresAuth: true,
+      requiredPermission: 'exam-grading.read',
+      breadcrumbs: crumbs(
+        'Lembar Pemeriksaan Uraian',
+        '/exam/print/grading-sheet',
+      ),
+    },
+  },
+  {
+    path: '/classwork/print/grading-sheet/:dayId?/:subjectId?/:classId?',
+    name: 'ClassworkPrintGradingSheet',
+    component: () => import('./views/GradingSheetView.vue'),
+    meta: {
+      title: 'Lembar Pemeriksaan Uraian',
+      category: 'NON_EXAM',
+      requiresAuth: true,
+      requiredPermission: 'exam-grading.read',
+      breadcrumbs: [
+        { title: 'Non-ujian', href: '#' },
+        {
+          title: 'Lembar Pemeriksaan Uraian',
+          href: '/classwork/print/grading-sheet',
+        },
+      ],
+    },
+  },
+  {
     path: '/exam/print/staff-attendance',
     name: 'ExamPrintStaffAttendance',
     component: () => import('./views/StaffAttendanceView.vue'),

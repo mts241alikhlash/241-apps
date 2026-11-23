@@ -39,7 +39,7 @@ const rowText = (row: number, reason: string) =>
 const identity = computed(() => [
   { label: 'Guru', value: props.preview.identity.teacherName },
   { label: 'NIK', value: props.preview.identity.nik },
-  { label: 'Mapel', value: props.preview.identity.subjectName },
+  { label: 'Mata Pelajaran', value: props.preview.identity.subjectName },
   {
     label: 'Tingkat',
     value: props.preview.identity.gradeLevel ?? '-',

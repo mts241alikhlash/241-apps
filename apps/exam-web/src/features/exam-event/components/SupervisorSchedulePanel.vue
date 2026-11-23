@@ -112,7 +112,7 @@ const dayColumns: ColumnDef<DayGroup>[] = [
   },
   {
     id: 'subjects',
-    header: 'Jumlah Mapel',
+    header: 'Jumlah Mata Pelajaran',
     meta: {
       align: 'center',
       mobileValue: (row: DayGroup) => row.subjectCount,

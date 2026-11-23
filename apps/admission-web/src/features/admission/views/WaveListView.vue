@@ -256,57 +256,53 @@ function quotaLabel(wave: { filledCount: number; quota: number }) {
             </template>
             <template #filters>
               <div
-                class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+                class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
               >
-                <div
-                  class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+                <FloatingLabelField
+                  label="Status"
+                  :for="statusFilterId"
+                  class="w-fit min-w-28"
+                  floating
                 >
-                  <FloatingLabelField
-                    label="Status"
-                    :for="statusFilterId"
-                    class="w-fit min-w-28"
-                    floating
-                  >
-                    <Select v-model="statusFilter">
-                      <SelectTrigger
-                        :id="statusFilterId"
-                        class="w-full"
+                  <Select v-model="statusFilter">
+                    <SelectTrigger
+                      :id="statusFilterId"
+                      class="w-full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Semua</SelectItem>
+                      <SelectItem value="true">Aktif</SelectItem>
+                      <SelectItem value="false">Nonaktif</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FloatingLabelField>
+                <FloatingLabelField
+                  label="Tahun Ajaran"
+                  :for="yearFilterId"
+                  class="w-fit min-w-28"
+                  floating
+                >
+                  <Select v-model="yearFilter">
+                    <SelectTrigger
+                      :id="yearFilterId"
+                      class="w-full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Semua</SelectItem>
+                      <SelectItem
+                        v-for="year in yearOptions"
+                        :key="year.id"
+                        :value="year.id"
                       >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Semua</SelectItem>
-                        <SelectItem value="true">Aktif</SelectItem>
-                        <SelectItem value="false">Nonaktif</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FloatingLabelField>
-                  <FloatingLabelField
-                    label="Tahun Ajaran"
-                    :for="yearFilterId"
-                    class="w-fit min-w-28"
-                    floating
-                  >
-                    <Select v-model="yearFilter">
-                      <SelectTrigger
-                        :id="yearFilterId"
-                        class="w-full"
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Semua</SelectItem>
-                        <SelectItem
-                          v-for="year in yearOptions"
-                          :key="year.id"
-                          :value="year.id"
-                        >
-                          {{ year.name }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FloatingLabelField>
-                </div>
+                        {{ year.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FloatingLabelField>
               </div>
             </template>
             <template #header-right>

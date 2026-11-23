@@ -98,7 +98,7 @@ describe('PackageCreateDialog', () => {
     const wrapper = open()
     await flushPromises()
 
-    for (const label of ['Judul', 'Mapel', 'Tingkat']) {
+    for (const label of ['Judul', 'Mata Pelajaran', 'Tingkat']) {
       expect(wrapper.text()).toContain(label)
     }
     wrapper.unmount()

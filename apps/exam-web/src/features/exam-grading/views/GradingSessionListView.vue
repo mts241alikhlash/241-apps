@@ -22,13 +22,26 @@ import {
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { sessionStatusLabel } from '@/features/exam-schedule/types'
 import { buildGradingSessionColumns } from '../components/gradingColumns'
-import { useGradingSessions } from '../composables/useGradingLists'
+import { useSortedGradingSessions } from '../composables/useGradingLists'
 
 const route = useRoute()
 const router = useRouter()
 const scheduleId = computed(() => String(route.params.scheduleId ?? ''))
 const { sectionPrefix } = useRouteCategory()
 const gradingBaseHref = computed(() => `${sectionPrefix.value}/grading`)
+const backLabel = computed(() =>
+  typeof route.query.periode === 'string' && route.query.periode !== ''
+    ? 'Kembali ke daftar kelas'
+    : 'Kembali ke Penilaian Ujian',
+)
+const backHref = computed(() => {
+  const periode = route.query.periode
+  const mapel = route.query.mapel
+  if (typeof periode !== 'string' || periode === '')
+    return gradingBaseHref.value
+  const base = `${gradingBaseHref.value}/period/${periode}`
+  return typeof mapel === 'string' && mapel !== '' ? `${base}/${mapel}` : base
+})
 const examTitle = computed(() =>
   typeof route.query.judul === 'string' && route.query.judul !== ''
     ? route.query.judul
@@ -45,7 +58,7 @@ useBreadcrumbs(() => [
 ])
 
 const { sessions, totalItems, loading, listError, refresh } =
-  useGradingSessions(scheduleId, status, page, pageSize)
+  useSortedGradingSessions(scheduleId, status, page, pageSize)
 
 watch(status, () => (page.value = 1), { flush: 'sync' })
 
@@ -74,8 +87,8 @@ function changePageSize(size: number) {
       <CardHeader standard>
         <div class="flex items-center gap-3">
           <BackButton
-            label="Kembali ke Penilaian Ujian"
-            @click="router.push(gradingBaseHref)"
+            :label="backLabel"
+            @click="router.push(backHref)"
           />
           <CardTitle class="font-semibold">{{ examTitle }}</CardTitle>
         </div>

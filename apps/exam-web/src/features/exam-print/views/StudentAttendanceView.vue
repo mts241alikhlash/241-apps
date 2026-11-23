@@ -197,7 +197,7 @@ const dayColumns: ColumnDef<AttendanceDay>[] = [
   },
   {
     id: 'subjects',
-    header: 'Jumlah Mapel',
+    header: 'Jumlah Mata Pelajaran',
     meta: {
       align: 'center',
       mobileValue: (row: AttendanceDay) => row.subjectCount,

@@ -128,25 +128,23 @@ onMounted(async () => {
           @update:page-size="(limit) => fetchClassrooms({ limit, page: 1 })"
         >
           <template #filters>
-            <div class="flex items-end gap-2">
-              <Select
-                :model-value="selectedAcademicYearId"
-                @update:model-value="onAcademicYearChange"
-              >
-                <SelectTrigger class="w-[150px]">
-                  <SelectValue placeholder="Tahun Ajaran" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="year in academicYears"
-                    :key="year.id"
-                    :value="year.id"
-                  >
-                    {{ year.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              :model-value="selectedAcademicYearId"
+              @update:model-value="onAcademicYearChange"
+            >
+              <SelectTrigger class="w-[150px]">
+                <SelectValue placeholder="Tahun Ajaran" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="year in academicYears"
+                  :key="year.id"
+                  :value="year.id"
+                >
+                  {{ year.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </template>
           <template #header-right>
             <SearchInput

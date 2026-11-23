@@ -25,6 +25,11 @@ describe('exam route tree', () => {
     '/classwork/activities/a1',
     '/classwork/schedules',
     '/classwork/grading',
+    '/exam/grading/period/e1',
+    '/exam/grading/period/e1/s1',
+    '/exam/print/grading-sheet',
+    '/exam/print/grading-sheet/d1/s1/c1',
+    '/classwork/print/grading-sheet',
     '/settings/presets',
     '/settings/seb',
     '/my-exams',
@@ -52,6 +57,15 @@ describe('exam route tree', () => {
     expect(instance.resolve('/classwork/grading').meta.category).toBe(
       'NON_EXAM',
     )
+    expect(instance.resolve('/exam/grading/period/e1').meta.category).toBe(
+      'EXAM',
+    )
+    expect(instance.resolve('/exam/print/grading-sheet').meta.category).toBe(
+      'EXAM',
+    )
+    expect(
+      instance.resolve('/classwork/print/grading-sheet').meta.category,
+    ).toBe('NON_EXAM')
 
     const names = instance
       .getRoutes()
@@ -182,6 +196,15 @@ describe('menu', () => {
             ],
           ],
           [
+            '/exam/monitoring',
+            undefined,
+            [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          ],
+          [
             '/exam/reports',
             undefined,
             [
@@ -196,6 +219,7 @@ describe('menu', () => {
           ['/exam/print/desks', 'exam-events.manage', undefined],
           ['/exam/print/student-attendance', 'exam-events.manage', undefined],
           ['/exam/print/staff-attendance', 'exam-events.manage', undefined],
+          ['/exam/print/grading-sheet', 'exam-grading.read', undefined],
         ],
       ],
       [
@@ -204,6 +228,7 @@ describe('menu', () => {
           ['/classwork/activities', 'exam-schedules.manage', undefined],
           ['/classwork/schedules', 'exam-schedules.read', undefined],
           ['/classwork/grading', 'exam-grading.read', undefined],
+          ['/classwork/print/grading-sheet', 'exam-grading.read', undefined],
         ],
       ],
       ['mine', [['/my-exams', 'exam-sessions.take', undefined]]],

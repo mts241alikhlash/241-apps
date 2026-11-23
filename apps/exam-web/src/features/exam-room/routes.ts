@@ -23,6 +23,21 @@ export const examRoomRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/exam/monitoring',
+    name: 'ExamRoomsLive',
+    component: () => import('./views/RoomsLiveView.vue'),
+    meta: {
+      title: 'Monitoring Semua Ruang',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-rooms.supervise',
+        'exam-rooms.technician',
+        'exam-rooms.manage-all',
+      ],
+      breadcrumbs: crumbs('Monitoring Semua Ruang', '/exam/monitoring'),
+    },
+  },
+  {
     path: '/exam/reports/:dayId?/:subjectId?',
     name: 'ExamRoomReports',
     component: () => import('./views/RoomReportListView.vue'),

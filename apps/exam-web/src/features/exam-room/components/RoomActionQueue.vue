@@ -10,13 +10,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import { isLowBattery } from './roomParticipantColumns'
+import { attentionOf, type AttentionEntry } from './roomAttention'
 import type { RoomMonitorParticipant } from '../types'
 
-const props = defineProps<{
-  participants: RoomMonitorParticipant[]
-  canRecover: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    participants: RoomMonitorParticipant[]
+    canRecover: boolean
+    title?: string
+    roomOf?: (row: RoomMonitorParticipant) => string
+  }>(),
+  { title: 'Perlu Tindakan', roomOf: undefined },
+)
 
 const emit = defineEmits<{
   reopen: [row: RoomMonitorParticipant]
@@ -24,93 +29,32 @@ const emit = defineEmits<{
   timeline: [row: RoomMonitorParticipant]
 }>()
 
-interface Entry {
-  id: string
-  row: RoomMonitorParticipant
-  reason: string
-  tone: 'destructive' | 'warning'
-  primary: 'reopen' | 'release' | 'timeline'
-}
+const entries = computed<AttentionEntry[]>(() =>
+  attentionOf(props.participants),
+)
 
-const OFFLINE_MS = 60_000
+const seat = (entry: AttentionEntry) =>
+  String(entry.row.seatNumber).padStart(2, '0')
 
-const entries = computed<Entry[]>(() => {
-  const now = Date.now()
-  const found = props.participants.flatMap((row): Entry[] => {
-    const session = row.session
-    if (session === null || row.absence !== null) return []
-    const base = { id: row.studentId, row }
-    if (session.lockedByViolation) {
-      return [
-        {
-          ...base,
-          reason: 'Terkunci pelanggaran',
-          tone: 'destructive',
-          primary: 'reopen',
-        },
-      ]
-    }
-    if (session.requiresTokenReentry) {
-      return [
-        {
-          ...base,
-          reason: 'Menunggu token ulang',
-          tone: 'destructive',
-          primary: 'release',
-        },
-      ]
-    }
-    if (
-      session.status === 'IN_PROGRESS' &&
-      session.lastSeenAt !== null &&
-      now - Date.parse(session.lastSeenAt) > OFFLINE_MS
-    ) {
-      const minutes = Math.floor(
-        (now - Date.parse(session.lastSeenAt)) / 60_000,
-      )
-      return [
-        {
-          ...base,
-          reason:
-            minutes < 1
-              ? 'Tidak ada kabar'
-              : `Tidak ada kabar ${minutes} menit`,
-          tone: 'warning',
-          primary: 'timeline',
-        },
-      ]
-    }
-    if (session.unsyncedCount > 0) {
-      return [
-        {
-          ...base,
-          reason: `${session.unsyncedCount} jawaban tertunda di HP`,
-          tone: 'warning',
-          primary: 'timeline',
-        },
-      ]
-    }
-    if (isLowBattery(session)) {
-      return [
-        {
-          ...base,
-          reason: `Baterai ${session.batteryLevel}%`,
-          tone: 'warning',
-          primary: 'timeline',
-        },
-      ]
-    }
-    return []
-  })
+const roomColumn = computed<ColumnDef<AttentionEntry>[]>(() => {
+  const roomOf = props.roomOf
+  if (roomOf === undefined) return []
   return [
-    ...found.filter((entry) => entry.tone === 'destructive'),
-    ...found.filter((entry) => entry.tone === 'warning'),
+    {
+      id: 'room',
+      header: 'Ruang',
+      meta: {
+        align: 'center',
+        mobileLabel: 'Ruang',
+        mobileValue: (entry: AttentionEntry) => roomOf(entry.row),
+      },
+      cell: ({ row }) => h('span', roomOf(row.original.row)),
+    },
   ]
 })
 
-const seat = (entry: Entry) => String(entry.row.seatNumber).padStart(2, '0')
-
-const columns = computed<ColumnDef<Entry>[]>(() => [
+const columns = computed<ColumnDef<AttentionEntry>[]>(() => [
+  ...roomColumn.value,
   {
     id: 'seat',
     header: 'Kursi',
@@ -127,7 +71,8 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
     meta: {
       align: 'center',
       mobileLabel: 'No. Peserta',
-      mobileValue: (entry: Entry) => entry.row.participantNumber ?? '-',
+      mobileValue: (entry: AttentionEntry) =>
+        entry.row.participantNumber ?? '-',
     },
     cell: ({ row }) => h('span', row.original.row.participantNumber ?? '-'),
   },
@@ -138,7 +83,7 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
       align: 'left',
       strong: true,
       mobileLabel: 'Nama',
-      mobileValue: (entry: Entry) => entry.row.studentName ?? '-',
+      mobileValue: (entry: AttentionEntry) => entry.row.studentName ?? '-',
     },
     cell: ({ row }) => h('span', row.original.row.studentName ?? '-'),
   },
@@ -148,7 +93,7 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
     meta: {
       align: 'center',
       mobileLabel: 'Masalah',
-      mobileValue: (entry: Entry) => entry.reason,
+      mobileValue: (entry: AttentionEntry) => entry.reason,
     },
     cell: ({ row }) =>
       h(Badge, { variant: row.original.tone }, () => row.original.reason),
@@ -189,7 +134,7 @@ const columns = computed<ColumnDef<Entry>[]>(() => [
 <template>
   <Card gap="none">
     <CardHeader standard>
-      <CardTitle size="md">Perlu Tindakan</CardTitle>
+      <CardTitle size="md">{{ title }}</CardTitle>
     </CardHeader>
     <CardContent variant="standard">
       <DataTable

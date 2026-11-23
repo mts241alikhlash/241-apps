@@ -274,18 +274,30 @@ const pageTitle = (page: SheetPage): string =>
 
 .sheet-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: fixed;
   font-size: 10pt;
 }
 
 .sheet-table th,
 .sheet-table td {
-  border: 1px solid currentColor;
+  border: 0;
+  border-right: 0.3mm solid currentColor;
+  border-bottom: 0.3mm solid currentColor;
   padding: 1px 4px;
   text-align: left;
   white-space: nowrap;
   line-height: 1.25;
+}
+
+.sheet-table th {
+  border-top: 0.3mm solid currentColor;
+}
+
+.sheet-table th:first-child,
+.sheet-table td:first-child {
+  border-left: 0.3mm solid currentColor;
 }
 
 .sheet-table th {

@@ -15,7 +15,25 @@ function buildGradingRoutes(
     breadcrumbs: [{ title: sectionTitle, href: '#' }, ...crumbs],
   })
 
+  const periodRoutes: RouteRecordRaw[] =
+    category === 'EXAM'
+      ? [
+          {
+            path: `${prefix}/grading/period/:eventId/:subjectId?`,
+            name: `${namePrefix}GradingPeriod`,
+            component: () => import('./views/GradingScheduleListView.vue'),
+            meta: meta(`Penilaian ${sectionTitle}`, [
+              {
+                title: `Penilaian ${sectionTitle}`,
+                href: `${prefix}/grading`,
+              },
+            ]),
+          },
+        ]
+      : []
+
   return [
+    ...periodRoutes,
     {
       path: `${prefix}/grading`,
       name: `${namePrefix}Grading`,

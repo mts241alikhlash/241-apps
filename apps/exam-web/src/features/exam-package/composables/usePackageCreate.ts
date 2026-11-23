@@ -38,7 +38,7 @@ export function usePackageCreate() {
 
   const messages = computed(() => ({
     title: title.value.trim() === '' ? 'Judul wajib diisi.' : null,
-    subjectId: subjectId.value === '' ? 'Mapel wajib dipilih.' : null,
+    subjectId: subjectId.value === '' ? 'Mata pelajaran wajib dipilih.' : null,
     gradeId: gradeId.value === '' ? 'Tingkat wajib dipilih.' : null,
   }))
 

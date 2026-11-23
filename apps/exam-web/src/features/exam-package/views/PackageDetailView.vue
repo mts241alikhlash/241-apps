@@ -202,7 +202,7 @@ onMounted(async () => {
               </dd>
             </div>
             <div class="flex flex-col gap-0.5">
-              <dt class="text-muted-foreground">Mapel</dt>
+              <dt class="text-muted-foreground">Mata Pelajaran</dt>
               <dd class="font-medium">
                 {{ store.subjectName(pkg.subjectId) }}
               </dd>

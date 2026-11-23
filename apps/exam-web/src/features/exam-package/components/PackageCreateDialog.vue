@@ -82,7 +82,7 @@ async function save() {
             />
           </FloatingLabelField>
           <FloatingLabelField
-            label="Mapel"
+            label="Mata Pelajaran"
             :for="`${fieldId}-subject`"
             :error="form.errors.value.subjectId ?? ''"
             required

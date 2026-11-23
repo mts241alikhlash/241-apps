@@ -102,6 +102,15 @@ export const menuSections: MenuSection[] = [
             ],
           },
           {
+            title: 'menu.examRoomsLive',
+            url: '/exam/monitoring',
+            requiredAnyPermission: [
+              'exam-rooms.supervise',
+              'exam-rooms.technician',
+              'exam-rooms.manage-all',
+            ],
+          },
+          {
             title: 'menu.examReports',
             url: '/exam/reports',
             requiredAnyPermission: [
@@ -150,6 +159,11 @@ export const menuSections: MenuSection[] = [
             url: '/exam/print/staff-attendance',
             requiredPermission: 'exam-events.manage',
           },
+          {
+            title: 'menu.examPrintGradingSheet',
+            url: '/exam/print/grading-sheet',
+            requiredPermission: 'exam-grading.read',
+          },
         ],
       },
     ],
@@ -177,6 +191,13 @@ export const menuSections: MenuSection[] = [
         title: 'menu.classworkGrading',
         url: '/classwork/grading',
         icon: ClipboardPen,
+        requiredPermission: 'exam-grading.read',
+      },
+      {
+        key: 'classwork-grading-sheet',
+        title: 'menu.classworkGradingSheet',
+        url: '/classwork/print/grading-sheet',
+        icon: Printer,
         requiredPermission: 'exam-grading.read',
       },
     ],

@@ -103,4 +103,27 @@ describe('RoomActionQueue', () => {
     ).map((item) => item.label)
     expect(labels).toContain('Buka Kembali Sesi')
   })
+
+  it('adds a room column and takes its own title when it spans many rooms', () => {
+    const wrapper = mount(RoomActionQueue, {
+      props: {
+        participants: [participant('a', 'Ahmad', { lockedByViolation: true })],
+        canRecover: true,
+        title: 'Perlu Tindakan Semua Ruang',
+        roomOf: () => 'Ruang 3',
+      },
+      global: {
+        stubs: {
+          Tooltip: passthrough,
+          TooltipProvider: passthrough,
+          TooltipTrigger: passthrough,
+          TooltipContent: passthrough,
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('Perlu Tindakan Semua Ruang')
+    expect(wrapper.text()).toContain('Ruang')
+    expect(wrapper.text()).toContain('Ruang 3')
+  })
 })
