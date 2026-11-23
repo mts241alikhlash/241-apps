@@ -25,7 +25,7 @@ const id = useId()
 
 <template>
   <FloatingLabelField
-    label="Mapel"
+    label="Mata Pelajaran"
     :for="`${id}-subject`"
     class="w-fit min-w-28"
     floating

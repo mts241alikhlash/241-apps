@@ -29,9 +29,9 @@ export function buildReviewColumns(
     },
     {
       id: 'subject',
-      header: 'Mapel',
+      header: 'Mata Pelajaran',
       meta: {
-        mobileLabel: 'Mapel',
+        mobileLabel: 'Mata Pelajaran',
         mobileValue: (row: ExamPackageSummary) =>
           options.subjectName(row.subjectId),
       },

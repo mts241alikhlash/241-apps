@@ -349,7 +349,12 @@ defineExpose({ table })
         v-if="$slots['header-left'] || $slots.filters"
         class="flex items-end gap-2"
       >
-        <slot name="filters" />
+        <div
+          v-if="$slots.filters"
+          class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+        >
+          <slot name="filters" />
+        </div>
         <slot name="header-left" />
       </div>
       <div class="flex items-end gap-2 w-full sm:w-auto sm:ml-auto justify-end">

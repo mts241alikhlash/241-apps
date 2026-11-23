@@ -120,34 +120,32 @@ onMounted(refresh)
           @update:page-size="changePageSize"
         >
           <template #filters>
-            <div class="flex flex-wrap items-end gap-2">
-              <AcademicPeriodFilter v-model:semester-id="semesterId" />
-              <FloatingLabelField
-                label="Status"
-                :for="'event-status'"
-                class="w-fit min-w-32"
-                floating
-              >
-                <Select v-model="status">
-                  <SelectTrigger
-                    id="event-status"
-                    class="w-full"
+            <AcademicPeriodFilter v-model:semester-id="semesterId" />
+            <FloatingLabelField
+              label="Status"
+              :for="'event-status'"
+              class="w-fit min-w-32"
+              floating
+            >
+              <Select v-model="status">
+                <SelectTrigger
+                  id="event-status"
+                  class="w-full"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua</SelectItem>
+                  <SelectItem
+                    v-for="option in EVENT_STATUSES"
+                    :key="option"
+                    :value="option"
                   >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">Semua</SelectItem>
-                    <SelectItem
-                      v-for="option in EVENT_STATUSES"
-                      :key="option"
-                      :value="option"
-                    >
-                      {{ eventStatusLabel(option) }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </FloatingLabelField>
-            </div>
+                    {{ eventStatusLabel(option) }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
           </template>
           <template #empty>
             <DataTableEmpty

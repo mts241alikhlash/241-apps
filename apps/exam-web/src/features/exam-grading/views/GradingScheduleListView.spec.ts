@@ -20,7 +20,7 @@ const listState = {
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
-  useRoute: () => ({ meta: { category: 'EXAM' } }),
+  useRoute: () => ({ meta: { category: 'NON_EXAM' }, params: {} }),
 }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
@@ -29,6 +29,18 @@ vi.mock('@mts241alikhlash/platform/auth', () => ({
 }))
 vi.mock('../composables/useGradingLists', () => ({
   useGradingSchedules: () => ({ ...listState, refresh }),
+  useEventGradingSchedules: () => ({
+    events: ref([]),
+    eventId: ref(''),
+    schedules: ref([]),
+    totalItems: ref(0),
+    loading: ref(false),
+    listError: ref(null),
+    refresh: vi.fn(),
+    schedulesOf: () => [],
+  }),
+  compareClassroom: (left: string | null, right: string | null) =>
+    (left ?? '').localeCompare(right ?? '', 'id', { numeric: true }),
 }))
 vi.mock('@/features/exam-schedule/components/MakeupDialog.vue', () => ({
   default: defineComponent({

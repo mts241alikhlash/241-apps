@@ -215,11 +215,11 @@ export function buildRoomParticipantColumns(
     },
     {
       id: 'subject',
-      header: 'Mapel',
+      header: 'Mata Pelajaran',
       meta: {
         mobile: 'hide',
         align: 'left',
-        mobileLabel: 'Mapel',
+        mobileLabel: 'Mata Pelajaran',
         mobileValue: (row: RoomMonitorParticipant) => row.subjectName ?? '-',
       },
       cell: ({ row }) => row.original.subjectName ?? '-',

@@ -66,7 +66,7 @@ export function buildTimetable(
       }
       day.slots.push(slot)
     }
-    const subject = activity.subjectName ?? 'Mapel tidak dikenal'
+    const subject = activity.subjectName ?? 'Mata pelajaran tidak dikenal'
     const grade = activity.gradeName ?? '-'
     const entry = slot.entries.find((row) => row.subject === subject)
     if (entry === undefined) slot.entries.push({ subject, grades: [grade] })

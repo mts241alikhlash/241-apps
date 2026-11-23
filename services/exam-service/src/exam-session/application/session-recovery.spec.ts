@@ -943,6 +943,47 @@ describe('record session events', () => {
     expect(fifth.lockedByViolation).toBe(true)
   })
 
+  it('ignores queued events older than the last reopen of the session', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id)
+    const actor = { id: STUDENT_USER.id, deviceId: 'device-1' }
+    await f.rooms.writeAuditLog({
+      sessionId: session.id,
+      roomId: f.roomA.id,
+      action: 'REOPEN_SESSION',
+      actorId: TECH_A.id,
+      reason: 'Siswa terkunci karena jaringan',
+    })
+    const useCase = build(f)
+    const before = new Date(NOW.getTime() - 6 * 3_600_000)
+
+    const stale = await useCase.execute(
+      actor,
+      session.id,
+      {
+        events: [
+          { ...event('old-1', 'LEFT_APP', true), occurredAt: before },
+          { ...event('old-2', 'FOCUS_LOST_BRIEF', true), occurredAt: before },
+          { ...event('old-3', 'SCREEN_OFF', true), occurredAt: before },
+        ],
+      },
+      NOW,
+    )
+    expect(stale.violationCount).toBe(0)
+    expect(stale.lockedByViolation).toBe(false)
+    expect(stale.requiresTokenReentry).toBe(false)
+
+    const later = await useCase.execute(
+      actor,
+      session.id,
+      {
+        events: [event('new-1', 'LEFT_APP', true)],
+      },
+      NOW,
+    )
+    expect(later.violationCount).toBe(1)
+  })
+
   it('records the absence start from the LEFT_APP event', async () => {
     const f = await setup()
     const session = seed(f.sessions, f.schedule.id)

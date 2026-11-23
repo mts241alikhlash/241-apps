@@ -236,57 +236,53 @@ async function confirmPendingAction() {
             </template>
             <template #filters>
               <div
-                class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+                class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
               >
-                <div
-                  class="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+                <FloatingLabelField
+                  label="Status"
+                  :for="statusFilterId"
+                  class="w-fit min-w-28"
+                  floating
                 >
-                  <FloatingLabelField
-                    label="Status"
-                    :for="statusFilterId"
-                    class="w-fit min-w-28"
-                    floating
-                  >
-                    <Select v-model="statusFilter">
-                      <SelectTrigger
-                        :id="statusFilterId"
-                        class="w-full"
+                  <Select v-model="statusFilter">
+                    <SelectTrigger
+                      :id="statusFilterId"
+                      class="w-full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Semua</SelectItem>
+                      <SelectItem value="true">Terbit</SelectItem>
+                      <SelectItem value="false">Draft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FloatingLabelField>
+                <FloatingLabelField
+                  label="Gelombang"
+                  :for="waveFilterId"
+                  class="w-fit min-w-28"
+                  floating
+                >
+                  <Select v-model="waveFilter">
+                    <SelectTrigger
+                      :id="waveFilterId"
+                      class="w-full"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Semua</SelectItem>
+                      <SelectItem
+                        v-for="wave in waves"
+                        :key="wave.id"
+                        :value="wave.id"
                       >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Semua</SelectItem>
-                        <SelectItem value="true">Terbit</SelectItem>
-                        <SelectItem value="false">Draft</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FloatingLabelField>
-                  <FloatingLabelField
-                    label="Gelombang"
-                    :for="waveFilterId"
-                    class="w-fit min-w-28"
-                    floating
-                  >
-                    <Select v-model="waveFilter">
-                      <SelectTrigger
-                        :id="waveFilterId"
-                        class="w-full"
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">Semua</SelectItem>
-                        <SelectItem
-                          v-for="wave in waves"
-                          :key="wave.id"
-                          :value="wave.id"
-                        >
-                          {{ wave.name }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FloatingLabelField>
-                </div>
+                        {{ wave.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FloatingLabelField>
               </div>
             </template>
             <template #header-right>

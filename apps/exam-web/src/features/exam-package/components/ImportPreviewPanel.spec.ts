@@ -52,7 +52,7 @@ describe('ImportPreviewPanel', () => {
     expect(text).toContain('Siti Aminah')
     expect(text).toContain('NIK')
     expect(text).toContain('3201010101010001')
-    expect(text).toContain('Mapel')
+    expect(text).toContain('Mata Pelajaran')
     expect(text).toContain('Matematika')
     expect(text).toContain('Tingkat')
     expect(text).toContain('7')

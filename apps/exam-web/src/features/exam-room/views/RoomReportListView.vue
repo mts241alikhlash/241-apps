@@ -817,7 +817,7 @@ onMounted(load)
           </FloatingLabelField>
           <FloatingLabelField
             v-if="printScope === 'subject'"
-            label="Mapel"
+            label="Mata Pelajaran"
             :for="`${eventFieldId}-mapel`"
             floating
           >

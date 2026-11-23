@@ -32,62 +32,60 @@ const asText = (value: AcceptableValue) =>
 </script>
 
 <template>
-  <div class="flex flex-wrap items-end gap-2">
-    <FloatingLabelField
-      label="Periode Ujian"
-      :for="eventFieldId"
-      class="w-fit min-w-40"
-      floating
+  <FloatingLabelField
+    label="Periode Ujian"
+    :for="eventFieldId"
+    class="w-fit min-w-40"
+    floating
+  >
+    <Select
+      :model-value="eventId"
+      @update:model-value="(value) => emit('update:eventId', asText(value))"
     >
-      <Select
-        :model-value="eventId"
-        @update:model-value="(value) => emit('update:eventId', asText(value))"
+      <SelectTrigger
+        :id="eventFieldId"
+        class="w-full"
       >
-        <SelectTrigger
-          :id="eventFieldId"
-          class="w-full"
+        <SelectValue placeholder="Pilih periode" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem
+          v-for="event in events"
+          :key="event.id"
+          :value="event.id"
         >
-          <SelectValue placeholder="Pilih periode" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem
-            v-for="event in events"
-            :key="event.id"
-            :value="event.id"
-          >
-            {{ event.name }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </FloatingLabelField>
-    <FloatingLabelField
-      v-if="showRoomFilter"
-      label="Ruang"
-      :for="roomFieldId"
-      class="w-fit min-w-40"
-      floating
+          {{ event.name }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </FloatingLabelField>
+  <FloatingLabelField
+    v-if="showRoomFilter"
+    label="Ruang"
+    :for="roomFieldId"
+    class="w-fit min-w-40"
+    floating
+  >
+    <Select
+      :model-value="roomId"
+      @update:model-value="(value) => emit('update:roomId', asText(value))"
     >
-      <Select
-        :model-value="roomId"
-        @update:model-value="(value) => emit('update:roomId', asText(value))"
+      <SelectTrigger
+        :id="roomFieldId"
+        class="w-full"
       >
-        <SelectTrigger
-          :id="roomFieldId"
-          class="w-full"
+        <SelectValue placeholder="Semua ruang" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem :value="ALL_ROOMS">Semua ruang</SelectItem>
+        <SelectItem
+          v-for="room in rooms"
+          :key="room.id"
+          :value="room.id"
         >
-          <SelectValue placeholder="Semua ruang" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem :value="ALL_ROOMS">Semua ruang</SelectItem>
-          <SelectItem
-            v-for="room in rooms"
-            :key="room.id"
-            :value="room.id"
-          >
-            {{ room.label }}
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </FloatingLabelField>
-  </div>
+          {{ room.label }}
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </FloatingLabelField>
 </template>

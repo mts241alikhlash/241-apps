@@ -52,12 +52,17 @@ export class RecordSessionEventsUseCase {
       input.events,
     )
     const fresh = stored.filter((row) => !known.has(row.clientId))
+    const recoveredAt = await this.lastRecoveryAt(session.id)
+    const current =
+      recoveredAt === null
+        ? fresh
+        : fresh.filter((event) => event.occurredAt.getTime() > recoveredAt)
 
-    const violations = fresh.filter((event) => event.isViolation).length
+    const violations = current.filter((event) => event.isViolation).length
     const violationCount = session.violationCount + violations
     const locked =
       session.lockedByViolation || violationCount >= violationLimitOf(session)
-    const leftApp = fresh.find((event) => event.type === 'LEFT_APP')
+    const leftApp = current.find((event) => event.type === 'LEFT_APP')
     const reentry = session.requiresTokenReentry || leftApp !== undefined
     const absentSince = leftApp?.occurredAt ?? session.absentSince
 
@@ -78,5 +83,16 @@ export class RecordSessionEventsUseCase {
       absentSince: patched.absentSince,
       serverTime: now,
     }
+  }
+
+  private async lastRecoveryAt(sessionId: string): Promise<number | null> {
+    const logs = await this.rooms.listAuditLogs(sessionId)
+    const times = logs
+      .filter(
+        (log) =>
+          log.action === 'REOPEN_SESSION' || log.action === 'RESET_SESSION',
+      )
+      .map((log) => log.createdAt.getTime())
+    return times.length === 0 ? null : Math.max(...times)
   }
 }

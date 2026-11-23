@@ -85,7 +85,7 @@ export function buildDayColumns(
     },
     {
       id: 'subjects',
-      header: 'Mapel',
+      header: 'Mata Pelajaran',
       meta: {
         align: 'center',
         mobileValue: (row: DayGroup) => row.subjectCount,

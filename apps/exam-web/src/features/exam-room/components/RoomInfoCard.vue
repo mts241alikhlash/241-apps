@@ -37,7 +37,7 @@ defineProps<{
           </dd>
         </div>
         <div class="contents sm:flex sm:flex-col sm:gap-0.5">
-          <dt class="text-control text-muted-foreground">Mapel</dt>
+          <dt class="text-control text-muted-foreground">Mata Pelajaran</dt>
           <dd class="min-w-0 break-words text-right font-medium sm:text-left">
             {{ subject ?? '-' }}
           </dd>

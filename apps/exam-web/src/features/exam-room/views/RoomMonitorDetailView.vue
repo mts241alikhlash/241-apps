@@ -347,34 +347,30 @@ onUnmounted(() => {
                 item-label="peserta"
               >
                 <template #filters>
-                  <div
-                    class="flex items-end sm:gap-0 sm:[&>*:not(:first-child)]:-ml-px sm:[&>*:not(:first-child)_:is(button,input)]:rounded-l-none sm:[&>*:not(:last-child)_:is(button,input)]:rounded-r-none sm:[&>*:focus-within]:z-10"
+                  <FloatingLabelField
+                    label="Status"
+                    :for="statusFieldId"
+                    class="w-fit min-w-28"
+                    floating
                   >
-                    <FloatingLabelField
-                      label="Status"
-                      :for="statusFieldId"
-                      class="w-fit min-w-28"
-                      floating
-                    >
-                      <Select v-model="status">
-                        <SelectTrigger
-                          :id="statusFieldId"
-                          class="w-full"
+                    <Select v-model="status">
+                      <SelectTrigger
+                        :id="statusFieldId"
+                        class="w-full"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem
+                          v-for="option in MONITOR_STATUSES"
+                          :key="option"
+                          :value="option"
                         >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem
-                            v-for="option in MONITOR_STATUSES"
-                            :key="option"
-                            :value="option"
-                          >
-                            {{ monitorStatusLabel(option as MonitorStatus) }}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FloatingLabelField>
-                  </div>
+                          {{ monitorStatusLabel(option as MonitorStatus) }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FloatingLabelField>
                 </template>
                 <template #header-right>
                   <SearchInput

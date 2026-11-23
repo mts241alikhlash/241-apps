@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -10,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
 import { examRoomService } from '../services/examRoomService'
@@ -32,8 +35,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{ 'update:open': [value: boolean]; done: [] }>()
 
-const reason = ref('')
-const minutes = ref(10)
 const busy = ref(false)
 const error = ref<string | null>(null)
 
@@ -66,18 +67,39 @@ const windowClosed = computed(
     (props.action === 'extend-time' && extendLimit.value === 0) ||
     (props.action === 'reopen' && !props.windowOpen),
 )
-const valid = computed(
-  () =>
-    reason.value.trim().length >= 5 &&
-    (props.action !== 'extend-time' ||
-      (minutes.value >= 1 && minutes.value <= extendLimit.value)),
+
+const schema = computed(() =>
+  toTypedSchema(
+    z.object({
+      reason: z
+        .string()
+        .trim()
+        .min(5, 'Alasan minimal 5 karakter')
+        .max(300, 'Alasan maksimal 300 karakter'),
+      minutes:
+        props.action === 'extend-time'
+          ? z
+              .number({ invalid_type_error: 'Tambahan menit wajib diisi' })
+              .int('Tambahan menit harus bilangan bulat')
+              .min(1, 'Tambahan menit minimal 1')
+              .max(
+                Math.max(extendLimit.value, 1),
+                `Tambahan menit maksimal ${extendLimit.value}`,
+              )
+          : z.number().optional(),
+    }),
+  ),
 )
+
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: schema,
+  initialValues: { reason: '', minutes: 10 },
+})
 
 const subject = computed(() => props.studentName ?? 'Siswa')
 const needsSession = computed(() => props.action !== 'allow-late')
 const canAct = computed(
   () =>
-    valid.value &&
     (!needsSession.value ||
       (props.sessionId !== null && props.sessionId !== '')) &&
     (!props.action.startsWith('allow-') || props.studentId !== null) &&
@@ -88,6 +110,7 @@ async function dispatch(
   sessionId: string,
   studentId: string,
   text: string,
+  minutes: number,
 ): Promise<boolean> {
   if (props.action === 'release') {
     return examRoomService.releaseSession(sessionId, text)
@@ -99,20 +122,20 @@ async function dispatch(
     return examRoomService.resetSession(sessionId, text)
   }
   if (props.action === 'extend-time') {
-    return examRoomService.extendTime(sessionId, minutes.value, text)
+    return examRoomService.extendTime(sessionId, minutes, text)
   }
   return examRoomService.allowLate(props.roomId, studentId, text)
 }
 
-async function submit() {
+const submit = handleSubmit(async (values) => {
   if (!canAct.value || busy.value) return
   busy.value = true
   error.value = null
-  const text = reason.value.trim()
   const done = await dispatch(
     props.sessionId ?? '',
     props.studentId ?? '',
-    text,
+    values.reason.trim(),
+    values.minutes ?? 0,
   )
   busy.value = false
   if (done) {
@@ -121,14 +144,13 @@ async function submit() {
   } else {
     error.value = 'Tindakan ditolak server.'
   }
-}
+})
 
 watch(
   () => props.open,
   (open) => {
     if (!open) return
-    reason.value = ''
-    minutes.value = 10
+    resetForm({ values: { reason: '', minutes: 10 } })
     error.value = null
   },
 )
@@ -144,47 +166,58 @@ watch(
         <DialogTitle>{{ title }}</DialogTitle>
         <DialogDescription>{{ subject }} · {{ description }}</DialogDescription>
       </DialogHeader>
-      <DialogBody class="space-y-4">
-        <div
-          v-if="error"
-          class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
-          role="alert"
+      <DialogBody>
+        <form
+          id="recovery-form"
+          class="space-y-4"
+          @submit.prevent="submit"
         >
-          {{ error }}
-        </div>
-        <FloatingLabelField
-          v-if="action === 'extend-time'"
-          label="Tambahan menit"
-          :for="'extend-minutes'"
-          floating
-        >
-          <Input
-            id="extend-minutes"
-            v-model.number="minutes"
-            type="number"
-            min="1"
-            :max="extendLimit"
-            :disabled="extendLimit === 0"
-          />
-        </FloatingLabelField>
-        <p
-          v-if="windowClosed"
-          class="text-control text-destructive"
-        >
-          Jendela ujian sudah habis
-        </p>
-        <FloatingLabelField
-          label="Alasan"
-          :for="'recovery-reason'"
-          floating
-        >
-          <Textarea
-            id="recovery-reason"
-            v-model="reason"
-            maxlength="300"
-            rows="3"
-          />
-        </FloatingLabelField>
+          <div
+            v-if="error"
+            class="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-control text-destructive"
+            role="alert"
+          >
+            {{ error }}
+          </div>
+          <p
+            v-if="windowClosed"
+            class="text-control text-destructive"
+          >
+            Jendela ujian sudah habis. Ubah jam selesai Kegiatan terlebih dahulu
+            agar waktu bisa ditambah.
+          </p>
+          <FloatingField
+            v-if="action === 'extend-time'"
+            v-slot="{ componentField }"
+            name="minutes"
+            label="Tambahan menit"
+            required
+          >
+            <FormControl>
+              <Input
+                v-bind="componentField"
+                type="number"
+                min="1"
+                :max="extendLimit"
+                :disabled="extendLimit === 0"
+              />
+            </FormControl>
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="reason"
+            label="Alasan"
+            required
+          >
+            <FormControl>
+              <Textarea
+                v-bind="componentField"
+                maxlength="300"
+                rows="3"
+              />
+            </FormControl>
+          </FloatingField>
+        </form>
       </DialogBody>
       <DialogFooter standard>
         <Button
@@ -195,9 +228,10 @@ watch(
           Batal
         </Button>
         <Button
+          type="submit"
+          form="recovery-form"
           :variant="destructive ? 'destructive' : 'default'"
           :disabled="busy || !canAct"
-          @click="submit"
         >
           {{ busy ? 'Menyimpan...' : 'Simpan' }}
         </Button>

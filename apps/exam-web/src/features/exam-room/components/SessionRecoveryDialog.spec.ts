@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { floatingFieldStub } from '../../../test-support/floatingFieldStub'
 import SessionRecoveryDialog from './SessionRecoveryDialog.vue'
 import type { RecoveryAction } from '../types'
 
@@ -28,10 +29,6 @@ const dialog = defineComponent({
   props: { open: Boolean },
   template: '<div v-if="open"><slot /></div>',
 })
-const field = defineComponent({
-  props: { label: String, for: String, floating: Boolean },
-  template: '<div><label :for="$props.for">{{ label }}</label><slot /></div>',
-})
 const button = defineComponent({
   props: { variant: String, disabled: Boolean },
   emits: ['click'],
@@ -39,16 +36,16 @@ const button = defineComponent({
     '<button type="button" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
 })
 const textarea = defineComponent({
-  props: { modelValue: String, id: String },
+  props: { modelValue: String },
   emits: ['update:modelValue'],
   template:
-    '<textarea :id="id" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
 })
 const input = defineComponent({
-  props: { modelValue: Number, id: String },
+  props: { modelValue: Number },
   emits: ['update:modelValue'],
   template:
-    '<input :id="id" :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
+    '<input :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
 })
 
 const stubs = {
@@ -60,7 +57,8 @@ const stubs = {
   DialogBody: passthrough,
   DialogFooter: passthrough,
   Button: button,
-  FloatingLabelField: field,
+  FloatingField: floatingFieldStub,
+  FormControl: passthrough,
   Textarea: textarea,
   Input: input,
 }
@@ -81,8 +79,9 @@ const open = (action: RecoveryAction, props: Record<string, unknown> = {}) =>
 
 async function confirm(host: ReturnType<typeof open>, reason: string) {
   await host.find('textarea').setValue(reason)
-  const save = host.findAll('button').find((item) => item.text() === 'Simpan')
-  await save!.trigger('click')
+  await host.find('form').trigger('submit')
+  await flushPromises()
+  await new Promise((resolve) => setTimeout(resolve, 20))
   await flushPromises()
 }
 
@@ -191,13 +190,22 @@ describe('SessionRecoveryDialog', () => {
 
   it('refuses to submit without a reason of five characters', async () => {
     const wrapper = open('release')
-    const save = wrapper
-      .findAll('button')
-      .find((item) => item.text() === 'Simpan')!
 
-    expect(save.attributes('disabled')).toBeDefined()
     await confirm(wrapper, 'ok')
+
     expect(releaseSession).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('Alasan minimal 5 karakter')
+    wrapper.unmount()
+  })
+
+  it('refuses minutes above the room left in the window', async () => {
+    const wrapper = open('extend-time', { maxExtendMinutes: 10 })
+    await wrapper.find('input').setValue('15')
+
+    await confirm(wrapper, 'Listrik padam sepuluh menit')
+
+    expect(extendTime).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('Tambahan menit maksimal 10')
     wrapper.unmount()
   })
 
