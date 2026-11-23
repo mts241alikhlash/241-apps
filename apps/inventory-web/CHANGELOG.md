@@ -1,5 +1,13 @@
 # inventory-web
 
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [e21b2ef]
+  - @mts241alikhlash/ui@0.2.3
+  - @mts241alikhlash/platform@0.2.4
+
 ## 0.1.8
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # exam-web
 
+## 0.8.10
+
+### Patch Changes
+
+- e21b2ef: Use one room token for the first entry and the re-entry of a seated student, lock a wrong token for two minutes, stop short connection gaps from counting as violations, lock a session at the violation limit of its own policy, show the exam window and the running exam in the room monitor, split the monitor activity column into start, last seen and submitted, translate the session events, close Safe Exam Browser after submitting, order the room reports by day then room, center the attendance number and put the rows per page, filter and search of a phone table on one line.
+- 541783c: Build the printed exam schedule from the activities of the period so subjects without a package, such as paper exams, are listed too, and let a device-bound app recover within five minutes when it lost the answer of a refresh rotation instead of revoking its session. The room monitor shows the exam that is running now for each student instead of the first exam the student sat.
+- Updated dependencies [e21b2ef]
+  - @mts241alikhlash/ui@0.2.3
+  - @mts241alikhlash/platform@0.2.4
+
 ## 0.8.9
 
 ### Patch Changes
