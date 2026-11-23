@@ -38,7 +38,9 @@ export class NativeRefreshUseCase {
       throw new UnauthorizedException('Sesi tidak valid')
     }
 
-    const result = await this.refresh.execute(input.refreshToken)
+    const result = await this.refresh.execute(input.refreshToken, {
+      recoverLostRotation: true,
+    })
     const [grants, profile] = await Promise.all([
       this.authRepository.findGrants(session.user.id),
       this.authRepository.findUserById(session.user.id),

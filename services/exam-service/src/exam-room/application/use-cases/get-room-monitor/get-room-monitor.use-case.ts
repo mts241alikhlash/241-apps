@@ -168,6 +168,29 @@ function matchesStatus(row: RosterRow, status: MonitorStatus): boolean {
   return row.session !== null && row.session.status !== 'IN_PROGRESS'
 }
 
+export function scheduleToShow<T extends { startsAt: Date; endsAt: Date }>(
+  candidates: T[],
+  sessionStatusOf: (row: T) => string | undefined,
+  now: Date,
+): T | undefined {
+  if (candidates.length === 0) return undefined
+  const time = now.getTime()
+  const byStart = [...candidates].sort(
+    (a, b) => a.startsAt.getTime() - b.startsAt.getTime(),
+  )
+  const inProgress = byStart.filter(
+    (row) => sessionStatusOf(row) === 'IN_PROGRESS',
+  )
+  if (inProgress.length > 0) return inProgress[inProgress.length - 1]
+  const running = byStart.filter(
+    (row) => row.startsAt.getTime() <= time && time < row.endsAt.getTime(),
+  )
+  if (running.length > 0) return running[running.length - 1]
+  const upcoming = byStart.find((row) => row.startsAt.getTime() > time)
+  if (upcoming !== undefined) return upcoming
+  return byStart[byStart.length - 1]
+}
+
 export function examWindowOf(
   schedules: { startsAt: Date; endsAt: Date }[],
 ): { startsAt: string; endsAt: string } | null {
@@ -247,10 +270,11 @@ export class GetRoomMonitorUseCase {
     const roster: RosterRow[] = seats
       .map((seat) => {
         const candidates = schedulesOfClassroom.get(seat.classroomId) ?? []
-        const sitting = candidates.find((row) =>
-          sessionOf.has(`${row.id}:${seat.studentId}`),
+        const schedule = scheduleToShow(
+          candidates,
+          (row) => sessionOf.get(`${row.id}:${seat.studentId}`)?.status,
+          now,
         )
-        const schedule = sitting ?? candidates[0]
         const session =
           schedule === undefined
             ? null

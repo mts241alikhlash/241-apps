@@ -1,3 +1,5 @@
+import { examActivityApi } from '@/features/exam-activity/api/examActivityApi'
+import type { ExamActivityRecord } from '@/features/exam-activity/types'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
 import { SCHEDULE_PAGE_LIMIT, examPrintApi } from '../api/examPrintApi'
 import type { PrintPack, PrintSchedule, ResetCredentials } from '../types'
@@ -8,6 +10,32 @@ export type PrintOutcome<T> =
 const failure = <T>(err: unknown, fallback: string): PrintOutcome<T> => ({
   success: false,
   error: messageOf(err, fallback),
+})
+
+export const scheduleOfActivity = (
+  activity: ExamActivityRecord,
+): PrintSchedule => ({
+  id: activity.id,
+  activityId: activity.id,
+  category: activity.category,
+  classroomId: activity.gradeId,
+  classroomName: activity.gradeName,
+  createdAt: activity.startsAt,
+  createdById: '',
+  durationMinutes: activity.durationMinutes,
+  endsAt: activity.endsAt,
+  eventId: activity.eventId,
+  hasSessions: false,
+  kind: 'REGULAR',
+  makeupOfId: null,
+  minSubmitMinutes: 0,
+  packageId: activity.packageId ?? activity.id,
+  packageTitle: activity.subjectName ?? '-',
+  semesterId: activity.semesterId,
+  startsAt: activity.startsAt,
+  status: 'SCHEDULED',
+  type: activity.type,
+  updatedAt: activity.startsAt,
 })
 
 export const examPrintService = {
@@ -30,6 +58,22 @@ export const examPrintService = {
       }
     } catch (err: unknown) {
       return failure(err, 'Kata sandi tidak dapat direset.')
+    }
+  },
+
+  async loadActivitySchedules(
+    event: PrintPack['event'],
+  ): Promise<PrintOutcome<PrintSchedule[]>> {
+    try {
+      const activities = await examActivityApi.list({ category: 'EXAM' })
+      return {
+        success: true,
+        data: activities
+          .filter((activity) => activity.eventId === event.id)
+          .map(scheduleOfActivity),
+      }
+    } catch (err: unknown) {
+      return failure(err, 'Jadwal ujian tidak dapat dimuat.')
     }
   },
 

@@ -3,6 +3,7 @@ import { IAuthRepository } from '../../../domain/repositories/auth.repository.js
 import {
   isUsable,
   slidExpiry,
+  withinRecoveryGrace,
   withinReuseGrace,
 } from '../../../domain/policies/session-lifetime.policy.js'
 import { TokenManagerService } from '../../services/token-manager.service.js'
@@ -16,7 +17,10 @@ export class RefreshTokenUseCase {
     private readonly authRepository: IAuthRepository,
   ) {}
 
-  async execute(refreshTokenFromCookie: string) {
+  async execute(
+    refreshTokenFromCookie: string,
+    options: { recoverLostRotation?: boolean } = {},
+  ) {
     let payload: { sessionId: string }
     try {
       payload = await this.tokenManagerService.verifyRefreshToken(
@@ -55,7 +59,12 @@ export class RefreshTokenUseCase {
         session.tokenHash,
       )
     ) {
-      if (!this.isJustReplaced(session, incomingHash, now)) {
+      const justReplaced = this.isJustReplaced(session, incomingHash, now)
+      const lostRotation =
+        !justReplaced &&
+        options.recoverLostRotation === true &&
+        this.isRecoverable(session, incomingHash, now)
+      if (!justReplaced && !lostRotation) {
         await this.authRepository.revokeSession(session.id)
         this.logger.warn(
           `Possible token reuse detected for session ${session.id}. Session revoked.`,
@@ -65,16 +74,24 @@ export class RefreshTokenUseCase {
         )
       }
 
-      const racedGrants = await this.authRepository.findGrants(session.user.id)
-      const { accessToken } = await this.tokenManagerService.generateTokenPair(
-        session.user,
-        session.id,
-        racedGrants,
-      )
+      if (justReplaced) {
+        const racedGrants = await this.authRepository.findGrants(
+          session.user.id,
+        )
+        const { accessToken } =
+          await this.tokenManagerService.generateTokenPair(
+            session.user,
+            session.id,
+            racedGrants,
+          )
+        this.logger.log(
+          `Refresh raced a refresh for session ${session.id}; access token issued, refresh token kept.`,
+        )
+        return { accessToken, user }
+      }
       this.logger.log(
-        `Refresh raced a refresh for session ${session.id}; access token issued, refresh token kept.`,
+        `Refresh recovered a lost rotation for session ${session.id}; rotating again.`,
       )
-      return { accessToken, user }
     }
 
     const grants = await this.authRepository.findGrants(session.user.id)
@@ -122,6 +139,24 @@ export class RefreshTokenUseCase {
       refreshExpiresInMs,
       user,
     }
+  }
+
+  private isRecoverable(
+    session: {
+      previousTokenHash?: string | null
+      previousRotatedAt?: Date | null
+    },
+    incomingHash: string,
+    now: Date,
+  ): boolean {
+    return (
+      !!session.previousTokenHash &&
+      withinRecoveryGrace(session.previousRotatedAt, now) &&
+      this.tokenManagerService.constantTimeEqual(
+        incomingHash,
+        session.previousTokenHash,
+      )
+    )
   }
 
   private isJustReplaced(

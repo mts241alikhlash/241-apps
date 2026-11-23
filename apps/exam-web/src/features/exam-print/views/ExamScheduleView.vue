@@ -146,7 +146,7 @@ const printable = (items: PrintSchedule[]): PrintSchedule[] =>
 async function printEventSchedules(event: ExamEvent) {
   if (printing.value) return
   const notice = toast.loading('Menyiapkan jadwal...')
-  const result = await examPrintService.loadSchedules(event)
+  const result = await examPrintService.loadActivitySchedules(event)
   toast.dismiss(notice)
   if (!result.success) {
     toast.error(result.error)
@@ -327,7 +327,7 @@ async function loadSchedules() {
   if (event === null) return
   loading.value = true
   error.value = null
-  const result = await examPrintService.loadSchedules(event)
+  const result = await examPrintService.loadActivitySchedules(event)
   loading.value = false
   if (result.success) schedules.value = result.data
   else error.value = result.error
