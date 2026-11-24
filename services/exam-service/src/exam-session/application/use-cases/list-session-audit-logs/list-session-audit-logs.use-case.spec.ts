@@ -1,12 +1,15 @@
 import { ForbiddenException } from '@nestjs/common'
 import {
   MANAGE_ALL,
+  READ_ALL,
   RoomAccessService,
   SUPERVISE,
+  TECHNICIAN,
   type RoomStaffUser,
 } from '../../../../exam-room/application/room-access.service.js'
 import {
   SUPERVISOR_ID,
+  TECHNICIAN_ID,
   seedMonitorRoom,
   startSession,
 } from '../../../../exam-room/application/room-monitor.test-support.js'
@@ -33,6 +36,7 @@ async function build() {
     reason: 'HP siswa mati',
   })
   return {
+    fixture,
     sessionId: session.id,
     useCase: new ListSessionAuditLogsUseCase(
       fixture.rooms,
@@ -69,6 +73,38 @@ describe('ListSessionAuditLogsUseCase', () => {
 
     await expect(
       useCase.execute({ id: 'sup-none', permissions: [SUPERVISE] }, sessionId),
+    ).rejects.toThrow(ForbiddenException)
+  })
+
+  it('lets read-all and the assigned technician read the log, and refuses another technician', async () => {
+    const { fixture, sessionId, useCase } = await build()
+    const roomless = startSession(fixture, fixture.studentIds[1], {
+      roomId: null,
+    })
+
+    await expect(
+      useCase.execute(
+        { id: 'principal-1', permissions: [READ_ALL] },
+        sessionId,
+      ),
+    ).resolves.toHaveLength(1)
+    await expect(
+      useCase.execute(
+        { id: 'principal-1', permissions: [READ_ALL] },
+        roomless.id,
+      ),
+    ).resolves.toEqual([])
+    await expect(
+      useCase.execute(
+        { id: TECHNICIAN_ID, permissions: [TECHNICIAN] },
+        sessionId,
+      ),
+    ).resolves.toHaveLength(1)
+    await expect(
+      useCase.execute(
+        { id: 'tech-other', permissions: [TECHNICIAN] },
+        sessionId,
+      ),
     ).rejects.toThrow(ForbiddenException)
   })
 })

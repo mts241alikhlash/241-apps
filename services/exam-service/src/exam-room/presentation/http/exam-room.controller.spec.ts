@@ -17,8 +17,12 @@ import { AssignSupervisorUseCase } from '../../application/use-cases/assign-supe
 import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam-events/manage-exam-events.use-case.js'
 import { ManageExamRoomsUseCase } from '../../application/use-cases/manage-exam-rooms/manage-exam-rooms.use-case.js'
 import { RoomAccessService } from '../../application/room-access.service.js'
-import { ExamRoomController } from './exam-room.controller.js'
+import {
+  ExamRoomController,
+  ExamRoomOverviewController,
+} from './exam-room.controller.js'
 import { ExamEventController } from './exam-event.controller.js'
+import { RoomAccessCodeService } from '../../application/room-access-code.service.js'
 import { AssignSeatsDto, ExamRoomSeatDto } from './dto/exam-room.dto.js'
 import { PrintPackDto, PrintPackQueryDto } from './dto/print-pack.dto.js'
 import { ResetCredentialsBodyDto } from './dto/reset-credentials.dto.js'
@@ -83,24 +87,47 @@ const roomAnyRoutes: Record<string, string[]> = {
   downloadRoomReportFile: [
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   ],
-  accessCode: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
+  accessCode: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
   rotateToken: ['exam-rooms.technician', 'exam-rooms.manage-all'],
-  auditLogs: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
-  seats: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
-  supervisors: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
+  auditLogs: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
+  seats: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
+  supervisors: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
   substitute: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   allowLateEntry: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   extendTime: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   roomMonitor: [
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   ],
   roomReport: [
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   ],
   saveRoomReport: [
@@ -121,20 +148,50 @@ const roomAnyRoutes: Record<string, string[]> = {
   submitRoomReport: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
 }
 
+const overviewAnyRoutes: Record<string, string[]> = {
+  list: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
+  roomReports: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
+}
+
 const eventRoutes: Record<string, string[]> = {
   create: ['exam-events.manage'],
   update: ['exam-events.manage'],
   createRoom: ['exam-events.manage'],
-  getPrintPack: ['exam-events.manage'],
   resetPasswords: ['exam-events.manage'],
   generateSeats: ['exam-events.manage'],
   generateSupervisorSlots: ['exam-events.manage'],
 }
 
 const eventAnyRoutes: Record<string, string[]> = {
-  list: ['exam-events.read', 'exam-rooms.supervise'],
-  findOne: ['exam-events.read', 'exam-rooms.supervise'],
-  roomsOfEvent: ['exam-events.read', 'exam-rooms.supervise'],
+  list: [
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+  ],
+  findOne: [
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+  ],
+  roomsOfEvent: [
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+  ],
+  getPrintPack: ['exam-events.manage', 'exam-events.read'],
 }
 
 function handlers(prototype: object): string[] {
@@ -169,6 +226,24 @@ describe('ExamRoomController permissions', () => {
   it('leaves no room route without a permission', () => {
     expect(handlers(ExamRoomController.prototype).sort()).toEqual(
       Object.keys(roomRoutes).sort(),
+    )
+  })
+
+  it.each(Object.entries(overviewAnyRoutes))(
+    'overview.%s accepts any of %j',
+    (method, codes) => {
+      const handler = ExamRoomOverviewController.prototype[
+        method as keyof ExamRoomOverviewController
+      ] as unknown as object
+
+      expect(Reflect.getMetadata(PERMISSIONS_ANY_KEY, handler)).toEqual(codes)
+      expect(Reflect.getMetadata(PERMISSIONS_KEY, handler)).toBeUndefined()
+    },
+  )
+
+  it('leaves no overview route without a permission', () => {
+    expect(handlers(ExamRoomOverviewController.prototype).sort()).toEqual(
+      Object.keys(overviewAnyRoutes).sort(),
     )
   })
 })
@@ -731,9 +806,10 @@ describe('ExamEventController supervised listing', () => {
   async function build() {
     const rooms = new FakeExamRoomRepository()
     const events = new ManageExamEventsUseCase(rooms)
+    const manageRooms = new ManageExamRoomsUseCase(rooms)
     const controller = new ExamEventController(
       events,
-      undefined as never,
+      manageRooms,
       undefined as never,
       undefined as never,
       undefined as never,
@@ -803,6 +879,113 @@ describe('ExamEventController supervised listing', () => {
     )
 
     expect(scoped.data.map((row) => row.id)).toEqual([mine.id])
+  })
+
+  it('scopes list, findOne, and roomsOfEvent to technician rooms while letting read-all see all', async () => {
+    const { controller, mine, other, rooms } = await build()
+    const techRoom = await rooms.createRoom({
+      eventId: mine.id,
+      code: 'R02',
+      name: 'Ruang Tech',
+      capacity: 30,
+      technicianUserId: 'tech-1',
+    })
+    const otherRoom = await rooms.createRoom({
+      eventId: other.id,
+      code: 'R03',
+      name: 'Ruang Lain',
+      capacity: 30,
+      technicianUserId: 'tech-2',
+    })
+    const techUser = { id: 'tech-1', permissions: ['exam-rooms.technician'] }
+    const readerUser = {
+      id: 'principal-1',
+      permissions: ['exam-rooms.read-all'],
+    }
+
+    const techList = await controller.list(techUser, { page: 1, limit: 10 })
+    expect(techList.data.map((row) => row.id)).toEqual([mine.id])
+
+    const readerList = await controller.list(readerUser, { page: 1, limit: 10 })
+    expect(readerList.data.map((row) => row.id)).toEqual([mine.id, other.id])
+
+    await expect(controller.findOne(techUser, mine.id)).resolves.toMatchObject({
+      id: mine.id,
+    })
+    await expect(controller.findOne(techUser, other.id)).rejects.toThrow()
+    await expect(
+      controller.findOne(readerUser, other.id),
+    ).resolves.toMatchObject({ id: other.id })
+
+    const techRooms = await controller.roomsOfEvent(techUser, mine.id)
+    expect(techRooms.map((row) => row.id)).toEqual([techRoom.id])
+    await expect(controller.roomsOfEvent(techUser, other.id)).rejects.toThrow()
+
+    const readerRooms = await controller.roomsOfEvent(readerUser, other.id)
+    expect(readerRooms.map((row) => row.id)).toEqual([otherRoom.id])
+  })
+})
+
+describe('ExamRoomController accessCode scoping', () => {
+  it('lets read-all and assigned technician read access-code while rejecting unassigned technician', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await rooms.createEvent({
+      semesterId: 'sem-1',
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: new Date('2026-11-02T01:00:00.000Z'),
+      endsAt: new Date('2026-11-02T04:00:00.000Z'),
+      createdById: 'admin-1',
+    })
+    const room = await rooms.createRoom({
+      eventId: event.id,
+      code: 'R01',
+      name: 'Ruang 01',
+      capacity: 30,
+      technicianUserId: 'tech-1',
+    })
+    const controller = new ExamRoomController(
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      new ManageExamRoomsUseCase(rooms),
+      new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
+      rooms,
+      new RoomAccessService(rooms),
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+      undefined as never,
+    )
+
+    await expect(
+      controller.accessCode(
+        { id: 'principal-1', permissions: ['exam-rooms.read-all'] },
+        room.id,
+      ),
+    ).resolves.toMatchObject({
+      accessCode: expect.stringMatching(/^[A-Z0-9]{6}$/),
+      rotation: 0,
+    })
+    await expect(
+      controller.accessCode(
+        { id: 'tech-1', permissions: ['exam-rooms.technician'] },
+        room.id,
+      ),
+    ).resolves.toMatchObject({
+      accessCode: expect.stringMatching(/^[A-Z0-9]{6}$/),
+      rotation: 0,
+    })
+    await expect(
+      controller.accessCode(
+        { id: 'tech-2', permissions: ['exam-rooms.technician'] },
+        room.id,
+      ),
+    ).rejects.toMatchObject({ response: { code: 'ROOM_FORBIDDEN' } })
   })
 })
 

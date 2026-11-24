@@ -1,5 +1,10 @@
 import type { RoomStaffUser } from '../../room-access.service.js'
-import { MANAGE_ALL, SUPERVISE, TECHNICIAN } from '../../room-access.service.js'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+} from '../../room-access.service.js'
 import {
   MONITOR_NOW,
   SUPERVISOR_ID,
@@ -95,5 +100,17 @@ describe('ListRoomsOverviewUseCase', () => {
         MONITOR_NOW,
       ),
     ).toHaveLength(2)
+  })
+
+  it('lists every active room for exam-rooms.read-all', async () => {
+    const { overview } = await build()
+
+    const rows = await overview.execute(
+      { id: 'principal-1', permissions: [READ_ALL] },
+      {},
+      MONITOR_NOW,
+    )
+
+    expect(rows.map((row) => row.code)).toEqual(['R01', 'R02'])
   })
 })

@@ -618,4 +618,26 @@ describe('FakeExamRoomRepository reports', () => {
     })
     expect(cleared?.incidentNotes).toBeNull()
   })
+
+  it('lists event ids for rooms staffed by a technician', async () => {
+    const { rooms, event: first } = await setup([1])
+    const second = await rooms.createEvent(event())
+    const techId = randomUUID()
+    await rooms.createRoom({
+      eventId: first.id,
+      code: 'R-TECH',
+      name: 'Ruang Tech',
+      capacity: 10,
+      technicianUserId: techId,
+    })
+    await rooms.createRoom({
+      eventId: second.id,
+      code: 'R-OTHER',
+      name: 'Ruang Other',
+      capacity: 10,
+      technicianUserId: randomUUID(),
+    })
+
+    expect(await rooms.listEventIdsByTechnician(techId)).toEqual([first.id])
+  })
 })

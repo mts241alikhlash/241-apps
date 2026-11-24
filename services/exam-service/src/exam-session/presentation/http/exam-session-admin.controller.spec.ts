@@ -41,8 +41,18 @@ const expected: Record<string, string[]> = {
 }
 
 const anyExpected: Record<string, string[]> = {
-  auditLogs: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
-  sessionTimeline: ['exam-rooms.supervise', 'exam-rooms.manage-all'],
+  auditLogs: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
+  sessionTimeline: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
   reopen: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   reset: ['exam-rooms.technician', 'exam-rooms.manage-all'],
   extendTime: ['exam-rooms.technician', 'exam-rooms.manage-all'],

@@ -9,11 +9,26 @@ import type { ExamSchedule } from '../domain/entities/exam-schedule.entity.js'
 export class MakeupScopeService {
   constructor(private readonly scope: GradingScopeService) {}
 
-  async assertAllowed(
+  async assertCanRead(
     user: GradingUser,
     schedule: ExamSchedule,
   ): Promise<void> {
-    const scope = await this.scope.forUser(user)
+    const scope = await this.scope.forRead(user)
+    await this.verify(scope, schedule)
+  }
+
+  async assertCanWrite(
+    user: GradingUser,
+    schedule: ExamSchedule,
+  ): Promise<void> {
+    const scope = await this.scope.forWrite(user)
+    await this.verify(scope, schedule)
+  }
+
+  private async verify(
+    scope: Awaited<ReturnType<GradingScopeService['forRead']>>,
+    schedule: ExamSchedule,
+  ): Promise<void> {
     const allowed = await scope.allows(
       schedule.subjectId,
       schedule.classroomId,

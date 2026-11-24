@@ -48,7 +48,7 @@ export class GetGradingSessionUseCase {
     const schedule = session
       ? await this.schedules.findById(session.scheduleId)
       : null
-    const scope = await this.scope.forUser(user)
+    const scope = await this.scope.forRead(user)
     if (
       session === null ||
       schedule === null ||

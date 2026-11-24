@@ -73,7 +73,12 @@ export class ExamSessionAdminController {
   }
 
   @Get('exam-sessions/:id/audit-logs')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The recovery actions taken on this session' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: [AuditLogDto] })
@@ -87,7 +92,12 @@ export class ExamSessionAdminController {
   }
 
   @Get('exam-sessions/:id/timeline')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({
     summary: 'The device events and recovery actions of one session, merged',
   })
