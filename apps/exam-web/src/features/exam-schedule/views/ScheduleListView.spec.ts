@@ -215,6 +215,8 @@ describe('ScheduleListView', () => {
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
 
+    expect(wrapper.text()).not.toContain('Cetak')
+
     await wrapper
       .findAll('button')
       .find((candidate) => candidate.text().includes('Tambah'))!

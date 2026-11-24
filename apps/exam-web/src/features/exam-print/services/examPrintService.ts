@@ -1,6 +1,7 @@
 import { examActivityApi } from '@/features/exam-activity/api/examActivityApi'
 import type { ExamActivityRecord } from '@/features/exam-activity/types'
 import { messageOf } from '@/features/exam-package/utils/messageOf'
+import { classroomApi } from '@/features/lookup/classroom'
 import { SCHEDULE_PAGE_LIMIT, examPrintApi } from '../api/examPrintApi'
 import type { PrintPack, PrintSchedule, ResetCredentials } from '../types'
 
@@ -74,6 +75,27 @@ export const examPrintService = {
       }
     } catch (err: unknown) {
       return failure(err, 'Jadwal ujian tidak dapat dimuat.')
+    }
+  },
+
+  async loadGradeClassrooms(): Promise<PrintOutcome<Map<string, string[]>>> {
+    try {
+      const page = await classroomApi.getClassrooms({ page: 1, limit: 200 })
+      const map = new Map<string, string[]>()
+      const append = (key: string | undefined, name: string) => {
+        if (!key) return
+        const held = map.get(key) ?? []
+        if (!held.includes(name)) held.push(name)
+        map.set(key, held)
+      }
+      for (const item of page.data) {
+        if (!item.name) continue
+        append(item.gradeId, item.name)
+        append(item.grade?.name, item.name)
+      }
+      return { success: true, data: map }
+    } catch (err: unknown) {
+      return failure(err, 'Data kelas tidak dapat dimuat.')
     }
   },
 

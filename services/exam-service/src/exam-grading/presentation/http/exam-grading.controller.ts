@@ -23,6 +23,7 @@ import { GetGradingSessionUseCase } from '../../application/use-cases/get-gradin
 import { GradeAnswerUseCase } from '../../application/use-cases/grade-answer/grade-answer.use-case.js'
 import { ListGradingSchedulesUseCase } from '../../application/use-cases/list-grading-schedules/list-grading-schedules.use-case.js'
 import { ListGradingSessionsUseCase } from '../../application/use-cases/list-grading-sessions/list-grading-sessions.use-case.js'
+import { ListScheduleGradingDetailsUseCase } from '../../application/use-cases/list-schedule-grading-details/list-schedule-grading-details.use-case.js'
 import {
   GradeAnswerDto,
   GradingScheduleQueryDto,
@@ -43,6 +44,7 @@ export class ExamGradingController {
   constructor(
     private readonly listSchedules: ListGradingSchedulesUseCase,
     private readonly listSessions: ListGradingSessionsUseCase,
+    private readonly listScheduleDetails: ListScheduleGradingDetailsUseCase,
     private readonly getSession: GetGradingSessionUseCase,
     private readonly gradeAnswer: GradeAnswerUseCase,
   ) {}
@@ -86,6 +88,22 @@ export class ExamGradingController {
         status: query.status,
       }),
     )
+  }
+
+  @Get('schedules/:scheduleId/sessions/details')
+  @RequirePermissions('exam-grading.read')
+  @ApiOperation({
+    summary:
+      'Finished sessions of one exam with answers and keys for batch printing',
+  })
+  @ApiParam({ name: 'scheduleId', format: 'uuid' })
+  @ApiResponse({ status: 200, type: [GradingSessionDetailDto] })
+  async scheduleSessionDetails(
+    @CurrentUser() user: GradingUser,
+    @Param('scheduleId', ParseUUIDPipe) scheduleId: string,
+  ): Promise<GradingSessionDetailDto[]> {
+    const details = await this.listScheduleDetails.execute(user, scheduleId)
+    return details.map((detail) => GradingSessionDetailDto.fromDomain(detail))
   }
 
   @Get('sessions/:sessionId')

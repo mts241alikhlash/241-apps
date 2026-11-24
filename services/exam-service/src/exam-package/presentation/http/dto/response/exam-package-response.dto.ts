@@ -1,17 +1,28 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import {
   QUESTION_TYPES,
   type QuestionType,
 } from '../../../../../question/domain/value-objects/question-content.js'
 import {
+  EssayContentDto,
+  MultipleChoiceContentDto,
+  MultipleResponseContentDto,
+  ShortAnswerContentDto,
+  TrueFalseContentDto,
+  type QuestionContentDto,
+} from '../../../../../question/presentation/http/dto/response/question-response.dto.js'
+import {
   EXAM_PACKAGE_STATUSES,
   type ExamPackage,
   type ExamPackageDetail,
+  type ExamPackagePrintView,
   type ExamPackageStatus,
   type ExamPackageSummary,
   type ExamPackageView,
+  type ItemResolution,
   type PackageItem,
   type PackageItemView,
+  type PackagePrintItem,
   type PackageQuestionNote,
   type PackageReview,
   type PackageReviewAction,
@@ -141,6 +152,58 @@ export class ExamPackageViewDto extends ExamPackageBaseDto {
     )
     dto.reviews = domain.reviews.map((review) =>
       PackageReviewDto.fromDomain(review),
+    )
+    return dto
+  }
+}
+
+@ApiExtraModels(
+  MultipleChoiceContentDto,
+  MultipleResponseContentDto,
+  TrueFalseContentDto,
+  ShortAnswerContentDto,
+  EssayContentDto,
+)
+export class ExamPackagePrintItemDto extends ExamPackageItemDto {
+  @ApiProperty({ enum: QUESTION_TYPES }) type!: QuestionType
+  @ApiProperty() bodyHtml!: string
+  @ApiProperty({
+    oneOf: [
+      { $ref: getSchemaPath(MultipleChoiceContentDto) },
+      { $ref: getSchemaPath(MultipleResponseContentDto) },
+      { $ref: getSchemaPath(TrueFalseContentDto) },
+      { $ref: getSchemaPath(ShortAnswerContentDto) },
+      { $ref: getSchemaPath(EssayContentDto) },
+    ],
+  })
+  content!: QuestionContentDto
+  @ApiProperty() points!: number
+  @ApiProperty({ enum: ['NORMAL', 'BONUS_ALL', 'KEY_OVERRIDE'] })
+  resolution!: ItemResolution
+
+  static fromDomain(domain: PackagePrintItem): ExamPackagePrintItemDto {
+    const dto = new ExamPackagePrintItemDto()
+    dto.questionId = domain.questionId
+    dto.questionVersion = domain.questionVersion
+    dto.position = domain.position
+    dto.type = domain.type
+    dto.bodyHtml = domain.bodyHtml
+    dto.content = domain.content
+    dto.points = domain.points
+    dto.resolution = domain.resolution
+    return dto
+  }
+}
+
+export class ExamPackagePrintDto extends ExamPackageBaseDto {
+  @ApiProperty({ type: () => [ExamPackagePrintItemDto] })
+  items!: ExamPackagePrintItemDto[]
+
+  static fromDomain(domain: ExamPackagePrintView): ExamPackagePrintDto {
+    const dto = new ExamPackagePrintDto()
+    dto.fill(domain)
+    dto.items = domain.items.map((item) =>
+      ExamPackagePrintItemDto.fromDomain(item),
     )
     return dto
   }

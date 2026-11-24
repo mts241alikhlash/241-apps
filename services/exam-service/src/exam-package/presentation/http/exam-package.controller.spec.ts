@@ -5,6 +5,7 @@ import { ExamPackageController } from './exam-package.controller.js'
 const expected: Record<string, string[]> = {
   findAll: ['exam-packages.read'],
   findOne: ['exam-packages.read'],
+  findPrint: ['exam-packages.read'],
   create: ['exam-packages.create'],
   rename: ['exam-packages.update'],
   remove: ['exam-packages.delete'],

@@ -20,6 +20,11 @@ export const examPackageApi = {
   getPackage: (id: string) =>
     unwrap(examClient.GET('/exam-packages/{id}', { params: { path: { id } } })),
 
+  getPackagePrint: (id: string) =>
+    unwrap(
+      examClient.GET('/exam-packages/{id}/print', { params: { path: { id } } }),
+    ),
+
   getPackageQuestion: (id: string, questionId: string) =>
     unwrap(
       examClient.GET('/exam-packages/{id}/questions/{questionId}', {

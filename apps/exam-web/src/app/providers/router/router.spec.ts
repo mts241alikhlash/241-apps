@@ -220,6 +220,8 @@ describe('menu', () => {
           ['/exam/print/student-attendance', 'exam-events.manage', undefined],
           ['/exam/print/staff-attendance', 'exam-events.manage', undefined],
           ['/exam/print/grading-sheet', 'exam-grading.read', undefined],
+          ['/exam/print/question-keys', 'exam-events.manage', undefined],
+          ['/exam/print/student-recap', 'exam-grading.read', undefined],
         ],
       ],
       [

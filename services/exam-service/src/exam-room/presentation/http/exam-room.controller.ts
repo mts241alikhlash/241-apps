@@ -531,7 +531,11 @@ export class ExamRoomController {
   }
 
   @Get('supervisors')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The supervisor slots of a room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
   @ApiResponse({ status: 200, type: [SupervisorSlotDto] })

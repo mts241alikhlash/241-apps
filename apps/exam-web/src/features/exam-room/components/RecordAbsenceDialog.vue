@@ -44,6 +44,10 @@ const studentName = computed(() => props.participant?.studentName ?? 'Siswa')
 async function submit() {
   const target = props.participant
   if (!target || busy.value) return
+  if (props.slotId === '') {
+    error.value = 'Slot pengawas ruangan belum tersedia.'
+    return
+  }
   busy.value = true
   error.value = null
   const result = await examRoomService.recordAbsence(

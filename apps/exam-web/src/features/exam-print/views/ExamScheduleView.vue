@@ -130,6 +130,7 @@ const dateOf = (iso: string): string =>
 
 const clock = (iso: string): string =>
   new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -154,7 +155,7 @@ async function printEventSchedules(event: ExamEvent) {
   }
   const items = printable(result.data)
   if (items.length === 0) {
-    toast.error('Belum ada jadwal pada periode ini.')
+    toast.info('Belum ada jadwal pada periode ini.')
     return
   }
   printEvent.value = event

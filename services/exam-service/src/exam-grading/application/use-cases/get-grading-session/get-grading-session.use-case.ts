@@ -9,25 +9,16 @@ import { IExamScheduleRepository } from '../../../../exam-schedule/domain/reposi
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
-import { toGradingItem, type GradingItem } from '../../grading-item.js'
+import {
+  toGradingSessionDetail,
+  type GradingSessionDetail,
+} from '../../grading-item.js'
 import {
   GradingScopeService,
   type GradingUser,
 } from '../../grading-scope.service.js'
 
-export interface GradingSessionDetail {
-  session: {
-    sessionId: string
-    scheduleId: string
-    studentId: string
-    studentName: string | null
-    studentNis: string | null
-    status: string
-    rawScore: number | null
-    maxScore: number | null
-  }
-  items: GradingItem[]
-}
+export type { GradingSessionDetail }
 
 @Injectable()
 export class GetGradingSessionUseCase {
@@ -74,32 +65,7 @@ export class GetGradingSessionUseCase {
       this.sessions.listAnswers(session.id),
       this.students.refsByIds([session.studentId]),
     ])
-    const answerOf = new Map(answers.map((row) => [row.questionId, row]))
 
-    const items: GradingItem[] = []
-    sources.forEach((source, index) => {
-      items.push(
-        toGradingItem(
-          source,
-          index + 1,
-          answerOf.get(source.questionId) ?? null,
-        ),
-      )
-    })
-
-    const ref = refs[0]
-    return {
-      session: {
-        sessionId: session.id,
-        scheduleId: session.scheduleId,
-        studentId: session.studentId,
-        studentName: ref?.name ?? null,
-        studentNis: ref?.nis ?? null,
-        status: session.status,
-        rawScore: session.rawScore,
-        maxScore: session.maxScore,
-      },
-      items,
-    }
+    return toGradingSessionDetail(session, sources, answers, refs[0] ?? null)
   }
 }

@@ -16,8 +16,16 @@ vi.mock('../services/examRoomService', () => ({
   abilitiesFor: () => ({ supervise: true, recover: true }),
 }))
 
+const routeState: {
+  params: { roomId: string }
+  query: Record<string, string>
+} = vi.hoisted(() => ({
+  params: { roomId: 'r1' },
+  query: { slot: 'slot1' },
+}))
+
 vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { roomId: 'r1' }, query: { slot: 'slot1' } }),
+  useRoute: () => routeState,
   useRouter: () => ({ push }),
 }))
 
@@ -90,7 +98,10 @@ const stubs = {
   FloatingLabelField: passthrough,
   RoomMonitorSummaryCards: passthrough,
   RoomReportTab: passthrough,
-  RecordAbsenceDialog: passthrough,
+  RecordAbsenceDialog: defineComponent({
+    props: { open: Boolean, roomId: String, slotId: String },
+    template: '<div data-testid="absence-dialog" :data-slot="slotId" />',
+  }),
   RecordFieldNoteDialog: passthrough,
   SessionRecoveryDialog: passthrough,
   SessionTimelineDialog: passthrough,
@@ -120,6 +131,7 @@ function mountView() {
 }
 
 beforeEach(() => {
+  routeState.query = { slot: 'slot1' }
   loadRoster.mockReset()
   loadReport.mockReset()
   loadReport.mockResolvedValue({ success: false, error: 'tidak ada' })
@@ -134,5 +146,25 @@ describe('RoomMonitorDetailView', () => {
     await flushPromises()
 
     expect(wrapper.text()).not.toContain('Kamera Pengawas')
+  })
+
+  it('resolves slotId from loadSupervisors for room staff when no slot query is set', async () => {
+    routeState.query = {}
+    loadSupervisors.mockResolvedValue([
+      {
+        slotId: 'slot-upcoming',
+        roomId: 'r1',
+        scheduledUserId: 'other',
+        actualUserId: 'other',
+        startsAt: '2099-01-01T01:30:00.000Z',
+        endsAt: '2099-01-01T02:45:00.000Z',
+      },
+    ])
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(
+      wrapper.get('[data-testid="absence-dialog"]').attributes('data-slot'),
+    ).toBe('slot-upcoming')
   })
 })

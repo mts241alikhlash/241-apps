@@ -31,11 +31,17 @@ const shownAnswer = (item: GradingItem): string =>
 </script>
 
 <template>
-  <div :class="stacked ? '' : 'print-stack space-y-6'">
+  <div
+    :class="
+      stacked
+        ? 'space-y-6 break-after-page last:break-after-auto'
+        : 'print-stack space-y-6'
+    "
+  >
     <section
       v-for="student in students"
       :key="student.key"
-      class="print-room"
+      class="print-room grading-sheet"
     >
       <div class="print-sheet space-y-1">
         <LetterheadKop />
@@ -307,6 +313,7 @@ const shownAnswer = (item: GradingItem): string =>
   display: flex;
   justify-content: flex-end;
   padding-top: 3mm;
+  break-inside: avoid;
 }
 
 .sheet-signature {

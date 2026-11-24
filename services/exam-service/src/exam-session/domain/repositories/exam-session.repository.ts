@@ -179,6 +179,9 @@ export abstract class IExamSessionRepository {
   ): Promise<Map<string, 'PENDING' | 'SENT'>>
   abstract countAnswers(sessionId: string): Promise<number>
   abstract listAnswers(sessionId: string): Promise<ExamAnswerRecord[]>
+  abstract listAnswersBySessionIds(
+    sessionIds: string[],
+  ): Promise<ExamAnswerRecord[]>
   abstract listByStudentAndSchedules(
     studentId: string,
     scheduleIds: string[],

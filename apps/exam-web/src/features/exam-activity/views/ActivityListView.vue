@@ -46,6 +46,7 @@ import {
 import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { examTypeLabel } from '@/features/exam-shared/examType'
+import { gradeNumberOf } from '@/features/exam-shared/classroomName'
 import { examActivityApi } from '../api/examActivityApi'
 import ActivityStatusDialog from '../components/ActivityStatusDialog.vue'
 import AttachPackageDialog from '../components/AttachPackageDialog.vue'
@@ -126,7 +127,7 @@ const dateOf = (iso: string): string => dateOnly.format(new Date(iso))
 const timeOf = (iso: string): string => timeOnly.format(new Date(iso))
 
 const gradeNumber = (name: string | null): number =>
-  Number(/(\d+)/.exec(name ?? '')?.[1] ?? Number.MAX_SAFE_INTEGER)
+  gradeNumberOf(name) ?? Number.MAX_SAFE_INTEGER
 
 const inScope = computed(() =>
   hierarchical.value

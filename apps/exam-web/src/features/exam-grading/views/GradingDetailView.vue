@@ -101,25 +101,13 @@ const filter = ref('ALL')
 const filterFieldId = useId()
 const openId = ref<string | null>(null)
 
-const TYPE_ORDER: GradingItem['type'][] = [
-  'MULTIPLE_CHOICE',
-  'MULTIPLE_RESPONSE',
-  'TRUE_FALSE',
-  'SHORT_ANSWER',
-  'ESSAY',
-]
-
 const shown = computed(() => {
   const items = detail.value?.items ?? []
   const rows =
     filter.value === 'WAITING'
       ? items.filter((item) => item.needsGrading)
       : items
-  return [...rows].sort(
-    (left, right) =>
-      TYPE_ORDER.indexOf(left.type) - TYPE_ORDER.indexOf(right.type) ||
-      left.number - right.number,
-  )
+  return [...rows].sort((left, right) => left.number - right.number)
 })
 const opened = computed(
   () =>

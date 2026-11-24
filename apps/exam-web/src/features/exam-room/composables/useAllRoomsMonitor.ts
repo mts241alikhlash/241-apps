@@ -1,4 +1,4 @@
-import { computed, onScopeDispose, ref } from 'vue'
+import { computed, onScopeDispose, ref, type Ref } from 'vue'
 import { examRoomService } from '../services/examRoomService'
 import type {
   RoomMonitorMeta,
@@ -26,7 +26,12 @@ export interface LiveRoom {
   failed: boolean
 }
 
-export function useAllRoomsMonitor() {
+export interface AllRoomsMonitorOptions {
+  eventId?: Ref<string>
+  slotByRoomTarget?: Ref<Map<string, string>>
+}
+
+export function useAllRoomsMonitor(options: AllRoomsMonitorOptions = {}) {
   const rooms = ref<LiveRoom[]>([])
   const notes = ref<LiveNote[]>([])
   const slotByRoom = ref(new Map<string, string>())
@@ -41,10 +46,12 @@ export function useAllRoomsMonitor() {
   let running = false
 
   async function loadRoom(room: RoomOverview): Promise<LiveRoom> {
+    const slotId = options.slotByRoomTarget?.value.get(room.id)
     try {
       const page = await examRoomService.loadMonitor(room.id, {
         page: 1,
         limit: MONITOR_ALL,
+        ...(slotId ? { slotId } : {}),
       })
       return { room, meta: page.meta, participants: page.data, failed: false }
     } catch {
@@ -56,13 +63,19 @@ export function useAllRoomsMonitor() {
     if (running) return
     running = true
     try {
-      const overview = await examRoomService.loadOverview()
+      const eventId = options.eventId?.value || undefined
+      const overview = await examRoomService.loadOverview(eventId)
       if (!overview.success) {
         error.value = overview.error
         return
       }
       error.value = null
-      const loaded = await Promise.all(overview.data.map(loadRoom))
+      const targets = options.slotByRoomTarget?.value
+      const scoped =
+        targets !== undefined && targets.size > 0
+          ? overview.data.filter((room) => targets.has(room.id))
+          : overview.data
+      const loaded = await Promise.all(scoped.map(loadRoom))
       rooms.value = loaded.sort((left, right) =>
         left.room.code.localeCompare(right.room.code, 'id', { numeric: true }),
       )
@@ -74,15 +87,19 @@ export function useAllRoomsMonitor() {
   }
 
   async function notesOf(room: RoomOverview): Promise<LiveNote[]> {
-    const slots = await examRoomService.loadSupervisors(room.id)
-    const now = Date.now()
-    const current = slots.find(
-      (slot) =>
-        Date.parse(slot.startsAt) <= now && Date.parse(slot.endsAt) > now,
-    )
-    if (current === undefined) return []
-    slotByRoom.value.set(room.id, current.slotId)
-    const report = await examRoomService.loadReport(room.id, current.slotId)
+    let targetSlotId = options.slotByRoomTarget?.value.get(room.id)
+    if (!targetSlotId) {
+      const slots = await examRoomService.loadSupervisors(room.id)
+      const now = Date.now()
+      const current = slots.find(
+        (slot) =>
+          Date.parse(slot.startsAt) <= now && Date.parse(slot.endsAt) > now,
+      )
+      targetSlotId = current?.slotId
+    }
+    if (!targetSlotId) return []
+    slotByRoom.value.set(room.id, targetSlotId)
+    const report = await examRoomService.loadReport(room.id, targetSlotId)
     if (!report.success) return []
     return report.data.fieldNotes.map((note) => ({
       id: `${room.id}-${note.id}`,
@@ -100,6 +117,8 @@ export function useAllRoomsMonitor() {
   }
 
   function start() {
+    stop()
+    loading.value = true
     void refresh().then(refreshNotes)
     notesTimer = setInterval(() => void refreshNotes(), NOTES_POLL_MS)
     pollTimer = setInterval(() => void refresh(), ALL_ROOMS_POLL_MS)

@@ -32,6 +32,7 @@ import { CopyExamPackageUseCase } from '../../application/use-cases/copy-exam-pa
 import { CreateDraftPackageUseCase } from '../../application/use-cases/create-draft-package/create-draft-package.use-case.js'
 import { DeleteExamPackageUseCase } from '../../application/use-cases/delete-exam-package/delete-exam-package.use-case.js'
 import { GetPackageQuestionUseCase } from '../../application/use-cases/get-package-question/get-package-question.use-case.js'
+import { GetPackagePrintUseCase } from '../../application/use-cases/get-package-print/get-package-print.use-case.js'
 import { GetExamPackageUseCase } from '../../application/use-cases/get-exam-package/get-exam-package.use-case.js'
 import { ListExamPackagesUseCase } from '../../application/use-cases/list-exam-packages/list-exam-packages.use-case.js'
 import { RemovePackageQuestionUseCase } from '../../application/use-cases/remove-package-question/remove-package-question.use-case.js'
@@ -55,6 +56,7 @@ import {
 import {
   ExamPackageDetailDto,
   ExamPackageListResponseDto,
+  ExamPackagePrintDto,
   ExamPackageViewDto,
 } from './dto/response/exam-package-response.dto.js'
 import {
@@ -72,6 +74,7 @@ export class ExamPackageController {
   constructor(
     private readonly listPackages: ListExamPackagesUseCase,
     private readonly getPackage: GetExamPackageUseCase,
+    private readonly getPackagePrint: GetPackagePrintUseCase,
     private readonly getPackageQuestion: GetPackageQuestionUseCase,
     private readonly createPackage: CreateDraftPackageUseCase,
     private readonly renamePackage: RenameExamPackageUseCase,
@@ -118,6 +121,26 @@ export class ExamPackageController {
   ): Promise<ExamPackageViewDto> {
     return ExamPackageViewDto.fromDomain(
       await this.getPackage.execute(id, {
+        id: user.id,
+        canSeeAll: user.permissions.includes(MANAGE_ALL),
+      }),
+    )
+  }
+
+  @Get(':id/print')
+  @RequirePermissions('exam-packages.read')
+  @ApiOperation({
+    summary:
+      'Get a package with full pinned questions and resolved keys for printing',
+  })
+  @ApiResponse({ status: 200, type: ExamPackagePrintDto })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  async findPrint(
+    @CurrentUser() user: ScopeUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ExamPackagePrintDto> {
+    return ExamPackagePrintDto.fromDomain(
+      await this.getPackagePrint.execute(id, {
         id: user.id,
         canSeeAll: user.permissions.includes(MANAGE_ALL),
       }),

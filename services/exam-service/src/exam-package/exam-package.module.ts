@@ -9,6 +9,7 @@ import { SubmitExamPackageUseCase } from './application/use-cases/submit-exam-pa
 import { ApproveExamPackageUseCase } from './application/use-cases/approve-exam-package/approve-exam-package.use-case.js'
 import { ReturnExamPackageUseCase } from './application/use-cases/return-exam-package/return-exam-package.use-case.js'
 import { GetPackageQuestionUseCase } from './application/use-cases/get-package-question/get-package-question.use-case.js'
+import { GetPackagePrintUseCase } from './application/use-cases/get-package-print/get-package-print.use-case.js'
 import { CopyExamPackageUseCase } from './application/use-cases/copy-exam-package/copy-exam-package.use-case.js'
 import { DeleteExamPackageUseCase } from './application/use-cases/delete-exam-package/delete-exam-package.use-case.js'
 import { GetExamPackageUseCase } from './application/use-cases/get-exam-package/get-exam-package.use-case.js'
@@ -36,6 +37,7 @@ import { ExamSessionModule } from '../exam-session/exam-session.module.js'
     GetPackageQuestionUseCase,
     RenameExamPackageUseCase,
     GetExamPackageUseCase,
+    GetPackagePrintUseCase,
     DeleteExamPackageUseCase,
     CopyExamPackageUseCase,
     AddPackageQuestionUseCase,

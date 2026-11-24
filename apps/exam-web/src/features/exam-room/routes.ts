@@ -8,6 +8,21 @@ const crumbs = (title: string, href: string) => [
 
 export const examRoomRoutes: RouteRecordRaw[] = [
   {
+    path: '/exam/rooms/period/:eventId/:dayId?/:subjectId?',
+    name: 'ExamRoomOverviewPeriod',
+    component: () => import('./views/RoomOverviewListView.vue'),
+    meta: {
+      title: 'Monitoring',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-rooms.supervise',
+        'exam-rooms.technician',
+        'exam-rooms.manage-all',
+      ],
+      breadcrumbs: crumbs('Monitoring', '/exam/rooms'),
+    },
+  },
+  {
     path: '/exam/rooms',
     name: 'ExamRoomOverview',
     component: () => import('./views/RoomOverviewListView.vue'),
@@ -23,7 +38,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/exam/monitoring',
+    path: '/exam/monitoring/:eventId?/:dayId?/:subjectId?',
     name: 'ExamRoomsLive',
     component: () => import('./views/RoomsLiveView.vue'),
     meta: {

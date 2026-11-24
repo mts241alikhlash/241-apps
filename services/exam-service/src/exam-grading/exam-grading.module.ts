@@ -12,6 +12,7 @@ import { GradeAnswerUseCase } from './application/use-cases/grade-answer/grade-a
 import { GetGradingSessionUseCase } from './application/use-cases/get-grading-session/get-grading-session.use-case.js'
 import { ListGradingSchedulesUseCase } from './application/use-cases/list-grading-schedules/list-grading-schedules.use-case.js'
 import { ListGradingSessionsUseCase } from './application/use-cases/list-grading-sessions/list-grading-sessions.use-case.js'
+import { ListScheduleGradingDetailsUseCase } from './application/use-cases/list-schedule-grading-details/list-schedule-grading-details.use-case.js'
 import { ExamGradingController } from './presentation/http/exam-grading.controller.js'
 
 @Module({
@@ -26,6 +27,7 @@ import { ExamGradingController } from './presentation/http/exam-grading.controll
     GradingScopeService,
     ListGradingSchedulesUseCase,
     ListGradingSessionsUseCase,
+    ListScheduleGradingDetailsUseCase,
     GetGradingSessionUseCase,
     GradeAnswerUseCase,
     PublishScoresUseCase,

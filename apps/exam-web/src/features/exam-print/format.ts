@@ -1,3 +1,5 @@
+import { gradeNumberOf } from '@/features/exam-shared/classroomName'
+
 const dateFormat = new Intl.DateTimeFormat('id-ID', {
   weekday: 'long',
   day: 'numeric',
@@ -26,6 +28,6 @@ export const formatEventPeriod = (startsAt: string) => {
 }
 
 export const gradeOf = (classroomName: string | null): string | null => {
-  const match = /(\d+)/.exec(classroomName ?? '')
-  return match === null ? null : match[1]
+  const grade = gradeNumberOf(classroomName)
+  return grade === null ? null : String(grade)
 }

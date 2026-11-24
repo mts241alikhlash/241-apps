@@ -1,33 +1,57 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import PrintDocumentView from './PrintDocumentView.vue'
 
-const { loadEvents, loadLetterhead, loadPack, loadActivitySchedules } =
-  vi.hoisted(() => ({
-    loadEvents: vi.fn(),
-    loadLetterhead: vi.fn(),
-    loadPack: vi.fn(),
-    loadActivitySchedules: vi.fn(),
-  }))
+const { loadEvents, loadPack, resetCredentials, push } = vi.hoisted(() => ({
+  loadEvents: vi.fn(),
+  loadPack: vi.fn(),
+  resetCredentials: vi.fn(),
+  push: vi.fn(),
+}))
 
+const routeState = reactive<{ params: Record<string, string> }>({
+  params: {},
+})
+
+vi.mock('vue-router', () => ({
+  useRoute: () => routeState,
+  useRouter: () => ({ push }),
+}))
+vi.mock('@mts241alikhlash/web-shared/composables/useBreadcrumbs', () => ({
+  useBreadcrumbs: vi.fn(),
+}))
+vi.mock('@/features/lookup/semester', () => ({
+  AcademicPeriodFilter: { template: '<div />' },
+}))
 vi.mock('@/features/exam-event/services/examEventService', () => ({
   examEventService: { loadEvents },
 }))
-vi.mock('@/features/exam-room/services/examRoomService', () => ({
-  examRoomService: { loadLetterhead },
-}))
 vi.mock('../services/examPrintService', () => ({
-  examPrintService: { loadPack, loadActivitySchedules },
+  examPrintService: { loadPack, resetCredentials },
 }))
 
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
+const DataTableStub = defineComponent({
+  props: {
+    data: { type: Array, required: true },
+  },
+  template:
+    '<div><div v-if="data.length === 0"><slot name="empty" /></div><div v-else data-testid="rows">{{ data.length }}</div></div>',
+})
+
 const stubs = {
+  Badge: passthrough,
   Card: passthrough,
   CardHeader: passthrough,
   CardTitle: passthrough,
   CardContent: passthrough,
+  CardFooter: passthrough,
+  BackButton: passthrough,
+  SearchInput: passthrough,
+  ServiceUnavailable: passthrough,
+  DataTableEmpty: passthrough,
   FloatingLabelField: passthrough,
   Select: passthrough,
   SelectContent: passthrough,
@@ -35,10 +59,14 @@ const stubs = {
   SelectTrigger: passthrough,
   SelectValue: passthrough,
   Button: passthrough,
-  Tooltip: passthrough,
-  TooltipProvider: passthrough,
-  TooltipTrigger: passthrough,
-  TooltipContent: passthrough,
+  Dialog: passthrough,
+  DialogBody: passthrough,
+  DialogContent: passthrough,
+  DialogDescription: passthrough,
+  DialogFooter: passthrough,
+  DialogHeader: passthrough,
+  DialogTitle: passthrough,
+  DataTable: DataTableStub,
 }
 
 const student = (n: number) => ({
@@ -82,55 +110,65 @@ const pack = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  for (const key of Object.keys(routeState.params)) {
+    delete routeState.params[key]
+  }
   loadEvents.mockResolvedValue({
     success: true,
-    data: [{ id: 'e1', name: 'UAS', status: 'ACTIVE' }],
+    data: [
+      {
+        id: 'e1',
+        name: 'UAS',
+        type: 'FINAL',
+        status: 'ACTIVE',
+        semesterId: 'sem-1',
+        startsAt: '2026-11-23T00:00:00.000Z',
+        endsAt: '2026-12-05T00:00:00.000Z',
+      },
+    ],
   })
-  loadLetterhead.mockResolvedValue({ name: 'MTs Persis 241' })
   loadPack.mockResolvedValue({ success: true, data: pack })
-  loadActivitySchedules.mockResolvedValue({ success: true, data: [] })
 })
 
-const mountView = (doc: string) =>
+const mountView = (doc: 'cards' | 'desks') =>
   mount(PrintDocumentView, {
-    props: { doc: doc as 'cards' },
+    props: { doc },
     global: { stubs },
   })
 
 describe('PrintDocumentView', () => {
-  it('prints one section per room for the participant cards', async () => {
+  it('shows exam event periods at level 1 before loading print pack', async () => {
     const wrapper = mountView('cards')
     await flushPromises()
+    expect(loadEvents).toHaveBeenCalled()
+    expect(loadPack).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="rows"]').text()).toBe('1')
+    expect(wrapper.findAll('.print-room')).toHaveLength(0)
+  })
+
+  it('shows rooms and printable sheets when an event is selected', async () => {
+    routeState.params.eventId = 'e1'
+    const wrapper = mountView('cards')
+    await flushPromises()
+    expect(loadPack).toHaveBeenCalledWith('e1')
+    expect(wrapper.find('[data-testid="rows"]').text()).toBe('2')
     expect(wrapper.findAll('.print-room')).toHaveLength(2)
     expect(wrapper.text()).toContain('P1')
     expect(wrapper.text()).toContain('1 siswa belum bernomor peserta')
   })
 
-  it('loads schedules for the schedule document', async () => {
-    loadActivitySchedules.mockResolvedValue({
-      success: true,
-      data: [
-        {
-          id: 's1',
-          startsAt: '2026-11-23T01:00:00.000Z',
-          endsAt: '2026-11-23T02:00:00.000Z',
-          classroomName: '7A',
-          packageTitle: 'Matematika',
-        },
-      ],
-    })
-    const wrapper = mountView('schedule')
+  it('scopes printable rooms and table to the selected room at level 3', async () => {
+    routeState.params.eventId = 'e1'
+    routeState.params.roomId = 'r1'
+    const wrapper = mountView('desks')
     await flushPromises()
-    expect(loadActivitySchedules).toHaveBeenCalledWith({
-      id: 'e1',
-      name: 'UAS',
-      startsAt: '2026-11-23T00:00:00.000Z',
-      endsAt: '2026-12-05T00:00:00.000Z',
-    })
-    expect(wrapper.text()).toContain('Matematika')
+    expect(wrapper.findAll('.print-room')).toHaveLength(1)
+    expect(wrapper.text()).toContain('P1')
+    expect(wrapper.text()).toContain('P2')
   })
 
-  it('shows the load error and no document', async () => {
+  it('shows the load error and no document when pack fails', async () => {
+    routeState.params.eventId = 'e1'
     loadPack.mockResolvedValue({ success: false, error: 'Gagal' })
     const wrapper = mountView('cards')
     await flushPromises()

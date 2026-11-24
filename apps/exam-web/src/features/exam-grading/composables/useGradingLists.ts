@@ -147,8 +147,7 @@ export function useEventGradingSchedules(
 
 const SESSION_LIMIT = 100
 
-export const compareClassroom = (left: string | null, right: string | null) =>
-  (left ?? '').localeCompare(right ?? '', 'id', { numeric: true })
+export { compareClassroom } from '@/features/exam-shared/classroomName'
 
 export function useSortedGradingSessions(
   scheduleId: Ref<string>,

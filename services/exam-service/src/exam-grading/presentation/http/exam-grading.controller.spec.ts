@@ -5,6 +5,7 @@ import { ExamGradingController } from './exam-grading.controller.js'
 const expected: Record<string, string[]> = {
   schedules: ['exam-grading.read'],
   sessions: ['exam-grading.read'],
+  scheduleSessionDetails: ['exam-grading.read'],
   session: ['exam-grading.read'],
   grade: ['exam-grading.grade'],
 }

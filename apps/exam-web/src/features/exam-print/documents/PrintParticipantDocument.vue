@@ -13,28 +13,27 @@ import {
 } from '@mts241alikhlash/ui/dialog'
 import ExamCard from '@/features/exam-room/components/ExamCard.vue'
 import ExamSeatCard from '@/features/exam-room/components/ExamSeatCard.vue'
-import PrintFilters from '../components/PrintFilters.vue'
 import {
   buildPrintParticipantColumns,
   type PrintParticipantRow,
 } from '../components/printParticipantColumns'
-import type { PrintPack, PrintPackRoom } from '../types'
+import type { PrintPackRoom } from '../types'
 
-const props = defineProps<{
-  kind: 'card' | 'seat'
-  event: PrintPack['event']
-  rooms: PrintPackRoom[]
-  events: { id: string; name: string }[]
-  eventId: string
-  roomId: string
-  roomOptions: { id: string; label: string }[]
-  showRoomFilter: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    kind: 'card' | 'seat'
+    rooms: PrintPackRoom[]
+    tableRooms?: PrintPackRoom[]
+    showTable?: boolean
+  }>(),
+  {
+    tableRooms: undefined,
+    showTable: true,
+  },
+)
 
 const emit = defineEmits<{
   printOne: [studentId: string]
-  'update:eventId': [value: string]
-  'update:roomId': [value: string]
 }>()
 
 defineOptions({ inheritAttrs: false })
@@ -69,7 +68,7 @@ const previewOpen = ref(false)
 const unit = computed(() => (props.kind === 'card' ? 'peserta' : 'meja'))
 
 const rows = computed<PrintParticipantRow[]>(() =>
-  props.rooms.flatMap((room) =>
+  (props.tableRooms ?? props.rooms).flatMap((room) =>
     room.students.map((student) => ({
       studentId: student.studentId,
       seatNumber: student.seatNumber,
@@ -138,7 +137,7 @@ const seatProps = computed(() =>
       },
 )
 
-watch(search, () => {
+watch([search, () => props.tableRooms], () => {
   page.value = 1
 })
 
@@ -161,6 +160,7 @@ function printOne() {
 <template>
   <div class="print-body space-y-4">
     <DataTable
+      v-if="showTable"
       class="print:hidden"
       mobile="cards"
       :columns="columns"
@@ -172,17 +172,6 @@ function printOne() {
       @update:page="page = $event"
       @update:page-size="changePageSize"
     >
-      <template #filters>
-        <PrintFilters
-          :events="events"
-          :event-id="eventId"
-          :rooms="roomOptions"
-          :room-id="roomId"
-          :show-room-filter="showRoomFilter"
-          @update:event-id="(value) => emit('update:eventId', value)"
-          @update:room-id="(value) => emit('update:roomId', value)"
-        />
-      </template>
       <template #header-right>
         <SearchInput
           v-model="search"
@@ -202,7 +191,7 @@ function printOne() {
           :message="
             search
               ? 'Tidak ada peserta yang cocok dengan pencarian.'
-              : `Belum ada ${unit} pada periode ini.`
+              : `Belum ada ${unit} pada ruangan ini.`
           "
         />
       </template>

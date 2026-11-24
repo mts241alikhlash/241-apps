@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, h, nextTick, ref } from 'vue'
+import { computed, h, nextTick, ref, useId, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import {
   ActionCell,
+  BackButton,
   DataTable,
+  DataTableEmpty,
   SearchInput,
   ServiceUnavailable,
-  DataTableEmpty,
 } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -33,17 +35,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import type { AcceptableValue } from '@mts241alikhlash/ui/select'
 import { Printer } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { isOutageMessage } from '@mts241alikhlash/web-shared/utils/service-error'
-import { usePrintPack } from '../composables/usePrintPack'
+import { examEventService } from '@/features/exam-event/services/examEventService'
+import {
+  EVENT_STATUSES,
+  eventStatusLabel,
+  type ExamEvent,
+} from '@/features/exam-event/types'
 import { examRoomService } from '@/features/exam-room/services/examRoomService'
 import type { RoomReportSummary } from '@/features/exam-room/types'
+import { examTypeLabel } from '@/features/exam-schedule/types'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
+import { buildPrintEventColumns } from '../components/printEventColumns'
+import StaffAttendanceSheet from '../documents/StaffAttendanceSheet.vue'
 import { formatPrintDate, formatPrintRange } from '../format'
 import { waitForPrintImages } from '../printImages'
-import StaffAttendanceSheet from '../documents/StaffAttendanceSheet.vue'
-import type { PrintPackRoom } from '../types'
+import { examPrintService } from '../services/examPrintService'
+import type { PrintPack, PrintPackRoom } from '../types'
 
 interface DayEntry {
   id: string
@@ -52,32 +63,83 @@ interface DayEntry {
   supervisorCount: number
 }
 
-const state = usePrintPack({ withSchedules: true })
-const eventFieldId = 'staff-attendance-event'
+interface BuiltStaffSheet {
+  key: string
+  date: string
+  supervisors: {
+    key: string
+    name: string | null
+    roomName: string
+    subject: string
+    time: string
+    startsAt: string
+  }[]
+  technicians: {
+    key: string
+    name: string | null
+    roomName: string
+    time: string
+  }[]
+}
+
+type Row = ExamEvent | DayEntry
+
+const route = useRoute()
+const router = useRouter()
+const statusFieldId = useId()
+
+const events = ref<ExamEvent[]>([])
+const eventsLoaded = ref(false)
+const pack = ref<PrintPack | null>(null)
+const dataLoaded = ref(false)
+const dataForEvent = ref<string | null>(null)
+const loadingEvents = ref(false)
+const loadingData = ref(false)
+const error = ref<string | null>(null)
+
+const semesterId = ref('')
+const status = ref('ALL')
 const search = ref('')
 const page = ref(1)
 const pageSize = ref(25)
-
-function changePageSize(size: number) {
-  pageSize.value = size
-  page.value = 1
-}
 const previewOpen = ref(false)
 const previewDay = ref<DayEntry | null>(null)
 const reports = ref<RoomReportSummary[]>([])
+const stackSheets = ref<BuiltStaffSheet[]>([])
+const printingAll = ref(false)
+
+const loading = computed(() => loadingEvents.value || loadingData.value)
+
+const eventId = computed(() => {
+  const value = route.params.eventId
+  const raw = Array.isArray(value) ? value[0] : value
+  return typeof raw === 'string' && raw !== '' ? raw : null
+})
+
+const activeEvent = computed(
+  () => events.value.find((event) => event.id === eventId.value) ?? null,
+)
+
+const hasEventData = computed(
+  () =>
+    dataForEvent.value !== null && dataForEvent.value === activeEvent.value?.id,
+)
 
 const dayKeyOf = (iso: string): string =>
   new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   }).format(new Date(iso))
 
-const dayLabelOf = (iso: string): string =>
-  new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(iso))
+const dateOf = (iso: string): string =>
+  new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    dateStyle: 'long',
+  }).format(new Date(iso))
 
-const days = computed<DayEntry[]>(() => {
-  const rooms = state.pack.value?.rooms ?? []
+function daysOfRooms(rooms: PrintPackRoom[]): DayEntry[] {
   const map = new Map<string, DayEntry>()
   for (const room of rooms) {
     const keys = new Set(
@@ -107,14 +169,18 @@ const days = computed<DayEntry[]>(() => {
     )
   }
   return [...map.values()].sort((a, b) => a.id.localeCompare(b.id))
-})
+}
+
+const days = computed<DayEntry[]>(() =>
+  hasEventData.value ? daysOfRooms(pack.value?.rooms ?? []) : [],
+)
 
 const filteredDays = computed(() => {
   const keyword = search.value.trim().toLocaleLowerCase('id')
   if (keyword === '') return days.value
   return days.value.filter((day) =>
     [
-      dayLabelOf(day.startsAt),
+      dateOf(day.startsAt),
       ...day.rooms.map((room) => room.name),
       ...day.rooms.flatMap((room) =>
         room.supervisors.map((slot) => slot.name ?? ''),
@@ -123,11 +189,58 @@ const filteredDays = computed(() => {
   )
 })
 
-function sheetOf(day: DayEntry) {
+function matchesEvent(text: string): boolean {
+  const needle = search.value.trim().toLowerCase()
+  return needle === '' || text.toLowerCase().includes(needle)
+}
+
+const levelRows = computed<Row[]>(() => {
+  if (!activeEvent.value) {
+    return events.value.filter(
+      (event) =>
+        (!semesterId.value || event.semesterId === semesterId.value) &&
+        (status.value === 'ALL' || event.status === status.value) &&
+        (matchesEvent(event.name) ||
+          matchesEvent(examTypeLabel(event.type)) ||
+          matchesEvent(eventStatusLabel(event.status))),
+    )
+  }
+  return filteredDays.value
+})
+
+const paginatedRows = computed(() => {
+  if (activeEvent.value) return levelRows.value
+  const start = (page.value - 1) * pageSize.value
+  return levelRows.value.slice(start, start + pageSize.value)
+})
+
+const pageTitle = computed(() =>
+  activeEvent.value
+    ? activeEvent.value.name
+    : 'Daftar Hadir Pengawas dan Teknisi',
+)
+
+const itemLabel = computed(() => (activeEvent.value ? 'hari' : 'periode'))
+
+const searchLabel = computed(() =>
+  activeEvent.value ? 'Cari hari, ruangan, atau pengawas' : 'Cari periode',
+)
+
+function goTo(nextEventId: string | null) {
+  void router.push({
+    name: 'ExamPrintStaffAttendance',
+    params: nextEventId === null ? {} : { eventId: nextEventId },
+  })
+}
+
+function sheetOf(
+  day: DayEntry,
+  reportRows: RoomReportSummary[] = reports.value,
+): BuiltStaffSheet {
   const ownRooms = new Set(day.rooms.map((room) => room.id))
   const rows = [
     ...new Map(
-      reports.value
+      reportRows
         .filter(
           (row) =>
             ownRooms.has(row.roomId) && dayKeyOf(row.startsAt) === day.id,
@@ -193,8 +306,6 @@ const daySheet = computed(() =>
   previewDay.value === null ? null : sheetOf(previewDay.value),
 )
 
-const stackDays = ref<DayEntry[]>([])
-const stackSheets = computed(() => stackDays.value.map(sheetOf))
 const printList = computed(() =>
   stackSheets.value.length > 0
     ? stackSheets.value
@@ -202,31 +313,112 @@ const printList = computed(() =>
       ? []
       : [daySheet.value],
 )
-const printingAll = ref(false)
+
+async function loadEvents() {
+  loadingEvents.value = true
+  error.value = null
+  try {
+    const result = await examEventService.loadEvents({ limit: 200 })
+    if (!result.success) {
+      error.value = result.error
+      return
+    }
+    events.value = result.data
+    eventsLoaded.value = true
+  } finally {
+    loadingEvents.value = false
+  }
+}
+
+async function loadEventData(targetEventId: string | null) {
+  if (targetEventId === null) {
+    pack.value = null
+    reports.value = []
+    dataLoaded.value = false
+    dataForEvent.value = null
+    loadingData.value = false
+    return
+  }
+  loadingData.value = true
+  error.value = null
+  dataLoaded.value = false
+  dataForEvent.value = null
+  reports.value = []
+  try {
+    const result = await examPrintService.loadPack(targetEventId)
+    if (eventId.value !== targetEventId) return
+    if (!result.success) {
+      error.value = result.error
+      pack.value = null
+      return
+    }
+    pack.value = result.data
+    dataForEvent.value = targetEventId
+    dataLoaded.value = true
+  } finally {
+    if (eventId.value === targetEventId) loadingData.value = false
+  }
+}
+
+function reloadCurrent() {
+  if (!eventsLoaded.value) void loadEvents()
+  if (eventId.value !== null) void loadEventData(eventId.value)
+}
+
+async function loadReports(
+  targetEventId: string | null = activeEvent.value?.id ?? null,
+) {
+  if (!targetEventId) {
+    reports.value = []
+    return []
+  }
+  const result = await examRoomService.loadReports(targetEventId)
+  const loaded = result.success ? result.data : []
+  if (targetEventId === activeEvent.value?.id) reports.value = loaded
+  return loaded
+}
 
 async function printAll() {
   if (printingAll.value || filteredDays.value.length === 0) return
   printingAll.value = true
   try {
-    stackDays.value = filteredDays.value
-    await loadReports()
+    const loaded = await loadReports()
+    stackSheets.value = filteredDays.value.map((day) => sheetOf(day, loaded))
     await nextTick()
     await waitForPrintImages()
     printSheets()
   } finally {
-    stackDays.value = []
+    stackSheets.value = []
     printingAll.value = false
   }
 }
 
-async function loadReports() {
-  const eventId = state.eventId.value
-  if (eventId === '') {
-    reports.value = []
-    return
+async function printEvent(event: ExamEvent) {
+  if (printingAll.value) return
+  printingAll.value = true
+  try {
+    const packResult =
+      dataForEvent.value === event.id && pack.value !== null
+        ? { success: true as const, data: pack.value }
+        : await examPrintService.loadPack(event.id)
+    if (!packResult.success) {
+      toast.error(packResult.error)
+      return
+    }
+    const eventDays = daysOfRooms(packResult.data.rooms)
+    if (eventDays.length === 0) {
+      toast.info('Belum ada jadwal pengawas pada periode ini.')
+      return
+    }
+    const loaded = await loadReports(event.id)
+    stackSheets.value = eventDays.map((day) => sheetOf(day, loaded))
+    await nextTick()
+    await waitForPrintImages()
+    printSheets()
+  } finally {
+    stackSheets.value = []
+    printingAll.value = false
   }
-  const result = await examRoomService.loadReports(eventId)
-  reports.value = result.success ? result.data : []
 }
 
 function openPreview(day: DayEntry) {
@@ -235,9 +427,24 @@ function openPreview(day: DayEntry) {
   void loadReports()
 }
 
-const paginatedDays = computed(() => {
-  const start = (page.value - 1) * pageSize.value
-  return filteredDays.value.slice(start, start + pageSize.value)
+async function printDay(day: DayEntry) {
+  previewDay.value = day
+  await loadReports()
+  await nextTick()
+  await waitForPrintImages()
+  printSheets()
+}
+
+function printSheets() {
+  document.body.classList.add('printing-stack')
+  window.print()
+  document.body.classList.remove('printing-stack')
+}
+
+const eventColumns = buildPrintEventColumns({
+  formatDate: dateOf,
+  onView: (event) => goTo(event.id),
+  onPrint: (event) => void printEvent(event),
 })
 
 const dayColumns: ColumnDef<DayEntry>[] = [
@@ -246,9 +453,9 @@ const dayColumns: ColumnDef<DayEntry>[] = [
     header: 'Tanggal',
     meta: {
       mobile: 'title',
-      mobileValue: (row: DayEntry) => dayLabelOf(row.startsAt),
+      mobileValue: (row: DayEntry) => dateOf(row.startsAt),
     },
-    cell: ({ row }) => dayLabelOf(row.original.startsAt),
+    cell: ({ row }) => dateOf(row.original.startsAt),
   },
   {
     id: 'rooms',
@@ -290,35 +497,62 @@ const dayColumns: ColumnDef<DayEntry>[] = [
   },
 ]
 
-async function printDay(day: DayEntry) {
-  previewDay.value = day
-  await loadReports()
-  await nextTick()
-  await waitForPrintImages()
-  printSheets()
-}
+const columns = computed(() =>
+  activeEvent.value
+    ? (dayColumns as unknown as ColumnDef<Row>[])
+    : (eventColumns as unknown as ColumnDef<Row>[]),
+)
 
-function printSheets() {
-  document.body.classList.add('printing-stack')
-  window.print()
-  document.body.classList.remove('printing-stack')
-}
+watch(
+  eventId,
+  (next) => {
+    void loadEventData(next)
+  },
+  { immediate: true },
+)
 
-async function changeEvent(value: AcceptableValue) {
-  if (typeof value !== 'string' || value === '') return
+watch(
+  [search, semesterId, status],
+  () => {
+    page.value = 1
+  },
+  { flush: 'sync' },
+)
+
+watch(eventId, () => {
+  search.value = ''
+  page.value = 1
   previewOpen.value = false
   previewDay.value = null
-  reports.value = []
-  await state.changeEvent(value)
+})
+
+watch([loading, eventsLoaded, activeEvent], () => {
+  if (loading.value) return
+  if (
+    eventId.value !== null &&
+    eventsLoaded.value &&
+    activeEvent.value === null
+  ) {
+    goTo(null)
+  }
+})
+
+function changePageSize(size: number) {
+  pageSize.value = size
+  page.value = 1
 }
 
 useBreadcrumbs(() => [
   { title: 'Ujian', href: '#' },
+  { title: 'Cetak Dokumen', href: '#' },
   {
     title: 'Daftar Hadir Pengawas dan Teknisi',
-    href: '/exam/print/staff-attendance',
+    href: activeEvent.value ? '/exam/print/staff-attendance' : '#',
   },
+  ...(activeEvent.value ? [{ title: activeEvent.value.name, href: '#' }] : []),
 ])
+
+void loadEvents()
 </script>
 
 <template>
@@ -328,14 +562,20 @@ useBreadcrumbs(() => [
       class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle class="font-semibold">
-          Daftar Hadir Pengawas dan Teknisi
-        </CardTitle>
+        <div class="flex min-w-0 items-center gap-3">
+          <BackButton
+            v-if="activeEvent"
+            label="Kembali ke daftar periode"
+            @click="goTo(null)"
+          />
+          <CardTitle class="font-semibold">
+            {{ pageTitle }}
+          </CardTitle>
+        </div>
         <Button
+          v-if="activeEvent"
           class="shrink-0"
-          :disabled="
-            state.loading.value || filteredDays.length === 0 || printingAll
-          "
+          :disabled="loading || filteredDays.length === 0 || printingAll"
           @click="printAll"
         >
           <Printer class="size-4" />
@@ -346,22 +586,22 @@ useBreadcrumbs(() => [
         class="flex min-h-0 flex-1 flex-col overflow-auto pt-2 px-4 pb-4"
       >
         <ServiceUnavailable
-          v-if="state.error.value && isOutageMessage(state.error.value)"
+          v-if="error && isOutageMessage(error)"
           class="mx-4"
           subject="Daftar hadir pengawas"
-          :message="state.error.value"
-          :retry="state.loadPack"
-          :is-retrying="state.loading.value"
+          :message="error"
+          :retry="reloadCurrent"
+          :is-retrying="loading"
         />
         <div
-          v-else-if="state.error.value"
+          v-else-if="error"
           class="m-4 space-y-3 rounded-md border p-4"
           role="alert"
         >
-          <p class="text-control">{{ state.error.value }}</p>
+          <p class="text-control">{{ error }}</p>
           <Button
             variant="outline"
-            @click="state.loadPack"
+            @click="reloadCurrent"
           >
             Coba lagi
           </Button>
@@ -369,40 +609,43 @@ useBreadcrumbs(() => [
         <template v-else>
           <DataTable
             mobile="cards"
-            :columns="dayColumns"
-            :data="paginatedDays"
+            :columns="columns"
+            :data="paginatedRows"
             :page="page"
             :page-size="pageSize"
-            :total-items="filteredDays.length"
-            :is-loading="state.loading.value"
-            item-label="hari"
+            :total-items="levelRows.length"
+            :is-loading="loading"
+            :item-label="itemLabel"
+            :hide-pagination="activeEvent !== null"
             @update:page="page = $event"
             @update:page-size="changePageSize"
           >
-            <template #filters>
+            <template
+              v-if="!activeEvent"
+              #filters
+            >
+              <AcademicPeriodFilter v-model:semester-id="semesterId" />
               <FloatingLabelField
-                label="Periode Ujian"
-                :for="eventFieldId"
-                class="w-fit min-w-40"
+                label="Status"
+                :for="statusFieldId"
+                class="w-fit min-w-32"
                 floating
               >
-                <Select
-                  :model-value="state.eventId.value"
-                  @update:model-value="changeEvent"
-                >
+                <Select v-model="status">
                   <SelectTrigger
-                    :id="eventFieldId"
+                    :id="statusFieldId"
                     class="w-full"
                   >
-                    <SelectValue placeholder="Pilih periode" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="ALL">Semua</SelectItem>
                     <SelectItem
-                      v-for="event in state.events.value"
-                      :key="event.id"
-                      :value="event.id"
+                      v-for="option in EVENT_STATUSES"
+                      :key="option"
+                      :value="option"
                     >
-                      {{ event.name }}
+                      {{ eventStatusLabel(option) }}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -412,13 +655,13 @@ useBreadcrumbs(() => [
               <SearchInput
                 v-model="search"
                 class="sm:w-40"
-                label="Cari hari, ruangan, atau pengawas"
+                :label="searchLabel"
               />
             </template>
             <template #mobile-toolbar>
               <SearchInput
                 v-model="search"
-                label="Cari hari, ruangan, atau pengawas"
+                :label="searchLabel"
                 class="w-full"
               />
             </template>
@@ -426,8 +669,10 @@ useBreadcrumbs(() => [
               <DataTableEmpty
                 :message="
                   search
-                    ? 'Tidak ada hari yang cocok dengan pencarian.'
-                    : 'Belum ada jadwal pengawas pada periode ini.'
+                    ? 'Tidak ada data yang cocok dengan pencarian.'
+                    : activeEvent
+                      ? 'Belum ada jadwal pengawas pada periode ini.'
+                      : 'Belum ada periode ujian.'
                 "
               />
             </template>

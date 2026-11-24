@@ -12,9 +12,9 @@ const documentRoutes: RouteRecordRaw[] = PRINT_DOCUMENT_KEYS.filter(
   (doc) => doc !== 'schedule',
 ).map((doc) => {
   const { title } = PRINT_DOCUMENTS[doc]
-  const path = `/exam/print/${doc}`
+  const basePath = `/exam/print/${doc}`
   return {
-    path,
+    path: `${basePath}/:eventId?/:roomId?`,
     name: `ExamPrint-${doc}`,
     component: () => import('./views/PrintDocumentView.vue'),
     props: { doc },
@@ -22,14 +22,14 @@ const documentRoutes: RouteRecordRaw[] = PRINT_DOCUMENT_KEYS.filter(
       title,
       requiresAuth: true,
       requiredAnyPermission: ['exam-events.manage'],
-      breadcrumbs: crumbs(title, path),
+      breadcrumbs: crumbs(title, basePath),
     },
   }
 })
 
 export const examPrintRoutes: RouteRecordRaw[] = [
   {
-    path: '/exam/print/student-attendance/:dayId?/:subjectId?',
+    path: '/exam/print/student-attendance/:eventId?/:dayId?/:subjectId?',
     name: 'ExamPrintStudentAttendance',
     component: () => import('./views/StudentAttendanceView.vue'),
     meta: {
@@ -43,7 +43,7 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/exam/print/grading-sheet/:dayId?/:subjectId?/:classId?',
+    path: '/exam/print/grading-sheet/:eventId?/:dayId?/:subjectId?/:classId?',
     name: 'ExamPrintGradingSheet',
     component: () => import('./views/GradingSheetView.vue'),
     meta: {
@@ -76,7 +76,7 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/exam/print/staff-attendance',
+    path: '/exam/print/staff-attendance/:eventId?',
     name: 'ExamPrintStaffAttendance',
     component: () => import('./views/StaffAttendanceView.vue'),
     meta: {
@@ -98,6 +98,28 @@ export const examPrintRoutes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiredAnyPermission: ['exam-events.manage'],
       breadcrumbs: crumbs('Jadwal Ujian', '/exam/print/schedule'),
+    },
+  },
+  {
+    path: '/exam/print/question-keys/:eventId?/:subjectId?',
+    name: 'ExamPrintQuestionKeys',
+    component: () => import('./views/QuestionKeySheetView.vue'),
+    meta: {
+      title: 'Daftar Soal dan Kunci',
+      requiresAuth: true,
+      requiredAnyPermission: ['exam-events.manage'],
+      breadcrumbs: crumbs('Daftar Soal dan Kunci', '/exam/print/question-keys'),
+    },
+  },
+  {
+    path: '/exam/print/student-recap/:eventId?/:subjectId?/:classId?',
+    name: 'ExamPrintStudentRecap',
+    component: () => import('./views/StudentRecapView.vue'),
+    meta: {
+      title: 'Rekap Soal Siswa',
+      requiresAuth: true,
+      requiredPermission: 'exam-grading.read',
+      breadcrumbs: crumbs('Rekap Soal Siswa', '/exam/print/student-recap'),
     },
   },
   ...documentRoutes,

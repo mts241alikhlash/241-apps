@@ -187,9 +187,19 @@
     font-synthesis: none;
   }
 
+  body.printing-stack .print-stack > *:not(:last-child) {
+    break-after: page;
+  }
+
   body.printing-stack .print-room {
     break-after: page;
     break-inside: avoid;
+  }
+
+  body.printing-stack .print-room.grading-sheet,
+  body.printing-stack .print-room.question-key-sheet,
+  body.printing-stack .print-room.student-recap-sheet {
+    break-inside: auto;
   }
 
   body.printing-stack .print-room:last-of-type {

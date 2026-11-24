@@ -164,6 +164,16 @@ export const menuSections: MenuSection[] = [
             url: '/exam/print/grading-sheet',
             requiredPermission: 'exam-grading.read',
           },
+          {
+            title: 'menu.examPrintQuestionKeys',
+            url: '/exam/print/question-keys',
+            requiredPermission: 'exam-events.manage',
+          },
+          {
+            title: 'menu.examPrintStudentRecap',
+            url: '/exam/print/student-recap',
+            requiredPermission: 'exam-grading.read',
+          },
         ],
       },
     ],

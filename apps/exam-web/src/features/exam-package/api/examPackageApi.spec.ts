@@ -54,6 +54,17 @@ describe('examPackageApi', () => {
     })
   })
 
+  it('reads one package for printing', async () => {
+    GET.mockResolvedValue(ok({ id: 'p1', items: [] }))
+    await expect(examPackageApi.getPackagePrint('p1')).resolves.toEqual({
+      id: 'p1',
+      items: [],
+    })
+    expect(GET).toHaveBeenCalledWith('/exam-packages/{id}/print', {
+      params: { path },
+    })
+  })
+
   it('reads one question of a package', async () => {
     GET.mockResolvedValue(ok({ id: 'q1' }))
     await expect(
@@ -217,6 +228,7 @@ describe('examPackageApi failures', () => {
   it.each([
     ['getPackages', 'GET', () => examPackageApi.getPackages()],
     ['getPackage', 'GET', () => examPackageApi.getPackage('p')],
+    ['getPackagePrint', 'GET', () => examPackageApi.getPackagePrint('p')],
     [
       'getPackageQuestion',
       'GET',
