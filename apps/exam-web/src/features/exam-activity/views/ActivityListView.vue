@@ -60,7 +60,13 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const { category, sectionPrefix } = useRouteCategory()
-const canManage = computed(() => hasPermission('exam-schedules.manage'))
+const canManage = computed(() =>
+  category.value === 'EXAM'
+    ? hasPermission('exam-schedules.manage-all') ||
+      hasPermission('exam-events.manage')
+    : hasPermission('exam-schedules.manage') ||
+      hasPermission('exam-schedules.manage-all'),
+)
 const route = useRoute()
 const NO_PERIOD = 'none'
 const periodId = computed(() => {

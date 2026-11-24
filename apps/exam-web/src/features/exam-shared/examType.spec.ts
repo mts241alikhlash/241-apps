@@ -25,10 +25,13 @@ describe('examType', () => {
     expect(examCategoryLabel('NON_EXAM')).toBe('Non-ujian')
   })
 
-  it('returns allowed types for category, manageAll and active midterm event', () => {
+  it('returns allowed types for category, manageAll, active midterm event, and event management', () => {
     expect(typesFor('NON_EXAM', false, false)).toEqual(['DAILY', 'ASSIGNMENT'])
     expect(typesFor('EXAM', false, false)).toEqual([])
-    expect(typesFor('EXAM', false, true)).toEqual(['MIDTERM'])
+    expect(typesFor('EXAM', false, true)).toEqual([])
+    expect(typesFor('EXAM', false, true, false)).toEqual([])
+    expect(typesFor('EXAM', false, true, true)).toEqual(['MIDTERM'])
+    expect(typesFor('EXAM', false, false, true)).toEqual([])
     expect(typesFor('EXAM', true, false)).toEqual(['MIDTERM', 'FINAL'])
   })
 

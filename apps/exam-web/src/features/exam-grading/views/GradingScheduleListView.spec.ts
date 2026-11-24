@@ -166,4 +166,17 @@ describe('GradingScheduleListView', () => {
     expect(labelsOf(schedule(), wrapper)).toEqual([])
     wrapper.unmount()
   })
+
+  it('shows Peserta on makeup rows and hides Susulan for exam-grading.read-all without exam-grading.grade', async () => {
+    permissions.clear()
+    permissions.add('exam-grading.read-all')
+    const makeup = schedule({ id: 'm1', kind: 'MAKEUP' })
+    listState.schedules.value = [schedule(), makeup]
+    const wrapper = mount(GradingScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(labelsOf(schedule(), wrapper)).toEqual([])
+    expect(labelsOf(makeup, wrapper)).toEqual(['Peserta'])
+    wrapper.unmount()
+  })
 })

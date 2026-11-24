@@ -64,7 +64,7 @@ const technicianName = (userId: string | null) =>
 const columns = computed(() =>
   buildRoomColumns({
     canManage: canManage.value,
-    canSupervise: canSupervise.value,
+    canSupervise: canSupervise.value || hasPermission('exam-rooms.read-all'),
     technicianName,
     canActOnRoom,
     onEdit: (room) => {

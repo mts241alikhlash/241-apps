@@ -162,10 +162,10 @@ describe('PresetSettingsView', () => {
     wrapper.unmount()
   })
 
-  it('requires exam-schedules.manage-all on /settings/presets', () => {
+  it('requires exam-settings.manage on /settings/presets', () => {
     const router = createRouter({ history: createMemoryHistory(), routes })
     const resolved = router.resolve('/settings/presets')
-    expect(resolved.meta.requiredPermission).toBe('exam-schedules.manage-all')
+    expect(resolved.meta.requiredPermission).toBe('exam-settings.manage')
   })
 
   it('puts the saved value back when saving fails', async () => {

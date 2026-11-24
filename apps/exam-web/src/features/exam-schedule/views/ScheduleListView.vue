@@ -221,11 +221,19 @@ async function printTimetable() {
 }
 
 const isClasswork = computed(() => category.value === 'NON_EXAM')
+const canWriteExam = computed(
+  () =>
+    hasPermission('exam-schedules.manage-all') ||
+    hasPermission('exam-events.manage'),
+)
+const canWriteInCategory = computed(
+  () => isClasswork.value || canWriteExam.value,
+)
 
 const scheduleOptions = computed<ScheduleColumnOptions>(() => ({
   subjectName,
-  canUpdate: hasPermission('exam-schedules.update'),
-  canCancel: hasPermission('exam-schedules.cancel'),
+  canUpdate: canWriteInCategory.value && hasPermission('exam-schedules.update'),
+  canCancel: canWriteInCategory.value && hasPermission('exam-schedules.cancel'),
   canAccessCode:
     isClasswork.value && hasPermission('exam-schedules.access-code'),
   canSessions: isClasswork.value && hasPermission('exam-sessions.read'),
@@ -460,7 +468,10 @@ const columns = computed(
         </div>
         <div class="flex shrink-0 items-center gap-2">
           <Button
-            v-if="hasPermission('exam-schedules.manage')"
+            v-if="
+              hasPermission('exam-schedules.read') ||
+              hasPermission('exam-schedules.manage')
+            "
             variant="outline"
             @click="printTimetable"
           >
@@ -468,7 +479,7 @@ const columns = computed(
             Cetak
           </Button>
           <Button
-            v-if="hasPermission('exam-schedules.manage')"
+            v-if="hasPermission('exam-schedules.manage') && canWriteInCategory"
             @click="openCreate"
           >
             <Plus class="size-4" />

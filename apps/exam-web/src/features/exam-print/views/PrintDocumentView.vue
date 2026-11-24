@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { usePrintPack } from '../composables/usePrintPack'
 import {
   usePrintScope,
@@ -23,6 +24,8 @@ import type { PrintDocumentKey } from '../types'
 
 const props = defineProps<{ doc: PrintDocumentKey }>()
 
+const { hasPermission } = useAuthSession()
+const canManageEvents = computed(() => hasPermission('exam-events.manage'))
 const definition = computed(() => PRINT_DOCUMENTS[props.doc])
 const state = usePrintPack({ withSchedules: props.doc === 'schedule' })
 const { scope, printWith } = usePrintScope()
@@ -139,7 +142,7 @@ const printedRooms = computed(() => {
     @retry="state.loadPack"
   >
     <template
-      v-if="doc === 'cards'"
+      v-if="doc === 'cards' && canManageEvents"
       #header-actions
     >
       <Button

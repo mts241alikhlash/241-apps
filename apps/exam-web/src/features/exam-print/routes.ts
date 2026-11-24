@@ -21,7 +21,7 @@ const documentRoutes: RouteRecordRaw[] = PRINT_DOCUMENT_KEYS.filter(
     meta: {
       title,
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.manage'],
+      requiredAnyPermission: ['exam-events.manage', 'exam-events.read'],
       breadcrumbs: crumbs(title, path),
     },
   }
@@ -35,7 +35,7 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     meta: {
       title: 'Daftar Hadir Peserta',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.manage'],
+      requiredAnyPermission: ['exam-events.manage', 'exam-events.read'],
       breadcrumbs: crumbs(
         'Daftar Hadir Peserta',
         '/exam/print/student-attendance',
@@ -50,7 +50,11 @@ export const examPrintRoutes: RouteRecordRaw[] = [
       title: 'Lembar Pemeriksaan Uraian',
       category: 'EXAM',
       requiresAuth: true,
-      requiredPermission: 'exam-grading.read',
+      requiredAnyPermission: [
+        'exam-grading.read',
+        'exam-grading.read-all',
+        'exam-grading.manage-all',
+      ],
       breadcrumbs: crumbs(
         'Lembar Pemeriksaan Uraian',
         '/exam/print/grading-sheet',
@@ -65,7 +69,11 @@ export const examPrintRoutes: RouteRecordRaw[] = [
       title: 'Lembar Pemeriksaan Uraian',
       category: 'NON_EXAM',
       requiresAuth: true,
-      requiredPermission: 'exam-grading.read',
+      requiredAnyPermission: [
+        'exam-grading.read',
+        'exam-grading.read-all',
+        'exam-grading.manage-all',
+      ],
       breadcrumbs: [
         { title: 'Non-ujian', href: '#' },
         {
@@ -82,7 +90,7 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     meta: {
       title: 'Daftar Hadir Pengawas dan Teknisi',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.manage'],
+      requiredAnyPermission: ['exam-events.manage', 'exam-events.read'],
       breadcrumbs: crumbs(
         'Daftar Hadir Pengawas dan Teknisi',
         '/exam/print/staff-attendance',
@@ -96,7 +104,7 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     meta: {
       title: 'Jadwal Ujian',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.manage'],
+      requiredAnyPermission: ['exam-events.manage', 'exam-events.read'],
       breadcrumbs: crumbs('Jadwal Ujian', '/exam/print/schedule'),
     },
   },

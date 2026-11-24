@@ -3,27 +3,46 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, ref } from 'vue'
 import RoomMonitorDetailView from './RoomMonitorDetailView.vue'
+import type * as ExamRoomServiceModule from '../services/examRoomService'
 
-const { loadReport, loadRoster, loadSupervisors, push } = vi.hoisted(() => ({
-  loadReport: vi.fn(),
-  loadRoster: vi.fn(),
-  loadSupervisors: vi.fn(),
-  push: vi.fn(),
-}))
+const {
+  loadReport,
+  loadRoster,
+  loadSupervisors,
+  push,
+  permissions,
+  routeState,
+} = vi.hoisted(() => {
+  const query: Record<string, string> = { slot: 'slot1' }
+  return {
+    loadReport: vi.fn(),
+    loadRoster: vi.fn(),
+    loadSupervisors: vi.fn(),
+    push: vi.fn(),
+    permissions: new Set<string>(),
+    routeState: {
+      params: { roomId: 'r1' },
+      query,
+    },
+  }
+})
 
-vi.mock('../services/examRoomService', () => ({
-  examRoomService: { loadReport, loadRoster, loadSupervisors },
-  abilitiesFor: () => ({ supervise: true, recover: true }),
-}))
+vi.mock('../services/examRoomService', async (importOriginal) => {
+  const actual = await importOriginal<typeof ExamRoomServiceModule>()
+  return {
+    ...actual,
+    examRoomService: { loadReport, loadRoster, loadSupervisors },
+  }
+})
 
 vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { roomId: 'r1' }, query: { slot: 'slot1' } }),
+  useRoute: () => routeState,
   useRouter: () => ({ push }),
 }))
 
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
-    hasPermission: () => true,
+    hasPermission: (code: string) => permissions.has(code),
     user: ref({ id: 'u1' }),
   }),
 }))
@@ -78,6 +97,13 @@ const dataTable = defineComponent({
   template: '<div data-testid="table"><slot name="empty" /></div>',
 })
 
+const notesCard = defineComponent({
+  name: 'RoomNotesCard',
+  props: { slotId: String, canAdd: Boolean },
+  template:
+    '<div data-test="notes-card" :data-slot="slotId" :data-can-add="String(canAdd)" />',
+})
+
 const stubs = {
   BackButton: passthrough,
   Badge: passthrough,
@@ -89,6 +115,10 @@ const stubs = {
   DataTable: dataTable,
   FloatingLabelField: passthrough,
   RoomMonitorSummaryCards: passthrough,
+  RoomNotesCard: notesCard,
+  RoomActionQueue: passthrough,
+  RoomInfoCard: passthrough,
+  RoomSessionCard: passthrough,
   RoomReportTab: passthrough,
   RecordAbsenceDialog: passthrough,
   RecordFieldNoteDialog: passthrough,
@@ -120,6 +150,9 @@ function mountView() {
 }
 
 beforeEach(() => {
+  permissions.clear()
+  permissions.add('exam-rooms.manage-all')
+  routeState.query = { slot: 'slot1' }
   loadRoster.mockReset()
   loadReport.mockReset()
   loadReport.mockResolvedValue({ success: false, error: 'tidak ada' })
@@ -134,5 +167,30 @@ describe('RoomMonitorDetailView', () => {
     await flushPromises()
 
     expect(wrapper.text()).not.toContain('Kamera Pengawas')
+  })
+
+  it('selects the active slot in read-only mode for exam-rooms.read-all without write controls', async () => {
+    permissions.clear()
+    permissions.add('exam-rooms.read-all')
+    routeState.query = {}
+    const now = Date.now()
+    loadSupervisors.mockResolvedValue([
+      {
+        slotId: 'slot-active',
+        scheduledUserId: 'sup-2',
+        actualUserId: 'sup-2',
+        startsAt: new Date(now - 10 * 60_000).toISOString(),
+        endsAt: new Date(now + 50 * 60_000).toISOString(),
+      },
+    ])
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('Anda tidak bertugas pada jam ini.')
+    const notes = wrapper.get('[data-test="notes-card"]')
+    expect(notes.attributes('data-slot')).toBe('slot-active')
+    expect(notes.attributes('data-can-add')).toBe('false')
+    wrapper.unmount()
   })
 })

@@ -42,6 +42,7 @@ const packages = ref<PackageOption[]>([])
 const subjects = ref<SubjectOption[]>([])
 const events = ref<EventOption[]>([])
 const isAdmin = computed(() => hasPermission('exam-schedules.manage-all'))
+const canManageEvents = computed(() => hasPermission('exam-events.manage'))
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
@@ -153,6 +154,7 @@ onMounted(load)
           :category="category"
           :fixed-event-id="fixedEventId"
           :is-admin="isAdmin"
+          :can-manage-events="canManageEvents"
           :submitting="submitting"
           @submit="submit"
         />

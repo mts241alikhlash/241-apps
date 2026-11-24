@@ -174,9 +174,15 @@ const schedule = (overrides: Partial<ExamSchedule> = {}): ExamSchedule => ({
 describe('ScheduleListView', () => {
   beforeEach(() => {
     permissions.clear()
-    ;['read', 'create', 'update', 'cancel', 'access-code', 'manage'].forEach(
-      (action) => permissions.add(`exam-schedules.${action}`),
-    )
+    ;[
+      'read',
+      'create',
+      'update',
+      'cancel',
+      'access-code',
+      'manage',
+      'manage-all',
+    ].forEach((action) => permissions.add(`exam-schedules.${action}`))
     permissions.add('exam-grading.read')
     permissions.add('exam-grading.grade')
     listState.schedules.value = [schedule()]
@@ -386,5 +392,36 @@ describe('ScheduleListView', () => {
         .attributes('data-schedule'),
     ).toBe('m1')
     wrapper.unmount()
+  })
+
+  it('hides write actions on EXAM for a teacher without manage-all or exam-events.manage', async () => {
+    routeMeta.category = 'EXAM'
+    permissions.delete('exam-schedules.manage-all')
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('Tambah')
+    expect(wrapper.findAllComponents(ActionCell)).toHaveLength(0)
+    wrapper.unmount()
+  })
+
+  it('hides all write actions on both EXAM and NON_EXAM for read-only users', async () => {
+    permissions.clear()
+    permissions.add('exam-schedules.read')
+    permissions.add('exam-events.read')
+
+    routeMeta.category = 'EXAM'
+    const examView = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(examView.text()).not.toContain('Tambah')
+    expect(examView.findAllComponents(ActionCell)).toHaveLength(0)
+    examView.unmount()
+
+    routeMeta.category = 'NON_EXAM'
+    const classworkView = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(classworkView.text()).not.toContain('Tambah')
+    expect(classworkView.findAllComponents(ActionCell)).toHaveLength(0)
+    classworkView.unmount()
   })
 })

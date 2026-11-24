@@ -7,6 +7,16 @@ function buildScheduleRoutes(
   sectionTitle: 'Ujian' | 'Non-ujian',
   category: ExamCategory,
 ): RouteRecordRaw[] {
+  const listPermissions =
+    category === 'EXAM'
+      ? ['exam-schedules.manage-all', 'exam-events.read']
+      : [
+          'exam-schedules.read',
+          'exam-schedules.manage',
+          'exam-schedules.manage-all',
+          'exam-events.read',
+        ]
+
   return [
     {
       path: `${prefix}/schedules`,
@@ -16,7 +26,7 @@ function buildScheduleRoutes(
         title: `Jadwal ${sectionTitle}`,
         category,
         requiresAuth: true,
-        requiredPermission: 'exam-schedules.read',
+        requiredAnyPermission: listPermissions,
         breadcrumbs: [
           { title: sectionTitle, href: '#' },
           { title: `Jadwal ${sectionTitle}`, href: `${prefix}/schedules` },

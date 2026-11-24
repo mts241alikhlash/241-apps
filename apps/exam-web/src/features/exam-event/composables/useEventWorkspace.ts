@@ -147,6 +147,7 @@ export function useEventWorkspace() {
     loading,
     loadFailed,
     canManage,
+    canReadEvents,
     canSupervise,
     canManageAll,
     canActOnRoom,

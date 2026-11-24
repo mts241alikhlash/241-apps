@@ -355,6 +355,11 @@ const activeEventName = computed(
 )
 
 const { hasPermission } = useAuthSession()
+const canSubmitReport = computed(
+  () =>
+    hasPermission('exam-rooms.supervise') ||
+    hasPermission('exam-rooms.manage-all'),
+)
 const canReplaceFile = computed(() => hasPermission('exam-rooms.manage-all'))
 
 const submission = useReportSubmission({
@@ -395,7 +400,9 @@ const columns = computed(() => {
     return buildRoomReportColumns({
       onOpen: (row) => void openPreview(row),
       onPrint: (row) => void printRoomReport(row),
-      onSubmit: (row) => submission.request([row]),
+      onSubmit: canSubmitReport.value
+        ? (row) => submission.request([row])
+        : undefined,
       onDownload: (row) =>
         void examRoomService.downloadReportFile(
           row.roomId,
@@ -410,13 +417,17 @@ const columns = computed(() => {
     return buildSubjectColumns({
       onOpen: (row) => goTo(row.dayKey, row.id),
       onPrint: (row) => openPrint('subject', row.id),
-      onSubmit: (row) => submission.request(row.rooms),
+      onSubmit: canSubmitReport.value
+        ? (row) => submission.request(row.rooms)
+        : undefined,
     }) as unknown as ColumnDef<ReportRow>[]
   }
   return buildDayColumns({
     onOpen: (row) => goTo(row.id),
     onPrint: (row) => openPrint('day', row.id),
-    onSubmit: (row) => submission.requestDay(row.subjects),
+    onSubmit: canSubmitReport.value
+      ? (row) => submission.requestDay(row.subjects)
+      : undefined,
   }) as unknown as ColumnDef<ReportRow>[]
 })
 

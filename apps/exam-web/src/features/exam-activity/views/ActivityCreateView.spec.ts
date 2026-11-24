@@ -49,7 +49,7 @@ vi.mock('@/features/exam-event/services/examEventService', () => ({
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const formStub = defineComponent({
   name: 'ActivityForm',
-  props: { isAdmin: Boolean, fixedEventId: String },
+  props: { isAdmin: Boolean, canManageEvents: Boolean, fixedEventId: String },
   template: '<div data-test="form" />',
 })
 
@@ -69,16 +69,25 @@ describe('ActivityCreateView', () => {
     routeState.query = {}
   })
 
-  it('does not hand admin rights to a teacher, and admin rights to a manager', async () => {
+  it('does not hand admin rights to a teacher, and passes canManageEvents and admin rights properly', async () => {
     const teacher = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
     expect(teacher.findComponent(formStub).props('isAdmin')).toBe(false)
+    expect(teacher.findComponent(formStub).props('canManageEvents')).toBe(false)
     teacher.unmount()
+
+    permissions.add('exam-events.manage')
+    const staff = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(staff.findComponent(formStub).props('isAdmin')).toBe(false)
+    expect(staff.findComponent(formStub).props('canManageEvents')).toBe(true)
+    staff.unmount()
 
     permissions.add('exam-schedules.manage-all')
     const manager = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
     expect(manager.findComponent(formStub).props('isAdmin')).toBe(true)
+    expect(manager.findComponent(formStub).props('canManageEvents')).toBe(true)
     manager.unmount()
   })
 

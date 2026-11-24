@@ -66,6 +66,7 @@ const props = defineProps<{
   category?: ExamCategory
   fixedEventId?: string
   isAdmin: boolean
+  canManageEvents?: boolean
   submitting?: boolean
 }>()
 
@@ -79,11 +80,26 @@ const midtermEventActive = computed(() =>
 
 const availableTypes = computed<ExamType[]>(() => {
   if (props.category) {
-    return typesFor(props.category, props.isAdmin, midtermEventActive.value)
+    return typesFor(
+      props.category,
+      props.isAdmin,
+      midtermEventActive.value,
+      props.canManageEvents ?? false,
+    )
   }
   return [
-    ...typesFor('NON_EXAM', props.isAdmin, midtermEventActive.value),
-    ...typesFor('EXAM', props.isAdmin, midtermEventActive.value),
+    ...typesFor(
+      'NON_EXAM',
+      props.isAdmin,
+      midtermEventActive.value,
+      props.canManageEvents ?? false,
+    ),
+    ...typesFor(
+      'EXAM',
+      props.isAdmin,
+      midtermEventActive.value,
+      props.canManageEvents ?? false,
+    ),
   ]
 })
 

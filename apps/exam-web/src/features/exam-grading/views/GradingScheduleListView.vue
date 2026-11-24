@@ -228,7 +228,10 @@ const classColumns = computed(() =>
   buildGradingScheduleColumns({
     subjectName,
     canMakeup: hasPermission('exam-grading.grade'),
-    canParticipants: hasPermission('exam-grading.read'),
+    canParticipants:
+      hasPermission('exam-grading.read') ||
+      hasPermission('exam-grading.read-all') ||
+      hasPermission('exam-grading.manage-all'),
     onMakeup: (schedule) => {
       makeupTarget.value = originOf(schedule)
     },
