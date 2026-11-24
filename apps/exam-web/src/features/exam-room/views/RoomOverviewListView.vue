@@ -79,7 +79,7 @@ const loadingReports = ref(false)
 const error = ref<string | null>(null)
 
 const semesterId = ref('')
-const eventStatusFilter = ref(ALL)
+const eventStatusFilter = ref<typeof ALL | ExamEvent['status']>(ALL)
 const search = ref('')
 const statusFilter = ref<'ALL' | RoomSlotPhase>('ALL')
 const filterId = useId()
@@ -411,6 +411,22 @@ function openRoom(room: RoomOverviewRow) {
   })
 }
 
+function openOverviewRow(row: TableRow) {
+  if ('slotId' in row) {
+    openRoom(row)
+    return
+  }
+  if ('dayKey' in row) {
+    goTo(eventId.value, row.dayKey, row.id)
+    return
+  }
+  if (level.value === 'day') {
+    goTo(eventId.value, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const eventColumns = computed(() =>
   buildRoomEventColumns({
     onOpen: (event) => goTo(event.id),
@@ -533,6 +549,7 @@ onMounted(loadEvents)
             :total-items="levelRows.length"
             :is-loading="loading"
             :item-label="itemLabel"
+            @row-click="openOverviewRow"
             @update:page="goToPage"
             @update:page-size="changePageSize"
           >

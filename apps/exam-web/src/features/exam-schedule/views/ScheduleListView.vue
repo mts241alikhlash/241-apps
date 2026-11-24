@@ -401,13 +401,38 @@ const byClassroom = (left: ExamSchedule, right: ExamSchedule): number =>
   left.startsAt.localeCompare(right.startsAt) ||
   left.packageTitle.localeCompare(right.packageTitle, 'id')
 
-const rows = computed<(PeriodGroup | DayGroup | ExamSchedule)[]>(() => {
+type ScheduleListRow = PeriodGroup | DayGroup | ExamSchedule
+
+const rows = computed<ScheduleListRow[]>(() => {
   if (level.value === 'period') return groupPeriods(schedules.value)
   if (level.value === 'day') return groupDays(inPeriod.value)
   return inPeriod.value
     .filter((item) => dayKeyOf(item.startsAt) === dayId.value)
     .sort(byClassroom)
 })
+
+function canOpenScheduleRow(row: ScheduleListRow): boolean {
+  if ('dayCount' in row || 'scheduleCount' in row) return true
+  return scheduleOptions.value.canSessions || scheduleOptions.value.canUpdate
+}
+
+function openScheduleRow(row: ScheduleListRow): void {
+  if ('dayCount' in row) {
+    go(row.id)
+    return
+  }
+  if ('scheduleCount' in row) {
+    go(hasPeriods.value ? periodId.value : null, row.id)
+    return
+  }
+  if (scheduleOptions.value.canSessions) {
+    scheduleOptions.value.onSessions(row)
+    return
+  }
+  if (scheduleOptions.value.canUpdate) {
+    openEdit(row)
+  }
+}
 
 const columns = computed(
   () =>
@@ -422,7 +447,7 @@ const columns = computed(
                 (rows.value as ExamSchedule[]).some((item) =>
                   scheduleHasActions(item, scheduleOptions.value),
                 )),
-          )) as unknown as ColumnDef<PeriodGroup | DayGroup | ExamSchedule>[],
+          )) as unknown as ColumnDef<ScheduleListRow>[],
 )
 </script>
 
@@ -476,6 +501,8 @@ const columns = computed(
           hide-pagination
           :is-loading="loading || filtersPending"
           :item-label="itemLabel"
+          :row-clickable="canOpenScheduleRow"
+          @row-click="openScheduleRow"
         >
           <template #empty>
             <DataTableEmpty message="Belum ada jadwal ujian." />

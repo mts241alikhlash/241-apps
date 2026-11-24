@@ -51,9 +51,13 @@ import {
 } from '@/features/exam-grading/types'
 import { examTypeLabel } from '@/features/exam-schedule/types'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
-import { compareClassroom } from '@/features/exam-shared/classroomName'
+import {
+  compareClassroom,
+  gradeOfClassroom,
+} from '@/features/exam-shared/classroomName'
 import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import StudentRecapSheet from '../documents/StudentRecapSheet.vue'
+import StudentScoreRecapSheet from '../documents/StudentScoreRecapSheet.vue'
 import { formatPrintDate, formatPrintRange, formatPrintTime } from '../format'
 import { waitForPrintImages } from '../printImages'
 import {
@@ -89,7 +93,9 @@ const people = ref<SessionPerson[]>([])
 const peopleLoaded = ref(false)
 const semesterId = ref('')
 const status = ref('ALL')
+const gradeFilter = ref('ALL')
 const search = ref('')
+const gradeFieldId = useId()
 const page = ref(1)
 const pageSize = ref(25)
 const loadingInit = ref(false)
@@ -97,7 +103,10 @@ const loadingPeople = ref(false)
 const printing = ref(false)
 const previewOpen = ref(false)
 const preview = ref<LoadedSheet | null>(null)
+const scorePreviewOpen = ref(false)
+const scorePreview = ref<LoadedSheet | null>(null)
 const printList = ref<LoadedSheet[]>([])
+const scorePrintList = ref<LoadedSheet[]>([])
 
 const loading = computed(() => loadingInit.value || loadingPeople.value)
 
@@ -170,6 +179,30 @@ function matches(text: string): boolean {
   return needle === '' || text.toLowerCase().includes(needle)
 }
 
+const gradeOptions = computed<string[]>(() => {
+  if (!activeSubject.value) return []
+  const seen = new Set<string>()
+  const list: string[] = []
+  for (const item of activeSubject.value.classes) {
+    const label = gradeOfClassroom(item.classroomName)
+    if (label !== '-' && !seen.has(label)) {
+      seen.add(label)
+      list.push(label)
+    }
+  }
+  return list
+})
+
+const filteredSubjectClasses = computed<GradingSchedule[]>(() => {
+  if (!activeSubject.value) return []
+  return activeSubject.value.classes.filter(
+    (item) =>
+      (gradeFilter.value === 'ALL' ||
+        gradeOfClassroom(item.classroomName) === gradeFilter.value) &&
+      matches(item.classroomName ?? ''),
+  )
+})
+
 const levelRows = computed<Row[]>(() => {
   if (!activeEvent.value) {
     return events.value.filter(
@@ -189,9 +222,7 @@ const levelRows = computed<Row[]>(() => {
     )
   }
   if (activeSubject.value) {
-    return activeSubject.value.classes.filter((item) =>
-      matches(item.classroomName ?? ''),
-    )
+    return filteredSubjectClasses.value
   }
   return subjects.value.filter((group) => matches(group.subject))
 })
@@ -252,7 +283,7 @@ const backTarget = computed<{
 
 const printTargetsList = computed<GradingSchedule[]>(() => {
   if (activeClass.value) return [activeClass.value]
-  if (activeSubject.value) return activeSubject.value.classes
+  if (activeSubject.value) return filteredSubjectClasses.value
   if (activeEvent.value) return eventSchedules.value
   return []
 })
@@ -334,10 +365,11 @@ watch(
 
 watch([eventId, subjectId, classId], () => {
   search.value = ''
+  gradeFilter.value = 'ALL'
   page.value = 1
 })
 
-watch([search, semesterId, status], () => {
+watch([search, semesterId, status, gradeFilter], () => {
   page.value = 1
 })
 
@@ -421,11 +453,7 @@ async function loadRecapSheets(
   const sorted = [...targets].sort(
     (left, right) =>
       left.startsAt.localeCompare(right.startsAt) ||
-      (left.classroomName ?? '').localeCompare(
-        right.classroomName ?? '',
-        'id',
-        { numeric: true },
-      ),
+      compareClassroom(left.classroomName, right.classroomName),
   )
   const loaded: LoadedSheet[] = []
   for (const schedule of sorted) {
@@ -433,7 +461,7 @@ async function loadRecapSheets(
       schedule,
       subjectName(schedule),
       onlyStudentId,
-      { manualOnly: false, includeTeacher: false },
+      { manualOnly: false, includeTeacher: true },
     )
     if (sheet.students.length > 0) loaded.push(sheet)
   }
@@ -462,6 +490,47 @@ async function printSchedules(
   } finally {
     document.body.classList.remove('printing-stack')
     printList.value = []
+    printing.value = false
+  }
+}
+
+async function printScoreSheets(targets: GradingSchedule[]) {
+  if (printing.value || targets.length === 0) return
+  printing.value = true
+  try {
+    const loaded = await loadRecapSheets(targets)
+    if (loaded.length === 0) {
+      toast.info('Tidak ada sesi siswa untuk dicetak.')
+      return
+    }
+    scorePrintList.value = loaded
+    await nextTick()
+    await waitForPrintImages()
+    document.body.classList.add('printing-stack')
+    window.print()
+  } catch {
+    toast.error('Gagal memuat rekap nilai siswa.')
+  } finally {
+    document.body.classList.remove('printing-stack')
+    scorePrintList.value = []
+    printing.value = false
+  }
+}
+
+async function openScorePreview(klass: GradingSchedule) {
+  if (printing.value) return
+  printing.value = true
+  try {
+    const [sheet] = await loadRecapSheets([klass])
+    if (sheet === undefined) {
+      toast.info('Data nilai siswa tidak ditemukan.')
+      return
+    }
+    scorePreview.value = sheet
+    scorePreviewOpen.value = true
+  } catch {
+    toast.error('Gagal memuat rekap nilai siswa.')
+  } finally {
     printing.value = false
   }
 }
@@ -563,7 +632,9 @@ const eventColumns = computed<ColumnDef<ExamEvent>[]>(() => [
         hideEdit: true,
         hideDelete: true,
         items: [
-          printItem(() => void printSchedules(schedulesOfEvent(row.original))),
+          printItem(
+            () => void printScoreSheets(schedulesOfEvent(row.original)),
+          ),
         ],
         onManage: () => goTo(row.original.id),
       }),
@@ -613,7 +684,7 @@ const subjectColumns = computed<ColumnDef<SubjectNode>[]>(() => [
         manageLabel: 'Lihat',
         hideEdit: true,
         hideDelete: true,
-        items: [printItem(() => void printSchedules(row.original.classes))],
+        items: [printItem(() => void printScoreSheets(row.original.classes))],
         onManage: () => goTo(activeEvent.value?.id ?? null, row.original.id),
       }),
   },
@@ -679,7 +750,22 @@ const classColumns = computed<ColumnDef<GradingSchedule>[]>(() => [
         manageLabel: 'Lihat',
         hideEdit: true,
         hideDelete: true,
-        items: [printItem(() => void printSchedules([row.original]))],
+        items: [
+          {
+            label: 'Pratinjau Nilai',
+            onClick: () => void openScorePreview(row.original),
+          },
+          {
+            label: 'Cetak Nilai',
+            icon: Printer,
+            onClick: () => void printScoreSheets([row.original]),
+          },
+          {
+            label: 'Cetak Detail Soal',
+            icon: Printer,
+            onClick: () => void printSchedules([row.original]),
+          },
+        ],
         onManage: () =>
           goTo(
             activeEvent.value?.id ?? null,
@@ -755,6 +841,22 @@ const peopleColumns = computed<ColumnDef<SessionPerson>[]>(() => [
   },
 ])
 
+function openRecapRow(row: Row) {
+  if ('studentId' in row) {
+    void openPreview(row)
+    return
+  }
+  if ('packageId' in row) {
+    goTo(activeEvent.value?.id ?? null, activeSubject.value?.id ?? null, row.id)
+    return
+  }
+  if ('classes' in row) {
+    goTo(activeEvent.value?.id ?? null, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const columns = computed(() => {
   if (!activeEvent.value) return eventColumns.value
   if (activeClass.value) return peopleColumns.value
@@ -789,10 +891,10 @@ void init()
           v-if="activeEvent"
           class="shrink-0"
           :disabled="loading || printing || printTargetsList.length === 0"
-          @click="printSchedules(printTargetsList)"
+          @click="printScoreSheets(printTargetsList)"
         >
           <Printer class="size-4" />
-          {{ printing ? 'Menyiapkan…' : 'Cetak' }}
+          {{ printing ? 'Menyiapkan…' : 'Cetak Nilai' }}
         </Button>
       </CardHeader>
       <CardContent
@@ -808,23 +910,55 @@ void init()
           :is-loading="loading"
           :item-label="itemLabel"
           :hide-pagination="activeEvent !== null"
+          @row-click="openRecapRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
           <template
-            v-if="!activeEvent"
+            v-if="
+              !activeEvent ||
+              (activeSubject && !activeClass && gradeOptions.length > 0)
+            "
             #filters
           >
-            <AcademicPeriodFilter v-model:semester-id="semesterId" />
+            <template v-if="!activeEvent">
+              <AcademicPeriodFilter v-model:semester-id="semesterId" />
+              <FloatingLabelField
+                label="Status"
+                :for="statusFieldId"
+                class="w-fit min-w-32"
+                floating
+              >
+                <Select v-model="status">
+                  <SelectTrigger
+                    :id="statusFieldId"
+                    class="w-full"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Semua</SelectItem>
+                    <SelectItem
+                      v-for="option in EVENT_STATUSES"
+                      :key="option"
+                      :value="option"
+                    >
+                      {{ eventStatusLabel(option) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </FloatingLabelField>
+            </template>
             <FloatingLabelField
-              label="Status"
-              :for="statusFieldId"
+              v-else
+              label="Tingkat"
+              :for="gradeFieldId"
               class="w-fit min-w-32"
               floating
             >
-              <Select v-model="status">
+              <Select v-model="gradeFilter">
                 <SelectTrigger
-                  :id="statusFieldId"
+                  :id="gradeFieldId"
                   class="w-full"
                 >
                   <SelectValue />
@@ -832,11 +966,11 @@ void init()
                 <SelectContent>
                   <SelectItem value="ALL">Semua</SelectItem>
                   <SelectItem
-                    v-for="option in EVENT_STATUSES"
-                    :key="option"
-                    :value="option"
+                    v-for="grade in gradeOptions"
+                    :key="grade"
+                    :value="grade"
                   >
-                    {{ eventStatusLabel(option) }}
+                    {{ grade }}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -920,6 +1054,70 @@ void init()
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <Dialog v-model:open="scorePreviewOpen">
+      <DialogContent
+        size="xl"
+        class="sm:max-w-[min(calc(100%-2rem),210mm)]"
+      >
+        <DialogHeader standard>
+          <DialogTitle>Pratinjau Rekap Nilai Siswa</DialogTitle>
+          <DialogDescription>
+            Rekap nilai siswa per kelas berdasarkan jenis soal ujian.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4 overflow-x-hidden">
+          <div
+            v-if="scorePreview"
+            class="mx-auto w-full max-w-[190mm] rounded-md border p-2 print:hidden"
+          >
+            <StudentScoreRecapSheet
+              :subject="scorePreview.subject"
+              :classroom="scorePreview.schedule.classroomName ?? '-'"
+              :date="formatPrintDate(scorePreview.schedule.startsAt)"
+              :time-range="
+                formatPrintRange(
+                  scorePreview.schedule.startsAt,
+                  scorePreview.schedule.endsAt,
+                )
+              "
+              :teacher="scorePreview.teacher"
+              :students="scorePreview.students"
+            />
+          </div>
+        </DialogBody>
+        <DialogFooter standard>
+          <Button
+            :disabled="scorePreview === null || printing"
+            @click="scorePreview && printScoreSheets([scorePreview.schedule])"
+          >
+            <Printer class="size-4" />
+            Cetak
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <div
+      v-if="scorePrintList.length > 0"
+      class="print-only"
+    >
+      <div class="print-stack">
+        <StudentScoreRecapSheet
+          v-for="sheet in scorePrintList"
+          :key="sheet.schedule.id"
+          :subject="sheet.subject"
+          :classroom="sheet.schedule.classroomName ?? '-'"
+          :date="formatPrintDate(sheet.schedule.startsAt)"
+          :time-range="
+            formatPrintRange(sheet.schedule.startsAt, sheet.schedule.endsAt)
+          "
+          :teacher="sheet.teacher"
+          :students="sheet.students"
+          stacked
+        />
+      </div>
+    </div>
 
     <div
       v-if="printList.length > 0"

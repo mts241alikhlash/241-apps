@@ -549,6 +549,14 @@ const roomColumns: ColumnDef<PrintPackRoom>[] = [
   },
 ]
 
+function openPrintRow(row: Row) {
+  if (activeEvent.value) {
+    goTo(activeEvent.value.id, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const columns = computed(() =>
   activeEvent.value
     ? (roomColumns as unknown as ColumnDef<Row>[])
@@ -717,6 +725,7 @@ void loadEvents()
             :is-loading="loading"
             :item-label="itemLabel"
             :hide-pagination="activeEvent !== null"
+            @row-click="openPrintRow"
             @update:page="page = $event"
             @update:page-size="changePageSize"
           >
@@ -870,7 +879,10 @@ void loadEvents()
       </DialogContent>
     </Dialog>
 
-    <Dialog v-model:open="confirmingReset">
+    <Dialog
+      v-if="doc === 'cards' && canManageEvents"
+      v-model:open="confirmingReset"
+    >
       <DialogContent size="md">
         <DialogHeader standard>
           <DialogTitle>Reset password siswa?</DialogTitle>

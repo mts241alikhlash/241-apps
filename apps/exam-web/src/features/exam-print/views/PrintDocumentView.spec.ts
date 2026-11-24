@@ -45,8 +45,9 @@ const DataTableStub = defineComponent({
   props: {
     data: { type: Array, required: true },
   },
+  emits: ['rowClick'],
   template:
-    '<div><div v-if="data.length === 0"><slot name="empty" /></div><div v-else data-testid="rows">{{ data.length }}</div></div>',
+    '<div><div v-if="data.length === 0"><slot name="empty" /></div><div v-else data-testid="rows" @click="$emit(\'rowClick\', data[0])">{{ data.length }}</div></div>',
 })
 
 const stubs = {
@@ -201,5 +202,15 @@ describe('PrintDocumentView', () => {
     await flushPromises()
     expect(manager.text()).toContain('Reset password')
     manager.unmount()
+  })
+
+  it('opens the period or room when a table row is clicked directly', async () => {
+    const wrapper = mountView('cards')
+    await flushPromises()
+    await wrapper.get('[data-testid="rows"]').trigger('click')
+    expect(push).toHaveBeenCalledWith({
+      name: 'ExamPrint-cards',
+      params: { eventId: 'e1' },
+    })
   })
 })

@@ -40,13 +40,15 @@ const { events, totalItems, loading, listError, filtersPending, refresh } =
 
 const canManage = computed(() => hasPermission('exam-events.manage'))
 
+const openEdit = (event: ExamEvent) => {
+  editing.value = event
+  formOpen.value = true
+}
+
 const columns = computed(() =>
   buildEventColumns({
     canManage: canManage.value,
-    onEdit: (event) => {
-      editing.value = event
-      formOpen.value = true
-    },
+    onEdit: openEdit,
   }),
 )
 
@@ -116,6 +118,8 @@ onMounted(refresh)
           :total-items="totalItems"
           :is-loading="loading || filtersPending"
           item-label="periode ujian"
+          :row-clickable="() => canManage"
+          @row-click="(event) => canManage && openEdit(event)"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

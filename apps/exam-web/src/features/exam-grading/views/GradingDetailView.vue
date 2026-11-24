@@ -213,6 +213,7 @@ onMounted(load)
             :page-size="1000"
             :total-items="shown.length"
             item-label="soal"
+            @row-click="(item) => (openId = item.questionId)"
           >
             <template #filters>
               <FloatingLabelField

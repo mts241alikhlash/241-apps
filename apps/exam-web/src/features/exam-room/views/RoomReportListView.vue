@@ -431,6 +431,18 @@ const columns = computed(() => {
   }) as unknown as ColumnDef<ReportRow>[]
 })
 
+function openReportRow(row: ReportRow) {
+  if ('roomId' in row) {
+    void openPreview(row)
+    return
+  }
+  if ('dayKey' in row) {
+    goTo(row.dayKey, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const itemLabel = computed(() =>
   activeSubject.value ? 'ruangan' : activeDay.value ? 'mapel' : 'hari',
 )
@@ -603,6 +615,7 @@ onMounted(load)
             :total-items="levelRows.length"
             :is-loading="loading"
             :item-label="itemLabel"
+            @row-click="openReportRow"
             @update:page="page = $event"
             @update:page-size="changePageSize"
           >

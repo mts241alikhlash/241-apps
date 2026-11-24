@@ -573,6 +573,22 @@ const roomColumns: ColumnDef<AttendanceRoom>[] = [
   },
 ]
 
+function openAttendanceRow(row: Row) {
+  if ('supervisorName' in row) {
+    openPreview(row)
+    return
+  }
+  if ('rooms' in row) {
+    goTo(activeEvent.value?.id ?? null, activeDay.value?.id ?? null, row.id)
+    return
+  }
+  if ('subjects' in row) {
+    goTo(activeEvent.value?.id ?? null, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const columns = computed(() => {
   if (!activeEvent.value) return eventColumns as unknown as ColumnDef<Row>[]
   if (activeSubject.value) return roomColumns as unknown as ColumnDef<Row>[]
@@ -746,6 +762,7 @@ void loadEvents()
             :is-loading="loading"
             :item-label="itemLabel"
             :hide-pagination="activeEvent !== null"
+            @row-click="openAttendanceRow"
             @update:page="page = $event"
             @update:page-size="changePageSize"
           >

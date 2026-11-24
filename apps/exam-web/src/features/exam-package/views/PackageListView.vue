@@ -207,6 +207,7 @@ onMounted(() => examPackageService.loadReferences())
           :total-items="totalItems"
           :is-loading="loading || filtersPending"
           item-label="paket"
+          @row-click="openPackage"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

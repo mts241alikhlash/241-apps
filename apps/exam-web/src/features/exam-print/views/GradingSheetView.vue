@@ -829,6 +829,31 @@ const personColumns = computed<ColumnDef<SessionPerson>[]>(() => [
   },
 ])
 
+function openSheetRow(row: Row) {
+  if ('studentId' in row) {
+    void openPreview(row)
+    return
+  }
+  if ('packageId' in row) {
+    goTo(
+      activeEvent.value?.id ?? null,
+      activeDay.value?.id ?? null,
+      activeSubject.value?.id ?? null,
+      row.id,
+    )
+    return
+  }
+  if ('classes' in row) {
+    goTo(activeEvent.value?.id ?? null, activeDay.value?.id ?? null, row.id)
+    return
+  }
+  if ('subjects' in row) {
+    goTo(activeEvent.value?.id ?? null, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const columns = computed(() => {
   if (atEventList.value) return eventColumns
   if (activeClass.value) return personColumns.value
@@ -892,6 +917,7 @@ else void loadSchedules()
           :is-loading="loading || peopleLoading"
           :item-label="itemLabel"
           :hide-pagination="isExam && activeEvent !== null"
+          @row-click="openSheetRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

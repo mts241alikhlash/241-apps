@@ -504,6 +504,14 @@ function changePageSize(size: number) {
   page.value = 1
 }
 
+function openActivityRow(row: ExamEvent | ExamActivityRecord) {
+  if ('subjectName' in row) {
+    open(row)
+    return
+  }
+  openPeriod(row.id)
+}
+
 watch(
   [search, statusFilter],
   () => {
@@ -517,7 +525,7 @@ watch(periodId, () => {
 })
 watch(semesterId, () => {
   page.value = 1
-  void loadEvents()
+  if (hierarchical.value) void loadEvents()
 })
 onMounted(load)
 </script>
@@ -573,6 +581,7 @@ onMounted(load)
           :total-items="total"
           :is-loading="loading"
           :item-label="level === 'period' ? 'periode ujian' : 'kegiatan'"
+          @row-click="openActivityRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

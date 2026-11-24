@@ -106,6 +106,9 @@ onMounted(() => {
           :data="rows"
           :is-loading="loading"
           item-label="periode ujian"
+          @row-click="
+            (row) => void router.push(`${detailBase}/${row.event.id}`)
+          "
         >
           <template #empty>
             <DataTableEmpty message="Belum ada periode ujian." />

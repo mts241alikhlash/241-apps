@@ -422,6 +422,7 @@ watch(levelTotal, () => {
           :total-items="events.length"
           :is-loading="loading"
           item-label="periode ujian"
+          @row-click="openEvent"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
@@ -439,6 +440,7 @@ watch(levelTotal, () => {
           :total-items="days.length"
           :is-loading="loading"
           item-label="hari"
+          @row-click="openPreview"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

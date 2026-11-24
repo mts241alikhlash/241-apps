@@ -497,6 +497,14 @@ const dayColumns: ColumnDef<DayEntry>[] = [
   },
 ]
 
+function openStaffRow(row: Row) {
+  if ('semesterId' in row) {
+    goTo(row.id)
+    return
+  }
+  openPreview(row)
+}
+
 const columns = computed(() =>
   activeEvent.value
     ? (dayColumns as unknown as ColumnDef<Row>[])
@@ -617,6 +625,7 @@ void loadEvents()
             :is-loading="loading"
             :item-label="itemLabel"
             :hide-pagination="activeEvent !== null"
+            @row-click="openStaffRow"
             @update:page="page = $event"
             @update:page-size="changePageSize"
           >

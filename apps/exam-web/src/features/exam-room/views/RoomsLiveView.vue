@@ -100,7 +100,7 @@ const loadingEvents = ref(false)
 const loadingReports = ref(false)
 const reportsError = ref<string | null>(null)
 const semesterId = ref('')
-const eventStatusFilter = ref(ALL)
+const eventStatusFilter = ref<typeof ALL | ExamEvent['status']>(ALL)
 const drillSearch = ref('')
 const eventFilterOpen = ref(false)
 const drillPage = ref(1)
@@ -430,6 +430,18 @@ const paginatedDrillRows = computed(() => {
   const startIndex = (drillPage.value - 1) * drillPageSize.value
   return drillRows.value.slice(startIndex, startIndex + drillPageSize.value)
 })
+
+function openDrillRow(row: DrillRow) {
+  if ('dayKey' in row) {
+    goTo(eventId.value, row.dayKey, row.id)
+    return
+  }
+  if (level.value === 'day') {
+    goTo(eventId.value, row.id)
+    return
+  }
+  goTo(row.id)
+}
 
 const drillLoading = computed(() =>
   level.value === 'event'
@@ -873,6 +885,7 @@ const noteColumns = computed<ColumnDef<LiveNote>[]>(() => {
           :total-items="drillRows.length"
           :is-loading="drillLoading"
           :item-label="drillItemLabel"
+          @row-click="openDrillRow"
           @update:page="(next: number) => (drillPage = next)"
           @update:page-size="
             (size: number) => {

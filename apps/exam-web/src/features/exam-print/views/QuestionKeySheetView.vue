@@ -542,6 +542,18 @@ const gradeColumns = computed<ColumnDef<QuestionKeyTarget>[]>(() => [
   },
 ])
 
+function openQuestionKeyRow(row: Row) {
+  if ('grades' in row) {
+    goTo(activeEvent.value?.id ?? null, row.id)
+    return
+  }
+  if ('semesterId' in row) {
+    goTo(row.id)
+    return
+  }
+  void openPreview(row)
+}
+
 const columns = computed(() => {
   if (!activeEvent.value) return eventColumns.value
   if (activeSubject.value) return gradeColumns.value
@@ -598,6 +610,7 @@ void loadEvents()
           :is-loading="loading"
           :item-label="itemLabel"
           :hide-pagination="activeEvent !== null"
+          @row-click="openQuestionKeyRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
