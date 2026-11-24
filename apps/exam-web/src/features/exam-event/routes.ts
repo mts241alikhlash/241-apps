@@ -9,7 +9,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Periode Ujian',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -43,7 +43,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Ruangan',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -59,7 +59,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Ruangan',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -76,7 +76,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Pembagian Kursi',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -92,7 +92,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Pembagian Kursi',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -112,7 +112,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Jadwal Pengawas',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },
@@ -128,7 +128,7 @@ export const examEventRoutes: RouteRecordRaw[] = [
       title: 'Jadwal Pengawas',
       category: 'EXAM',
       requiresAuth: true,
-      requiredAnyPermission: ['exam-events.read', 'exam-rooms.supervise'],
+      requiredAnyPermission: ['exam-events.read', 'exam-events.manage'],
       breadcrumbs: [
         { title: 'Ujian', href: '#' },
         { title: 'Persiapan', href: '#' },

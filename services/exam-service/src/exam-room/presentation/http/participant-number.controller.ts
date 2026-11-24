@@ -12,7 +12,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import {
+  RequireAnyPermission,
+  RequirePermissions,
+} from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { IssueSemesterParticipantNumbersUseCase } from '../../application/use-cases/issue-semester-participant-numbers/issue-semester-participant-numbers.use-case.js'
 import { LookupParticipantNumbersUseCase } from '../../application/use-cases/lookup-participant-numbers/lookup-participant-numbers.use-case.js'
@@ -48,7 +51,13 @@ export class ExamParticipantNumberController {
 
   @Post('lookup')
   @HttpCode(HttpStatus.OK)
-  @RequirePermissions('exam-events.manage')
+  @RequireAnyPermission(
+    'exam-events.manage',
+    'exam-events.read',
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({
     summary: 'Participant numbers of many students in one semester',
   })

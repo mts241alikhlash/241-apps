@@ -16,6 +16,7 @@ import { ArrayMaxSize, IsArray, IsUUID, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ICurriculumSubjectRepository } from '../../domain/repositories/curriculum-subject.repository.js'
 
 export class PassingScoreQueryDto {
@@ -44,6 +45,7 @@ export class BatchPassingScoreResponseDto {
 
 @ApiTags('Curriculum Subjects')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('curriculum-subjects')
 export class CurriculumSubjectInternalController {

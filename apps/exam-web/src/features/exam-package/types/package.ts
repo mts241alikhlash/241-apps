@@ -35,6 +35,10 @@ export type ExamPackageDetail = Schemas['ExamPackageDetailDto']
 
 export type ExamPackageView = Schemas['ExamPackageViewDto']
 
+export type ExamPackagePrintItem = Schemas['ExamPackagePrintItemDto']
+
+export type ExamPackagePrint = Schemas['ExamPackagePrintDto']
+
 export type ExamPackageCreatePayload = Schemas['CreateExamPackageDto']
 
 export interface AddQuestionPayload {

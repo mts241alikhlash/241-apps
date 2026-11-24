@@ -39,6 +39,7 @@ import {
 } from 'class-validator'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
@@ -279,6 +280,7 @@ export function createSimpleListControllers(
 
   @ApiTags(tag)
   @Public()
+  @SkipThrottle()
   @UseGuards(ProvisioningTokenGuard)
   @Controller(path)
   class InternalController {

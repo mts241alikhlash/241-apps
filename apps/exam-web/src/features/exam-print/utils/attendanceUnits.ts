@@ -76,6 +76,7 @@ export function buildAttendanceDays(
   pack: PrintPack,
   schedules: PrintSchedule[],
   subjectOf: (schedule: PrintSchedule) => string,
+  gradeClassrooms: ReadonlyMap<string, readonly string[]> = new Map(),
 ): AttendanceDay[] {
   const groups = new Map<
     string,
@@ -91,8 +92,16 @@ export function buildAttendanceDays(
       classes: new Set<string>(),
     }
     group.items.push(schedule)
-    if (schedule.classroomName !== null)
+    const mapped =
+      gradeClassrooms.get(schedule.classroomId) ??
+      (schedule.classroomName !== null
+        ? gradeClassrooms.get(schedule.classroomName)
+        : undefined)
+    if (mapped && mapped.length > 0) {
+      for (const name of mapped) group.classes.add(name)
+    } else if (schedule.classroomName !== null) {
       group.classes.add(schedule.classroomName)
+    }
     groups.set(key, group)
   }
 

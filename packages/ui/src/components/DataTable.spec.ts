@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { h } from 'vue'
 import { mount } from '@vue/test-utils'
 import type { ColumnDef } from '@tanstack/vue-table'
@@ -226,5 +226,92 @@ describe('DataTable hidden pagination', () => {
   it('still pages rows when pagination is shown', () => {
     const w = mount(DataTable, { props: { columns, data: many } })
     expect(w.findAll('tbody tr')).toHaveLength(10)
+  })
+})
+
+describe('DataTable row click', () => {
+  const interactiveColumns: ColumnDef<object, unknown>[] = [
+    { id: 'select', header: 'Pilih', cell: () => 'x', size: 40 },
+    {
+      accessorKey: 'name',
+      header: 'Nama',
+      cell: ({ row }) =>
+        h('div', [
+          h('span', (row.original as Row).name),
+          h('button', { type: 'button', class: 'inline-btn' }, 'Salin'),
+        ]),
+    },
+    { id: 'actions', header: 'Aksi', cell: () => 'a', size: 60 },
+  ]
+
+  it('emits rowClick on row click with cursor-pointer and ignores actions, select, and buttons', async () => {
+    const onRowClick = vi.fn()
+    const w = mount(DataTable, {
+      props: { columns: interactiveColumns, data, onRowClick },
+    })
+
+    const tr = w.get('tbody tr')
+    expect(tr.classes()).toContain('cursor-pointer')
+
+    const cells = w.findAll('tbody td')
+    await cells[0]!.trigger('click')
+    await cells[2]!.trigger('click')
+    await w.get('.inline-btn').trigger('click')
+    expect(onRowClick).not.toHaveBeenCalled()
+
+    await cells[1]!.trigger('click')
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+    expect(onRowClick).toHaveBeenCalledWith(data[0])
+  })
+
+  it('emits rowClick on mobile cards and ignores actions/select wrappers', async () => {
+    const onRowClick = vi.fn()
+    const w = mount(DataTable, {
+      props: {
+        columns: interactiveColumns,
+        data,
+        mobile: 'cards',
+        onRowClick,
+      },
+    })
+
+    const card = w.get('[data-slot="data-table-cards"] li')
+    expect(card.classes()).toContain('cursor-pointer')
+
+    await card.findAll('div')[0]!.trigger('click')
+    await w.get('.inline-btn').trigger('click')
+    expect(onRowClick).not.toHaveBeenCalled()
+
+    await card.get('span').trigger('click')
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+    expect(onRowClick).toHaveBeenCalledWith(data[0])
+  })
+
+  it('respects rowClickable predicate and omits cursor-pointer when no handler is bound', async () => {
+    const plain = mount(DataTable, { props: { columns, data } })
+    expect(plain.get('tbody tr').classes()).not.toContain('cursor-pointer')
+
+    const onRowClick = vi.fn()
+    const rows: Row[] = [
+      { id: '1', name: 'Ahmad' },
+      { id: '2', name: 'Budi' },
+    ]
+    const w = mount(DataTable, {
+      props: {
+        columns,
+        data: rows,
+        rowClickable: (row: object) => (row as Row).id === '2',
+        onRowClick,
+      },
+    })
+    const trs = w.findAll('tbody tr')
+    expect(trs[0]!.classes()).not.toContain('cursor-pointer')
+    expect(trs[1]!.classes()).toContain('cursor-pointer')
+
+    await trs[0]!.trigger('click')
+    expect(onRowClick).not.toHaveBeenCalled()
+
+    await trs[1]!.trigger('click')
+    expect(onRowClick).toHaveBeenCalledWith(rows[1])
   })
 })

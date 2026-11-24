@@ -1,4 +1,7 @@
-import type { QuestionType } from '../../../question/domain/value-objects/question-content.js'
+import type {
+  QuestionContent,
+  QuestionType,
+} from '../../../question/domain/value-objects/question-content.js'
 import type { QuestionMarker } from '../policies/question-marker.policy.js'
 
 export const EXAM_PACKAGE_STATUSES = [
@@ -53,6 +56,21 @@ export interface PackageItemView extends PackageItem {
 export interface ExamPackageView extends ExamPackage {
   items: PackageItemView[]
   reviews: PackageReview[]
+}
+
+export interface PackagePrintItem {
+  questionId: string
+  questionVersion: number
+  position: number
+  type: QuestionType
+  bodyHtml: string
+  content: QuestionContent
+  points: number
+  resolution: ItemResolution
+}
+
+export interface ExamPackagePrintView extends ExamPackage {
+  items: PackagePrintItem[]
 }
 
 export type PackageReviewAction = 'SUBMIT' | 'APPROVE' | 'RETURN'

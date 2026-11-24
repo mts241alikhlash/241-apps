@@ -62,13 +62,15 @@ const { sessions, totalItems, loading, listError, refresh } =
 
 watch(status, () => (page.value = 1), { flush: 'sync' })
 
+const openSession = (session: { sessionId: string }) =>
+  void router.push({
+    path: `${gradingBaseHref.value}/${scheduleId.value}/${session.sessionId}`,
+    query: route.query,
+  })
+
 const columns = computed(() =>
   buildGradingSessionColumns({
-    onOpen: (session) =>
-      void router.push({
-        path: `${gradingBaseHref.value}/${scheduleId.value}/${session.sessionId}`,
-        query: route.query,
-      }),
+    onOpen: openSession,
   }),
 )
 
@@ -121,6 +123,7 @@ function changePageSize(size: number) {
           :total-items="totalItems"
           :is-loading="loading"
           item-label="siswa"
+          @row-click="openSession"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

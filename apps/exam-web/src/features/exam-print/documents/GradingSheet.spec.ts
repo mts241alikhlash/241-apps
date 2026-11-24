@@ -81,4 +81,14 @@ describe('GradingSheet', () => {
 
     expect(wrapper.get('.sheet-signature-name').text()).toContain('....')
   })
+
+  it('adds page breaks between stacked grading sheets instead of merging kop on the same page', () => {
+    const stacked = mountSheet([student('a')], { stacked: true })
+    const standalone = mountSheet([student('a')])
+
+    expect(stacked.classes()).toContain('break-after-page')
+    expect(stacked.classes()).toContain('last:break-after-auto')
+    expect(stacked.classes()).not.toContain('print-stack')
+    expect(standalone.classes()).toContain('print-stack')
+  })
 })

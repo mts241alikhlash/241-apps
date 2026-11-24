@@ -1,6 +1,24 @@
-import type { ExamAnswerRecord } from '../../exam-session/domain/entities/exam-session.entity.js'
+import type {
+  ExamAnswerRecord,
+  ExamSession,
+} from '../../exam-session/domain/entities/exam-session.entity.js'
 import type { QuestionType } from '../../question/domain/value-objects/question-content.js'
 import type { PaperSource } from '../../exam-session/domain/policies/build-paper.policy.js'
+import type { StudentRef } from '../../platform/student-directory/student-directory.port.js'
+
+export interface GradingSessionDetail {
+  session: {
+    sessionId: string
+    scheduleId: string
+    studentId: string
+    studentName: string | null
+    studentNis: string | null
+    status: string
+    rawScore: number | null
+    maxScore: number | null
+  }
+  items: GradingItem[]
+}
 
 export interface GradingItem {
   questionId: string
@@ -79,5 +97,29 @@ export function toGradingItem(
     note: answer?.gradeNote ?? null,
     gradedAt: answer?.gradedAt ?? null,
     needsGrading: manual && !isBlankAnswer(answer) && answer?.score === null,
+  }
+}
+
+export function toGradingSessionDetail(
+  session: ExamSession,
+  sources: PaperSource[],
+  answers: ExamAnswerRecord[],
+  ref: StudentRef | null,
+): GradingSessionDetail {
+  const answerOf = new Map(answers.map((row) => [row.questionId, row]))
+  return {
+    session: {
+      sessionId: session.id,
+      scheduleId: session.scheduleId,
+      studentId: session.studentId,
+      studentName: ref?.name ?? null,
+      studentNis: ref?.nis ?? null,
+      status: session.status,
+      rawScore: session.rawScore,
+      maxScore: session.maxScore,
+    },
+    items: sources.map((source, index) =>
+      toGradingItem(source, index + 1, answerOf.get(source.questionId) ?? null),
+    ),
   }
 }

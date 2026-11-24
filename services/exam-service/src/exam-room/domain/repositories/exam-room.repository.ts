@@ -75,6 +75,7 @@ export abstract class IExamRoomRepository {
     query: ExamEventListQuery,
   ): Promise<PaginatedResult<ExamEvent>>
   abstract listEventIdsSupervisedBy(userId: string, at: Date): Promise<string[]>
+  abstract listEventIdsByTechnician(userId: string): Promise<string[]>
   abstract listActivitiesByEvent(
     eventId: string,
   ): Promise<ExamRoomActivityRef[]>

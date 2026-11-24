@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IAcademicSettingRepository } from '../../domain/repositories/academic-setting.repository.js'
 
 export class AcademicSettingSummaryDto {
@@ -33,6 +34,7 @@ export class AcademicSettingSummaryResponseDto {
 
 @ApiTags('Academic Settings')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('academic-settings')
 export class AcademicSettingInternalController {

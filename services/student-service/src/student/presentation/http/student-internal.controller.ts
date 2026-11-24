@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { GetParticipantNumberUseCase } from '../../application/use-cases/get-participant-number/get-participant-number.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListParticipantNumbersUseCase } from '../../application/use-cases/list-participant-numbers/list-participant-numbers.use-case.js'
@@ -87,6 +88,7 @@ export class IssueParticipantNumbersResponseDto {
 
 @ApiTags('Students')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('students')
 export class StudentInternalController {

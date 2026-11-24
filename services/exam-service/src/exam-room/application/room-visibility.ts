@@ -2,6 +2,7 @@ import type { ExamRoom } from '../domain/entities/exam-room.entity.js'
 import type { IExamRoomRepository } from '../domain/repositories/exam-room.repository.js'
 import {
   MANAGE_ALL,
+  READ_ALL,
   SUPERVISE,
   TECHNICIAN,
   type RoomStaffUser,
@@ -11,7 +12,10 @@ export async function visibleRooms(
   rooms: IExamRoomRepository,
   user: RoomStaffUser,
 ): Promise<ExamRoom[]> {
-  if (user.permissions?.includes(MANAGE_ALL)) {
+  if (
+    user.permissions?.includes(MANAGE_ALL) ||
+    user.permissions?.includes(READ_ALL)
+  ) {
     return rooms.listRoomsByEventStatus('ACTIVE')
   }
   const found = new Map<string, ExamRoom>()

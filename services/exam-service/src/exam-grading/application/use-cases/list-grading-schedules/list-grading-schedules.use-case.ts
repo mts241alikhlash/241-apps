@@ -42,7 +42,7 @@ export class ListGradingSchedulesUseCase {
       return { data: [], total: 0, page: query.page, limit: query.limit }
     }
 
-    const scope = await this.scope.forUser(user)
+    const scope = await this.scope.forRead(user)
     const pairs = scope.all ? null : await scope.pairsFor(semesterId)
     const page = await this.schedules.findForGrading({
       semesterId,

@@ -17,7 +17,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { computed, ref, watch } from 'vue'
+import { computed, getCurrentInstance, ref, watch } from 'vue'
 import { Button } from '@mts241alikhlash/ui/button'
 
 import {
@@ -69,6 +69,7 @@ const props = withDefaults(
     pageSize?: number
     pinnedColumns?: { left?: string[]; right?: string[] }
     mobile?: 'table' | 'cards'
+    rowClickable?: (row: TData) => boolean
   }>(),
   {
     page: 1,
@@ -81,7 +82,32 @@ const emit = defineEmits<{
   (e: 'selectionChange', rows: TData[]): void
   (e: 'update:page', page: number): void
   (e: 'update:page-size', pageSize: number): void
+  (e: 'rowClick', row: TData): void
 }>()
+
+const instance = getCurrentInstance()
+const hasRowClickListener = computed(() =>
+  Boolean(instance?.vnode.props?.onRowClick),
+)
+
+function isRowClickable(row: TData): boolean {
+  if (!hasRowClickListener.value) return false
+  return props.rowClickable ? props.rowClickable(row) : true
+}
+
+function handleRowClick(row: TData, event: MouseEvent): void {
+  if (!isRowClickable(row)) return
+  if (window.getSelection()?.toString().trim()) return
+  const target = event.target as Element | null
+  if (
+    target?.closest(
+      'a, button, input, select, textarea, [role="button"], [role="menuitem"], [data-row-click-ignore]',
+    )
+  ) {
+    return
+  }
+  emit('rowClick', row)
+}
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -511,7 +537,9 @@ defineExpose({ table })
                 index % 2 === 0
                   ? 'bg-card hover:bg-table-stripe-hover'
                   : 'bg-table-stripe hover:bg-table-stripe-hover',
+                isRowClickable(row.original) && 'cursor-pointer',
               ]"
+              @click="handleRowClick(row.original, $event)"
             >
               <TableCell
                 v-for="cell in row.getVisibleCells()"
@@ -611,11 +639,14 @@ defineExpose({ table })
             index % 2 === 0
               ? 'bg-card hover:bg-table-stripe-hover'
               : 'bg-table-stripe hover:bg-table-stripe-hover',
+            isRowClickable(row.original) && 'cursor-pointer',
           ]"
+          @click="handleRowClick(row.original, $event)"
         >
           <div
             v-if="cardParts(row).select"
             class="shrink-0 py-2 pl-3"
+            @click.stop
           >
             <FlexRender
               :render="cardParts(row).select!.column.columnDef.cell"
@@ -642,6 +673,7 @@ defineExpose({ table })
               <div
                 v-if="cardParts(row).actions"
                 class="shrink-0"
+                @click.stop
               >
                 <FlexRender
                   :render="cardParts(row).actions!.column.columnDef.cell"

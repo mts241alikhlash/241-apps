@@ -5,5 +5,8 @@ export interface GradingSheetStudent {
   studentId: string
   name: string | null
   participantNumber: string | null
+  status?: string
+  rawScore?: number | null
+  maxScore?: number | null
   items: GradingItem[]
 }

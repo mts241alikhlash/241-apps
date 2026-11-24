@@ -2,6 +2,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { routes } from '@/app/providers/router/routes'
 import SebSettingsView from './SebSettingsView.vue'
 import type * as SebModule from '@/shared/seb'
 import type { SebProof } from '@/shared/seb'
@@ -242,5 +244,11 @@ describe('SebSettingsView', () => {
       'Tidak cocok dengan konfigurasi aktif mana pun.',
     )
     wrapper.unmount()
+  })
+
+  it('requires exam-settings.manage on /settings/seb', () => {
+    const router = createRouter({ history: createMemoryHistory(), routes })
+    const resolved = router.resolve('/settings/seb')
+    expect(resolved.meta.requiredPermission).toBe('exam-settings.manage')
   })
 })

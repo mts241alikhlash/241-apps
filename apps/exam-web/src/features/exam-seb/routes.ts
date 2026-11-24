@@ -8,7 +8,7 @@ export const examSebRoutes: RouteRecordRaw[] = [
     meta: {
       title: 'Safe Exam Browser',
       requiresAuth: true,
-      requiredPermission: 'exam-schedules.manage-all',
+      requiredPermission: 'exam-settings.manage',
       breadcrumbs: [
         { title: 'Pengaturan', href: '#' },
         { title: 'Safe Exam Browser', href: '/settings/seb' },

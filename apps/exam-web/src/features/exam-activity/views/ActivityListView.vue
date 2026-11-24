@@ -46,6 +46,7 @@ import {
 import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { examTypeLabel } from '@/features/exam-shared/examType'
+import { gradeNumberOf } from '@/features/exam-shared/classroomName'
 import { examActivityApi } from '../api/examActivityApi'
 import ActivityStatusDialog from '../components/ActivityStatusDialog.vue'
 import AttachPackageDialog from '../components/AttachPackageDialog.vue'
@@ -60,7 +61,13 @@ const router = useRouter()
 const { hasPermission } = useAuthSession()
 
 const { category, sectionPrefix } = useRouteCategory()
-const canManage = computed(() => hasPermission('exam-schedules.manage'))
+const canManage = computed(() =>
+  category.value === 'EXAM'
+    ? hasPermission('exam-schedules.manage-all') ||
+      hasPermission('exam-events.manage')
+    : hasPermission('exam-schedules.manage') ||
+      hasPermission('exam-schedules.manage-all'),
+)
 const route = useRoute()
 const NO_PERIOD = 'none'
 const periodId = computed(() => {
@@ -126,7 +133,7 @@ const dateOf = (iso: string): string => dateOnly.format(new Date(iso))
 const timeOf = (iso: string): string => timeOnly.format(new Date(iso))
 
 const gradeNumber = (name: string | null): number =>
-  Number(/(\d+)/.exec(name ?? '')?.[1] ?? Number.MAX_SAFE_INTEGER)
+  gradeNumberOf(name) ?? Number.MAX_SAFE_INTEGER
 
 const inScope = computed(() =>
   hierarchical.value
@@ -497,6 +504,14 @@ function changePageSize(size: number) {
   page.value = 1
 }
 
+function openActivityRow(row: ExamEvent | ExamActivityRecord) {
+  if ('subjectName' in row) {
+    open(row)
+    return
+  }
+  openPeriod(row.id)
+}
+
 watch(
   [search, statusFilter],
   () => {
@@ -510,7 +525,7 @@ watch(periodId, () => {
 })
 watch(semesterId, () => {
   page.value = 1
-  void loadEvents()
+  if (hierarchical.value) void loadEvents()
 })
 onMounted(load)
 </script>
@@ -566,6 +581,7 @@ onMounted(load)
           :total-items="total"
           :is-loading="loading"
           :item-label="level === 'period' ? 'periode ujian' : 'kegiatan'"
+          @row-click="openActivityRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

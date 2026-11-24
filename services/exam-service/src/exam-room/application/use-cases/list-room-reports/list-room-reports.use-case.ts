@@ -8,6 +8,7 @@ import type { ExamRoomSupervisor } from '../../../domain/entities/exam-room-supe
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
 import {
   MANAGE_ALL,
+  READ_ALL,
   TECHNICIAN,
   type RoomStaffUser,
 } from '../../room-access.service.js'
@@ -201,6 +202,7 @@ export class ListRoomReportsUseCase {
   ): ExamRoomSupervisor[] {
     const everySlot =
       user.permissions?.includes(MANAGE_ALL) === true ||
+      user.permissions?.includes(READ_ALL) === true ||
       (user.permissions?.includes(TECHNICIAN) === true &&
         room.technicianUserId === user.id)
     return [...slots]

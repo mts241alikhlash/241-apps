@@ -1,6 +1,7 @@
 import { examGradingApi } from '@/features/exam-grading/api/examGradingApi'
 import { examGradingService } from '@/features/exam-grading/services/examGradingService'
 import type {
+  GradingDetail,
   GradingSchedule,
   GradingSessionRow,
 } from '@/features/exam-grading/types'
@@ -10,7 +11,6 @@ import { teachingAssignmentApi } from '@/features/lookup/teaching-assignment'
 import type { GradingSheetStudent } from '../documents/gradingSheet'
 
 const PAGE_LIMIT = 100
-const DETAIL_BATCH = 8
 
 export interface LoadedSheet {
   schedule: GradingSchedule
@@ -82,6 +82,27 @@ async function teacherOf(schedule: GradingSchedule): Promise<string> {
   return name
 }
 
+function toSheetStudent(
+  detail: GradingDetail,
+  participantNumber: string | null,
+  manualOnly: boolean,
+): GradingSheetStudent | null {
+  const items = (
+    manualOnly ? detail.items.filter((item) => item.manual) : [...detail.items]
+  ).sort((left, right) => left.number - right.number)
+  if (items.length === 0) return null
+  return {
+    key: detail.session.sessionId,
+    studentId: detail.session.studentId,
+    name: detail.session.studentName,
+    participantNumber,
+    status: detail.session.status,
+    rawScore: detail.session.rawScore,
+    maxScore: detail.session.maxScore,
+    items,
+  }
+}
+
 export const gradingSheetService = {
   loadSchedules(
     category: ExamCategory | undefined,
@@ -121,32 +142,54 @@ export const gradingSheetService = {
     schedule: GradingSchedule,
     subject: string,
     onlyStudentId?: string,
+    options?: { manualOnly?: boolean; includeTeacher?: boolean },
   ): Promise<LoadedSheet> {
-    const people = (await this.loadPeople(schedule)).filter(
-      (row) => onlyStudentId === undefined || row.studentId === onlyStudentId,
-    )
-    const students: GradingSheetStudent[] = []
-    for (let start = 0; start < people.length; start += DETAIL_BATCH) {
-      const batch = people.slice(start, start + DETAIL_BATCH)
-      const details = await Promise.all(
-        batch.map((row) => examGradingService.loadSession(row.sessionId)),
-      )
-      details.forEach((detail, index) => {
-        const row = batch[index]
-        if (!detail.success) return
-        const items = detail.data.items
-          .filter((item) => item.manual)
-          .sort((left, right) => left.number - right.number)
-        if (items.length === 0) return
-        students.push({
-          key: row.sessionId,
-          studentId: row.studentId,
-          name: row.studentName,
-          participantNumber: row.participantNumber,
-          items,
-        })
-      })
+    if (schedule.sessions === 0) {
+      return { schedule, subject, teacher: '', students: [] }
     }
-    return { schedule, subject, teacher: await teacherOf(schedule), students }
+    const manualOnly = options?.manualOnly ?? true
+    const includeTeacher = options?.includeTeacher ?? true
+    const students: GradingSheetStudent[] = []
+
+    if (onlyStudentId !== undefined) {
+      const person = (await this.loadPeople(schedule)).find(
+        (row) => row.studentId === onlyStudentId,
+      )
+      if (person !== undefined) {
+        const detail = await examGradingService.loadSession(person.sessionId)
+        if (!detail.success) throw new Error(detail.error)
+        const student = toSheetStudent(
+          detail.data,
+          person.participantNumber,
+          manualOnly,
+        )
+        if (student !== null) students.push(student)
+      }
+    } else {
+      const details = (
+        await examGradingApi.getScheduleSessionDetails(schedule.id)
+      ).sort((left, right) =>
+        (left.session.studentName ?? '').localeCompare(
+          right.session.studentName ?? '',
+          'id',
+        ),
+      )
+      const numbers = await numbersOf(
+        schedule.semesterId,
+        details.map((detail) => detail.session.studentId),
+      )
+      for (const detail of details) {
+        const student = toSheetStudent(
+          detail,
+          numbers.get(detail.session.studentId) ?? null,
+          manualOnly,
+        )
+        if (student !== null) students.push(student)
+      }
+    }
+
+    const teacher =
+      students.length > 0 && includeTeacher ? await teacherOf(schedule) : ''
+    return { schedule, subject, teacher, students }
   },
 }

@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ISemesterRepository } from '../../domain/repositories/semester.repository.js'
 
 export class SemesterSummaryDto {
@@ -73,6 +74,7 @@ export class SemesterSummaryResponseDto {
 
 @ApiTags('Semesters')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('semesters')
 export class SemesterInternalController {

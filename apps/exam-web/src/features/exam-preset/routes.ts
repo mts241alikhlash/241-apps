@@ -8,7 +8,7 @@ export const examPresetRoutes: RouteRecordRaw[] = [
     meta: {
       title: 'Preset Kebijakan',
       requiresAuth: true,
-      requiredPermission: 'exam-schedules.manage-all',
+      requiredPermission: 'exam-settings.manage',
       breadcrumbs: [
         { title: 'Pengaturan', href: '#' },
         { title: 'Preset', href: '/settings/presets' },

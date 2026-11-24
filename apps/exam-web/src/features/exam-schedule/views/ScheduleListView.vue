@@ -27,8 +27,7 @@ import {
   CardTitle,
   CardFooter,
 } from '@mts241alikhlash/ui/card'
-import { Plus, Printer } from '@lucide/vue'
-import { toast } from 'vue-sonner'
+import { Plus } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examEventService } from '@/features/exam-event/services/examEventService'
@@ -43,12 +42,8 @@ import MakeupDialog from '../components/MakeupDialog.vue'
 import MakeupParticipantsDialog from '../components/MakeupParticipantsDialog.vue'
 import AccessCodeDialog from '../components/AccessCodeDialog.vue'
 import ScheduleFormDialog from '../components/ScheduleFormDialog.vue'
+import { compareClassroom } from '@/features/exam-shared/classroomName'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
-import { examActivityApi } from '@/features/exam-activity/api/examActivityApi'
-import {
-  buildTimetable,
-  timetableHtml,
-} from '@/features/exam-activity/utils/buildTimetable'
 import { useScheduleList } from '../composables/useScheduleList'
 import { examScheduleService } from '../services/examScheduleService'
 import {
@@ -163,6 +158,11 @@ useBreadcrumbs(() => [
 ])
 
 onMounted(async () => {
+  if (category.value !== 'EXAM') {
+    periodNames.value = new Map()
+    periodEvents.value = new Map()
+    return
+  }
   const result = await examEventService.loadEvents({ limit: 1000 })
   if (result.success) {
     periodNames.value = new Map(
@@ -201,31 +201,20 @@ async function confirmCancel() {
   }
 }
 
-async function printTimetable() {
-  const popup = window.open('', '_blank')
-  if (popup === null) return
-  try {
-    const activities = await examActivityApi.list(
-      category.value ? { category: category.value } : undefined,
-    )
-    popup.document.write(
-      timetableHtml(buildTimetable(activities), 'Jadwal Ujian'),
-    )
-    popup.document.close()
-    popup.focus()
-    popup.print()
-  } catch {
-    popup.close()
-    toast.error('Jadwal mapel tidak dapat dimuat.')
-  }
-}
-
 const isClasswork = computed(() => category.value === 'NON_EXAM')
+const canWriteExam = computed(
+  () =>
+    hasPermission('exam-schedules.manage-all') ||
+    hasPermission('exam-events.manage'),
+)
+const canWriteInCategory = computed(
+  () => isClasswork.value || canWriteExam.value,
+)
 
 const scheduleOptions = computed<ScheduleColumnOptions>(() => ({
   subjectName,
-  canUpdate: hasPermission('exam-schedules.update'),
-  canCancel: hasPermission('exam-schedules.cancel'),
+  canUpdate: canWriteInCategory.value && hasPermission('exam-schedules.update'),
+  canCancel: canWriteInCategory.value && hasPermission('exam-schedules.cancel'),
   canAccessCode:
     isClasswork.value && hasPermission('exam-schedules.access-code'),
   canSessions: isClasswork.value && hasPermission('exam-sessions.read'),
@@ -407,24 +396,43 @@ const dayColumns: ColumnDef<DayGroup>[] = [
   },
 ]
 
-const gradeNumber = (name: string | null): number =>
-  Number(/(\d+)/.exec(name ?? '')?.[1] ?? Number.MAX_SAFE_INTEGER)
-
 const byClassroom = (left: ExamSchedule, right: ExamSchedule): number =>
-  gradeNumber(left.classroomName) - gradeNumber(right.classroomName) ||
-  (left.classroomName ?? '').localeCompare(right.classroomName ?? '', 'id', {
-    numeric: true,
-  }) ||
+  compareClassroom(left.classroomName, right.classroomName) ||
   left.startsAt.localeCompare(right.startsAt) ||
   left.packageTitle.localeCompare(right.packageTitle, 'id')
 
-const rows = computed<(PeriodGroup | DayGroup | ExamSchedule)[]>(() => {
+type ScheduleListRow = PeriodGroup | DayGroup | ExamSchedule
+
+const rows = computed<ScheduleListRow[]>(() => {
   if (level.value === 'period') return groupPeriods(schedules.value)
   if (level.value === 'day') return groupDays(inPeriod.value)
   return inPeriod.value
     .filter((item) => dayKeyOf(item.startsAt) === dayId.value)
     .sort(byClassroom)
 })
+
+function canOpenScheduleRow(row: ScheduleListRow): boolean {
+  if ('dayCount' in row || 'scheduleCount' in row) return true
+  return scheduleOptions.value.canSessions || scheduleOptions.value.canUpdate
+}
+
+function openScheduleRow(row: ScheduleListRow): void {
+  if ('dayCount' in row) {
+    go(row.id)
+    return
+  }
+  if ('scheduleCount' in row) {
+    go(hasPeriods.value ? periodId.value : null, row.id)
+    return
+  }
+  if (scheduleOptions.value.canSessions) {
+    scheduleOptions.value.onSessions(row)
+    return
+  }
+  if (scheduleOptions.value.canUpdate) {
+    openEdit(row)
+  }
+}
 
 const columns = computed(
   () =>
@@ -439,7 +447,7 @@ const columns = computed(
                 (rows.value as ExamSchedule[]).some((item) =>
                   scheduleHasActions(item, scheduleOptions.value),
                 )),
-          )) as unknown as ColumnDef<PeriodGroup | DayGroup | ExamSchedule>[],
+          )) as unknown as ColumnDef<ScheduleListRow>[],
 )
 </script>
 
@@ -458,23 +466,14 @@ const columns = computed(
           />
           <CardTitle class="font-semibold">{{ levelTitle }}</CardTitle>
         </div>
-        <div class="flex shrink-0 items-center gap-2">
-          <Button
-            v-if="hasPermission('exam-schedules.manage')"
-            variant="outline"
-            @click="printTimetable"
-          >
-            <Printer class="size-4" />
-            Cetak
-          </Button>
-          <Button
-            v-if="hasPermission('exam-schedules.manage')"
-            @click="openCreate"
-          >
-            <Plus class="size-4" />
-            Tambah
-          </Button>
-        </div>
+        <Button
+          v-if="hasPermission('exam-schedules.manage') && canWriteInCategory"
+          class="shrink-0"
+          @click="openCreate"
+        >
+          <Plus class="size-4" />
+          Tambah
+        </Button>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
@@ -502,6 +501,8 @@ const columns = computed(
           hide-pagination
           :is-loading="loading || filtersPending"
           :item-label="itemLabel"
+          :row-clickable="canOpenScheduleRow"
+          @row-click="openScheduleRow"
         >
           <template #empty>
             <DataTableEmpty message="Belum ada jadwal ujian." />

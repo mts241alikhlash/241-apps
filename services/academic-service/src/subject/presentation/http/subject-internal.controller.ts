@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ISubjectRepository } from '../../domain/repositories/subject.repository.js'
 
 export class SubjectSummaryDto {
@@ -38,6 +39,7 @@ export class SubjectIdsDto {
 
 @ApiTags('Subjects')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('subjects')
 export class SubjectInternalController {

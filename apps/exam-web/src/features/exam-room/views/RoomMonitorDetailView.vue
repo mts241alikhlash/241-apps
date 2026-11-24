@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type LocationQueryValue } from 'vue-router'
 import { Filter } from '@lucide/vue'
 import {
   BackButton,
@@ -229,9 +229,10 @@ async function loadActiveSlot() {
   const latest = byStart
     .filter((slot) => new Date(slot.endsAt).getTime() <= now)
     .at(-1)
-  const overview = abilities.value.recover
-    ? (current ?? upcoming ?? latest ?? slots[0])
-    : undefined
+  const overview =
+    abilities.value.recover || hasPermission('exam-rooms.read-all')
+      ? (current ?? upcoming ?? latest ?? slots[0])
+      : undefined
   activeSlotId.value =
     overview?.slotId ?? mineNow?.slotId ?? next?.slotId ?? past?.slotId ?? ''
   activeSlot.value =
@@ -246,6 +247,36 @@ onMounted(async () => {
 onUnmounted(() => {
   stop()
 })
+const paramText = (
+  value: LocationQueryValue | LocationQueryValue[] | undefined,
+): string | null => (typeof value === 'string' && value !== '' ? value : null)
+
+const periodId = computed(() => paramText(route.query.periode))
+const dayId = computed(() => paramText(route.query.hari))
+const subjectId = computed(() => paramText(route.query.mapel))
+
+const backTarget = computed(() => {
+  if (route.query.from === 'monitoring') {
+    const parts = [periodId.value, dayId.value, subjectId.value]
+      .filter((part): part is string => part !== null)
+      .map(encodeURIComponent)
+    return parts.length === 0
+      ? '/exam/monitoring'
+      : `/exam/monitoring/${parts.join('/')}`
+  }
+  if (periodId.value) {
+    const parts = [periodId.value, dayId.value, subjectId.value]
+      .filter((part): part is string => part !== null)
+      .map(encodeURIComponent)
+    return `/exam/rooms/period/${parts.join('/')}`
+  }
+  return '/exam/rooms'
+})
+const backLabel = computed(() =>
+  route.query.from === 'monitoring'
+    ? 'Kembali ke Monitoring Semua Ruang'
+    : 'Kembali ke Monitoring',
+)
 </script>
 
 <template>
@@ -257,8 +288,8 @@ onUnmounted(() => {
       <CardHeader standard>
         <div class="flex min-w-0 items-center gap-3">
           <BackButton
-            label="Kembali ke Monitoring"
-            @click="router.push('/exam/rooms')"
+            :label="backLabel"
+            @click="router.push(backTarget)"
           />
           <CardTitle class="truncate font-semibold">{{
             room?.name ?? 'Ruang Ujian'

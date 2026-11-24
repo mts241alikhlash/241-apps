@@ -131,6 +131,14 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     return Promise.resolve([...ids])
   }
 
+  listEventIdsByTechnician(userId: string) {
+    const ids = new Set<string>()
+    for (const room of this.rooms.values()) {
+      if (room.technicianUserId === userId) ids.add(room.eventId)
+    }
+    return Promise.resolve([...ids])
+  }
+
   createRoom(input: NewExamRoom) {
     const taken = [...this.rooms.values()].some(
       (row) => row.eventId === input.eventId && row.code === input.code,

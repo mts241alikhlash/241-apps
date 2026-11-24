@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  forwardRef,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -18,9 +20,16 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import {
+  RequireAnyPermission,
+  RequirePermissions,
+} from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../../exam-schedule/application/schedule-scope.service.js'
 import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
@@ -54,26 +63,42 @@ export class ExamActivityController {
     private readonly rotateToken: RotateActivityTokenUseCase,
     private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
     private readonly attachPackage: AttachActivityPackageUseCase,
+    @Inject(forwardRef(() => ScheduleScopeService))
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   @Get()
-  @RequirePermissions('exam-schedules.manage')
+  @RequireAnyPermission(
+    'exam-schedules.read',
+    'exam-schedules.manage',
+    'exam-schedules.manage-all',
+    'exam-events.read',
+  )
   @ApiOperation({ summary: 'List the activities of the active semester' })
   @ApiResponse({ status: 200, type: [ExamActivityDto] })
-  async list(@Query() query: ExamActivityQueryDto): Promise<ExamActivityDto[]> {
-    const rows = await this.listActivities.listNamed(query.category)
+  async list(
+    @CurrentUser() user: ScheduleAccessUser,
+    @Query() query: ExamActivityQueryDto,
+  ): Promise<ExamActivityDto[]> {
+    const rows = await this.listActivities.listNamed(user, query.category)
     return rows.map((row) => ExamActivityDto.of(row.activity, row))
   }
 
   @Get(':id')
-  @RequirePermissions('exam-schedules.manage')
+  @RequireAnyPermission(
+    'exam-schedules.read',
+    'exam-schedules.manage',
+    'exam-schedules.manage-all',
+    'exam-events.read',
+  )
   @ApiOperation({ summary: 'Get one activity with its classroom schedules' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: ExamActivityDetailDto })
   async findOne(
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ExamActivityDetailDto> {
-    const detail = await this.listActivities.findOne(id)
+    const detail = await this.listActivities.findOne(id, user)
     return ExamActivityDetailDto.ofDetail(detail.activity, detail.schedules)
   }
 
@@ -82,17 +107,17 @@ export class ExamActivityController {
   @ApiOperation({ summary: 'Change the status of an activity' })
   @ApiResponse({ status: 200, type: ExamActivityDto })
   async changeStatus(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateActivityStatusRequestDto,
   ): Promise<ExamActivityDto> {
-    const activity = await this.updateStatus.execute(user.id, id, dto.status)
+    const activity = await this.updateStatus.execute(user, id, dto.status)
     return ExamActivityDto.of(activity)
   }
 
   @Post(':id/participant-numbers/issue')
   @HttpCode(HttpStatus.OK)
-  @RequirePermissions('exam-schedules.manage')
+  @RequireAnyPermission('exam-events.manage', 'exam-schedules.manage-all')
   @ApiOperation({
     summary: 'Issue the participant numbers of the activity semester again',
   })
@@ -111,12 +136,24 @@ export class ExamActivityController {
   @ApiOperation({ summary: 'Create one activity for a grade and its classes' })
   @ApiResponse({ status: 201, type: ExamActivityDto })
   async create(
-    @CurrentUser() user: { id: string; permissions: string[] },
+    @CurrentUser() user: ScheduleAccessUser,
     @Body() dto: CreateActivityRequestDto,
   ): Promise<ExamActivityDto> {
+    const scope = await this.scheduleScope.forUser(user)
+    await scope.assertCanManageActivity(
+      {
+        type: dto.type,
+        semesterId: dto.semesterId,
+        gradeId: dto.gradeId,
+        subjectId: dto.subjectId,
+      },
+      dto.classroomIds,
+    )
+    const perms = user.permissions ?? []
     const activity = await this.createActivity.execute({
       actorId: user.id,
-      manageAll: user.permissions.includes('exam-schedules.manage-all'),
+      manageAll: perms.includes('exam-schedules.manage-all'),
+      canManageEvents: perms.includes('exam-events.manage'),
       semesterId: dto.semesterId,
       eventId: dto.eventId ?? null,
       gradeId: dto.gradeId,
@@ -142,12 +179,12 @@ export class ExamActivityController {
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: ExamActivityDto })
   async attach(
-    @CurrentUser() user: { id: string },
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AttachActivityPackageRequestDto,
   ): Promise<ExamActivityDto> {
     const activity = await this.attachPackage.execute({
-      actorId: user.id,
+      actor: user,
       activityId: id,
       packageId: dto.packageId,
       classroomIds: dto.classroomIds,

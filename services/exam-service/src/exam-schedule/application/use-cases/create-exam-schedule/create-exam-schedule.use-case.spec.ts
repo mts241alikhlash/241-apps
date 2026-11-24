@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common'
@@ -12,14 +13,24 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SCHEDULE_ADMIN_USER,
+  SCHEDULE_TEACHER_USER,
   SEMESTER_ID,
   START,
   USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule.test-support.js'
+import type { ScheduleAccessUser } from '../../schedule-scope.service.js'
 import { ExamScheduleDto } from '../../../presentation/http/dto/response/exam-schedule-response.dto.js'
 import { MyExamDto } from '../../../../exam-session/presentation/http/dto/student-exam-response.dto.js'
 import { CreateExamScheduleUseCase } from './create-exam-schedule.use-case.js'
+
+const STAFF_USER: ScheduleAccessUser = {
+  id: USER.id,
+  roles: ['CURRICULUM_STAFF'],
+  permissions: ['exam-schedules.create', 'exam-events.manage'],
+}
 
 describe('CreateExamScheduleUseCase', () => {
   let packages: FakeExamPackageRepository
@@ -37,10 +48,11 @@ describe('CreateExamScheduleUseCase', () => {
       packages,
       academic,
       rooms,
+      scheduleScope(),
     )
     return {
       execute: (
-        user: { id: string; manageAll?: boolean },
+        user: ScheduleAccessUser,
         body: ReturnType<typeof input>,
         now: Date = NOW,
       ) => useCase.execute(user, body, now),
@@ -128,7 +140,7 @@ describe('CreateExamScheduleUseCase', () => {
     const event = await activeEvent(rooms, 'FINAL')
 
     const created = await build(new FakeAcademicLookup(), rooms).execute(
-      { ...USER, manageAll: true },
+      SCHEDULE_ADMIN_USER,
       input({ type: 'FINAL', eventId: event.id }),
     )
 
@@ -142,7 +154,7 @@ describe('CreateExamScheduleUseCase', () => {
 
     await expect(
       build(new FakeAcademicLookup(), rooms).execute(
-        USER,
+        SCHEDULE_TEACHER_USER,
         input({ type: 'FINAL', eventId: event.id }),
       ),
     ).rejects.toMatchObject({ response: { code: 'FINAL_ADMIN_ONLY' } })
@@ -150,11 +162,23 @@ describe('CreateExamScheduleUseCase', () => {
 
   it('refuses a final schedule without an event even for an admin', async () => {
     await expect(
-      build().execute({ ...USER, manageAll: true }, input({ type: 'FINAL' })),
+      build().execute(SCHEDULE_ADMIN_USER, input({ type: 'FINAL' })),
     ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
   })
 
-  it('refuses a midterm schedule from a teacher outside an active midterm event', async () => {
+  it('refuses a midterm schedule from a teacher without manage-all or exam-events.manage', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'MIDTERM')
+
+    await expect(
+      build(new FakeAcademicLookup(), rooms).execute(
+        SCHEDULE_TEACHER_USER,
+        input({ type: 'MIDTERM', eventId: event.id }),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EXAM_ADMIN_ONLY' } })
+  })
+
+  it('refuses a midterm schedule from event staff outside an active midterm event', async () => {
     const rooms = new FakeExamRoomRepository()
     const draft = await rooms.createEvent({
       semesterId: SEMESTER_ID,
@@ -167,22 +191,36 @@ describe('CreateExamScheduleUseCase', () => {
 
     await expect(
       build(new FakeAcademicLookup(), rooms).execute(
-        USER,
+        STAFF_USER,
         input({ type: 'MIDTERM', eventId: draft.id }),
       ),
     ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
   })
 
-  it('lets a teacher schedule a midterm inside an active midterm event', async () => {
+  it('lets event staff schedule a midterm inside an active midterm event', async () => {
     const rooms = new FakeExamRoomRepository()
     const event = await activeEvent(rooms, 'MIDTERM')
 
     const created = await build(new FakeAcademicLookup(), rooms).execute(
-      USER,
+      STAFF_USER,
       input({ type: 'MIDTERM', eventId: event.id }),
     )
 
     expect(created.eventId).toBe(event.id)
+  })
+
+  it('refuses a DAILY schedule for an untaught classroom', async () => {
+    const useCase = new CreateExamScheduleUseCase(
+      schedules,
+      packages,
+      new FakeAcademicLookup(),
+      new FakeExamRoomRepository(),
+      scheduleScope([]),
+    )
+
+    await expect(
+      useCase.execute(SCHEDULE_TEACHER_USER, input(), NOW),
+    ).rejects.toBeInstanceOf(ForbiddenException)
   })
 
   it('refuses a classroom of another grade', async () => {
@@ -314,7 +352,7 @@ describe('CreateExamScheduleUseCase', () => {
     })
 
     const created = await build(new FakeAcademicLookup(), rooms).execute(
-      { ...USER, manageAll: true },
+      SCHEDULE_ADMIN_USER,
       input({ type: 'MIDTERM', eventId: event.id }),
     )
 

@@ -16,13 +16,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { RequireAnyPermission } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import type { GradingUser } from '../../application/grading-scope.service.js'
 import { GetGradingSessionUseCase } from '../../application/use-cases/get-grading-session/get-grading-session.use-case.js'
 import { GradeAnswerUseCase } from '../../application/use-cases/grade-answer/grade-answer.use-case.js'
 import { ListGradingSchedulesUseCase } from '../../application/use-cases/list-grading-schedules/list-grading-schedules.use-case.js'
 import { ListGradingSessionsUseCase } from '../../application/use-cases/list-grading-sessions/list-grading-sessions.use-case.js'
+import { ListScheduleGradingDetailsUseCase } from '../../application/use-cases/list-schedule-grading-details/list-schedule-grading-details.use-case.js'
 import {
   GradeAnswerDto,
   GradingScheduleQueryDto,
@@ -43,12 +44,17 @@ export class ExamGradingController {
   constructor(
     private readonly listSchedules: ListGradingSchedulesUseCase,
     private readonly listSessions: ListGradingSessionsUseCase,
+    private readonly listScheduleDetails: ListScheduleGradingDetailsUseCase,
     private readonly getSession: GetGradingSessionUseCase,
     private readonly gradeAnswer: GradeAnswerUseCase,
   ) {}
 
   @Get('schedules')
-  @RequirePermissions('exam-grading.read')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({
     summary: 'The exams the caller may grade, with grading counts',
   })
@@ -68,7 +74,11 @@ export class ExamGradingController {
   }
 
   @Get('schedules/:scheduleId/sessions')
-  @RequirePermissions('exam-grading.read')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({
     summary: 'The sessions of one exam with their grading state',
   })
@@ -88,8 +98,32 @@ export class ExamGradingController {
     )
   }
 
+  @Get('schedules/:scheduleId/sessions/details')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
+  @ApiOperation({
+    summary:
+      'Finished sessions of one exam with answers and keys for batch printing',
+  })
+  @ApiParam({ name: 'scheduleId', format: 'uuid' })
+  @ApiResponse({ status: 200, type: [GradingSessionDetailDto] })
+  async scheduleSessionDetails(
+    @CurrentUser() user: GradingUser,
+    @Param('scheduleId', ParseUUIDPipe) scheduleId: string,
+  ): Promise<GradingSessionDetailDto[]> {
+    const details = await this.listScheduleDetails.execute(user, scheduleId)
+    return details.map((detail) => GradingSessionDetailDto.fromDomain(detail))
+  }
+
   @Get('sessions/:sessionId')
-  @RequirePermissions('exam-grading.read')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({
     summary: 'The short answers and essays of a session to grade',
   })
@@ -105,7 +139,7 @@ export class ExamGradingController {
   }
 
   @Patch('sessions/:sessionId/answers/:questionId')
-  @RequirePermissions('exam-grading.grade')
+  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
   @ApiOperation({ summary: 'Grade one short answer or essay' })
   @ApiParam({ name: 'sessionId', format: 'uuid' })
   @ApiParam({ name: 'questionId', format: 'uuid' })

@@ -18,6 +18,10 @@ import {
   validateScheduleWindow,
 } from '../../../domain/policies/validate-schedule-window.policy.js'
 import { IExamScheduleRepository } from '../../../domain/repositories/exam-schedule.repository.js'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../schedule-scope.service.js'
 
 export interface CreateExamScheduleInput {
   packageId: string
@@ -37,10 +41,11 @@ export class CreateExamScheduleUseCase {
     private readonly packages: IExamPackageRepository,
     private readonly academic: IAcademicLookupPort,
     private readonly rooms: IExamRoomRepository,
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
-    user: { id: string; manageAll?: boolean },
+    user: ScheduleAccessUser,
     input: CreateExamScheduleInput,
     now: Date = new Date(),
   ): Promise<ExamSchedule> {
@@ -76,14 +81,24 @@ export class CreateExamScheduleUseCase {
     if (eventId !== null && event === null) {
       throw new NotFoundException('Kegiatan ujian tidak ditemukan')
     }
+    const permissions = user.permissions ?? []
     assertTypeAllowed({
       type: input.type,
-      manageAll: user.manageAll ?? false,
+      manageAll: permissions.includes('exam-schedules.manage-all'),
+      canManageEvents: permissions.includes('exam-events.manage'),
       event,
       eventId,
       semesterId: semester.id,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
+    })
+    const scope = await this.scheduleScope.forUser(user)
+    await scope.assertCanManageSchedule({
+      type: input.type,
+      kind: 'REGULAR',
+      subjectId: examPackage.subjectId,
+      classroomId: input.classroomId,
+      semesterId: semester.id,
     })
 
     const created = await this.schedules.createAndLockPackage({

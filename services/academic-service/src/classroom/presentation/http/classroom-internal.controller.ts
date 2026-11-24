@@ -26,6 +26,7 @@ import {
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { withDisplayName } from '../../../shared/utils/classroom-display-name.helper.js'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IClassroomRepository } from '../../domain/repositories/classroom.repository.js'
 import { IClassroomStructureRepository } from '../../domain/repositories/classroom-structure.repository.js'
 import { IClassroomSupervisorRepository } from '../../domain/repositories/classroom-supervisor.repository.js'
@@ -134,6 +135,7 @@ export class ClassroomSummaryResponseDto {
 
 @ApiTags('Classrooms')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('classrooms')
 export class ClassroomInternalController {

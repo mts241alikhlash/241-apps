@@ -11,7 +11,11 @@ function buildGradingRoutes(
     title,
     category,
     requiresAuth: true,
-    requiredPermission: 'exam-grading.read',
+    requiredAnyPermission: [
+      'exam-grading.read',
+      'exam-grading.read-all',
+      'exam-grading.manage-all',
+    ],
     breadcrumbs: [{ title: sectionTitle, href: '#' }, ...crumbs],
   })
 

@@ -184,4 +184,35 @@ describe('syncPermissions grants brand-new codes to existing default roles', () 
       ),
     ).toEqual([])
   })
+
+  it('grants the new exam read-only and settings codes to their standardized roles', async () => {
+    const examNewCodes = [
+      'exam-grading.read-all',
+      'exam-rooms.read-all',
+      'exam-settings.manage',
+    ]
+    const beforeExam = catalog.filter((code) => !examNewCodes.includes(code))
+    const { prisma, grantedTo } = fakePrisma(beforeExam, allRoles)
+    await syncPermissions(prisma as never)
+
+    expect(grantedTo('exam-grading.read-all')).toEqual([
+      'CURRICULUM_STAFF',
+      'EXAM_ADMIN',
+      'OPERATOR',
+      'PRINCIPAL',
+      'SUPER_ADMIN',
+      'VICE_PRINCIPAL_CURRICULUM',
+      'VICE_PRINCIPAL_STUDENT_AFFAIRS',
+    ])
+    expect(grantedTo('exam-rooms.read-all')).toEqual([
+      'PRINCIPAL',
+      'SUPER_ADMIN',
+    ])
+    expect(grantedTo('exam-settings.manage')).toEqual([
+      'EXAM_ADMIN',
+      'OPERATOR',
+      'SUPER_ADMIN',
+      'VICE_PRINCIPAL_CURRICULUM',
+    ])
+  })
 })

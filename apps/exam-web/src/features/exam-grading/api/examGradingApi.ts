@@ -22,6 +22,13 @@ export const examGradingApi = {
       }),
     ),
 
+  getScheduleSessionDetails: (scheduleId: string) =>
+    unwrap(
+      examClient.GET('/exam-grading/schedules/{scheduleId}/sessions/details', {
+        params: { path: { scheduleId } },
+      }),
+    ),
+
   getSession: (sessionId: string) =>
     unwrap(
       examClient.GET('/exam-grading/sessions/{sessionId}', {

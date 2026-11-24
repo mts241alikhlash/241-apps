@@ -178,6 +178,19 @@ describe('GradeAnswerUseCase', () => {
     expect(stored?.gradedById).toBe(STAFF.id)
   })
 
+  it('refuses a user with exam-grading.read-all but without exam-grading.grade', async () => {
+    const { world, essay } = await setup()
+    const reader = {
+      id: 'principal-1',
+      roles: ['PRINCIPAL'],
+      permissions: ['exam-grading.read', 'exam-grading.read-all'],
+    }
+
+    await expect(
+      make(world).execute(reader, 'ses-1', essay, { score: 5 }, NOW),
+    ).rejects.toThrow(NotFoundException)
+  })
+
   it('two grades at once leave one publication and the right total', async () => {
     const { world, essay, short } = await setup()
 

@@ -146,6 +146,7 @@ export class ExamRoomController {
   @RequireAnyPermission(
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   )
   @ApiOperation({
@@ -167,6 +168,7 @@ export class ExamRoomController {
   @RequireAnyPermission(
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   )
   @ApiOperation({
@@ -324,6 +326,7 @@ export class ExamRoomController {
   @RequireAnyPermission(
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   )
   @ApiOperation({ summary: 'Download the file of a submitted Berita Acara' })
@@ -379,7 +382,12 @@ export class ExamRoomController {
   }
 
   @Get('access-code')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({
     summary: 'The rotating token students type to enter this room',
   })
@@ -389,7 +397,7 @@ export class ExamRoomController {
     @CurrentUser() user: RoomStaffUser,
     @Param('roomId', ParseUUIDPipe) roomId: string,
   ): Promise<RoomAccessCodeDto> {
-    const room = await this.access.assertCanSupervise(user, roomId, new Date())
+    const room = await this.access.assertCanView(user, roomId)
     const derived = this.roomCodes.codeFor(
       room.id,
       room.tokenRotation,
@@ -449,7 +457,12 @@ export class ExamRoomController {
   }
 
   @Get('seats')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The students seated in this room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
   @ApiResponse({ status: 200, type: [ExamRoomSeatResponseDto] })
@@ -457,7 +470,7 @@ export class ExamRoomController {
     @CurrentUser() user: RoomStaffUser,
     @Param('roomId', ParseUUIDPipe) roomId: string,
   ): Promise<ExamRoomSeatResponseDto[]> {
-    await this.access.assertCanSupervise(user, roomId, new Date())
+    await this.access.assertCanView(user, roomId)
     return (await this.manageRooms.listSeats(roomId)).map((seat) => {
       const row = new ExamRoomSeatResponseDto()
       row.studentId = seat.studentId
@@ -468,7 +481,12 @@ export class ExamRoomController {
   }
 
   @Get('audit-logs')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The recovery actions taken in this room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
   @ApiResponse({ status: 200, type: [AuditLogDto] })
@@ -476,7 +494,7 @@ export class ExamRoomController {
     @CurrentUser() user: RoomStaffUser,
     @Param('roomId', ParseUUIDPipe) roomId: string,
   ): Promise<AuditLogDto[]> {
-    await this.access.assertCanSupervise(user, roomId, new Date())
+    await this.access.assertCanView(user, roomId)
     return (await this.manageRooms.listAuditLogs(roomId)).map((row) =>
       AuditLogDto.fromDomain(row),
     )
@@ -531,7 +549,12 @@ export class ExamRoomController {
   }
 
   @Get('supervisors')
-  @RequireAnyPermission('exam-rooms.supervise', 'exam-rooms.manage-all')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The supervisor slots of a room' })
   @ApiParam({ name: 'roomId', format: 'uuid' })
   @ApiResponse({ status: 200, type: [SupervisorSlotDto] })
@@ -647,6 +670,7 @@ export class ExamRoomOverviewController {
   @RequireAnyPermission(
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   )
   @ApiOperation({
@@ -666,6 +690,7 @@ export class ExamRoomOverviewController {
   @RequireAnyPermission(
     'exam-rooms.supervise',
     'exam-rooms.technician',
+    'exam-rooms.read-all',
     'exam-rooms.manage-all',
   )
   @ApiOperation({

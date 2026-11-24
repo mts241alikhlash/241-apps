@@ -9,6 +9,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { UpsertExamScoreUseCase } from '../../application/use-cases/upsert-exam-score/upsert-exam-score.use-case.js'
 import {
   ExamScoreReceiptDto,
@@ -17,6 +18,7 @@ import {
 
 @ApiTags('Exam Scores')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('exam-scores')
 export class ExamScoreInternalController {

@@ -85,6 +85,10 @@ const onSubmit = handleSubmit(async (form) => {
     roomId: props.roomId,
     slotId: props.slotId,
   }
+  if (where.slotId === '') {
+    error.value = 'Slot pengawas ruangan belum tersedia.'
+    return
+  }
   const result = await examRoomService.recordFieldNote(
     where.roomId,
     where.slotId,

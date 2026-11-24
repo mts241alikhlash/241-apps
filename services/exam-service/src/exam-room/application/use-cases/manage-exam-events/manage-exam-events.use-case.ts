@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { ApiUnprocessableException } from '../../../../core/filters/api-exception.js'
 import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import type {
@@ -9,13 +13,25 @@ import type {
 } from '../../../domain/entities/exam-event.entity.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repository.js'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+  type RoomStaffUser,
+} from '../../room-access.service.js'
 
 export interface EventListFilter {
   semesterId?: string
   status?: ExamEventStatus
   page?: number
   limit?: number
-  supervisedOnly?: { userId: string; from: Date }
+  staffedOnly?: {
+    userId: string
+    from: Date
+    supervise: boolean
+    technician: boolean
+  }
 }
 
 @Injectable()
@@ -36,13 +52,13 @@ export class ManageExamEventsUseCase {
   }
 
   async list(filter: EventListFilter): Promise<PaginatedResult<ExamEvent>> {
-    const { supervisedOnly, ...query } = filter
-    if (supervisedOnly === undefined) return this.rooms.listEvents(query)
-    const allowed = new Set(
-      await this.rooms.listEventIdsSupervisedBy(
-        supervisedOnly.userId,
-        supervisedOnly.from,
-      ),
+    const { staffedOnly, ...query } = filter
+    if (staffedOnly === undefined) return this.rooms.listEvents(query)
+    const allowed = await this.staffedEventIds(
+      staffedOnly.userId,
+      staffedOnly.from,
+      staffedOnly.supervise,
+      staffedOnly.technician,
     )
     const all = await this.rooms.listEvents({ ...query, page: 1, limit: 1000 })
     const rows = all.data.filter((row) => allowed.has(row.id))
@@ -54,6 +70,57 @@ export class ManageExamEventsUseCase {
       page,
       limit,
     }
+  }
+
+  async getForUser(
+    user: RoomStaffUser,
+    id: string,
+    now: Date = new Date(),
+  ): Promise<ExamEvent> {
+    const found = await this.get(id)
+    if (
+      user.permissions?.includes('exam-events.read') ||
+      user.permissions?.includes(READ_ALL) ||
+      user.permissions?.includes(MANAGE_ALL)
+    ) {
+      return found
+    }
+    const allowed = await this.staffedEventIds(
+      user.id,
+      now,
+      user.permissions?.includes(SUPERVISE) === true,
+      user.permissions?.includes(TECHNICIAN) === true,
+    )
+    if (!allowed.has(id)) {
+      throw new ForbiddenException({
+        code: 'EVENT_FORBIDDEN',
+        message: 'Anda tidak berwenang pada kegiatan ujian ini',
+      })
+    }
+    return found
+  }
+
+  private async staffedEventIds(
+    userId: string,
+    from: Date,
+    supervise: boolean,
+    technician: boolean,
+  ): Promise<Set<string>> {
+    const allowed = new Set<string>()
+    if (supervise) {
+      for (const id of await this.rooms.listEventIdsSupervisedBy(
+        userId,
+        from,
+      )) {
+        allowed.add(id)
+      }
+    }
+    if (technician) {
+      for (const id of await this.rooms.listEventIdsByTechnician(userId)) {
+        allowed.add(id)
+      }
+    }
+    return allowed
   }
 
   async get(id: string): Promise<ExamEvent> {

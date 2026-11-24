@@ -577,938 +577,10 @@
         ]
       }
     },
-    "/me/exams": {
+    "/exam-schedules": {
       "get": {
-        "operationId": "StudentExamController_findMine",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/MyExamDto"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The exams of the classroom the student is in",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/me/exams/{scheduleId}/sessions": {
-      "post": {
-        "operationId": "StudentExamController_start",
+        "operationId": "ExamScheduleController_findAll",
         "parameters": [
-          {
-            "name": "scheduleId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StartSessionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/StartedSessionDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Start the exam, or continue it on the same device, with the access code",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/questions": {
-      "get": {
-        "operationId": "SessionExamController_questions",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SessionPaperDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The shuffled paper of this session, without keys",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/answers": {
-      "get": {
-        "operationId": "SessionExamController_answers",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/SavedAnswerDto"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The answers saved so far",
-        "tags": [
-          "Student Exams"
-        ]
-      },
-      "post": {
-        "operationId": "SessionExamController_save",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SaveAnswerDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SavedAnswerAckDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Save one answer; replaying a client id is a no-op",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/answers/batch": {
-      "post": {
-        "operationId": "SessionExamController_saveBatch",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SaveAnswersBatchDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SaveAnswersBatchResultDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Save a batch of answers; a repeated entry keeps the last one",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/violations": {
-      "post": {
-        "operationId": "SessionExamController_violations",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordViolationsRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ViolationCountDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Tell the server how many times the student left the exam; it keeps the highest count and answers with it",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/events": {
-      "post": {
-        "operationId": "SessionExamController_events",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordSessionEventsRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/RecordSessionEventsResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload the events the app recorded; leaving the app demands a fresh token",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/heartbeat": {
-      "post": {
-        "operationId": "SessionExamController_heartbeatNow",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SessionHeartbeatDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Keep the session seen and read its lock state",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/suspension": {
-      "post": {
-        "operationId": "SessionExamController_suspension",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SessionSuspensionRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SessionSuspensionDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Give back the time a phone call took",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/resume": {
-      "post": {
-        "operationId": "SessionExamController_resume",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResumeSessionRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ResumeSessionResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Continue a session after leaving the app, with the current token",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/submit": {
-      "post": {
-        "operationId": "SessionExamController_submit",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubmitSessionRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/SubmitSessionResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Hand in the exam after verifying the answers the server holds; repeating it changes nothing",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/student-exams/{sessionId}/files/{fileId}": {
-      "get": {
-        "operationId": "SessionExamController_file",
-        "parameters": [
-          {
-            "name": "X-Client-Platform",
-            "in": "header",
-            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Device-Id",
-            "in": "header",
-            "description": "The tablet the session was started on",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "fileId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The image bytes",
-            "content": {
-              "image/png": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Stream an image used by the paper of this session",
-        "tags": [
-          "Student Exams"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/sessions": {
-      "get": {
-        "operationId": "ExamSessionAdminController_findBySchedule",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -1529,6 +601,66 @@
               "default": 10,
               "type": "number"
             }
+          },
+          {
+            "name": "classroomId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "packageId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SCHEDULED",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EXAM",
+                "NON_EXAM"
+              ]
+            }
           }
         ],
         "responses": {
@@ -1550,7 +682,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ScheduleSessionDto"
+                        "$ref": "#/components/schemas/ExamScheduleDto"
                       }
                     },
                     "meta": {
@@ -1578,15 +710,63 @@
             "bearer": []
           }
         ],
-        "summary": "The sessions students started for a schedule",
+        "summary": "List exam schedules",
         "tags": [
-          "Exam Sessions"
+          "Exam Schedules"
+        ]
+      },
+      "post": {
+        "operationId": "ExamScheduleController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExamScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamScheduleDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Schedule a package for a classroom and lock the package",
+        "tags": [
+          "Exam Schedules"
         ]
       }
     },
-    "/exam-sessions/{id}/audit-logs": {
+    "/exam-schedules/{id}": {
       "get": {
-        "operationId": "ExamSessionAdminController_auditLogs",
+        "operationId": "ExamScheduleController_findOne",
         "parameters": [
           {
             "name": "id",
@@ -1615,10 +795,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/AuditLogDto"
-                      }
+                      "$ref": "#/components/schemas/ExamScheduleDto"
                     }
                   }
                 }
@@ -1631,15 +808,103 @@
             "bearer": []
           }
         ],
-        "summary": "The recovery actions taken on this session",
+        "summary": "Get an exam schedule",
         "tags": [
-          "Exam Sessions"
+          "Exam Schedules"
+        ]
+      },
+      "patch": {
+        "operationId": "ExamScheduleController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamScheduleDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change the window and duration of a schedule",
+        "tags": [
+          "Exam Schedules"
         ]
       }
     },
-    "/exam-sessions/{id}/timeline": {
+    "/exam-schedules/{id}/cancel": {
+      "post": {
+        "operationId": "ExamScheduleController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a schedule",
+        "tags": [
+          "Exam Schedules"
+        ]
+      }
+    },
+    "/exam-schedules/{id}/access-code": {
       "get": {
-        "operationId": "ExamSessionAdminController_sessionTimeline",
+        "operationId": "ExamScheduleController_accessCode",
         "parameters": [
           {
             "name": "id",
@@ -1668,10 +933,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/SessionTimelineEntryDto"
-                      }
+                      "$ref": "#/components/schemas/AccessCodeDto"
                     }
                   }
                 }
@@ -1684,15 +946,15 @@
             "bearer": []
           }
         ],
-        "summary": "The device events and recovery actions of one session, merged",
+        "summary": "The access code students enter to start",
         "tags": [
-          "Exam Sessions"
+          "Exam Schedules"
         ]
       }
     },
-    "/exam-sessions/{id}/release": {
+    "/exam-schedules/{id}/access-code/rotate": {
       "post": {
-        "operationId": "ExamSessionAdminController_release",
+        "operationId": "ExamScheduleController_rotateAccessCode",
         "parameters": [
           {
             "name": "id",
@@ -1704,196 +966,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecoveryReasonDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ScheduleSessionDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Free the device of a session so the student can continue elsewhere",
-        "tags": [
-          "Exam Sessions"
-        ]
-      }
-    },
-    "/exam-sessions/{id}/reopen": {
-      "post": {
-        "operationId": "ExamSessionAdminController_reopen",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecoveryReasonDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/RecoverySessionDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Reopen an accidentally handed-in or violation-locked session, keeping its answers",
-        "tags": [
-          "Exam Sessions"
-        ]
-      }
-    },
-    "/exam-sessions/{id}/reset": {
-      "post": {
-        "operationId": "ExamSessionAdminController_reset",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecoveryReasonDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/RecoverySessionDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Wipe the answers and restart the session with a fresh shuffle",
-        "tags": [
-          "Exam Sessions"
-        ]
-      }
-    },
-    "/exam-sessions/{id}/extend-time": {
-      "post": {
-        "operationId": "ExamSessionAdminController_extendTime",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExtendSessionTimeDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
@@ -1911,7 +983,7 @@
                       "example": "Success"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/RecoverySessionDto"
+                      "$ref": "#/components/schemas/AccessCodeDto"
                     }
                   }
                 }
@@ -1924,9 +996,9 @@
             "bearer": []
           }
         ],
-        "summary": "Add compensation minutes to one session",
+        "summary": "Replace the access code with a new one",
         "tags": [
-          "Exam Sessions"
+          "Exam Schedules"
         ]
       }
     },
@@ -2230,6 +1302,56 @@
           }
         ],
         "summary": "Delete a package that is not waiting for review or scheduled",
+        "tags": [
+          "Exam Packages"
+        ]
+      }
+    },
+    "/exam-packages/{id}/print": {
+      "get": {
+        "operationId": "ExamPackageController_findPrint",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamPackagePrintDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a package with full pinned questions and resolved keys for printing",
         "tags": [
           "Exam Packages"
         ]
@@ -2885,431 +2007,6 @@
         "summary": "Mark a question as a bonus or replace its key, then rescore finished sessions",
         "tags": [
           "Exam Packages"
-        ]
-      }
-    },
-    "/exam-schedules": {
-      "get": {
-        "operationId": "ExamScheduleController_findAll",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "classroomId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "packageId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "SCHEDULED",
-                "CANCELLED"
-              ]
-            }
-          },
-          {
-            "name": "from",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "date-time",
-              "type": "string"
-            }
-          },
-          {
-            "name": "category",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "EXAM",
-                "NON_EXAM"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ExamScheduleDto"
-                      }
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "number"
-                        },
-                        "page": {
-                          "type": "number"
-                        },
-                        "limit": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List exam schedules",
-        "tags": [
-          "Exam Schedules"
-        ]
-      },
-      "post": {
-        "operationId": "ExamScheduleController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExamScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Schedule a package for a classroom and lock the package",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}": {
-      "get": {
-        "operationId": "ExamScheduleController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get an exam schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      },
-      "patch": {
-        "operationId": "ExamScheduleController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateExamScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/ExamScheduleDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Change the window and duration of a schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/cancel": {
-      "post": {
-        "operationId": "ExamScheduleController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Cancel a schedule",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/access-code": {
-      "get": {
-        "operationId": "ExamScheduleController_accessCode",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AccessCodeDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The access code students enter to start",
-        "tags": [
-          "Exam Schedules"
-        ]
-      }
-    },
-    "/exam-schedules/{id}/access-code/rotate": {
-      "post": {
-        "operationId": "ExamScheduleController_rotateAccessCode",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Success"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AccessCodeDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Replace the access code with a new one",
-        "tags": [
-          "Exam Schedules"
         ]
       }
     },
@@ -5609,6 +4306,1359 @@
         ]
       }
     },
+    "/me/exams": {
+      "get": {
+        "operationId": "StudentExamController_findMine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MyExamDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The exams of the classroom the student is in",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/me/exams/{scheduleId}/sessions": {
+      "post": {
+        "operationId": "StudentExamController_start",
+        "parameters": [
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/StartedSessionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start the exam, or continue it on the same device, with the access code",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/questions": {
+      "get": {
+        "operationId": "SessionExamController_questions",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionPaperDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The shuffled paper of this session, without keys",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/answers": {
+      "get": {
+        "operationId": "SessionExamController_answers",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SavedAnswerDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The answers saved so far",
+        "tags": [
+          "Student Exams"
+        ]
+      },
+      "post": {
+        "operationId": "SessionExamController_save",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SavedAnswerAckDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Save one answer; replaying a client id is a no-op",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/answers/batch": {
+      "post": {
+        "operationId": "SessionExamController_saveBatch",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAnswersBatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SaveAnswersBatchResultDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Save a batch of answers; a repeated entry keeps the last one",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/violations": {
+      "post": {
+        "operationId": "SessionExamController_violations",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordViolationsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ViolationCountDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tell the server how many times the student left the exam; it keeps the highest count and answers with it",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/events": {
+      "post": {
+        "operationId": "SessionExamController_events",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordSessionEventsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecordSessionEventsResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload the events the app recorded; leaving the app demands a fresh token",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/heartbeat": {
+      "post": {
+        "operationId": "SessionExamController_heartbeatNow",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionHeartbeatDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Keep the session seen and read its lock state",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/suspension": {
+      "post": {
+        "operationId": "SessionExamController_suspension",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionSuspensionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionSuspensionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Give back the time a phone call took",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/resume": {
+      "post": {
+        "operationId": "SessionExamController_resume",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeSessionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ResumeSessionResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Continue a session after leaving the app, with the current token",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/submit": {
+      "post": {
+        "operationId": "SessionExamController_submit",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSessionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SubmitSessionResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Hand in the exam after verifying the answers the server holds; repeating it changes nothing",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/student-exams/{sessionId}/files/{fileId}": {
+      "get": {
+        "operationId": "SessionExamController_file",
+        "parameters": [
+          {
+            "name": "X-Client-Platform",
+            "in": "header",
+            "description": "Kirim 'web' dari browser (dengan Origin atau Sec-Fetch-Site); aplikasi Android tidak mengirimnya.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "description": "The tablet the session was started on",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The image bytes",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream an image used by the paper of this session",
+        "tags": [
+          "Student Exams"
+        ]
+      }
+    },
+    "/exam-schedules/{id}/sessions": {
+      "get": {
+        "operationId": "ExamSessionAdminController_findBySchedule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ScheduleSessionDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The sessions students started for a schedule",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/audit-logs": {
+      "get": {
+        "operationId": "ExamSessionAdminController_auditLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuditLogDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The recovery actions taken on this session",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/timeline": {
+      "get": {
+        "operationId": "ExamSessionAdminController_sessionTimeline",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SessionTimelineEntryDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The device events and recovery actions of one session, merged",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/release": {
+      "post": {
+        "operationId": "ExamSessionAdminController_release",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ScheduleSessionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Free the device of a session so the student can continue elsewhere",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/reopen": {
+      "post": {
+        "operationId": "ExamSessionAdminController_reopen",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecoverySessionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reopen an accidentally handed-in or violation-locked session, keeping its answers",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/reset": {
+      "post": {
+        "operationId": "ExamSessionAdminController_reset",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecoverySessionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Wipe the answers and restart the session with a fresh shuffle",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
+    "/exam-sessions/{id}/extend-time": {
+      "post": {
+        "operationId": "ExamSessionAdminController_extendTime",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtendSessionTimeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RecoverySessionDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add compensation minutes to one session",
+        "tags": [
+          "Exam Sessions"
+        ]
+      }
+    },
     "/exam-files": {
       "post": {
         "operationId": "ExamFileController_upload",
@@ -6512,6 +6562,59 @@
           }
         ],
         "summary": "The sessions of one exam with their grading state",
+        "tags": [
+          "Exam Grading"
+        ]
+      }
+    },
+    "/exam-grading/schedules/{scheduleId}/sessions/details": {
+      "get": {
+        "operationId": "ExamGradingController_scheduleSessionDetails",
+        "parameters": [
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GradingSessionDetailDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Finished sessions of one exam with answers and keys for batch printing",
         "tags": [
           "Exam Grading"
         ]
@@ -7730,25 +7833,50 @@
           "updatedAt"
         ]
       },
-      "MyExamDto": {
+      "ExamScheduleDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
-            "description": "The schedule id"
+            "format": "uuid"
           },
-          "title": {
-            "type": "string"
-          },
-          "subjectId": {
+          "packageId": {
             "type": "string",
             "format": "uuid"
           },
-          "subjectName": {
+          "packageTitle": {
+            "type": "string"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "semesterId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
             "type": "string",
             "nullable": true,
-            "description": "Null when academic-service cannot name the subject right now"
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
           },
           "type": {
             "enum": [
@@ -7766,30 +7894,14 @@
             ],
             "type": "string"
           },
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number"
-          },
-          "minSubmitMinutes": {
-            "type": "number"
-          },
-          "status": {
+          "kind": {
             "enum": [
-              "UPCOMING",
-              "OPEN",
-              "IN_PROGRESS",
-              "FINISHED"
+              "REGULAR",
+              "MAKEUP"
             ],
             "type": "string"
           },
-          "sessionId": {
+          "makeupOfId": {
             "type": "string",
             "nullable": true,
             "format": "uuid"
@@ -7797,990 +7909,63 @@
           "activityId": {
             "type": "string",
             "nullable": true,
-            "format": "uuid",
-            "description": "The activity this exam belongs to, when it belongs to one"
-          },
-          "activityStatus": {
-            "nullable": true,
-            "enum": [
-              "DRAFT",
-              "SCHEDULED",
-              "ACTIVE",
-              "CLOSED"
-            ],
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "nullable": true,
             "format": "uuid"
           },
-          "eventName": {
-            "type": "string",
-            "nullable": true,
-            "description": "Null when the event cannot be named right now"
-          },
-          "lifecycle": {
+          "status": {
             "enum": [
-              "UPCOMING",
-              "OPEN",
-              "FINISHED"
+              "SCHEDULED",
+              "CANCELLED"
             ],
             "type": "string"
           },
-          "roomName": {
+          "createdById": {
             "type": "string",
-            "nullable": true,
-            "description": "Only filled while the exam is open"
+            "format": "uuid"
           },
-          "seatNumber": {
-            "type": "number",
-            "nullable": true
-          },
-          "participantNumber": {
-            "type": "string",
-            "nullable": true,
-            "description": "Null when no number was issued for the semester"
-          },
-          "makeup": {
+          "hasSessions": {
             "type": "boolean",
-            "description": "True for a makeup sitting"
+            "description": "True once a student started: it can no longer be cancelled"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
           "id",
-          "title",
-          "subjectId",
-          "subjectName",
-          "type",
-          "category",
+          "packageId",
+          "packageTitle",
+          "classroomId",
+          "classroomName",
+          "semesterId",
+          "eventId",
           "startsAt",
           "endsAt",
           "durationMinutes",
           "minSubmitMinutes",
-          "status",
-          "sessionId",
-          "activityId",
-          "activityStatus",
-          "eventId",
-          "eventName",
-          "lifecycle",
-          "roomName",
-          "seatNumber",
-          "participantNumber",
-          "makeup"
-        ]
-      },
-      "SebProofDto": {
-        "type": "object",
-        "properties": {
-          "configKeyHash": {
-            "type": "string",
-            "minLength": 64,
-            "maxLength": 64,
-            "pattern": "^[0-9a-fA-F]{64}$",
-            "description": "64 hex characters, SHA-256 of page URL and config key"
-          },
-          "pageUrl": {
-            "type": "string",
-            "maxLength": 2048
-          }
-        },
-        "required": [
-          "configKeyHash",
-          "pageUrl"
-        ]
-      },
-      "StartSessionDto": {
-        "type": "object",
-        "properties": {
-          "accessCode": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 20,
-            "example": "K7M2QX"
-          },
-          "deviceId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100,
-            "description": "Identifier of the tablet starting the exam"
-          },
-          "seb": {
-            "$ref": "#/components/schemas/SebProofDto"
-          }
-        },
-        "required": [
-          "accessCode",
-          "deviceId"
-        ]
-      },
-      "StartedSessionDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "deadline": {
-            "type": "number",
-            "description": "End of the working time, epoch milliseconds"
-          },
-          "serverTime": {
-            "type": "number",
-            "description": "Server clock, epoch milliseconds"
-          },
-          "policy": {
-            "$ref": "#/components/schemas/ExamPolicyDto"
-          }
-        },
-        "required": [
-          "sessionId",
-          "deadline",
-          "serverTime",
-          "policy"
-        ]
-      },
-      "PaperChoiceDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "enum": [
-              "A",
-              "B",
-              "C",
-              "D",
-              "E"
-            ]
-          },
-          "html": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "key",
-          "html"
-        ]
-      },
-      "PaperQuestionDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "number": {
-            "type": "number",
-            "description": "Position on this student paper, from 1"
-          },
-          "type": {
-            "enum": [
-              "MULTIPLE_CHOICE",
-              "MULTIPLE_RESPONSE",
-              "TRUE_FALSE",
-              "SHORT_ANSWER",
-              "ESSAY"
-            ],
-            "type": "string"
-          },
-          "bodyHtml": {
-            "type": "string"
-          },
-          "points": {
-            "type": "number"
-          },
-          "choices": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaperChoiceDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "number",
           "type",
-          "bodyHtml",
-          "points",
-          "choices"
-        ]
-      },
-      "SessionPaperDto": {
-        "type": "object",
-        "properties": {
-          "questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaperQuestionDto"
-            }
-          },
-          "startedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "minSubmitMinutes": {
-            "type": "number"
-          },
-          "serverTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "questions",
-          "startedAt",
-          "minSubmitMinutes",
-          "serverTime"
-        ]
-      },
-      "KeyAnswerPayloadDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "enum": [
-              "A",
-              "B",
-              "C",
-              "D",
-              "E"
-            ],
-            "type": "string"
-          }
-        },
-        "required": [
-          "key"
-        ]
-      },
-      "KeysAnswerPayloadDto": {
-        "type": "object",
-        "properties": {
-          "keys": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum": [
-                "A",
-                "B",
-                "C",
-                "D",
-                "E"
-              ]
-            }
-          }
-        },
-        "required": [
-          "keys"
-        ]
-      },
-      "ValueAnswerPayloadDto": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "value"
-        ]
-      },
-      "TextAnswerPayloadDto": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "text"
-        ]
-      },
-      "SavedAnswerDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "answer": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/TextAnswerPayloadDto"
-              }
-            ],
-            "description": "One of { key } | { keys } | { value } | { text }"
-          }
-        },
-        "required": [
-          "questionId",
-          "answer"
-        ]
-      },
-      "SaveAnswerDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64,
-            "description": "Generated by the tablet per change; a replay is a no-op"
-          },
-          "answer": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/TextAnswerPayloadDto"
-              }
-            ],
-            "description": "One of { key } | { keys } | { value } | { text }"
-          }
-        },
-        "required": [
-          "questionId",
-          "clientId",
-          "answer"
-        ]
-      },
-      "SavedAnswerAckDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "receivedAfterDeadline": {
-            "type": "boolean"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "questionId",
-          "clientId",
-          "receivedAfterDeadline",
+          "category",
+          "kind",
+          "makeupOfId",
+          "activityId",
+          "status",
+          "createdById",
+          "hasSessions",
+          "createdAt",
           "updatedAt"
         ]
       },
-      "SaveAnswerItemDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64,
-            "description": "Generated by the tablet per change; a replay is a no-op"
-          },
-          "answer": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
-              },
-              {
-                "$ref": "#/components/schemas/TextAnswerPayloadDto"
-              }
-            ],
-            "description": "One of { key } | { keys } | { value } | { text }"
-          }
-        },
-        "required": [
-          "questionId",
-          "clientId",
-          "answer"
-        ]
-      },
-      "SaveAnswersBatchDto": {
-        "type": "object",
-        "properties": {
-          "answers": {
-            "maxItems": 250,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SaveAnswerItemDto"
-            }
-          },
-          "batteryLevel": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 100,
-            "nullable": true
-          },
-          "isCharging": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "dndGranted": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "lockTaskActive": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "batteryUnrestricted": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "pendingLocalCount": {
-            "type": "number",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "answers"
-        ]
-      },
-      "ConfirmedAnswerDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "receivedAfterDeadline": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "questionId",
-          "clientId",
-          "updatedAt",
-          "receivedAfterDeadline"
-        ]
-      },
-      "SaveAnswersBatchResultDto": {
-        "type": "object",
-        "properties": {
-          "confirmed": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ConfirmedAnswerDto"
-            }
-          },
-          "skipped": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "questionId": {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                "clientId": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "questionId",
-                "clientId"
-              ]
-            },
-            "description": "Items refused because their clientId already belongs to another question; re-send each one with a fresh clientId"
-          },
-          "confirmedCount": {
-            "type": "number"
-          },
-          "serverTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "confirmed",
-          "skipped",
-          "confirmedCount",
-          "serverTime"
-        ]
-      },
-      "RecordViolationsRequestDto": {
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1000,
-            "description": "How many times the app saw the student leave the exam so far; the server keeps the highest value it was told, so send 0 to only read it back"
-          }
-        },
-        "required": [
-          "count"
-        ]
-      },
-      "ViolationCountDto": {
-        "type": "object",
-        "properties": {
-          "violationCount": {
-            "type": "number",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "violationCount"
-        ]
-      },
-      "SessionEventItemDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64,
-            "description": "Stable id of the event on the tablet"
-          },
-          "type": {
-            "enum": [
-              "PERMISSION_DIALOG",
-              "SCREEN_OFF",
-              "FOCUS_LOST_BRIEF",
-              "OVERLAY_OR_SHADE",
-              "CALL_OR_MIC_ACTIVE",
-              "ABSENCE_GAP",
-              "SCREEN_SHARE_DETECTED",
-              "LEFT_APP",
-              "VIOLATION_LOCKED",
-              "CALL_SUSPENDED"
-            ],
-            "type": "string"
-          },
-          "isViolation": {
-            "type": "boolean"
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 0,
-            "maxLength": 200
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "clientId",
-          "type",
-          "isViolation",
-          "occurredAt"
-        ]
-      },
-      "RecordSessionEventsRequestDto": {
-        "type": "object",
-        "properties": {
-          "events": {
-            "maxItems": 200,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SessionEventItemDto"
-            }
-          }
-        },
-        "required": [
-          "events"
-        ]
-      },
-      "SessionEventDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientId": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "PERMISSION_DIALOG",
-              "SCREEN_OFF",
-              "FOCUS_LOST_BRIEF",
-              "OVERLAY_OR_SHADE",
-              "CALL_OR_MIC_ACTIVE",
-              "ABSENCE_GAP",
-              "SCREEN_SHARE_DETECTED",
-              "LEFT_APP",
-              "VIOLATION_LOCKED",
-              "CALL_SUSPENDED"
-            ]
-          },
-          "isViolation": {
-            "type": "boolean"
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "occurredAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "clientId",
-          "type",
-          "isViolation",
-          "detail",
-          "occurredAt"
-        ]
-      },
-      "RecordSessionEventsResponseDto": {
-        "type": "object",
-        "properties": {
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SessionEventDto"
-            }
-          },
-          "violationCount": {
-            "type": "number",
-            "minimum": 0
-          },
-          "requiresTokenReentry": {
-            "type": "boolean"
-          },
-          "lockedByViolation": {
-            "type": "boolean"
-          },
-          "serverTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "events",
-          "violationCount",
-          "requiresTokenReentry",
-          "lockedByViolation",
-          "serverTime"
-        ]
-      },
-      "SessionHeartbeatDto": {
-        "type": "object",
-        "properties": {
-          "lockedByViolation": {
-            "type": "boolean"
-          },
-          "requiresTokenReentry": {
-            "type": "boolean"
-          },
-          "absentSince": {
-            "type": "string",
-            "nullable": true
-          },
-          "serverTime": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "lockedByViolation",
-          "requiresTokenReentry",
-          "absentSince",
-          "serverTime"
-        ]
-      },
-      "SessionSuspensionRequestDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "enum": [
-              "CALL"
-            ],
-            "type": "string"
-          },
-          "seconds": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 900
-          },
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "reason",
-          "seconds",
-          "clientId"
-        ]
-      },
-      "SessionSuspensionDto": {
-        "type": "object",
-        "properties": {
-          "deadline": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "finalizeAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "extraMinutes": {
-            "type": "number",
-            "description": "Minutes this report added to the session"
-          },
-          "suspendedSeconds": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "deadline",
-          "finalizeAt",
-          "extraMinutes",
-          "suspendedSeconds"
-        ]
-      },
-      "ResumeSessionRequestDto": {
-        "type": "object",
-        "properties": {
-          "accessCode": {
-            "type": "string",
-            "minLength": 4,
-            "maxLength": 12,
-            "description": "The room or schedule token shown now"
-          },
-          "deviceId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
-          },
-          "seb": {
-            "$ref": "#/components/schemas/SebProofDto"
-          }
-        },
-        "required": [
-          "accessCode",
-          "deviceId"
-        ]
-      },
-      "ResumeSessionResponseDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "IN_PROGRESS",
-              "SUBMITTED",
-              "EXPIRED",
-              "GRADED"
-            ]
-          },
-          "deadline": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "serverTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "requiresTokenReentry": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "sessionId",
-          "status",
-          "deadline",
-          "serverTime",
-          "requiresTokenReentry"
-        ]
-      },
-      "SubmitSessionRequestDto": {
-        "type": "object",
-        "properties": {
-          "violations": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1000,
-            "description": "Times the app saw the student leave the exam; four or more is what made the app hand the exam in"
-          },
-          "expectedAnswerCount": {
-            "type": "number",
-            "minimum": 0,
-            "description": "How many questions the tablet believes it answered; a shortfall keeps the session open"
-          },
-          "pendingAnswers": {
-            "maxItems": 250,
-            "description": "Answers the tablet could not confirm before handing in",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SaveAnswerItemDto"
-            }
-          }
-        }
-      },
-      "SubmitSessionResponseDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "SUBMITTED",
-              "EXPIRED",
-              "GRADED"
-            ]
-          },
-          "submittedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "confirmedAnswerCount": {
-            "type": "number"
-          },
-          "answersStored": {
-            "type": "boolean",
-            "description": "False when the session was already closed, so the carried answers were not stored"
-          },
-          "serverTime": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "status",
-          "submittedAt",
-          "confirmedAnswerCount",
-          "answersStored",
-          "serverTime"
-        ]
-      },
-      "ScheduleSessionDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "studentId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "studentName": {
-            "type": "string",
-            "nullable": true
-          },
-          "studentNis": {
-            "type": "string",
-            "nullable": true
-          },
-          "participantNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "enum": [
-              "IN_PROGRESS",
-              "SUBMITTED",
-              "EXPIRED",
-              "GRADED"
-            ],
-            "type": "string"
-          },
-          "client": {
-            "enum": [
-              "ISTIQRA",
-              "SEB"
-            ],
-            "type": "string"
-          },
-          "startedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "submittedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "rawScore": {
-            "type": "number",
-            "nullable": true
-          },
-          "maxScore": {
-            "type": "number",
-            "nullable": true
-          },
-          "deviceBound": {
-            "type": "boolean",
-            "description": "False once a supervisor released the device"
-          },
-          "violationCount": {
-            "type": "number",
-            "description": "Times the app reported the student leaving the exam"
-          }
-        },
-        "required": [
-          "sessionId",
-          "studentId",
-          "studentName",
-          "studentNis",
-          "participantNumber",
-          "status",
-          "client",
-          "startedAt",
-          "submittedAt",
-          "rawScore",
-          "maxScore",
-          "deviceBound",
-          "violationCount"
-        ]
-      },
-      "ScheduleSessionListResponseDto": {
+      "ExamScheduleListResponseDto": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ScheduleSessionDto"
+              "$ref": "#/components/schemas/ExamScheduleDto"
             }
           },
           "total": {
@@ -8800,236 +7985,127 @@
           "limit"
         ]
       },
-      "AuditLogDto": {
+      "CreateExamScheduleDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "sessionId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "roomId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "action": {
-            "type": "string",
-            "enum": [
-              "RELEASE_DEVICE",
-              "REOPEN_SESSION",
-              "RESET_SESSION",
-              "EXTEND_TIME",
-              "ALLOW_WEB_CLIENT",
-              "ALLOW_LATE_ENTRY",
-              "ROTATE_ROOM_TOKEN",
-              "SUBSTITUTE_SUPERVISOR",
-              "ASSIGN_SUPERVISOR",
-              "SUBMIT_ROOM_REPORT",
-              "VERIFY_ROOM_REPORT",
-              "REOPEN_ROOM_REPORT",
-              "CLOSED_BY_ADMIN",
-              "RESET_CREDENTIALS",
-              "REPLACE_ROOM_REPORT_FILE",
-              "UPLOAD_ATTENDANCE_FILE"
-            ]
-          },
-          "actorId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "sessionId",
-          "roomId",
-          "action",
-          "actorId",
-          "reason",
-          "metadata",
-          "createdAt"
-        ]
-      },
-      "SessionTimelineEntryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "kind": {
-            "type": "string",
-            "enum": [
-              "EVENT",
-              "AUDIT"
-            ]
-          },
-          "occurredAt": {
+          "startsAt": {
             "type": "string",
             "format": "date-time"
           },
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "action": {
-            "type": "string",
-            "nullable": true
-          },
-          "isViolation": {
-            "type": "boolean"
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "actorId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "reason": {
-            "type": "string",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        },
-        "required": [
-          "id",
-          "kind",
-          "occurredAt",
-          "type",
-          "action",
-          "isViolation",
-          "detail",
-          "actorId",
-          "reason",
-          "metadata"
-        ]
-      },
-      "RecoveryReasonDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 5,
-            "maxLength": 300
-          }
-        },
-        "required": [
-          "reason"
-        ]
-      },
-      "RecoverySessionDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "scheduleId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "roomId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "IN_PROGRESS",
-              "SUBMITTED",
-              "EXPIRED",
-              "GRADED"
-            ]
-          },
-          "violationCount": {
-            "type": "number"
-          },
-          "lockedByViolation": {
-            "type": "boolean"
-          },
-          "requiresTokenReentry": {
-            "type": "boolean"
-          },
-          "extraMinutes": {
-            "type": "number"
-          },
-          "allowLateEntry": {
-            "type": "boolean"
-          },
-          "deadline": {
+          "endsAt": {
             "type": "string",
             "format": "date-time"
           },
-          "finalizeAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "submittedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "gradedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "sessionId",
-          "scheduleId",
-          "roomId",
-          "status",
-          "violationCount",
-          "lockedByViolation",
-          "requiresTokenReentry",
-          "extraMinutes",
-          "allowLateEntry",
-          "deadline",
-          "finalizeAt",
-          "submittedAt",
-          "gradedAt"
-        ]
-      },
-      "ExtendSessionTimeDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "minLength": 5,
-            "maxLength": 300
-          },
-          "minutes": {
+          "durationMinutes": {
             "type": "number",
             "minimum": 1,
-            "maximum": 120
+            "maximum": 1440
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classroomId": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
-          "reason",
-          "minutes"
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "type",
+          "packageId",
+          "classroomId"
+        ]
+      },
+      "UpdateExamScheduleDto": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "minSubmitMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1440
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
+          }
+        },
+        "required": [
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "type"
+        ]
+      },
+      "AccessCodeDto": {
+        "type": "object",
+        "properties": {
+          "accessCode": {
+            "type": "string",
+            "example": "K7M2QX"
+          },
+          "rotation": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "slotIndex": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "accessCode",
+          "rotation",
+          "expiresAt",
+          "slotIndex"
         ]
       },
       "ExamPackageSummaryDto": {
@@ -9299,127 +8375,6 @@
           "reviews"
         ]
       },
-      "CreateExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "title",
-          "subjectId",
-          "gradeId"
-        ]
-      },
-      "ExamPackageItemDto": {
-        "type": "object",
-        "properties": {
-          "questionId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "questionVersion": {
-            "type": "number"
-          },
-          "position": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "questionId",
-          "questionVersion",
-          "position"
-        ]
-      },
-      "ExamPackageDetailDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "title": {
-            "type": "string"
-          },
-          "subjectId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "gradeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "DRAFT",
-              "SUBMITTED",
-              "RETURNED",
-              "APPROVED",
-              "LOCKED"
-            ],
-            "type": "string"
-          },
-          "lockedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamPackageItemDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "subjectId",
-          "gradeId",
-          "status",
-          "lockedAt",
-          "createdById",
-          "createdAt",
-          "updatedAt",
-          "items"
-        ]
-      },
-      "RenameExamPackageDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 200
-          }
-        },
-        "required": [
-          "title"
-        ]
-      },
       "ChoiceDto": {
         "type": "object",
         "properties": {
@@ -9582,6 +8537,260 @@
         },
         "required": [
           "guideHtml"
+        ]
+      },
+      "ExamPackagePrintItemDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionVersion": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "ESSAY"
+            ],
+            "type": "string"
+          },
+          "bodyHtml": {
+            "type": "string"
+          },
+          "content": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MultipleChoiceContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/MultipleResponseContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/TrueFalseContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/ShortAnswerContentDto"
+              },
+              {
+                "$ref": "#/components/schemas/EssayContentDto"
+              }
+            ]
+          },
+          "points": {
+            "type": "number"
+          },
+          "resolution": {
+            "enum": [
+              "NORMAL",
+              "BONUS_ALL",
+              "KEY_OVERRIDE"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "questionId",
+          "questionVersion",
+          "position",
+          "type",
+          "bodyHtml",
+          "content",
+          "points",
+          "resolution"
+        ]
+      },
+      "ExamPackagePrintDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "RETURNED",
+              "APPROVED",
+              "LOCKED"
+            ],
+            "type": "string"
+          },
+          "lockedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamPackagePrintItemDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "gradeId",
+          "status",
+          "lockedAt",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "items"
+        ]
+      },
+      "CreateExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "title",
+          "subjectId",
+          "gradeId"
+        ]
+      },
+      "ExamPackageItemDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "questionVersion": {
+            "type": "number"
+          },
+          "position": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "questionId",
+          "questionVersion",
+          "position"
+        ]
+      },
+      "ExamPackageDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "gradeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "RETURNED",
+              "APPROVED",
+              "LOCKED"
+            ],
+            "type": "string"
+          },
+          "lockedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "createdById": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamPackageItemDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "gradeId",
+          "status",
+          "lockedAt",
+          "createdById",
+          "createdAt",
+          "updatedAt",
+          "items"
+        ]
+      },
+      "RenameExamPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "title"
         ]
       },
       "QuestionVersionDto": {
@@ -9923,281 +9132,6 @@
           "questionId",
           "resolution",
           "rescoredSessions"
-        ]
-      },
-      "ExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "packageTitle": {
-            "type": "string"
-          },
-          "classroomId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "classroomName": {
-            "type": "string",
-            "nullable": true
-          },
-          "semesterId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number"
-          },
-          "minSubmitMinutes": {
-            "type": "number"
-          },
-          "type": {
-            "enum": [
-              "DAILY",
-              "ASSIGNMENT",
-              "MIDTERM",
-              "FINAL"
-            ],
-            "type": "string"
-          },
-          "category": {
-            "enum": [
-              "EXAM",
-              "NON_EXAM"
-            ],
-            "type": "string"
-          },
-          "kind": {
-            "enum": [
-              "REGULAR",
-              "MAKEUP"
-            ],
-            "type": "string"
-          },
-          "makeupOfId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "activityId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid"
-          },
-          "status": {
-            "enum": [
-              "SCHEDULED",
-              "CANCELLED"
-            ],
-            "type": "string"
-          },
-          "createdById": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "hasSessions": {
-            "type": "boolean",
-            "description": "True once a student started: it can no longer be cancelled"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "packageId",
-          "packageTitle",
-          "classroomId",
-          "classroomName",
-          "semesterId",
-          "eventId",
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "minSubmitMinutes",
-          "type",
-          "category",
-          "kind",
-          "makeupOfId",
-          "activityId",
-          "status",
-          "createdById",
-          "hasSessions",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "ExamScheduleListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExamScheduleDto"
-            }
-          },
-          "total": {
-            "type": "number"
-          },
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "data",
-          "total",
-          "page",
-          "limit"
-        ]
-      },
-      "CreateExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1440
-          },
-          "minSubmitMinutes": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1440
-          },
-          "type": {
-            "enum": [
-              "DAILY",
-              "ASSIGNMENT",
-              "MIDTERM",
-              "FINAL"
-            ],
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
-          },
-          "packageId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "classroomId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "type",
-          "packageId",
-          "classroomId"
-        ]
-      },
-      "UpdateExamScheduleDto": {
-        "type": "object",
-        "properties": {
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 1,
-            "maximum": 1440
-          },
-          "minSubmitMinutes": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1440
-          },
-          "type": {
-            "enum": [
-              "DAILY",
-              "ASSIGNMENT",
-              "MIDTERM",
-              "FINAL"
-            ],
-            "type": "string"
-          },
-          "eventId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid",
-            "description": "The exam event this schedule belongs to; seats come from it. Null detaches it"
-          }
-        },
-        "required": [
-          "startsAt",
-          "endsAt",
-          "durationMinutes",
-          "type"
-        ]
-      },
-      "AccessCodeDto": {
-        "type": "object",
-        "properties": {
-          "accessCode": {
-            "type": "string",
-            "example": "K7M2QX"
-          },
-          "rotation": {
-            "type": "number"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "slotIndex": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "accessCode",
-          "rotation",
-          "expiresAt",
-          "slotIndex"
         ]
       },
       "ExamEventDto": {
@@ -11904,6 +10838,19 @@
           "expiresAt"
         ]
       },
+      "RecoveryReasonDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
       "UpdateExamRoomDto": {
         "type": "object",
         "properties": {
@@ -11952,6 +10899,71 @@
           "studentId",
           "classroomId",
           "seatNumber"
+        ]
+      },
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "RELEASE_DEVICE",
+              "REOPEN_SESSION",
+              "RESET_SESSION",
+              "EXTEND_TIME",
+              "ALLOW_WEB_CLIENT",
+              "ALLOW_LATE_ENTRY",
+              "ROTATE_ROOM_TOKEN",
+              "SUBSTITUTE_SUPERVISOR",
+              "ASSIGN_SUPERVISOR",
+              "SUBMIT_ROOM_REPORT",
+              "VERIFY_ROOM_REPORT",
+              "REOPEN_ROOM_REPORT",
+              "CLOSED_BY_ADMIN",
+              "RESET_CREDENTIALS",
+              "REPLACE_ROOM_REPORT_FILE",
+              "UPLOAD_ATTENDANCE_FILE"
+            ]
+          },
+          "actorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "sessionId",
+          "roomId",
+          "action",
+          "actorId",
+          "reason",
+          "metadata",
+          "createdAt"
         ]
       },
       "ExamRoomSeatDto": {
@@ -12118,6 +11130,81 @@
         "required": [
           "reason",
           "minutes"
+        ]
+      },
+      "RecoverySessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scheduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "EXPIRED",
+              "GRADED"
+            ]
+          },
+          "violationCount": {
+            "type": "number"
+          },
+          "lockedByViolation": {
+            "type": "boolean"
+          },
+          "requiresTokenReentry": {
+            "type": "boolean"
+          },
+          "extraMinutes": {
+            "type": "number"
+          },
+          "allowLateEntry": {
+            "type": "boolean"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalizeAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submittedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "gradedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sessionId",
+          "scheduleId",
+          "roomId",
+          "status",
+          "violationCount",
+          "lockedByViolation",
+          "requiresTokenReentry",
+          "extraMinutes",
+          "allowLateEntry",
+          "deadline",
+          "finalizeAt",
+          "submittedAt",
+          "gradedAt"
         ]
       },
       "RecoverySessionListDto": {
@@ -12346,6 +11433,1155 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "MyExamDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The schedule id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when academic-service cannot name the subject right now"
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "ASSIGNMENT",
+              "MIDTERM",
+              "FINAL"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "EXAM",
+              "NON_EXAM"
+            ],
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "UPCOMING",
+              "OPEN",
+              "IN_PROGRESS",
+              "FINISHED"
+            ],
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The activity this exam belongs to, when it belongs to one"
+          },
+          "activityStatus": {
+            "nullable": true,
+            "enum": [
+              "DRAFT",
+              "SCHEDULED",
+              "ACTIVE",
+              "CLOSED"
+            ],
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when the event cannot be named right now"
+          },
+          "lifecycle": {
+            "enum": [
+              "UPCOMING",
+              "OPEN",
+              "FINISHED"
+            ],
+            "type": "string"
+          },
+          "roomName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Only filled while the exam is open"
+          },
+          "seatNumber": {
+            "type": "number",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when no number was issued for the semester"
+          },
+          "makeup": {
+            "type": "boolean",
+            "description": "True for a makeup sitting"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "subjectId",
+          "subjectName",
+          "type",
+          "category",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "minSubmitMinutes",
+          "status",
+          "sessionId",
+          "activityId",
+          "activityStatus",
+          "eventId",
+          "eventName",
+          "lifecycle",
+          "roomName",
+          "seatNumber",
+          "participantNumber",
+          "makeup"
+        ]
+      },
+      "SebProofDto": {
+        "type": "object",
+        "properties": {
+          "configKeyHash": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64,
+            "pattern": "^[0-9a-fA-F]{64}$",
+            "description": "64 hex characters, SHA-256 of page URL and config key"
+          },
+          "pageUrl": {
+            "type": "string",
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "configKeyHash",
+          "pageUrl"
+        ]
+      },
+      "StartSessionDto": {
+        "type": "object",
+        "properties": {
+          "accessCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "example": "K7M2QX"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Identifier of the tablet starting the exam"
+          },
+          "seb": {
+            "$ref": "#/components/schemas/SebProofDto"
+          }
+        },
+        "required": [
+          "accessCode",
+          "deviceId"
+        ]
+      },
+      "StartedSessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deadline": {
+            "type": "number",
+            "description": "End of the working time, epoch milliseconds"
+          },
+          "serverTime": {
+            "type": "number",
+            "description": "Server clock, epoch milliseconds"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/ExamPolicyDto"
+          }
+        },
+        "required": [
+          "sessionId",
+          "deadline",
+          "serverTime",
+          "policy"
+        ]
+      },
+      "PaperChoiceDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ]
+          },
+          "html": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "html"
+        ]
+      },
+      "PaperQuestionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "number",
+            "description": "Position on this student paper, from 1"
+          },
+          "type": {
+            "enum": [
+              "MULTIPLE_CHOICE",
+              "MULTIPLE_RESPONSE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "ESSAY"
+            ],
+            "type": "string"
+          },
+          "bodyHtml": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          },
+          "choices": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaperChoiceDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "type",
+          "bodyHtml",
+          "points",
+          "choices"
+        ]
+      },
+      "SessionPaperDto": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaperQuestionDto"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "minSubmitMinutes": {
+            "type": "number"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "questions",
+          "startedAt",
+          "minSubmitMinutes",
+          "serverTime"
+        ]
+      },
+      "KeyAnswerPayloadDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "KeysAnswerPayloadDto": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D",
+                "E"
+              ]
+            }
+          }
+        },
+        "required": [
+          "keys"
+        ]
+      },
+      "ValueAnswerPayloadDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "TextAnswerPayloadDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "SavedAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "answer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/TextAnswerPayloadDto"
+              }
+            ],
+            "description": "One of { key } | { keys } | { value } | { text }"
+          }
+        },
+        "required": [
+          "questionId",
+          "answer"
+        ]
+      },
+      "SaveAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Generated by the tablet per change; a replay is a no-op"
+          },
+          "answer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/TextAnswerPayloadDto"
+              }
+            ],
+            "description": "One of { key } | { keys } | { value } | { text }"
+          }
+        },
+        "required": [
+          "questionId",
+          "clientId",
+          "answer"
+        ]
+      },
+      "SavedAnswerAckDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "receivedAfterDeadline": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "questionId",
+          "clientId",
+          "receivedAfterDeadline",
+          "updatedAt"
+        ]
+      },
+      "SaveAnswerItemDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Generated by the tablet per change; a replay is a no-op"
+          },
+          "answer": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KeyAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/KeysAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/ValueAnswerPayloadDto"
+              },
+              {
+                "$ref": "#/components/schemas/TextAnswerPayloadDto"
+              }
+            ],
+            "description": "One of { key } | { keys } | { value } | { text }"
+          }
+        },
+        "required": [
+          "questionId",
+          "clientId",
+          "answer"
+        ]
+      },
+      "SaveAnswersBatchDto": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "maxItems": 250,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaveAnswerItemDto"
+            }
+          },
+          "batteryLevel": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true
+          },
+          "isCharging": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "dndGranted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "lockTaskActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "batteryUnrestricted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "pendingLocalCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      },
+      "ConfirmedAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receivedAfterDeadline": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "questionId",
+          "clientId",
+          "updatedAt",
+          "receivedAfterDeadline"
+        ]
+      },
+      "SaveAnswersBatchResultDto": {
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfirmedAnswerDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "questionId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "clientId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "questionId",
+                "clientId"
+              ]
+            },
+            "description": "Items refused because their clientId already belongs to another question; re-send each one with a fresh clientId"
+          },
+          "confirmedCount": {
+            "type": "number"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "confirmed",
+          "skipped",
+          "confirmedCount",
+          "serverTime"
+        ]
+      },
+      "RecordViolationsRequestDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000,
+            "description": "How many times the app saw the student leave the exam so far; the server keeps the highest value it was told, so send 0 to only read it back"
+          }
+        },
+        "required": [
+          "count"
+        ]
+      },
+      "ViolationCountDto": {
+        "type": "object",
+        "properties": {
+          "violationCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "violationCount"
+        ]
+      },
+      "SessionEventItemDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Stable id of the event on the tablet"
+          },
+          "type": {
+            "enum": [
+              "PERMISSION_DIALOG",
+              "SCREEN_OFF",
+              "FOCUS_LOST_BRIEF",
+              "OVERLAY_OR_SHADE",
+              "CALL_OR_MIC_ACTIVE",
+              "ABSENCE_GAP",
+              "SCREEN_SHARE_DETECTED",
+              "LEFT_APP",
+              "VIOLATION_LOCKED",
+              "CALL_SUSPENDED"
+            ],
+            "type": "string"
+          },
+          "isViolation": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 0,
+            "maxLength": 200
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "clientId",
+          "type",
+          "isViolation",
+          "occurredAt"
+        ]
+      },
+      "RecordSessionEventsRequestDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionEventItemDto"
+            }
+          }
+        },
+        "required": [
+          "events"
+        ]
+      },
+      "SessionEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PERMISSION_DIALOG",
+              "SCREEN_OFF",
+              "FOCUS_LOST_BRIEF",
+              "OVERLAY_OR_SHADE",
+              "CALL_OR_MIC_ACTIVE",
+              "ABSENCE_GAP",
+              "SCREEN_SHARE_DETECTED",
+              "LEFT_APP",
+              "VIOLATION_LOCKED",
+              "CALL_SUSPENDED"
+            ]
+          },
+          "isViolation": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "clientId",
+          "type",
+          "isViolation",
+          "detail",
+          "occurredAt"
+        ]
+      },
+      "RecordSessionEventsResponseDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionEventDto"
+            }
+          },
+          "violationCount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "requiresTokenReentry": {
+            "type": "boolean"
+          },
+          "lockedByViolation": {
+            "type": "boolean"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "events",
+          "violationCount",
+          "requiresTokenReentry",
+          "lockedByViolation",
+          "serverTime"
+        ]
+      },
+      "SessionHeartbeatDto": {
+        "type": "object",
+        "properties": {
+          "lockedByViolation": {
+            "type": "boolean"
+          },
+          "requiresTokenReentry": {
+            "type": "boolean"
+          },
+          "absentSince": {
+            "type": "string",
+            "nullable": true
+          },
+          "serverTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "lockedByViolation",
+          "requiresTokenReentry",
+          "absentSince",
+          "serverTime"
+        ]
+      },
+      "SessionSuspensionRequestDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "enum": [
+              "CALL"
+            ],
+            "type": "string"
+          },
+          "seconds": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 900
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "reason",
+          "seconds",
+          "clientId"
+        ]
+      },
+      "SessionSuspensionDto": {
+        "type": "object",
+        "properties": {
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalizeAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "extraMinutes": {
+            "type": "number",
+            "description": "Minutes this report added to the session"
+          },
+          "suspendedSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "deadline",
+          "finalizeAt",
+          "extraMinutes",
+          "suspendedSeconds"
+        ]
+      },
+      "ResumeSessionRequestDto": {
+        "type": "object",
+        "properties": {
+          "accessCode": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 12,
+            "description": "The room or schedule token shown now"
+          },
+          "deviceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "seb": {
+            "$ref": "#/components/schemas/SebProofDto"
+          }
+        },
+        "required": [
+          "accessCode",
+          "deviceId"
+        ]
+      },
+      "ResumeSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "EXPIRED",
+              "GRADED"
+            ]
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requiresTokenReentry": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "sessionId",
+          "status",
+          "deadline",
+          "serverTime",
+          "requiresTokenReentry"
+        ]
+      },
+      "SubmitSessionRequestDto": {
+        "type": "object",
+        "properties": {
+          "violations": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000,
+            "description": "Times the app saw the student leave the exam; four or more is what made the app hand the exam in"
+          },
+          "expectedAnswerCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "How many questions the tablet believes it answered; a shortfall keeps the session open"
+          },
+          "pendingAnswers": {
+            "maxItems": 250,
+            "description": "Answers the tablet could not confirm before handing in",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaveAnswerItemDto"
+            }
+          }
+        }
+      },
+      "SubmitSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUBMITTED",
+              "EXPIRED",
+              "GRADED"
+            ]
+          },
+          "submittedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "confirmedAnswerCount": {
+            "type": "number"
+          },
+          "answersStored": {
+            "type": "boolean",
+            "description": "False when the session was already closed, so the carried answers were not stored"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "submittedAt",
+          "confirmedAnswerCount",
+          "answersStored",
+          "serverTime"
+        ]
+      },
+      "ScheduleSessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentNis": {
+            "type": "string",
+            "nullable": true
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "EXPIRED",
+              "GRADED"
+            ],
+            "type": "string"
+          },
+          "client": {
+            "enum": [
+              "ISTIQRA",
+              "SEB"
+            ],
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submittedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "rawScore": {
+            "type": "number",
+            "nullable": true
+          },
+          "maxScore": {
+            "type": "number",
+            "nullable": true
+          },
+          "deviceBound": {
+            "type": "boolean",
+            "description": "False once a supervisor released the device"
+          },
+          "violationCount": {
+            "type": "number",
+            "description": "Times the app reported the student leaving the exam"
+          }
+        },
+        "required": [
+          "sessionId",
+          "studentId",
+          "studentName",
+          "studentNis",
+          "participantNumber",
+          "status",
+          "client",
+          "startedAt",
+          "submittedAt",
+          "rawScore",
+          "maxScore",
+          "deviceBound",
+          "violationCount"
+        ]
+      },
+      "ScheduleSessionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduleSessionDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "SessionTimelineEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "EVENT",
+              "AUDIT"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "action": {
+            "type": "string",
+            "nullable": true
+          },
+          "isViolation": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "occurredAt",
+          "type",
+          "action",
+          "isViolation",
+          "detail",
+          "actorId",
+          "reason",
+          "metadata"
+        ]
+      },
+      "ExtendSessionTimeDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "minutes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 120
+          }
+        },
+        "required": [
+          "reason",
+          "minutes"
         ]
       },
       "ExamFileDto": {

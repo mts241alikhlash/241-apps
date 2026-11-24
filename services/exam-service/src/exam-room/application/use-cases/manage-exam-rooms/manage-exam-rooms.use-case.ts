@@ -10,7 +10,13 @@ import type {
 } from '../../../domain/entities/exam-room-seat.entity.js'
 import type { AssignSeatInput } from '../../../domain/repositories/exam-room.repository.js'
 import type { ExamSessionAuditLog } from '../../../domain/entities/exam-session-audit-log.entity.js'
-import type { RoomStaffUser } from '../../room-access.service.js'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+  type RoomStaffUser,
+} from '../../room-access.service.js'
 import { assertRecoveryReason } from '../../../../exam-session/domain/policies/recovery-reason.policy.js'
 import type {
   ExamRoom,
@@ -43,6 +49,28 @@ export class ManageExamRoomsUseCase {
 
   list(eventId: string): Promise<ExamRoom[]> {
     return this.rooms.listRoomsByEvent(eventId)
+  }
+
+  async listForUser(user: RoomStaffUser, eventId: string): Promise<ExamRoom[]> {
+    if (
+      user.permissions?.includes('exam-events.read') ||
+      user.permissions?.includes(READ_ALL) ||
+      user.permissions?.includes(MANAGE_ALL)
+    ) {
+      return this.list(eventId)
+    }
+    const found = new Map<string, ExamRoom>()
+    if (user.permissions?.includes(TECHNICIAN)) {
+      for (const room of await this.rooms.listRoomsByTechnician(user.id)) {
+        if (room.eventId === eventId) found.set(room.id, room)
+      }
+    }
+    if (user.permissions?.includes(SUPERVISE)) {
+      for (const room of await this.rooms.listRoomsSupervisedBy(user.id)) {
+        if (room.eventId === eventId) found.set(room.id, room)
+      }
+    }
+    return [...found.values()].sort((a, b) => a.code.localeCompare(b.code))
   }
 
   async update(id: string, edit: ExamRoomEdit): Promise<ExamRoom> {

@@ -10,10 +10,12 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SCHEDULE_TEACHER_USER,
   SEMESTER_ID,
   START,
   USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule.test-support.js'
 import { UpdateExamScheduleUseCase } from './update-exam-schedule.use-case.js'
 
@@ -35,7 +37,8 @@ describe('Update and cancel exam schedule', () => {
         packages,
         new FakeAcademicLookup(),
         rooms,
-      ).execute(USER, {
+        scheduleScope(),
+      ).execute(SCHEDULE_TEACHER_USER, {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
         startsAt: START,
@@ -132,7 +135,24 @@ describe('Update and cancel exam schedule', () => {
     ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
   })
 
-  it('refuses a teacher moving a midterm schedule outside its event', async () => {
+  it('refuses a teacher turning a schedule into a midterm one', async () => {
+    const event = await activeEvent('MIDTERM')
+
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'MIDTERM',
+          eventId: event.id,
+        },
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EXAM_ADMIN_ONLY' } })
+  })
+
+  it('refuses event staff moving a midterm schedule outside its event', async () => {
     const event = await activeEvent('MIDTERM')
 
     await expect(
@@ -145,6 +165,8 @@ describe('Update and cancel exam schedule', () => {
           type: 'MIDTERM',
           eventId: event.id,
         },
+        false,
+        true,
       ),
     ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
   })

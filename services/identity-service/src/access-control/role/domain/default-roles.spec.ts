@@ -17,7 +17,10 @@ describe('default roles', () => {
     }
   })
 
-  it('defines the default roles and four structural grants', () => {
+  it('defines the default roles without ASSESSMENT_ADMIN and includes EXAM_ADMIN', () => {
+    const codes = DEFAULT_ROLES.map((role) => role.code)
+    expect(codes).toContain('EXAM_ADMIN')
+    expect(codes).not.toContain('ASSESSMENT_ADMIN')
     expect(DEFAULT_ROLES.filter((role) => !role.structural)).toHaveLength(23)
     expect(
       DEFAULT_ROLES.filter((role) => role.structural)
@@ -270,6 +273,27 @@ describe('default roles', () => {
     expect(codesOf('TREASURER')).toContain('admission-waves.read')
   })
 
+  it('merges ASSESSMENT_ADMIN academic permissions into ACADEMIC_ADMIN without operational exam grants', () => {
+    for (const code of [
+      'assessment-items.create',
+      'student-scores.read',
+      'report-cards.publish',
+      'attendances.manage',
+      'exam-scores.read',
+      'exam-scores.read-all',
+    ]) {
+      expect(codesOf('ACADEMIC_ADMIN')).toContain(code)
+    }
+
+    const operationalExam = [...codesOf('ACADEMIC_ADMIN')].filter(
+      (code) =>
+        code.startsWith('exam-') &&
+        code !== 'exam-scores.read' &&
+        code !== 'exam-scores.read-all',
+    )
+    expect(operationalExam).toEqual([])
+  })
+
   describe('exam questions', () => {
     const teacherCodes = ['read', 'create', 'update', 'delete'].map(
       (action) => `exam-questions.${action}`,
@@ -282,38 +306,47 @@ describe('default roles', () => {
       expect(codesOf('TEACHER')).not.toContain('exam-questions.manage-all')
     })
 
-    it('lets the academic admin hold the same four question codes', () => {
-      for (const code of teacherCodes) {
-        expect(codesOf('ACADEMIC_ADMIN')).toContain(code)
+    it('gives full question management including approve and manage-all to EXAM_ADMIN, OPERATOR and the curriculum deputy', () => {
+      for (const role of [
+        'EXAM_ADMIN',
+        'OPERATOR',
+        'VICE_PRINCIPAL_CURRICULUM',
+      ]) {
+        for (const action of [
+          'read',
+          'create',
+          'update',
+          'delete',
+          'approve',
+          'manage-all',
+        ]) {
+          expect(codesOf(role)).toContain(`exam-questions.${action}`)
+        }
       }
     })
 
-    it('lets the deputy for curriculum hold all six codes', () => {
+    it('lets curriculum staff read questions only without approve or manage-all', () => {
+      expect(codesOf('CURRICULUM_STAFF')).toContain('exam-questions.read')
       for (const action of [
-        'read',
         'create',
         'update',
         'delete',
         'approve',
         'manage-all',
       ]) {
-        expect(codesOf('VICE_PRINCIPAL_CURRICULUM')).toContain(
+        expect(codesOf('CURRICULUM_STAFF')).not.toContain(
           `exam-questions.${action}`,
         )
       }
     })
 
-    it('lets curriculum staff help with every question but not approve', () => {
-      for (const code of [...teacherCodes, 'exam-questions.manage-all']) {
-        expect(codesOf('CURRICULUM_STAFF')).toContain(code)
-      }
-      expect(codesOf('CURRICULUM_STAFF')).not.toContain(
-        'exam-questions.approve',
-      )
-    })
-
-    it('keeps every exam question code away from students and applicants', () => {
-      for (const role of ['STUDENT', 'APPLICANT', 'EMPLOYEE']) {
+    it('keeps every exam question code away from academic admin, students and applicants', () => {
+      for (const role of [
+        'ACADEMIC_ADMIN',
+        'STUDENT',
+        'APPLICANT',
+        'EMPLOYEE',
+      ]) {
         expect(
           [...codesOf(role)].filter((code) =>
             code.startsWith('exam-questions.'),
@@ -330,81 +363,101 @@ describe('default roles', () => {
       ).map((role) => role.code)
 
       expect(holders.sort()).toEqual([
-        'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
+        'OPERATOR',
         'VICE_PRINCIPAL_CURRICULUM',
       ])
     })
   })
 
-  describe('exam packages and schedules', () => {
-    const codes = [
-      ...['read', 'create', 'update', 'delete'].map(
-        (action) => `exam-packages.${action}`,
-      ),
-      ...['read', 'create', 'update', 'cancel', 'access-code'].map(
-        (action) => `exam-schedules.${action}`,
-      ),
-    ]
+  describe('exam packages, schedules and settings', () => {
+    const teacherScheduleCodes = [
+      'read',
+      'create',
+      'update',
+      'cancel',
+      'manage',
+      'access-code',
+    ].map((action) => `exam-schedules.${action}`)
 
-    it('gives every code to curriculum staff, the deputy for curriculum and the academic admin', () => {
+    it('gives full Istiqra management including exam-schedules.manage-all and exam-settings.manage to EXAM_ADMIN, OPERATOR and VICE_PRINCIPAL_CURRICULUM', () => {
       for (const role of [
-        'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
+        'OPERATOR',
         'VICE_PRINCIPAL_CURRICULUM',
-        'ACADEMIC_ADMIN',
       ]) {
-        for (const code of codes) expect(codesOf(role)).toContain(code)
+        expect(contains(role, 'EXAM_ADMIN')).toBe(true)
+        for (const code of [
+          ...teacherScheduleCodes,
+          'exam-schedules.manage-all',
+          'exam-settings.manage',
+          'exam-packages.read',
+          'exam-packages.create',
+          'exam-packages.update',
+          'exam-packages.delete',
+          'exam-packages.adjust-key',
+        ]) {
+          expect(codesOf(role)).toContain(code)
+        }
       }
     })
 
-    it('lets a teacher build packages but not schedule them', () => {
+    it('gives curriculum staff and student affairs deputy schedule management without settings or adjust-key', () => {
+      for (const code of teacherScheduleCodes) {
+        expect(codesOf('CURRICULUM_STAFF')).toContain(code)
+        expect(codesOf('VICE_PRINCIPAL_STUDENT_AFFAIRS')).toContain(code)
+      }
+      expect(codesOf('CURRICULUM_STAFF')).not.toContain(
+        'exam-schedules.manage-all',
+      )
+      expect(codesOf('VICE_PRINCIPAL_STUDENT_AFFAIRS')).toContain(
+        'exam-schedules.manage-all',
+      )
+      for (const role of [
+        'CURRICULUM_STAFF',
+        'VICE_PRINCIPAL_STUDENT_AFFAIRS',
+      ]) {
+        expect(codesOf(role)).toContain('exam-packages.read')
+        expect(codesOf(role)).not.toContain('exam-packages.adjust-key')
+        expect(codesOf(role)).not.toContain('exam-settings.manage')
+      }
+    })
+
+    it('lets a teacher manage packages and non-exam schedules without manage-all or exam-settings', () => {
       for (const action of ['read', 'create', 'update', 'delete']) {
         expect(codesOf('TEACHER')).toContain(`exam-packages.${action}`)
       }
-      expect(
-        [...codesOf('TEACHER')].filter((code) =>
-          code.startsWith('exam-schedules.'),
-        ),
-      ).toEqual([])
+      for (const code of teacherScheduleCodes) {
+        expect(codesOf('TEACHER')).toContain(code)
+      }
+      expect(codesOf('TEACHER')).not.toContain('exam-schedules.manage-all')
+      expect(codesOf('TEACHER')).not.toContain('exam-packages.adjust-key')
+      expect(codesOf('TEACHER')).not.toContain('exam-settings.manage')
     })
 
-    it('keeps the codes away from students, applicants and employees, and gives the operator only the key correction', () => {
-      for (const role of ['STUDENT', 'APPLICANT', 'EMPLOYEE']) {
+    it('keeps package and schedule codes away from academic admin, students, applicants and employees', () => {
+      for (const role of [
+        'ACADEMIC_ADMIN',
+        'STUDENT',
+        'APPLICANT',
+        'EMPLOYEE',
+      ]) {
         expect(
           [...codesOf(role)].filter(
             (code) =>
               code.startsWith('exam-packages.') ||
-              code.startsWith('exam-schedules.'),
+              code.startsWith('exam-schedules.') ||
+              code.startsWith('exam-settings.'),
           ),
         ).toEqual([])
       }
-      expect(
-        [...codesOf('OPERATOR')].filter(
-          (code) =>
-            code.startsWith('exam-packages.') ||
-            code.startsWith('exam-schedules.'),
-        ),
-      ).toEqual(['exam-packages.adjust-key'])
     })
 
-    it('never gives the changing codes through a broad grant', () => {
-      const changing = codes.filter((code) => !code.endsWith('.read'))
-      const holders = DEFAULT_ROLES.filter((role) =>
-        changing.some((code) => codesOf(role.code).has(code)),
-      ).map((role) => role.code)
-
-      expect(holders.sort()).toEqual([
-        'ACADEMIC_ADMIN',
-        'CURRICULUM_STAFF',
-        'EXAM_TECHNICIAN',
-        'TEACHER',
-        'VICE_PRINCIPAL_CURRICULUM',
-      ])
-    })
-
-    it('lets the principal read packages and schedules but not see the access code', () => {
+    it('lets the principal read packages and schedules but not see the access code or settings', () => {
       expect(codesOf('PRINCIPAL')).toContain('exam-packages.read')
       expect(codesOf('PRINCIPAL')).toContain('exam-schedules.read')
       expect(codesOf('PRINCIPAL')).not.toContain('exam-schedules.access-code')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-settings.manage')
     })
   })
 
@@ -418,42 +471,39 @@ describe('default roles', () => {
       expect(holders('exam-sessions.take')).toEqual(['STUDENT'])
     })
 
-    it('gives release to curriculum staff, the deputy, the academic admin, the technician and the supervisor', () => {
+    it('gives release to the exam operations and committee roles', () => {
       expect(holders('exam-sessions.release')).toEqual([
-        'ACADEMIC_ADMIN',
         'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
         'EXAM_SUPERVISOR',
         'EXAM_TECHNICIAN',
+        'OPERATOR',
         'VICE_PRINCIPAL_CURRICULUM',
+        'VICE_PRINCIPAL_STUDENT_AFFAIRS',
       ])
     })
 
-    it('gives read to the same staff, plus the principal through its read-everything grant', () => {
+    it('gives read to those roles plus teachers and the principal', () => {
       expect(holders('exam-sessions.read')).toEqual([
-        'ACADEMIC_ADMIN',
         'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
         'EXAM_TECHNICIAN',
+        'OPERATOR',
         'PRINCIPAL',
+        'TEACHER',
         'VICE_PRINCIPAL_CURRICULUM',
+        'VICE_PRINCIPAL_STUDENT_AFFAIRS',
       ])
     })
 
-    it('keeps applicants, employees and the operator away from every session code', () => {
-      for (const role of ['APPLICANT', 'EMPLOYEE', 'OPERATOR']) {
+    it('keeps academic admin, applicants and employees away from every session code', () => {
+      for (const role of ['ACADEMIC_ADMIN', 'APPLICANT', 'EMPLOYEE']) {
         expect(
           [...codesOf(role)].filter((code) =>
             code.startsWith('exam-sessions.'),
           ),
         ).toEqual([])
       }
-    })
-
-    it('gives a teacher no session code', () => {
-      expect(
-        [...codesOf('TEACHER')].filter((code) =>
-          code.startsWith('exam-sessions.'),
-        ),
-      ).toEqual([])
     })
   })
 
@@ -463,40 +513,40 @@ describe('default roles', () => {
         .map((role) => role.code)
         .sort()
 
-    it('lets teachers grade and read the scores of their classes', () => {
-      expect(holders('exam-grading.read')).toContain('TEACHER')
-      expect(holders('exam-grading.grade')).toContain('TEACHER')
-      expect(holders('exam-scores.read')).toContain('TEACHER')
+    it('lets only teachers grade exam answers and leaves exam-grading.manage-all unassigned', () => {
+      expect(holders('exam-grading.grade')).toEqual(['TEACHER'])
+      expect(holders('exam-grading.manage-all')).toEqual([])
     })
 
-    it('gives manage-all and read-all only to curriculum staff, the deputy and the academic admin', () => {
-      const staff = [
+    it('gives exam-grading.read-all to committee, admins and principal without grade', () => {
+      expect(holders('exam-grading.read-all')).toEqual([
+        'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
+        'OPERATOR',
+        'PRINCIPAL',
+        'VICE_PRINCIPAL_CURRICULUM',
+        'VICE_PRINCIPAL_STUDENT_AFFAIRS',
+      ])
+      expect(codesOf('TEACHER')).toContain('exam-grading.read')
+      expect(codesOf('TEACHER')).not.toContain('exam-grading.read-all')
+    })
+
+    it('gives exam-scores.read and exam-scores.read-all to academic admin, committee, exam admins and principal', () => {
+      expect(holders('exam-scores.read-all')).toEqual([
         'ACADEMIC_ADMIN',
         'CURRICULUM_STAFF',
+        'EXAM_ADMIN',
+        'OPERATOR',
+        'PRINCIPAL',
         'VICE_PRINCIPAL_CURRICULUM',
-      ]
-      expect(holders('exam-grading.manage-all')).toEqual(staff)
-      expect(holders('exam-scores.read-all')).toEqual(staff)
+        'VICE_PRINCIPAL_STUDENT_AFFAIRS',
+      ])
+      expect(codesOf('TEACHER')).toContain('exam-scores.read')
+      expect(codesOf('TEACHER')).not.toContain('exam-scores.read-all')
     })
 
-    it('gives that staff the base codes too, because the guard wants every code of a route', () => {
-      for (const role of [
-        'ACADEMIC_ADMIN',
-        'CURRICULUM_STAFF',
-        'VICE_PRINCIPAL_CURRICULUM',
-      ]) {
-        for (const code of [
-          'exam-grading.read',
-          'exam-grading.grade',
-          'exam-scores.read',
-        ]) {
-          expect(codesOf(role).has(code)).toBe(true)
-        }
-      }
-    })
-
-    it('keeps students, applicants, employees and the operator away from both', () => {
-      for (const role of ['STUDENT', 'APPLICANT', 'EMPLOYEE', 'OPERATOR']) {
+    it('keeps students, applicants and employees away from both', () => {
+      for (const role of ['STUDENT', 'APPLICANT', 'EMPLOYEE']) {
         expect(
           [...codesOf(role)].filter(
             (code) =>
@@ -513,67 +563,58 @@ describe('default roles', () => {
       DEFAULT_ROLES.filter((role) => codesOf(role.code).has(code))
         .map((role) => role.code)
         .sort()
-    const managing = [
-      'exam-events.manage',
-      'exam-rooms.manage-all',
-      'exam-packages.adjust-key',
-    ]
-    const admins = [
-      'ACADEMIC_ADMIN',
+    const examCommittee = [
       'CURRICULUM_STAFF',
+      'EXAM_ADMIN',
       'OPERATOR',
       'VICE_PRINCIPAL_CURRICULUM',
+      'VICE_PRINCIPAL_STUDENT_AFFAIRS',
     ]
 
-    it('gives the three management codes to the four managing roles', () => {
-      for (const code of managing) {
-        expect(holders(code)).toEqual([...admins].sort())
+    it('gives exam event management and manage-all rooms to the exam committee and admins', () => {
+      for (const code of ['exam-events.manage', 'exam-rooms.manage-all']) {
+        expect(holders(code)).toEqual([...examCommittee].sort())
       }
+      expect(holders('exam-packages.adjust-key')).toEqual([
+        'EXAM_ADMIN',
+        'OPERATOR',
+        'VICE_PRINCIPAL_CURRICULUM',
+      ])
     })
 
-    it('gives exam-schedules.manage-all to the curriculum roles but not the operator', () => {
-      expect(holders('exam-schedules.manage-all')).toEqual(
-        admins.filter((role) => role !== 'OPERATOR').sort(),
-      )
-    })
-
-    it('lets the principal and the technician read the event', () => {
+    it('lets the principal read events and all rooms without manage or write codes', () => {
       expect(holders('exam-events.read')).toEqual(
-        [...admins, 'EXAM_TECHNICIAN', 'PRINCIPAL'].sort(),
+        [...examCommittee, 'PRINCIPAL'].sort(),
       )
+      expect(holders('exam-rooms.read-all')).toEqual(['PRINCIPAL'])
       expect(codesOf('PRINCIPAL')).not.toContain('exam-events.manage')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-rooms.manage-all')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-rooms.supervise')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-rooms.technician')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-sessions.release')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-grading.grade')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-packages.adjust-key')
+      expect(codesOf('PRINCIPAL')).not.toContain('exam-questions.approve')
     })
 
-    it('lets every managing role read the staff list the room forms need', () => {
-      for (const role of admins) {
+    it('lets every room managing role read the staff list the room forms need', () => {
+      for (const role of examCommittee) {
         expect(codesOf(role).has('users.read')).toBe(true)
       }
       expect(codesOf('EXAM_TECHNICIAN')).not.toContain('users.read')
     })
 
-    it('gives supervise to the supervisor and the technician only', () => {
-      expect(holders('exam-rooms.supervise')).toEqual([
-        'EXAM_SUPERVISOR',
-        'EXAM_TECHNICIAN',
-      ])
-      expect(codesOf('TEACHER')).not.toContain('exam-rooms.supervise')
-    })
-
-    it('defines the supervisor role with exactly supervise and release', () => {
+    it('gives supervise strictly to EXAM_SUPERVISOR', () => {
+      expect(holders('exam-rooms.supervise')).toEqual(['EXAM_SUPERVISOR'])
       expect(resolveGrants('EXAM_SUPERVISOR')).toEqual([
         'exam-rooms.supervise',
         'exam-sessions.release',
       ])
     })
 
-    it('gives the technician code to the technician role only', () => {
+    it('gives technician strictly to EXAM_TECHNICIAN without supervise, events or users.read', () => {
       expect(holders('exam-rooms.technician')).toEqual(['EXAM_TECHNICIAN'])
-    })
-
-    it('defines the technician role with exactly its seven codes', () => {
       expect(resolveGrants('EXAM_TECHNICIAN')).toEqual([
-        'exam-events.read',
-        'exam-rooms.supervise',
         'exam-rooms.technician',
         'exam-schedules.access-code',
         'exam-schedules.read',
@@ -582,14 +623,11 @@ describe('default roles', () => {
       ])
     })
 
-    it('keeps all six codes out of every broad grant', () => {
-      for (const code of [
-        ...managing,
-        'exam-schedules.manage-all',
-        'exam-events.read',
-        'exam-rooms.supervise',
-        'exam-rooms.technician',
-      ]) {
+    it('keeps every exam-* permission in EXPLICIT_ONLY', () => {
+      const examCodes = SYSTEM_PERMISSIONS.map((p) => p.code).filter((code) =>
+        code.startsWith('exam-'),
+      )
+      for (const code of examCodes) {
         expect(isExplicitOnly(code)).toBe(true)
       }
       expect(
@@ -597,13 +635,16 @@ describe('default roles', () => {
           code.startsWith('exam-rooms.'),
         ),
       ).toEqual(['exam-rooms.manage-all'])
-      expect(codesOf('PRINCIPAL')).not.toContain('exam-rooms.supervise')
-      expect(codesOf('PRINCIPAL')).not.toContain('exam-rooms.technician')
-      expect(codesOf('PRINCIPAL')).not.toContain('exam-packages.adjust-key')
     })
 
-    it('keeps every new code away from students, applicants and employees', () => {
-      for (const role of ['STUDENT', 'APPLICANT', 'EMPLOYEE']) {
+    it('keeps every event and room code away from academic admin, teachers, students, applicants and employees', () => {
+      for (const role of [
+        'ACADEMIC_ADMIN',
+        'TEACHER',
+        'STUDENT',
+        'APPLICANT',
+        'EMPLOYEE',
+      ]) {
         expect(
           [...codesOf(role)].filter(
             (code) =>

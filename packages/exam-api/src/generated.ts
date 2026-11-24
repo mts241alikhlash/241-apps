@@ -333,6 +333,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-grading/schedules/{scheduleId}/sessions/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Finished sessions of one exam with answers and keys for batch printing */
+        get: operations["ExamGradingController_scheduleSessionDetails"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-grading/sessions/{sessionId}": {
         parameters: {
             query?: never;
@@ -500,6 +517,23 @@ export interface paths {
         put?: never;
         /** Mark a question as a bonus or replace its key, then rescore finished sessions */
         post: operations["ExamPackageController_adjustKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-packages/{id}/print": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a package with full pinned questions and resolved keys for printing */
+        get: operations["ExamPackageController_findPrint"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2007,6 +2041,39 @@ export interface components {
             limit: number;
             page: number;
             total: number;
+        };
+        ExamPackagePrintDto: {
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: uuid */
+            createdById: string;
+            /** Format: uuid */
+            gradeId: string;
+            /** Format: uuid */
+            id: string;
+            items: components["schemas"]["ExamPackagePrintItemDto"][];
+            /** Format: date-time */
+            lockedAt: string | null;
+            /** @enum {string} */
+            status: "DRAFT" | "SUBMITTED" | "RETURNED" | "APPROVED" | "LOCKED";
+            /** Format: uuid */
+            subjectId: string;
+            title: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ExamPackagePrintItemDto: {
+            bodyHtml: string;
+            content: components["schemas"]["MultipleChoiceContentDto"] | components["schemas"]["MultipleResponseContentDto"] | components["schemas"]["TrueFalseContentDto"] | components["schemas"]["ShortAnswerContentDto"] | components["schemas"]["EssayContentDto"];
+            points: number;
+            position: number;
+            /** Format: uuid */
+            questionId: string;
+            questionVersion: number;
+            /** @enum {string} */
+            resolution: "NORMAL" | "BONUS_ALL" | "KEY_OVERRIDE";
+            /** @enum {string} */
+            type: "MULTIPLE_CHOICE" | "MULTIPLE_RESPONSE" | "TRUE_FALSE" | "SHORT_ANSWER" | "ESSAY";
         };
         ExamPackageSummaryDto: {
             /** Format: date-time */
@@ -4041,6 +4108,33 @@ export interface operations {
             };
         };
     };
+    ExamGradingController_scheduleSessionDetails: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scheduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["GradingSessionDetailDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamGradingController_session: {
         parameters: {
             query?: never;
@@ -4422,6 +4516,33 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AdjustedPackageItemKeyDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamPackageController_findPrint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamPackagePrintDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import { RequireAnyPermission } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import type { GradingUser } from '../../../exam-grading/application/grading-scope.service.js'
 import { AddMakeupParticipantsUseCase } from '../../application/use-cases/makeup-participants/add-makeup-participants.use-case.js'
@@ -48,7 +48,11 @@ export class ExamMakeupController {
   ) {}
 
   @Get(':id/absentees')
-  @RequirePermissions('exam-grading.read')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({
     summary: 'The students of the classroom who can still sit a makeup',
   })
@@ -64,7 +68,7 @@ export class ExamMakeupController {
   }
 
   @Post(':id/makeups')
-  @RequirePermissions('exam-grading.grade')
+  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
   @ApiOperation({
     summary: 'Create a makeup of an exam for students who did not sit it',
   })
@@ -91,7 +95,11 @@ export class ExamMakeupController {
   }
 
   @Get(':id/participants')
-  @RequirePermissions('exam-grading.read')
+  @RequireAnyPermission(
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({ summary: 'The students on a makeup, with live status' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: [ParticipantDto] })
@@ -106,7 +114,7 @@ export class ExamMakeupController {
 
   @Post(':id/participants')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('exam-grading.grade')
+  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
   @ApiOperation({ summary: 'Add students to a makeup' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 204 })
@@ -128,7 +136,7 @@ export class ExamMakeupController {
 
   @Delete(':id/participants/:studentId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('exam-grading.grade')
+  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
   @ApiOperation({ summary: 'Remove a student who has not started the makeup' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiParam({ name: 'studentId', format: 'uuid' })

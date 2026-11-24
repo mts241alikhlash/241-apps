@@ -17,6 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ProvisioningTokenGuard } from '../../guards/provisioning-token.guard.js'
 import { IEmployeeIdentityReadPort } from '../../domain/repositories/employee-identity-read.port.js'
 import { EmployeeRosterResponseDto } from './dto/response/employee-roster-response.dto.js'
@@ -75,6 +76,7 @@ export class EmployeeRefListResponseDto {
 
 @ApiTags('Employees')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('employees')
 export class EmployeeInternalController {

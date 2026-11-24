@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ITeachingAssignmentRepository } from '../../domain/repositories/teaching-assignment.repository.js'
 
 export class TeachingAssignmentExistsDataDto {
@@ -94,6 +95,7 @@ export class TeachingLoadResponseDto {
 
 @ApiTags('Teaching Assignments')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('teaching-assignments')
 export class TeachingAssignmentInternalController {

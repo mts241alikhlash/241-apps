@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -21,6 +22,11 @@ import {
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../application/schedule-scope.service.js'
+import { IExamScheduleRepository } from '../../domain/repositories/exam-schedule.repository.js'
 import { CancelExamScheduleUseCase } from '../../application/use-cases/cancel-exam-schedule/cancel-exam-schedule.use-case.js'
 import { CreateExamScheduleUseCase } from '../../application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
 import { GetAccessCodeUseCase } from '../../application/use-cases/get-access-code/get-access-code.use-case.js'
@@ -39,6 +45,18 @@ import {
   ExamScheduleListResponseDto,
 } from './dto/response/exam-schedule-response.dto.js'
 
+async function assertManageableSchedule(
+  schedules: IExamScheduleRepository,
+  scheduleScope: ScheduleScopeService,
+  user: ScheduleAccessUser,
+  id: string,
+): Promise<void> {
+  const existing = await schedules.findById(id)
+  if (existing === null) throw new NotFoundException('Jadwal tidak ditemukan')
+  const scope = await scheduleScope.forUser(user)
+  await scope.assertCanManageSchedule(existing)
+}
+
 @ApiTags('Exam Schedules')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -52,6 +70,8 @@ export class ExamScheduleController {
     private readonly cancelSchedule: CancelExamScheduleUseCase,
     private readonly getCode: GetAccessCodeUseCase,
     private readonly rotateCode: RotateAccessCodeUseCase,
+    private readonly schedules: IExamScheduleRepository,
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   @Get()
@@ -59,14 +79,18 @@ export class ExamScheduleController {
   @ApiOperation({ summary: 'List exam schedules' })
   @ApiResponse({ status: 200, type: ExamScheduleListResponseDto })
   async findAll(
+    @CurrentUser() user: ScheduleAccessUser,
     @Query() query: ExamScheduleQueryDto,
   ): Promise<ExamScheduleListResponseDto> {
     return ExamScheduleListResponseDto.fromDomain(
-      await this.listSchedules.execute({
-        ...query,
-        from: query.from ? new Date(query.from) : undefined,
-        to: query.to ? new Date(query.to) : undefined,
-      }),
+      await this.listSchedules.execute(
+        {
+          ...query,
+          from: query.from ? new Date(query.from) : undefined,
+          to: query.to ? new Date(query.to) : undefined,
+        },
+        user,
+      ),
     )
   }
 
@@ -76,9 +100,13 @@ export class ExamScheduleController {
   @ApiResponse({ status: 200, type: ExamScheduleDto })
   @ApiParam({ name: 'id', format: 'uuid' })
   async findOne(
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ExamScheduleDto> {
-    return ExamScheduleDto.fromDomain(await this.getSchedule.execute(id))
+    const view = await this.getSchedule.execute(id)
+    const scope = await this.scheduleScope.forUser(user)
+    await scope.assertCanReadSchedule(view)
+    return ExamScheduleDto.fromDomain(view)
   }
 
   @Post()
@@ -88,26 +116,20 @@ export class ExamScheduleController {
   })
   @ApiResponse({ status: 201, type: ExamScheduleDto })
   async create(
-    @CurrentUser() user: { id: string; permissions: string[] },
+    @CurrentUser() user: ScheduleAccessUser,
     @Body() dto: CreateExamScheduleDto,
   ): Promise<ExamScheduleDto> {
     return ExamScheduleDto.fromDomain(
-      await this.createSchedule.execute(
-        {
-          id: user.id,
-          manageAll: user.permissions.includes('exam-schedules.manage-all'),
-        },
-        {
-          packageId: dto.packageId,
-          classroomId: dto.classroomId,
-          startsAt: new Date(dto.startsAt),
-          endsAt: new Date(dto.endsAt),
-          durationMinutes: dto.durationMinutes,
-          minSubmitMinutes: dto.minSubmitMinutes,
-          type: dto.type,
-          eventId: dto.eventId,
-        },
-      ),
+      await this.createSchedule.execute(user, {
+        packageId: dto.packageId,
+        classroomId: dto.classroomId,
+        startsAt: new Date(dto.startsAt),
+        endsAt: new Date(dto.endsAt),
+        durationMinutes: dto.durationMinutes,
+        minSubmitMinutes: dto.minSubmitMinutes,
+        type: dto.type,
+        eventId: dto.eventId,
+      }),
     )
   }
 
@@ -118,9 +140,11 @@ export class ExamScheduleController {
   @ApiParam({ name: 'id', format: 'uuid' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: { permissions: string[] },
+    @CurrentUser() user: ScheduleAccessUser,
     @Body() dto: UpdateExamScheduleDto,
   ): Promise<ExamScheduleDto> {
+    await assertManageableSchedule(this.schedules, this.scheduleScope, user, id)
+    const permissions = user.permissions ?? []
     return ExamScheduleDto.fromDomain(
       await this.updateSchedule.execute(
         id,
@@ -132,7 +156,8 @@ export class ExamScheduleController {
           type: dto.type,
           eventId: dto.eventId,
         },
-        user.permissions.includes('exam-schedules.manage-all'),
+        permissions.includes('exam-schedules.manage-all'),
+        permissions.includes('exam-events.manage'),
       ),
     )
   }
@@ -143,7 +168,11 @@ export class ExamScheduleController {
   @ApiOperation({ summary: 'Cancel a schedule' })
   @ApiResponse({ status: 204 })
   @ApiParam({ name: 'id', format: 'uuid' })
-  async cancel(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async cancel(
+    @CurrentUser() user: ScheduleAccessUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    await assertManageableSchedule(this.schedules, this.scheduleScope, user, id)
     await this.cancelSchedule.execute(id)
   }
 
@@ -153,8 +182,10 @@ export class ExamScheduleController {
   @ApiResponse({ status: 200, type: AccessCodeDto })
   @ApiParam({ name: 'id', format: 'uuid' })
   async accessCode(
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AccessCodeDto> {
+    await assertManageableSchedule(this.schedules, this.scheduleScope, user, id)
     const result = await this.getCode.execute(id)
     return AccessCodeDto.of(
       result.accessCode,
@@ -171,8 +202,10 @@ export class ExamScheduleController {
   @ApiResponse({ status: 200, type: AccessCodeDto })
   @ApiParam({ name: 'id', format: 'uuid' })
   async rotateAccessCode(
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AccessCodeDto> {
+    await assertManageableSchedule(this.schedules, this.scheduleScope, user, id)
     const result = await this.rotateCode.execute(id)
     return AccessCodeDto.of(
       result.accessCode,

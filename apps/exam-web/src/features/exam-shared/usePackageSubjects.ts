@@ -43,13 +43,15 @@ export const subjectFromTitle = (title: string): string => {
 
 export function usePackageSubjects() {
   const names = ref(loaded ?? new Map<string, string>())
+  const ready = ref(loaded !== null)
 
   onMounted(async () => {
     names.value = await loadMap()
+    ready.value = true
   })
 
   const subjectOf = (packageId: string, title: string): string =>
     names.value.get(packageId) ?? subjectFromTitle(title)
 
-  return { subjectOf }
+  return { subjectOf, ready }
 }

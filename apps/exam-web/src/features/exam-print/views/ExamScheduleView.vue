@@ -130,6 +130,7 @@ const dateOf = (iso: string): string =>
 
 const clock = (iso: string): string =>
   new Intl.DateTimeFormat('id-ID', {
+    timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -154,7 +155,7 @@ async function printEventSchedules(event: ExamEvent) {
   }
   const items = printable(result.data)
   if (items.length === 0) {
-    toast.error('Belum ada jadwal pada periode ini.')
+    toast.info('Belum ada jadwal pada periode ini.')
     return
   }
   printEvent.value = event
@@ -421,6 +422,7 @@ watch(levelTotal, () => {
           :total-items="events.length"
           :is-loading="loading"
           item-label="periode ujian"
+          @row-click="openEvent"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
@@ -438,6 +440,7 @@ watch(levelTotal, () => {
           :total-items="days.length"
           :is-loading="loading"
           item-label="hari"
+          @row-click="openPreview"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

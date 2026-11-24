@@ -38,11 +38,22 @@ import {
 } from '@mts241alikhlash/ui/select'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { examEventService } from '@/features/exam-event/services/examEventService'
+import {
+  EVENT_STATUSES,
+  eventStatusLabel,
+  type ExamEvent,
+} from '@/features/exam-event/types'
+import { examTypeLabel } from '@/features/exam-schedule/types'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
+import {
+  compareClassroom,
+  compareGrade,
+} from '@/features/exam-shared/classroomName'
 import type { GradingSchedule } from '@/features/exam-grading/types'
 import { dayKeyOf } from '@/features/exam-schedule/utils/groupSchedules'
 import { AcademicPeriodFilter } from '@/features/lookup/semester'
+import { buildPrintEventColumns } from '../components/printEventColumns'
 import GradingSheet from '../documents/GradingSheet.vue'
 import { formatPrintDate, formatPrintRange, gradeOf } from '../format'
 import { waitForPrintImages } from '../printImages'
@@ -67,7 +78,7 @@ interface DayNode {
   subjects: SubjectNode[]
 }
 
-type Row = DayNode | SubjectNode | GradingSchedule | SessionPerson
+type Row = ExamEvent | DayNode | SubjectNode | GradingSchedule | SessionPerson
 
 const ALL = 'ALL'
 const SESSION_LABELS: Record<string, string> = {
@@ -82,39 +93,29 @@ const { subjectOf } = usePackageSubjects()
 const { category } = useRouteCategory()
 const isExam = computed(() => category.value !== 'NON_EXAM')
 const gradeFieldId = useId()
-const eventFieldId = useId()
+const statusFieldId = useId()
 
-interface EventOption {
-  id: string
-  name: string
-  startsAt: string
-  endsAt: string
-}
-
-const events = ref<EventOption[]>([])
-const eventId = ref('')
+const events = ref<ExamEvent[]>([])
+const eventsLoaded = ref(false)
+const schedulesLoaded = ref(false)
+const loadingEvents = ref(false)
+const loadingSchedules = ref(false)
 
 const semesterId = ref('')
+const status = ref(ALL)
 const search = ref('')
 const gradeFilter = ref(ALL)
 const page = ref(1)
 const pageSize = ref(25)
-const loading = ref(false)
 const printing = ref(false)
 const loadedSchedules = ref<GradingSchedule[]>([])
-const schedules = computed(() => {
-  if (!isExam.value) return loadedSchedules.value
-  const event = events.value.find((item) => item.id === eventId.value)
-  if (event === undefined) return []
-  return loadedSchedules.value.filter(
-    (item) => item.startsAt >= event.startsAt && item.startsAt <= event.endsAt,
-  )
-})
 const people = ref<SessionPerson[]>([])
 const peopleLoading = ref(false)
 const previewOpen = ref(false)
 const preview = ref<LoadedSheet | null>(null)
 const printList = ref<LoadedSheet[]>([])
+
+const loading = computed(() => loadingEvents.value || loadingSchedules.value)
 
 const paramValue = (name: string): string | null => {
   const value = route.params[name]
@@ -122,9 +123,31 @@ const paramValue = (name: string): string | null => {
   return typeof raw === 'string' && raw !== '' ? raw : null
 }
 
+const eventId = computed(() => (isExam.value ? paramValue('eventId') : null))
 const dayId = computed(() => paramValue('dayId'))
 const subjectId = computed(() => paramValue('subjectId'))
 const classId = computed(() => paramValue('classId'))
+
+const activeEvent = computed(() =>
+  isExam.value
+    ? (events.value.find((item) => item.id === eventId.value) ?? null)
+    : null,
+)
+
+function schedulesOfEvent(
+  list: GradingSchedule[],
+  event: ExamEvent,
+): GradingSchedule[] {
+  return list.filter(
+    (item) => item.startsAt >= event.startsAt && item.startsAt <= event.endsAt,
+  )
+}
+
+const schedules = computed(() => {
+  if (!isExam.value) return loadedSchedules.value
+  if (activeEvent.value === null) return []
+  return schedulesOfEvent(loadedSchedules.value, activeEvent.value)
+})
 
 const subjectName = (schedule: GradingSchedule) =>
   subjectOf(schedule.packageId, schedule.title)
@@ -188,7 +211,7 @@ const gradeOptions = computed(() =>
         .map((item) => gradeOf(item.classroomName))
         .filter((grade): grade is string => grade !== null),
     ),
-  ].sort(),
+  ].sort(compareGrade),
 )
 
 const filteredClasses = computed(() =>
@@ -200,13 +223,7 @@ const filteredClasses = computed(() =>
     )
     .filter((item) => matches(item.classroomName ?? ''))
     .sort((left, right) =>
-      (left.classroomName ?? '').localeCompare(
-        right.classroomName ?? '',
-        'id',
-        {
-          numeric: true,
-        },
-      ),
+      compareClassroom(left.classroomName, right.classroomName),
     ),
 )
 
@@ -215,7 +232,19 @@ function matches(text: string): boolean {
   return needle === '' || text.toLowerCase().includes(needle)
 }
 
+const atEventList = computed(() => isExam.value && activeEvent.value === null)
+
 const levelRows = computed<Row[]>(() => {
+  if (atEventList.value) {
+    return events.value.filter(
+      (event) =>
+        (!semesterId.value || event.semesterId === semesterId.value) &&
+        (status.value === ALL || event.status === status.value) &&
+        (matches(event.name) ||
+          matches(examTypeLabel(event.type)) ||
+          matches(eventStatusLabel(event.status))),
+    )
+  }
   if (activeClass.value) {
     return people.value.filter((row) =>
       matches(`${row.studentName ?? ''} ${row.participantNumber ?? ''}`),
@@ -229,6 +258,7 @@ const levelRows = computed<Row[]>(() => {
 })
 
 const paginatedRows = computed(() => {
+  if (isExam.value && activeEvent.value !== null) return levelRows.value
   const start = (page.value - 1) * pageSize.value
   return levelRows.value.slice(start, start + pageSize.value)
 })
@@ -243,26 +273,24 @@ const pageTitle = computed(() => {
   }
   if (activeSubject.value) return activeSubject.value.subject
   if (activeDay.value) return dateOf(activeDay.value.startsAt)
+  if (activeEvent.value) return activeEvent.value.name
   return 'Lembar Pemeriksaan Uraian'
 })
 
-const backLabel = computed(() =>
-  activeClass.value
-    ? 'Kembali ke daftar kelas'
-    : activeSubject.value
-      ? 'Kembali ke daftar mapel'
-      : 'Kembali ke semua hari',
-)
+const backLabel = computed(() => {
+  if (activeClass.value) return 'Kembali ke daftar kelas'
+  if (activeSubject.value) return 'Kembali ke daftar mapel'
+  if (activeDay.value) return 'Kembali ke semua hari'
+  return 'Kembali ke daftar periode'
+})
 
-const itemLabel = computed(() =>
-  activeClass.value
-    ? 'siswa'
-    : activeSubject.value
-      ? 'kelas'
-      : activeDay.value
-        ? 'mapel'
-        : 'hari',
-)
+const itemLabel = computed(() => {
+  if (atEventList.value) return 'periode'
+  if (activeClass.value) return 'siswa'
+  if (activeSubject.value) return 'kelas'
+  if (activeDay.value) return 'mapel'
+  return 'hari'
+})
 
 const printLabel = computed(() =>
   activeSubject.value && !activeClass.value && gradeFilter.value !== ALL
@@ -276,21 +304,43 @@ const printTargets = computed<GradingSchedule[]>(() => {
   if (activeDay.value) {
     return activeDay.value.subjects.flatMap((item) => item.classes)
   }
-  return days.value.flatMap((day) =>
-    day.subjects.flatMap((item) => item.classes),
-  )
+  if (!atEventList.value) {
+    return days.value.flatMap((day) =>
+      day.subjects.flatMap((item) => item.classes),
+    )
+  }
+  return []
 })
 
 function goTo(
-  day: string | null,
-  subject: string | null = null,
-  klass: string | null = null,
+  nextEventId: string | null,
+  nextDayId: string | null = null,
+  nextSubjectId: string | null = null,
+  nextClassId: string | null = null,
 ) {
   const params: Record<string, string> = {}
-  if (day !== null) params.dayId = day
-  if (day !== null && subject !== null) params.subjectId = subject
-  if (day !== null && subject !== null && klass !== null) {
-    params.classId = klass
+  if (isExam.value) {
+    if (nextEventId !== null) params.eventId = nextEventId
+    if (nextEventId !== null && nextDayId !== null) params.dayId = nextDayId
+    if (nextEventId !== null && nextDayId !== null && nextSubjectId !== null) {
+      params.subjectId = nextSubjectId
+    }
+    if (
+      nextEventId !== null &&
+      nextDayId !== null &&
+      nextSubjectId !== null &&
+      nextClassId !== null
+    ) {
+      params.classId = nextClassId
+    }
+  } else {
+    if (nextDayId !== null) params.dayId = nextDayId
+    if (nextDayId !== null && nextSubjectId !== null) {
+      params.subjectId = nextSubjectId
+    }
+    if (nextDayId !== null && nextSubjectId !== null && nextClassId !== null) {
+      params.classId = nextClassId
+    }
   }
   void router.push({
     name: isExam.value ? 'ExamPrintGradingSheet' : 'ClassworkPrintGradingSheet',
@@ -299,23 +349,29 @@ function goTo(
 }
 
 function goBack() {
-  if (activeClass.value) goTo(dayId.value, subjectId.value)
-  else if (activeSubject.value) goTo(dayId.value)
+  const currentEventId = activeEvent.value?.id ?? null
+  if (activeClass.value) goTo(currentEventId, dayId.value, subjectId.value)
+  else if (activeSubject.value) goTo(currentEventId, dayId.value)
+  else if (activeDay.value) goTo(currentEventId)
   else goTo(null)
 }
 
-async function loadSchedules() {
-  loading.value = true
+async function loadSchedules(): Promise<GradingSchedule[]> {
+  loadingSchedules.value = true
   try {
-    loadedSchedules.value = await gradingSheetService.loadSchedules(
+    const loaded = await gradingSheetService.loadSchedules(
       category.value,
       isExam.value ? '' : semesterId.value,
     )
+    loadedSchedules.value = loaded
+    schedulesLoaded.value = true
+    return loaded
   } catch {
     toast.error('Gagal memuat daftar ujian.')
     loadedSchedules.value = []
+    return []
   } finally {
-    loading.value = false
+    loadingSchedules.value = false
   }
 }
 
@@ -325,25 +381,29 @@ watch(semesterId, () => {
 })
 
 async function loadEvents() {
-  const result = await examEventService.loadEvents({ limit: 200 })
-  if (!result.success) {
-    toast.error('Gagal memuat periode ujian.')
-    return
+  loadingEvents.value = true
+  try {
+    const result = await examEventService.loadEvents({ limit: 200 })
+    if (!result.success) {
+      toast.error('Gagal memuat periode ujian.')
+      return
+    }
+    events.value = result.data
+    eventsLoaded.value = true
+  } finally {
+    loadingEvents.value = false
   }
-  events.value = result.data.map((event) => ({
-    id: event.id,
-    name: event.name,
-    startsAt: event.startsAt,
-    endsAt: event.endsAt,
-  }))
-  const active = result.data.find((event) => event.status === 'ACTIVE')
-  eventId.value = active?.id ?? result.data[0]?.id ?? ''
 }
 
-watch(eventId, (_next, previous) => {
-  page.value = 1
-  if (previous !== '' && dayId.value !== null) goTo(null)
-})
+watch(
+  eventId,
+  (next) => {
+    if (isExam.value && next !== null && !schedulesLoaded.value) {
+      void loadSchedules()
+    }
+  },
+  { immediate: true },
+)
 
 watch(
   activeClass,
@@ -362,14 +422,58 @@ watch(
   { immediate: true },
 )
 
-watch([dayId, subjectId, classId, gradeFilter, search], () => {
+watch([eventId, dayId, subjectId, classId], () => {
+  search.value = ''
+  gradeFilter.value = ALL
   page.value = 1
 })
 
-watch([days, () => route.params.dayId], () => {
-  if (loading.value) return
-  if (dayId.value !== null && activeDay.value === null) goTo(null)
+watch([gradeFilter, search, semesterId, status], () => {
+  page.value = 1
 })
+
+watch(
+  [
+    loading,
+    eventsLoaded,
+    schedulesLoaded,
+    activeEvent,
+    activeDay,
+    activeSubject,
+    activeClass,
+  ],
+  () => {
+    if (loading.value) return
+    if (
+      isExam.value &&
+      eventId.value !== null &&
+      eventsLoaded.value &&
+      activeEvent.value === null
+    ) {
+      goTo(null)
+      return
+    }
+    if (isExam.value && activeEvent.value === null) return
+    if (!schedulesLoaded.value) return
+    const currentEventId = activeEvent.value?.id ?? null
+    if (dayId.value !== null && activeDay.value === null) {
+      goTo(currentEventId)
+    } else if (
+      dayId.value !== null &&
+      subjectId.value !== null &&
+      activeSubject.value === null
+    ) {
+      goTo(currentEventId, dayId.value)
+    } else if (
+      dayId.value !== null &&
+      subjectId.value !== null &&
+      classId.value !== null &&
+      activeClass.value === null
+    ) {
+      goTo(currentEventId, dayId.value, subjectId.value)
+    }
+  },
+)
 
 useBreadcrumbs(() => [
   ...(isExam.value
@@ -381,9 +485,23 @@ useBreadcrumbs(() => [
   {
     title: 'Lembar Pemeriksaan Uraian',
     href: isExam.value
-      ? '/exam/print/grading-sheet'
-      : '/classwork/print/grading-sheet',
+      ? activeEvent.value
+        ? '/exam/print/grading-sheet'
+        : '#'
+      : activeDay.value
+        ? '/classwork/print/grading-sheet'
+        : '#',
   },
+  ...(isExam.value && activeEvent.value
+    ? [
+        {
+          title: activeEvent.value.name,
+          href: activeDay.value
+            ? `/exam/print/grading-sheet/${activeEvent.value.id}`
+            : '#',
+        },
+      ]
+    : []),
   ...(activeDay.value
     ? [{ title: dateOf(activeDay.value.startsAt), href: '#' }]
     : []),
@@ -447,6 +565,21 @@ async function printSchedules(
   }
 }
 
+async function printEvent(event: ExamEvent) {
+  if (printing.value) return
+  const all = schedulesLoaded.value
+    ? loadedSchedules.value
+    : await loadSchedules()
+  const targets = schedulesOfEvent(all, event).filter(
+    (schedule) => schedule.kind !== 'MAKEUP',
+  )
+  if (targets.length === 0) {
+    toast.info('Belum ada ujian yang dikerjakan siswa pada periode ini.')
+    return
+  }
+  await printSchedules(targets)
+}
+
 async function openPreview(person: SessionPerson) {
   const klass = activeClass.value
   if (klass === null || printing.value) return
@@ -470,6 +603,12 @@ const printItem = (action: () => void) => ({
   label: 'Cetak',
   icon: Printer,
   onClick: action,
+})
+
+const eventColumns = buildPrintEventColumns({
+  formatDate: dateOf,
+  onView: (event) => goTo(event.id),
+  onPrint: (event) => void printEvent(event),
 })
 
 const dayColumns = computed<ColumnDef<DayNode>[]>(() => [
@@ -525,7 +664,7 @@ const dayColumns = computed<ColumnDef<DayNode>[]>(() => [
               ),
           ),
         ],
-        onManage: () => goTo(row.original.id),
+        onManage: () => goTo(activeEvent.value?.id ?? null, row.original.id),
       }),
   },
 ])
@@ -578,7 +717,12 @@ const subjectColumns = computed<ColumnDef<SubjectNode>[]>(() => [
         hideEdit: true,
         hideDelete: true,
         items: [printItem(() => void printSchedules(row.original.classes))],
-        onManage: () => goTo(row.original.dayKey, row.original.id),
+        onManage: () =>
+          goTo(
+            activeEvent.value?.id ?? null,
+            row.original.dayKey,
+            row.original.id,
+          ),
       }),
   },
 ])
@@ -622,7 +766,13 @@ const classColumns = computed<ColumnDef<GradingSchedule>[]>(() => [
         hideEdit: true,
         hideDelete: true,
         items: [printItem(() => void printSchedules([row.original]))],
-        onManage: () => goTo(dayId.value, subjectId.value, row.original.id),
+        onManage: () =>
+          goTo(
+            activeEvent.value?.id ?? null,
+            dayId.value,
+            subjectId.value,
+            row.original.id,
+          ),
       }),
   },
 ])
@@ -679,7 +829,33 @@ const personColumns = computed<ColumnDef<SessionPerson>[]>(() => [
   },
 ])
 
+function openSheetRow(row: Row) {
+  if ('studentId' in row) {
+    void openPreview(row)
+    return
+  }
+  if ('packageId' in row) {
+    goTo(
+      activeEvent.value?.id ?? null,
+      activeDay.value?.id ?? null,
+      activeSubject.value?.id ?? null,
+      row.id,
+    )
+    return
+  }
+  if ('classes' in row) {
+    goTo(activeEvent.value?.id ?? null, activeDay.value?.id ?? null, row.id)
+    return
+  }
+  if ('subjects' in row) {
+    goTo(activeEvent.value?.id ?? null, row.id)
+    return
+  }
+  goTo(row.id)
+}
+
 const columns = computed(() => {
+  if (atEventList.value) return eventColumns
   if (activeClass.value) return personColumns.value
   if (activeSubject.value) return classColumns.value
   if (activeDay.value) return subjectColumns.value
@@ -691,18 +867,16 @@ function changePageSize(size: number) {
   page.value = 1
 }
 
-const searchLabel = computed(() =>
-  activeClass.value
-    ? 'Cari nama atau nomor peserta'
-    : activeSubject.value
-      ? 'Cari kelas'
-      : activeDay.value
-        ? 'Cari mata pelajaran'
-        : 'Cari tanggal',
-)
+const searchLabel = computed(() => {
+  if (atEventList.value) return 'Cari periode'
+  if (activeClass.value) return 'Cari nama atau nomor peserta'
+  if (activeSubject.value) return 'Cari kelas'
+  if (activeDay.value) return 'Cari mata pelajaran'
+  return 'Cari tanggal'
+})
 
 if (isExam.value) void loadEvents()
-void loadSchedules()
+else void loadSchedules()
 </script>
 
 <template>
@@ -714,13 +888,14 @@ void loadSchedules()
       <CardHeader standard>
         <div class="flex min-w-0 items-center gap-3">
           <BackButton
-            v-if="activeDay"
+            v-if="activeEvent || activeDay"
             :label="backLabel"
             @click="goBack"
           />
           <CardTitle class="font-semibold">{{ pageTitle }}</CardTitle>
         </div>
         <Button
+          v-if="!atEventList"
           class="shrink-0"
           :disabled="loading || printing || printTargets.length === 0"
           @click="printSchedules(printTargets)"
@@ -741,39 +916,44 @@ void loadSchedules()
           :total-items="levelRows.length"
           :is-loading="loading || peopleLoading"
           :item-label="itemLabel"
+          :hide-pagination="isExam && activeEvent !== null"
+          @row-click="openSheetRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >
           <template #filters>
+            <template v-if="atEventList">
+              <AcademicPeriodFilter v-model:semester-id="semesterId" />
+              <FloatingLabelField
+                label="Status"
+                :for="statusFieldId"
+                class="w-fit min-w-32"
+                floating
+              >
+                <Select v-model="status">
+                  <SelectTrigger
+                    :id="statusFieldId"
+                    class="w-full"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem :value="ALL">Semua</SelectItem>
+                    <SelectItem
+                      v-for="option in EVENT_STATUSES"
+                      :key="option"
+                      :value="option"
+                    >
+                      {{ eventStatusLabel(option) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </FloatingLabelField>
+            </template>
             <AcademicPeriodFilter
               v-if="!isExam && !activeSubject"
               v-model:semester-id="semesterId"
             />
-            <FloatingLabelField
-              v-if="isExam && !activeSubject"
-              label="Periode Ujian"
-              :for="eventFieldId"
-              class="w-fit min-w-40"
-              floating
-            >
-              <Select v-model="eventId">
-                <SelectTrigger
-                  :id="eventFieldId"
-                  class="w-full"
-                >
-                  <SelectValue placeholder="Pilih periode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="event in events"
-                    :key="event.id"
-                    :value="event.id"
-                  >
-                    {{ event.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </FloatingLabelField>
             <FloatingLabelField
               v-if="activeSubject && !activeClass"
               label="Tingkat"
@@ -820,7 +1000,11 @@ void loadSchedules()
               :message="
                 search
                   ? 'Tidak ada data yang cocok dengan pencarian.'
-                  : 'Belum ada ujian yang dikerjakan siswa pada periode ini.'
+                  : atEventList
+                    ? 'Belum ada periode ujian.'
+                    : activeClass
+                      ? 'Belum ada siswa yang mengumpulkan ujian pada kelas ini.'
+                      : 'Belum ada ujian yang dikerjakan siswa pada periode ini.'
               "
             />
           </template>

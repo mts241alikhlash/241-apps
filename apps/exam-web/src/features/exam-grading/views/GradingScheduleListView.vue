@@ -224,30 +224,48 @@ useBreadcrumbs(() => [
     : []),
 ])
 
+function openGradingSchedule(schedule: GradingSchedule) {
+  void router.push({
+    path: `${baseHref.value}/${schedule.id}`,
+    query: {
+      judul: subjectName(schedule),
+      ...(isExam.value && eventParam.value
+        ? { periode: eventParam.value }
+        : {}),
+      ...(isExam.value && subjectParam.value
+        ? { mapel: subjectParam.value }
+        : {}),
+    },
+  })
+}
+
+function openGradingRow(row: Row) {
+  if ('classes' in row) {
+    goTo(eventParam.value, row.id)
+    return
+  }
+  if ('packageId' in row) {
+    openGradingSchedule(row)
+    return
+  }
+  goTo(row.id)
+}
+
 const classColumns = computed(() =>
   buildGradingScheduleColumns({
     subjectName,
     canMakeup: hasPermission('exam-grading.grade'),
-    canParticipants: hasPermission('exam-grading.read'),
+    canParticipants:
+      hasPermission('exam-grading.read') ||
+      hasPermission('exam-grading.read-all') ||
+      hasPermission('exam-grading.manage-all'),
     onMakeup: (schedule) => {
       makeupTarget.value = originOf(schedule)
     },
     onParticipants: (schedule) => {
       participantsTarget.value = schedule
     },
-    onOpen: (schedule) =>
-      void router.push({
-        path: `${baseHref.value}/${schedule.id}`,
-        query: {
-          judul: subjectName(schedule),
-          ...(isExam.value && eventParam.value
-            ? { periode: eventParam.value }
-            : {}),
-          ...(isExam.value && subjectParam.value
-            ? { mapel: subjectParam.value }
-            : {}),
-        },
-      }),
+    onOpen: openGradingSchedule,
   }),
 )
 
@@ -432,6 +450,7 @@ function changePageSize(size: number) {
           :total-items="totalItems"
           :is-loading="loading"
           :item-label="itemLabel"
+          @row-click="openGradingRow"
           @update:page="page = $event"
           @update:page-size="changePageSize"
         >

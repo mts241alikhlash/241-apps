@@ -1,7 +1,12 @@
 import type { RoomStaffUser } from '../../room-access.service.js'
 import { SAMPLE_ATTACHMENT } from '../../room-report-file-storage.fake.js'
 import { CLASSROOM_7A } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
-import { MANAGE_ALL, SUPERVISE, TECHNICIAN } from '../../room-access.service.js'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+} from '../../room-access.service.js'
 import {
   SUPERVISOR_ID,
   TECHNICIAN_ID,
@@ -191,5 +196,16 @@ describe('ListRoomReportsUseCase', () => {
       status: 'DRAFT',
       supervisorName: null,
     })
+  })
+
+  it('lists every room and slot for exam-rooms.read-all', async () => {
+    const { reports } = await build()
+
+    const rows = await reports.execute(
+      { id: 'principal-1', permissions: [READ_ALL] },
+      {},
+    )
+
+    expect(rows).toHaveLength(3)
   })
 })

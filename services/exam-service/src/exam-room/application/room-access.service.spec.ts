@@ -4,11 +4,13 @@ import type { ExamRoomSupervisor } from '../domain/entities/exam-room-supervisor
 import { IExamRoomRepository } from '../domain/repositories/exam-room.repository.js'
 import {
   MANAGE_ALL,
+  READ_ALL,
   RoomAccessService,
   SUPERVISE,
   TECHNICIAN,
   type RoomStaffUser,
 } from './room-access.service.js'
+import { visibleRooms } from './room-visibility.js'
 
 const NOW = new Date('2026-11-02T02:00:00.000Z')
 const ROOM_A = '11111111-1111-4111-8111-111111111111'
@@ -23,6 +25,7 @@ const SUPERVISOR_A: RoomStaffUser = {
   permissions: [SUPERVISE],
 }
 const ADMIN: RoomStaffUser = { id: 'admin-1', permissions: [MANAGE_ALL] }
+const READER: RoomStaffUser = { id: 'principal-1', permissions: [READ_ALL] }
 
 class StubRooms extends IExamRoomRepository {
   readonly rooms = new Map<string, ExamRoom>()
@@ -35,6 +38,7 @@ class StubRooms extends IExamRoomRepository {
   isEventLinked = vi.fn()
   listEvents = vi.fn()
   listEventIdsSupervisedBy = vi.fn()
+  listEventIdsByTechnician = vi.fn()
   createRoom = vi.fn()
   listRoomsByEvent = vi.fn()
   listRoomsByEventStatus = vi.fn()
@@ -241,5 +245,40 @@ describe('RoomAccessService', () => {
         '33333333-3333-4333-8333-333333333333',
       ),
     ).rejects.toThrow(NotFoundException)
+  })
+
+  it('lets exam-rooms.read-all view all rooms and slots while refusing write actions', async () => {
+    const { rooms, access } = setup()
+    rooms.listRoomsByEventStatus.mockResolvedValue([
+      rooms.rooms.get(ROOM_A)!,
+      rooms.rooms.get(ROOM_B)!,
+    ])
+
+    await expect(visibleRooms(rooms, READER)).resolves.toHaveLength(2)
+    await expect(access.assertCanView(READER, ROOM_A)).resolves.toMatchObject({
+      id: ROOM_A,
+    })
+    await expect(access.assertCanView(READER, ROOM_B)).resolves.toMatchObject({
+      id: ROOM_B,
+    })
+    await expect(
+      access.assertCanViewSlot(READER, ROOM_A, rooms.slots[0]),
+    ).resolves.toMatchObject({ id: ROOM_A })
+    await expect(
+      access.assertCanViewWithoutRoom(READER),
+    ).resolves.toBeUndefined()
+
+    const writeActions = [
+      () => access.assertCanWriteSlot(READER, ROOM_A, rooms.slots[0], NOW),
+      () => access.assertCanSupervise(READER, ROOM_A, NOW),
+      () => access.assertCanActAsTechnician(READER, ROOM_A),
+      () => access.assertCanRelease(READER, ROOM_A, NOW),
+      () => access.assertCanActWithoutRoom(READER),
+    ]
+    for (const action of writeActions) {
+      await expect(action()).rejects.toMatchObject({
+        response: { code: 'ROOM_FORBIDDEN' },
+      })
+    }
   })
 })

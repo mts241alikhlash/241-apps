@@ -34,6 +34,14 @@ function buildWhere(
     ...(query.category
       ? { type: { in: typesInCategory(query.category) } }
       : {}),
+    ...(query.allowedPairs && query.allowedPairs.length > 0
+      ? {
+          OR: query.allowedPairs.map((pair) => ({
+            classroomId: pair.classroomId,
+            package: { subjectId: pair.subjectId },
+          })),
+        }
+      : {}),
   }
 }
 
@@ -47,6 +55,9 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     query: ExamScheduleListQuery,
   ): Promise<PaginatedResult<ExamSchedule>> {
     const { page, limit } = query
+    if (query.allowedPairs?.length === 0) {
+      return { data: [], total: 0, page, limit }
+    }
     const where = buildWhere(query)
     const [rows, total] = await Promise.all([
       this.prisma.examSchedule.findMany({

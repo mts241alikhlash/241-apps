@@ -1,23 +1,37 @@
-import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import {
+  PERMISSIONS_ANY_KEY,
+  PERMISSIONS_KEY,
+} from '@mts241alikhlash/nest-core/access-control'
 import { describe, expect, it, vi } from 'vitest'
 import { DEFAULT_POLICIES } from '../../domain/policies/exam-policy.policy.js'
 import type { ManagePresetsUseCase } from '../../application/use-cases/manage-presets/manage-presets.use-case.js'
 import { ExamPolicyPresetController } from './exam-policy-preset.controller.js'
 
 describe('ExamPolicyPresetController', () => {
-  it('requires exam-schedules.read on list and exam-schedules.manage-all on update', () => {
+  it('allows schedule readers or settings managers on list and requires exam-settings.manage on update', () => {
+    expect(
+      Reflect.getMetadata(
+        PERMISSIONS_ANY_KEY,
+        ExamPolicyPresetController.prototype.list,
+      ),
+    ).toEqual([
+      'exam-schedules.read',
+      'exam-schedules.manage',
+      'exam-schedules.manage-all',
+      'exam-settings.manage',
+    ])
     expect(
       Reflect.getMetadata(
         PERMISSIONS_KEY,
         ExamPolicyPresetController.prototype.list,
       ),
-    ).toEqual(['exam-schedules.read'])
+    ).toBeUndefined()
     expect(
       Reflect.getMetadata(
         PERMISSIONS_KEY,
         ExamPolicyPresetController.prototype.update,
       ),
-    ).toEqual(['exam-schedules.manage-all'])
+    ).toEqual(['exam-settings.manage'])
   })
 
   it('maps presets to ExamPolicyPresetDto with category', async () => {

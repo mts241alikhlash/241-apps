@@ -24,7 +24,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import {
+  RequireAnyPermission,
+  RequirePermissions,
+} from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { AttendanceFileService } from '../../application/attendance-file.service.js'
 import { attendanceFileName } from '../../domain/policies/attendance-scope.policy.js'
@@ -76,7 +79,7 @@ export class ExamAttendanceFileController {
   }
 
   @Get()
-  @RequirePermissions('exam-events.manage')
+  @RequireAnyPermission('exam-events.manage', 'exam-events.read')
   @ApiOperation({ summary: 'The uploaded attendance sheets of an event' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: [AttendanceFileDto] })
@@ -90,7 +93,7 @@ export class ExamAttendanceFileController {
   }
 
   @Get(':fileId')
-  @RequirePermissions('exam-events.manage')
+  @RequireAnyPermission('exam-events.manage', 'exam-events.read')
   @ApiOperation({ summary: 'Download an uploaded attendance sheet' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiParam({ name: 'fileId', format: 'uuid' })

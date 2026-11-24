@@ -429,6 +429,17 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
     return rows.map(toAnswer)
   }
 
+  async listAnswersBySessionIds(
+    sessionIds: string[],
+  ): Promise<ExamAnswerRecord[]> {
+    if (sessionIds.length === 0) return []
+    const rows = await this.prisma.examAnswer.findMany({
+      where: { sessionId: { in: sessionIds } },
+      orderBy: { createdAt: 'asc' },
+    })
+    return rows.map(toAnswer)
+  }
+
   async applyRecovery(
     id: string,
     patch: SessionRecoveryPatch,

@@ -4,37 +4,47 @@ import { ActionCell } from '@mts241alikhlash/ui'
 import { Badge } from '@mts241alikhlash/ui/badge'
 import type { RoomOverview } from '../types'
 
+export type RoomSlotPhase = 'ACTIVE' | 'WAITING' | 'FINISHED'
+
+export interface RoomOverviewRow extends RoomOverview {
+  slotId?: string
+  slotPhase?: RoomSlotPhase
+}
+
+const phaseLabel: Record<RoomSlotPhase, string> = {
+  ACTIVE: 'Berlangsung',
+  WAITING: 'Menunggu',
+  FINISHED: 'Selesai',
+}
+
+const phaseVariant: Record<RoomSlotPhase, 'default' | 'outline' | 'secondary'> =
+  {
+    ACTIVE: 'default',
+    WAITING: 'outline',
+    FINISHED: 'secondary',
+  }
+
+const statusOf = (row: RoomOverviewRow): RoomSlotPhase =>
+  row.slotPhase ?? (row.isActiveNow ? 'ACTIVE' : 'WAITING')
+
 export interface RoomOverviewColumnOptions {
-  onOpen: (room: RoomOverview) => void
+  onOpen: (room: RoomOverviewRow) => void
 }
 
 export function buildRoomOverviewColumns(
   options: RoomOverviewColumnOptions,
-): ColumnDef<RoomOverview>[] {
+): ColumnDef<RoomOverviewRow>[] {
   return [
-    {
-      id: 'code',
-      header: 'Kode',
-      meta: { align: 'center', strong: true },
-      cell: ({ row }) => h('span', row.original.code),
-    },
     {
       id: 'name',
       header: 'Ruangan',
       meta: {
+        strong: true,
+        mobile: 'title',
         mobileLabel: 'Ruangan',
-        mobileValue: (row: RoomOverview) => row.name,
+        mobileValue: (row: RoomOverviewRow) => row.name,
       },
       cell: ({ row }) => row.original.name,
-    },
-    {
-      id: 'building',
-      header: 'Gedung',
-      meta: {
-        mobileLabel: 'Gedung',
-        mobileValue: (row: RoomOverview) => row.building ?? '-',
-      },
-      cell: ({ row }) => row.original.building ?? '-',
     },
     {
       id: 'registered',
@@ -42,7 +52,7 @@ export function buildRoomOverviewColumns(
       meta: {
         align: 'center',
         mobileLabel: 'Peserta',
-        mobileValue: (row: RoomOverview) =>
+        mobileValue: (row: RoomOverviewRow) =>
           `${row.registeredCount} dari ${row.capacity}`,
       },
       cell: ({ row }) =>
@@ -53,7 +63,7 @@ export function buildRoomOverviewColumns(
       header: 'Pengawas',
       meta: {
         mobileLabel: 'Pengawas',
-        mobileValue: (row: RoomOverview) =>
+        mobileValue: (row: RoomOverviewRow) =>
           row.currentSupervisorName ?? 'Belum ditugaskan',
       },
       cell: ({ row }) =>
@@ -71,7 +81,7 @@ export function buildRoomOverviewColumns(
       header: 'Teknisi',
       meta: {
         mobileLabel: 'Teknisi',
-        mobileValue: (row: RoomOverview) => row.technicianName ?? '-',
+        mobileValue: (row: RoomOverviewRow) => row.technicianName ?? '-',
       },
       cell: ({ row }) => row.original.technicianName ?? '-',
     },
@@ -81,15 +91,16 @@ export function buildRoomOverviewColumns(
       meta: {
         align: 'center',
         mobileLabel: 'Status',
-        mobileValue: (row: RoomOverview) =>
-          row.isActiveNow ? 'Berlangsung' : 'Menunggu',
+        mobileValue: (row: RoomOverviewRow) => phaseLabel[statusOf(row)],
       },
-      cell: ({ row }) =>
-        h(
+      cell: ({ row }) => {
+        const phase = statusOf(row.original)
+        return h(
           Badge,
-          { variant: row.original.isActiveNow ? 'default' : 'outline' },
-          () => (row.original.isActiveNow ? 'Berlangsung' : 'Menunggu'),
-        ),
+          { variant: phaseVariant[phase] },
+          () => phaseLabel[phase],
+        )
+      },
     },
     {
       id: 'actions',

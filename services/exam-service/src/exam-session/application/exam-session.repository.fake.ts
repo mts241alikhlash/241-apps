@@ -397,6 +397,16 @@ export class FakeExamSessionRepository extends IExamSessionRepository {
     )
   }
 
+  listAnswersBySessionIds(sessionIds: string[]) {
+    if (sessionIds.length === 0) return Promise.resolve([])
+    const wanted = new Set(sessionIds)
+    return Promise.resolve(
+      [...this.answers.values()].filter((answer) =>
+        wanted.has(answer.sessionId),
+      ),
+    )
+  }
+
   listByStudentAndSchedules(studentId: string, scheduleIds: string[]) {
     return Promise.resolve(
       [...this.sessions.values()].filter(

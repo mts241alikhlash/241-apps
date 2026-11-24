@@ -12,6 +12,7 @@ import {
 import { GetGradingSessionUseCase } from './get-grading-session/get-grading-session.use-case.js'
 import { ListGradingSchedulesUseCase } from './list-grading-schedules/list-grading-schedules.use-case.js'
 import { ListGradingSessionsUseCase } from './list-grading-sessions/list-grading-sessions.use-case.js'
+import { ListScheduleGradingDetailsUseCase } from './list-schedule-grading-details/list-schedule-grading-details.use-case.js'
 
 describe('grading queries', () => {
   const listSchedules = (w: ReturnType<typeof build>) =>
@@ -25,6 +26,15 @@ describe('grading queries', () => {
     new ListGradingSessionsUseCase(w.scope, w.schedules, w.sessions, w.students)
   const getSession = (w: ReturnType<typeof build>) =>
     new GetGradingSessionUseCase(
+      w.scope,
+      w.schedules,
+      w.packages,
+      w.questions,
+      w.sessions,
+      w.students,
+    )
+  const listScheduleDetails = (w: ReturnType<typeof build>) =>
+    new ListScheduleGradingDetailsUseCase(
       w.scope,
       w.schedules,
       w.packages,
@@ -81,6 +91,32 @@ describe('grading queries', () => {
       expect(
         (await listSchedules(w).execute(STAFF, { page: 1, limit: 10 })).total,
       ).toBe(1)
+    })
+
+    it('shows every schedule, session list, and session detail to exam-grading.read-all', async () => {
+      const w = build({ taught: [], employee: null })
+      const { schedule, questionIds } = await paperWithManual(w)
+      submitted(w, schedule, { [questionIds[1]]: { text: 'jawab' } })
+      const reader = {
+        id: 'principal-1',
+        roles: ['PRINCIPAL'],
+        permissions: ['exam-grading.read', 'exam-grading.read-all'],
+      }
+
+      expect(
+        (await listSchedules(w).execute(reader, { page: 1, limit: 10 })).total,
+      ).toBe(1)
+      expect(
+        (
+          await listSessions(w).execute(reader, schedule.id, {
+            page: 1,
+            limit: 10,
+          })
+        ).total,
+      ).toBe(1)
+      expect(
+        (await getSession(w).execute(reader, 'ses-1')).session.sessionId,
+      ).toBe('ses-1')
     })
 
     it('leaves out schedules nobody started', async () => {
@@ -330,6 +366,52 @@ describe('grading queries', () => {
       await expect(getSession(w).execute(TEACHER, 'ses-1')).rejects.toThrow(
         ConflictException,
       )
+    })
+  })
+
+  describe('schedule details batch', () => {
+    it('loads finished sessions with answers and resolves students in one call', async () => {
+      const w = build()
+      const refsSpy = vi.spyOn(w.students, 'refsByIds')
+      const { schedule, questionIds } = await paperWithManual(w)
+      const [, essay] = questionIds
+      submitted(w, schedule, { [essay]: { text: 'uraian 1' } })
+      submitted(
+        w,
+        schedule,
+        {},
+        { id: 'ses-prog', studentId: 'st-prog', status: 'IN_PROGRESS' },
+      )
+
+      const details = await listScheduleDetails(w).execute(TEACHER, schedule.id)
+
+      expect(details).toHaveLength(1)
+      expect(details[0].session.sessionId).toBe('ses-1')
+      expect(details[0].items[1].answer).toEqual({ text: 'uraian 1' })
+      expect(refsSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('returns an empty list without student lookup when no finished sessions exist', async () => {
+      const w = build()
+      const refsSpy = vi.spyOn(w.students, 'refsByIds')
+      const { schedule } = await paperWithManual(w)
+
+      const details = await listScheduleDetails(w).execute(TEACHER, schedule.id)
+
+      expect(details).toEqual([])
+      expect(refsSpy).not.toHaveBeenCalled()
+    })
+
+    it('answers 404 when schedule is outside scope or missing', async () => {
+      const w = build({ taught: [] })
+      const { schedule } = await paperWithManual(w)
+
+      await expect(
+        listScheduleDetails(w).execute(TEACHER, schedule.id),
+      ).rejects.toThrow(NotFoundException)
+      await expect(
+        listScheduleDetails(w).execute(TEACHER, 'missing'),
+      ).rejects.toThrow(NotFoundException)
     })
   })
 })

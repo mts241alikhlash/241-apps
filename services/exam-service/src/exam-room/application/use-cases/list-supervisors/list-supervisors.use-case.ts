@@ -16,9 +16,8 @@ export class ListSupervisorsUseCase {
   async execute(
     user: RoomStaffUser,
     roomId: string,
-    now: Date = new Date(),
   ): Promise<ExamRoomSupervisor[]> {
-    await this.access.assertCanSupervise(user, roomId, now)
+    await this.access.assertCanView(user, roomId)
     return this.rooms.listSupervisors(roomId)
   }
 }

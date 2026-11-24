@@ -15,6 +15,7 @@ import {
 import { ArrayMaxSize, IsArray, IsUUID } from 'class-validator'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IReportCardRepository } from '../../domain/repositories/report-card.repository.js'
 
 export class EnrollmentIdsDto {
@@ -42,6 +43,7 @@ export class ReportCardAveragesResponseDto {
 
 @ApiTags('Report Cards')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('report-cards')
 export class ReportCardInternalController {

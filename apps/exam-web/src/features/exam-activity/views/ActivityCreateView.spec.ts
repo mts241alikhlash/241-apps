@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import ActivityCreateView from './ActivityCreateView.vue'
+import { examEventService } from '@/features/exam-event/services/examEventService'
 
 const { create, permissions, routeState } = vi.hoisted(() => ({
   create: vi.fn(),
@@ -49,7 +50,7 @@ vi.mock('@/features/exam-event/services/examEventService', () => ({
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const formStub = defineComponent({
   name: 'ActivityForm',
-  props: { isAdmin: Boolean, fixedEventId: String },
+  props: { isAdmin: Boolean, canManageEvents: Boolean, fixedEventId: String },
   template: '<div data-test="form" />',
 })
 
@@ -66,19 +67,29 @@ describe('ActivityCreateView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     permissions.clear()
+    routeState.meta = { category: 'EXAM' }
     routeState.query = {}
   })
 
-  it('does not hand admin rights to a teacher, and admin rights to a manager', async () => {
+  it('does not hand admin rights to a teacher, and passes canManageEvents and admin rights properly', async () => {
     const teacher = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
     expect(teacher.findComponent(formStub).props('isAdmin')).toBe(false)
+    expect(teacher.findComponent(formStub).props('canManageEvents')).toBe(false)
     teacher.unmount()
+
+    permissions.add('exam-events.manage')
+    const staff = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(staff.findComponent(formStub).props('isAdmin')).toBe(false)
+    expect(staff.findComponent(formStub).props('canManageEvents')).toBe(true)
+    staff.unmount()
 
     permissions.add('exam-schedules.manage-all')
     const manager = mount(ActivityCreateView, { global: { stubs } })
     await flushPromises()
     expect(manager.findComponent(formStub).props('isAdmin')).toBe(true)
+    expect(manager.findComponent(formStub).props('canManageEvents')).toBe(true)
     manager.unmount()
   })
 
@@ -89,5 +100,19 @@ describe('ActivityCreateView', () => {
 
     expect(wrapper.findComponent(formStub).props('fixedEventId')).toBe('ev-1')
     wrapper.unmount()
+  })
+
+  it('loads exam event options only for EXAM and skips them for NON_EXAM', async () => {
+    routeState.meta = { category: 'NON_EXAM' }
+    const classworkView = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEventOptions).not.toHaveBeenCalled()
+    classworkView.unmount()
+
+    routeState.meta = { category: 'EXAM' }
+    const examView = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEventOptions).toHaveBeenCalledWith('sem-1')
+    examView.unmount()
   })
 })

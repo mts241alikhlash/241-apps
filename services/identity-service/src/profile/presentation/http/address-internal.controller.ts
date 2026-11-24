@@ -11,6 +11,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsUUID } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { IProfileAddressRepository } from '../../domain/repositories/profile-address.repository.js'
 import { ProfileAddressService } from '../../application/services/profile-address.service.js'
@@ -34,6 +35,7 @@ export class BatchAddressLookupDto {
 
 @ApiTags('Profiles')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('addresses')
 export class AddressInternalController {

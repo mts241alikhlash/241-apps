@@ -25,7 +25,7 @@ export class RemoveMakeupParticipantUseCase {
     if (makeup?.kind !== 'MAKEUP') {
       throw new NotFoundException('Jadwal susulan tidak ditemukan')
     }
-    await this.scope.assertAllowed(user, makeup)
+    await this.scope.assertCanWrite(user, makeup)
     const participants = await this.schedules.listParticipants(scheduleId)
     if (!participants.some((row) => row.studentId === studentId)) {
       throw new NotFoundException('Siswa bukan peserta susulan ini')

@@ -6,7 +6,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
+import {
+  RequireAnyPermission,
+  RequirePermissions,
+} from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import {
@@ -25,7 +28,12 @@ export class ExamPolicyPresetController {
   constructor(private readonly presets: ManagePresetsUseCase) {}
 
   @Get()
-  @RequirePermissions('exam-schedules.read')
+  @RequireAnyPermission(
+    'exam-schedules.read',
+    'exam-schedules.manage',
+    'exam-schedules.manage-all',
+    'exam-settings.manage',
+  )
   @ApiOperation({ summary: 'List the default enforcement policy presets' })
   @ApiResponse({ status: 200, type: [ExamPolicyPresetDto] })
   async list(): Promise<ExamPolicyPresetDto[]> {
@@ -35,7 +43,7 @@ export class ExamPolicyPresetController {
   }
 
   @Patch(':type')
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({ summary: 'Update one policy preset' })
   @ApiParam({ name: 'type', enum: EXAM_TYPES })
   @ApiResponse({ status: 200, type: ExamPolicyPresetDto })

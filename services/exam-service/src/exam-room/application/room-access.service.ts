@@ -8,6 +8,7 @@ import type { ExamRoomSupervisor } from '../domain/entities/exam-room-supervisor
 import { IExamRoomRepository } from '../domain/repositories/exam-room.repository.js'
 
 export const MANAGE_ALL = 'exam-rooms.manage-all'
+export const READ_ALL = 'exam-rooms.read-all'
 export const SUPERVISE = 'exam-rooms.supervise'
 export const TECHNICIAN = 'exam-rooms.technician'
 
@@ -46,7 +47,12 @@ export class RoomAccessService {
 
   async assertCanView(user: RoomStaffUser, roomId: string): Promise<ExamRoom> {
     const room = await this.loadRoom(roomId)
-    if (user.permissions?.includes(MANAGE_ALL)) return room
+    if (
+      user.permissions?.includes(MANAGE_ALL) ||
+      user.permissions?.includes(READ_ALL)
+    ) {
+      return room
+    }
     if (this.runsRoom(user, room)) return room
     if (!user.permissions?.includes(SUPERVISE)) throw denied()
     if ((await this.ownSlots(user, roomId)).length === 0) throw denied()
@@ -59,7 +65,11 @@ export class RoomAccessService {
     slot: ExamRoomSupervisor,
   ): Promise<ExamRoom> {
     const room = await this.assertCanView(user, roomId)
-    if (user.permissions?.includes(MANAGE_ALL) || this.runsRoom(user, room)) {
+    if (
+      user.permissions?.includes(MANAGE_ALL) ||
+      user.permissions?.includes(READ_ALL) ||
+      this.runsRoom(user, room)
+    ) {
       return room
     }
     if (slot.actualUserId !== user.id && slot.scheduledUserId !== user.id) {
@@ -116,6 +126,17 @@ export class RoomAccessService {
     )
     if (slot === null) throw denied()
     return room
+  }
+
+  assertCanViewWithoutRoom(user: RoomStaffUser): Promise<void> {
+    if (
+      !user.permissions?.includes(MANAGE_ALL) &&
+      !user.permissions?.includes(READ_ALL) &&
+      !user.permissions?.includes(SUPERVISE)
+    ) {
+      return Promise.reject(denied())
+    }
+    return Promise.resolve()
   }
 
   assertCanActWithoutRoom(user: RoomStaffUser): Promise<void> {

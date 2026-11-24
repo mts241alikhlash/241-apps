@@ -36,6 +36,15 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
       .filter(
         (row) => !query.category || categoryOf(row.type) === query.category,
       )
+      .filter(
+        (row) =>
+          query.allowedPairs === undefined ||
+          query.allowedPairs.some(
+            (pair) =>
+              pair.subjectId === row.subjectId &&
+              pair.classroomId === row.classroomId,
+          ),
+      )
     return Promise.resolve({
       data: rows.slice(
         (query.page - 1) * query.limit,

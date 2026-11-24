@@ -30,7 +30,7 @@ export class AddMakeupParticipantsUseCase {
     if (makeup.kind !== 'MAKEUP' || makeup.makeupOfId === null) {
       throw new BadRequestException('Hanya jadwal susulan yang punya peserta')
     }
-    await this.scope.assertAllowed(user, makeup)
+    await this.scope.assertCanWrite(user, makeup)
     if (makeup.status !== 'SCHEDULED') {
       throw new ConflictException('Jadwal ujian sudah dibatalkan')
     }
