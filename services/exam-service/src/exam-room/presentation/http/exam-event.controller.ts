@@ -75,6 +75,7 @@ export class ExamEventController {
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   )
   @ApiOperation({ summary: 'The exam events of a semester' })
   @ApiResponse({ status: 200, type: ExamEventListResponseDto })
@@ -107,6 +108,7 @@ export class ExamEventController {
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   )
   @ApiOperation({ summary: 'One exam event' })
   @ApiParam({ name: 'id', format: 'uuid' })
@@ -168,6 +170,7 @@ export class ExamEventController {
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   )
   @ApiOperation({ summary: 'The rooms of an exam event' })
   @ApiParam({ name: 'id', format: 'uuid' })

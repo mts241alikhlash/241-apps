@@ -178,18 +178,21 @@ const eventAnyRoutes: Record<string, string[]> = {
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   ],
   findOne: [
     'exam-events.read',
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   ],
   roomsOfEvent: [
     'exam-events.read',
     'exam-rooms.supervise',
     'exam-rooms.technician',
     'exam-rooms.read-all',
+    'exam-rooms.manage-all',
   ],
   getPrintPack: ['exam-events.manage', 'exam-events.read'],
 }
@@ -923,6 +926,21 @@ describe('ExamEventController supervised listing', () => {
 
     const readerRooms = await controller.roomsOfEvent(readerUser, other.id)
     expect(readerRooms.map((row) => row.id)).toEqual([otherRoom.id])
+
+    const managerUser = {
+      id: 'manager-1',
+      permissions: ['exam-rooms.manage-all'],
+    }
+    const managerList = await controller.list(managerUser, {
+      page: 1,
+      limit: 10,
+    })
+    expect(managerList.data.map((row) => row.id)).toEqual([mine.id, other.id])
+    await expect(
+      controller.findOne(managerUser, other.id),
+    ).resolves.toMatchObject({ id: other.id })
+    const managerRooms = await controller.roomsOfEvent(managerUser, other.id)
+    expect(managerRooms.map((row) => row.id)).toEqual([otherRoom.id])
   })
 })
 
