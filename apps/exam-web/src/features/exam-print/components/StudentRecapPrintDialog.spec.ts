@@ -157,7 +157,7 @@ describe('StudentRecapPrintDialog', () => {
 
     wrapper
       .findAllComponents(SelectStub)[1]
-      .vm.$emit('update:modelValue', 'VIII')
+      .vm.$emit('update:modelValue', 'Kelas 8')
     await flushPromises()
     expect(wrapper.text()).toContain('1 lembar rekap nilai kelas (22 siswa)')
 
