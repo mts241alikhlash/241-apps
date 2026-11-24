@@ -80,7 +80,7 @@ export class GetSessionTimelineUseCase {
     session: ExamSession,
   ): Promise<void> {
     if (session.roomId === null) {
-      await this.access.assertCanActWithoutRoom(user)
+      await this.access.assertCanViewWithoutRoom(user)
       return
     }
     await this.access.assertCanView(user, session.roomId)

@@ -93,6 +93,32 @@ describe('grading queries', () => {
       ).toBe(1)
     })
 
+    it('shows every schedule, session list, and session detail to exam-grading.read-all', async () => {
+      const w = build({ taught: [], employee: null })
+      const { schedule, questionIds } = await paperWithManual(w)
+      submitted(w, schedule, { [questionIds[1]]: { text: 'jawab' } })
+      const reader = {
+        id: 'principal-1',
+        roles: ['PRINCIPAL'],
+        permissions: ['exam-grading.read', 'exam-grading.read-all'],
+      }
+
+      expect(
+        (await listSchedules(w).execute(reader, { page: 1, limit: 10 })).total,
+      ).toBe(1)
+      expect(
+        (
+          await listSessions(w).execute(reader, schedule.id, {
+            page: 1,
+            limit: 10,
+          })
+        ).total,
+      ).toBe(1)
+      expect(
+        (await getSession(w).execute(reader, 'ses-1')).session.sessionId,
+      ).toBe('ses-1')
+    })
+
     it('leaves out schedules nobody started', async () => {
       const w = build()
       await paperWithManual(w)

@@ -878,6 +878,13 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
   },
   {
     module: 'exam-rooms',
+    action: 'read-all',
+    code: 'exam-rooms.read-all',
+    description:
+      'Read monitoring, access codes, timelines and reports of every exam room',
+  },
+  {
+    module: 'exam-rooms',
     action: 'supervise',
     code: 'exam-rooms.supervise',
     description: 'Supervise the exam rooms assigned to the caller',
@@ -935,10 +942,25 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
   },
 
   {
+    module: 'exam-settings',
+    action: 'manage',
+    code: 'exam-settings.manage',
+    description:
+      'Manage Istiqra exam policy presets and Safe Exam Browser configurations',
+  },
+
+  {
     module: 'exam-grading',
     action: 'read',
     code: 'exam-grading.read',
     description: 'Read exam answers waiting for grading in the classes taught',
+  },
+  {
+    module: 'exam-grading',
+    action: 'read-all',
+    code: 'exam-grading.read-all',
+    description:
+      'Read exam grading lists, answers, essay sheets and score recaps of every class',
   },
   {
     module: 'exam-grading',

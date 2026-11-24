@@ -158,6 +158,11 @@ useBreadcrumbs(() => [
 ])
 
 onMounted(async () => {
+  if (category.value !== 'EXAM') {
+    periodNames.value = new Map()
+    periodEvents.value = new Map()
+    return
+  }
   const result = await examEventService.loadEvents({ limit: 1000 })
   if (result.success) {
     periodNames.value = new Map(
@@ -197,11 +202,19 @@ async function confirmCancel() {
 }
 
 const isClasswork = computed(() => category.value === 'NON_EXAM')
+const canWriteExam = computed(
+  () =>
+    hasPermission('exam-schedules.manage-all') ||
+    hasPermission('exam-events.manage'),
+)
+const canWriteInCategory = computed(
+  () => isClasswork.value || canWriteExam.value,
+)
 
 const scheduleOptions = computed<ScheduleColumnOptions>(() => ({
   subjectName,
-  canUpdate: hasPermission('exam-schedules.update'),
-  canCancel: hasPermission('exam-schedules.cancel'),
+  canUpdate: canWriteInCategory.value && hasPermission('exam-schedules.update'),
+  canCancel: canWriteInCategory.value && hasPermission('exam-schedules.cancel'),
   canAccessCode:
     isClasswork.value && hasPermission('exam-schedules.access-code'),
   canSessions: isClasswork.value && hasPermission('exam-sessions.read'),
@@ -429,7 +442,7 @@ const columns = computed(
           <CardTitle class="font-semibold">{{ levelTitle }}</CardTitle>
         </div>
         <Button
-          v-if="hasPermission('exam-schedules.manage')"
+          v-if="hasPermission('exam-schedules.manage') && canWriteInCategory"
           class="shrink-0"
           @click="openCreate"
         >

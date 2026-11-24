@@ -42,6 +42,7 @@ const packages = ref<PackageOption[]>([])
 const subjects = ref<SubjectOption[]>([])
 const events = ref<EventOption[]>([])
 const isAdmin = computed(() => hasPermission('exam-schedules.manage-all'))
+const canManageEvents = computed(() => hasPermission('exam-events.manage'))
 const submitting = ref(false)
 const error = ref<string | null>(null)
 
@@ -60,7 +61,7 @@ async function load(): Promise<void> {
   const activeSemester =
     semesters.data.find((item) => item.isActive) ?? semesters.data[0]
   semesterId.value = activeSemester?.id ?? ''
-  if (semesterId.value !== '') {
+  if (semesterId.value !== '' && category.value === 'EXAM') {
     const activeEvents = await examEventService.loadEventOptions(
       semesterId.value,
     )
@@ -69,6 +70,8 @@ async function load(): Promise<void> {
       name: item.name,
       type: item.type,
     }))
+  } else {
+    events.value = []
   }
 
   classrooms.value = rooms.data.map((room) => ({
@@ -153,6 +156,7 @@ onMounted(load)
           :category="category"
           :fixed-event-id="fixedEventId"
           :is-admin="isAdmin"
+          :can-manage-events="canManageEvents"
           :submitting="submitting"
           @submit="submit"
         />

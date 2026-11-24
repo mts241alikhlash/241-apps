@@ -41,10 +41,11 @@ export function typesFor(
   category: ExamCategory,
   manageAll: boolean,
   midtermEventActive: boolean,
+  canManageEvents = false,
 ): ExamType[] {
   if (category === 'NON_EXAM') return ['DAILY', 'ASSIGNMENT']
   if (manageAll) return ['MIDTERM', 'FINAL']
-  return midtermEventActive ? ['MIDTERM'] : []
+  return canManageEvents && midtermEventActive ? ['MIDTERM'] : []
 }
 
 export const sectionPrefixOf = (category: ExamCategory | undefined): string =>

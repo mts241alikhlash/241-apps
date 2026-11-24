@@ -44,10 +44,12 @@ import { SessionHeartbeatUseCase } from './use-cases/session-heartbeat/session-h
 import { SuspendSessionUseCase } from './use-cases/suspend-session/suspend-session.use-case.js'
 import { StartExamSessionUseCase } from './use-cases/start-exam-session/start-exam-session.use-case.js'
 import { CreateExamScheduleUseCase } from '../../exam-schedule/application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
-import { FakeAcademicLookup } from '../../exam-schedule/application/exam-schedule.test-support.js'
 import {
   CLASSROOM_7A,
+  FakeAcademicLookup,
+  SCHEDULE_ADMIN_USER,
   SEMESTER_ID,
+  scheduleScope,
 } from '../../exam-schedule/application/exam-schedule.test-support.js'
 import { FakeExamAccessAttemptRepository } from './exam-access-attempt.repository.fake.js'
 import { FakeExamActivityRepository } from '../../exam-activity/application/exam-activity.repository.fake.js'
@@ -605,8 +607,9 @@ describe('allow flags before the session starts', () => {
       f.packages,
       new FakeAcademicLookup(),
       f.rooms,
+      scheduleScope(),
     ).execute(
-      { id: ADMIN.id, manageAll: true },
+      SCHEDULE_ADMIN_USER,
       {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
@@ -1342,8 +1345,9 @@ describe('seated sessions in production', () => {
       f.packages,
       new FakeAcademicLookup(),
       f.rooms,
+      scheduleScope(),
     ).execute(
-      { id: ADMIN.id, manageAll: true },
+      SCHEDULE_ADMIN_USER,
       {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
@@ -1469,8 +1473,9 @@ describe('client gates', () => {
       f.packages,
       new FakeAcademicLookup(),
       f.rooms,
+      scheduleScope(),
     ).execute(
-      { id: ADMIN.id, manageAll: true },
+      SCHEDULE_ADMIN_USER,
       {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,

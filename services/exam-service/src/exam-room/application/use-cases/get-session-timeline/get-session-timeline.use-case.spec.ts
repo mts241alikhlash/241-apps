@@ -1,13 +1,16 @@
 import { ForbiddenException } from '@nestjs/common'
 import {
   MANAGE_ALL,
+  READ_ALL,
   RoomAccessService,
   SUPERVISE,
+  TECHNICIAN,
   type RoomStaffUser,
 } from '../../room-access.service.js'
 import {
   FOREIGN_SUPERVISOR_ID,
   SUPERVISOR_ID,
+  TECHNICIAN_ID,
   type MonitorFixture,
   seedMonitorRoom,
   startSession,
@@ -117,6 +120,38 @@ describe('GetSessionTimelineUseCase', () => {
 
     await expect(
       timeline.execute({ id: 'sup-none', permissions: [SUPERVISE] }, sessionId),
+    ).rejects.toThrow(ForbiddenException)
+  })
+
+  it('lets read-all and the assigned technician read the timeline, and refuses another technician', async () => {
+    const { fixture, sessionId, timeline } = await build()
+    const roomless = startSession(fixture, fixture.studentIds[1], {
+      roomId: null,
+    })
+
+    await expect(
+      timeline.execute(
+        { id: 'principal-1', permissions: [READ_ALL] },
+        sessionId,
+      ),
+    ).resolves.toHaveLength(3)
+    await expect(
+      timeline.execute(
+        { id: 'principal-1', permissions: [READ_ALL] },
+        roomless.id,
+      ),
+    ).resolves.toEqual([])
+    await expect(
+      timeline.execute(
+        { id: TECHNICIAN_ID, permissions: [TECHNICIAN] },
+        sessionId,
+      ),
+    ).resolves.toHaveLength(3)
+    await expect(
+      timeline.execute(
+        { id: 'tech-other', permissions: [TECHNICIAN] },
+        sessionId,
+      ),
     ).rejects.toThrow(ForbiddenException)
   })
 })

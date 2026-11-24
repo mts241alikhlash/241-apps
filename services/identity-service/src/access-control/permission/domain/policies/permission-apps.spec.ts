@@ -38,6 +38,7 @@ describe('permission applications', () => {
     expect(appForModule('exam-questions')).toBe('exam')
     expect(appForModule('exam-schedules')).toBe('exam')
     expect(appForModule('exam-sessions')).toBe('exam')
+    expect(appForModule('exam-settings')).toBe('exam')
     expect(appForModule('exam-grading')).toBe('exam')
     expect(appForModule('exam-events')).toBe('exam')
     expect(appForModule('exam-rooms')).toBe('exam')
@@ -50,8 +51,11 @@ describe('permission applications', () => {
       'exam-events.manage',
       'exam-rooms.supervise',
       'exam-rooms.technician',
+      'exam-rooms.read-all',
       'exam-rooms.manage-all',
       'exam-packages.adjust-key',
+      'exam-grading.read-all',
+      'exam-settings.manage',
     ]) {
       const permission = SYSTEM_PERMISSIONS.find((p) => p.code === code)
       expect(permission).toBeDefined()

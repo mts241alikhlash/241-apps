@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { examRoomService } from './examRoomService'
+import { abilitiesFor, examRoomService } from './examRoomService'
 
 const { getMonitor } = vi.hoisted(() => ({ getMonitor: vi.fn() }))
 vi.mock('../api/examRoomApi', () => ({
@@ -102,5 +102,35 @@ describe('examRoomService.loadMonitor', () => {
     const result = await examRoomService.loadMonitor('r1', {})
 
     expect(result.meta).toBe(meta)
+  })
+})
+
+describe('abilitiesFor', () => {
+  const check = (granted: string[]) =>
+    abilitiesFor((code) => granted.includes(code))
+
+  it('grants neither supervise nor recover for read-all only', () => {
+    expect(check(['exam-rooms.read-all'])).toEqual({
+      supervise: false,
+      recover: false,
+    })
+  })
+
+  it('grants supervise for exam-rooms.supervise and recover for exam-rooms.technician', () => {
+    expect(check(['exam-rooms.supervise'])).toEqual({
+      supervise: true,
+      recover: false,
+    })
+    expect(check(['exam-rooms.technician'])).toEqual({
+      supervise: false,
+      recover: true,
+    })
+  })
+
+  it('grants both abilities for exam-rooms.manage-all', () => {
+    expect(check(['exam-rooms.manage-all'])).toEqual({
+      supervise: true,
+      recover: true,
+    })
   })
 })

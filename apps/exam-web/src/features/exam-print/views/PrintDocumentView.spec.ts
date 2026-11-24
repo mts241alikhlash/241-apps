@@ -4,11 +4,19 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, reactive } from 'vue'
 import PrintDocumentView from './PrintDocumentView.vue'
 
-const { loadEvents, loadPack, resetCredentials, push } = vi.hoisted(() => ({
-  loadEvents: vi.fn(),
-  loadPack: vi.fn(),
-  resetCredentials: vi.fn(),
-  push: vi.fn(),
+const { loadEvents, loadPack, resetCredentials, push, permissions } =
+  vi.hoisted(() => ({
+    loadEvents: vi.fn(),
+    loadPack: vi.fn(),
+    resetCredentials: vi.fn(),
+    push: vi.fn(),
+    permissions: new Set<string>(),
+  }))
+
+vi.mock('@mts241alikhlash/platform/auth', () => ({
+  useAuthSession: () => ({
+    hasPermission: (code: string) => permissions.has(code),
+  }),
 }))
 
 const routeState = reactive<{ params: Record<string, string> }>({
@@ -113,6 +121,8 @@ beforeEach(() => {
   for (const key of Object.keys(routeState.params)) {
     delete routeState.params[key]
   }
+  permissions.clear()
+  permissions.add('exam-events.manage')
   loadEvents.mockResolvedValue({
     success: true,
     data: [
@@ -174,5 +184,22 @@ describe('PrintDocumentView', () => {
     await flushPromises()
     expect(wrapper.text()).toContain('Gagal')
     expect(wrapper.findAll('.print-room')).toHaveLength(0)
+  })
+
+  it('hides Reset password on cards when user only holds exam-events.read', async () => {
+    routeState.params.eventId = 'e1'
+    permissions.clear()
+    permissions.add('exam-events.read')
+    const wrapper = mountView('cards')
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('Reset password')
+    wrapper.unmount()
+
+    permissions.add('exam-events.manage')
+    const manager = mountView('cards')
+    await flushPromises()
+    expect(manager.text()).toContain('Reset password')
+    manager.unmount()
   })
 })

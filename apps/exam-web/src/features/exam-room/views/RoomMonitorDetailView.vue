@@ -229,9 +229,10 @@ async function loadActiveSlot() {
   const latest = byStart
     .filter((slot) => new Date(slot.endsAt).getTime() <= now)
     .at(-1)
-  const overview = abilities.value.recover
-    ? (current ?? upcoming ?? latest ?? slots[0])
-    : undefined
+  const overview =
+    abilities.value.recover || hasPermission('exam-rooms.read-all')
+      ? (current ?? upcoming ?? latest ?? slots[0])
+      : undefined
   activeSlotId.value =
     overview?.slotId ?? mineNow?.slotId ?? next?.slotId ?? past?.slotId ?? ''
   activeSlot.value =

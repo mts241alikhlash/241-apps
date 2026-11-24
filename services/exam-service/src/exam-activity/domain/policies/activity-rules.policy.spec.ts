@@ -110,7 +110,7 @@ describe('assertActivityAllowed', () => {
     ).toEqual({ code: 'EVENT_REQUIRED', status: 422 })
   })
 
-  it('MIDTERM, manageAll: false, event MIDTERM berstatus DRAFT -> MIDTERM_OUTSIDE_EVENT', () => {
+  it('MIDTERM, manageAll: false, canManageEvents: false -> EXAM_ADMIN_ONLY (403)', () => {
     expect(
       codeOf(() =>
         assertActivityAllowed({
@@ -118,6 +118,45 @@ describe('assertActivityAllowed', () => {
           presetName: 'MIDTERM',
           tokenMode: 'ROTATING',
           manageAll: false,
+          canManageEvents: false,
+          event: activeMidtermEvent,
+          eventId: 'event-1',
+          semesterId: SEMESTER,
+          startsAt,
+          endsAt,
+        }),
+      ),
+    ).toEqual({ code: 'EXAM_ADMIN_ONLY', status: 403 })
+  })
+
+  it('FINAL, manageAll: false, canManageEvents: true -> FINAL_ADMIN_ONLY (403)', () => {
+    expect(
+      codeOf(() =>
+        assertActivityAllowed({
+          type: 'FINAL',
+          presetName: 'FINAL',
+          tokenMode: 'ROTATING',
+          manageAll: false,
+          canManageEvents: true,
+          event: { ...activeMidtermEvent, type: 'FINAL' },
+          eventId: 'event-1',
+          semesterId: SEMESTER,
+          startsAt,
+          endsAt,
+        }),
+      ),
+    ).toEqual({ code: 'FINAL_ADMIN_ONLY', status: 403 })
+  })
+
+  it('MIDTERM, manageAll: false, canManageEvents: true, event MIDTERM berstatus DRAFT -> MIDTERM_OUTSIDE_EVENT', () => {
+    expect(
+      codeOf(() =>
+        assertActivityAllowed({
+          type: 'MIDTERM',
+          presetName: 'MIDTERM',
+          tokenMode: 'ROTATING',
+          manageAll: false,
+          canManageEvents: true,
           event: { ...activeMidtermEvent, status: 'DRAFT' },
           eventId: 'event-1',
           semesterId: SEMESTER,
@@ -128,7 +167,7 @@ describe('assertActivityAllowed', () => {
     ).toEqual({ code: 'MIDTERM_OUTSIDE_EVENT', status: 422 })
   })
 
-  it('MIDTERM, manageAll: false, event aktif, endsAt = event.endsAt + 60_000 -> MIDTERM_OUTSIDE_EVENT', () => {
+  it('MIDTERM, manageAll: false, canManageEvents: true, event aktif, endsAt = event.endsAt + 60_000 -> MIDTERM_OUTSIDE_EVENT', () => {
     expect(
       codeOf(() =>
         assertActivityAllowed({
@@ -136,6 +175,7 @@ describe('assertActivityAllowed', () => {
           presetName: 'MIDTERM',
           tokenMode: 'ROTATING',
           manageAll: false,
+          canManageEvents: true,
           event: activeMidtermEvent,
           eventId: 'event-1',
           semesterId: SEMESTER,
@@ -198,13 +238,14 @@ describe('assertActivityAllowed', () => {
     ).toEqual({ code: 'PRESET_LOCKED', status: 422 })
   })
 
-  it('MIDTERM, manageAll: false, event MIDTERM aktif, jendela tepat di dalam -> tidak melempar', () => {
+  it('MIDTERM, manageAll: false, canManageEvents: true, event MIDTERM aktif, jendela tepat di dalam -> tidak melempar', () => {
     expect(() =>
       assertActivityAllowed({
         type: 'MIDTERM',
         presetName: 'MIDTERM',
         tokenMode: 'ROTATING',
         manageAll: false,
+        canManageEvents: true,
         event: activeMidtermEvent,
         eventId: 'event-1',
         semesterId: SEMESTER,

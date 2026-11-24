@@ -60,7 +60,7 @@ export class SebConfigController {
   ) {}
 
   @Get()
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({ summary: 'List Safe Exam Browser configurations' })
   @ApiResponse({ status: 200, type: [SebConfigDto] })
   async list(): Promise<SebConfigDto[]> {
@@ -81,7 +81,7 @@ export class SebConfigController {
 
   @Post('check')
   @HttpCode(HttpStatus.OK)
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({ summary: 'Check a Safe Exam Browser config key hash' })
   @ApiResponse({ status: 200, type: CheckSebResponseDto })
   async check(@Body() dto: CheckSebRequestDto): Promise<CheckSebResponseDto> {
@@ -91,7 +91,7 @@ export class SebConfigController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @UseInterceptors(
     FileInterceptor('file', {
       limits: { fileSize: SEB_CONFIG_MAX_BYTES + 1, files: 1 },
@@ -121,7 +121,7 @@ export class SebConfigController {
 
   @Post('generate')
   @HttpCode(HttpStatus.CREATED)
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({
     summary:
       'Build a .seb that starts on the student exam list of the calling app and register its Config Key',
@@ -145,7 +145,7 @@ export class SebConfigController {
   }
 
   @Patch(':id')
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({ summary: 'Rename or activate/deactivate a configuration' })
   @ApiResponse({ status: 200, type: SebConfigDto })
   async update(
@@ -157,7 +157,7 @@ export class SebConfigController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequirePermissions('exam-schedules.manage-all')
+  @RequirePermissions('exam-settings.manage')
   @ApiOperation({ summary: 'Delete a configuration and its file' })
   @ApiResponse({ status: 204, description: 'Configuration deleted' })
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {

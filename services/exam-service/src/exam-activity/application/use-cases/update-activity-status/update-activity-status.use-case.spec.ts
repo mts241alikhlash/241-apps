@@ -1,5 +1,17 @@
-import { NotFoundException } from '@nestjs/common'
+import { ForbiddenException, NotFoundException } from '@nestjs/common'
 import { describe, expect, it, vi } from 'vitest'
+import {
+  CLASSROOM_7A,
+  FakeAcademicLookup,
+  SCHEDULE_ADMIN_USER,
+  SEMESTER_ID,
+  YEAR_ID,
+} from '../../../../exam-schedule/application/exam-schedule.test-support.js'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../../../exam-schedule/application/schedule-scope.service.js'
+import type { IEmployeeIdentityReadPort } from '../../../../platform/employee-identity/employee-identity.port.js'
 import { FakeExamActivityRepository } from '../../exam-activity.repository.fake.js'
 import { DEFAULT_POLICIES } from '../../../domain/policies/exam-policy.policy.js'
 import type {
@@ -9,13 +21,20 @@ import type {
 import type { CloseActivitySessionsUseCase } from '../../../../exam-session/application/use-cases/close-activity-sessions/close-activity-sessions.use-case.js'
 import { UpdateActivityStatusUseCase } from './update-activity-status.use-case.js'
 
+const CLASSROOM_7B = {
+  id: '77777777-7777-4777-8777-777777777778',
+  gradeId: CLASSROOM_7A.gradeId,
+  academicYearId: YEAR_ID,
+  name: 'VII B',
+}
+
 function seeded(status: ActivityStatus): FakeExamActivityRepository {
   const repo = new FakeExamActivityRepository()
   const activity: ExamActivity = {
     id: 'activity-1',
-    semesterId: 'sem-1',
+    semesterId: SEMESTER_ID,
     eventId: null,
-    gradeId: 'grade-9',
+    gradeId: CLASSROOM_7A.gradeId,
     subjectId: 'subject-inf',
     packageId: 'package-1',
     type: 'DAILY',
@@ -33,12 +52,28 @@ function seeded(status: ActivityStatus): FakeExamActivityRepository {
   return repo
 }
 
-function build(repo: FakeExamActivityRepository) {
+function build(
+  repo: FakeExamActivityRepository,
+  assignments: { subjectId: string; classroomId: string }[] = [],
+) {
   const closeSessions = { execute: vi.fn().mockResolvedValue(0) }
+  const employees = {
+    findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
+    employeeExists: () => Promise.resolve(true),
+  } as IEmployeeIdentityReadPort
+  const scope = new ScheduleScopeService(
+    employees,
+    new FakeAcademicLookup({
+      semesterId: SEMESTER_ID,
+      assignments,
+      classrooms: [CLASSROOM_7A, CLASSROOM_7B],
+    }),
+  )
   return {
     useCase: new UpdateActivityStatusUseCase(
       repo,
       closeSessions as unknown as CloseActivitySessionsUseCase,
+      scope,
     ),
     closeSessions,
   }
@@ -49,13 +84,17 @@ describe('UpdateActivityStatusUseCase', () => {
     const repo = seeded('ACTIVE')
     const { useCase, closeSessions } = build(repo)
 
-    const updated = await useCase.execute('admin-1', 'activity-1', 'CLOSED')
+    const updated = await useCase.execute(
+      SCHEDULE_ADMIN_USER,
+      'activity-1',
+      'CLOSED',
+    )
 
     expect(updated.status).toBe('CLOSED')
     expect(repo.activities.get('activity-1')?.status).toBe('CLOSED')
     expect(closeSessions.execute).toHaveBeenCalledExactlyOnceWith(
       'activity-1',
-      'admin-1',
+      SCHEDULE_ADMIN_USER.id,
     )
   })
 
@@ -65,7 +104,7 @@ describe('UpdateActivityStatusUseCase', () => {
     closeSessions.execute.mockRejectedValueOnce(new Error('finalizer down'))
 
     await expect(
-      useCase.execute('admin-1', 'activity-1', 'CLOSED'),
+      useCase.execute(SCHEDULE_ADMIN_USER, 'activity-1', 'CLOSED'),
     ).rejects.toThrow('finalizer down')
     expect(repo.activities.get('activity-1')?.status).toBe('ACTIVE')
   })
@@ -74,7 +113,7 @@ describe('UpdateActivityStatusUseCase', () => {
     const repo = seeded('SCHEDULED')
     const { useCase, closeSessions } = build(repo)
 
-    await useCase.execute('admin-1', 'activity-1', 'CLOSED')
+    await useCase.execute(SCHEDULE_ADMIN_USER, 'activity-1', 'CLOSED')
 
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
@@ -88,7 +127,7 @@ describe('UpdateActivityStatusUseCase', () => {
     const { useCase, closeSessions } = build(repo)
 
     await expect(
-      useCase.execute('admin-1', 'activity-1', 'SCHEDULED'),
+      useCase.execute(SCHEDULE_ADMIN_USER, 'activity-1', 'SCHEDULED'),
     ).rejects.toMatchObject({
       message: 'Pasang paket soal dulu',
     })
@@ -101,8 +140,36 @@ describe('UpdateActivityStatusUseCase', () => {
     const { useCase, closeSessions } = build(repo)
 
     await expect(
-      useCase.execute('admin-1', 'activity-2', 'CLOSED'),
+      useCase.execute(SCHEDULE_ADMIN_USER, 'activity-2', 'CLOSED'),
     ).rejects.toBeInstanceOf(NotFoundException)
+    expect(closeSessions.execute).not.toHaveBeenCalled()
+  })
+
+  it('blocks Teacher A (7A) from closing Teacher B (7B) activity in the same grade and subject', async () => {
+    const repo = seeded('ACTIVE')
+    const act = repo.activities.get('activity-1')!
+    repo.activities.set(act.id, { ...act, createdById: 'teacher-b' })
+    repo.activitySchedules.set(act.id, [
+      {
+        id: 'sched-7b',
+        classroomId: CLASSROOM_7B.id,
+        startsAt: act.startsAt,
+        endsAt: act.endsAt,
+      },
+    ])
+    const { useCase, closeSessions } = build(repo, [
+      { subjectId: 'subject-inf', classroomId: CLASSROOM_7A.id },
+    ])
+    const teacherA: ScheduleAccessUser = {
+      id: 'teacher-a',
+      roles: ['TEACHER'],
+      permissions: ['exam-schedules.manage'],
+    }
+
+    await expect(
+      useCase.execute(teacherA, 'activity-1', 'CLOSED'),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    expect(repo.activities.get('activity-1')?.status).toBe('ACTIVE')
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
 })

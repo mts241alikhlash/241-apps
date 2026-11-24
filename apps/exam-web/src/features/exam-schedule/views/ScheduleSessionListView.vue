@@ -56,6 +56,8 @@ const canRecover = computed(
 const canReadHistory = computed(
   () =>
     hasPermission('exam-rooms.supervise') ||
+    hasPermission('exam-rooms.technician') ||
+    hasPermission('exam-rooms.read-all') ||
     hasPermission('exam-rooms.manage-all'),
 )
 

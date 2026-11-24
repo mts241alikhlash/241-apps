@@ -11,9 +11,10 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SCHEDULE_TEACHER_USER,
   START,
-  USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule.test-support.js'
 import { RotateAccessCodeUseCase } from '../rotate-access-code/rotate-access-code.use-case.js'
 import { GetAccessCodeUseCase } from './get-access-code.use-case.js'
@@ -37,7 +38,8 @@ describe('Access code use cases', () => {
         packages,
         new FakeAcademicLookup(),
         new FakeExamRoomRepository(),
-      ).execute(USER, {
+        scheduleScope(),
+      ).execute(SCHEDULE_TEACHER_USER, {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
         startsAt: START,

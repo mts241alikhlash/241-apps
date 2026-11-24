@@ -180,6 +180,15 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     return [...new Set(rows.map((row) => row.room.eventId))]
   }
 
+  async listEventIdsByTechnician(userId: string): Promise<string[]> {
+    const rows = await this.prisma.examRoom.findMany({
+      where: { technicianUserId: userId },
+      select: { eventId: true },
+      distinct: ['eventId'],
+    })
+    return rows.map((row) => row.eventId)
+  }
+
   async createRoom(input: NewExamRoom): Promise<ExamRoom> {
     try {
       const row = await this.prisma.examRoom.create({ data: input })

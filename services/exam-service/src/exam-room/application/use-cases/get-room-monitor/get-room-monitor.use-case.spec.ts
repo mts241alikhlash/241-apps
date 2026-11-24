@@ -3,6 +3,7 @@ import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import type { ConfigService } from '@nestjs/config'
 import {
   MANAGE_ALL,
+  READ_ALL,
   RoomAccessService,
   SUPERVISE,
   TECHNICIAN,
@@ -32,6 +33,10 @@ const ROOM_TECH: RoomStaffUser = {
 const COORDINATOR: RoomStaffUser = {
   id: 'koord-1',
   permissions: [MANAGE_ALL],
+}
+const READER: RoomStaffUser = {
+  id: 'principal-1',
+  permissions: [READ_ALL],
 }
 
 function build() {
@@ -417,5 +422,23 @@ describe('GetRoomMonitorUseCase', () => {
     expect(session).not.toHaveProperty('lastSnapshotAt')
     expect(session).not.toHaveProperty('cameraBlocked')
     expect(session).not.toHaveProperty('latestSnapshotUrl')
+  })
+
+  it('returns the roster and rotating token for exam-rooms.read-all', async () => {
+    const { fixture, monitor } = await build()
+
+    const result = await monitor.execute(
+      READER,
+      fixture.room.id,
+      { page: 1, limit: 5 },
+      MONITOR_NOW,
+    )
+
+    expect(result.meta.room.id).toBe(fixture.room.id)
+    expect(result.meta.token).toMatchObject({
+      accessCode: expect.stringMatching(/^[A-Z0-9]{6}$/),
+      expiresAt: expect.any(String),
+      rotation: fixture.room.tokenRotation,
+    })
   })
 })

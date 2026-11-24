@@ -115,9 +115,14 @@ describe('exam route tree', () => {
 
 describe('landing route', () => {
   it('follows the strongest exam permission the user holds', () => {
-    expect(landingPath(['exam-schedules.read'])).toBe('/exam/schedules')
+    expect(landingPath(['exam-schedules.read', 'exam-events.read'])).toBe(
+      '/exam/schedules',
+    )
+    expect(landingPath(['exam-schedules.read'])).toBe('/classwork/schedules')
     expect(landingPath(['exam-packages.read'])).toBe('/exam/packages')
     expect(landingPath(['exam-grading.read'])).toBe('/exam/grading')
+    expect(landingPath(['exam-grading.read-all'])).toBe('/exam/grading')
+    expect(landingPath(['exam-rooms.read-all'])).toBe('/exam/rooms')
     expect(landingPath(['exam-sessions.take'])).toBe('/my-exams')
   })
 
@@ -129,6 +134,72 @@ describe('landing route', () => {
     expect(resolved.name).not.toBe('not-found')
     expect(resolved.meta.requiresAuth).toBe(true)
     expect(resolved.meta.requiredPermission).toBeUndefined()
+  })
+})
+
+describe('route permission guards', () => {
+  it('enforces standardized permissions on settings, preparation, activities, monitoring, prints, and grading routes', () => {
+    const instance = router()
+
+    expect(instance.resolve('/settings/presets').meta.requiredPermission).toBe(
+      'exam-settings.manage',
+    )
+    expect(instance.resolve('/settings/seb').meta.requiredPermission).toBe(
+      'exam-settings.manage',
+    )
+    expect(
+      instance.resolve('/exam/room-setup').meta.requiredAnyPermission,
+    ).toEqual(['exam-events.read', 'exam-events.manage'])
+    expect(
+      instance.resolve('/exam/monitoring').meta.requiredAnyPermission,
+    ).toEqual([
+      'exam-rooms.technician',
+      'exam-rooms.read-all',
+      'exam-rooms.manage-all',
+    ])
+    expect(instance.resolve('/exam/rooms').meta.requiredAnyPermission).toEqual([
+      'exam-rooms.supervise',
+      'exam-rooms.technician',
+      'exam-rooms.read-all',
+      'exam-rooms.manage-all',
+    ])
+    expect(
+      instance.resolve('/exam/activities').meta.requiredAnyPermission,
+    ).toEqual(['exam-schedules.manage-all', 'exam-events.read'])
+    expect(
+      instance.resolve('/exam/activities/new').meta.requiredAnyPermission,
+    ).toEqual(['exam-schedules.manage-all', 'exam-events.manage'])
+    expect(
+      instance.resolve('/classwork/activities').meta.requiredAnyPermission,
+    ).toEqual([
+      'exam-schedules.manage',
+      'exam-schedules.read',
+      'exam-schedules.manage-all',
+      'exam-events.read',
+    ])
+    expect(
+      instance.resolve('/classwork/activities/new').meta.requiredAnyPermission,
+    ).toEqual(['exam-schedules.manage', 'exam-schedules.manage-all'])
+    expect(
+      instance.resolve('/exam/schedules').meta.requiredAnyPermission,
+    ).toEqual(['exam-schedules.manage-all', 'exam-events.read'])
+    expect(
+      instance.resolve('/exam/grading').meta.requiredAnyPermission,
+    ).toEqual([
+      'exam-grading.read',
+      'exam-grading.read-all',
+      'exam-grading.manage-all',
+    ])
+    expect(
+      instance.resolve('/exam/print/cards').meta.requiredAnyPermission,
+    ).toEqual(['exam-events.manage', 'exam-events.read'])
+    expect(
+      instance.resolve('/exam/print/grading-sheet').meta.requiredAnyPermission,
+    ).toEqual([
+      'exam-grading.read',
+      'exam-grading.read-all',
+      'exam-grading.manage-all',
+    ])
   })
 })
 
@@ -167,24 +238,36 @@ describe('menu', () => {
       [
         'exam',
         [
-          ['/exam/events', 'exam-events.read', undefined],
+          [
+            '/exam/events',
+            undefined,
+            ['exam-events.read', 'exam-events.manage'],
+          ],
           [
             '/exam/room-setup',
             undefined,
-            ['exam-events.read', 'exam-rooms.supervise'],
+            ['exam-events.read', 'exam-events.manage'],
           ],
           ['/exam/participant-numbers', 'exam-events.manage', undefined],
           [
             '/exam/seat-assignment',
             undefined,
-            ['exam-events.read', 'exam-rooms.supervise'],
+            ['exam-events.read', 'exam-events.manage'],
           ],
-          ['/exam/activities', 'exam-schedules.manage', undefined],
-          ['/exam/schedules', 'exam-schedules.read', undefined],
+          [
+            '/exam/activities',
+            undefined,
+            ['exam-schedules.manage-all', 'exam-events.read'],
+          ],
+          [
+            '/exam/schedules',
+            undefined,
+            ['exam-schedules.manage-all', 'exam-events.read'],
+          ],
           [
             '/exam/supervisor-schedule',
             undefined,
-            ['exam-events.read', 'exam-rooms.supervise'],
+            ['exam-events.read', 'exam-events.manage'],
           ],
           [
             '/exam/rooms',
@@ -192,6 +275,7 @@ describe('menu', () => {
             [
               'exam-rooms.supervise',
               'exam-rooms.technician',
+              'exam-rooms.read-all',
               'exam-rooms.manage-all',
             ],
           ],
@@ -199,8 +283,8 @@ describe('menu', () => {
             '/exam/monitoring',
             undefined,
             [
-              'exam-rooms.supervise',
               'exam-rooms.technician',
+              'exam-rooms.read-all',
               'exam-rooms.manage-all',
             ],
           ],
@@ -210,35 +294,116 @@ describe('menu', () => {
             [
               'exam-rooms.supervise',
               'exam-rooms.technician',
+              'exam-rooms.read-all',
               'exam-rooms.manage-all',
             ],
           ],
-          ['/exam/grading', 'exam-grading.read', undefined],
-          ['/exam/print/schedule', 'exam-events.manage', undefined],
-          ['/exam/print/cards', 'exam-events.manage', undefined],
-          ['/exam/print/desks', 'exam-events.manage', undefined],
-          ['/exam/print/student-attendance', 'exam-events.manage', undefined],
-          ['/exam/print/staff-attendance', 'exam-events.manage', undefined],
-          ['/exam/print/grading-sheet', 'exam-grading.read', undefined],
-          ['/exam/print/question-keys', 'exam-events.manage', undefined],
-          ['/exam/print/student-recap', 'exam-grading.read', undefined],
+          [
+            '/exam/grading',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
+            '/exam/print/schedule',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/cards',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/desks',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/student-attendance',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/staff-attendance',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/grading-sheet',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
+            '/exam/print/question-keys',
+            undefined,
+            ['exam-events.manage', 'exam-events.read'],
+          ],
+          [
+            '/exam/print/student-recap',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
         ],
       ],
       [
         'classwork',
         [
-          ['/classwork/activities', 'exam-schedules.manage', undefined],
-          ['/classwork/schedules', 'exam-schedules.read', undefined],
-          ['/classwork/grading', 'exam-grading.read', undefined],
-          ['/classwork/print/grading-sheet', 'exam-grading.read', undefined],
+          [
+            '/classwork/activities',
+            undefined,
+            [
+              'exam-schedules.manage',
+              'exam-schedules.manage-all',
+              'exam-events.read',
+            ],
+          ],
+          [
+            '/classwork/schedules',
+            undefined,
+            [
+              'exam-schedules.manage',
+              'exam-schedules.manage-all',
+              'exam-events.read',
+            ],
+          ],
+          [
+            '/classwork/grading',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
+            '/classwork/print/grading-sheet',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
         ],
       ],
       ['mine', [['/my-exams', 'exam-sessions.take', undefined]]],
       [
         'settings',
         [
-          ['/settings/presets', 'exam-schedules.manage-all', undefined],
-          ['/settings/seb', 'exam-schedules.manage-all', undefined],
+          ['/settings/presets', 'exam-settings.manage', undefined],
+          ['/settings/seb', 'exam-settings.manage', undefined],
         ],
       ],
     ])

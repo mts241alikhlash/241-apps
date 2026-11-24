@@ -37,7 +37,7 @@ export class GetMakeupParticipantsUseCase {
     if (makeup?.kind !== 'MAKEUP' || makeup.makeupOfId === null) {
       throw new NotFoundException('Jadwal susulan tidak ditemukan')
     }
-    await this.scope.assertAllowed(user, makeup)
+    await this.scope.assertCanRead(user, makeup)
     const participants = await this.schedules.listParticipants(scheduleId)
     const refs = new Map(
       (

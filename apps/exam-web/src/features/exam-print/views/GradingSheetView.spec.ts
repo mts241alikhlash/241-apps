@@ -4,12 +4,15 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { computed, defineComponent, reactive, ref } from 'vue'
 import GradingSheetView from './GradingSheetView.vue'
 
-const { loadEvents, loadSchedules, loadPeople, push } = vi.hoisted(() => ({
-  loadEvents: vi.fn(),
-  loadSchedules: vi.fn(),
-  loadPeople: vi.fn(),
-  push: vi.fn(),
-}))
+const { loadEvents, loadSchedules, loadPeople, toastError, push } = vi.hoisted(
+  () => ({
+    loadEvents: vi.fn(),
+    loadSchedules: vi.fn(),
+    loadPeople: vi.fn(),
+    toastError: vi.fn(),
+    push: vi.fn(),
+  }),
+)
 
 const routeState = reactive<{ params: Record<string, string> }>({
   params: {},
@@ -19,6 +22,9 @@ const routeCategory = ref<'EXAM' | 'NON_EXAM'>('EXAM')
 vi.mock('vue-router', () => ({
   useRoute: () => routeState,
   useRouter: () => ({ push }),
+}))
+vi.mock('vue-sonner', () => ({
+  toast: { error: toastError, info: vi.fn() },
 }))
 vi.mock('@mts241alikhlash/web-shared/composables/useBreadcrumbs', () => ({
   useBreadcrumbs: vi.fn(),
@@ -129,14 +135,17 @@ describe('GradingSheetView', () => {
     await flushPromises()
     expect(loadEvents).toHaveBeenCalled()
     expect(loadSchedules).not.toHaveBeenCalled()
+    expect(toastError).not.toHaveBeenCalled()
     expect(wrapper.find('[data-testid="rows"]').text()).toBe('1')
   })
 
-  it('shows exam days when an exam event is selected', async () => {
+  it('shows exam days cleanly when an exam event is selected', async () => {
     routeState.params.eventId = 'e1'
     const wrapper = mount(GradingSheetView, { global: { stubs } })
     await flushPromises()
+    expect(loadEvents).toHaveBeenCalledWith({ limit: 200 })
     expect(loadSchedules).toHaveBeenCalledWith('EXAM', '')
+    expect(toastError).not.toHaveBeenCalled()
     expect(wrapper.find('[data-testid="rows"]').text()).toBe('1')
   })
 
@@ -146,6 +155,7 @@ describe('GradingSheetView', () => {
     await flushPromises()
     expect(loadEvents).not.toHaveBeenCalled()
     expect(loadSchedules).toHaveBeenCalledWith('NON_EXAM', '')
+    expect(toastError).not.toHaveBeenCalled()
     expect(wrapper.find('[data-testid="rows"]').text()).toBe('1')
   })
 

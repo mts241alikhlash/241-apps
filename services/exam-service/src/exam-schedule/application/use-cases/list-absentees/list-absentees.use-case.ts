@@ -41,7 +41,7 @@ export class ListAbsenteesUseCase {
     if (original.kind !== 'REGULAR') {
       throw new BadRequestException('Susulan hanya untuk jadwal utama')
     }
-    await this.scope.assertAllowed(user, original)
+    await this.scope.assertCanRead(user, original)
     const candidates = await this.candidates.evaluate(original, now)
     const refs = await this.students.refsByIds(
       candidates.map((candidate) => candidate.studentId),

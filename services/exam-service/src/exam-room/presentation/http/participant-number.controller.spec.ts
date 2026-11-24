@@ -1,4 +1,7 @@
-import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import {
+  PERMISSIONS_ANY_KEY,
+  PERMISSIONS_KEY,
+} from '@mts241alikhlash/nest-core/access-control'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import { describe, expect, it, vi } from 'vitest'
@@ -17,7 +20,7 @@ const uuid = (n: number) =>
   `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 
 describe('ExamParticipantNumberController', () => {
-  it('requires exam-events.manage for both routes', () => {
+  it('requires exam-events.manage for issue and read permissions for lookup', () => {
     expect(
       Reflect.getMetadata(
         PERMISSIONS_KEY,
@@ -26,10 +29,22 @@ describe('ExamParticipantNumberController', () => {
     ).toEqual(['exam-events.manage'])
     expect(
       Reflect.getMetadata(
+        PERMISSIONS_ANY_KEY,
+        ExamParticipantNumberController.prototype.lookup,
+      ),
+    ).toEqual([
+      'exam-events.manage',
+      'exam-events.read',
+      'exam-grading.read',
+      'exam-grading.read-all',
+      'exam-grading.manage-all',
+    ])
+    expect(
+      Reflect.getMetadata(
         PERMISSIONS_KEY,
         ExamParticipantNumberController.prototype.lookup,
       ),
-    ).toEqual(['exam-events.manage'])
+    ).toBeUndefined()
   })
 
   it('answers the issue result of the semester', async () => {

@@ -24,7 +24,12 @@ import {
   RoomAccessService,
   type RoomStaffUser,
 } from '../../room-access.service.js'
-import { MANAGE_ALL, SUPERVISE, TECHNICIAN } from '../../room-access.service.js'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+} from '../../room-access.service.js'
 import { staffNames } from '../../room-staff-names.js'
 
 export const MONITOR_STATUSES = [
@@ -443,6 +448,7 @@ export class GetRoomMonitorUseCase {
   ): RoomMonitorMeta['token'] {
     const maySee =
       user.permissions?.includes(MANAGE_ALL) === true ||
+      user.permissions?.includes(READ_ALL) === true ||
       user.permissions?.includes(SUPERVISE) === true ||
       user.permissions?.includes(TECHNICIAN) === true
     if (!maySee) return null
@@ -514,6 +520,7 @@ export class GetRoomMonitorUseCase {
     const current = await this.rooms.findSupervisorAt(room.id, now)
     if (
       user.permissions?.includes(MANAGE_ALL) ||
+      user.permissions?.includes(READ_ALL) ||
       (user.permissions?.includes(TECHNICIAN) === true &&
         room.technicianUserId === user.id)
     ) {

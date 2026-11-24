@@ -7,6 +7,20 @@ function buildActivityRoutes(
   sectionTitle: 'Ujian' | 'Non-ujian',
   category: ExamCategory,
 ): RouteRecordRaw[] {
+  const readPermissions =
+    category === 'EXAM'
+      ? ['exam-schedules.manage-all', 'exam-events.read']
+      : [
+          'exam-schedules.manage',
+          'exam-schedules.read',
+          'exam-schedules.manage-all',
+          'exam-events.read',
+        ]
+  const createPermissions =
+    category === 'EXAM'
+      ? ['exam-schedules.manage-all', 'exam-events.manage']
+      : ['exam-schedules.manage', 'exam-schedules.manage-all']
+
   return [
     {
       path: `${prefix}/activities`,
@@ -16,7 +30,7 @@ function buildActivityRoutes(
         title: `Kegiatan ${sectionTitle}`,
         category,
         requiresAuth: true,
-        requiredPermission: 'exam-schedules.manage',
+        requiredAnyPermission: readPermissions,
         breadcrumbs: [
           { title: sectionTitle, href: '#' },
           { title: 'Kegiatan', href: `${prefix}/activities` },
@@ -31,7 +45,7 @@ function buildActivityRoutes(
         title: `Buat Kegiatan ${sectionTitle}`,
         category,
         requiresAuth: true,
-        requiredPermission: 'exam-schedules.manage',
+        requiredAnyPermission: createPermissions,
         breadcrumbs: [
           { title: sectionTitle, href: '#' },
           { title: 'Kegiatan', href: `${prefix}/activities` },
@@ -47,7 +61,7 @@ function buildActivityRoutes(
         title: `Detail Kegiatan ${sectionTitle}`,
         category,
         requiresAuth: true,
-        requiredPermission: 'exam-schedules.manage',
+        requiredAnyPermission: readPermissions,
         breadcrumbs: [
           { title: sectionTitle, href: '#' },
           { title: 'Kegiatan', href: `${prefix}/activities` },

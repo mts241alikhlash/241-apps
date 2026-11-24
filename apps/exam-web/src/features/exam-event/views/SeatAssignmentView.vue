@@ -12,6 +12,7 @@ const {
   loading,
   loadFailed,
   canManage,
+  canReadEvents,
   canSupervise,
   canActOnRoom,
   load,
@@ -45,7 +46,7 @@ useBreadcrumbs(() => [
       v-if="event"
       :rooms="visibleRooms"
       :semester-id="event.semesterId"
-      :can-supervise="canSupervise"
+      :can-supervise="canSupervise || canReadEvents"
       :can-assign="canManage"
       :can-act-on-room="canActOnRoom"
     />

@@ -37,7 +37,7 @@ export class ListScheduleGradingDetailsUseCase {
     scheduleId: string,
   ): Promise<GradingSessionDetail[]> {
     const schedule = await this.schedules.findById(scheduleId)
-    const scope = await this.scope.forUser(user)
+    const scope = await this.scope.forRead(user)
     if (
       schedule === null ||
       !(await scope.allows(

@@ -24,7 +24,7 @@ export class ListSessionAuditLogsUseCase {
       throw new NotFoundException('Sesi ujian tidak ditemukan')
     }
     if (session.roomId === null) {
-      await this.access.assertCanActWithoutRoom(user)
+      await this.access.assertCanViewWithoutRoom(user)
     } else {
       await this.access.assertCanView(user, session.roomId)
     }

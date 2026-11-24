@@ -32,6 +32,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Monitoring', '/exam/rooms'),
@@ -45,8 +46,8 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       title: 'Monitoring Semua Ruang',
       requiresAuth: true,
       requiredAnyPermission: [
-        'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Monitoring Semua Ruang', '/exam/monitoring'),
@@ -62,6 +63,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Berita Acara', '/exam/reports'),
@@ -77,6 +79,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Pemantauan Ruangan', '#'),
@@ -92,6 +95,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Cetak Berita Acara', '#'),
@@ -108,6 +112,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Kartu Peserta', '#'),
@@ -124,6 +129,7 @@ export const examRoomRoutes: RouteRecordRaw[] = [
       requiredAnyPermission: [
         'exam-rooms.supervise',
         'exam-rooms.technician',
+        'exam-rooms.read-all',
         'exam-rooms.manage-all',
       ],
       breadcrumbs: crumbs('Daftar Meja', '#'),

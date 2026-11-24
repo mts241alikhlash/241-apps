@@ -3,6 +3,7 @@ import { ExamRoomModule } from '../exam-room/exam-room.module.js'
 import { ConfigService } from '@nestjs/config'
 import { ExamPackageModule } from '../exam-package/exam-package.module.js'
 import { AccessCodeService } from './application/access-code.service.js'
+import { ScheduleScopeService } from './application/schedule-scope.service.js'
 import { CancelExamScheduleUseCase } from './application/use-cases/cancel-exam-schedule/cancel-exam-schedule.use-case.js'
 import { CreateExamScheduleUseCase } from './application/use-cases/create-exam-schedule/create-exam-schedule.use-case.js'
 import { GetAccessCodeUseCase } from './application/use-cases/get-access-code/get-access-code.use-case.js'
@@ -43,7 +44,8 @@ import { ExamScheduleController } from './presentation/http/exam-schedule.contro
     CancelExamScheduleUseCase,
     GetAccessCodeUseCase,
     RotateAccessCodeUseCase,
+    ScheduleScopeService,
   ],
-  exports: [IExamScheduleRepository, AccessCodeService],
+  exports: [IExamScheduleRepository, AccessCodeService, ScheduleScopeService],
 })
 export class ExamScheduleModule {}

@@ -24,6 +24,10 @@ import {
 } from '../../exam-session.test-support.js'
 import { FakeSessionFinalizer } from '../../session-finalizer.fake.js'
 import { LifecycleGate } from '../../lifecycle-gate.service.js'
+import {
+  SCHEDULE_ADMIN_USER,
+  scheduleScope,
+} from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { StartExamSessionUseCase } from '../start-exam-session/start-exam-session.use-case.js'
 import { ListScheduleSessionsUseCase } from '../list-schedule-sessions/list-schedule-sessions.use-case.js'
 import { ReleaseSessionUseCase } from './release-session.use-case.js'
@@ -159,14 +163,19 @@ describe('ReleaseSessionUseCase', () => {
       sessions,
       new FakeStudentDirectory(),
       new FakeParticipantNumber(),
+      scheduleScope(),
     )
 
-    expect(await list.execute(schedule.id, 1, 10)).toMatchObject({
+    expect(
+      await list.execute(schedule.id, SCHEDULE_ADMIN_USER, 1, 10),
+    ).toMatchObject({
       total: 1,
       page: 1,
       limit: 10,
     })
-    await expect(list.execute('missing')).rejects.toThrow(NotFoundException)
+    await expect(list.execute('missing', SCHEDULE_ADMIN_USER)).rejects.toThrow(
+      NotFoundException,
+    )
   })
 
   it('carries the student name and nis, and tolerates a student that is gone', async () => {
@@ -177,13 +186,15 @@ describe('ReleaseSessionUseCase', () => {
       sessions,
       new FakeStudentDirectory(),
       new FakeParticipantNumber(),
-    ).execute(schedule.id)
+      scheduleScope(),
+    ).execute(schedule.id, SCHEDULE_ADMIN_USER)
     const missing = await new ListScheduleSessionsUseCase(
       schedules,
       sessions,
       new FakeStudentDirectory([]),
       new FakeParticipantNumber(),
-    ).execute(schedule.id)
+      scheduleScope(),
+    ).execute(schedule.id, SCHEDULE_ADMIN_USER)
 
     expect(known.data[0]).toMatchObject({
       studentName: 'Ahmad Fauzi',
@@ -206,13 +217,15 @@ describe('ReleaseSessionUseCase', () => {
       new FakeParticipantNumber({
         numbers: new Map([[studentId, '25-007']]),
       }),
-    ).execute(schedule.id)
+      scheduleScope(),
+    ).execute(schedule.id, SCHEDULE_ADMIN_USER)
     const failing = await new ListScheduleSessionsUseCase(
       schedules,
       sessions,
       new FakeStudentDirectory(),
       new FakeParticipantNumber({ failWith: new Error('student down') }),
-    ).execute(schedule.id)
+      scheduleScope(),
+    ).execute(schedule.id, SCHEDULE_ADMIN_USER)
 
     expect(numbered.data[0].participantNumber).toBe('25-007')
     expect(failing.data[0].participantNumber).toBeNull()

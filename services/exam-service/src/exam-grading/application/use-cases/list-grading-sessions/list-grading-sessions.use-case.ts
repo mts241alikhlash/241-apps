@@ -41,7 +41,7 @@ export class ListGradingSessionsUseCase {
     query: { page: number; limit: number; status?: ExamSessionStatus },
   ): Promise<PaginatedResult<GradingSessionRow>> {
     const schedule = await this.schedules.findById(scheduleId)
-    const scope = await this.scope.forUser(user)
+    const scope = await this.scope.forRead(user)
     if (
       schedule === null ||
       !(await scope.allows(

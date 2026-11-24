@@ -53,7 +53,7 @@ export class CreateMakeupUseCase {
       throw new ConflictException('Jadwal ujian sudah dibatalkan')
     }
 
-    await this.scope.assertAllowed(user, original)
+    await this.scope.assertCanWrite(user, original)
     validateScheduleWindow(input)
     assertWindowNotPast(input, now)
     if (input.startsAt.getTime() < original.endsAt.getTime()) {

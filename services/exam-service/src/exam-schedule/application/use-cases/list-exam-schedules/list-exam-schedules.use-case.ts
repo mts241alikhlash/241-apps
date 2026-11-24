@@ -7,6 +7,10 @@ import {
   IExamScheduleRepository,
   type ExamScheduleListQuery,
 } from '../../../domain/repositories/exam-schedule.repository.js'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../schedule-scope.service.js'
 import { withClassroomNames } from '../../with-classroom-names.js'
 
 @Injectable()
@@ -15,13 +19,22 @@ export class ListExamSchedulesUseCase {
     private readonly schedules: IExamScheduleRepository,
     private readonly academic: IAcademicLookupPort,
     private readonly guard: IScheduleSessionGuard,
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
     input: Partial<ExamScheduleListQuery>,
+    user: ScheduleAccessUser,
   ): Promise<PaginatedResult<ExamScheduleView>> {
+    let allowedPairs = input.allowedPairs
+    const scope = await this.scheduleScope.forUser(user)
+    if (!scope.allRead) {
+      const semester = await this.academic.activeSemester()
+      allowedPairs = semester ? await scope.pairsFor(semester.id) : []
+    }
     const page = await this.schedules.findAll({
       ...input,
+      allowedPairs,
       page: input.page ?? 1,
       limit: input.limit ?? 10,
     })

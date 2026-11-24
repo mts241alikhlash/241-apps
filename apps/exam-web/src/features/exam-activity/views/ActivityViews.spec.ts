@@ -178,6 +178,51 @@ describe('ActivityListView', () => {
     )
     wrapper.unmount()
   })
+
+  it('hides create, attach, and status actions on EXAM for read-only and teacher callers', async () => {
+    routeState.meta.category = 'EXAM'
+    routeState.path = '/exam/activities'
+    routeState.query = { periode: 'none' }
+    list.mockResolvedValue([sampleDetail({ id: 'act-1', packageId: null })])
+
+    permissions.clear()
+    permissions.add('exam-events.read')
+    const reader = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+    expect(reader.text()).not.toContain('Tambah')
+    expect(
+      (
+        reader.findComponent(ActionCell).props('items') as { label: string }[]
+      ).map((item) => item.label),
+    ).toEqual([])
+    reader.unmount()
+
+    permissions.clear()
+    permissions.add('exam-schedules.manage')
+    const teacher = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+    expect(teacher.text()).not.toContain('Tambah')
+    expect(
+      (
+        teacher.findComponent(ActionCell).props('items') as { label: string }[]
+      ).map((item) => item.label),
+    ).toEqual([])
+    teacher.unmount()
+
+    permissions.add('exam-events.manage')
+    const coordinator = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+    expect(coordinator.text()).toContain('Tambah')
+    expect(
+      (
+        coordinator.findComponent(ActionCell).props('items') as {
+          label: string
+        }[]
+      ).map((item) => item.label),
+    ).toEqual(['Pasang Paket', 'Ubah Status'])
+    coordinator.unmount()
+    routeState.query = {}
+  })
 })
 
 describe('ActivityDetailView', () => {

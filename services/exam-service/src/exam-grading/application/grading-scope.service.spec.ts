@@ -6,7 +6,13 @@ import { GradingScopeService } from './grading-scope.service.js'
 const teacher = {
   id: 'u1',
   roles: ['TEACHER'],
-  permissions: ['exam-grading.read'],
+  permissions: ['exam-grading.read', 'exam-grading.grade'],
+}
+
+const principal = {
+  id: 'u2',
+  roles: ['PRINCIPAL'],
+  permissions: ['exam-grading.read', 'exam-grading.read-all'],
 }
 
 const employees = (employeeId: string | null) =>
@@ -23,7 +29,7 @@ describe('GradingScopeService', () => {
     const scope = await new GradingScopeService(
       employees('e1'),
       academic,
-    ).forUser(teacher)
+    ).forRead(teacher)
 
     expect(await scope.allows('math', '7a', 'sem-1')).toBe(true)
     expect(await scope.allows('math', '7b', 'sem-1')).toBe(false)
@@ -40,7 +46,7 @@ describe('GradingScopeService', () => {
     const scope = await new GradingScopeService(
       employees('e1'),
       academic,
-    ).forUser(teacher)
+    ).forRead(teacher)
 
     expect(await scope.allows('math', '7a', 'sem-old')).toBe(true)
     expect(await scope.allows('math', '7a', 'sem-new')).toBe(false)
@@ -55,7 +61,7 @@ describe('GradingScopeService', () => {
     const scope = await new GradingScopeService(
       employees('e1'),
       academic,
-    ).forUser(teacher)
+    ).forRead(teacher)
 
     await scope.allows('a', 'b', 'sem-1')
     await scope.allows('c', 'd', 'sem-1')
@@ -63,27 +69,61 @@ describe('GradingScopeService', () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
-  it('lets manage-all through without asking anyone', async () => {
+  it('lets manage-all through for both read and write without asking anyone', async () => {
     const academic = new FakeAcademicLookup()
     const spy = vi.spyOn(academic, 'teachingAssignmentsOf')
-    const scope = await new GradingScopeService(
-      employees(null),
-      academic,
-    ).forUser({
+    const service = new GradingScopeService(employees(null), academic)
+    const manager = {
       ...teacher,
       permissions: ['exam-grading.read', 'exam-grading.manage-all'],
-    })
+    }
+    const readScope = await service.forRead(manager)
+    const writeScope = await service.forWrite(manager)
 
-    expect(scope.all).toBe(true)
-    expect(await scope.allows('any', 'any', 'any')).toBe(true)
+    expect(readScope.all).toBe(true)
+    expect(await readScope.allows('any', 'any', 'any')).toBe(true)
+    expect(writeScope.all).toBe(true)
+    expect(await writeScope.allows('any', 'any', 'any')).toBe(true)
     expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('lets read-all read everything while denying write without grade permission', async () => {
+    const academic = new FakeAcademicLookup({
+      assignments: [{ subjectId: 'math', classroomId: '7a' }],
+    })
+    const spy = vi.spyOn(academic, 'teachingAssignmentsOf')
+    const service = new GradingScopeService(employees('e1'), academic)
+
+    const readScope = await service.forRead(principal)
+    expect(readScope.all).toBe(true)
+    expect(await readScope.allows('any', 'any', 'any')).toBe(true)
+
+    const writeScope = await service.forWrite(principal)
+    expect(writeScope.all).toBe(false)
+    expect(await writeScope.allows('math', '7a', 'sem-1')).toBe(false)
+    expect(await writeScope.pairsFor('sem-1')).toEqual([])
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('scopes forWrite by teaching assignments when user has exam-grading.grade', async () => {
+    const academic = new FakeAcademicLookup({
+      assignments: [{ subjectId: 'math', classroomId: '7a' }],
+    })
+    const writeScope = await new GradingScopeService(
+      employees('e1'),
+      academic,
+    ).forWrite(teacher)
+
+    expect(writeScope.all).toBe(false)
+    expect(await writeScope.allows('math', '7a', 'sem-1')).toBe(true)
+    expect(await writeScope.allows('math', '7b', 'sem-1')).toBe(false)
   })
 
   it('allows nothing to an account without an employee record', async () => {
     const scope = await new GradingScopeService(
       employees(null),
       new FakeAcademicLookup(),
-    ).forUser(teacher)
+    ).forRead(teacher)
 
     expect(scope.all).toBe(false)
     expect(await scope.allows('math', '7a', 'sem-1')).toBe(false)
@@ -97,7 +137,7 @@ describe('GradingScopeService', () => {
     const scope = await new GradingScopeService(
       employees('e1'),
       academic,
-    ).forUser(teacher)
+    ).forRead(teacher)
 
     await expect(scope.allows('math', '7a', 'sem-1')).rejects.toThrow(
       ServiceUnavailableException,

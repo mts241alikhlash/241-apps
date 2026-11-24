@@ -5,6 +5,9 @@ import {
 } from '../../platform/academic-lookup/academic-lookup.port.js'
 import { IEmployeeIdentityReadPort } from '../../platform/employee-identity/employee-identity.port.js'
 
+const READ = 'exam-grading.read'
+const READ_ALL = 'exam-grading.read-all'
+const GRADE = 'exam-grading.grade'
 const MANAGE_ALL = 'exam-grading.manage-all'
 
 export interface GradingUser {
@@ -23,6 +26,18 @@ export interface GradingScope {
   ): Promise<boolean>
 }
 
+const ALL_SCOPE: GradingScope = {
+  all: true,
+  pairsFor: () => Promise.resolve([]),
+  allows: () => Promise.resolve(true),
+}
+
+const EMPTY_SCOPE: GradingScope = {
+  all: false,
+  pairsFor: () => Promise.resolve([]),
+  allows: () => Promise.resolve(false),
+}
+
 @Injectable()
 export class GradingScopeService {
   constructor(
@@ -30,15 +45,30 @@ export class GradingScopeService {
     private readonly academic: IAcademicLookupPort,
   ) {}
 
-  async forUser(user: GradingUser): Promise<GradingScope> {
-    if (user.permissions.includes(MANAGE_ALL)) {
-      return {
-        all: true,
-        pairsFor: () => Promise.resolve([]),
-        allows: () => Promise.resolve(true),
-      }
+  async forRead(user: GradingUser): Promise<GradingScope> {
+    if (
+      user.permissions.includes(MANAGE_ALL) ||
+      user.permissions.includes(READ_ALL)
+    ) {
+      return ALL_SCOPE
     }
+    if (!user.permissions.includes(READ) && !user.permissions.includes(GRADE)) {
+      return EMPTY_SCOPE
+    }
+    return this.scopedToAssignments(user)
+  }
 
+  async forWrite(user: GradingUser): Promise<GradingScope> {
+    if (user.permissions.includes(MANAGE_ALL)) {
+      return ALL_SCOPE
+    }
+    if (!user.permissions.includes(GRADE)) {
+      return EMPTY_SCOPE
+    }
+    return this.scopedToAssignments(user)
+  }
+
+  private async scopedToAssignments(user: GradingUser): Promise<GradingScope> {
     const employeeId = await this.employees.findEmployeeIdByUserId(user.id)
     const cache = new Map<string, Promise<TeachingAssignmentRef[]>>()
     const pairsFor = (semesterId: string): Promise<TeachingAssignmentRef[]> => {

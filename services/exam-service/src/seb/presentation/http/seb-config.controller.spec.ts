@@ -43,16 +43,17 @@ const createLab = (useCase: ManageSebConfigsUseCase) =>
   })
 
 describe('SebConfigController', () => {
-  it('guards the admin routes with exam-schedules.manage-all', () => {
+  it('guards the admin routes with exam-settings.manage', () => {
     for (const handler of [
       SebConfigController.prototype.list,
+      SebConfigController.prototype.check,
       SebConfigController.prototype.create,
       SebConfigController.prototype.generate,
       SebConfigController.prototype.update,
       SebConfigController.prototype.remove,
     ]) {
       expect(Reflect.getMetadata(PERMISSIONS_KEY, handler)).toEqual([
-        'exam-schedules.manage-all',
+        'exam-settings.manage',
       ])
     }
   })

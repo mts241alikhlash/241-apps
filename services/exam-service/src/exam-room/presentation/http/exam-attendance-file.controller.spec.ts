@@ -1,21 +1,34 @@
 import 'reflect-metadata'
 import { Readable } from 'node:stream'
 import { describe, expect, it, vi } from 'vitest'
-import { PERMISSIONS_KEY } from '@mts241alikhlash/nest-core/access-control'
+import {
+  PERMISSIONS_ANY_KEY,
+  PERMISSIONS_KEY,
+} from '@mts241alikhlash/nest-core/access-control'
 import { ExamAttendanceFileController } from './exam-attendance-file.controller.js'
 
 const ID = '11111111-1111-4111-8111-111111111111'
 
 describe('ExamAttendanceFileController', () => {
-  it.each(['upload', 'list', 'download'] as const)(
-    '%s requires exam-events.manage',
+  it('upload requires exam-events.manage', () => {
+    const handler = ExamAttendanceFileController.prototype
+      .upload as unknown as object
+    expect(Reflect.getMetadata(PERMISSIONS_KEY, handler)).toEqual([
+      'exam-events.manage',
+    ])
+  })
+
+  it.each(['list', 'download'] as const)(
+    '%s accepts exam-events.manage or exam-events.read',
     (method) => {
       const handler = ExamAttendanceFileController.prototype[
         method
       ] as unknown as object
-      expect(Reflect.getMetadata(PERMISSIONS_KEY, handler)).toEqual([
+      expect(Reflect.getMetadata(PERMISSIONS_ANY_KEY, handler)).toEqual([
         'exam-events.manage',
+        'exam-events.read',
       ])
+      expect(Reflect.getMetadata(PERMISSIONS_KEY, handler)).toBeUndefined()
     },
   )
 

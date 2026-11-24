@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Printer } from '@lucide/vue'
 import { toast } from 'vue-sonner'
+import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   ActionCell,
   BackButton,
@@ -79,6 +80,8 @@ const props = defineProps<{ doc: PrintDocumentKey }>()
 
 const route = useRoute()
 const router = useRouter()
+const { hasPermission } = useAuthSession()
+const canManageEvents = computed(() => hasPermission('exam-events.manage'))
 const statusFieldId = useId()
 const scopeFieldId = useId()
 const targetFieldId = useId()
@@ -652,7 +655,7 @@ void loadEvents()
           class="flex shrink-0 items-center gap-2"
         >
           <Button
-            v-if="doc === 'cards'"
+            v-if="doc === 'cards' && canManageEvents"
             variant="outline"
             :disabled="resetting || !hasContent"
             @click="confirmingReset = true"

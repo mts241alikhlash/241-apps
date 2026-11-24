@@ -24,6 +24,13 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequireAnyPermission } from '@mts241alikhlash/nest-core/access-control'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
+import {
+  MANAGE_ALL,
+  READ_ALL,
+  SUPERVISE,
+  TECHNICIAN,
+  type RoomStaffUser,
+} from '../../application/room-access.service.js'
 import { ManageExamEventsUseCase } from '../../application/use-cases/manage-exam-events/manage-exam-events.use-case.js'
 import { ManageExamRoomsUseCase } from '../../application/use-cases/manage-exam-rooms/manage-exam-rooms.use-case.js'
 import { GetPrintPackUseCase } from '../../application/use-cases/get-print-pack/get-print-pack.use-case.js'
@@ -63,31 +70,60 @@ export class ExamEventController {
   ) {}
 
   @Get()
-  @RequireAnyPermission('exam-events.read', 'exam-rooms.supervise')
+  @RequireAnyPermission(
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
+  )
   @ApiOperation({ summary: 'The exam events of a semester' })
   @ApiResponse({ status: 200, type: ExamEventListResponseDto })
   async list(
-    @CurrentUser() user: { id: string; permissions?: string[] },
+    @CurrentUser() user: RoomStaffUser,
     @Query() query: ExamEventQueryDto,
   ): Promise<ExamEventListResponseDto> {
-    const readsAll = user.permissions?.includes('exam-events.read') === true
+    const readsAll =
+      user.permissions?.includes('exam-events.read') === true ||
+      user.permissions?.includes(READ_ALL) === true ||
+      user.permissions?.includes(MANAGE_ALL) === true ||
+      user.permissions?.includes('exam-grading.read') === true ||
+      user.permissions?.includes('exam-grading.read-all') === true ||
+      user.permissions?.includes('exam-grading.manage-all') === true
     return ExamEventListResponseDto.fromDomain(
       await this.events.list({
         ...query,
-        supervisedOnly: readsAll
+        staffedOnly: readsAll
           ? undefined
-          : { userId: user.id, from: new Date() },
+          : {
+              userId: user.id,
+              from: new Date(),
+              supervise: user.permissions?.includes(SUPERVISE) === true,
+              technician: user.permissions?.includes(TECHNICIAN) === true,
+            },
       }),
     )
   }
 
   @Get(':id')
-  @RequireAnyPermission('exam-events.read', 'exam-rooms.supervise')
+  @RequireAnyPermission(
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'One exam event' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: ExamEventDto })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ExamEventDto> {
-    return ExamEventDto.fromDomain(await this.events.get(id))
+  async findOne(
+    @CurrentUser() user: RoomStaffUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ExamEventDto> {
+    return ExamEventDto.fromDomain(await this.events.getForUser(user, id))
   }
 
   @Post()
@@ -135,14 +171,22 @@ export class ExamEventController {
   }
 
   @Get(':id/rooms')
-  @RequireAnyPermission('exam-events.read', 'exam-rooms.supervise')
+  @RequireAnyPermission(
+    'exam-events.read',
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
   @ApiOperation({ summary: 'The rooms of an exam event' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: [ExamRoomDto] })
   async roomsOfEvent(
+    @CurrentUser() user: RoomStaffUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ExamRoomDto[]> {
-    return (await this.rooms.list(id)).map((room) =>
+    await this.events.getForUser(user, id)
+    return (await this.rooms.listForUser(user, id)).map((room) =>
       ExamRoomDto.fromDomain(room),
     )
   }
@@ -169,7 +213,7 @@ export class ExamEventController {
   }
 
   @Get(':id/print-pack')
-  @RequirePermissions('exam-events.manage')
+  @RequireAnyPermission('exam-events.manage', 'exam-events.read')
   @ApiOperation({ summary: 'The print pack of an exam event' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiQuery({ name: 'roomId', required: false, format: 'uuid' })
