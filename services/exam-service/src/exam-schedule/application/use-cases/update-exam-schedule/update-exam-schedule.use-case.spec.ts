@@ -132,7 +132,24 @@ describe('Update and cancel exam schedule', () => {
     ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
   })
 
-  it('refuses a teacher moving a midterm schedule outside its event', async () => {
+  it('refuses a teacher turning a schedule into a midterm one', async () => {
+    const event = await activeEvent('MIDTERM')
+
+    await expect(
+      new UpdateExamScheduleUseCase(schedules, guard, rooms).execute(
+        scheduleId,
+        {
+          startsAt: START,
+          endsAt: END,
+          durationMinutes: 90,
+          type: 'MIDTERM',
+          eventId: event.id,
+        },
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EXAM_ADMIN_ONLY' } })
+  })
+
+  it('refuses event staff moving a midterm schedule outside its event', async () => {
     const event = await activeEvent('MIDTERM')
 
     await expect(
@@ -145,6 +162,8 @@ describe('Update and cancel exam schedule', () => {
           type: 'MIDTERM',
           eventId: event.id,
         },
+        false,
+        true,
       ),
     ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
   })

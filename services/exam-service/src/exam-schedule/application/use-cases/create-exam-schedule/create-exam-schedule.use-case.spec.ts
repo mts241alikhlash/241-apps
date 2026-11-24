@@ -40,7 +40,7 @@ describe('CreateExamScheduleUseCase', () => {
     )
     return {
       execute: (
-        user: { id: string; manageAll?: boolean },
+        user: { id: string; manageAll?: boolean; canManageEvents?: boolean },
         body: ReturnType<typeof input>,
         now: Date = NOW,
       ) => useCase.execute(user, body, now),
@@ -154,7 +154,19 @@ describe('CreateExamScheduleUseCase', () => {
     ).rejects.toMatchObject({ response: { code: 'EVENT_REQUIRED' } })
   })
 
-  it('refuses a midterm schedule from a teacher outside an active midterm event', async () => {
+  it('refuses a midterm schedule from a teacher without manage-all or exam-events.manage', async () => {
+    const rooms = new FakeExamRoomRepository()
+    const event = await activeEvent(rooms, 'MIDTERM')
+
+    await expect(
+      build(new FakeAcademicLookup(), rooms).execute(
+        USER,
+        input({ type: 'MIDTERM', eventId: event.id }),
+      ),
+    ).rejects.toMatchObject({ response: { code: 'EXAM_ADMIN_ONLY' } })
+  })
+
+  it('refuses a midterm schedule from event staff outside an active midterm event', async () => {
     const rooms = new FakeExamRoomRepository()
     const draft = await rooms.createEvent({
       semesterId: SEMESTER_ID,
@@ -167,18 +179,18 @@ describe('CreateExamScheduleUseCase', () => {
 
     await expect(
       build(new FakeAcademicLookup(), rooms).execute(
-        USER,
+        { ...USER, canManageEvents: true },
         input({ type: 'MIDTERM', eventId: draft.id }),
       ),
     ).rejects.toMatchObject({ response: { code: 'MIDTERM_OUTSIDE_EVENT' } })
   })
 
-  it('lets a teacher schedule a midterm inside an active midterm event', async () => {
+  it('lets event staff schedule a midterm inside an active midterm event', async () => {
     const rooms = new FakeExamRoomRepository()
     const event = await activeEvent(rooms, 'MIDTERM')
 
     const created = await build(new FakeAcademicLookup(), rooms).execute(
-      USER,
+      { ...USER, canManageEvents: true },
       input({ type: 'MIDTERM', eventId: event.id }),
     )
 

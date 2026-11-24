@@ -17,6 +17,7 @@ export interface ActivityEventRef {
 export function assertTypeAllowed(input: {
   type: ExamType
   manageAll: boolean
+  canManageEvents?: boolean
   event: ActivityEventRef | null
   eventId: string | null
   semesterId: string
@@ -38,6 +39,12 @@ export function assertTypeAllowed(input: {
   }
 
   if (input.type === 'MIDTERM' && !input.manageAll) {
+    if (!input.canManageEvents) {
+      throw new ApiForbiddenException(
+        'EXAM_ADMIN_ONLY',
+        'Penilaian Tengah Semester hanya dapat dibuat oleh panitia atau admin ujian.',
+      )
+    }
     if (
       input.event?.type !== 'MIDTERM' ||
       input.event.status !== 'ACTIVE' ||
@@ -46,7 +53,7 @@ export function assertTypeAllowed(input: {
     ) {
       throw new ApiUnprocessableException(
         'MIDTERM_OUTSIDE_EVENT',
-        'Penilaian Tengah Semester oleh guru memerlukan periode UTS yang sedang aktif dan berada di dalam rentang waktunya.',
+        'Penilaian Tengah Semester oleh panitia memerlukan periode UTS yang sedang aktif dan berada di dalam rentang waktunya.',
       )
     }
   }
@@ -81,6 +88,7 @@ export function assertActivityAllowed(input: {
   presetName: ExamType
   tokenMode: ActivityTokenMode
   manageAll: boolean
+  canManageEvents?: boolean
   event: ActivityEventRef | null
   eventId: string | null
   semesterId: string

@@ -30,6 +30,7 @@ export class UpdateExamScheduleUseCase {
     id: string,
     fields: ScheduleWindowFields,
     manageAll = false,
+    canManageEvents = false,
   ): Promise<ExamSchedule> {
     const existing = await this.schedules.findById(id)
     if (existing === null) throw new NotFoundException('Jadwal tidak ditemukan')
@@ -62,15 +63,18 @@ export class UpdateExamScheduleUseCase {
     }
     validateScheduleWindow(next)
     await this.assertMakeupRules(existing, next)
-    assertTypeAllowed({
-      type: next.type,
-      manageAll,
-      event,
-      eventId,
-      semesterId: existing.semesterId,
-      startsAt: next.startsAt,
-      endsAt: next.endsAt,
-    })
+    if (existing.kind !== 'MAKEUP') {
+      assertTypeAllowed({
+        type: next.type,
+        manageAll,
+        canManageEvents,
+        event,
+        eventId,
+        semesterId: existing.semesterId,
+        startsAt: next.startsAt,
+        endsAt: next.endsAt,
+      })
+    }
     const updated = await this.schedules.updateWindow(id, next)
     if (updated === null) {
       throw new ConflictException(

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, Optional } from '@nestjs/common'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../../../exam-schedule/application/schedule-scope.service.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
@@ -19,16 +23,22 @@ export class ListScheduleSessionsUseCase {
     private readonly sessions: IExamSessionRepository,
     private readonly students: IStudentDirectoryPort,
     private readonly participantNumbers: IParticipantNumberPort,
+    @Optional() private readonly scheduleScope?: ScheduleScopeService,
   ) {}
 
   async execute(
     scheduleId: string,
     page = 1,
     limit = 10,
+    user?: ScheduleAccessUser,
   ): Promise<PaginatedResult<ScheduleSessionRow>> {
     const schedule = await this.schedules.findById(scheduleId)
     if (schedule === null) {
       throw new NotFoundException('Jadwal tidak ditemukan')
+    }
+    if (this.scheduleScope && user) {
+      const scope = await this.scheduleScope.forUser(user)
+      await scope.assertCanReadSchedule(schedule)
     }
     const result = await this.sessions.findPageBySchedule(
       scheduleId,

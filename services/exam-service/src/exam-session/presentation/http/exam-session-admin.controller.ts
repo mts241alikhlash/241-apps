@@ -21,6 +21,7 @@ import { RequireAnyPermission } from '@mts241alikhlash/nest-core/access-control'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
+import type { ScheduleAccessUser } from '../../../exam-schedule/application/schedule-scope.service.js'
 import type { RoomStaffUser } from '../../../exam-room/application/room-access.service.js'
 import { ListScheduleSessionsUseCase } from '../../application/use-cases/list-schedule-sessions/list-schedule-sessions.use-case.js'
 import { ReleaseSessionUseCase } from '../../application/use-cases/release-session/release-session.use-case.js'
@@ -62,11 +63,12 @@ export class ExamSessionAdminController {
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 200, type: ScheduleSessionListResponseDto })
   async findBySchedule(
+    @CurrentUser() user: ScheduleAccessUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Query() query: PaginationQueryDto,
   ): Promise<ScheduleSessionListResponseDto> {
     return ScheduleSessionListResponseDto.fromDomain(
-      await this.listSessions.execute(id, query.page, query.limit),
+      await this.listSessions.execute(id, query.page, query.limit, user),
     )
   }
 

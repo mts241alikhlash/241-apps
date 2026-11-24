@@ -19,6 +19,7 @@ export interface ExamScheduleListQuery {
   from?: Date
   to?: Date
   category?: ExamCategory
+  allowedPairs?: { subjectId: string; classroomId: string }[]
 }
 
 export interface ExamScheduleGradingQuery {

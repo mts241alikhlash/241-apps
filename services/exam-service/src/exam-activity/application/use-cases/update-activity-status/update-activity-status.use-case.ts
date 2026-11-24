@@ -1,8 +1,13 @@
 import {
   Injectable,
   NotFoundException,
+  Optional,
   UnprocessableEntityException,
 } from '@nestjs/common'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../../../exam-schedule/application/schedule-scope.service.js'
 import type {
   ActivityStatus,
   ExamActivity,
@@ -15,16 +20,22 @@ export class UpdateActivityStatusUseCase {
   constructor(
     private readonly activities: ExamActivityRepository,
     private readonly closeSessions: CloseActivitySessionsUseCase,
+    @Optional() private readonly scheduleScope?: ScheduleScopeService,
   ) {}
 
   async execute(
-    actorId: string,
+    actor: string | ScheduleAccessUser,
     activityId: string,
     status: ActivityStatus,
   ): Promise<ExamActivity> {
+    const actorId = typeof actor === 'string' ? actor : actor.id
     const current = await this.activities.findById(activityId)
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
+    }
+    if (this.scheduleScope && typeof actor !== 'string') {
+      const scope = await this.scheduleScope.forUser(actor)
+      await scope.assertCanManageActivity(current)
     }
     if (
       current.packageId === null &&

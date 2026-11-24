@@ -203,7 +203,30 @@ describe('CreateActivityUseCase', () => {
     expect(repo.lastCreatedActivity?.policy).toEqual(DEFAULT_POLICIES.DAILY)
   })
 
-  it('allows teacher to create MIDTERM inside an active MIDTERM event', async () => {
+  it('refuses teacher without exam-events.manage creating MIDTERM even inside an active MIDTERM event', async () => {
+    const repo = new FakeActivityRepository()
+    repo.events.set('event-pts', {
+      semesterId: 'sem-1',
+      type: 'MIDTERM',
+      status: 'ACTIVE',
+      startsAt: new Date('2026-11-10T00:00:00Z'),
+      endsAt: new Date('2026-11-10T06:00:00Z'),
+    })
+    const { presetName: _omitted, ...withoutPreset } = command
+    await expect(
+      new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...withoutPreset,
+        manageAll: false,
+        canManageEvents: false,
+        type: 'MIDTERM',
+        eventId: 'event-pts',
+        tokenMode: 'ROTATING',
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    expect(repo.created).toEqual([])
+  })
+
+  it('allows curriculum staff with canManageEvents to create MIDTERM inside an active MIDTERM event', async () => {
     const repo = new FakeActivityRepository()
     repo.events.set('event-pts', {
       semesterId: 'sem-1',
@@ -216,6 +239,7 @@ describe('CreateActivityUseCase', () => {
     await new CreateActivityUseCase(repo, new FakeParticipants()).execute({
       ...withoutPreset,
       manageAll: false,
+      canManageEvents: true,
       type: 'MIDTERM',
       eventId: 'event-pts',
       tokenMode: 'ROTATING',

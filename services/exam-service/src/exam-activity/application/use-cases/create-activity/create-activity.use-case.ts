@@ -38,6 +38,7 @@ export async function assertPackageReady(
 export interface CreateActivityCommand {
   actorId: string
   manageAll: boolean
+  canManageEvents?: boolean
   semesterId: string
   eventId?: string | null
   gradeId: string
@@ -87,6 +88,7 @@ export class CreateActivityUseCase {
       presetName,
       tokenMode: command.tokenMode,
       manageAll: command.manageAll,
+      canManageEvents: command.canManageEvents,
       event,
       eventId: command.eventId ?? null,
       semesterId: command.semesterId,

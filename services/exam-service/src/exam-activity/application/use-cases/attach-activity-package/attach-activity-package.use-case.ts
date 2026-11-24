@@ -2,7 +2,12 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../../../exam-schedule/application/schedule-scope.service.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 import { ApiConflictException } from '../../../../core/filters/api-exception.js'
@@ -10,6 +15,7 @@ import { assertPackageReady } from '../create-activity/create-activity.use-case.
 
 export interface AttachActivityPackageCommand {
   actorId: string
+  actor?: ScheduleAccessUser
   activityId: string
   packageId: string
   classroomIds: string[]
@@ -17,12 +23,19 @@ export interface AttachActivityPackageCommand {
 
 @Injectable()
 export class AttachActivityPackageUseCase {
-  constructor(private readonly activities: ExamActivityRepository) {}
+  constructor(
+    private readonly activities: ExamActivityRepository,
+    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+  ) {}
 
   async execute(command: AttachActivityPackageCommand): Promise<ExamActivity> {
     const current = await this.activities.findById(command.activityId)
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
+    }
+    if (this.scheduleScope && command.actor) {
+      const scope = await this.scheduleScope.forUser(command.actor)
+      await scope.assertCanManageActivity(current, command.classroomIds)
     }
     if (current.packageId !== null) {
       throw new ApiConflictException(
