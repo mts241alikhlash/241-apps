@@ -68,7 +68,7 @@ export class ExamSessionAdminController {
     @Query() query: PaginationQueryDto,
   ): Promise<ScheduleSessionListResponseDto> {
     return ScheduleSessionListResponseDto.fromDomain(
-      await this.listSessions.execute(id, query.page, query.limit, user),
+      await this.listSessions.execute(id, user, query.page, query.limit),
     )
   }
 

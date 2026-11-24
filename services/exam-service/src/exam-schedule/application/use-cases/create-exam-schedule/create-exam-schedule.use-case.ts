@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  Optional,
 } from '@nestjs/common'
 import { assertTypeAllowed } from '../../../../exam-activity/domain/policies/activity-rules.policy.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
@@ -19,7 +18,10 @@ import {
   validateScheduleWindow,
 } from '../../../domain/policies/validate-schedule-window.policy.js'
 import { IExamScheduleRepository } from '../../../domain/repositories/exam-schedule.repository.js'
-import { ScheduleScopeService } from '../../schedule-scope.service.js'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from '../../schedule-scope.service.js'
 
 export interface CreateExamScheduleInput {
   packageId: string
@@ -39,16 +41,11 @@ export class CreateExamScheduleUseCase {
     private readonly packages: IExamPackageRepository,
     private readonly academic: IAcademicLookupPort,
     private readonly rooms: IExamRoomRepository,
-    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
-    user: {
-      id: string
-      manageAll?: boolean
-      canManageEvents?: boolean
-      permissions?: string[]
-    },
+    user: ScheduleAccessUser,
     input: CreateExamScheduleInput,
     now: Date = new Date(),
   ): Promise<ExamSchedule> {
@@ -84,33 +81,25 @@ export class CreateExamScheduleUseCase {
     if (eventId !== null && event === null) {
       throw new NotFoundException('Kegiatan ujian tidak ditemukan')
     }
+    const permissions = user.permissions ?? []
     assertTypeAllowed({
       type: input.type,
-      manageAll: user.manageAll ?? false,
-      canManageEvents: user.canManageEvents ?? false,
+      manageAll: permissions.includes('exam-schedules.manage-all'),
+      canManageEvents: permissions.includes('exam-events.manage'),
       event,
       eventId,
       semesterId: semester.id,
       startsAt: input.startsAt,
       endsAt: input.endsAt,
     })
-    if (this.scheduleScope) {
-      const permissions = user.permissions ?? [
-        ...(user.manageAll ? ['exam-schedules.manage-all'] : []),
-        ...(user.canManageEvents ? ['exam-events.manage'] : []),
-      ]
-      const scope = await this.scheduleScope.forUser({
-        id: user.id,
-        permissions,
-      })
-      await scope.assertCanManageSchedule({
-        type: input.type,
-        kind: 'REGULAR',
-        subjectId: examPackage.subjectId,
-        classroomId: input.classroomId,
-        semesterId: semester.id,
-      })
-    }
+    const scope = await this.scheduleScope.forUser(user)
+    await scope.assertCanManageSchedule({
+      type: input.type,
+      kind: 'REGULAR',
+      subjectId: examPackage.subjectId,
+      classroomId: input.classroomId,
+      semesterId: semester.id,
+    })
 
     const created = await this.schedules.createAndLockPackage({
       packageId: input.packageId,

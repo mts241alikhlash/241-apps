@@ -10,6 +10,10 @@ import {
 } from '../../exam-grading/application/grading-scope.service.js'
 import type { IEmployeeIdentityReadPort } from '../../platform/employee-identity/employee-identity.port.js'
 import { MakeupScopeService } from './makeup-scope.service.js'
+import {
+  ScheduleScopeService,
+  type ScheduleAccessUser,
+} from './schedule-scope.service.js'
 import type { FakeQuestionRepository } from '../../question/application/question.repository.fake.js'
 import {
   IAcademicLookupPort,
@@ -132,5 +136,40 @@ export function makeupScope(
       employees,
       new FakeAcademicLookup({ assignments: taught }),
     ),
+  )
+}
+
+export const SCHEDULE_TEACHER_USER: ScheduleAccessUser = {
+  id: USER.id,
+  roles: ['TEACHER'],
+  permissions: [
+    'exam-schedules.read',
+    'exam-schedules.create',
+    'exam-schedules.update',
+    'exam-schedules.cancel',
+    'exam-schedules.manage',
+    'exam-schedules.access-code',
+  ],
+}
+
+export const SCHEDULE_ADMIN_USER: ScheduleAccessUser = {
+  id: USER.id,
+  roles: ['EXAM_ADMIN'],
+  permissions: ['exam-schedules.manage-all', 'exam-events.manage'],
+}
+
+export function scheduleScope(
+  taught: { subjectId: string; classroomId: string }[] = [
+    { subjectId: SUBJECT_ID, classroomId: CLASSROOM_7A.id },
+  ],
+  classrooms: ClassroomRef[] = [CLASSROOM_7A],
+): ScheduleScopeService {
+  const employees = {
+    findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
+    employeeExists: () => Promise.resolve(true),
+  } as IEmployeeIdentityReadPort
+  return new ScheduleScopeService(
+    employees,
+    new FakeAcademicLookup({ assignments: taught, classrooms }),
   )
 }

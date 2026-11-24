@@ -9,10 +9,13 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SCHEDULE_ADMIN_USER,
+  SCHEDULE_TEACHER_USER,
   SEMESTER_ID,
   START,
   USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule.test-support.js'
 import { GetExamScheduleUseCase } from '../get-exam-schedule/get-exam-schedule.use-case.js'
 import { ListExamSchedulesUseCase } from './list-exam-schedules.use-case.js'
@@ -33,7 +36,8 @@ describe('List and get exam schedules', () => {
         packages,
         new FakeAcademicLookup(),
         new FakeExamRoomRepository(),
-      ).execute(USER, {
+        scheduleScope(),
+      ).execute(SCHEDULE_TEACHER_USER, {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
         startsAt: START,
@@ -49,7 +53,8 @@ describe('List and get exam schedules', () => {
       schedules,
       new FakeAcademicLookup(),
       guard,
-    ).execute({})
+      scheduleScope(),
+    ).execute({}, SCHEDULE_ADMIN_USER)
 
     expect(page.total).toBe(1)
     expect(page.data[0].classroomName).toBe('VII A')
@@ -60,7 +65,8 @@ describe('List and get exam schedules', () => {
       schedules,
       new FakeAcademicLookup({ classrooms: [] }),
       guard,
-    ).execute({})
+      scheduleScope(),
+    ).execute({}, SCHEDULE_ADMIN_USER)
 
     expect(page.data[0].classroomName).toBeNull()
   })
@@ -73,7 +79,8 @@ describe('List and get exam schedules', () => {
           failWith: new ServiceUnavailableException('down'),
         }),
         guard,
-      ).execute({}),
+        scheduleScope(),
+      ).execute({}, SCHEDULE_ADMIN_USER),
     ).rejects.toThrow(ServiceUnavailableException)
   })
 
@@ -95,7 +102,8 @@ describe('List and get exam schedules', () => {
       schedules,
       new FakeAcademicLookup(),
       guard,
-    ).execute({})
+      scheduleScope(),
+    ).execute({}, SCHEDULE_ADMIN_USER)
     const one = await new GetExamScheduleUseCase(
       schedules,
       new FakeAcademicLookup(),
@@ -111,7 +119,8 @@ describe('List and get exam schedules', () => {
       schedules,
       new FakeAcademicLookup(),
       guard,
-    ).execute({})
+      scheduleScope(),
+    ).execute({}, SCHEDULE_ADMIN_USER)
 
     expect(page.data[0].hasSessions).toBe(false)
   })
@@ -135,9 +144,10 @@ describe('List and get exam schedules', () => {
       packages,
       new FakeAcademicLookup(),
       rooms,
+      scheduleScope(),
     )
     for (let i = 0; i < 3; i += 1) {
-      await creator.execute(USER, {
+      await creator.execute(SCHEDULE_TEACHER_USER, {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
         startsAt: START,
@@ -147,25 +157,23 @@ describe('List and get exam schedules', () => {
       })
     }
     for (let i = 0; i < 2; i += 1) {
-      await creator.execute(
-        { ...USER, manageAll: true },
-        {
-          packageId: pkg.id,
-          classroomId: CLASSROOM_7A.id,
-          startsAt: START,
-          endsAt: END,
-          durationMinutes: 90,
-          type: 'MIDTERM',
-          eventId: event.id,
-        },
-      )
+      await creator.execute(SCHEDULE_ADMIN_USER, {
+        packageId: pkg.id,
+        classroomId: CLASSROOM_7A.id,
+        startsAt: START,
+        endsAt: END,
+        durationMinutes: 90,
+        type: 'MIDTERM',
+        eventId: event.id,
+      })
     }
 
     const examPage = await new ListExamSchedulesUseCase(
       repo,
       new FakeAcademicLookup(),
       guard,
-    ).execute({ category: 'EXAM' })
+      scheduleScope(),
+    ).execute({ category: 'EXAM' }, SCHEDULE_ADMIN_USER)
 
     expect(examPage.total).toBe(2)
     expect(examPage.data.every((row) => row.type === 'MIDTERM')).toBe(true)

@@ -32,6 +32,13 @@ import type { ExamActivity } from '../../domain/entities/exam-activity.entity.js
 import { DEFAULT_POLICIES } from '../../domain/policies/exam-policy.policy.js'
 import { ExamActivityController } from './exam-activity.controller.js'
 
+const CLASSROOM_7B = {
+  id: '77777777-7777-4777-8777-777777777778',
+  gradeId: CLASSROOM_7A.gradeId,
+  academicYearId: YEAR_ID,
+  name: 'VII B',
+}
+
 const CLASSROOM_8A = {
   id: '88888888-8888-4888-8888-888888888881',
   gradeId: '33333333-3333-4333-8333-333333333333',
@@ -105,7 +112,7 @@ function build(
   const academic = new FakeAcademicLookup({
     semesterId: SEMESTER_ID,
     assignments,
-    classrooms: [CLASSROOM_7A, CLASSROOM_8A],
+    classrooms: [CLASSROOM_7A, CLASSROOM_7B, CLASSROOM_8A],
   })
   const employees = {
     findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
@@ -378,5 +385,37 @@ describe('ExamActivityController', () => {
     await expect(
       controller.changeStatus(teacher, ownedDraft.id, { status: 'SCHEDULED' }),
     ).resolves.toMatchObject({ status: 'SCHEDULED' })
+  })
+
+  it('prevents Teacher A (7A) from listing, inspecting, or closing Teacher B (7B) activity in the same grade and subject', async () => {
+    const { repo, controller } = build([
+      { subjectId: 'subject-math', classroomId: CLASSROOM_7A.id },
+    ])
+    const teacherBActivity = makeActivity({
+      id: 'a-teacher-b-7b',
+      subjectId: 'subject-math',
+      gradeId: CLASSROOM_7A.gradeId,
+      status: 'ACTIVE',
+      createdById: 'teacher-b',
+    })
+    repo.activities.set(teacherBActivity.id, teacherBActivity)
+    repo.activitySchedules.set(teacherBActivity.id, [
+      {
+        id: 'sched-7b',
+        classroomId: CLASSROOM_7B.id,
+        startsAt: teacherBActivity.startsAt,
+        endsAt: teacherBActivity.endsAt,
+      },
+    ])
+
+    await expect(controller.list(teacher, {})).resolves.toEqual([])
+    await expect(
+      controller.findOne(teacher, teacherBActivity.id),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    await expect(
+      controller.changeStatus(teacher, teacherBActivity.id, {
+        status: 'CLOSED',
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException)
   })
 })

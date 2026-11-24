@@ -10,9 +10,12 @@ import type { FakeExamScheduleRepository } from '../../exam-schedule/application
 import {
   CLASSROOM_7A,
   FakeAcademicLookup,
+  SCHEDULE_ADMIN_USER,
+  SCHEDULE_TEACHER_USER,
   SEMESTER_ID,
   USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule/application/exam-schedule.test-support.js'
 import type { ExamSchedule } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import {
@@ -210,8 +213,9 @@ export async function scheduleExam(
     fixtures.packages,
     new FakeAcademicLookup(),
     rooms,
+    scheduleScope(),
   ).execute(
-    { ...USER, manageAll: true },
+    SCHEDULE_ADMIN_USER,
     {
       packageId: pkg.id,
       classroomId: CLASSROOM_7A.id,
@@ -318,8 +322,9 @@ export async function schedulePaper(
     fixtures.packages,
     new FakeAcademicLookup(),
     new FakeExamRoomRepository(),
+    scheduleScope(),
   ).execute(
-    USER,
+    SCHEDULE_TEACHER_USER,
     {
       packageId: pkg.id,
       classroomId: CLASSROOM_7A.id,

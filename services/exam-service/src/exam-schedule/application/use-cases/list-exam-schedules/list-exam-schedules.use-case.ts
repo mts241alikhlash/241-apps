@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type { ExamScheduleView } from '../../../domain/entities/exam-schedule.entity.js'
@@ -19,20 +19,18 @@ export class ListExamSchedulesUseCase {
     private readonly schedules: IExamScheduleRepository,
     private readonly academic: IAcademicLookupPort,
     private readonly guard: IScheduleSessionGuard,
-    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
     input: Partial<ExamScheduleListQuery>,
-    user?: ScheduleAccessUser,
+    user: ScheduleAccessUser,
   ): Promise<PaginatedResult<ExamScheduleView>> {
     let allowedPairs = input.allowedPairs
-    if (this.scheduleScope && user) {
-      const scope = await this.scheduleScope.forUser(user)
-      if (!scope.allRead) {
-        const semester = await this.academic.activeSemester()
-        allowedPairs = semester ? await scope.pairsFor(semester.id) : []
-      }
+    const scope = await this.scheduleScope.forUser(user)
+    if (!scope.allRead) {
+      const semester = await this.academic.activeSemester()
+      allowedPairs = semester ? await scope.pairsFor(semester.id) : []
     }
     const page = await this.schedules.findAll({
       ...input,

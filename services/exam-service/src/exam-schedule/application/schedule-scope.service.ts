@@ -24,6 +24,7 @@ export type ActivityScopeTarget = Pick<
   'type' | 'semesterId' | 'gradeId' | 'subjectId'
 > & {
   createdById?: string
+  classroomIds?: string[]
 }
 
 export type ScheduleScopeTarget = Pick<
@@ -154,6 +155,20 @@ export class ScheduleScopeService {
       )
     }
 
+    const teachesAnyActivityClassroom = async (
+      activity: ActivityScopeTarget,
+      classroomIds: string[],
+    ): Promise<boolean> => {
+      const pairs = await pairsFor(activity.semesterId)
+      return classroomIds.some((classroomId) =>
+        pairs.some(
+          (pair) =>
+            pair.subjectId === activity.subjectId &&
+            pair.classroomId === classroomId,
+        ),
+      )
+    }
+
     const canReadActivity = async (
       activity: ActivityScopeTarget,
     ): Promise<boolean> => {
@@ -164,6 +179,12 @@ export class ScheduleScopeService {
         activity.createdById === user.id
       ) {
         return true
+      }
+      if (
+        activity.classroomIds !== undefined &&
+        activity.classroomIds.length > 0
+      ) {
+        return teachesAnyActivityClassroom(activity, activity.classroomIds)
       }
       return teachesActivity(activity)
     }
@@ -192,8 +213,19 @@ export class ScheduleScopeService {
             'Kegiatan ujian hanya dapat dikelola oleh panitia atau admin ujian.',
           )
         }
-        if (classroomIds !== undefined && classroomIds.length > 0) {
-          if (!(await teachesActivityClassrooms(activity, classroomIds))) {
+        const targetClassrooms =
+          classroomIds !== undefined && classroomIds.length > 0
+            ? classroomIds
+            : activity.classroomIds
+        if (targetClassrooms !== undefined && targetClassrooms.length > 0) {
+          if (
+            activity.createdById !== undefined &&
+            activity.createdById === user.id &&
+            classroomIds === undefined
+          ) {
+            return
+          }
+          if (!(await teachesActivityClassrooms(activity, targetClassrooms))) {
             throw forbiddenSchedule()
           }
           return

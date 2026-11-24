@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException, Optional } from '@nestjs/common'
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import type { ExamCategory } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { categoryOf } from '../../../../exam-schedule/domain/policies/exam-category.policy.js'
 import {
   ScheduleScopeService,
   type ScheduleAccessUser,
@@ -32,26 +38,39 @@ export class ListActivitiesUseCase {
   constructor(
     private readonly activities: ExamActivityRepository,
     private readonly academic: IAcademicLookupPort,
-    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+    @Inject(forwardRef(() => ScheduleScopeService))
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
+    user: ScheduleAccessUser,
     category?: ExamCategory,
-    user?: ScheduleAccessUser,
   ): Promise<ExamActivity[]> {
     const semester = await this.academic.activeSemester()
     if (semester === null) return []
     const rows = await this.activities.listBySemester(semester.id, category)
-    if (!this.scheduleScope || !user) return rows
     const scope = await this.scheduleScope.forUser(user)
-    return scope.filterActivities(rows)
+    if (scope.allRead) return rows
+    const targets = await Promise.all(
+      rows.map(async (row) => {
+        if (categoryOf(row.type) === 'EXAM' || row.createdById === user.id) {
+          return row
+        }
+        const schedules = await this.activities.listSchedules(row.id)
+        return {
+          ...row,
+          classroomIds: schedules.map((item) => item.classroomId),
+        }
+      }),
+    )
+    return scope.filterActivities(targets)
   }
 
   async listNamed(
+    user: ScheduleAccessUser,
     category?: ExamCategory,
-    user?: ScheduleAccessUser,
   ): Promise<NamedActivity[]> {
-    const activities = await this.execute(category, user)
+    const activities = await this.execute(user, category)
     const subjects = new Map(
       (
         await this.academic.subjectsByIds([
@@ -73,19 +92,17 @@ export class ListActivitiesUseCase {
     }))
   }
 
-  async findOne(
-    id: string,
-    user?: ScheduleAccessUser,
-  ): Promise<ActivityDetail> {
+  async findOne(id: string, user: ScheduleAccessUser): Promise<ActivityDetail> {
     const activity = await this.activities.findById(id)
     if (activity === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
     }
-    if (this.scheduleScope && user) {
-      const scope = await this.scheduleScope.forUser(user)
-      await scope.assertCanReadActivity(activity)
-    }
+    const scope = await this.scheduleScope.forUser(user)
     const rows = await this.activities.listSchedules(id)
+    await scope.assertCanReadActivity({
+      ...activity,
+      classroomIds: rows.map((row) => row.classroomId),
+    })
     const ids = [...new Set(rows.map((row) => row.classroomId))]
     const names = new Map(
       (await this.academic.classroomsByIds(ids)).map((room) => [

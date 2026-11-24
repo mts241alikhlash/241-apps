@@ -119,26 +119,17 @@ export class ExamScheduleController {
     @CurrentUser() user: ScheduleAccessUser,
     @Body() dto: CreateExamScheduleDto,
   ): Promise<ExamScheduleDto> {
-    const permissions = user.permissions ?? []
     return ExamScheduleDto.fromDomain(
-      await this.createSchedule.execute(
-        {
-          id: user.id,
-          manageAll: permissions.includes('exam-schedules.manage-all'),
-          canManageEvents: permissions.includes('exam-events.manage'),
-          permissions,
-        },
-        {
-          packageId: dto.packageId,
-          classroomId: dto.classroomId,
-          startsAt: new Date(dto.startsAt),
-          endsAt: new Date(dto.endsAt),
-          durationMinutes: dto.durationMinutes,
-          minSubmitMinutes: dto.minSubmitMinutes,
-          type: dto.type,
-          eventId: dto.eventId,
-        },
-      ),
+      await this.createSchedule.execute(user, {
+        packageId: dto.packageId,
+        classroomId: dto.classroomId,
+        startsAt: new Date(dto.startsAt),
+        endsAt: new Date(dto.endsAt),
+        durationMinutes: dto.durationMinutes,
+        minSubmitMinutes: dto.minSubmitMinutes,
+        type: dto.type,
+        eventId: dto.eventId,
+      }),
     )
   }
 

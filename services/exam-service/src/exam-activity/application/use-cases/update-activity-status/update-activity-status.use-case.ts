@@ -1,7 +1,8 @@
 import {
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
-  Optional,
   UnprocessableEntityException,
 } from '@nestjs/common'
 import {
@@ -20,23 +21,29 @@ export class UpdateActivityStatusUseCase {
   constructor(
     private readonly activities: ExamActivityRepository,
     private readonly closeSessions: CloseActivitySessionsUseCase,
-    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+    @Inject(forwardRef(() => ScheduleScopeService))
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(
-    actor: string | ScheduleAccessUser,
+    actor: ScheduleAccessUser,
     activityId: string,
     status: ActivityStatus,
   ): Promise<ExamActivity> {
-    const actorId = typeof actor === 'string' ? actor : actor.id
     const current = await this.activities.findById(activityId)
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
     }
-    if (this.scheduleScope && typeof actor !== 'string') {
-      const scope = await this.scheduleScope.forUser(actor)
-      await scope.assertCanManageActivity(current)
-    }
+    const scope = await this.scheduleScope.forUser(actor)
+    const classroomIds = scope.allManage
+      ? undefined
+      : (await this.activities.listSchedules(activityId)).map(
+          (row) => row.classroomId,
+        )
+    await scope.assertCanManageActivity({
+      ...current,
+      classroomIds,
+    })
     if (
       current.packageId === null &&
       (status === 'SCHEDULED' || status === 'ACTIVE')
@@ -44,12 +51,12 @@ export class UpdateActivityStatusUseCase {
       throw new UnprocessableEntityException('Pasang paket soal dulu')
     }
     if (current.status === 'ACTIVE' && status !== 'ACTIVE') {
-      await this.closeSessions.execute(activityId, actorId)
+      await this.closeSessions.execute(activityId, actor.id)
     }
     const updated = await this.activities.updateStatus(
       activityId,
       status,
-      actorId,
+      actor.id,
     )
     if (updated === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')

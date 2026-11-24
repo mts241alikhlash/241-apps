@@ -261,6 +261,52 @@ describe('ScheduleScopeService', () => {
     )
   })
 
+  it('enforces classroom-level isolation on same-grade same-subject NON_EXAM activities', async () => {
+    const academic = new FakeAcademicLookup({
+      assignments: [{ subjectId: 'math', classroomId: CLASSROOM_7A.id }],
+      classrooms: [CLASSROOM_7A, CLASSROOM_7B],
+    })
+    const scope = await new ScheduleScopeService(
+      employees('emp-1'),
+      academic,
+    ).forUser(teacher)
+
+    const class7bOnly = {
+      ...activity({
+        id: 'act-7b',
+        subjectId: 'math',
+        gradeId: CLASSROOM_7A.gradeId,
+        createdById: 'teacher-b',
+      }),
+      classroomIds: [CLASSROOM_7B.id],
+    }
+    const class7aAnd7b = {
+      ...activity({
+        id: 'act-both',
+        subjectId: 'math',
+        gradeId: CLASSROOM_7A.gradeId,
+        createdById: 'admin-1',
+      }),
+      classroomIds: [CLASSROOM_7A.id, CLASSROOM_7B.id],
+    }
+
+    const filtered = await scope.filterActivities([class7bOnly, class7aAnd7b])
+    expect(filtered.map((item) => item.id)).toEqual(['act-both'])
+
+    await expect(
+      scope.assertCanReadActivity(class7bOnly),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    await expect(
+      scope.assertCanManageActivity(class7bOnly),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    await expect(
+      scope.assertCanReadActivity(class7aAnd7b),
+    ).resolves.toBeUndefined()
+    await expect(
+      scope.assertCanManageActivity(class7aAnd7b),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+  })
+
   it('scopes teacher schedules to taught assignments and preserves MAKEUP for allowed graders', async () => {
     const academic = new FakeAcademicLookup({
       assignments: [{ subjectId: 'math', classroomId: CLASSROOM_7A.id }],

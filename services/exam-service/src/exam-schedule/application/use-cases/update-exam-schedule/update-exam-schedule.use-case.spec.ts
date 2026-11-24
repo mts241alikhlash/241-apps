@@ -10,10 +10,12 @@ import {
   CLASSROOM_7A,
   END,
   FakeAcademicLookup,
+  SCHEDULE_TEACHER_USER,
   SEMESTER_ID,
   START,
   USER,
   approvedPackage,
+  scheduleScope,
 } from '../../exam-schedule.test-support.js'
 import { UpdateExamScheduleUseCase } from './update-exam-schedule.use-case.js'
 
@@ -35,7 +37,8 @@ describe('Update and cancel exam schedule', () => {
         packages,
         new FakeAcademicLookup(),
         rooms,
-      ).execute(USER, {
+        scheduleScope(),
+      ).execute(SCHEDULE_TEACHER_USER, {
         packageId: pkg.id,
         classroomId: CLASSROOM_7A.id,
         startsAt: START,

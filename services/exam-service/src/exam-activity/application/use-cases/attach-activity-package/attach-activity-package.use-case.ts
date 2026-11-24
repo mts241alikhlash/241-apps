@@ -1,8 +1,9 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
-  Optional,
 } from '@nestjs/common'
 import {
   ScheduleScopeService,
@@ -14,8 +15,7 @@ import { ApiConflictException } from '../../../../core/filters/api-exception.js'
 import { assertPackageReady } from '../create-activity/create-activity.use-case.js'
 
 export interface AttachActivityPackageCommand {
-  actorId: string
-  actor?: ScheduleAccessUser
+  actor: ScheduleAccessUser
   activityId: string
   packageId: string
   classroomIds: string[]
@@ -25,7 +25,8 @@ export interface AttachActivityPackageCommand {
 export class AttachActivityPackageUseCase {
   constructor(
     private readonly activities: ExamActivityRepository,
-    @Optional() private readonly scheduleScope?: ScheduleScopeService,
+    @Inject(forwardRef(() => ScheduleScopeService))
+    private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
   async execute(command: AttachActivityPackageCommand): Promise<ExamActivity> {
@@ -33,10 +34,8 @@ export class AttachActivityPackageUseCase {
     if (current === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
     }
-    if (this.scheduleScope && command.actor) {
-      const scope = await this.scheduleScope.forUser(command.actor)
-      await scope.assertCanManageActivity(current, command.classroomIds)
-    }
+    const scope = await this.scheduleScope.forUser(command.actor)
+    await scope.assertCanManageActivity(current, command.classroomIds)
     if (current.packageId !== null) {
       throw new ApiConflictException(
         'ACTIVITY_HAS_PACKAGE',
@@ -47,7 +46,12 @@ export class AttachActivityPackageUseCase {
     if (command.classroomIds.length === 0) {
       throw new BadRequestException('Pilih minimal satu kelas')
     }
-    const updated = await this.activities.attachPackage(command)
+    const updated = await this.activities.attachPackage({
+      activityId: command.activityId,
+      packageId: command.packageId,
+      classroomIds: command.classroomIds,
+      actorId: command.actor.id,
+    })
     if (updated === null) {
       throw new NotFoundException('Kegiatan tidak ditemukan')
     }

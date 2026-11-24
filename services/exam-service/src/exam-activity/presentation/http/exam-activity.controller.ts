@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  forwardRef,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -61,6 +63,7 @@ export class ExamActivityController {
     private readonly rotateToken: RotateActivityTokenUseCase,
     private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
     private readonly attachPackage: AttachActivityPackageUseCase,
+    @Inject(forwardRef(() => ScheduleScopeService))
     private readonly scheduleScope: ScheduleScopeService,
   ) {}
 
@@ -77,7 +80,7 @@ export class ExamActivityController {
     @CurrentUser() user: ScheduleAccessUser,
     @Query() query: ExamActivityQueryDto,
   ): Promise<ExamActivityDto[]> {
-    const rows = await this.listActivities.listNamed(query.category, user)
+    const rows = await this.listActivities.listNamed(user, query.category)
     return rows.map((row) => ExamActivityDto.of(row.activity, row))
   }
 
@@ -181,7 +184,6 @@ export class ExamActivityController {
     @Body() dto: AttachActivityPackageRequestDto,
   ): Promise<ExamActivityDto> {
     const activity = await this.attachPackage.execute({
-      actorId: user.id,
       actor: user,
       activityId: id,
       packageId: dto.packageId,
