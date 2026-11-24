@@ -1,5 +1,17 @@
 # exam-web
 
+## 0.9.0
+
+### Minor Changes
+
+- be1132e: Standardize Istiqra exam RBAC roles and permissions: add `EXAM_ADMIN`, retire `ASSESSMENT_ADMIN` into `ACADEMIC_ADMIN`, introduce `exam-grading.read-all`, `exam-rooms.read-all`, and `exam-settings.manage`, scope teacher schedules to non-exam activities, add read-only access for `PRINCIPAL`, tighten technician/supervisor room scoping, and provide `db:reconcile-exam-roles` for production role reconciliation.
+
+### Patch Changes
+
+- Updated dependencies [be1132e]
+  - @mts241alikhlash/ui@0.3.0
+  - @mts241alikhlash/platform@0.2.6
+
 ## 0.8.11
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # academic-service
 
+## 0.1.4
+
+### Patch Changes
+
+- be1132e: Add DataTable row-click support, exam score recap documents, exam-api updates, and skip throttling on internal controllers.
+
 ## 0.1.3
 
 ### Patch Changes
