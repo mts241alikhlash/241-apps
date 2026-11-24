@@ -37,6 +37,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "seed:permissions": "tsx prisma/seed-permissions.ts",
     "seed:admin-minimal": "tsx prisma/seed-admin-minimal.ts",
+    "db:reconcile-exam-roles": "tsx prisma/reconcile-exam-roles.ts",
     "regions:migration": "tsx prisma/region-migration.ts",
     "ci": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build"
   },

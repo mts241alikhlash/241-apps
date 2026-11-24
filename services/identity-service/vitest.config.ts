@@ -1,3 +1,11 @@
 import { nest } from '@mts241alikhlash/vitest-config'
 
-export default nest()
+const base = nest()
+
+export default {
+  ...base,
+  test: {
+    ...base.test,
+    include: ['src/**/*.spec.ts', 'prisma/**/*.spec.ts'],
+  },
+}
