@@ -1,5 +1,11 @@
 # @mts241alikhlash/exam-api
 
+## 0.8.4
+
+### Patch Changes
+
+- be1132e: Add DataTable row-click support, exam score recap documents, exam-api updates, and skip throttling on internal controllers.
+
 ## 0.8.3
 
 ### Patch Changes
