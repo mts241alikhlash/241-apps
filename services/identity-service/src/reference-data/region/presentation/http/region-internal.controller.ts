@@ -14,6 +14,7 @@ import {
 } from '@nestjs/swagger'
 import { ArrayMaxSize, IsArray, Matches } from 'class-validator'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IRegionRepository } from '../../domain/repositories/region.repository.js'
 import {
@@ -31,6 +32,7 @@ export class RegionCodesDto {
 
 @ApiTags('Regions')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('regions')
 export class RegionInternalController {

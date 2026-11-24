@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IReligionRepository } from '../../domain/repositories/religion.repository.js'
 
@@ -39,6 +40,7 @@ export class ReligionSummaryListResponseDto {
 
 @ApiTags('Religions')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('religions')
 export class ReligionInternalController {

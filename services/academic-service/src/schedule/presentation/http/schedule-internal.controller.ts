@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { DayEnum } from '@mts241alikhlash/nest-core/domain'
 import { IScheduleRepository } from '../../domain/repositories/schedule.repository.js'
 
@@ -69,6 +70,7 @@ export class ScheduleRefListResponseDto {
 
 @ApiTags('Schedules')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('schedules')
 export class ScheduleInternalController {

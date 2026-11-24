@@ -7,6 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { SkipThrottle } from '@nestjs/throttler'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../guards/provisioning-token.guard.js'
 import { BatchProfileLookupDto } from './dto/request/batch-profile-lookup.dto.js'
@@ -15,6 +16,7 @@ import { GetProfilesByIdsUseCase } from '../../application/use-cases/get-profile
 
 @ApiTags('Profiles')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('profiles')
 export class ProfilesController {

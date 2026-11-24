@@ -14,6 +14,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
+import { SkipThrottle } from '@nestjs/throttler'
 import { ProvisioningTokenGuard } from '../../../../user/guards/provisioning-token.guard.js'
 import { IBloodTypeRepository } from '../../domain/repositories/blood-type.repository.js'
 
@@ -38,6 +39,7 @@ export class BloodTypeSummaryListResponseDto {
 
 @ApiTags('BloodTypes')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('blood-types')
 export class BloodTypeInternalController {

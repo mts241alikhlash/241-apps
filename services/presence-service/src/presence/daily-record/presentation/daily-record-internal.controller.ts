@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IDailyPresenceReadPort } from '../domain/interfaces/daily-presence-read.port.js'
 
 export class GateSuggestionQueryDto {
@@ -89,6 +90,7 @@ export class MonthlyPresenceSummaryListResponseDto {
 
 @ApiTags('Daily Presences')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('daily-presences')
 export class DailyRecordInternalController {

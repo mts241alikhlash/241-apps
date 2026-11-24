@@ -18,6 +18,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { SkipThrottle } from '@nestjs/throttler'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../guards/provisioning-token.guard.js'
 import { ProvisionAccountDto } from './dto/request/provision-account.dto.js'
@@ -40,6 +41,7 @@ import { ResetPasswordsUseCase } from '../../application/use-cases/reset-passwor
 
 @ApiTags('Accounts')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('accounts')
 export class AccountsController {

@@ -29,6 +29,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IEnrollmentRepository } from '../../domain/repositories/enrollment.repository.js'
 import { EnrollmentStatus } from '../../../shared/domain/enums/index.js'
 
@@ -192,6 +193,7 @@ export class ActiveEnrollmentResponseDto {
 
 @ApiTags('Student Enrollments')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('student-enrollments')
 export class EnrollmentInternalController {

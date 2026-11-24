@@ -7,6 +7,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IAttendancePeriodRepository } from '../domain/interfaces/attendance-period-repository.interface.js'
 
 export class AttendancePeriodClosedDto {
@@ -24,6 +25,7 @@ export class AttendancePeriodClosedResponseDto {
 
 @ApiTags('Attendance Periods')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('presence/periods')
 export class AttendancePeriodInternalController {

@@ -1,5 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { SkipThrottle } from '@nestjs/throttler'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '../../../user/guards/provisioning-token.guard.js'
 import { ISchoolUnitRepository } from '../../domain/repositories/school-unit.repository.js'
@@ -7,6 +8,7 @@ import { SchoolUnitProfileResponseDto } from './dto/response/school-unit-profile
 
 @ApiTags('School Unit')
 @Public()
+@SkipThrottle({ default: true, auth: true })
 @UseGuards(ProvisioningTokenGuard)
 @Controller('school-units')
 export class SchoolUnitProfileController {

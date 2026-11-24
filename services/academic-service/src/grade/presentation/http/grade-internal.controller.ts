@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger'
 import { Public } from '@mts241alikhlash/nest-core/decorators'
 import { ProvisioningTokenGuard } from '@mts241alikhlash/nest-core/guards'
+import { SkipThrottle } from '@nestjs/throttler'
 import { IGradeRepository } from '../../domain/repositories/grade.repository.js'
 
 export class GradeSummaryDto {
@@ -54,6 +55,7 @@ export class GradeLevelsResponseDto {
 
 @ApiTags('Grades')
 @Public()
+@SkipThrottle()
 @UseGuards(ProvisioningTokenGuard)
 @Controller('grades')
 export class GradeInternalController {
