@@ -61,7 +61,7 @@ async function load(): Promise<void> {
   const activeSemester =
     semesters.data.find((item) => item.isActive) ?? semesters.data[0]
   semesterId.value = activeSemester?.id ?? ''
-  if (semesterId.value !== '') {
+  if (semesterId.value !== '' && category.value === 'EXAM') {
     const activeEvents = await examEventService.loadEventOptions(
       semesterId.value,
     )
@@ -70,6 +70,8 @@ async function load(): Promise<void> {
       name: item.name,
       type: item.type,
     }))
+  } else {
+    events.value = []
   }
 
   classrooms.value = rooms.data.map((room) => ({

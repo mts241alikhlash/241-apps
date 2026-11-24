@@ -47,80 +47,83 @@ export async function reconcileExamRoles(
     STANDARDIZED_ROLE_CODES.has(role.code),
   ).map((role) => role.code)
 
-  const txResult = await prisma.$transaction(async (tx) => {
-    const permissions = await tx.permission.findMany({
-      select: { id: true, code: true },
-    })
-    const permissionIdByCode = new Map(permissions.map((p) => [p.code, p.id]))
-    const reconciledRoles: string[] = []
+  const txResult = await prisma.$transaction(
+    async (tx) => {
+      const permissions = await tx.permission.findMany({
+        select: { id: true, code: true },
+      })
+      const permissionIdByCode = new Map(permissions.map((p) => [p.code, p.id]))
+      const reconciledRoles: string[] = []
 
-    for (const roleCode of targetRoleCodes) {
-      const role = await tx.role.findUnique({
-        where: { code: roleCode },
+      for (const roleCode of targetRoleCodes) {
+        const role = await tx.role.findUnique({
+          where: { code: roleCode },
+          select: { id: true },
+        })
+        if (!role) continue
+
+        const desiredIds = resolveGrants(roleCode)
+          .map((code) => permissionIdByCode.get(code))
+          .filter((id): id is string => id !== undefined)
+
+        await tx.rolePermission.deleteMany({
+          where: { roleId: role.id, permissionId: { notIn: desiredIds } },
+        })
+        if (desiredIds.length > 0) {
+          await tx.rolePermission.createMany({
+            data: desiredIds.map((permissionId) => ({
+              roleId: role.id,
+              permissionId,
+            })),
+            skipDuplicates: true,
+          })
+        }
+        reconciledRoles.push(roleCode)
+      }
+
+      let migratedUsers = 0
+      const assessmentAdmin = await tx.role.findUnique({
+        where: { code: 'ASSESSMENT_ADMIN' },
         select: { id: true },
       })
-      if (!role) continue
 
-      const desiredIds = resolveGrants(roleCode)
-        .map((code) => permissionIdByCode.get(code))
-        .filter((id): id is string => id !== undefined)
+      if (assessmentAdmin) {
+        const academicAdmin = await tx.role.findUnique({
+          where: { code: 'ACADEMIC_ADMIN' },
+          select: { id: true },
+        })
+        if (!academicAdmin) {
+          throw new Error('ACADEMIC_ADMIN role not found')
+        }
 
-      await tx.rolePermission.deleteMany({
-        where: { roleId: role.id, permissionId: { notIn: desiredIds } },
-      })
-      if (desiredIds.length > 0) {
-        await tx.rolePermission.createMany({
-          data: desiredIds.map((permissionId) => ({
-            roleId: role.id,
-            permissionId,
-          })),
-          skipDuplicates: true,
+        const existingUserRoles = await tx.userRole.findMany({
+          where: { roleId: assessmentAdmin.id },
+          select: { userId: true },
+        })
+        if (existingUserRoles.length > 0) {
+          const created = await tx.userRole.createMany({
+            data: existingUserRoles.map(({ userId }) => ({
+              userId,
+              roleId: academicAdmin.id,
+            })),
+            skipDuplicates: true,
+          })
+          migratedUsers = created.count
+        }
+        await tx.userRole.deleteMany({ where: { roleId: assessmentAdmin.id } })
+        await tx.rolePermission.deleteMany({
+          where: { roleId: assessmentAdmin.id },
         })
       }
-      reconciledRoles.push(roleCode)
-    }
 
-    let migratedUsers = 0
-    const assessmentAdmin = await tx.role.findUnique({
-      where: { code: 'ASSESSMENT_ADMIN' },
-      select: { id: true },
-    })
-
-    if (assessmentAdmin) {
-      const academicAdmin = await tx.role.findUnique({
-        where: { code: 'ACADEMIC_ADMIN' },
-        select: { id: true },
-      })
-      if (!academicAdmin) {
-        throw new Error('ACADEMIC_ADMIN role not found')
+      return {
+        assessmentAdminId: assessmentAdmin?.id ?? null,
+        migratedUsers,
+        reconciledRoles,
       }
-
-      const existingUserRoles = await tx.userRole.findMany({
-        where: { roleId: assessmentAdmin.id },
-        select: { userId: true },
-      })
-      if (existingUserRoles.length > 0) {
-        const created = await tx.userRole.createMany({
-          data: existingUserRoles.map(({ userId }) => ({
-            userId,
-            roleId: academicAdmin.id,
-          })),
-          skipDuplicates: true,
-        })
-        migratedUsers = created.count
-      }
-      await tx.userRole.deleteMany({ where: { roleId: assessmentAdmin.id } })
-      await tx.rolePermission.deleteMany({
-        where: { roleId: assessmentAdmin.id },
-      })
-    }
-
-    return {
-      assessmentAdminId: assessmentAdmin?.id ?? null,
-      migratedUsers,
-      reconciledRoles,
-    }
-  })
+    },
+    { timeout: 30_000 },
+  )
 
   let retiredAssessmentAdmin: ReconcileExamRolesResult['retiredAssessmentAdmin'] =
     'absent'

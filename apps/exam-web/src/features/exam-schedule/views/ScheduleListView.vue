@@ -163,6 +163,11 @@ useBreadcrumbs(() => [
 ])
 
 onMounted(async () => {
+  if (category.value !== 'EXAM') {
+    periodNames.value = new Map()
+    periodEvents.value = new Map()
+    return
+  }
   const result = await examEventService.loadEvents({ limit: 1000 })
   if (result.success) {
     periodNames.value = new Map(

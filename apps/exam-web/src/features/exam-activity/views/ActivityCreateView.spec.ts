@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import ActivityCreateView from './ActivityCreateView.vue'
+import { examEventService } from '@/features/exam-event/services/examEventService'
 
 const { create, permissions, routeState } = vi.hoisted(() => ({
   create: vi.fn(),
@@ -66,6 +67,7 @@ describe('ActivityCreateView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     permissions.clear()
+    routeState.meta = { category: 'EXAM' }
     routeState.query = {}
   })
 
@@ -98,5 +100,19 @@ describe('ActivityCreateView', () => {
 
     expect(wrapper.findComponent(formStub).props('fixedEventId')).toBe('ev-1')
     wrapper.unmount()
+  })
+
+  it('loads exam event options only for EXAM and skips them for NON_EXAM', async () => {
+    routeState.meta = { category: 'NON_EXAM' }
+    const classworkView = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEventOptions).not.toHaveBeenCalled()
+    classworkView.unmount()
+
+    routeState.meta = { category: 'EXAM' }
+    const examView = mount(ActivityCreateView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEventOptions).toHaveBeenCalledWith('sem-1')
+    examView.unmount()
   })
 })

@@ -179,6 +179,9 @@ const eventAnyRoutes: Record<string, string[]> = {
     'exam-rooms.technician',
     'exam-rooms.read-all',
     'exam-rooms.manage-all',
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
   ],
   findOne: [
     'exam-events.read',
@@ -941,6 +944,21 @@ describe('ExamEventController supervised listing', () => {
     ).resolves.toMatchObject({ id: other.id })
     const managerRooms = await controller.roomsOfEvent(managerUser, other.id)
     expect(managerRooms.map((row) => row.id)).toEqual([otherRoom.id])
+  })
+
+  it('returns all events on list for grading permissions while still denying findOne and roomsOfEvent', async () => {
+    const { controller, mine, other } = await build()
+    for (const code of [
+      'exam-grading.read',
+      'exam-grading.read-all',
+      'exam-grading.manage-all',
+    ]) {
+      const user = { id: `grader-${code}`, permissions: [code] }
+      const listed = await controller.list(user, { page: 1, limit: 10 })
+      expect(listed.data.map((row) => row.id)).toEqual([mine.id, other.id])
+      await expect(controller.findOne(user, mine.id)).rejects.toThrow()
+      await expect(controller.roomsOfEvent(user, mine.id)).rejects.toThrow()
+    }
   })
 })
 

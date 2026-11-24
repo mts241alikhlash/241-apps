@@ -226,7 +226,12 @@ function createFakePrisma(options: FakeOptions = {}) {
         return Promise.resolve({ count: before - userRoles.length })
       }),
     },
-    $transaction: vi.fn((fn: (tx: unknown) => Promise<unknown>) => fn(client)),
+    $transaction: vi.fn(
+      (
+        fn: (tx: unknown) => Promise<unknown>,
+        _options?: { timeout?: number },
+      ) => fn(client),
+    ),
   }
 
   return {
@@ -289,6 +294,12 @@ describe('reconcileExamRoles', () => {
 
     const result = await reconcileExamRoles(fake.prisma as never)
 
+    expect(fake.prisma.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      {
+        timeout: 30_000,
+      },
+    )
     expect(result.migratedUsers).toBe(1)
     expect(result.retiredAssessmentAdmin).toBe('deleted')
     expect(fake.hasRole('ASSESSMENT_ADMIN')).toBe(false)
@@ -318,6 +329,12 @@ describe('reconcileExamRoles', () => {
 
     const result = await reconcileExamRoles(fake.prisma as never)
 
+    expect(fake.prisma.$transaction).toHaveBeenCalledWith(
+      expect.any(Function),
+      {
+        timeout: 30_000,
+      },
+    )
     expect(result.migratedUsers).toBe(1)
     expect(result.retiredAssessmentAdmin).toBe('cleared')
     expect(fake.hasRole('ASSESSMENT_ADMIN')).toBe(true)

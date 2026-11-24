@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, ref, type Ref } from 'vue'
 import ScheduleListView from './ScheduleListView.vue'
+import { examEventService } from '@/features/exam-event/services/examEventService'
 import type { ExamSchedule } from '../types'
 import { toInstant } from '../utils/instant'
 import { ActionCell } from '@mts241alikhlash/ui'
@@ -423,5 +424,19 @@ describe('ScheduleListView', () => {
     expect(classworkView.text()).not.toContain('Tambah')
     expect(classworkView.findAllComponents(ActionCell)).toHaveLength(0)
     classworkView.unmount()
+  })
+
+  it('loads exam events only for EXAM and skips loadEvents for NON_EXAM', async () => {
+    routeMeta.category = 'NON_EXAM'
+    const classworkView = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEvents).not.toHaveBeenCalled()
+    classworkView.unmount()
+
+    routeMeta.category = 'EXAM'
+    const examView = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(examEventService.loadEvents).toHaveBeenCalledWith({ limit: 1000 })
+    examView.unmount()
   })
 })

@@ -76,6 +76,9 @@ export class ExamEventController {
     'exam-rooms.technician',
     'exam-rooms.read-all',
     'exam-rooms.manage-all',
+    'exam-grading.read',
+    'exam-grading.read-all',
+    'exam-grading.manage-all',
   )
   @ApiOperation({ summary: 'The exam events of a semester' })
   @ApiResponse({ status: 200, type: ExamEventListResponseDto })
@@ -86,7 +89,10 @@ export class ExamEventController {
     const readsAll =
       user.permissions?.includes('exam-events.read') === true ||
       user.permissions?.includes(READ_ALL) === true ||
-      user.permissions?.includes(MANAGE_ALL) === true
+      user.permissions?.includes(MANAGE_ALL) === true ||
+      user.permissions?.includes('exam-grading.read') === true ||
+      user.permissions?.includes('exam-grading.read-all') === true ||
+      user.permissions?.includes('exam-grading.manage-all') === true
     return ExamEventListResponseDto.fromDomain(
       await this.events.list({
         ...query,
