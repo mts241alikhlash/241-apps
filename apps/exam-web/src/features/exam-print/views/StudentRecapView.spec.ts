@@ -79,6 +79,15 @@ const StudentRecapStub = defineComponent({
   template:
     '<div data-testid="detail-recap">{{ subject }}|{{ classroom }}|{{ students.length }}</div>',
 })
+const PrintDialogStub = defineComponent({
+  props: {
+    open: Boolean,
+    schedules: { type: Array, default: () => [] },
+  },
+  emits: ['update:open', 'confirm'],
+  template:
+    '<div v-if="open" data-testid="print-dialog"><button data-testid="confirm-score" @click="$emit(\'confirm\', { docType: \'score\', schedules })" /><button data-testid="confirm-detail" @click="$emit(\'confirm\', { docType: \'detail\', schedules })" /><button data-testid="confirm-subset" @click="$emit(\'confirm\', { docType: \'detail\', schedules, studentIds: [\'stu-1\'] })" /></div>',
+})
 
 const stubs = {
   Badge: passthrough,
@@ -107,6 +116,7 @@ const stubs = {
   DataTable: DataTableStub,
   StudentScoreRecapSheet: StudentScoreRecapStub,
   StudentRecapSheet: StudentRecapStub,
+  StudentRecapPrintDialog: PrintDialogStub,
 }
 
 const makeSchedule = (id: string, classroomName: string) => ({
@@ -214,8 +224,9 @@ describe('StudentRecapView', () => {
 
     const printBtn = wrapper
       .findAll('button')
-      .find((b) => b.text().includes('Cetak Nilai'))!
+      .find((b) => b.text().trim() === 'Cetak')!
     await printBtn.trigger('click')
+    await wrapper.get('[data-testid="confirm-score"]').trigger('click')
     await flushPromises()
 
     expect(loadSheet).toHaveBeenCalledWith(
@@ -255,5 +266,94 @@ describe('StudentRecapView', () => {
     expect(wrapper.get('[data-testid="detail-recap"]').text()).toBe(
       'Matematika|VII-A|1',
     )
+  })
+
+  it('prints detail recaps for all students in a class via the print dialog', async () => {
+    routeState.params.eventId = 'e1'
+    routeState.params.subjectId = 'matematika'
+    routeState.params.classId = 'sch-1'
+    const wrapper = mount(StudentRecapView, { global: { stubs } })
+    await flushPromises()
+
+    let detailCount = 0
+    printSpy.mockImplementation(() => {
+      detailCount = wrapper.findAll('[data-testid="detail-recap"]').length
+    })
+
+    const printBtn = wrapper
+      .findAll('button')
+      .find((b) => b.text().trim() === 'Cetak')!
+    await printBtn.trigger('click')
+    await wrapper.get('[data-testid="confirm-detail"]').trigger('click')
+    await flushPromises()
+
+    expect(loadSheet).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'sch-1' }),
+      'Matematika',
+      undefined,
+      { manualOnly: false, includeTeacher: true },
+    )
+    expect(detailCount).toBe(1)
+    expect(printSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('filters loaded students when a subset of studentIds is confirmed', async () => {
+    loadSheet.mockImplementation((schedule) =>
+      Promise.resolve({
+        schedule,
+        subject: 'Matematika',
+        teacher: 'Ust. Abdullah',
+        students: [
+          {
+            key: 'ses-1',
+            studentId: 'stu-1',
+            name: 'Ahmad',
+            participantNumber: 'P-01',
+            items: [],
+          },
+          {
+            key: 'ses-2',
+            studentId: 'stu-2',
+            name: 'Budi',
+            participantNumber: 'P-02',
+            items: [],
+          },
+          {
+            key: 'ses-3',
+            studentId: 'stu-3',
+            name: 'Citra',
+            participantNumber: 'P-03',
+            items: [],
+          },
+        ],
+      }),
+    )
+
+    routeState.params.eventId = 'e1'
+    routeState.params.subjectId = 'matematika'
+    routeState.params.classId = 'sch-1'
+    const wrapper = mount(StudentRecapView, { global: { stubs } })
+    await flushPromises()
+
+    let rendered = ''
+    printSpy.mockImplementation(() => {
+      rendered = wrapper.get('[data-testid="detail-recap"]').text()
+    })
+
+    wrapper.findComponent(PrintDialogStub).vm.$emit('confirm', {
+      docType: 'detail',
+      schedules: [makeSchedule('sch-1', 'VII-A')],
+      studentIds: ['stu-1', 'stu-3'],
+    })
+    await flushPromises()
+
+    expect(loadSheet).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'sch-1' }),
+      'Matematika',
+      undefined,
+      { manualOnly: false, includeTeacher: true },
+    )
+    expect(rendered).toBe('Matematika|VII-A|2')
+    expect(printSpy).toHaveBeenCalledTimes(1)
   })
 })

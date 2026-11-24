@@ -56,6 +56,8 @@ import {
   gradeOfClassroom,
 } from '@/features/exam-shared/classroomName'
 import { AcademicPeriodFilter } from '@/features/lookup/semester'
+import StudentRecapPrintDialog from '../components/StudentRecapPrintDialog.vue'
+import type { RecapPrintConfirmPayload } from '../documents/studentScoreRecap'
 import StudentRecapSheet from '../documents/StudentRecapSheet.vue'
 import StudentScoreRecapSheet from '../documents/StudentScoreRecapSheet.vue'
 import { formatPrintDate, formatPrintRange, formatPrintTime } from '../format'
@@ -107,6 +109,9 @@ const scorePreviewOpen = ref(false)
 const scorePreview = ref<LoadedSheet | null>(null)
 const printList = ref<LoadedSheet[]>([])
 const scorePrintList = ref<LoadedSheet[]>([])
+const printDialogOpen = ref(false)
+const printDialogSchedules = ref<GradingSchedule[]>([])
+const printDialogInitialGrade = ref('ALL')
 
 const loading = computed(() => loadingInit.value || loadingPeople.value)
 
@@ -283,7 +288,7 @@ const backTarget = computed<{
 
 const printTargetsList = computed<GradingSchedule[]>(() => {
   if (activeClass.value) return [activeClass.value]
-  if (activeSubject.value) return filteredSubjectClasses.value
+  if (activeSubject.value) return activeSubject.value.classes
   if (activeEvent.value) return eventSchedules.value
   return []
 })
@@ -448,8 +453,19 @@ useBreadcrumbs(() => [
 
 async function loadRecapSheets(
   targets: GradingSchedule[],
-  onlyStudentId?: string,
+  onlyStudentIds?: string | string[],
 ): Promise<LoadedSheet[]> {
+  if (Array.isArray(onlyStudentIds) && onlyStudentIds.length === 0) return []
+  const singleStudentId =
+    typeof onlyStudentIds === 'string'
+      ? onlyStudentIds
+      : Array.isArray(onlyStudentIds) && onlyStudentIds.length === 1
+        ? onlyStudentIds[0]
+        : undefined
+  const allowedIds =
+    Array.isArray(onlyStudentIds) && onlyStudentIds.length > 1
+      ? new Set(onlyStudentIds)
+      : null
   const sorted = [...targets].sort(
     (left, right) =>
       left.startsAt.localeCompare(right.startsAt) ||
@@ -460,22 +476,26 @@ async function loadRecapSheets(
     const sheet = await gradingSheetService.loadSheet(
       schedule,
       subjectName(schedule),
-      onlyStudentId,
+      singleStudentId,
       { manualOnly: false, includeTeacher: true },
     )
-    if (sheet.students.length > 0) loaded.push(sheet)
+    const students =
+      allowedIds === null
+        ? sheet.students
+        : sheet.students.filter((student) => allowedIds.has(student.studentId))
+    if (students.length > 0) loaded.push({ ...sheet, students })
   }
   return loaded
 }
 
 async function printSchedules(
   targets: GradingSchedule[],
-  onlyStudentId?: string,
+  onlyStudentIds?: string | string[],
 ) {
   if (printing.value || targets.length === 0) return
   printing.value = true
   try {
-    const loaded = await loadRecapSheets(targets, onlyStudentId)
+    const loaded = await loadRecapSheets(targets, onlyStudentIds)
     if (loaded.length === 0) {
       toast.info('Tidak ada sesi siswa untuk dicetak.')
       return
@@ -515,6 +535,22 @@ async function printScoreSheets(targets: GradingSchedule[]) {
     scorePrintList.value = []
     printing.value = false
   }
+}
+
+function openPrintDialog(targets: GradingSchedule[], initialGrade = 'ALL') {
+  if (printing.value || targets.length === 0) return
+  printDialogSchedules.value = targets
+  printDialogInitialGrade.value = initialGrade
+  printDialogOpen.value = true
+}
+
+async function handlePrintConfirm(payload: RecapPrintConfirmPayload) {
+  printDialogOpen.value = false
+  if (payload.docType === 'score') {
+    await printScoreSheets(payload.schedules)
+    return
+  }
+  await printSchedules(payload.schedules, payload.studentIds)
 }
 
 async function openScorePreview(klass: GradingSchedule) {
@@ -632,9 +668,7 @@ const eventColumns = computed<ColumnDef<ExamEvent>[]>(() => [
         hideEdit: true,
         hideDelete: true,
         items: [
-          printItem(
-            () => void printScoreSheets(schedulesOfEvent(row.original)),
-          ),
+          printItem(() => openPrintDialog(schedulesOfEvent(row.original))),
         ],
         onManage: () => goTo(row.original.id),
       }),
@@ -684,7 +718,7 @@ const subjectColumns = computed<ColumnDef<SubjectNode>[]>(() => [
         manageLabel: 'Lihat',
         hideEdit: true,
         hideDelete: true,
-        items: [printItem(() => void printScoreSheets(row.original.classes))],
+        items: [printItem(() => openPrintDialog(row.original.classes))],
         onManage: () => goTo(activeEvent.value?.id ?? null, row.original.id),
       }),
   },
@@ -755,16 +789,7 @@ const classColumns = computed<ColumnDef<GradingSchedule>[]>(() => [
             label: 'Pratinjau Nilai',
             onClick: () => void openScorePreview(row.original),
           },
-          {
-            label: 'Cetak Nilai',
-            icon: Printer,
-            onClick: () => void printScoreSheets([row.original]),
-          },
-          {
-            label: 'Cetak Detail Soal',
-            icon: Printer,
-            onClick: () => void printSchedules([row.original]),
-          },
+          printItem(() => openPrintDialog([row.original])),
         ],
         onManage: () =>
           goTo(
@@ -891,10 +916,15 @@ void init()
           v-if="activeEvent"
           class="shrink-0"
           :disabled="loading || printing || printTargetsList.length === 0"
-          @click="printScoreSheets(printTargetsList)"
+          @click="
+            openPrintDialog(
+              printTargetsList,
+              activeSubject && !activeClass ? gradeFilter : 'ALL',
+            )
+          "
         >
           <Printer class="size-4" />
-          {{ printing ? 'Menyiapkan…' : 'Cetak Nilai' }}
+          {{ printing ? 'Menyiapkan…' : 'Cetak' }}
         </Button>
       </CardHeader>
       <CardContent
@@ -1097,6 +1127,17 @@ void init()
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <StudentRecapPrintDialog
+      v-model:open="printDialogOpen"
+      :schedules="printDialogSchedules"
+      :initial-grade="printDialogInitialGrade"
+      :known-schedule-id="activeClass?.id"
+      :known-people="peopleLoaded ? people : undefined"
+      :subject-of="subjectName"
+      :printing="printing"
+      @confirm="handlePrintConfirm"
+    />
 
     <div
       v-if="scorePrintList.length > 0"

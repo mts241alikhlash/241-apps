@@ -1,5 +1,17 @@
-import { formatScore, type GradingItem } from '@/features/exam-grading/types'
+import {
+  formatScore,
+  type GradingItem,
+  type GradingSchedule,
+} from '@/features/exam-grading/types'
 import type { GradingSheetStudent } from './gradingSheet'
+
+export type RecapDocType = 'score' | 'detail'
+
+export interface RecapPrintConfirmPayload {
+  docType: RecapDocType
+  schedules: GradingSchedule[]
+  studentIds?: string[]
+}
 
 export interface ScoreTypeColumn {
   type: GradingItem['type']
