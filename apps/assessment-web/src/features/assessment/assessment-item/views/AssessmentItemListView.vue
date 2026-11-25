@@ -6,6 +6,12 @@ import AssessmentItemFormDialog from '../components/AssessmentItemFormDialog.vue
 import { createAssessmentItemColumns } from '../components/columns'
 import { useAssessmentItem } from '../composables/useAssessmentItem'
 import type { AssessmentItem } from '../types'
+import {
+  RdmFillDialog,
+  RdmImportDialog,
+  rdmService,
+  type RdmWorkbookKind,
+} from '@/features/assessment/rdm'
 import { DataTable, DataTableEmpty, SearchInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -24,6 +30,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@mts241alikhlash/ui/dropdown-menu'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
@@ -33,7 +48,14 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { useRoleGuard } from '@mts241alikhlash/platform/auth'
-import { Filter, Plus } from '@lucide/vue'
+import {
+  ChevronDown,
+  Download,
+  FileSpreadsheet,
+  Filter,
+  Plus,
+  Upload,
+} from '@lucide/vue'
 import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
@@ -92,6 +114,9 @@ const pageSize = ref(25)
 
 const openForm = ref(false)
 const editingItem = ref<AssessmentItem | null>(null)
+const openRdmFill = ref(false)
+const openRdmImport = ref(false)
+const downloadingRdm = ref(false)
 
 const classroomObjectById = computed(
   () => new Map(classrooms.value.map((c) => [c.id, c])),
@@ -287,6 +312,19 @@ const classroomName = (item: AssessmentItem): string =>
 const canCreate = computed(() => can('assessment-items.create'))
 const canUpdate = computed(() => can('assessment-items.update'))
 const canDelete = computed(() => can('assessment-items.delete'))
+const canRdm = computed(() => can('assessment-items.rdm'))
+
+const selectedAssignment = computed(() =>
+  !relatedLoading.value &&
+  !waitingFor.value &&
+  matchingAssignments.value.length === 1
+    ? matchingAssignments.value[0]
+    : null,
+)
+
+const showRdmMenu = computed(
+  () => canRdm.value && selectedAssignment.value !== null,
+)
 
 const filteredItems = computed(() => {
   if (waitingFor.value) return []
@@ -390,6 +428,18 @@ async function handleFilter() {
 function openAddForm() {
   editingItem.value = null
   openForm.value = true
+}
+
+async function handleDownloadRdmWorkbook(kind: RdmWorkbookKind) {
+  if (!selectedAssignment.value || downloadingRdm.value) return
+  downloadingRdm.value = true
+  try {
+    await rdmService.downloadWorkbook(selectedAssignment.value.id, kind)
+  } catch {
+    return
+  } finally {
+    downloadingRdm.value = false
+  }
 }
 
 watch(openForm, (isOpen) => {
@@ -502,14 +552,58 @@ onMounted(async () => {
     >
       <CardHeader standard>
         <CardTitle class="font-semibold">{{ pageTitle }}</CardTitle>
-        <Button
-          v-if="!waitingFor && canCreate"
-          class="shrink-0"
-          @click="openAddForm"
+        <div
+          v-if="showRdmMenu || (!waitingFor && canCreate)"
+          class="flex shrink-0 items-center gap-2"
         >
-          <Plus class="size-4" />
-          Tambah
-        </Button>
+          <DropdownMenu v-if="showRdmMenu">
+            <DropdownMenuTrigger as-child>
+              <Button variant="outline">
+                RDM
+                <ChevronDown class="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem @select="openRdmFill = true">
+                <FileSpreadsheet class="size-4" />
+                Isi template RDM
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Download class="size-4" />
+                  Unduh template
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem
+                    :disabled="downloadingRdm"
+                    @select="handleDownloadRdmWorkbook('sumatif')"
+                  >
+                    Template Sumatif
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="downloadingRdm"
+                    @select="handleDownloadRdmWorkbook('sas')"
+                  >
+                    Template SAS
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem @select="openRdmImport = true">
+                <Upload class="size-4" />
+                Impor nilai
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            v-if="!waitingFor && canCreate"
+            class="shrink-0"
+            @click="openAddForm"
+          >
+            <Plus class="size-4" />
+            Tambah
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent
@@ -829,6 +923,19 @@ onMounted(async () => {
           : undefined
       "
       @save-success="handleFilter"
+    />
+
+    <RdmFillDialog
+      v-if="selectedAssignment"
+      v-model:open="openRdmFill"
+      :teaching-assignment-id="selectedAssignment.id"
+    />
+
+    <RdmImportDialog
+      v-if="selectedAssignment"
+      v-model:open="openRdmImport"
+      :teaching-assignment-id="selectedAssignment.id"
+      @import-success="handleFilter"
     />
   </div>
 </template>
