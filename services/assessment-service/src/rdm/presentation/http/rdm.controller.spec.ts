@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  StreamableFile,
   ValidationPipe,
   type ExecutionContext,
 } from '@nestjs/common'
@@ -7,13 +8,18 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import type { AuthenticatedUser } from '@mts241alikhlash/nest-core/types'
+import type { Response } from 'express'
 import request from 'supertest'
 import type { App } from 'supertest/types.js'
+import { DownloadRdmWorkbookUseCase } from '../../application/use-cases/download-rdm-workbook.use-case.js'
 import { FillRdmTemplateUseCase } from '../../application/use-cases/fill-rdm-template.use-case.js'
 import { GetRdmCandidatesUseCase } from '../../application/use-cases/get-rdm-candidates.use-case.js'
+import { ImportRdmWorkbookUseCase } from '../../application/use-cases/import-rdm-workbook.use-case.js'
 import { FillRdmTemplateDto } from './dto/request/fill-rdm-template.dto.js'
 import { RdmCandidatesResponseDto } from './dto/response/rdm-candidates-response.dto.js'
 import { RdmFillResponseDto } from './dto/response/rdm-fill-response.dto.js'
+import { RdmImportPreviewDto } from './dto/response/rdm-import-preview-response.dto.js'
+import { RdmImportResponseDto } from './dto/response/rdm-import-response.dto.js'
 import { RdmController } from './rdm.controller.js'
 
 const XLSX_MIME =
@@ -56,12 +62,23 @@ describe('RdmController', () => {
     execute: vi.fn(),
   }
 
+  const mockDownloadUseCase = {
+    execute: vi.fn(),
+  }
+
+  const mockImportUseCase = {
+    preview: vi.fn(),
+    confirm: vi.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RdmController],
       providers: [
         { provide: GetRdmCandidatesUseCase, useValue: mockCandidatesUseCase },
         { provide: FillRdmTemplateUseCase, useValue: mockFillUseCase },
+        { provide: DownloadRdmWorkbookUseCase, useValue: mockDownloadUseCase },
+        { provide: ImportRdmWorkbookUseCase, useValue: mockImportUseCase },
       ],
     }).compile()
 
@@ -94,6 +111,60 @@ describe('RdmController', () => {
     })
     expect(result).toBeInstanceOf(RdmCandidatesResponseDto)
     expect(result.sumatif).toHaveLength(1)
+  })
+
+  it('streams downloaded workbook with Content-Disposition fallback/UTF-8 and optional X-Rdm-Items-Not-Included', async () => {
+    mockDownloadUseCase.execute.mockResolvedValue({
+      buffer: Buffer.from('xlsx-bytes'),
+      fileName: 'Nilai Sumatif-IX.A-Qur’an.xlsx',
+      itemsNotIncluded: 3,
+    })
+    const set = vi.fn()
+    const res = { set } as unknown as Response
+
+    const result = await controller.workbook(
+      user,
+      {
+        teachingAssignmentId: '11111111-1111-4111-8111-111111111111',
+        kind: 'sumatif',
+      },
+      res,
+    )
+
+    expect(result).toBeInstanceOf(StreamableFile)
+    expect(mockDownloadUseCase.execute).toHaveBeenCalledWith({
+      userId: 'user-1',
+      teachingAssignmentId: '11111111-1111-4111-8111-111111111111',
+      kind: 'sumatif',
+    })
+    expect(set).toHaveBeenCalledWith({
+      'Content-Type': XLSX_MIME,
+      'Content-Disposition':
+        'attachment; filename="Nilai Sumatif-IX.A-Qur_an.xlsx"; filename*=UTF-8\'\'Nilai%20Sumatif-IX.A-Qur%E2%80%99an.xlsx',
+      'X-Rdm-Items-Not-Included': '3',
+    })
+
+    set.mockClear()
+    mockDownloadUseCase.execute.mockResolvedValue({
+      buffer: Buffer.from('xlsx-bytes'),
+      fileName: 'Nilai SAS-IX.A-Informatika.xlsx',
+      itemsNotIncluded: 0,
+    })
+
+    await controller.workbook(
+      user,
+      {
+        teachingAssignmentId: '11111111-1111-4111-8111-111111111111',
+        kind: 'sas',
+      },
+      res,
+    )
+
+    expect(set).toHaveBeenCalledWith({
+      'Content-Type': XLSX_MIME,
+      'Content-Disposition':
+        'attachment; filename="Nilai SAS-IX.A-Informatika.xlsx"; filename*=UTF-8\'\'Nilai%20SAS-IX.A-Informatika.xlsx',
+    })
   })
 
   it('delegates fill with xlsx file and maps RdmFillResponseDto', async () => {
@@ -139,6 +210,55 @@ describe('RdmController', () => {
     expect(result.fileName).toBe('template - terisi.xlsx')
   })
 
+  it('delegates import/preview and import to ImportRdmWorkbookUseCase', async () => {
+    mockImportUseCase.preview.mockResolvedValue({
+      sheets: [
+        {
+          sheetName: 'SUM 1',
+          name: 'UH 1',
+          action: 'create',
+          itemId: null,
+          scoresToWrite: 2,
+          unchanged: 0,
+        },
+      ],
+      unmatchedRows: [],
+      invalidValues: [],
+    })
+    mockImportUseCase.confirm.mockResolvedValue({
+      itemsCreated: 1,
+      itemsUpdated: 0,
+      scoresWritten: 2,
+    })
+
+    const file = makeFile()
+    const taId = '11111111-1111-4111-8111-111111111111'
+
+    const preview = await controller.importPreview(
+      user,
+      { teachingAssignmentId: taId },
+      file,
+    )
+    expect(preview).toBeInstanceOf(RdmImportPreviewDto)
+    expect(mockImportUseCase.preview).toHaveBeenCalledWith({
+      userId: 'user-1',
+      teachingAssignmentId: taId,
+      file: file.buffer,
+    })
+
+    const confirmed = await controller.importConfirm(
+      user,
+      { teachingAssignmentId: taId },
+      file,
+    )
+    expect(confirmed).toBeInstanceOf(RdmImportResponseDto)
+    expect(mockImportUseCase.confirm).toHaveBeenCalledWith({
+      userId: 'user-1',
+      teachingAssignmentId: taId,
+      file: file.buffer,
+    })
+  })
+
   it('accepts application/octet-stream when extension is .xlsx', async () => {
     mockFillUseCase.execute.mockResolvedValue({
       fileName: 'template - terisi.xlsx',
@@ -163,29 +283,24 @@ describe('RdmController', () => {
     ).resolves.toBeInstanceOf(RdmFillResponseDto)
   })
 
-  it('rejects missing file or non-xlsx files', async () => {
+  it('rejects missing file or non-xlsx files on fill and import', async () => {
+    const dto = { teachingAssignmentId: '11111111-1111-4111-8111-111111111111' }
+
+    await expect(controller.fill(user, dto, undefined)).rejects.toThrow(
+      BadRequestException,
+    )
     await expect(
-      controller.fill(
-        user,
-        { teachingAssignmentId: '11111111-1111-4111-8111-111111111111' },
-        undefined,
-      ),
+      controller.fill(user, dto, makeFile({ originalname: 'template.csv' })),
+    ).rejects.toThrow(BadRequestException)
+    await expect(
+      controller.fill(user, dto, makeFile({ mimetype: 'text/csv' })),
     ).rejects.toThrow(BadRequestException)
 
     await expect(
-      controller.fill(
-        user,
-        { teachingAssignmentId: '11111111-1111-4111-8111-111111111111' },
-        makeFile({ originalname: 'template.csv' }),
-      ),
+      controller.importPreview(user, dto, undefined),
     ).rejects.toThrow(BadRequestException)
-
     await expect(
-      controller.fill(
-        user,
-        { teachingAssignmentId: '11111111-1111-4111-8111-111111111111' },
-        makeFile({ mimetype: 'text/csv' }),
-      ),
+      controller.importConfirm(user, dto, makeFile({ mimetype: 'text/csv' })),
     ).rejects.toThrow(BadRequestException)
   })
 
@@ -235,6 +350,8 @@ describe('RdmController', () => {
       providers: [
         { provide: GetRdmCandidatesUseCase, useValue: mockCandidatesUseCase },
         { provide: FillRdmTemplateUseCase, useValue: mockFillUseCase },
+        { provide: DownloadRdmWorkbookUseCase, useValue: mockDownloadUseCase },
+        { provide: ImportRdmWorkbookUseCase, useValue: mockImportUseCase },
       ],
     })
       .overrideGuard(JwtAuthGuard)

@@ -2908,6 +2908,70 @@
         ]
       }
     },
+    "/assessment-items/rdm/workbook": {
+      "get": {
+        "operationId": "RdmController_workbook",
+        "parameters": [
+          {
+            "name": "teachingAssignmentId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sumatif",
+                "sas"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an RDM-layout Excel workbook",
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename with ASCII fallback and UTF-8 encoding",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Rdm-Items-Not-Included": {
+                "description": "Count of eligible items omitted past the sheet limit",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download an offline Excel workbook in RDM layout",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
     "/assessment-items/rdm/fill": {
       "post": {
         "operationId": "RdmController_fill",
@@ -2974,6 +3038,134 @@
           }
         ],
         "summary": "Fill an RDM Excel template with assessment items and scores",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/import/preview": {
+      "post": {
+        "operationId": "RdmController_importPreview",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmImportPreviewDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Preview importing an RDM-layout Excel workbook without writing",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/import": {
+      "post": {
+        "operationId": "RdmController_importConfirm",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmImportResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import an RDM-layout Excel workbook in one transaction",
         "tags": [
           "RDM"
         ]
@@ -6176,6 +6368,104 @@
           "fileName",
           "fileBase64",
           "summary"
+        ]
+      },
+      "RdmImportSheetPreviewDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "create",
+              "update"
+            ],
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoresToWrite": {
+            "type": "number"
+          },
+          "unchanged": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "name",
+          "action",
+          "itemId",
+          "scoresToWrite",
+          "unchanged"
+        ]
+      },
+      "RdmImportRowIssueDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "row": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "row"
+        ]
+      },
+      "RdmImportPreviewDto": {
+        "type": "object",
+        "properties": {
+          "sheets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportSheetPreviewDto"
+            }
+          },
+          "unmatchedRows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportRowIssueDto"
+            }
+          },
+          "invalidValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportRowIssueDto"
+            }
+          }
+        },
+        "required": [
+          "sheets",
+          "unmatchedRows",
+          "invalidValues"
+        ]
+      },
+      "RdmImportResponseDto": {
+        "type": "object",
+        "properties": {
+          "itemsCreated": {
+            "type": "number"
+          },
+          "itemsUpdated": {
+            "type": "number"
+          },
+          "scoresWritten": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "itemsCreated",
+          "itemsUpdated",
+          "scoresWritten"
         ]
       },
       "RdmSettingResponseDto": {

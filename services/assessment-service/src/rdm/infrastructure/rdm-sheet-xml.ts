@@ -242,7 +242,7 @@ function extractTagContent(xml: string, tagName: string): string | null {
 export function readCellRawValue(
   cell: ParsedCell,
   sharedStrings: string[],
-): string | number | bigint {
+): string | number | bigint | boolean {
   const cellType = readAttr(cell.attrs, 't')
   if (cellType === 's') {
     const indexText = extractTagContent(cell.innerXml, 'v')
@@ -259,6 +259,12 @@ export function readCellRawValue(
   if (cellType === 'str') {
     const valueText = extractTagContent(cell.innerXml, 'v')
     return valueText !== null ? unescapeXml(valueText) : ''
+  }
+  if (cellType === 'b') {
+    return extractTagContent(cell.innerXml, 'v')?.trim() === '1'
+  }
+  if (cellType === 'e') {
+    return extractTagContent(cell.innerXml, 'v') ?? '#ERROR!'
   }
   const valueText = extractTagContent(cell.innerXml, 'v')
   if (valueText === null) return ''

@@ -75,6 +75,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/assessment-items/rdm/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import an RDM-layout Excel workbook in one transaction */
+        post: operations["RdmController_importConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/import/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview importing an RDM-layout Excel workbook without writing */
+        post: operations["RdmController_importPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an offline Excel workbook in RDM layout */
+        get: operations["RdmController_workbook"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/assessment-settings/rdm": {
         parameters: {
             query?: never;
@@ -1109,6 +1160,29 @@ export interface components {
             sheets: components["schemas"]["RdmFillSheetSummaryDto"][];
             unmatchedRows: number[];
         };
+        RdmImportPreviewDto: {
+            invalidValues: components["schemas"]["RdmImportRowIssueDto"][];
+            sheets: components["schemas"]["RdmImportSheetPreviewDto"][];
+            unmatchedRows: components["schemas"]["RdmImportRowIssueDto"][];
+        };
+        RdmImportResponseDto: {
+            itemsCreated: number;
+            itemsUpdated: number;
+            scoresWritten: number;
+        };
+        RdmImportRowIssueDto: {
+            row: number;
+            sheetName: string;
+        };
+        RdmImportSheetPreviewDto: {
+            /** @enum {string} */
+            action: "create" | "update";
+            itemId: string | null;
+            name: string;
+            scoresToWrite: number;
+            sheetName: string;
+            unchanged: number;
+        };
         RdmItemRefDto: {
             id: string;
             name: string;
@@ -1682,6 +1756,101 @@ export interface operations {
                         /** @example 200 */
                         statusCode?: number;
                     };
+                };
+            };
+        };
+    };
+    RdmController_importConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmImportResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_importPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmImportPreviewDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_workbook: {
+        parameters: {
+            query: {
+                kind: "sumatif" | "sas";
+                teachingAssignmentId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returns an RDM-layout Excel workbook */
+            200: {
+                headers: {
+                    /** @description Attachment filename with ASCII fallback and UTF-8 encoding */
+                    "Content-Disposition"?: string;
+                    /** @description Count of eligible items omitted past the sheet limit */
+                    "X-Rdm-Items-Not-Included"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
         };

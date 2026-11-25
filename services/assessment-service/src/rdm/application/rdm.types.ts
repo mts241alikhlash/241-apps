@@ -55,3 +55,41 @@ export interface FillRdmTemplateResult {
   fileBase64: string
   summary: RdmFillSummary
 }
+
+export interface DownloadRdmWorkbookInput {
+  userId: string
+  teachingAssignmentId: string
+  kind: RdmKind
+}
+
+export interface DownloadRdmWorkbookResult {
+  buffer: Buffer
+  fileName: string
+  itemsNotIncluded: number
+}
+
+export interface ImportRdmWorkbookInput {
+  userId: string
+  teachingAssignmentId: string
+  file: Buffer
+}
+
+export interface RdmImportSheetPreview {
+  sheetName: string
+  name: string
+  action: 'create' | 'update'
+  itemId: string | null
+  scoresToWrite: number
+  unchanged: number
+}
+
+export interface RdmImportRowIssue {
+  sheetName: string
+  row: number
+}
+
+export interface RdmImportPreviewResult {
+  sheets: RdmImportSheetPreview[]
+  unmatchedRows: RdmImportRowIssue[]
+  invalidValues: RdmImportRowIssue[]
+}

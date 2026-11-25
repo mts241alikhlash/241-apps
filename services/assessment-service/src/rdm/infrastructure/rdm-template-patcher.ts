@@ -33,19 +33,19 @@ export interface RdmTemplateReadResult {
   rows: RdmTemplateRow[]
 }
 
-interface SheetPart {
+export interface SheetPart {
   name: string
   partPath: string
 }
 
-const INVALID_TEMPLATE_MESSAGE = 'File ini bukan template RDM'
+export const INVALID_TEMPLATE_MESSAGE = 'File ini bukan template RDM'
 
 function normalizeTargetPath(target: string): string {
   if (target.startsWith('/')) return target.slice(1)
   return target.startsWith('xl/') ? target : `xl/${target}`
 }
 
-async function loadWorkbookZip(file: Buffer): Promise<JSZip> {
+export async function loadWorkbookZip(file: Buffer): Promise<JSZip> {
   try {
     return await JSZip.loadAsync(file)
   } catch {
@@ -53,7 +53,7 @@ async function loadWorkbookZip(file: Buffer): Promise<JSZip> {
   }
 }
 
-async function resolveWorkbookSheets(zip: JSZip): Promise<SheetPart[]> {
+export async function resolveWorkbookSheets(zip: JSZip): Promise<SheetPart[]> {
   const workbookEntry = zip.file('xl/workbook.xml')
   const relsEntry = zip.file('xl/_rels/workbook.xml.rels')
   if (!workbookEntry || !relsEntry) {
@@ -182,6 +182,13 @@ export async function patchRdmTemplate(
   return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
 }
 
+export async function loadSharedStrings(zip: JSZip): Promise<string[]> {
+  const sharedStringsEntry = zip.file('xl/sharedStrings.xml')
+  return sharedStringsEntry
+    ? parseSharedStrings(await sharedStringsEntry.async('string'))
+    : []
+}
+
 export async function readRdmTemplateRows(
   file: Buffer,
 ): Promise<RdmTemplateReadResult> {
@@ -192,10 +199,7 @@ export async function readRdmTemplateRows(
     throw new BadRequestException(INVALID_TEMPLATE_MESSAGE)
   }
 
-  const sharedStringsEntry = zip.file('xl/sharedStrings.xml')
-  const sharedStrings = sharedStringsEntry
-    ? parseSharedStrings(await sharedStringsEntry.async('string'))
-    : []
+  const sharedStrings = await loadSharedStrings(zip)
 
   const firstSheetEntry = zip.file(firstSheet.partPath)
   if (!firstSheetEntry) {

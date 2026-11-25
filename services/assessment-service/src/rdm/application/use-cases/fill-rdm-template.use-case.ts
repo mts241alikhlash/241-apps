@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import {
   IAssessmentItemRepository,
   type AssessmentItemWithDetails,
@@ -18,7 +14,6 @@ import {
   matchStudents,
   toRdmValue,
   type RdmKind,
-  type RosterStudent,
 } from '../../domain/rdm-rules.js'
 import { IRdmSettingRepository } from '../../domain/rdm-setting.js'
 import {
@@ -27,19 +22,18 @@ import {
   type RdmSheetPatch,
 } from '../../infrastructure/rdm-template-patcher.js'
 import { assertTeaches } from '../assert-teaches.js'
+import {
+  buildSasCountError,
+  loadRoster,
+  loadScoresByItem,
+  resolveAssignmentMeta,
+  type AssignmentMeta,
+} from '../rdm-assignment.helper.js'
 import type {
   FillRdmTemplateInput,
   FillRdmTemplateResult,
   RdmFillSheetSummary,
 } from '../rdm.types.js'
-
-interface AssignmentMeta {
-  classroomId: string
-  semesterId: string
-  classroomCode: string
-  classroomName: string | null
-  subjectName: string
-}
 
 function selectItems(
   kind: RdmKind,
@@ -69,10 +63,7 @@ function selectItems(
 
   if (kind === 'sas') {
     if (selected.length !== 1) {
-      const names = selected.map((item) => item.name).join(', ') || '-'
-      throw new BadRequestException(
-        `Template SAS membutuhkan tepat satu penilaian jenis ${sasType}; ditemukan ${selected.length}: ${names}`,
-      )
+      throw buildSasCountError(sasType, selected)
     }
   } else if (selected.length > RDM_MAX_SUMATIF_SHEETS) {
     throw new BadRequestException(
@@ -151,38 +142,6 @@ export class FillRdmTemplateUseCase {
     private readonly academicLookup: IAcademicLookupPort,
   ) {}
 
-  private async resolveAssignmentMeta(
-    teachingAssignmentId: string,
-    allItems: AssessmentItemWithDetails[],
-  ): Promise<AssignmentMeta> {
-    const ref = allItems.find(
-      (item) => item.teachingAssignment !== undefined,
-    )?.teachingAssignment
-    if (ref?.classroom && ref.subject) {
-      return {
-        classroomId: ref.classroomId,
-        semesterId: ref.semesterId,
-        classroomCode: ref.classroom.code,
-        classroomName: ref.classroom.name,
-        subjectName: ref.subject.name,
-      }
-    }
-
-    const [detail] = await this.academicLookup.listTeachingAssignments([
-      teachingAssignmentId,
-    ])
-    if (!detail) {
-      throw new NotFoundException('Penugasan mengajar tidak ditemukan')
-    }
-    return {
-      classroomId: detail.classroomId,
-      semesterId: detail.semesterId,
-      classroomCode: detail.classroomCode,
-      classroomName: detail.classroomName,
-      subjectName: detail.subjectName,
-    }
-  }
-
   async execute(input: FillRdmTemplateInput): Promise<FillRdmTemplateResult> {
     await assertTeaches(input.userId, input.teachingAssignmentId, {
       employeeIdentity: this.employeeIdentity,
@@ -219,39 +178,26 @@ export class FillRdmTemplateUseCase {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((item) => ({ id: item.id, name: item.name }))
 
-    const meta = await this.resolveAssignmentMeta(
+    const meta = await resolveAssignmentMeta(
+      this.academicLookup,
       input.teachingAssignmentId,
       allItems,
     )
     const classSubjectWarning = buildClassSubjectWarning(template.e2, meta)
 
-    const enrollments = await this.enrollmentLookup.search({
-      classroomId: meta.classroomId,
-      semesterId: meta.semesterId,
-    })
-    const roster: RosterStudent[] = enrollments.map((enrollment) => ({
-      enrollmentId: enrollment.id,
-      nis: enrollment.studentNis,
-      nisn: enrollment.studentNisn,
-      name: enrollment.studentName ?? '',
-    }))
+    const roster = await loadRoster(
+      this.enrollmentLookup,
+      meta.classroomId,
+      meta.semesterId,
+    )
 
     const matchResult = matchStudents(template.rows, roster)
     const matchedEnrollmentIds = [...new Set(matchResult.matched.values())]
-    const rawScores = await this.studentScoreRepository.findScoresForItems(
+    const scoreMap = await loadScoresByItem(
+      this.studentScoreRepository,
       selectedItems.map((item) => item.id),
       matchedEnrollmentIds,
     )
-
-    const scoreMap = new Map<string, Map<string, number | null>>()
-    for (const row of rawScores) {
-      let byEnrollment = scoreMap.get(row.assessmentItemId)
-      if (!byEnrollment) {
-        byEnrollment = new Map<string, number | null>()
-        scoreMap.set(row.assessmentItemId, byEnrollment)
-      }
-      byEnrollment.set(row.enrollmentId, row.score)
-    }
 
     const patches: RdmSheetPatch[] = []
     const sheets: RdmFillSheetSummary[] = []
