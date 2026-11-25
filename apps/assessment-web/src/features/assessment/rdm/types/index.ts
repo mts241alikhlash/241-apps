@@ -75,3 +75,8 @@ export interface RdmDownloadResult {
   fileName: string
   itemsNotIncluded: number
 }
+
+export interface RdmSetting {
+  sumatifTypes: AssessmentType[]
+  sasType: AssessmentType
+}

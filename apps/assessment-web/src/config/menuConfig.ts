@@ -6,6 +6,7 @@ import {
   ListChecks,
   Medal,
   Scale,
+  SlidersHorizontal,
 } from '@lucide/vue'
 
 export type {
@@ -86,6 +87,13 @@ export const menuSections: MenuSection[] = [
         url: '/report-card',
         icon: FileText,
         requiredPermission: 'report-cards.read',
+      },
+      {
+        key: 'rdm-settings',
+        title: 'menu.rdmSettings',
+        url: '/settings/rdm',
+        icon: SlidersHorizontal,
+        requiredPermission: 'assessment-settings.read',
       },
     ],
   },

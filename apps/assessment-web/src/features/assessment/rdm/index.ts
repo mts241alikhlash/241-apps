@@ -6,6 +6,8 @@ export {
 } from './services/rdmService'
 export { RDM_MAX_SUMATIF_ITEMS, useRdmFill } from './composables/useRdmFill'
 export { useRdmImport } from './composables/useRdmImport'
+export { useRdmSetting } from './composables/useRdmSetting'
+export { rdmRoutes } from './routes'
 export { default as RdmFillDialog } from './components/RdmFillDialog.vue'
 export { default as RdmImportDialog } from './components/RdmImportDialog.vue'
 export type {
@@ -20,5 +22,6 @@ export type {
   RdmImportRowIssue,
   RdmImportSheetPreview,
   RdmItemRef,
+  RdmSetting,
   RdmWorkbookKind,
 } from './types'

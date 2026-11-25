@@ -5,6 +5,7 @@ import type {
   RdmFillResponse,
   RdmImportPreview,
   RdmImportResponse,
+  RdmSetting,
   RdmWorkbookKind,
 } from '../types'
 
@@ -38,4 +39,10 @@ export const rdmApi = {
       '/assessment-items/rdm/import',
       formData,
     ),
+
+  getSettings: () =>
+    api.get<ApiSingleResponse<RdmSetting>>('/assessment-settings/rdm'),
+
+  updateSettings: (payload: RdmSetting) =>
+    api.put<ApiSingleResponse<RdmSetting>>('/assessment-settings/rdm', payload),
 }

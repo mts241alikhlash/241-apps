@@ -11,6 +11,8 @@ vi.mock('../api/rdmApi', () => ({
     fillTemplate: vi.fn(),
     previewImport: vi.fn(),
     confirmImport: vi.fn(),
+    getSettings: vi.fn(),
+    updateSettings: vi.fn(),
   },
 }))
 
@@ -162,5 +164,57 @@ describe('rdmService', () => {
     await expect(rdmService.downloadWorkbook('ta-1', 'sas')).rejects.toThrow(
       'Hanya guru pengampu kelas dan mapel ini yang dapat memakai fitur RDM',
     )
+  })
+
+  it('fetches and updates RDM settings and surfaces 400 validation errors verbatim', async () => {
+    vi.mocked(rdmApi.getSettings).mockResolvedValueOnce({
+      data: {
+        data: {
+          sumatifTypes: ['DAILY', 'ASSIGNMENT'],
+          sasType: 'FINAL',
+        },
+      },
+    } as never)
+
+    const loaded = await rdmService.getSettings()
+    expect(loaded).toEqual({
+      sumatifTypes: ['DAILY', 'ASSIGNMENT'],
+      sasType: 'FINAL',
+    })
+
+    vi.mocked(rdmApi.updateSettings).mockResolvedValueOnce({
+      data: {
+        data: {
+          sumatifTypes: ['DAILY', 'PRACTICAL'],
+          sasType: 'MIDTERM',
+        },
+      },
+    } as never)
+
+    const saved = await rdmService.updateSettings({
+      sumatifTypes: ['DAILY', 'PRACTICAL'],
+      sasType: 'MIDTERM',
+    })
+    expect(rdmApi.updateSettings).toHaveBeenCalledWith({
+      sumatifTypes: ['DAILY', 'PRACTICAL'],
+      sasType: 'MIDTERM',
+    })
+    expect(saved).toEqual({
+      sumatifTypes: ['DAILY', 'PRACTICAL'],
+      sasType: 'MIDTERM',
+    })
+
+    vi.mocked(rdmApi.updateSettings).mockRejectedValueOnce({
+      response: {
+        status: 400,
+        data: {
+          message: 'Pilih minimal satu jenis penilaian untuk Sumatif',
+        },
+      },
+    })
+
+    await expect(
+      rdmService.updateSettings({ sumatifTypes: [], sasType: 'FINAL' }),
+    ).rejects.toThrow('Pilih minimal satu jenis penilaian untuk Sumatif')
   })
 })

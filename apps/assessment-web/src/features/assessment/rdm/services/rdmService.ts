@@ -7,6 +7,7 @@ import type {
   RdmFillResponse,
   RdmImportPreview,
   RdmImportResponse,
+  RdmSetting,
   RdmWorkbookKind,
 } from '../types'
 
@@ -239,6 +240,30 @@ export const rdmService = {
     } catch (err: unknown) {
       throw new Error(
         await extractRdmErrorMessage(err, 'Gagal mengimpor nilai RDM.'),
+        { cause: err },
+      )
+    }
+  },
+
+  getSettings: async (): Promise<RdmSetting> => {
+    try {
+      const res = await rdmApi.getSettings()
+      return res.data.data
+    } catch (err: unknown) {
+      throw new Error(
+        await extractRdmErrorMessage(err, 'Gagal memuat pengaturan RDM.'),
+        { cause: err },
+      )
+    }
+  },
+
+  updateSettings: async (payload: RdmSetting): Promise<RdmSetting> => {
+    try {
+      const res = await rdmApi.updateSettings(payload)
+      return res.data.data
+    } catch (err: unknown) {
+      throw new Error(
+        await extractRdmErrorMessage(err, 'Gagal menyimpan pengaturan RDM.'),
         { cause: err },
       )
     }

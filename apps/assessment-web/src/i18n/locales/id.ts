@@ -16,6 +16,7 @@ export default {
     examScores: 'Nilai Ujian',
     assessmentWeights: 'Bobot Penilaian',
     reportCard: 'Rapor',
+    rdmSettings: 'Pengaturan RDM',
     attendance: 'Presensi',
     attendanceInput: 'Input Presensi',
     attendanceRecap: 'Rekapitulasi',

@@ -16,6 +16,7 @@ export default {
     examScores: 'Exam Scores',
     assessmentWeights: 'Assessment Weights',
     reportCard: 'Report Cards',
+    rdmSettings: 'RDM Settings',
     attendance: 'Attendance',
     attendanceInput: 'Record Attendance',
     attendanceRecap: 'Attendance Summary',
