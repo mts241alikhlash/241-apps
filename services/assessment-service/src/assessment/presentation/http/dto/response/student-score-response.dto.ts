@@ -292,6 +292,12 @@ export class StudentScoreResponseAssessmentItemDto {
   @ApiProperty({ type: Number })
   maxScore!: number
 
+  @ApiProperty({ type: String, nullable: true })
+  material!: string | null
+
+  @ApiProperty({ type: Number, nullable: true })
+  kktp!: number | null
+
   static fromDomain(
     domain: NonNullable<StudentScoreWithDetails['assessmentItem']>,
   ): StudentScoreResponseAssessmentItemDto {
@@ -314,6 +320,8 @@ export class StudentScoreResponseAssessmentItemDto {
     dto.type = domain.type
     dto.weight = domain.weight
     dto.maxScore = domain.maxScore
+    dto.material = domain.material
+    dto.kktp = domain.kktp
     return dto
   }
 }

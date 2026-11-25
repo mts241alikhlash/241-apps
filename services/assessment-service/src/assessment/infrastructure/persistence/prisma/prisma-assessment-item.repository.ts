@@ -156,6 +156,23 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
     return withRefs
   }
 
+  async findNameClash(
+    teachingAssignmentId: string,
+    name: string,
+    exceptId?: string,
+  ): Promise<boolean> {
+    const existing = await this.prisma.assessmentItem.findFirst({
+      where: {
+        teachingAssignmentId,
+        deletedAt: null,
+        name: { equals: name.trim(), mode: 'insensitive' },
+        ...(exceptId && { NOT: { id: exceptId } }),
+      },
+      select: { id: true },
+    })
+    return existing !== null
+  }
+
   async create(dto: CreateAssessmentItemRepositoryInput) {
     const row = await this.prisma.assessmentItem.create({
       data: {
@@ -164,6 +181,8 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
         type: dto.type,
         ...(dto.weight !== undefined && { weight: dto.weight }),
         ...(dto.maxScore !== undefined && { maxScore: dto.maxScore }),
+        ...(dto.material !== undefined && { material: dto.material }),
+        ...(dto.kktp !== undefined && { kktp: dto.kktp }),
       },
       include: ASSESSMENT_ITEM_WITH_DETAILS_INCLUDE,
     })
@@ -175,10 +194,12 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
     const row = await this.prisma.assessmentItem.update({
       where: { id },
       data: {
-        ...(dto.name && { name: dto.name }),
+        ...(dto.name !== undefined && { name: dto.name }),
         ...(dto.type && { type: dto.type }),
         ...(dto.weight !== undefined && { weight: dto.weight }),
         ...(dto.maxScore !== undefined && { maxScore: dto.maxScore }),
+        ...(dto.material !== undefined && { material: dto.material }),
+        ...(dto.kktp !== undefined && { kktp: dto.kktp }),
       },
       include: ASSESSMENT_ITEM_WITH_DETAILS_INCLUDE,
     })

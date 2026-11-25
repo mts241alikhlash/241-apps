@@ -20,6 +20,8 @@ export interface CreateAssessmentItemRepositoryInput {
   type: AssessmentType
   weight?: number
   maxScore?: number
+  material?: string | null
+  kktp?: number | null
 }
 
 export type UpdateAssessmentItemRepositoryInput =
@@ -30,6 +32,11 @@ export abstract class IAssessmentItemRepository {
     query: AssessmentItemQueryInput,
   ): Promise<PaginatedResult<AssessmentItemWithDetails>>
   abstract findById(id: string): Promise<AssessmentItemWithDetails | null>
+  abstract findNameClash(
+    teachingAssignmentId: string,
+    name: string,
+    exceptId?: string,
+  ): Promise<boolean>
   abstract create(
     input: CreateAssessmentItemRepositoryInput,
   ): Promise<AssessmentItemWithDetails>

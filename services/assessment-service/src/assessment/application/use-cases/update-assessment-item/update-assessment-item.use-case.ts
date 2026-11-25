@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import { ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE } from '../../../constants/assessment.constants.js'
 import {
   AssessmentItemWithDetails,
   IAssessmentItemRepository,
@@ -20,11 +25,26 @@ export class UpdateAssessmentItemUseCase {
       throw new NotFoundException('Assessment item not found')
     }
 
+    let name: string | undefined
+    if (input.name !== undefined) {
+      name = input.name.trim()
+      const clash = await this.assessmentItemRepository.findNameClash(
+        item.teachingAssignmentId,
+        name,
+        id,
+      )
+      if (clash) {
+        throw new BadRequestException(ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE)
+      }
+    }
+
     return this.assessmentItemRepository.update(id, {
-      name: input.name,
+      name,
       type: input.type,
       weight: input.weight,
       maxScore: input.maxScore,
+      material: input.material,
+      kktp: input.kktp,
     })
   }
 }

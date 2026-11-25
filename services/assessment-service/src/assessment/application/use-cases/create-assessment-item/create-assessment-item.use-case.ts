@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE } from '../../../constants/assessment.constants.js'
 import {
   AssessmentItemWithDetails,
   IAssessmentItemRepository,
@@ -22,12 +23,24 @@ export class CreateAssessmentItemUseCase {
     if (!exists) {
       throw new BadRequestException('Teaching assignment not found')
     }
+
+    const name = input.name.trim()
+    const clash = await this.assessmentItemRepository.findNameClash(
+      input.teachingAssignmentId,
+      name,
+    )
+    if (clash) {
+      throw new BadRequestException(ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE)
+    }
+
     return this.assessmentItemRepository.create({
       teachingAssignmentId: input.teachingAssignmentId,
-      name: input.name,
+      name,
       type: input.type,
       weight: input.weight,
       maxScore: input.maxScore,
+      material: input.material,
+      kktp: input.kktp,
     })
   }
 }
