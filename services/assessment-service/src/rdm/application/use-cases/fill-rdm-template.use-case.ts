@@ -8,7 +8,10 @@ import { IStudentScoreRepository } from '../../../assessment/domain/repositories
 import { IAcademicLookupPort } from '../../../platform/academic-lookup/academic-lookup.port.js'
 import { IEmployeeIdentityReadPort } from '../../../platform/employee-identity/employee-identity.port.js'
 import { IEnrollmentLookupPort } from '../../../platform/enrollment-lookup/enrollment-lookup.port.js'
-import { RDM_MAX_SUMATIF_SHEETS } from '../../constants/rdm.constants.js'
+import {
+  RDM_COMPONENT_NAME_MAX_LENGTH,
+  RDM_MAX_SUMATIF_SHEETS,
+} from '../../constants/rdm.constants.js'
 import {
   detectRdmKind,
   matchStudents,
@@ -72,7 +75,19 @@ function selectItems(
   }
 
   assertUniqueSelectionNames(selected)
+  assertRdmNameLengths(selected)
   return selected
+}
+
+function assertRdmNameLengths(items: AssessmentItemWithDetails[]): void {
+  const tooLong = items
+    .map((item) => item.name.trim())
+    .filter((name) => name.length > RDM_COMPONENT_NAME_MAX_LENGTH)
+  if (tooLong.length > 0) {
+    throw new BadRequestException(
+      `Nama penilaian untuk RDM maksimal ${RDM_COMPONENT_NAME_MAX_LENGTH} karakter: ${tooLong.join(', ')}`,
+    )
+  }
 }
 
 function assertUniqueSelectionNames(items: AssessmentItemWithDetails[]): void {

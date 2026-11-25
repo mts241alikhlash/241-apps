@@ -571,6 +571,40 @@ describe('FillRdmTemplateUseCase', () => {
     )
   })
 
+  it('refuses names longer than 50 characters because RDM cuts them and duplicates the TP/LM', async () => {
+    const fifty = 'A'.repeat(50)
+    const fiftyOne = `B${'b'.repeat(50)}`
+    items = [
+      makeItem({ id: 'item-1', name: fifty }),
+      makeItem({ id: 'item-2', name: fiftyOne }),
+    ]
+    const template = await buildRdmTemplateFixture('sumatif', [
+      { nis: '1001', nisn: '0011111111', name: 'Ahmad' },
+    ])
+
+    await expect(
+      useCase.execute({
+        userId: USER_ID,
+        teachingAssignmentId: TA_ID,
+        file: template,
+        originalFileName: 'template.xlsx',
+      }),
+    ).rejects.toThrow(
+      new BadRequestException(
+        `Nama penilaian untuk RDM maksimal 50 karakter: ${fiftyOne}`,
+      ),
+    )
+
+    const accepted = await useCase.execute({
+      userId: USER_ID,
+      teachingAssignmentId: TA_ID,
+      file: template,
+      originalFileName: 'template.xlsx',
+      itemIds: ['item-1'],
+    })
+    expect(accepted.summary.sheets).toHaveLength(1)
+  })
+
   it('refuses itemIds outside the teaching assignment or of an incompatible type', async () => {
     items = [
       makeItem({ id: 'item-sas', name: 'UAS', type: AssessmentType.FINAL }),
