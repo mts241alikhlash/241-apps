@@ -36,6 +36,7 @@ describe('GradeAssignedStudentScoresUseCase', () => {
         teachesAssessmentItem: vi
           .fn()
           .mockResolvedValue(options.teaches ?? false),
+        teachesTeachingAssignment: vi.fn().mockResolvedValue(false),
         supervisesEnrollment,
       },
     )

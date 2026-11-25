@@ -4,6 +4,11 @@ export abstract class IGradingScopeReadPort {
     assessmentItemId: string,
   ): Promise<boolean>
 
+  abstract teachesTeachingAssignment(
+    employeeId: string,
+    teachingAssignmentId: string,
+  ): Promise<boolean>
+
   abstract supervisesEnrollment(
     employeeId: string,
     enrollmentId: string,

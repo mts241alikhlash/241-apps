@@ -3064,6 +3064,14 @@
           "maxScore": {
             "type": "number"
           },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
+          },
           "gradedCount": {
             "type": "number"
           },
@@ -3077,7 +3085,9 @@
           "name",
           "type",
           "weight",
-          "maxScore"
+          "maxScore",
+          "material",
+          "kktp"
         ]
       },
       "AssessmentItemListResponseDto": {
@@ -3137,6 +3147,17 @@
             "minimum": 1,
             "maximum": 100,
             "default": 100
+          },
+          "material": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 100
           }
         },
         "required": [
@@ -3169,6 +3190,17 @@
           "maxScore": {
             "type": "number",
             "minimum": 1,
+            "maximum": 100
+          },
+          "material": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
             "maximum": 100
           }
         }
@@ -3431,6 +3463,14 @@
           },
           "maxScore": {
             "type": "number"
+          },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
           }
         },
         "required": [
@@ -3439,7 +3479,9 @@
           "name",
           "type",
           "weight",
-          "maxScore"
+          "maxScore",
+          "material",
+          "kktp"
         ]
       },
       "StudentScoreResponseEnrollmentStudentUserProfileDto": {

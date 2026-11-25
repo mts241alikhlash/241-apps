@@ -24,8 +24,15 @@ export class PrismaGradingScopeReadPort extends IGradingScopeReadPort {
     })
     if (!item) return false
 
+    return this.teachesTeachingAssignment(employeeId, item.teachingAssignmentId)
+  }
+
+  async teachesTeachingAssignment(
+    employeeId: string,
+    teachingAssignmentId: string,
+  ): Promise<boolean> {
     return this.academicLookup.teachingAssignmentBelongsTo(
-      item.teachingAssignmentId,
+      teachingAssignmentId,
       employeeId,
     )
   }

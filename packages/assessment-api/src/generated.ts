@@ -556,6 +556,8 @@ export interface components {
             _count?: components["schemas"]["AssessmentItemResponseCountDto"];
             gradedCount?: number;
             id: string;
+            kktp: number | null;
+            material: string | null;
             maxScore: number;
             name: string;
             studentCount?: number;
@@ -763,6 +765,8 @@ export interface components {
             records: components["schemas"]["BulkStudentScoreRecordDto"][];
         };
         CreateAssessmentItemDto: {
+            kktp?: number | null;
+            material?: string | null;
             /** @default 100 */
             maxScore: number;
             name: string;
@@ -1236,6 +1240,8 @@ export interface components {
         StudentScoreResponseAssessmentItemDto: {
             _count?: components["schemas"]["StudentScoreResponseAssessmentItemCountDto"];
             id: string;
+            kktp: number | null;
+            material: string | null;
             maxScore: number;
             name: string;
             teachingAssignment?: components["schemas"]["StudentScoreResponseAssessmentItemTeachingAssignmentDto"];
@@ -1341,6 +1347,8 @@ export interface components {
             studentName: string;
         };
         UpdateAssessmentItemDto: {
+            kktp?: number | null;
+            material?: string | null;
             maxScore?: number;
             name?: string;
             /** @enum {string} */

@@ -15,6 +15,7 @@ function enrollment(id: string, userId: string | null) {
     status: 'ACTIVE',
     studentUserId: userId,
     studentNis: null,
+    studentNisn: null,
     studentName: null,
   }
 }

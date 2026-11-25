@@ -900,7 +900,7 @@ export interface components {
             /** @description Resolved from identity-service by this service, not joined. */
             studentName: Record<string, never> | null;
             studentNis: Record<string, never> | null;
-            studentNisn?: Record<string, never> | null;
+            studentNisn: Record<string, never> | null;
             /** @description The account behind the student, for callers resolving a name */
             studentUserId: Record<string, never> | null;
         };

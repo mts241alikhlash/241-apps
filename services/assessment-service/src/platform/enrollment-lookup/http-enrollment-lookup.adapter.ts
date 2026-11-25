@@ -130,6 +130,9 @@ function isSummary(row: unknown): row is EnrollmentSummary {
     typeof r.id === 'string' &&
     typeof r.studentId === 'string' &&
     typeof r.classroomId === 'string' &&
-    typeof r.semesterId === 'string'
+    typeof r.semesterId === 'string' &&
+    (r.studentNisn === undefined ||
+      r.studentNisn === null ||
+      typeof r.studentNisn === 'string')
   )
 }
