@@ -2,6 +2,7 @@ import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 import type {
   BulkStudentScoreRecord,
+  ItemEnrollmentScore,
   StudentScoreRosterItem,
 } from '../../../domain/repositories/student-score.repository.js'
 
@@ -78,4 +79,24 @@ export async function upsertScores(
     ),
   )
   return { saved: results.length }
+}
+
+export async function findScoresForItems(
+  prisma: PrismaService,
+  assessmentItemIds: string[],
+  enrollmentIds: string[],
+): Promise<ItemEnrollmentScore[]> {
+  if (assessmentItemIds.length === 0 || enrollmentIds.length === 0) return []
+  return prisma.studentScore.findMany({
+    where: {
+      assessmentItemId: { in: assessmentItemIds },
+      enrollmentId: { in: enrollmentIds },
+      deletedAt: null,
+    },
+    select: {
+      assessmentItemId: true,
+      enrollmentId: true,
+      score: true,
+    },
+  })
 }

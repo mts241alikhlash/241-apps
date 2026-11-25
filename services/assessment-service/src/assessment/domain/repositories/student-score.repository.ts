@@ -78,6 +78,12 @@ export interface BulkUpsertResult {
   saved: number
 }
 
+export interface ItemEnrollmentScore {
+  assessmentItemId: string
+  enrollmentId: string
+  score: number | null
+}
+
 export abstract class IStudentScoreRepository {
   abstract findAll(
     query: StudentScoreQueryInput,
@@ -120,6 +126,10 @@ export abstract class IStudentScoreRepository {
     classroomId?: string,
     semesterId?: string,
   ): Promise<StudentScoreRosterItem[]>
+  abstract findScoresForItems(
+    assessmentItemIds: string[],
+    enrollmentIds: string[],
+  ): Promise<ItemEnrollmentScore[]>
   abstract findAllForReportCard(
     enrollmentId: string,
   ): Promise<ReportCardScoreRow[]>

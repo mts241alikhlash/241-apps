@@ -41,6 +41,40 @@ export interface paths {
         patch: operations["AssessmentItemController_update"];
         trace?: never;
     };
+    "/assessment-items/rdm/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List assessment items offered for RDM sumatif and SAS templates */
+        get: operations["RdmController_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/fill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fill an RDM Excel template with assessment items and scores */
+        post: operations["RdmController_fill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/assessment-settings/rdm": {
         parameters: {
             query?: never;
@@ -1041,6 +1075,44 @@ export interface components {
             latestScores: components["schemas"]["DashboardScoreResponseDto"][];
             todayLessons: components["schemas"]["DashboardLessonResponseDto"][];
         };
+        RdmCandidateItemDto: {
+            id: string;
+            kktp: number | null;
+            material: string | null;
+            maxScore: number;
+            name: string;
+            /** @enum {string} */
+            type: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+        };
+        RdmCandidatesResponseDto: {
+            sas: components["schemas"]["RdmCandidateItemDto"][];
+            sumatif: components["schemas"]["RdmCandidateItemDto"][];
+        };
+        RdmFillResponseDto: {
+            fileBase64: string;
+            fileName: string;
+            summary: components["schemas"]["RdmFillSummaryDto"];
+        };
+        RdmFillSheetSummaryDto: {
+            itemId: string;
+            itemName: string;
+            sheetName: string;
+            written: number;
+        };
+        RdmFillSummaryDto: {
+            ambiguousRows: number[];
+            classSubjectWarning: string | null;
+            itemsNotSent: components["schemas"]["RdmItemRefDto"][];
+            /** @enum {string} */
+            kind: "sumatif" | "sas";
+            missingStudents: string[];
+            sheets: components["schemas"]["RdmFillSheetSummaryDto"][];
+            unmatchedRows: number[];
+        };
+        RdmItemRefDto: {
+            id: string;
+            name: string;
+        };
         RdmSettingResponseDto: {
             /** @enum {string} */
             sasType: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
@@ -1543,6 +1615,68 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AssessmentItemResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_candidates: {
+        parameters: {
+            query: {
+                teachingAssignmentId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmCandidatesResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_fill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    itemIds?: string[];
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmFillResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

@@ -146,6 +146,17 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
     return { data: await this.decorate(rows), total, page, limit }
   }
 
+  async findAllByTeachingAssignment(
+    teachingAssignmentId: string,
+  ): Promise<AssessmentItemWithDetails[]> {
+    const rows = await this.prisma.assessmentItem.findMany({
+      where: { teachingAssignmentId, deletedAt: null },
+      include: ASSESSMENT_ITEM_WITH_DETAILS_INCLUDE,
+      orderBy: { name: 'asc' },
+    })
+    return this.decorate(rows)
+  }
+
   async findById(id: string) {
     const row = await this.prisma.assessmentItem.findFirst({
       where: { id, deletedAt: null },

@@ -31,6 +31,9 @@ export abstract class IAssessmentItemRepository {
   abstract findAll(
     query: AssessmentItemQueryInput,
   ): Promise<PaginatedResult<AssessmentItemWithDetails>>
+  abstract findAllByTeachingAssignment(
+    teachingAssignmentId: string,
+  ): Promise<AssessmentItemWithDetails[]>
   abstract findById(id: string): Promise<AssessmentItemWithDetails | null>
   abstract findNameClash(
     teachingAssignmentId: string,

@@ -63,6 +63,7 @@ const SERVICE_BY_PREFIX: Record<string, string> = {
   '/positions': 'hr',
 
   '/assessment-items': 'assessment',
+  '/assessment-settings': 'assessment',
   '/assessment-weights': 'assessment',
   '/attendances': 'assessment',
   '/dashboards': 'assessment',

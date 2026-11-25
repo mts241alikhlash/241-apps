@@ -2858,6 +2858,127 @@
         ]
       }
     },
+    "/assessment-items/rdm/candidates": {
+      "get": {
+        "operationId": "RdmController_candidates",
+        "parameters": [
+          {
+            "name": "teachingAssignmentId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmCandidatesResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List assessment items offered for RDM sumatif and SAS templates",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/fill": {
+      "post": {
+        "operationId": "RdmController_fill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "itemIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmFillResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fill an RDM Excel template with assessment items and scores",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
     "/assessment-settings/rdm": {
       "get": {
         "operationId": "RdmSettingController_get",
@@ -5882,6 +6003,179 @@
           "scoreCompleteness",
           "attendanceToday",
           "examScores"
+        ]
+      },
+      "RdmCandidateItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number"
+          },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "maxScore",
+          "material",
+          "kktp"
+        ]
+      },
+      "RdmCandidatesResponseDto": {
+        "type": "object",
+        "properties": {
+          "sumatif": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmCandidateItemDto"
+            }
+          },
+          "sas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmCandidateItemDto"
+            }
+          }
+        },
+        "required": [
+          "sumatif",
+          "sas"
+        ]
+      },
+      "RdmFillSheetSummaryDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "itemName": {
+            "type": "string"
+          },
+          "written": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "itemId",
+          "itemName",
+          "written"
+        ]
+      },
+      "RdmItemRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "RdmFillSummaryDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "sumatif",
+              "sas"
+            ],
+            "type": "string"
+          },
+          "classSubjectWarning": {
+            "type": "string",
+            "nullable": true
+          },
+          "sheets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmFillSheetSummaryDto"
+            }
+          },
+          "unmatchedRows": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "ambiguousRows": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "missingStudents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "itemsNotSent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmItemRefDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "classSubjectWarning",
+          "sheets",
+          "unmatchedRows",
+          "ambiguousRows",
+          "missingStudents",
+          "itemsNotSent"
+        ]
+      },
+      "RdmFillResponseDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "fileBase64": {
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/RdmFillSummaryDto"
+          }
+        },
+        "required": [
+          "fileName",
+          "fileBase64",
+          "summary"
         ]
       },
       "RdmSettingResponseDto": {

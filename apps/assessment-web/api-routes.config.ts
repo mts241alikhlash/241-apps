@@ -14,6 +14,7 @@ export const SERVICE_PREFIXES = {
 
   assessment: [
     '/assessment-items',
+    '/assessment-settings',
     '/assessment-weights',
     '/attendances',
     '/dashboards',

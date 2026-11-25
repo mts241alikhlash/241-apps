@@ -74,6 +74,7 @@ import { EmployeeIdentityModule } from '../platform/employee-identity/employee-i
     IAssessmentItemRepository,
     IAssessmentWeightRepository,
     IStudentScoreRepository,
+    IGradingScopeReadPort,
   ],
 })
 export class AssessmentModule {}
