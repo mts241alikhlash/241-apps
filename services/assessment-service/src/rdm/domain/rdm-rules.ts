@@ -115,6 +115,19 @@ function lookupStudent(
     : { status: 'absent' }
 }
 
+function resolveRow(byNis: KeyLookup, byNisn: KeyLookup): KeyLookup {
+  if (byNis.status === 'ambiguous' || byNisn.status === 'ambiguous') {
+    return { status: 'ambiguous' }
+  }
+  if (byNis.status === 'matched' && byNisn.status === 'matched') {
+    return byNis.enrollmentId === byNisn.enrollmentId
+      ? byNis
+      : { status: 'ambiguous' }
+  }
+  if (byNis.status === 'matched') return byNis
+  return byNisn
+}
+
 export function matchStudents(
   rows: StudentMatchRow[],
   roster: RosterStudent[],
@@ -124,29 +137,34 @@ export function matchStudents(
 
   const matched = new Map<number, string>()
   const unmatchedRows: number[] = []
-  const ambiguousRows: number[] = []
+  const ambiguous = new Set<number>()
+  const firstRowByEnrollment = new Map<string, number>()
 
   for (const entry of rows) {
-    const nisResult = lookupStudent(byNis, entry.nis)
-    if (nisResult.status === 'matched') {
-      matched.set(entry.row, nisResult.enrollmentId)
-      continue
-    }
-    if (nisResult.status === 'ambiguous') {
-      ambiguousRows.push(entry.row)
-      continue
-    }
-
-    const nisnResult = lookupStudent(byNisn, entry.nisn)
-    if (nisnResult.status === 'matched') {
-      matched.set(entry.row, nisnResult.enrollmentId)
-    } else if (nisnResult.status === 'ambiguous') {
-      ambiguousRows.push(entry.row)
-    } else {
+    const resolved = resolveRow(
+      lookupStudent(byNis, entry.nis),
+      lookupStudent(byNisn, entry.nisn),
+    )
+    if (resolved.status === 'absent') {
       unmatchedRows.push(entry.row)
+      continue
     }
+    if (resolved.status === 'ambiguous') {
+      ambiguous.add(entry.row)
+      continue
+    }
+    const firstRow = firstRowByEnrollment.get(resolved.enrollmentId)
+    if (firstRow === undefined) {
+      firstRowByEnrollment.set(resolved.enrollmentId, entry.row)
+      matched.set(entry.row, resolved.enrollmentId)
+      continue
+    }
+    matched.delete(firstRow)
+    ambiguous.add(firstRow)
+    ambiguous.add(entry.row)
   }
 
+  const ambiguousRows = [...ambiguous].sort((a, b) => a - b)
   const matchedEnrollmentIds = new Set(matched.values())
   const missing = roster.filter(
     (student) => !matchedEnrollmentIds.has(student.enrollmentId),

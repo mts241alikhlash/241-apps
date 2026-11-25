@@ -173,6 +173,54 @@ describe('matchStudents', () => {
     expect(result.ambiguousRows).toEqual([7, 8])
     expect(result.missing).toEqual(duplicated)
   })
+
+  it('reports a row whose NIS and NISN point to different students as ambiguous', () => {
+    const result = matchStudents(
+      [
+        { row: 7, nis: '260001', nisn: '0143909889' },
+        { row: 8, nis: '260002', nisn: '0143909889' },
+        { row: 9, nis: '260001', nisn: '9999999999' },
+      ],
+      roster,
+    )
+
+    expect(result.ambiguousRows).toEqual([7])
+    expect(result.matched.get(8)).toBe('enr-2')
+    expect(result.matched.get(9)).toBe('enr-1')
+    expect(result.matched.has(7)).toBe(false)
+  })
+
+  it('reports a row as ambiguous when its NIS matches but its NISN is shared', () => {
+    const shared: RosterStudent[] = [
+      { enrollmentId: 'enr-1', nis: '260001', nisn: '0100000009', name: 'A' },
+      { enrollmentId: 'enr-2', nis: '260002', nisn: '0100000009', name: 'B' },
+    ]
+
+    const result = matchStudents(
+      [{ row: 7, nis: '260001', nisn: '0100000009' }],
+      shared,
+    )
+
+    expect(result.ambiguousRows).toEqual([7])
+    expect(result.matched.size).toBe(0)
+  })
+
+  it('reports every row that resolves to an already matched student as ambiguous', () => {
+    const result = matchStudents(
+      [
+        { row: 7, nis: '260001', nisn: '' },
+        { row: 8, nis: '', nisn: '0143909888' },
+        { row: 9, nis: '260002', nisn: '' },
+      ],
+      roster,
+    )
+
+    expect(result.ambiguousRows).toEqual([7, 8])
+    expect(result.matched.has(7)).toBe(false)
+    expect(result.matched.has(8)).toBe(false)
+    expect(result.matched.get(9)).toBe('enr-2')
+    expect(result.missing).toEqual([roster[0], roster[2], roster[3]])
+  })
 })
 
 describe('sameName', () => {
