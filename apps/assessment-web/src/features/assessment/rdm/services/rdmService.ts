@@ -11,6 +11,10 @@ import type {
   RdmWorkbookKind,
 } from '../types'
 
+export class RdmRequestError extends Error {
+  override name = 'RdmRequestError'
+}
+
 const XLSX_MIME =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -113,11 +117,8 @@ export async function extractRdmErrorMessage(
     if (message) return message
   }
 
-  if (!response && err instanceof Error) {
-    const trimmed = err.message.trim()
-    if (trimmed && trimmed !== 'Network Error') {
-      return trimmed
-    }
+  if (err instanceof RdmRequestError) {
+    return err.message
   }
 
   return getIndonesianErrorMessage(err, fallback)
@@ -131,7 +132,7 @@ export const rdmService = {
       const res = await rdmApi.getCandidates(teachingAssignmentId)
       return res.data.data
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal memuat daftar penilaian RDM.'),
         { cause: err },
       )
@@ -165,7 +166,9 @@ export const rdmService = {
       if (itemsNotIncluded > 0) {
         toast.success('Template berhasil diunduh.', { id: toastId })
         toast.warning(
-          `${itemsNotIncluded} penilaian tidak disertakan karena batas 15 penilaian per file RDM.`,
+          kind === 'sas'
+            ? `${itemsNotIncluded} penilaian tidak disertakan karena template SAS hanya memuat 1 penilaian.`
+            : `${itemsNotIncluded} penilaian tidak disertakan karena batas 15 penilaian per file RDM.`,
         )
       } else {
         toast.success('Template berhasil diunduh.', { id: toastId })
@@ -178,7 +181,7 @@ export const rdmService = {
         'Gagal mengunduh template RDM.',
       )
       toast.error(message, { id: toastId })
-      throw new Error(message, { cause: err })
+      throw new RdmRequestError(message, { cause: err })
     }
   },
 
@@ -200,7 +203,7 @@ export const rdmService = {
       saveBase64Xlsx(result.fileBase64, result.fileName)
       return result
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal mengisi template RDM.'),
         { cause: err },
       )
@@ -219,7 +222,7 @@ export const rdmService = {
       const res = await rdmApi.previewImport(formData)
       return res.data.data
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal mempratinjau file impor RDM.'),
         { cause: err },
       )
@@ -238,7 +241,7 @@ export const rdmService = {
       const res = await rdmApi.confirmImport(formData)
       return res.data.data
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal mengimpor nilai RDM.'),
         { cause: err },
       )
@@ -250,7 +253,7 @@ export const rdmService = {
       const res = await rdmApi.getSettings()
       return res.data.data
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal memuat pengaturan RDM.'),
         { cause: err },
       )
@@ -262,7 +265,7 @@ export const rdmService = {
       const res = await rdmApi.updateSettings(payload)
       return res.data.data
     } catch (err: unknown) {
-      throw new Error(
+      throw new RdmRequestError(
         await extractRdmErrorMessage(err, 'Gagal menyimpan pengaturan RDM.'),
         { cause: err },
       )

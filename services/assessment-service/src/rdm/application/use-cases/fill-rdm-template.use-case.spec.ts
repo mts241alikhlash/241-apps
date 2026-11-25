@@ -368,6 +368,28 @@ describe('FillRdmTemplateUseCase', () => {
     )
   })
 
+  it('refuses a sumatif fill when no item can be sent instead of returning an untouched file', async () => {
+    items = [
+      makeItem({ id: 'final-1', name: 'UAS', type: AssessmentType.FINAL }),
+    ]
+    const template = await buildRdmTemplateFixture('sumatif', [
+      { nis: '1001', nisn: '0011111111', name: 'Ahmad' },
+    ])
+
+    await expect(
+      useCase.execute({
+        userId: USER_ID,
+        teachingAssignmentId: TA_ID,
+        file: template,
+        originalFileName: 'sumatif.xlsx',
+      }),
+    ).rejects.toThrow(
+      new BadRequestException(
+        'Tidak ada penilaian yang dapat dikirim ke template Sumatif ini',
+      ),
+    )
+  })
+
   it('refuses SAS with zero or multiple SAS-type items', async () => {
     items = [
       makeItem({ id: 'item-1', name: 'UH 1', type: AssessmentType.DAILY }),

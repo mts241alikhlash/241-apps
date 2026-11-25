@@ -136,6 +136,43 @@ describe('RdmFillDialog', () => {
     wrapper.unmount()
   })
 
+  it('keeps the fill button disabled while candidates load and when nothing can be sent', async () => {
+    interface Candidates {
+      sumatif: RdmCandidateItem[]
+      sas: RdmCandidateItem[]
+    }
+    const resolvers: ((value: Candidates) => void)[] = []
+    vi.mocked(rdmService.getCandidates).mockReturnValueOnce(
+      new Promise<Candidates>((resolve) => {
+        resolvers.push(resolve)
+      }),
+    )
+
+    const wrapper = mount(RdmFillDialog, {
+      props: { open: true, teachingAssignmentId: 'ta-1' },
+      attachTo: document.body,
+    })
+    await flushPromises()
+    selectFileOnInput(new File(['tpl'], 'Template Nilai Sumatif-7A.xlsx'))
+    await flushPromises()
+
+    const submitButton = () =>
+      Array.from(
+        document.body.querySelectorAll<HTMLButtonElement>('button'),
+      ).find((btn) => btn.textContent?.includes('Isi Template'))
+    expect(submitButton()?.disabled).toBe(true)
+
+    resolvers[0]?.({ sumatif: [], sas: [] })
+    await flushPromises()
+    expect(submitButton()?.disabled).toBe(true)
+
+    submitButton()?.click()
+    await flushPromises()
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
   it('blocks selecting more than 15 items with the brief message', async () => {
     const sixteen = Array.from({ length: 16 }, (_, i) => makeCandidate(i + 1))
     vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({

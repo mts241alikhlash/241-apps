@@ -68,6 +68,10 @@ function selectItems(
     if (selected.length !== 1) {
       throw buildSasCountError(sasType, selected)
     }
+  } else if (selected.length === 0) {
+    throw new BadRequestException(
+      'Tidak ada penilaian yang dapat dikirim ke template Sumatif ini',
+    )
   } else if (selected.length > RDM_MAX_SUMATIF_SHEETS) {
     throw new BadRequestException(
       `Maksimal ${RDM_MAX_SUMATIF_SHEETS} penilaian per file RDM`,

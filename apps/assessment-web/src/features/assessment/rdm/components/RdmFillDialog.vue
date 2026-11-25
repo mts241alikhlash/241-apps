@@ -59,15 +59,17 @@ watch(
 )
 
 const canSubmit = computed(() => {
-  if (!fill.selectedFile.value || fill.isSubmitting.value) return false
   if (
-    fill.templateKind.value === 'sumatif' &&
-    fill.sumatifCandidates.value.length > 0 &&
-    fill.selectedIds.value.length === 0
+    !fill.selectedFile.value ||
+    fill.isSubmitting.value ||
+    fill.loadingCandidates.value
   ) {
     return false
   }
-  return true
+  if (fill.templateKind.value === 'sas') {
+    return fill.sasCandidates.value.length === 1
+  }
+  return fill.selectedIds.value.length > 0
 })
 
 function handleFileChange(event: Event) {

@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'vue-sonner'
 import { rdmApi } from '../api/rdmApi'
-import { rdmService } from './rdmService'
+import { RdmRequestError, rdmService } from './rdmService'
 
 vi.mock('../api/rdmApi', () => ({
   rdmApi: {
@@ -124,6 +124,30 @@ describe('rdmService', () => {
     expect(result.itemsNotIncluded).toBe(3)
     expect(createdAnchors[0]?.download).toBe('Nilai Sumatif-7A-MTK.xlsx')
     expect(toast.warning).toHaveBeenCalledWith(expect.stringContaining('3'))
+  })
+
+  it('explains omitted SAS items with the one-item SAS limit, not the 15-item limit', async () => {
+    vi.mocked(rdmApi.downloadWorkbook).mockResolvedValueOnce({
+      data: new Blob(['xlsx'], { type: XLSX_MIME }),
+      headers: { 'x-rdm-items-not-included': '1' },
+    } as never)
+
+    await rdmService.downloadWorkbook('ta-1', 'sas')
+
+    expect(toast.warning).toHaveBeenCalledWith(
+      '1 penilaian tidak disertakan karena template SAS hanya memuat 1 penilaian.',
+    )
+  })
+
+  it('shows an Indonesian fallback for errors without an HTTP response', async () => {
+    vi.mocked(rdmApi.getCandidates).mockRejectedValueOnce(
+      new Error('timeout of 30000ms exceeded'),
+    )
+
+    const failure = rdmService.getCandidates('ta-1')
+
+    await expect(failure).rejects.toBeInstanceOf(RdmRequestError)
+    await expect(failure).rejects.not.toThrow('timeout of 30000ms exceeded')
   })
 
   it('surfaces verbatim Indonesian 400/403 API error messages including blob errors', async () => {
