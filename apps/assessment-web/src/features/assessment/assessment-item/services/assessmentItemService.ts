@@ -9,6 +9,26 @@ import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/err
 import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
 import { toast } from 'vue-sonner'
 
+const NAME_FIELD_ERRORS = new Set([
+  'Nama penilaian sudah dipakai di kelas dan mapel ini',
+  'Nama penilaian wajib diisi',
+])
+
+function extractNameFieldError(err: unknown): string | null {
+  const raw = (err as { response?: { data?: { message?: string | string[] } } })
+    ?.response?.data?.message
+  const messages = Array.isArray(raw)
+    ? raw
+    : typeof raw === 'string'
+      ? [raw]
+      : []
+  for (const msg of messages) {
+    const trimmed = msg.trim()
+    if (NAME_FIELD_ERRORS.has(trimmed)) return trimmed
+  }
+  return null
+}
+
 export const assessmentItemService = {
   fetchAssignmentsForSemester: async (semesterId: string | null) => {
     const store = useAssessmentItemStore()
@@ -187,8 +207,17 @@ export const assessmentItemService = {
       }
       return { success: true }
     } catch (err: unknown) {
+      const nameError = extractNameFieldError(err)
+      if (nameError) {
+        store.formError = null
+        return {
+          success: false as const,
+          error: nameError,
+          fieldErrors: { name: nameError },
+        }
+      }
       store.formError = getIndonesianErrorMessage(err, 'Gagal menyimpan tugas.')
-      return { success: false, error: store.formError }
+      return { success: false as const, error: store.formError }
     } finally {
       store.isSaving = false
     }
