@@ -41,6 +41,24 @@ export interface paths {
         patch: operations["AssessmentItemController_update"];
         trace?: never;
     };
+    "/assessment-settings/rdm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get school-wide RDM settings */
+        get: operations["RdmSettingController_get"];
+        /** Replace school-wide RDM settings */
+        put: operations["RdmSettingController_replace"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/assessment-weights": {
         parameters: {
             query?: never;
@@ -1023,6 +1041,11 @@ export interface components {
             latestScores: components["schemas"]["DashboardScoreResponseDto"][];
             todayLessons: components["schemas"]["DashboardLessonResponseDto"][];
         };
+        RdmSettingResponseDto: {
+            /** @enum {string} */
+            sasType: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+            sumatifTypes: ("DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL")[];
+        };
         ReceiveExamScoreDto: {
             /** Format: uuid */
             classroomId: string;
@@ -1056,6 +1079,15 @@ export interface components {
             teachingAssignmentId: string;
             /** @description The complete set. Types left out contribute nothing. The listed weights must total 100. */
             weights: components["schemas"]["AssessmentWeightRecordDto"][];
+        };
+        ReplaceRdmSettingDto: {
+            /**
+             * @description Assessment type mapped to the RDM SAS sheet
+             * @enum {string}
+             */
+            sasType: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+            /** @description Assessment types mapped to RDM Sumatif sheets */
+            sumatifTypes: ("DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL")[];
         };
         ReportCardAverageDto: {
             enrollmentId: string;
@@ -1511,6 +1543,60 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AssessmentItemResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmSettingController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmSettingResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmSettingController_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceRdmSettingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmSettingResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

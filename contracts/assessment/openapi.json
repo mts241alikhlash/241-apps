@@ -2857,6 +2857,94 @@
           "Dashboards"
         ]
       }
+    },
+    "/assessment-settings/rdm": {
+      "get": {
+        "operationId": "RdmSettingController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmSettingResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get school-wide RDM settings",
+        "tags": [
+          "RDM Settings"
+        ]
+      },
+      "put": {
+        "operationId": "RdmSettingController_replace",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceRdmSettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmSettingResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace school-wide RDM settings",
+        "tags": [
+          "RDM Settings"
+        ]
+      }
     }
   },
   "info": {
@@ -5794,6 +5882,72 @@
           "scoreCompleteness",
           "attendanceToday",
           "examScores"
+        ]
+      },
+      "RdmSettingResponseDto": {
+        "type": "object",
+        "properties": {
+          "sumatifTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DAILY",
+                "MIDTERM",
+                "FINAL",
+                "ASSIGNMENT",
+                "PRACTICAL"
+              ]
+            }
+          },
+          "sasType": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "sumatifTypes",
+          "sasType"
+        ]
+      },
+      "ReplaceRdmSettingDto": {
+        "type": "object",
+        "properties": {
+          "sumatifTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DAILY",
+                "MIDTERM",
+                "FINAL",
+                "ASSIGNMENT",
+                "PRACTICAL"
+              ]
+            },
+            "description": "Assessment types mapped to RDM Sumatif sheets"
+          },
+          "sasType": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string",
+            "description": "Assessment type mapped to the RDM SAS sheet"
+          }
+        },
+        "required": [
+          "sumatifTypes",
+          "sasType"
         ]
       }
     }

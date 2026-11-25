@@ -294,6 +294,22 @@ describe('default roles', () => {
     expect(operationalExam).toEqual([])
   })
 
+  it('grants RDM settings and bridge permissions to assessment admins and teachers appropriately', () => {
+    for (const role of ['ACADEMIC_ADMIN', 'OPERATOR']) {
+      expect(codesOf(role)).toContain('assessment-settings.read')
+      expect(codesOf(role)).toContain('assessment-settings.update')
+      expect(codesOf(role)).toContain('assessment-items.rdm')
+    }
+
+    expect(codesOf('TEACHER')).toContain('assessment-items.rdm')
+    expect(codesOf('TEACHER')).not.toContain('assessment-settings.read')
+    expect(codesOf('TEACHER')).not.toContain('assessment-settings.update')
+
+    expect(codesOf('PRINCIPAL')).toContain('assessment-settings.read')
+    expect(codesOf('PRINCIPAL')).not.toContain('assessment-settings.update')
+    expect(codesOf('PRINCIPAL')).not.toContain('assessment-items.rdm')
+  })
+
   describe('exam questions', () => {
     const teacherCodes = ['read', 'create', 'update', 'delete'].map(
       (action) => `exam-questions.${action}`,
