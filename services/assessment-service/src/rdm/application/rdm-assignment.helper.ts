@@ -55,12 +55,14 @@ export async function loadRoster(
     classroomId,
     semesterId,
   })
-  return enrollments.map((enrollment) => ({
-    enrollmentId: enrollment.id,
-    nis: enrollment.studentNis,
-    nisn: enrollment.studentNisn,
-    name: enrollment.studentName ?? '',
-  }))
+  return enrollments
+    .filter((enrollment) => enrollment.status === 'ACTIVE')
+    .map((enrollment) => ({
+      enrollmentId: enrollment.id,
+      nis: enrollment.studentNis,
+      nisn: enrollment.studentNisn,
+      name: enrollment.studentName ?? '',
+    }))
 }
 
 export async function loadScoresByItem(

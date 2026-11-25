@@ -4,11 +4,23 @@ import { AssessmentType } from '@mts241alikhlash/nest-core/domain'
 import { PrismaService } from '../../core/database/prisma.service.js'
 import { PrismaRdmImportRepository } from './prisma-rdm-import.repository.js'
 
-const enabled =
-  process.env.ASSESSMENT_DB_TESTS === '1' || process.env.EXAM_DB_TESTS === '1'
-const suite = enabled ? describe : describe.skip
+const suite = process.env.ASSESSMENT_DB_TESTS === '1' ? describe : describe.skip
+
+function databaseName(url: string | undefined): string {
+  if (!url) return ''
+  return new URL(url).pathname.replace(/^\//, '')
+}
 
 suite('PrismaRdmImportRepository against a real database', () => {
+  beforeAll(() => {
+    const name = databaseName(process.env.DATABASE_URL)
+    if (!name || name === 'assessment') {
+      throw new Error(
+        'Set ASSESSMENT_TEST_DATABASE_URL to a throwaway database; refusing to run against the development database',
+      )
+    }
+  })
+
   const prisma = new PrismaService({
     get: (key: string) => process.env[key],
   } as unknown as ConfigService)

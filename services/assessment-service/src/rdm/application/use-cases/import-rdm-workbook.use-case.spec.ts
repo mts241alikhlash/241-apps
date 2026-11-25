@@ -451,6 +451,76 @@ describe('ImportRdmWorkbookUseCase', () => {
     )
   })
 
+  it('refuses creating a SAS item whose name is already used by another item', async () => {
+    items = [
+      makeItem({
+        id: 'daily-1',
+        name: 'SAS Ganjil',
+        type: AssessmentType.DAILY,
+      }),
+    ]
+    const sasFile = await buildRdmWorkbook({
+      kind: 'sas',
+      classSubject: 'IX.A/Informatika',
+      students: [{ nis: '1001', nisn: '0011111111', name: 'Ahmad' }],
+      sheets: [
+        {
+          name: ' sas ganjil ',
+          material: null,
+          kktp: null,
+          scores: new Map([[0, 92]]),
+        },
+      ],
+    })
+
+    await expect(
+      useCase.preview({
+        userId: USER_ID,
+        teachingAssignmentId: TA_ID,
+        file: sasFile,
+      }),
+    ).rejects.toThrow(
+      new BadRequestException(
+        'Nama penilaian sudah dipakai di kelas dan mapel ini',
+      ),
+    )
+  })
+
+  it('leaves students whose enrollment is not active unmatched', async () => {
+    enrollments.push({
+      ...makeEnrollment('e-4', '1004', '0044444444', 'Dodi'),
+      status: 'TRANSFERRED',
+    })
+    const file = await buildRdmWorkbook({
+      kind: 'sumatif',
+      classSubject: 'IX.A/Informatika',
+      students: [
+        { nis: '1001', nisn: '0011111111', name: 'Ahmad' },
+        { nis: '1004', nisn: '0044444444', name: 'Dodi' },
+      ],
+      sheets: [
+        {
+          name: 'PH 1',
+          material: null,
+          kktp: null,
+          scores: new Map([
+            [0, 80],
+            [1, 90],
+          ]),
+        },
+      ],
+    })
+
+    const preview = await useCase.preview({
+      userId: USER_ID,
+      teachingAssignmentId: TA_ID,
+      file,
+    })
+
+    expect(preview.sheets[0]?.scoresToWrite).toBe(1)
+    expect(preview.unmatchedRows).toHaveLength(1)
+  })
+
   it('refuses two sheets with the same B2 naming both sheets', async () => {
     const file = await buildRdmWorkbook({
       kind: 'sumatif',

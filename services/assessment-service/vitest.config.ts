@@ -1,13 +1,16 @@
 import { nest } from '@mts241alikhlash/vitest-config'
 import { defineConfig, mergeConfig } from 'vitest/config'
 
+const testDatabaseUrl =
+  process.env.ASSESSMENT_DB_TESTS === '1'
+    ? process.env.ASSESSMENT_TEST_DATABASE_URL
+    : undefined
+
 export default mergeConfig(
   nest(),
   defineConfig({
     test: {
-      env: process.env.DATABASE_URL
-        ? { DATABASE_URL: process.env.DATABASE_URL }
-        : undefined,
+      env: testDatabaseUrl ? { DATABASE_URL: testDatabaseUrl } : undefined,
     },
   }),
 )

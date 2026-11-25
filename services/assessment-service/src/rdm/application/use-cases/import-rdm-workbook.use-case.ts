@@ -157,7 +157,14 @@ export class ImportRdmWorkbookUseCase {
     const matchedBySheet = new Map<string, AssessmentItemWithDetails | null>()
     for (const sheet of activeSheets) {
       if (workbook.kind === 'sas') {
-        matchedBySheet.set(sheet.sheetName, sasItems[0] ?? null)
+        const sasItem = sasItems[0] ?? null
+        if (
+          !sasItem &&
+          allItems.some((item) => sameName(item.name, sheet.name))
+        ) {
+          throw new BadRequestException(ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE)
+        }
+        matchedBySheet.set(sheet.sheetName, sasItem)
         continue
       }
 
