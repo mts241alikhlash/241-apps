@@ -10,7 +10,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --filter assessment-web...
 RUN pnpm --filter assessment-web run build
 
-FROM nginxinc/nginx-unprivileged:1.30.5-alpine
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine
 COPY apps/assessment-web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /workspace/apps/assessment-web/dist /usr/share/nginx/html
 EXPOSE 8080
