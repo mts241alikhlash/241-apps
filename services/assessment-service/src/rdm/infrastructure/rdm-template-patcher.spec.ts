@@ -407,4 +407,39 @@ describe('rdm-template-patcher', () => {
       ]),
     ).rejects.toBeInstanceOf(BadRequestException)
   })
+
+  it('refuses a zip whose sheet entry decompresses past the byte budget on read and patch', async () => {
+    const zip = await JSZip.loadAsync(sasTemplate)
+    const bigPayload = 'A'.repeat(20_000)
+    zip.file(
+      'xl/worksheets/sheet1.xml',
+      `<worksheet><sheetData><row r="2"><c r="B2" t="inlineStr"><is><t>${bigPayload}</t></is></c></row></sheetData></worksheet>`,
+    )
+    const bomb = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+    })
+
+    await expect(readRdmTemplateRows(bomb, 4096)).rejects.toThrow(
+      new BadRequestException('File terlalu besar setelah diekstrak'),
+    )
+
+    await expect(
+      patchRdmTemplate(
+        bomb,
+        [
+          {
+            sheetName: 'SAS 1',
+            name: 'UAS',
+            material: null,
+            kktp: null,
+            scores: new Map(),
+          },
+        ],
+        4096,
+      ),
+    ).rejects.toThrow(
+      new BadRequestException('File terlalu besar setelah diekstrak'),
+    )
+  })
 })

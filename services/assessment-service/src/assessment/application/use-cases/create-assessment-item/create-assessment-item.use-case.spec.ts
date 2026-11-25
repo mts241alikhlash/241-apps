@@ -152,6 +152,20 @@ describe('CreateAssessmentItemUseCase', () => {
     expect(created.kktp).toBe(75)
   })
 
+  it('rejects a blank or whitespace-only name', async () => {
+    const { useCase, items } = makeUseCase()
+
+    const promise = useCase.execute({
+      teachingAssignmentId: TA_ID_1,
+      name: '   ',
+      type: AssessmentType.ASSIGNMENT,
+    })
+
+    await expect(promise).rejects.toThrow(BadRequestException)
+    await expect(promise).rejects.toThrow('Nama penilaian wajib diisi')
+    expect(items).toHaveLength(0)
+  })
+
   describe('CreateAssessmentItemDto validation', () => {
     async function validatePayload(payload: Record<string, unknown>) {
       const dto = plainToInstance(CreateAssessmentItemDto, {

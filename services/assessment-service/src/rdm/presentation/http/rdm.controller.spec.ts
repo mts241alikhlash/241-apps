@@ -212,6 +212,8 @@ describe('RdmController', () => {
 
   it('delegates import/preview and import to ImportRdmWorkbookUseCase', async () => {
     mockImportUseCase.preview.mockResolvedValue({
+      classSubjectWarning:
+        'Kelas/mapel di file (IX.B/Informatika) berbeda dengan kelas dan mapel yang dipilih (IX.A/Informatika)',
       sheets: [
         {
           sheetName: 'SUM 1',
@@ -240,6 +242,9 @@ describe('RdmController', () => {
       file,
     )
     expect(preview).toBeInstanceOf(RdmImportPreviewDto)
+    expect(preview.classSubjectWarning).toBe(
+      'Kelas/mapel di file (IX.B/Informatika) berbeda dengan kelas dan mapel yang dipilih (IX.A/Informatika)',
+    )
     expect(mockImportUseCase.preview).toHaveBeenCalledWith({
       userId: 'user-1',
       teachingAssignmentId: taId,

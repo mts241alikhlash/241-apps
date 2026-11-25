@@ -225,9 +225,16 @@ function extractTextRuns(xmlFragment: string): string {
   return result
 }
 
+function stripPhoneticRuns(xmlFragment: string): string {
+  return xmlFragment
+    .replace(/<rPh\b[^>]*>[\s\S]*?<\/rPh>/g, '')
+    .replace(/<phoneticPr\b[^>]*\/>/g, '')
+    .replace(/<phoneticPr\b[^>]*>[\s\S]*?<\/phoneticPr>/g, '')
+}
+
 export function parseSharedStrings(xml: string): string[] {
-  return [...xml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map((match) =>
-    extractTextRuns(match[1] ?? ''),
+  return [...xml.matchAll(/<si\b[^>]*?(?:\/>|>([\s\S]*?)<\/si>)/g)].map(
+    (match) => extractTextRuns(stripPhoneticRuns(match[1] ?? '')),
   )
 }
 

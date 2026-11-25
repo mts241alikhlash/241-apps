@@ -52,6 +52,9 @@ export class RdmImportRowIssueDto {
 }
 
 export class RdmImportPreviewDto {
+  @ApiProperty({ type: String, nullable: true })
+  classSubjectWarning!: string | null
+
   @ApiProperty({ type: () => [RdmImportSheetPreviewDto] })
   sheets!: RdmImportSheetPreviewDto[]
 
@@ -63,6 +66,7 @@ export class RdmImportPreviewDto {
 
   static fromDomain(domain: RdmImportPreviewResult): RdmImportPreviewDto {
     const dto = new RdmImportPreviewDto()
+    dto.classSubjectWarning = domain.classSubjectWarning
     dto.sheets = domain.sheets.map((sheet) =>
       RdmImportSheetPreviewDto.fromDomain(sheet),
     )

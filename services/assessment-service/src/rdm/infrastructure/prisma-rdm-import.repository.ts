@@ -8,6 +8,8 @@ import {
   type RdmImportResult,
 } from '../domain/rdm-import.repository.js'
 
+const RDM_IMPORT_TRANSACTION_OPTIONS = { maxWait: 10000, timeout: 30000 }
+
 @Injectable()
 export class PrismaRdmImportRepository extends IRdmImportRepository {
   constructor(private readonly prisma: PrismaService) {
@@ -78,6 +80,6 @@ export class PrismaRdmImportRepository extends IRdmImportRepository {
       }
 
       return { itemsCreated, itemsUpdated, scoresWritten }
-    })
+    }, RDM_IMPORT_TRANSACTION_OPTIONS)
   }
 }

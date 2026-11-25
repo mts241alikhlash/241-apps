@@ -12,6 +12,11 @@ import {
   unescapeXml,
   type CellWriteTarget,
 } from './rdm-sheet-xml.js'
+import {
+  createDecompressionBudget,
+  readEntryText,
+  type DecompressionBudget,
+} from './rdm-zip.js'
 
 export interface RdmSheetPatch {
   sheetName: string
@@ -53,17 +58,18 @@ export async function loadWorkbookZip(file: Buffer): Promise<JSZip> {
   }
 }
 
-export async function resolveWorkbookSheets(zip: JSZip): Promise<SheetPart[]> {
+export async function resolveWorkbookSheets(
+  zip: JSZip,
+  budget: DecompressionBudget,
+): Promise<SheetPart[]> {
   const workbookEntry = zip.file('xl/workbook.xml')
   const relsEntry = zip.file('xl/_rels/workbook.xml.rels')
   if (!workbookEntry || !relsEntry) {
     throw new BadRequestException(INVALID_TEMPLATE_MESSAGE)
   }
 
-  const [workbookXml, relsXml] = await Promise.all([
-    workbookEntry.async('string'),
-    relsEntry.async('string'),
-  ])
+  const workbookXml = await readEntryText(workbookEntry, budget)
+  const relsXml = await readEntryText(relsEntry, budget)
 
   const targetByRelId = new Map<string, string>()
   for (const match of relsXml.matchAll(/<Relationship\b([^>]*)\/?>/g)) {
@@ -160,9 +166,11 @@ function patchSheetXml(sheetXml: string, patch: RdmSheetPatch): string {
 export async function patchRdmTemplate(
   file: Buffer,
   patches: RdmSheetPatch[],
+  maxUncompressedBytes?: number,
 ): Promise<Buffer> {
+  const budget = createDecompressionBudget(maxUncompressedBytes)
   const zip = await loadWorkbookZip(file)
-  const sheets = await resolveWorkbookSheets(zip)
+  const sheets = await resolveWorkbookSheets(zip, budget)
   const partBySheetName = new Map(
     sheets.map((sheet) => [sheet.name, sheet.partPath]),
   )
@@ -175,38 +183,43 @@ export async function patchRdmTemplate(
         `Sheet "${patch.sheetName}" tidak ditemukan di template RDM`,
       )
     }
-    const sheetXml = await entry.async('string')
+    const sheetXml = await readEntryText(entry, budget)
     zip.file(partPath, patchSheetXml(sheetXml, patch))
   }
 
   return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
 }
 
-export async function loadSharedStrings(zip: JSZip): Promise<string[]> {
+export async function loadSharedStrings(
+  zip: JSZip,
+  budget: DecompressionBudget,
+): Promise<string[]> {
   const sharedStringsEntry = zip.file('xl/sharedStrings.xml')
   return sharedStringsEntry
-    ? parseSharedStrings(await sharedStringsEntry.async('string'))
+    ? parseSharedStrings(await readEntryText(sharedStringsEntry, budget))
     : []
 }
 
 export async function readRdmTemplateRows(
   file: Buffer,
+  maxUncompressedBytes?: number,
 ): Promise<RdmTemplateReadResult> {
+  const budget = createDecompressionBudget(maxUncompressedBytes)
   const zip = await loadWorkbookZip(file)
-  const sheets = await resolveWorkbookSheets(zip)
+  const sheets = await resolveWorkbookSheets(zip, budget)
   const firstSheet = sheets[0]
   if (!firstSheet) {
     throw new BadRequestException(INVALID_TEMPLATE_MESSAGE)
   }
 
-  const sharedStrings = await loadSharedStrings(zip)
+  const sharedStrings = await loadSharedStrings(zip, budget)
 
   const firstSheetEntry = zip.file(firstSheet.partPath)
   if (!firstSheetEntry) {
     throw new BadRequestException(INVALID_TEMPLATE_MESSAGE)
   }
 
-  const firstSheetXml = await firstSheetEntry.async('string')
+  const firstSheetXml = await readEntryText(firstSheetEntry, budget)
   const parsedRows = findRows(firstSheetXml)
 
   let e2: string | null = null

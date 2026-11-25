@@ -89,6 +89,7 @@ export interface RdmImportRowIssue {
 }
 
 export interface RdmImportPreviewResult {
+  classSubjectWarning: string | null
   sheets: RdmImportSheetPreview[]
   unmatchedRows: RdmImportRowIssue[]
   invalidValues: RdmImportRowIssue[]

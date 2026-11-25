@@ -159,6 +159,16 @@ describe('UpdateAssessmentItemUseCase', () => {
     expect(cleared.kktp).toBeNull()
   })
 
+  it('rejects a blank or whitespace-only name', async () => {
+    const { useCase, items } = makeUseCase()
+
+    const promise = useCase.execute('item-1', { name: '   ' })
+
+    await expect(promise).rejects.toThrow(BadRequestException)
+    await expect(promise).rejects.toThrow('Nama penilaian wajib diisi')
+    expect(items[0]?.name).toBe('Tugas 1')
+  })
+
   describe('UpdateAssessmentItemDto validation', () => {
     async function validatePayload(payload: Record<string, unknown>) {
       const dto = plainToInstance(UpdateAssessmentItemDto, payload)
@@ -182,6 +192,7 @@ describe('UpdateAssessmentItemUseCase', () => {
     })
 
     it.each([
+      { name: '' },
       { kktp: -1 },
       { kktp: 101 },
       { kktp: 75.5 },

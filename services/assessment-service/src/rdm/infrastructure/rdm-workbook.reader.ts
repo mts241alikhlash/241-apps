@@ -17,6 +17,7 @@ import {
   loadWorkbookZip,
   resolveWorkbookSheets,
 } from './rdm-template-patcher.js'
+import { createDecompressionBudget, readEntryText } from './rdm-zip.js'
 
 export type RdmParsedCellValue =
   | { status: 'empty' }
@@ -132,12 +133,14 @@ function parseSheetXml(
 
 export async function readRdmWorkbook(
   file: Buffer,
+  maxUncompressedBytes?: number,
 ): Promise<RdmWorkbookReadResult> {
+  const budget = createDecompressionBudget(maxUncompressedBytes)
   const zip = await loadWorkbookZip(file)
-  const sheetParts = await resolveWorkbookSheets(zip)
+  const sheetParts = await resolveWorkbookSheets(zip, budget)
   const sheetNames = sheetParts.map((sheet) => sheet.name)
   const kind = detectRdmKind(sheetNames)
-  const sharedStrings = await loadSharedStrings(zip)
+  const sharedStrings = await loadSharedStrings(zip, budget)
 
   const sheets: RdmWorkbookSheet[] = []
   for (const part of sheetParts) {
@@ -145,7 +148,7 @@ export async function readRdmWorkbook(
     if (!entry) {
       throw new BadRequestException(INVALID_TEMPLATE_MESSAGE)
     }
-    const sheetXml = await entry.async('string')
+    const sheetXml = await readEntryText(entry, budget)
     sheets.push(parseSheetXml(part.name, sheetXml, sharedStrings))
   }
 

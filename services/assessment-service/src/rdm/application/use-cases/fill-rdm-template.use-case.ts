@@ -29,8 +29,8 @@ import {
   buildSasCountError,
   loadRoster,
   loadScoresByItem,
+  buildClassSubjectWarning,
   resolveAssignmentMeta,
-  type AssignmentMeta,
 } from '../rdm-assignment.helper.js'
 import type {
   FillRdmTemplateInput,
@@ -111,33 +111,6 @@ function assertUniqueSelectionNames(items: AssessmentItemWithDetails[]): void {
       `Nama penilaian ganda: ${duplicates.join(', ')}`,
     )
   }
-}
-
-function buildClassSubjectWarning(
-  e2: string | null,
-  meta: AssignmentMeta,
-): string | null {
-  const actual = e2?.trim() ?? ''
-  const classroomCode = meta.classroomCode.trim()
-  const classroomName = meta.classroomName?.trim() ?? ''
-  const subjectName = meta.subjectName.trim()
-
-  const expectedByCode = `${classroomCode}/${subjectName}`
-  const expectedByName = classroomName
-    ? `${classroomName}/${subjectName}`
-    : null
-
-  const normalizedActual = actual.toLowerCase()
-  if (
-    normalizedActual === expectedByCode.toLowerCase() ||
-    (expectedByName !== null &&
-      normalizedActual === expectedByName.toLowerCase())
-  ) {
-    return null
-  }
-
-  const expectedLabel = classroomCode ? expectedByCode : (expectedByName ?? '')
-  return `Kelas/mapel di file (${actual || '-'}) berbeda dengan kelas dan mapel yang dipilih (${expectedLabel})`
 }
 
 function buildOutputFileName(originalFileName: string): string {

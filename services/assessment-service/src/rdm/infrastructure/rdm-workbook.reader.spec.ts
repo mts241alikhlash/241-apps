@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
+import JSZip from 'jszip'
 import { buildRdmTemplateFixture } from '../testing/rdm-template.fixture.js'
 import { patchRdmTemplate } from './rdm-template-patcher.js'
 import { buildRdmWorkbook } from './rdm-workbook.builder.js'
@@ -135,6 +136,24 @@ describe('rdm-workbook.reader', () => {
 
     await expect(readRdmWorkbook(buffer)).rejects.toThrow(
       new BadRequestException('File ini bukan template RDM'),
+    )
+  })
+
+  it('refuses a zip whose sheet entry decompresses past the byte budget', async () => {
+    const template = await buildRdmTemplateFixture('sas', students)
+    const zip = await JSZip.loadAsync(template)
+    const bigPayload = 'A'.repeat(20_000)
+    zip.file(
+      'xl/worksheets/sheet1.xml',
+      `<worksheet><sheetData><row r="2"><c r="B2" t="inlineStr"><is><t>${bigPayload}</t></is></c></row></sheetData></worksheet>`,
+    )
+    const bomb = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+    })
+
+    await expect(readRdmWorkbook(bomb, 4096)).rejects.toThrow(
+      new BadRequestException('File terlalu besar setelah diekstrak'),
     )
   })
 })

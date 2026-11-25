@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsInt,
   IsNumber,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Max,
@@ -16,6 +17,7 @@ export class UpdateAssessmentItemDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(100)
   name?: string
   @ApiPropertyOptional({ enum: AssessmentType })

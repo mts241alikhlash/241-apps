@@ -36,6 +36,7 @@ import {
   buildSasCountError,
   loadRoster,
   loadScoresByItem,
+  buildClassSubjectWarning,
   resolveAssignmentMeta,
 } from '../rdm-assignment.helper.js'
 import type {
@@ -119,7 +120,12 @@ export class ImportRdmWorkbookUseCase {
 
     if (activeSheets.length === 0) {
       return {
-        preview: { sheets: [], unmatchedRows: [], invalidValues: [] },
+        preview: {
+          classSubjectWarning: null,
+          sheets: [],
+          unmatchedRows: [],
+          invalidValues: [],
+        },
         plan: {
           teachingAssignmentId: input.teachingAssignmentId,
           creates: [],
@@ -307,6 +313,7 @@ export class ImportRdmWorkbookUseCase {
 
     return {
       preview: {
+        classSubjectWarning: buildClassSubjectWarning(workbook.e2, meta),
         sheets: sheetPreviews,
         unmatchedRows,
         invalidValues,

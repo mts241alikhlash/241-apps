@@ -214,6 +214,7 @@ describe('ImportRdmWorkbookUseCase', () => {
     })
 
     expect(preview).toEqual({
+      classSubjectWarning: null,
       sheets: [],
       unmatchedRows: [],
       invalidValues: [],
@@ -271,6 +272,7 @@ describe('ImportRdmWorkbookUseCase', () => {
     })
 
     expect(preview).toEqual({
+      classSubjectWarning: null,
       sheets: [
         {
           sheetName: 'SUM 1',
@@ -688,6 +690,7 @@ describe('ImportRdmWorkbookUseCase', () => {
       file: filledFile,
     })
     expect(preview).toEqual({
+      classSubjectWarning: null,
       sheets: [
         {
           sheetName: 'SUM 1',
@@ -712,5 +715,61 @@ describe('ImportRdmWorkbookUseCase', () => {
       creates: [],
       updates: [],
     })
+  })
+
+  it('returns classSubjectWarning on preview when E2 differs without blocking confirm, and null when E2 matches', async () => {
+    const mismatchFile = await buildRdmWorkbook({
+      kind: 'sumatif',
+      classSubject: 'IX.B/Informatika',
+      students: [{ nis: '1001', nisn: '0011111111', name: 'Ahmad' }],
+      sheets: [
+        {
+          name: 'UH 1',
+          material: null,
+          kktp: null,
+          scores: new Map([[0, 88]]),
+        },
+      ],
+    })
+
+    const mismatchPreview = await useCase.preview({
+      userId: USER_ID,
+      teachingAssignmentId: TA_ID,
+      file: mismatchFile,
+    })
+
+    expect(mismatchPreview.classSubjectWarning).toBe(
+      'Kelas/mapel di file (IX.B/Informatika) berbeda dengan kelas dan mapel yang dipilih (IX.A/Informatika)',
+    )
+
+    const confirmResult = await useCase.confirm({
+      userId: USER_ID,
+      teachingAssignmentId: TA_ID,
+      file: mismatchFile,
+    })
+    expect(confirmResult).toEqual(applyResult)
+    expect(appliedPlans).toHaveLength(1)
+
+    const matchingFile = await buildRdmWorkbook({
+      kind: 'sumatif',
+      classSubject: '9a/informatika',
+      students: [{ nis: '1001', nisn: '0011111111', name: 'Ahmad' }],
+      sheets: [
+        {
+          name: 'UH 1',
+          material: null,
+          kktp: null,
+          scores: new Map([[0, 88]]),
+        },
+      ],
+    })
+
+    const matchingPreview = await useCase.preview({
+      userId: USER_ID,
+      teachingAssignmentId: TA_ID,
+      file: matchingFile,
+    })
+
+    expect(matchingPreview.classSubjectWarning).toBeNull()
   })
 })

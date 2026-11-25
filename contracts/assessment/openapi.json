@@ -6424,6 +6424,10 @@
       "RdmImportPreviewDto": {
         "type": "object",
         "properties": {
+          "classSubjectWarning": {
+            "type": "string",
+            "nullable": true
+          },
           "sheets": {
             "type": "array",
             "items": {
@@ -6444,6 +6448,7 @@
           }
         },
         "required": [
+          "classSubjectWarning",
           "sheets",
           "unmatchedRows",
           "invalidValues"

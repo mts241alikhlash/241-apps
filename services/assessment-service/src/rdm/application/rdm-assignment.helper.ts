@@ -99,3 +99,30 @@ export function buildSasCountError(
     `Template SAS membutuhkan tepat satu penilaian jenis ${sasType}; ditemukan ${items.length}: ${names}`,
   )
 }
+
+export function buildClassSubjectWarning(
+  e2: string | null,
+  meta: AssignmentMeta,
+): string | null {
+  const actual = e2?.trim() ?? ''
+  const classroomCode = meta.classroomCode.trim()
+  const classroomName = meta.classroomName?.trim() ?? ''
+  const subjectName = meta.subjectName.trim()
+
+  const expectedByCode = `${classroomCode}/${subjectName}`
+  const expectedByName = classroomName
+    ? `${classroomName}/${subjectName}`
+    : null
+
+  const normalizedActual = actual.toLowerCase()
+  if (
+    normalizedActual === expectedByCode.toLowerCase() ||
+    (expectedByName !== null &&
+      normalizedActual === expectedByName.toLowerCase())
+  ) {
+    return null
+  }
+
+  const expectedLabel = classroomCode ? expectedByCode : (expectedByName ?? '')
+  return `Kelas/mapel di file (${actual || '-'}) berbeda dengan kelas dan mapel yang dipilih (${expectedLabel})`
+}

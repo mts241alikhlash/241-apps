@@ -1161,6 +1161,7 @@ export interface components {
             unmatchedRows: number[];
         };
         RdmImportPreviewDto: {
+            classSubjectWarning: string | null;
             invalidValues: components["schemas"]["RdmImportRowIssueDto"][];
             sheets: components["schemas"]["RdmImportSheetPreviewDto"][];
             unmatchedRows: components["schemas"]["RdmImportRowIssueDto"][];

@@ -1,5 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE } from '../../../constants/assessment.constants.js'
+import {
+  ASSESSMENT_ITEM_NAME_CONFLICT_MESSAGE,
+  ASSESSMENT_ITEM_NAME_REQUIRED_MESSAGE,
+} from '../../../constants/assessment.constants.js'
 import {
   AssessmentItemWithDetails,
   IAssessmentItemRepository,
@@ -25,6 +28,9 @@ export class CreateAssessmentItemUseCase {
     }
 
     const name = input.name.trim()
+    if (name.length === 0) {
+      throw new BadRequestException(ASSESSMENT_ITEM_NAME_REQUIRED_MESSAGE)
+    }
     const clash = await this.assessmentItemRepository.findNameClash(
       input.teachingAssignmentId,
       name,
