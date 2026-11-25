@@ -10,7 +10,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --filter account-web...
 RUN pnpm --filter account-web run build
 
-FROM nginxinc/nginx-unprivileged:1.30.5-alpine
+FROM nginxinc/nginx-unprivileged:1.31.7-alpine
 COPY apps/account-web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /workspace/apps/account-web/dist /usr/share/nginx/html
 EXPOSE 8080
