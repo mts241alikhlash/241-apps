@@ -39,12 +39,14 @@ describe('scheduleLifecycle', () => {
   const makeup = {
     kind: 'MAKEUP' as const,
     deliveryMode: 'ONLINE' as const,
+    packageId: 'pkg-1',
     startsAt: new Date('2026-11-12T02:00:00Z'),
     endsAt: new Date('2026-11-12T04:00:00Z'),
   }
   const offline = {
     kind: 'REGULAR' as const,
     deliveryMode: 'OFFLINE' as const,
+    packageId: null,
     ...activityWindow,
   }
 
@@ -65,6 +67,7 @@ describe('scheduleLifecycle', () => {
     const regular = {
       kind: 'REGULAR' as const,
       deliveryMode: 'ONLINE' as const,
+      packageId: 'pkg-1',
       ...activityWindow,
     }
     const now = new Date('2026-11-09T03:00:00Z')
@@ -107,5 +110,48 @@ describe('scheduleLifecycle', () => {
       now,
     )
     expect(myExamStatus(offline, null, now, lifecycle)).toBe('FINISHED')
+  })
+
+  const online = {
+    kind: 'REGULAR' as const,
+    deliveryMode: 'ONLINE' as const,
+    packageId: 'pkg-1',
+    ...activityWindow,
+  }
+  const before = new Date('2026-11-09T01:59:59Z')
+  const inside = new Date('2026-11-09T03:00:00Z')
+  const after = new Date('2026-11-09T05:00:00Z')
+
+  it('keeps a scheduled activity upcoming until its window ends, then finished', () => {
+    const activity = { ...activityWindow, status: 'SCHEDULED' as const }
+    expect(scheduleLifecycle(online, activity, before)).toBe('UPCOMING')
+    expect(scheduleLifecycle(online, activity, inside)).toBe('UPCOMING')
+    expect(scheduleLifecycle(online, activity, after)).toBe('FINISHED')
+  })
+
+  it('never opens an online schedule without a package', () => {
+    const unpackaged = { ...online, packageId: null }
+    for (const status of ['SCHEDULED', 'ACTIVE'] as const) {
+      const activity = { ...activityWindow, status }
+      expect(scheduleLifecycle(unpackaged, activity, before)).toBe('UPCOMING')
+      expect(scheduleLifecycle(unpackaged, activity, inside)).toBe('UPCOMING')
+      expect(scheduleLifecycle(unpackaged, activity, after)).toBe('FINISHED')
+    }
+    expect(
+      scheduleLifecycle(
+        unpackaged,
+        { ...activityWindow, status: 'CLOSED' },
+        inside,
+      ),
+    ).toBe('FINISHED')
+  })
+
+  it('shows a scheduled activity as upcoming to the student inside its window', () => {
+    const lifecycle = scheduleLifecycle(
+      online,
+      { ...activityWindow, status: 'SCHEDULED' },
+      inside,
+    )
+    expect(myExamStatus(online, null, inside, lifecycle)).toBe('UPCOMING')
   })
 })

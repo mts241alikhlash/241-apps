@@ -153,7 +153,7 @@ suite('PrismaExamSessionRepository against a real database', () => {
     await prisma.$disconnect()
   })
 
-  it('finds the running sessions of an activity and of its makeups', async () => {
+  it('finds the running sessions of the regular schedules of an activity, not of its makeups', async () => {
     const paper = await schedule(1)
     const activityId = await activity(paper.packageId)
     await prisma.examSchedule.update({
@@ -161,12 +161,16 @@ suite('PrismaExamSessionRepository against a real database', () => {
       data: { activityId },
     })
     const makeupId = await makeup(paper.scheduleId, paper.packageId)
+    await prisma.examSchedule.update({
+      where: { id: makeupId },
+      data: { activityId },
+    })
     const regularSession = await session(paper.scheduleId)
-    const makeupSession = await session(makeupId)
+    await session(makeupId)
 
     const found = await sessions.findInProgressIdsByActivity(activityId)
 
-    expect(new Set(found)).toEqual(new Set([regularSession, makeupSession]))
+    expect(found).toEqual([regularSession])
   })
 
   it('saves 46 answers in one transaction with the telemetry', async () => {

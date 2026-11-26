@@ -116,6 +116,9 @@ describe('CreateExamScheduleUseCase', () => {
         seatNumber: null,
         participantNumber: null,
         makeup: false,
+        deliveryMode: 'ONLINE',
+        hasPackage: true,
+        offlineKind: null,
       }).minSubmitMinutes,
     ).toBe(20)
   })

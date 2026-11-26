@@ -117,7 +117,7 @@ describe('CloseActivitySessionsUseCase', () => {
     ])
   })
 
-  it('expires the running makeup sessions of the activity too', async () => {
+  it('leaves the running makeup sessions of the activity running', async () => {
     const { schedule, questionIds } = await schedulePaper(
       { packages, schedules, questions },
       [ESSAY],
@@ -135,21 +135,18 @@ describe('CloseActivitySessionsUseCase', () => {
       makeupOfId: schedule.id,
       participants: [],
     })
+    belongTo(makeup!.id, ACTIVITY_ID)
+    sessions.sessions.set('r', sessionFor(schedule, { id: 'r' }))
     sessions.sessions.set('m', sessionFor(makeup!, { id: 'm' }))
+    saveAnswer('r', questionIds[0])
     saveAnswer('m', questionIds[0])
 
     expect(await useCase.execute(ACTIVITY_ID, ADMIN_ID, LATER)).toBe(1)
 
-    expect(sessions.sessions.get('m')?.status).toBe('EXPIRED')
-    expect(sessions.answers.get('answer-m')?.answer).toEqual({
-      text: 'jawaban',
-    })
+    expect(sessions.sessions.get('r')?.status).toBe('EXPIRED')
+    expect(sessions.sessions.get('m')?.status).toBe('IN_PROGRESS')
     expect(sessions.auditLogs).toMatchObject([
-      {
-        action: 'CLOSED_BY_ADMIN',
-        sessionId: 'm',
-        metadata: { activityId: ACTIVITY_ID },
-      },
+      { action: 'CLOSED_BY_ADMIN', sessionId: 'r' },
     ])
   })
 

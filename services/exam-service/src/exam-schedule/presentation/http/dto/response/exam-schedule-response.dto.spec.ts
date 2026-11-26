@@ -133,6 +133,9 @@ describe('exam schedule response DTOs', () => {
         seatNumber: null,
         participantNumber: null,
         makeup: false,
+        deliveryMode: 'ONLINE',
+        hasPackage: true,
+        offlineKind: null,
       }).category,
     ).toBe('NON_EXAM')
   })

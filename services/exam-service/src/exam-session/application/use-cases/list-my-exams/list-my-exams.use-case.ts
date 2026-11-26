@@ -8,6 +8,10 @@ import { IParticipantNumberPort } from '../../../../platform/participant-number/
 import { IStudentIdentityReadPort } from '../../../../platform/student-identity/student-identity.port.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
 import type {
+  ExamDeliveryMode,
+  ExamOfflineKind,
+} from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
+import type {
   ExamSchedule,
   ExamType,
 } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
@@ -48,6 +52,9 @@ export interface MyExam {
   seatNumber: number | null
   participantNumber: string | null
   makeup: boolean
+  deliveryMode: ExamDeliveryMode
+  hasPackage: boolean
+  offlineKind: ExamOfflineKind | null
 }
 
 const RANK: Record<MyExamStatus, number> = {
@@ -127,14 +134,17 @@ export class ListMyExamsUseCase {
       ) {
         continue
       }
-      if (schedule.packageId === null) continue
-      const pkg = await this.packages.findById(schedule.packageId)
-      if (pkg === null) continue
+      const pkg =
+        schedule.packageId === null
+          ? null
+          : await this.packages.findById(schedule.packageId)
+      if (schedule.packageId !== null && pkg === null) continue
       const session = sessionOf.get(schedule.id) ?? null
       const source = original ?? schedule
       const activity = source.activityId
         ? await this.activities.findById(source.activityId)
         : null
+      if (schedule.kind === 'REGULAR' && activity?.status === 'DRAFT') continue
       const eventId = activity?.eventId ?? source.eventId
       const lifecycle = scheduleLifecycle(schedule, activity, now)
       const seat =
@@ -143,11 +153,8 @@ export class ListMyExamsUseCase {
           : null
       rows.push({
         id: schedule.id,
-        title:
-          schedule.kind === 'MAKEUP'
-            ? `${schedule.packageTitle} (Susulan)`
-            : (schedule.packageTitle ?? pkg.title),
-        subjectId: pkg.subjectId,
+        title: schedule.packageTitle ?? pkg?.title ?? '',
+        subjectId: pkg?.subjectId ?? schedule.subjectId,
         subjectName: null,
         type: schedule.type,
         startsAt: schedule.startsAt,
@@ -168,10 +175,17 @@ export class ListMyExamsUseCase {
         seatNumber: seat?.seatNumber ?? null,
         participantNumber: await number(),
         makeup: schedule.kind === 'MAKEUP',
+        deliveryMode: schedule.deliveryMode,
+        hasPackage: schedule.packageId !== null,
+        offlineKind: activity?.offlineKind ?? null,
       })
     }
     const names = await this.subjectNames(rows.map((row) => row.subjectId))
-    for (const row of rows) row.subjectName = names.get(row.subjectId) ?? null
+    for (const row of rows) {
+      row.subjectName = names.get(row.subjectId) ?? null
+      row.title ||= row.subjectName ?? ''
+      if (row.makeup) row.title = `${row.title} (Susulan)`
+    }
 
     return rows.sort(
       (a, b) =>

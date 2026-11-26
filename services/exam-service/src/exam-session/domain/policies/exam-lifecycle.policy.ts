@@ -30,6 +30,7 @@ export function scheduleLifecycle(
   schedule: LifecycleWindow & {
     kind: 'REGULAR' | 'MAKEUP'
     deliveryMode: 'ONLINE' | 'OFFLINE'
+    packageId: string | null
   },
   activity: (LifecycleWindow & { status: ExamActivityStatus }) | null,
   now: Date,
@@ -41,6 +42,12 @@ export function scheduleLifecycle(
     return status !== 'CLOSED' && now.getTime() < window.startsAt.getTime()
       ? 'UPCOMING'
       : 'FINISHED'
+  }
+  if (
+    status === 'SCHEDULED' ||
+    (status === 'ACTIVE' && schedule.packageId === null)
+  ) {
+    return now.getTime() < window.endsAt.getTime() ? 'UPCOMING' : 'FINISHED'
   }
   return examLifecycle(status, window, now)
 }

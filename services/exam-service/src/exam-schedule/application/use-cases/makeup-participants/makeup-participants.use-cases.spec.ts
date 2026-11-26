@@ -296,7 +296,7 @@ describe('makeup participants', () => {
       const context = await setup()
       const { schedule, schedules } = context
       const makeup = await schedules.createMakeup({
-        packageId: schedule.packageId,
+        packageId: schedule.packageId!,
         classroomId: schedule.classroomId,
         semesterId: schedule.semesterId,
         startsAt: new Date('2026-11-06T01:00:00.000Z'),

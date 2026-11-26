@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { ACTIVITY_STATUSES } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
+import {
+  ACTIVITY_STATUSES,
+  EXAM_DELIVERY_MODES,
+  EXAM_OFFLINE_KINDS,
+} from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import {
   EXAM_CATEGORIES,
   EXAM_TYPES,
@@ -70,6 +74,19 @@ export class MyExamDto {
   participantNumber!: string | null
   @ApiProperty({ description: 'True for a makeup sitting' })
   makeup!: boolean
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES })
+  deliveryMode!: MyExam['deliveryMode']
+  @ApiProperty({
+    description:
+      'False while no question package is attached; never startable then',
+  })
+  hasPackage!: boolean
+  @ApiProperty({
+    enum: EXAM_OFFLINE_KINDS,
+    nullable: true,
+    description: 'Set for an offline exam only',
+  })
+  offlineKind!: MyExam['offlineKind']
 
   static fromDomain(domain: MyExam): MyExamDto {
     const dto = new MyExamDto()
@@ -94,6 +111,9 @@ export class MyExamDto {
     dto.seatNumber = domain.seatNumber
     dto.participantNumber = domain.participantNumber
     dto.makeup = domain.makeup
+    dto.deliveryMode = domain.deliveryMode
+    dto.hasPackage = domain.hasPackage
+    dto.offlineKind = domain.offlineKind
     return dto
   }
 }
