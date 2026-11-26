@@ -576,6 +576,12 @@ export class StudentScoreRosterResponseItemsDto {
   @ApiProperty({ type: String })
   nis!: string
 
+  @ApiPropertyOptional({ type: String })
+  nisn?: string
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  gender?: string | null
+
   @ApiProperty({ type: String, nullable: true })
   scoreId!: string | null
 
@@ -596,6 +602,8 @@ export class StudentScoreRosterResponseItemsDto {
     dto.enrollmentId = domain.enrollmentId
     dto.studentName = domain.studentName
     dto.nis = domain.nis
+    if (domain.nisn !== undefined) dto.nisn = domain.nisn
+    if (domain.gender !== undefined) dto.gender = domain.gender
     dto.scoreId = domain.scoreId
     dto.score = domain.score
     dto.note = domain.note

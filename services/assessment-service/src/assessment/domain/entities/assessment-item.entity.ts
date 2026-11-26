@@ -33,6 +33,8 @@ export interface AssessmentTeachingAssignmentRef {
 
 export interface AssessmentItemWithDetails extends AssessmentItemEntity {
   teachingAssignment?: AssessmentTeachingAssignmentRef
+  gradedCount?: number
+  studentCount?: number
   _count?: {
     studentScores?: number
   }

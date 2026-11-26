@@ -286,6 +286,19 @@
             }
           },
           {
+            "name": "teachingAssignmentIds",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated on the query string",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
             "name": "type",
             "required": false,
             "in": "query",
@@ -3050,6 +3063,12 @@
           },
           "maxScore": {
             "type": "number"
+          },
+          "gradedCount": {
+            "type": "number"
+          },
+          "studentCount": {
+            "type": "number"
           }
         },
         "required": [
@@ -3633,6 +3652,13 @@
           },
           "nis": {
             "type": "string"
+          },
+          "nisn": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true
           },
           "scoreId": {
             "type": "string",

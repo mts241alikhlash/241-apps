@@ -33,6 +33,8 @@ export async function buildScoreRoster(
       return {
         enrollmentId: enrollment.id,
         nis: enrollment.studentNis ?? '',
+        nisn: enrollment.studentNisn ?? '',
+        gender: enrollment.studentGender ?? null,
         studentName: enrollment.studentName ?? '-',
         scoreId: score?.id ?? null,
         score: score?.score ?? null,

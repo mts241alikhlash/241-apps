@@ -257,6 +257,12 @@ export class AssessmentItemResponseDto {
   @ApiProperty({ type: Number })
   maxScore!: number
 
+  @ApiPropertyOptional({ type: Number })
+  gradedCount?: number
+
+  @ApiPropertyOptional({ type: Number })
+  studentCount?: number
+
   static fromDomain(
     domain: AssessmentItemWithDetails,
   ): AssessmentItemResponseDto {
@@ -279,6 +285,9 @@ export class AssessmentItemResponseDto {
     dto.type = domain.type
     dto.weight = domain.weight
     dto.maxScore = domain.maxScore
+    if (domain.gradedCount !== undefined) dto.gradedCount = domain.gradedCount
+    if (domain.studentCount !== undefined)
+      dto.studentCount = domain.studentCount
     return dto
   }
 }

@@ -20,6 +20,7 @@ export class GetAssessmentItemsUseCase {
       limit: input.limit,
       type: input.type,
       teachingAssignmentId: input.teachingAssignmentId,
+      teachingAssignmentIds: input.teachingAssignmentIds,
     })
   }
 }

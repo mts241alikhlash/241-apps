@@ -41,6 +41,8 @@ export interface StudentScoreRosterItem {
   enrollmentId: string
   studentName: string
   nis: string
+  nisn?: string
+  gender?: string | null
   scoreId: string | null
   score: number | null
   note: string | null
