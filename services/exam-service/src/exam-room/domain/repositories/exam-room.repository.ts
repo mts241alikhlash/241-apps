@@ -1,5 +1,9 @@
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import type {
+  ExamDeliveryMode,
+  ExamOfflineKind,
+} from '../../../exam-activity/domain/entities/exam-activity.entity.js'
+import type {
   ExamEvent,
   ExamEventEdit,
   ExamEventStatus,
@@ -55,6 +59,8 @@ export interface ExamRoomActivityRef {
   subjectId: string
   startsAt: Date
   endsAt: Date
+  deliveryMode: ExamDeliveryMode
+  offlineKind: ExamOfflineKind | null
 }
 
 export interface AssignSeatInput extends NewExamRoomSeat {

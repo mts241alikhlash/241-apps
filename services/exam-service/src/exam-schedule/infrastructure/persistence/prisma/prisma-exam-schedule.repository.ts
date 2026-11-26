@@ -80,6 +80,7 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     }
     const where: Prisma.ExamScheduleWhereInput = {
       semesterId: query.semesterId,
+      packageId: { not: null },
       ...(query.category
         ? { type: { in: typesInCategory(query.category) } }
         : {}),

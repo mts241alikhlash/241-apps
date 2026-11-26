@@ -6,7 +6,10 @@ import {
 } from '@nestjs/common'
 import { IExamScheduleRepository } from '../../../domain/repositories/exam-schedule.repository.js'
 import { AccessCodeService } from '../../access-code.service.js'
-import type { AccessCodeResult } from '../get-access-code/get-access-code.use-case.js'
+import {
+  assertUsesToken,
+  type AccessCodeResult,
+} from '../get-access-code/get-access-code.use-case.js'
 import { CANCELLED_MESSAGE } from '../update-exam-schedule/update-exam-schedule.use-case.js'
 
 @Injectable()
@@ -19,6 +22,7 @@ export class RotateAccessCodeUseCase {
   async execute(id: string, now: Date = new Date()): Promise<AccessCodeResult> {
     const found = await this.schedules.findById(id)
     if (found === null) throw new NotFoundException('Jadwal tidak ditemukan')
+    assertUsesToken(found)
     const rotated = await this.schedules.rotateToken(id)
     if (rotated === null) throw new ConflictException(CANCELLED_MESSAGE)
     const codeScope = codeScopeOf(rotated, now)

@@ -31,7 +31,8 @@ export class GradingScheduleDto {
   @ApiProperty({ format: 'uuid' }) semesterId!: string
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
   @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
-  @ApiProperty({ format: 'uuid' }) packageId!: string
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  packageId!: string | null
   @ApiProperty() durationMinutes!: number
   @ApiProperty({ enum: EXAM_SCHEDULE_KINDS }) kind!: ExamScheduleKind
   @ApiProperty({ format: 'date-time' }) startsAt!: string
@@ -53,7 +54,7 @@ export class GradingScheduleDto {
     dto.semesterId = domain.semesterId
     dto.type = domain.type
     dto.category = categoryOf(domain.type)
-    dto.packageId = domain.packageId ?? ''
+    dto.packageId = domain.packageId
     dto.durationMinutes = domain.durationMinutes
     dto.kind = domain.kind
     dto.startsAt = domain.startsAt.toISOString()

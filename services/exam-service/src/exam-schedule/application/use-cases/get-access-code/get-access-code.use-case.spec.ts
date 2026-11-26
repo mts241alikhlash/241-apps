@@ -108,4 +108,33 @@ describe('Access code use cases', () => {
       new RotateAccessCodeUseCase(schedules, codes).execute(scheduleId),
     ).rejects.toThrow(ConflictException)
   })
+
+  it.each([
+    ['an offline schedule', 'OFFLINE' as const, 'OFFLINE_NO_TOKEN'],
+    [
+      'an online schedule without a package',
+      'ONLINE' as const,
+      'PACKAGE_MISSING',
+    ],
+  ])('refuses the code of %s with 409', async (_name, deliveryMode, code) => {
+    const found = schedules.schedules.get(scheduleId)!
+    schedules.schedules.set(scheduleId, {
+      ...found,
+      deliveryMode,
+      packageId: null,
+      packageTitle: null,
+    })
+
+    for (const run of [
+      new GetAccessCodeUseCase(schedules, codes),
+      new RotateAccessCodeUseCase(schedules, codes),
+    ]) {
+      const refusal = await run
+        .execute(scheduleId, NOW)
+        .catch((e: unknown) => e)
+      expect(refusal).toBeInstanceOf(ConflictException)
+      expect(refusal).toMatchObject({ code })
+    }
+    expect(schedules.schedules.get(scheduleId)?.tokenRotation).toBe(0)
+  })
 })

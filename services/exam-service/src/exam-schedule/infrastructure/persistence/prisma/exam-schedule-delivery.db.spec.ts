@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
+import { PrismaExamScheduleRepository } from './prisma-exam-schedule.repository.js'
 
 const enabled = process.env.EXAM_DB_TESTS === '1'
 const suite = enabled ? describe : describe.skip
@@ -16,6 +17,7 @@ suite('Delivery mode constraints against a real database', () => {
   const packageIds: string[] = []
   const scheduleIds: string[] = []
   const activityIds: string[] = []
+  const eventIds: string[] = []
 
   async function pkg() {
     const row = await prisma.examPackage.create({
@@ -82,6 +84,7 @@ suite('Delivery mode constraints against a real database', () => {
     await prisma.examSchedule.deleteMany({ where: { id: { in: scheduleIds } } })
     await prisma.examActivity.deleteMany({ where: { id: { in: activityIds } } })
     await prisma.examPackage.deleteMany({ where: { id: { in: packageIds } } })
+    await prisma.examEvent.deleteMany({ where: { id: { in: eventIds } } })
     await prisma.$disconnect()
   })
 
@@ -147,5 +150,57 @@ suite('Delivery mode constraints against a real database', () => {
     await expect(prisma.examOfflineResult.create({ data })).rejects.toThrow(
       /Unique constraint/,
     )
+  })
+
+  it('lists a schedule without a package in its event window with a null title, and keeps it out of grading', async () => {
+    const repository = new PrismaExamScheduleRepository(prisma)
+    const event = await prisma.examEvent.create({
+      data: {
+        semesterId: id(),
+        name: 'Delivery DB',
+        type: 'FINAL',
+        startsAt: NOW,
+        endsAt: new Date(NOW.getTime() + 7_200_000),
+        createdById: userId,
+      },
+    })
+    eventIds.push(event.id)
+    const unpackaged = await schedule('OFFLINE', null)
+    const packaged = await schedule('ONLINE', await pkg())
+    const window = {
+      eventId: event.id,
+      endsAt: new Date(NOW.getTime() + 3_600_000),
+    }
+    await prisma.examSchedule.updateMany({
+      where: { id: { in: [unpackaged.id, packaged.id] } },
+      data: window,
+    })
+
+    const listed = await repository.listSchedulesForEventWindow(
+      event.id,
+      NOW,
+      window.endsAt,
+    )
+
+    expect(listed.map((row) => row.id).sort()).toEqual(
+      [unpackaged.id, packaged.id].sort(),
+    )
+    expect(listed.find((row) => row.id === unpackaged.id)).toMatchObject({
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+    expect(listed.find((row) => row.id === packaged.id)).toMatchObject({
+      packageTitle: 'Delivery DB',
+    })
+
+    const graded = await repository.findForGrading({
+      semesterId: unpackaged.semesterId,
+      pairs: null,
+      now: new Date(window.endsAt.getTime() + 60_000),
+      page: 1,
+      limit: 10,
+    })
+    expect(graded).toMatchObject({ data: [], total: 0 })
   })
 })

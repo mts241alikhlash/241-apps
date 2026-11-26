@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common'
+import { ConflictException, ForbiddenException } from '@nestjs/common'
 import { FakeExamActivityRepository } from '../../exam-activity/application/exam-activity.repository.fake.js'
 import { FakeExamPackageRepository } from '../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../exam-schedule/application/exam-schedule.repository.fake.js'
@@ -103,7 +103,9 @@ describe('LifecycleGate.assertOpen', () => {
     await attach()
     update({ status: 'CANCELLED' })
 
-    expect(await refusal(schedule.id)).toBeInstanceOf(Error)
+    const refused = await refusal(schedule.id)
+    expect(refused).toBeInstanceOf(ForbiddenException)
+    expect(refused).toMatchObject({ code: 'SCHEDULE_CANCELLED' })
   })
 
   it('refuses a cancelled makeup inside its own window', async () => {
@@ -126,6 +128,8 @@ describe('LifecycleGate.assertOpen', () => {
 
     await schedules.cancel(makeup!.id)
 
-    expect(await refusal(makeup!.id, at)).toBeInstanceOf(Error)
+    const refused = await refusal(makeup!.id, at)
+    expect(refused).toBeInstanceOf(ForbiddenException)
+    expect(refused).toMatchObject({ code: 'SCHEDULE_CANCELLED' })
   })
 })

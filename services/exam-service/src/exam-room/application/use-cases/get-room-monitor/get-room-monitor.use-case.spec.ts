@@ -10,7 +10,9 @@ import {
   type RoomStaffUser,
 } from '../../room-access.service.js'
 import { RoomAccessCodeService } from '../../room-access-code.service.js'
+import { CLASSROOM_7A } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import {
+  CLASSROOM_8A,
   MONITOR_NOW,
   OTHER_SUPERVISOR_ID,
   SUPERVISOR_ID,
@@ -440,5 +442,50 @@ describe('GetRoomMonitorUseCase', () => {
       expiresAt: expect.any(String),
       rotation: fixture.room.tokenRotation,
     })
+  })
+
+  it('leaves offline and unpackaged schedules out of the roster and the exam window', async () => {
+    const { fixture, monitor } = await build()
+    const offline = fixture.scheduleByClassroom.get(CLASSROOM_7A.id)!
+    fixture.schedules.schedules.set(offline.id, {
+      ...offline,
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+    fixture.schedules.schedules.set('unseated-unpackaged', {
+      ...offline,
+      id: 'unseated-unpackaged',
+      classroomId: 'classroom-without-seats',
+      packageId: null,
+      packageTitle: null,
+      endsAt: new Date('2026-11-02T04:00:00.000Z'),
+    })
+
+    const result = await monitor.execute(
+      COORDINATOR,
+      fixture.room.id,
+      { page: 1, limit: 3 },
+      MONITOR_NOW,
+    )
+
+    const [seventh, eighth] = result.data
+    expect(seventh).toMatchObject({
+      scheduleId: '',
+      packageTitle: '',
+      subjectName: null,
+      totalQuestions: 0,
+      session: null,
+    })
+    expect(eighth).toMatchObject({
+      scheduleId: fixture.scheduleByClassroom.get(CLASSROOM_8A.id)!.id,
+      packageTitle: 'UAS Matematika',
+      totalQuestions: 40,
+    })
+    expect(result.meta.window).toEqual({
+      startsAt: '2026-11-02T01:30:00.000Z',
+      endsAt: '2026-11-02T03:00:00.000Z',
+    })
+    expect(result.meta.summary.totalRegistered).toBe(120)
   })
 })

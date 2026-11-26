@@ -33,6 +33,7 @@ import {
   SAMPLE_ATTACHMENT,
 } from '../../room-report-file-storage.fake.js'
 import { FakeAcademicLookup } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
+import type { ExamSchedule } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { CLASSROOM_7A } from '../../../../exam-schedule/application/exam-schedule.test-support.js'
 import { CLASSROOM_8A } from '../../room-monitor.test-support.js'
 import { GetRoomReportUseCase } from '../get-room-report/get-room-report.use-case.js'
@@ -966,6 +967,8 @@ const CLASSROOM_9A = {
   name: 'IX A',
 }
 const MATH_ID = '44444444-4444-4444-8444-444444444444'
+const EMPTY_GRADE_ID = '66666666-6666-4666-8666-000000000006'
+const EMPTY_CLASSROOM_ID = '66666666-6666-4666-8666-000000000066'
 const IPA_ID = '55555555-5555-4555-8555-555555555555'
 
 async function timetableRoom() {
@@ -1000,7 +1003,7 @@ async function timetableRoom() {
     academic,
     reports,
   )
-  return { fixture, get }
+  return { fixture, get, save: new SaveRoomReportUseCase(reports) }
 }
 
 function seedActivity(
@@ -1011,9 +1014,32 @@ function seedActivity(
     subjectId: string
     startsAt: Date
     endsAt: Date
+    deliveryMode?: 'ONLINE' | 'OFFLINE'
+    offlineKind?: 'WRITTEN' | 'PRACTICAL' | null
   },
 ) {
-  fixture.rooms.activities.set(input.id, { ...input, eventId: fixture.eventId })
+  fixture.rooms.activities.set(input.id, {
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
+    ...input,
+    eventId: fixture.eventId,
+  })
+}
+
+function withoutPackage(
+  fixture: MonitorFixture,
+  classroomId: string,
+  fields: Partial<ExamSchedule> = {},
+): ExamSchedule {
+  const schedule = fixture.scheduleByClassroom.get(classroomId)!
+  const updated: ExamSchedule = {
+    ...schedule,
+    packageId: null,
+    packageTitle: null,
+    ...fields,
+  }
+  fixture.schedules.schedules.set(schedule.id, updated)
+  return updated
 }
 
 describe('GetRoomReportUseCase timetable rows', () => {
@@ -1033,6 +1059,8 @@ describe('GetRoomReportUseCase timetable rows', () => {
       subjectId: IPA_ID,
       startsAt: SLOT_START,
       endsAt: SLOT_END,
+      deliveryMode: 'OFFLINE',
+      offlineKind: 'PRACTICAL',
     })
 
     const report = await get.execute(
@@ -1047,16 +1075,24 @@ describe('GetRoomReportUseCase timetable rows', () => {
         expect.objectContaining({
           scheduleId: null,
           activityId: 'act-math-7',
+          deliveryMode: 'ONLINE',
+          offlineKind: null,
           subjectName: 'Matematika',
           gradeId: GRADE_7,
           registeredCount: 6,
+          startedCount: null,
+          submittedCount: null,
         }),
         expect.objectContaining({
           scheduleId: null,
           activityId: 'act-ipa-9',
+          deliveryMode: 'OFFLINE',
+          offlineKind: 'PRACTICAL',
           subjectName: 'IPA',
           gradeId: GRADE_9,
           registeredCount: 1,
+          startedCount: null,
+          submittedCount: null,
         }),
       ]),
     )
@@ -1106,5 +1142,120 @@ describe('GetRoomReportUseCase timetable rows', () => {
     )
 
     expect(report.schedules).toEqual([])
+  })
+
+  it('shows an offline schedule with its kind and no session counts, and takes an absence on it', async () => {
+    const { fixture, get, save } = await timetableRoom()
+    const offline = withoutPackage(fixture, CLASSROOM_7A.id, {
+      deliveryMode: 'OFFLINE',
+      activityId: 'act-tafsir-7',
+    })
+    seedActivity(fixture, {
+      id: 'act-tafsir-7',
+      gradeId: GRADE_7,
+      subjectId: MATH_ID,
+      startsAt: SLOT_START,
+      endsAt: SLOT_END,
+      deliveryMode: 'OFFLINE',
+      offlineKind: 'WRITTEN',
+    })
+    const absent = fixture.studentIds[3]
+
+    await save.recordAbsence(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+      { studentId: absent, scheduleId: offline.id, reason: 'SICK' },
+      MONITOR_NOW,
+    )
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    expect(
+      report.schedules.find((row) => row.scheduleId === offline.id),
+    ).toEqual(
+      expect.objectContaining({
+        activityId: 'act-tafsir-7',
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'WRITTEN',
+        packageTitle: null,
+        registeredCount: 2,
+        startedCount: null,
+        submittedCount: null,
+        absentCount: 1,
+      }),
+    )
+    expect(report.absences).toEqual([
+      expect.objectContaining({ studentId: absent, scheduleId: offline.id }),
+    ])
+    expect(report.schedules.some((row) => row.scheduleId === null)).toBe(false)
+  })
+
+  it('shows an online schedule without a package with no session counts', async () => {
+    const { fixture, get } = await timetableRoom()
+    const unpackaged = withoutPackage(fixture, CLASSROOM_8A.id)
+
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    const byId = new Map(report.schedules.map((row) => [row.scheduleId, row]))
+    expect(byId.get(unpackaged.id)).toEqual(
+      expect.objectContaining({
+        deliveryMode: 'ONLINE',
+        offlineKind: null,
+        packageTitle: null,
+        registeredCount: 4,
+        startedCount: null,
+        submittedCount: null,
+        absentCount: 0,
+      }),
+    )
+    expect(byId.get(fixture.schedule.id)).toEqual(
+      expect.objectContaining({
+        deliveryMode: 'ONLINE',
+        offlineKind: null,
+        packageTitle: 'UAS Matematika',
+        startedCount: 0,
+        submittedCount: 0,
+      }),
+    )
+  })
+
+  it('renders zero rows for an offline exam of a classroom with nobody seated in the room', async () => {
+    const { fixture, get } = await timetableRoom()
+    fixture.schedules.schedules.clear()
+    fixture.schedules.schedules.set('offline-empty', {
+      ...fixture.schedule,
+      id: 'offline-empty',
+      classroomId: EMPTY_CLASSROOM_ID,
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+      activityId: 'act-empty',
+    })
+    seedActivity(fixture, {
+      id: 'act-empty',
+      gradeId: EMPTY_GRADE_ID,
+      subjectId: MATH_ID,
+      startsAt: SLOT_START,
+      endsAt: SLOT_END,
+      deliveryMode: 'OFFLINE',
+      offlineKind: 'WRITTEN',
+    })
+
+    const report = await get.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+    )
+
+    expect(report.schedules).toEqual([])
+    expect(report.absences).toEqual([])
   })
 })

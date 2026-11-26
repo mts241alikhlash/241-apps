@@ -234,7 +234,9 @@ export class GetRoomMonitorUseCase {
     const room = await this.access.assertCanView(user, roomId)
     const slot = await this.resolveSlot(user, room, query.slotId, now)
     const seats = await this.rooms.listSeatsByRoom(roomId)
-    const schedules = await this.roomSchedules(room.eventId, slot, now)
+    const schedules = (
+      await this.roomSchedules(room.eventId, slot, now)
+    ).filter((row) => row.packageId !== null)
     const sessions = await this.sessions.listByRoom(roomId)
     const sessionOf = new Map(
       sessions.map((session) => [

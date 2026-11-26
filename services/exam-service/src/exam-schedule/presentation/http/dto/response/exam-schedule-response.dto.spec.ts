@@ -50,6 +50,26 @@ describe('exam schedule response DTOs', () => {
     expect(dto.makeupOfId).toBe('44444444-4444-4444-8444-444444444444')
   })
 
+  it('keeps a missing package as null and carries the delivery mode', () => {
+    const dto = ExamScheduleDto.fromDomain({
+      ...view,
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+
+    expect(dto).toMatchObject({
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+    expect(ExamScheduleDto.fromDomain(view)).toMatchObject({
+      deliveryMode: 'ONLINE',
+      packageId: view.packageId,
+      packageTitle: 'UTS',
+    })
+  })
+
   it('exposes the access code only through AccessCodeDto', () => {
     const dto = AccessCodeDto.of(
       'K7M2QX',

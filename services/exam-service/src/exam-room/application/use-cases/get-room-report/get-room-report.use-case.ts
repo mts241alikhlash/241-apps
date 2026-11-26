@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
+import type {
+  ExamDeliveryMode,
+  ExamOfflineKind,
+} from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import type { RoomStaffUser } from '../../room-access.service.js'
@@ -10,6 +14,8 @@ import { IExamRoomRepository } from '../../../domain/repositories/exam-room.repo
 export interface ReportScheduleRow {
   scheduleId: string | null
   activityId: string | null
+  deliveryMode: ExamDeliveryMode
+  offlineKind: ExamOfflineKind | null
   packageTitle: string | null
   subjectName: string | null
   gradeId: string | null
@@ -17,8 +23,8 @@ export interface ReportScheduleRow {
   startsAt: string
   endsAt: string
   registeredCount: number
-  startedCount: number
-  submittedCount: number
+  startedCount: number | null
+  submittedCount: number | null
   absentCount: number
 }
 
@@ -104,9 +110,11 @@ export class GetRoomReportUseCase {
         .map((row) => row.activityId)
         .filter((id): id is string => id !== undefined && id !== null),
     )
-    const activities = (
-      await this.rooms.listActivitiesByEvent(room.eventId)
-    ).filter(
+    const eventActivities = await this.rooms.listActivitiesByEvent(room.eventId)
+    const offlineKinds = new Map(
+      eventActivities.map((row) => [row.id, row.offlineKind]),
+    )
+    const activities = eventActivities.filter(
       (row) =>
         row.startsAt.getTime() < slot.endsAt.getTime() &&
         row.endsAt.getTime() > slot.startsAt.getTime(),
@@ -183,9 +191,13 @@ export class GetRoomReportUseCase {
               session.scheduleId === schedule.id &&
               inClass.some((seat) => seat.studentId === session.studentId),
           )
+          const sessionless =
+            schedule.deliveryMode === 'OFFLINE' || schedule.packageId === null
           return {
             scheduleId: schedule.id,
             activityId: schedule.activityId ?? null,
+            deliveryMode: schedule.deliveryMode,
+            offlineKind: offlineKinds.get(schedule.activityId ?? '') ?? null,
             packageTitle: schedule.packageTitle,
             subjectName: subjectNames.get(schedule.subjectId) ?? null,
             gradeId: classroomGrades.get(schedule.classroomId) ?? null,
@@ -193,10 +205,12 @@ export class GetRoomReportUseCase {
             startsAt: schedule.startsAt.toISOString(),
             endsAt: schedule.endsAt.toISOString(),
             registeredCount: inClass.length,
-            startedCount: classSessions.length,
-            submittedCount: classSessions.filter(
-              (session) => session.status !== 'IN_PROGRESS',
-            ).length,
+            startedCount: sessionless ? null : classSessions.length,
+            submittedCount: sessionless
+              ? null
+              : classSessions.filter(
+                  (session) => session.status !== 'IN_PROGRESS',
+                ).length,
             absentCount: absences.filter(
               (row) => row.scheduleId === schedule.id,
             ).length,
@@ -205,6 +219,8 @@ export class GetRoomReportUseCase {
         ...derived.map((activity): ReportScheduleRow => ({
           scheduleId: null,
           activityId: activity.id,
+          deliveryMode: activity.deliveryMode,
+          offlineKind: activity.offlineKind,
           packageTitle: null,
           subjectName: subjectNames.get(activity.subjectId) ?? null,
           gradeId: activity.gradeId,
@@ -212,8 +228,8 @@ export class GetRoomReportUseCase {
           startsAt: activity.startsAt.toISOString(),
           endsAt: activity.endsAt.toISOString(),
           registeredCount: seatedByGrade.get(activity.gradeId) ?? 0,
-          startedCount: 0,
-          submittedCount: 0,
+          startedCount: null,
+          submittedCount: null,
           absentCount: 0,
         })),
       ].sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)),

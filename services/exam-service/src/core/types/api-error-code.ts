@@ -26,6 +26,8 @@ export const API_ERROR_CODES = [
   'OFFLINE_NOT_STARTABLE',
   'PACKAGE_MISSING',
   'OFFLINE_NO_PACKAGE',
+  'OFFLINE_NO_TOKEN',
+  'SCHEDULE_CANCELLED',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

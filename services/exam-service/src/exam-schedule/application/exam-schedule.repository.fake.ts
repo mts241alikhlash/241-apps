@@ -59,6 +59,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
   findForGrading(query: ExamScheduleGradingQuery) {
     const rows = [...this.schedules.values()]
       .filter((row) => row.semesterId === query.semesterId)
+      .filter((row) => row.packageId !== null)
       .filter(
         (row) => !query.category || categoryOf(row.type) === query.category,
       )

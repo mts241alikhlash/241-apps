@@ -1,9 +1,12 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import type { ExamActivity } from '../../exam-activity/domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../exam-activity/domain/repositories/exam-activity.repository.js'
 import type { ExamSchedule } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { IExamScheduleRepository } from '../../exam-schedule/domain/repositories/exam-schedule.repository.js'
-import { ApiConflictException } from '../../core/filters/api-exception.js'
+import {
+  ApiConflictException,
+  ApiForbiddenException,
+} from '../../core/filters/api-exception.js'
 import { assertOpenable } from '../../exam-schedule/domain/policies/assert-openable.policy.js'
 import type { ExamSession } from '../domain/entities/exam-session.entity.js'
 import { lifecycleWindow } from '../domain/policies/exam-lifecycle.policy.js'
@@ -62,7 +65,10 @@ export class LifecycleGate {
         : target
     if (schedule === null) return
     if (schedule.status !== 'SCHEDULED') {
-      throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
+      throw new ApiForbiddenException(
+        'SCHEDULE_CANCELLED',
+        'Jadwal ujian sudah dibatalkan',
+      )
     }
     const { activity, eventId } = await this.sourceOf(schedule)
     const window = lifecycleWindow(schedule, activity)

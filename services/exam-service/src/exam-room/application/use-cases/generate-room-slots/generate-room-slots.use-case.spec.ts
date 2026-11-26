@@ -40,6 +40,8 @@ async function seed() {
       subjectId: `subject-${index}`,
       startsAt: new Date(startsAt),
       endsAt: new Date(endsAt),
+      deliveryMode: 'ONLINE',
+      offlineKind: null,
     })
   })
   rooms.activities.set('act-0-ipa', {
@@ -49,6 +51,8 @@ async function seed() {
     subjectId: 'subject-ipa',
     startsAt: new Date(windows[0][0]),
     endsAt: new Date(windows[0][1]),
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
   })
   return {
     rooms,

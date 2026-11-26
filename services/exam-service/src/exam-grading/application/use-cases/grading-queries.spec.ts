@@ -166,6 +166,24 @@ describe('grading queries', () => {
       expect(page.data[0].sessions).toBe(0)
     })
 
+    it('leaves out an ended schedule that has no package', async () => {
+      const w = build()
+      const { schedule } = await paperWithManual(w)
+      w.schedules.schedules.set(schedule.id, {
+        ...schedule,
+        packageId: null,
+        packageTitle: null,
+      })
+
+      const page = await listSchedules(w).execute(
+        STAFF,
+        { page: 1, limit: 10 },
+        new Date(schedule.endsAt.getTime() + 60_000),
+      )
+
+      expect(page).toMatchObject({ data: [], total: 0 })
+    })
+
     it('lists a makeup before anyone started it, only for the teacher of that class', async () => {
       const w = build()
       const { schedule } = await paperWithManual(w)
