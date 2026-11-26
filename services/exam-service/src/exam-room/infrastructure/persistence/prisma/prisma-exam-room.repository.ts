@@ -172,7 +172,6 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
     const rows = await this.prisma.examRoomSupervisor.findMany({
       where: {
         actualUserId: userId,
-        startsAt: { lte: at },
         endsAt: { gt: at },
       },
       select: { room: { select: { eventId: true } } },

@@ -581,4 +581,67 @@ suite('Prisma exam rooms against a real database', () => {
       rooms.createReport({ roomId: first.id, supervisorSlotId: slot.id }),
     ).rejects.toBeInstanceOf(ExamRoomConflictError)
   })
+
+  it('lists upcoming and active supervised events identically in fake and database', async () => {
+    const upcoming = await event()
+    const ended = await event()
+    const upcomingRoom = await room(upcoming.id, 'R1')
+    const endedRoom = await room(ended.id, 'R2')
+    const now = new Date('2026-11-02T12:00:00Z')
+    const check = async (
+      repo: IExamRoomRepository,
+      targetUpcoming: string,
+      targetEnded: string,
+    ) => {
+      await repo.assignSupervisor({
+        roomId: targetUpcoming,
+        startsAt: new Date('2026-11-03T00:00:00Z'),
+        endsAt: new Date('2026-11-03T04:00:00Z'),
+        scheduledUserId: supervisorA,
+      })
+      await repo.assignSupervisor({
+        roomId: targetEnded,
+        startsAt: new Date('2026-11-02T00:00:00Z'),
+        endsAt: new Date('2026-11-02T04:00:00Z'),
+        scheduledUserId: supervisorA,
+      })
+      return repo.listEventIdsSupervisedBy(supervisorA, now)
+    }
+
+    const fake = new FakeExamRoomRepository()
+    const fakeUpcoming = await fake.createEvent({
+      semesterId,
+      name: 'UTS Ganjil',
+      type: 'MIDTERM',
+      startsAt: new Date('2026-11-02T01:00:00Z'),
+      endsAt: new Date('2026-11-03T05:00:00Z'),
+      createdById: userId,
+    })
+    const fakeEnded = await fake.createEvent({
+      semesterId,
+      name: 'UTS Lalu',
+      type: 'MIDTERM',
+      startsAt: new Date('2026-11-01T01:00:00Z'),
+      endsAt: new Date('2026-11-02T05:00:00Z'),
+      createdById: userId,
+    })
+    const fakeUpcomingRoom = await fake.createRoom({
+      eventId: fakeUpcoming.id,
+      code: 'R1',
+      name: 'Ruang R1',
+      capacity: 2,
+    })
+    const fakeEndedRoom = await fake.createRoom({
+      eventId: fakeEnded.id,
+      code: 'R2',
+      name: 'Ruang R2',
+      capacity: 2,
+    })
+
+    const fakeIds = await check(fake, fakeUpcomingRoom.id, fakeEndedRoom.id)
+    const realIds = await check(rooms, upcomingRoom.id, endedRoom.id)
+
+    expect(fakeIds).toEqual([fakeUpcoming.id])
+    expect(realIds).toEqual([upcoming.id])
+  })
 })
