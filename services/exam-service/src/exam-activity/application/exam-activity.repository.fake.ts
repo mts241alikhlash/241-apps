@@ -254,6 +254,27 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     return Promise.resolve(updated)
   }
 
+  readonly autoStatusAudits: {
+    activityId: string
+    actorId: string
+    before: boolean
+    after: boolean
+  }[] = []
+
+  updateAutoStatus(id: string, autoStatus: boolean, actorId: string) {
+    const activity = this.activities.get(id)
+    if (activity === undefined) return Promise.resolve(null)
+    const updated: ExamActivity = { ...activity, autoStatus }
+    this.activities.set(id, updated)
+    this.autoStatusAudits.push({
+      activityId: id,
+      actorId,
+      before: activity.autoStatus,
+      after: autoStatus,
+    })
+    return Promise.resolve(updated)
+  }
+
   readonly autoAudits: {
     activityId: string
     actorId: string

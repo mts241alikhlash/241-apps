@@ -33,14 +33,18 @@ import {
 import { AssignActivityClassroomsUseCase } from '../../application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
+import { GetActivityReadinessUseCase } from '../../application/use-cases/get-activity-readiness/get-activity-readiness.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
+import { UpdateActivityAutoStatusUseCase } from '../../application/use-cases/update-activity-auto-status/update-activity-auto-status.use-case.js'
 import { UpdateActivityStatusUseCase } from '../../application/use-cases/update-activity-status/update-activity-status.use-case.js'
 import {
   RotateActivityTokenUseCase,
   UpdateActivityPolicyUseCase,
 } from '../../application/use-cases/update-activity-policy/update-activity-policy.use-case.js'
 import {
+  ActivityReadinessDto,
+  ActivityReadinessQueryDto,
   AssignActivityClassroomsRequestDto,
   AttachActivityPackageRequestDto,
   CreateActivityRequestDto,
@@ -48,6 +52,7 @@ import {
   ExamActivityDto,
   ExamActivityQueryDto,
   IssueParticipantNumbersResponseDto,
+  UpdateActivityAutoStatusRequestDto,
   UpdateActivityPolicyRequestDto,
   UpdateActivityStatusRequestDto,
 } from './dto/exam-activity.dto.js'
@@ -66,6 +71,8 @@ export class ExamActivityController {
     private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
     private readonly attachPackage: AttachActivityPackageUseCase,
     private readonly assignClassrooms: AssignActivityClassroomsUseCase,
+    private readonly readiness: GetActivityReadinessUseCase,
+    private readonly updateAutoStatus: UpdateActivityAutoStatusUseCase,
     @Inject(forwardRef(() => ScheduleScopeService))
     private readonly scheduleScope: ScheduleScopeService,
   ) {}
@@ -85,6 +92,25 @@ export class ExamActivityController {
   ): Promise<ExamActivityDto[]> {
     const rows = await this.listActivities.listNamed(user, query.category)
     return rows.map((row) => ExamActivityDto.of(row.activity, row))
+  }
+
+  @Get('readiness')
+  @RequireAnyPermission(
+    'exam-schedules.read',
+    'exam-schedules.manage',
+    'exam-schedules.manage-all',
+    'exam-events.read',
+  )
+  @ApiOperation({
+    summary: 'Check what is still missing before the activities of a day',
+  })
+  @ApiResponse({ status: 200, type: [ActivityReadinessDto] })
+  async readinessOfDay(
+    @CurrentUser() user: ScheduleAccessUser,
+    @Query() query: ActivityReadinessQueryDto,
+  ): Promise<ActivityReadinessDto[]> {
+    const rows = await this.readiness.execute(user, query)
+    return rows.map((row) => ActivityReadinessDto.of(row))
   }
 
   @Get(':id')
@@ -115,6 +141,24 @@ export class ExamActivityController {
     @Body() dto: UpdateActivityStatusRequestDto,
   ): Promise<ExamActivityDto> {
     const activity = await this.updateStatus.execute(user, id, dto.status)
+    return ExamActivityDto.of(activity)
+  }
+
+  @Patch(':id/auto-status')
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({ summary: 'Switch automatic opening and closing' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: ExamActivityDto })
+  async switchAutoStatus(
+    @CurrentUser() user: ScheduleAccessUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateActivityAutoStatusRequestDto,
+  ): Promise<ExamActivityDto> {
+    const activity = await this.updateAutoStatus.execute(
+      user,
+      id,
+      dto.autoStatus,
+    )
     return ExamActivityDto.of(activity)
   }
 

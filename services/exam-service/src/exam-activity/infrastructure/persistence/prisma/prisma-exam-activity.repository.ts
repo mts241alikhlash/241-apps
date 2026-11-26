@@ -405,6 +405,27 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     })
   }
 
+  async updateAutoStatus(id: string, autoStatus: boolean, actorId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.examActivity.findUnique({ where: { id } })
+      if (before === null) return null
+      const updated = await tx.examActivity.update({
+        where: { id },
+        data: { autoStatus },
+      })
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId: id,
+          actorId,
+          action: 'UPDATE_AUTO_STATUS',
+          before: { autoStatus: before.autoStatus },
+          after: { autoStatus: updated.autoStatus },
+        },
+      })
+      return toEntity(updated)
+    })
+  }
+
   async findDueForAdvance(now: Date) {
     const rows = await this.prisma.examActivity.findMany({
       where: {

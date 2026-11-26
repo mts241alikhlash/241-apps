@@ -158,6 +158,30 @@ suite('PrismaExamActivityRepository against a real database', () => {
     expect(rows.map((row) => row.classroomId).sort()).toEqual([a, b].sort())
   })
 
+  it('switches autoStatus and audits the change in the same transaction', async () => {
+    const activity = await newActivity('ONLINE')
+    const actorId = '00000000-0000-0000-0000-000000000009'
+
+    const updated = await repo.updateAutoStatus(activity.id, false, actorId)
+    const missing = await repo.updateAutoStatus(
+      '00000000-0000-0000-0000-0000000000ff',
+      false,
+      actorId,
+    )
+
+    expect(updated?.autoStatus).toBe(false)
+    expect(missing).toBeNull()
+    const logs = await prisma.examActivityAuditLog.findMany({
+      where: { activityId: activity.id, action: 'UPDATE_AUTO_STATUS' },
+    })
+    expect(logs).toHaveLength(1)
+    expect(logs[0]).toMatchObject({
+      actorId,
+      before: { autoStatus: true },
+      after: { autoStatus: false },
+    })
+  })
+
   it('changes status once under compare-and-set and audits only that change', async () => {
     const activity = await newActivity('ONLINE')
     await prisma.examActivity.update({

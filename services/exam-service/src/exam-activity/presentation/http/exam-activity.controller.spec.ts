@@ -20,6 +20,8 @@ import { IParticipantNumberPort } from '../../../platform/participant-number/par
 import { FakeExamActivityRepository } from '../../application/exam-activity.repository.fake.js'
 import { AssignActivityClassroomsUseCase } from '../../application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
+import { GetActivityReadinessUseCase } from '../../application/use-cases/get-activity-readiness/get-activity-readiness.use-case.js'
+import { UpdateActivityAutoStatusUseCase } from '../../application/use-cases/update-activity-auto-status/update-activity-auto-status.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import type { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListActivitiesUseCase } from '../../application/use-cases/list-activities/list-activities.use-case.js'
@@ -135,6 +137,9 @@ function build(
     execute: vi.fn().mockResolvedValue(0),
   } as unknown as CloseActivitySessionsUseCase
 
+  const readiness = {
+    execute: vi.fn().mockResolvedValue([]),
+  } as unknown as GetActivityReadinessUseCase
   const controller = new ExamActivityController(
     new CreateActivityUseCase(repo, participants),
     new ListActivitiesUseCase(repo, academic, scope),
@@ -144,14 +149,17 @@ function build(
     { execute: issue } as unknown as IssueParticipantNumbersUseCase,
     new AttachActivityPackageUseCase(repo, scope, academic),
     new AssignActivityClassroomsUseCase(repo, scope, academic),
+    readiness,
+    new UpdateActivityAutoStatusUseCase(repo, scope),
     scope,
   )
 
-  return { repo, controller, issue }
+  return { repo, controller, issue, readiness }
 }
 
 const exactExpected: Record<string, string[]> = {
   changeStatus: ['exam-schedules.manage'],
+  switchAutoStatus: ['exam-schedules.manage'],
   create: ['exam-schedules.manage'],
   attach: ['exam-schedules.manage'],
   assign: ['exam-schedules.manage'],
@@ -161,6 +169,12 @@ const exactExpected: Record<string, string[]> = {
 
 const anyExpected: Record<string, string[]> = {
   list: [
+    'exam-schedules.read',
+    'exam-schedules.manage',
+    'exam-schedules.manage-all',
+    'exam-events.read',
+  ],
+  readinessOfDay: [
     'exam-schedules.read',
     'exam-schedules.manage',
     'exam-schedules.manage-all',
@@ -204,6 +218,60 @@ describe('ExamActivityController', () => {
     expect(routes.sort()).toEqual(
       [...Object.keys(exactExpected), ...Object.keys(anyExpected)].sort(),
     )
+  })
+
+  it('declares the static readiness route before the id routes', () => {
+    const names = Object.getOwnPropertyNames(ExamActivityController.prototype)
+    const path = (name: string) =>
+      Reflect.getMetadata(
+        'path',
+        ExamActivityController.prototype[name as keyof ExamActivityController],
+      )
+
+    expect(path('readinessOfDay')).toBe('readiness')
+    expect(path('findOne')).toBe(':id')
+    expect(names.indexOf('readinessOfDay')).toBeLessThan(
+      names.indexOf('findOne'),
+    )
+  })
+
+  it('passes the query and the user to the readiness use case', async () => {
+    const { controller, readiness } = build()
+    vi.mocked(readiness.execute).mockResolvedValueOnce([
+      {
+        activityId: 'activity-1',
+        subjectName: 'Matematika',
+        gradeName: 'Kelas 7',
+        startsAt: new Date('2026-11-10T01:00:00Z'),
+        deliveryMode: 'OFFLINE',
+        checks: [{ key: 'LATE_TOLERANCE', ok: true, detail: 'x' }],
+      },
+    ])
+
+    const rows = await controller.readinessOfDay(examAdmin, {
+      date: '2026-11-10',
+    })
+
+    expect(readiness.execute).toHaveBeenCalledWith(examAdmin, {
+      date: '2026-11-10',
+    })
+    expect(rows[0]).toMatchObject({
+      activityId: 'activity-1',
+      startsAt: '2026-11-10T01:00:00.000Z',
+      checks: [{ key: 'LATE_TOLERANCE', ok: true, detail: 'x' }],
+    })
+  })
+
+  it('switches the automatic status of an activity', async () => {
+    const { controller, repo } = build()
+    repo.activities.set('activity-1', makeActivity())
+
+    const dto = await controller.switchAutoStatus(examAdmin, 'activity-1', {
+      autoStatus: false,
+    })
+
+    expect(dto.autoStatus).toBe(false)
+    expect(repo.autoStatusAudits).toHaveLength(1)
   })
 
   it('answers whether the registry issued the numbers', async () => {

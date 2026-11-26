@@ -128,6 +128,10 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve([])
   }
 
+  updateAutoStatus() {
+    return Promise.resolve(null)
+  }
+
   updateStatusIf() {
     return Promise.resolve(false)
   }

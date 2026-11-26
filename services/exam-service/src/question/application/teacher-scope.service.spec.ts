@@ -20,6 +20,7 @@ function build(options: {
       teachingPairsOf,
       gradesByIds: vi.fn(),
       classroomsByIds: vi.fn(),
+      classroomsOfYear: vi.fn(),
       activeSemester: vi.fn(),
       teachingAssignmentsOf: vi.fn(),
       subjectsByIds: vi.fn(),

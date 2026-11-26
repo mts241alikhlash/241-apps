@@ -6,6 +6,7 @@ import {
   IsIn,
   IsInt,
   IsISO8601,
+  Matches,
   IsOptional,
   IsUUID,
   Max,
@@ -25,6 +26,11 @@ import {
   EXAM_DELIVERY_MODES,
   EXAM_OFFLINE_KINDS,
 } from '../../../domain/entities/exam-activity.entity.js'
+import {
+  READINESS_KEYS,
+  type ActivityReadiness,
+  type ReadinessCheck,
+} from '../../../application/use-cases/get-activity-readiness/get-activity-readiness.use-case.js'
 import type { ExamPolicy } from '../../../domain/policies/exam-policy.policy.js'
 
 export const EXAM_PRESET_NAMES = EXAM_TYPES
@@ -120,6 +126,49 @@ export class UpdateActivityStatusRequestDto {
   @ApiProperty({ enum: ACTIVITY_STATUSES })
   @IsIn([...ACTIVITY_STATUSES])
   status!: (typeof ACTIVITY_STATUSES)[number]
+}
+
+export class UpdateActivityAutoStatusRequestDto {
+  @ApiProperty() @IsBoolean() autoStatus!: boolean
+}
+
+export class ActivityReadinessQueryDto {
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  eventId?: string
+
+  @ApiProperty({ example: '2026-11-30', description: 'Day in Asia/Jakarta' })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  date!: string
+}
+
+export class ActivityReadinessCheckDto {
+  @ApiProperty({ enum: READINESS_KEYS }) key!: ReadinessCheck['key']
+  @ApiProperty() ok!: boolean
+  @ApiProperty() detail!: string
+}
+
+export class ActivityReadinessDto {
+  @ApiProperty({ format: 'uuid' }) activityId!: string
+  @ApiProperty({ nullable: true }) subjectName!: string | null
+  @ApiProperty({ nullable: true }) gradeName!: string | null
+  @ApiProperty({ format: 'date-time' }) startsAt!: string
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES })
+  deliveryMode!: ActivityReadiness['deliveryMode']
+  @ApiProperty({ type: [ActivityReadinessCheckDto] })
+  checks!: ActivityReadinessCheckDto[]
+
+  static of(row: ActivityReadiness): ActivityReadinessDto {
+    const dto = new ActivityReadinessDto()
+    dto.activityId = row.activityId
+    dto.subjectName = row.subjectName
+    dto.gradeName = row.gradeName
+    dto.startsAt = row.startsAt.toISOString()
+    dto.deliveryMode = row.deliveryMode
+    dto.checks = row.checks.map((check) => ({ ...check }))
+    return dto
+  }
 }
 
 export class IssueParticipantNumbersResponseDto {

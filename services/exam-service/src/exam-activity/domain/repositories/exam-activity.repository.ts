@@ -22,6 +22,7 @@ export interface ActivityAuditEntry {
     | 'ROTATE_TOKEN'
     | 'UPDATE_STATUS'
     | 'AUTO_STATUS'
+    | 'UPDATE_AUTO_STATUS'
   before: unknown
   after: unknown
 }
@@ -85,6 +86,11 @@ export abstract class ExamActivityRepository {
   abstract updateStatus(
     id: string,
     status: ActivityStatus,
+    actorId: string,
+  ): Promise<ExamActivity | null>
+  abstract updateAutoStatus(
+    id: string,
+    autoStatus: boolean,
     actorId: string,
   ): Promise<ExamActivity | null>
   abstract findDueForAdvance(now: Date): Promise<ExamActivity[]>
