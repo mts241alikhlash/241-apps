@@ -263,7 +263,9 @@ export class GetRoomMonitorUseCase {
       ).map((row) => [row.id, row.name]),
     )
     const questionCounts = await this.questionCounts(
-      schedules.map((row) => row.packageId),
+      schedules.flatMap((row) =>
+        row.packageId === null ? [] : [row.packageId],
+      ),
     )
     const schedulesOfClassroom = new Map<string, ExamSchedule[]>()
     for (const schedule of schedules) {
@@ -293,7 +295,7 @@ export class GetRoomMonitorUseCase {
               ? null
               : (subjectNames.get(schedule.subjectId) ?? null),
           totalQuestions:
-            schedule === undefined
+            schedule?.packageId == null
               ? 0
               : (questionCounts.get(schedule.packageId) ?? 0),
           absence:

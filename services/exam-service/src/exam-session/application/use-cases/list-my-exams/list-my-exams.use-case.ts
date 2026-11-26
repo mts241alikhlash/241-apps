@@ -127,6 +127,7 @@ export class ListMyExamsUseCase {
       ) {
         continue
       }
+      if (schedule.packageId === null) continue
       const pkg = await this.packages.findById(schedule.packageId)
       if (pkg === null) continue
       const session = sessionOf.get(schedule.id) ?? null
@@ -145,7 +146,7 @@ export class ListMyExamsUseCase {
         title:
           schedule.kind === 'MAKEUP'
             ? `${schedule.packageTitle} (Susulan)`
-            : schedule.packageTitle,
+            : (schedule.packageTitle ?? pkg.title),
         subjectId: pkg.subjectId,
         subjectName: null,
         type: schedule.type,

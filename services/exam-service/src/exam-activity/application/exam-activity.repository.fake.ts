@@ -87,6 +87,10 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
       id: randomUUID(),
       tokenRotation: 0,
       status: 'DRAFT',
+      deliveryMode: input.activity.deliveryMode ?? 'ONLINE',
+      offlineKind: input.activity.offlineKind ?? null,
+      maxScore: input.activity.maxScore ?? 100,
+      autoStatus: input.activity.autoStatus ?? true,
     }
     this.activities.set(activity.id, activity)
     this.activitySchedules.set(

@@ -75,7 +75,7 @@ suite('Prisma makeup schedules against a real database', () => {
     const base = await original()
 
     const makeup = await schedules.createMakeup({
-      packageId: base.packageId,
+      packageId: base.packageId!,
       classroomId,
       semesterId,
       startsAt: new Date('2026-11-04T01:00:00Z'),
@@ -107,7 +107,7 @@ suite('Prisma makeup schedules against a real database', () => {
   it('finds the makeups of an original and the makeups a student is on', async () => {
     const base = await original()
     const makeup = await schedules.createMakeup({
-      packageId: base.packageId,
+      packageId: base.packageId!,
       classroomId,
       semesterId,
       startsAt: new Date('2026-11-04T01:00:00Z'),
@@ -139,7 +139,7 @@ suite('Prisma makeup schedules against a real database', () => {
   it('adds and removes participants and refuses the same student twice', async () => {
     const base = await original()
     const makeup = await schedules.createMakeup({
-      packageId: base.packageId,
+      packageId: base.packageId!,
       classroomId,
       semesterId,
       startsAt: new Date('2026-11-04T01:00:00Z'),
@@ -175,7 +175,7 @@ suite('Prisma makeup schedules against a real database', () => {
   it('keeps makeups out of the regular listing of a classroom', async () => {
     const base = await original()
     const makeup = await schedules.createMakeup({
-      packageId: base.packageId,
+      packageId: base.packageId!,
       classroomId,
       semesterId,
       startsAt: new Date('2026-11-04T01:00:00Z'),
@@ -199,7 +199,7 @@ suite('Prisma makeup schedules against a real database', () => {
     const base = await original()
     const create = () =>
       schedules.createMakeup({
-        packageId: base.packageId,
+        packageId: base.packageId!,
         classroomId,
         semesterId,
         startsAt: new Date('2099-11-04T01:00:00Z'),
@@ -229,7 +229,7 @@ suite('Prisma makeup schedules against a real database', () => {
     const base = await original()
     const makeup = (studentId: string) =>
       schedules.createMakeup({
-        packageId: base.packageId,
+        packageId: base.packageId!,
         classroomId,
         semesterId,
         startsAt: new Date('2099-11-04T01:00:00Z'),
@@ -263,7 +263,7 @@ suite('Prisma makeup schedules against a real database', () => {
   it('does not remove a student whose session exists, even when the check came first', async () => {
     const base = await original()
     const makeup = await schedules.createMakeup({
-      packageId: base.packageId,
+      packageId: base.packageId!,
       classroomId,
       semesterId,
       startsAt: new Date('2099-11-04T01:00:00Z'),

@@ -48,8 +48,8 @@ export class ExamScheduleDto {
   ): ExamScheduleDto {
     const dto = new ExamScheduleDto()
     dto.id = domain.id
-    dto.packageId = domain.packageId
-    dto.packageTitle = domain.packageTitle
+    dto.packageId = domain.packageId ?? ''
+    dto.packageTitle = domain.packageTitle ?? ''
     dto.classroomId = domain.classroomId
     dto.classroomName = domain.classroomName ?? null
     dto.semesterId = domain.semesterId

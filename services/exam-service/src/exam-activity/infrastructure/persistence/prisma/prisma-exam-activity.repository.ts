@@ -11,6 +11,8 @@ import type {
   ActivityStatus,
   ActivityTokenMode,
   ExamActivity,
+  ExamDeliveryMode,
+  ExamOfflineKind,
 } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 import {
@@ -34,6 +36,10 @@ interface ActivityRow {
   endsAt: Date
   durationMinutes: number
   status: ActivityStatus
+  deliveryMode: ExamDeliveryMode
+  offlineKind: ExamOfflineKind | null
+  maxScore: number
+  autoStatus: boolean
   createdById: string
 }
 
@@ -54,6 +60,10 @@ function toEntity(row: ActivityRow): ExamActivity {
     endsAt: row.endsAt,
     durationMinutes: row.durationMinutes,
     status: row.status,
+    deliveryMode: row.deliveryMode,
+    offlineKind: row.offlineKind,
+    maxScore: row.maxScore,
+    autoStatus: row.autoStatus,
     createdById: row.createdById,
   }
 }
@@ -180,6 +190,10 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
           startsAt: activity.startsAt,
           endsAt: activity.endsAt,
           durationMinutes: activity.durationMinutes,
+          deliveryMode: activity.deliveryMode,
+          offlineKind: activity.offlineKind,
+          maxScore: activity.maxScore,
+          autoStatus: activity.autoStatus,
           createdById: activity.createdById,
         },
       })

@@ -97,7 +97,7 @@ describe('CreateExamScheduleUseCase', () => {
     expect(
       MyExamDto.fromDomain({
         id: created.id,
-        title: created.packageTitle,
+        title: created.packageTitle!,
         subjectId: created.subjectId,
         subjectName: null,
         type: created.type,

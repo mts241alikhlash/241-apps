@@ -111,6 +111,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     const now = new Date()
     const row: ExamSchedule = {
       id: randomUUID(),
+      deliveryMode: 'ONLINE',
       packageId: input.packageId,
       packageTitle: pkg.title,
       subjectId: pkg.subjectId,
@@ -142,6 +143,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     const now = new Date()
     const row: ExamSchedule = {
       id: randomUUID(),
+      deliveryMode: 'ONLINE',
       packageId: input.packageId,
       packageTitle: pkg.title,
       subjectId: pkg.subjectId,

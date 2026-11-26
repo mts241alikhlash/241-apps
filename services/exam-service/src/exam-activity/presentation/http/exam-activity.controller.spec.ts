@@ -98,6 +98,10 @@ function makeActivity(overrides: Partial<ExamActivity> = {}): ExamActivity {
     endsAt: new Date('2026-11-10T04:00:00Z'),
     durationMinutes: 90,
     status: 'DRAFT',
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
+    maxScore: 100,
+    autoStatus: true,
     createdById: 'other-user',
     ...overrides,
   }

@@ -11,6 +11,8 @@ export interface ExamPolicy {
   tokenSlotSeconds: number
   lateToleranceMinutes: number
   minSubmitMinutes: number
+  autoOpenLeadMinutes: number
+  autoCloseGraceMinutes: number
   shuffleQuestions: boolean
   shuffleChoices: boolean
   allowWeb: boolean
@@ -33,6 +35,8 @@ const BOUNDS = {
   tokenSlotSeconds: [300, 3_600],
   lateToleranceMinutes: [0, 120],
   minSubmitMinutes: [0, 180],
+  autoOpenLeadMinutes: [0, 60],
+  autoCloseGraceMinutes: [0, 240],
 } as const satisfies Record<NumericPolicyKey, readonly [number, number]>
 
 export const POLICY_KEYS = Object.keys(BOUNDS) as NumericPolicyKey[]
@@ -54,6 +58,8 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     tokenSlotSeconds: 600,
     lateToleranceMinutes: 15,
     minSubmitMinutes: 0,
+    autoOpenLeadMinutes: 5,
+    autoCloseGraceMinutes: 15,
     shuffleQuestions: true,
     shuffleChoices: true,
     allowWeb: true,
@@ -68,6 +74,8 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     tokenSlotSeconds: 600,
     lateToleranceMinutes: 15,
     minSubmitMinutes: 0,
+    autoOpenLeadMinutes: 5,
+    autoCloseGraceMinutes: 15,
     shuffleQuestions: true,
     shuffleChoices: true,
     allowWeb: true,
@@ -82,6 +90,8 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     tokenSlotSeconds: 600,
     lateToleranceMinutes: 15,
     minSubmitMinutes: 0,
+    autoOpenLeadMinutes: 5,
+    autoCloseGraceMinutes: 15,
     shuffleQuestions: true,
     shuffleChoices: true,
     allowWeb: true,
@@ -96,6 +106,8 @@ export const DEFAULT_POLICIES: Record<ExamType, ExamPolicy> = {
     tokenSlotSeconds: 600,
     lateToleranceMinutes: 15,
     minSubmitMinutes: 0,
+    autoOpenLeadMinutes: 5,
+    autoCloseGraceMinutes: 15,
     shuffleQuestions: true,
     shuffleChoices: true,
     allowWeb: true,

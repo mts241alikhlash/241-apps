@@ -23,6 +23,8 @@ export const API_ERROR_CODES = [
   'EVENT_WINDOW_MISMATCH',
   'SEATS_EXIST',
   'ACTIVITY_HAS_PACKAGE',
+  'OFFLINE_NOT_STARTABLE',
+  'PACKAGE_MISSING',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

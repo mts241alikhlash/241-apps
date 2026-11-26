@@ -46,6 +46,10 @@ function seeded(status: ActivityStatus): FakeExamActivityRepository {
     endsAt: new Date('2026-11-10T04:00:00Z'),
     durationMinutes: 90,
     status,
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
+    maxScore: 100,
+    autoStatus: true,
     createdById: 'admin-1',
   }
   repo.activities.set(activity.id, activity)

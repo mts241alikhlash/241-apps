@@ -46,14 +46,14 @@ export class GradingScheduleDto {
     dto.title =
       domain.kind === 'MAKEUP'
         ? `${domain.packageTitle} (Susulan)`
-        : domain.packageTitle
+        : (domain.packageTitle ?? '')
     dto.subjectId = domain.subjectId
     dto.classroomId = domain.classroomId
     dto.classroomName = domain.classroomName
     dto.semesterId = domain.semesterId
     dto.type = domain.type
     dto.category = categoryOf(domain.type)
-    dto.packageId = domain.packageId
+    dto.packageId = domain.packageId ?? ''
     dto.durationMinutes = domain.durationMinutes
     dto.kind = domain.kind
     dto.startsAt = domain.startsAt.toISOString()

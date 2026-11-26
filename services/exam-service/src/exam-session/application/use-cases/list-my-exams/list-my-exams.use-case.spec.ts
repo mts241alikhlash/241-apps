@@ -228,7 +228,7 @@ describe('ListMyExamsUseCase', () => {
     async function withMakeup(participants: string[] = [STUDENT_ID]) {
       const original = await scheduleExam(fixtures())
       const makeup = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-05T01:00:00.000Z'),
@@ -309,7 +309,7 @@ describe('ListMyExamsUseCase', () => {
     it('hides a makeup once the student sat an earlier makeup of the same exam', async () => {
       const { original, makeup } = await withMakeup()
       const earlier = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-03T01:00:00.000Z'),
@@ -508,7 +508,7 @@ describe('ListMyExamsUseCase', () => {
         activityId: activity.id,
       })
       const makeup = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-10T01:00:00.000Z'),

@@ -12,6 +12,12 @@ export const ACTIVITY_STATUSES = [
 ] as const
 export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number]
 
+export const EXAM_DELIVERY_MODES = ['ONLINE', 'OFFLINE'] as const
+export type ExamDeliveryMode = (typeof EXAM_DELIVERY_MODES)[number]
+
+export const EXAM_OFFLINE_KINDS = ['WRITTEN', 'PRACTICAL'] as const
+export type ExamOfflineKind = (typeof EXAM_OFFLINE_KINDS)[number]
+
 export interface ExamActivity {
   id: string
   semesterId: string
@@ -28,6 +34,10 @@ export interface ExamActivity {
   endsAt: Date
   durationMinutes: number
   status: ActivityStatus
+  deliveryMode: ExamDeliveryMode
+  offlineKind: ExamOfflineKind | null
+  maxScore: number
+  autoStatus: boolean
   createdById: string
 }
 
@@ -44,5 +54,9 @@ export interface NewExamActivity {
   startsAt: Date
   endsAt: Date
   durationMinutes: number
+  deliveryMode?: ExamDeliveryMode
+  offlineKind?: ExamOfflineKind | null
+  maxScore?: number
+  autoStatus?: boolean
   createdById: string
 }

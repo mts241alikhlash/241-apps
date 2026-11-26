@@ -166,6 +166,20 @@ export class UpdateActivityPolicyRequestDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  autoOpenLeadMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(240)
+  autoCloseGraceMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
   shuffleQuestions?: boolean
 
@@ -190,6 +204,8 @@ export class ExamPolicyDto implements ExamPolicy {
   @ApiProperty() tokenSlotSeconds!: number
   @ApiProperty() lateToleranceMinutes!: number
   @ApiProperty() minSubmitMinutes!: number
+  @ApiProperty() autoOpenLeadMinutes!: number
+  @ApiProperty() autoCloseGraceMinutes!: number
   @ApiProperty() shuffleQuestions!: boolean
   @ApiProperty() shuffleChoices!: boolean
   @ApiProperty() allowWeb!: boolean

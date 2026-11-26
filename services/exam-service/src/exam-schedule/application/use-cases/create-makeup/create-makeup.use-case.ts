@@ -63,6 +63,7 @@ export class CreateMakeupUseCase {
     }
 
     const packageId = input.packageId ?? original.packageId
+    if (packageId === null) throw new NotFoundException('Paket tidak ditemukan')
     await this.assertPackage(original, packageId)
     await this.participants.assertEligible(original, input.participants, now)
 
@@ -89,7 +90,10 @@ export class CreateMakeupUseCase {
     const target = await this.packages.findById(packageId)
     if (target === null) throw new NotFoundException('Paket tidak ditemukan')
     assertCanSchedule(target.status)
-    const source = await this.packages.findById(original.packageId)
+    const source =
+      original.packageId === null
+        ? null
+        : await this.packages.findById(original.packageId)
     if (source === null) throw new NotFoundException('Paket tidak ditemukan')
     if (
       source.subjectId !== target.subjectId ||

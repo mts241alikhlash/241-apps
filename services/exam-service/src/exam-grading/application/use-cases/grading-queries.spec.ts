@@ -170,7 +170,7 @@ describe('grading queries', () => {
       const w = build()
       const { schedule } = await paperWithManual(w)
       const makeup = await w.schedules.createMakeup({
-        packageId: schedule.packageId,
+        packageId: schedule.packageId!,
         classroomId: schedule.classroomId,
         semesterId: schedule.semesterId,
         startsAt: new Date(schedule.endsAt.getTime() + 3_600_000),

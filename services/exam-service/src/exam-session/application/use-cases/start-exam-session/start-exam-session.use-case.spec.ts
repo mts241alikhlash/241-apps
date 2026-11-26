@@ -747,7 +747,7 @@ describe('StartExamSessionUseCase', () => {
 
     async function withMakeup(participants: string[] = [STUDENT_ID]) {
       const makeup = await schedules.createMakeup({
-        packageId: schedule.packageId,
+        packageId: schedule.packageId!,
         classroomId: schedule.classroomId,
         semesterId: schedule.semesterId,
         startsAt: new Date('2026-11-05T01:00:00.000Z'),
@@ -866,9 +866,21 @@ describe('StartExamSessionUseCase', () => {
       await expect(startMakeup(makeup)).resolves.toBeDefined()
     })
 
-    it('refuses the makeup when the activity is closed', async () => {
+    it('starts the makeup in its own window while the original activity is closed', async () => {
       const makeup = await withMakeup()
       await attach({ status: 'CLOSED' })
+
+      await expect(startMakeup(makeup)).resolves.toBeDefined()
+    })
+
+    it('refuses the makeup after its own window', async () => {
+      const makeup = await withMakeup()
+      schedules.schedules.set(makeup.id, {
+        ...makeup,
+        startsAt: new Date('2026-11-05T00:00:00.000Z'),
+        endsAt: new Date('2026-11-05T01:30:00.000Z'),
+      })
+      await attach({ status: 'ACTIVE' })
 
       const error = await startMakeup(makeup).catch((thrown: unknown) => thrown)
 
@@ -878,6 +890,11 @@ describe('StartExamSessionUseCase', () => {
 
     it('names the room of the activity event when it refuses the makeup', async () => {
       const makeup = await withMakeup()
+      schedules.schedules.set(makeup.id, {
+        ...makeup,
+        startsAt: new Date('2026-11-05T00:00:00.000Z'),
+        endsAt: new Date('2026-11-05T01:30:00.000Z'),
+      })
       const event = await rooms.createEvent({
         semesterId: schedule.semesterId,
         name: 'UTS Ganjil',
@@ -972,7 +989,7 @@ describe('StartExamSessionUseCase', () => {
 
     it('refuses a student who already sat an earlier makeup of the same exam', async () => {
       const earlier = await schedules.createMakeup({
-        packageId: schedule.packageId,
+        packageId: schedule.packageId!,
         classroomId: schedule.classroomId,
         semesterId: schedule.semesterId,
         startsAt: new Date('2026-11-03T01:00:00.000Z'),

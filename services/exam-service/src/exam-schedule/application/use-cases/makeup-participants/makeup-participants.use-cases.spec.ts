@@ -61,7 +61,7 @@ describe('makeup participants', () => {
       [choiceSpec('B')],
     )
     const makeup = await schedules.createMakeup({
-      packageId: schedule.packageId,
+      packageId: schedule.packageId!,
       classroomId: schedule.classroomId,
       semesterId: schedule.semesterId,
       startsAt: new Date('2026-11-05T01:00:00.000Z'),

@@ -853,7 +853,7 @@ describe('RoomReportService roster and slot guards', () => {
   it('counts a schedule spanning two slots only in the slot holding its start', async () => {
     const { fixture, save, get } = await build()
     const spanning = await fixture.schedules.createAndLockPackage({
-      packageId: (await fixture.packages.findById(fixture.schedule.packageId))!
+      packageId: (await fixture.packages.findById(fixture.schedule.packageId!))!
         .id,
       classroomId: fixture.schedule.classroomId,
       semesterId: fixture.schedule.semesterId,
@@ -874,7 +874,7 @@ describe('RoomReportService roster and slot guards', () => {
     const laterStart = laterSlot!.startsAt
     const laterEnd = laterSlot!.endsAt
     const laterSpanning = await fixture.schedules.createAndLockPackage({
-      packageId: spanning.packageId,
+      packageId: spanning.packageId!,
       classroomId: spanning.classroomId,
       semesterId: spanning.semesterId,
       eventId: fixture.eventId,
