@@ -106,6 +106,20 @@ const current = computed<PaperQuestion | null>(
 )
 const isLast = computed(() => index.value >= questions.value.length - 1)
 const unanswered = computed(() => questions.value.length - answeredCount.value)
+const submitStats = computed(() => [
+  { label: 'Dijawab', value: answeredCount.value, tone: 'text-success' },
+  { label: 'Ragu-ragu', value: doubtful.value.size, tone: 'text-warning' },
+  {
+    label: 'Belum dijawab',
+    value: unanswered.value,
+    tone: 'text-destructive',
+  },
+  {
+    label: 'Belum terkirim',
+    value: sync.value.pendingCount,
+    tone: sync.value.pendingCount > 0 ? 'text-warning' : 'text-success',
+  },
+])
 
 function answerOf(question: PaperQuestion): AnswerPayload | undefined {
   return answers.value.get(question.id)
@@ -286,31 +300,18 @@ function statusOf(question: PaperQuestion | null): string {
       />
       <span
         v-if="!wide && !loading && !finished"
-        class="flex min-w-0 items-center gap-2"
+        class="text-[19px] font-bold tabular-nums"
+        :class="
+          remainingLabel <= '05:00' ? 'text-destructive' : 'text-foreground'
+        "
       >
-        <span
-          class="rounded-md border border-border bg-muted px-2 py-1 text-control font-semibold"
-          :class="
-            remainingLabel <= '05:00' ? 'text-destructive' : 'text-foreground'
-          "
-        >
-          {{ remainingLabel }}
-        </span>
-        <span
-          class="truncate rounded-md border px-2 py-1 text-control font-medium"
-          :class="
-            sync.pendingCount === 0
-              ? 'border-success text-success'
-              : 'border-warning text-warning'
-          "
-        >
-          {{ syncSummaryLabel }}
-        </span>
+        {{ remainingLabel }}
       </span>
     </header>
 
     <main
-      class="relative flex min-h-0 w-full flex-1 flex-col gap-2 overflow-hidden p-2"
+      class="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden"
+      :class="wide ? 'gap-2 p-2' : 'gap-3 px-4 py-3'"
     >
       <div
         v-if="loading"
@@ -368,29 +369,84 @@ function statusOf(question: PaperQuestion | null): string {
         </Card>
 
         <div
-          class="grid min-h-0 flex-1 gap-2 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-4"
+          v-if="!wide && current"
+          class="flex shrink-0 items-center gap-3 rounded-[10px] border border-border bg-card px-3.5 py-2.5"
+        >
+          <span class="min-w-0 flex-1 truncate text-sm font-semibold">
+            {{ examTitle ?? '-' }}
+          </span>
+          <button
+            type="button"
+            class="flex h-8 shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-2.5 text-control font-medium text-primary"
+            @click="showList = true"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              class="size-4 fill-primary"
+              aria-hidden="true"
+            >
+              <rect
+                x="1"
+                y="1"
+                width="6"
+                height="6"
+                rx="1.5"
+              />
+              <rect
+                x="9"
+                y="1"
+                width="6"
+                height="6"
+                rx="1.5"
+              />
+              <rect
+                x="1"
+                y="9"
+                width="6"
+                height="6"
+                rx="1.5"
+              />
+              <rect
+                x="9"
+                y="9"
+                width="6"
+                height="6"
+                rx="1.5"
+              />
+            </svg>
+            Daftar Soal
+          </button>
+        </div>
+
+        <div
+          class="grid min-h-0 flex-1 md:grid-cols-[minmax(0,1fr)_18rem] md:gap-4"
+          :class="wide ? 'gap-2' : 'content-start overflow-y-auto'"
         >
           <Card
             v-if="current"
             gap="none"
-            class="flex min-h-0 flex-col overflow-hidden md:max-w-[46rem]"
+            class="flex min-h-0 flex-col md:max-w-[46rem]"
+            :class="wide ? 'overflow-hidden' : 'shrink-0 overflow-visible'"
           >
             <CardHeader standard>
               <CardTitle>Soal {{ index + 1 }}</CardTitle>
-              <div class="flex items-center gap-2">
-                <span class="text-control text-muted-foreground">
-                  {{ statusOf(current) }}
-                </span>
-                <Button
-                  v-if="!wide"
-                  variant="outline"
-                  size="sm"
-                  class="min-h-[var(--control-h-lg,2.25rem)]"
-                  @click="showList = true"
-                >
-                  Daftar Soal
-                </Button>
-              </div>
+              <span
+                v-if="wide"
+                class="text-control text-muted-foreground"
+              >
+                {{ statusOf(current) }}
+              </span>
+              <span
+                v-else
+                class="min-w-0 truncate rounded-md border px-2 py-0.5 text-xs font-medium"
+                :class="
+                  sync.pendingCount === 0
+                    ? 'border-success text-success'
+                    : 'border-warning text-warning'
+                "
+              >
+                {{ syncSummaryLabel }}
+              </span>
             </CardHeader>
 
             <CardContent variant="standard">
@@ -399,6 +455,13 @@ function statusOf(question: PaperQuestion | null): string {
                 :session-id="sessionId"
               />
             </CardContent>
+
+            <div
+              v-if="!wide"
+              class="border-t border-border bg-foreground/[0.03] px-4 py-2 text-sm font-semibold"
+            >
+              Jawaban
+            </div>
 
             <CardContent
               variant="standard"
@@ -416,7 +479,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 md:min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keyOf(current) === choice.key
                       ? 'border-primary bg-primary/[0.06]'
@@ -451,7 +514,7 @@ function statusOf(question: PaperQuestion | null): string {
                   v-for="(choice, position) in current.choices ?? []"
                   :key="choice.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 md:min-h-[var(--control-h-lg,2.25rem)] disabled:cursor-not-allowed disabled:opacity-60"
                   :class="
                     keysOf(current).includes(choice.key)
                       ? 'border-primary bg-primary/[0.06]'
@@ -486,7 +549,7 @@ function statusOf(question: PaperQuestion | null): string {
                   ]"
                   :key="option.key"
                   type="button"
-                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-[var(--control-h-lg,2.25rem)]"
+                  class="flex w-full cursor-pointer items-stretch overflow-hidden rounded-[var(--radius-md)] border text-left min-h-11 md:min-h-[var(--control-h-lg,2.25rem)]"
                   :class="
                     boolOf(current) === option.value
                       ? 'border-primary bg-primary/[0.06]'
@@ -526,6 +589,7 @@ function statusOf(question: PaperQuestion | null): string {
               />
             </CardContent>
             <div
+              v-if="wide"
               class="flex items-center gap-2 border-t border-border px-2 py-1.5"
             >
               <Button
@@ -589,6 +653,47 @@ function statusOf(question: PaperQuestion | null): string {
       </template>
     </main>
 
+    <div
+      v-if="!wide && !loading && !finished && current"
+      class="z-20 shrink-0 border-t border-border bg-card px-2 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))]"
+    >
+      <div class="grid grid-cols-3 gap-2">
+        <Button
+          variant="outline"
+          class="h-11 px-2 text-[13px] font-medium"
+          :disabled="index === 0 || submitting"
+          @click="go(index - 1)"
+        >
+          Sebelumnya
+        </Button>
+        <button
+          type="button"
+          class="h-11 rounded-lg border px-2 text-[13px] font-medium disabled:cursor-not-allowed disabled:opacity-60"
+          :class="
+            doubtful.has(current.id)
+              ? 'border-warning bg-warning/10 text-warning'
+              : 'border-border bg-transparent text-foreground/80'
+          "
+          :disabled="controlsLocked"
+          @click="toggleDoubtful(current)"
+        >
+          Ragu-ragu
+        </button>
+        <Button
+          class="h-11 px-2 text-[13px] font-medium leading-tight"
+          :class="
+            isLast
+              ? 'bg-success text-white hover:bg-success'
+              : 'bg-primary text-primary-foreground'
+          "
+          :disabled="controlsLocked || (isLast && !canSubmit)"
+          @click="goNext"
+        >
+          {{ nextLabel }}
+        </Button>
+      </div>
+    </div>
+
     <QuestionListDialog
       v-if="!wide"
       v-model:open="showList"
@@ -596,7 +701,15 @@ function statusOf(question: PaperQuestion | null): string {
       :answers="answers"
       :doubtful="doubtful"
       :current-index="index"
+      :submit-label="submitLabel"
+      :submit-disabled="controlsLocked || !canSubmit"
       @go="go"
+      @submit="
+        () => {
+          showList = false
+          confirmSubmit = true
+        }
+      "
     />
 
     <Dialog v-model:open="confirmSubmit">
@@ -606,9 +719,30 @@ function statusOf(question: PaperQuestion | null): string {
         </DialogHeader>
         <div class="space-y-2 px-4 py-3">
           <DialogDescription> Konfirmasi pengumpulan ujian. </DialogDescription>
-          <p class="text-control">
-            Masih ada {{ unanswered }} soal belum dijawab. Jawaban tidak bisa
-            diubah setelah dikumpulkan.
+          <div class="grid grid-cols-2 gap-2">
+            <div
+              v-for="stat in submitStats"
+              :key="stat.label"
+              class="rounded-lg border border-border px-3 py-2"
+            >
+              <p class="text-xs text-muted-foreground">{{ stat.label }}</p>
+              <p
+                class="text-lg font-bold"
+                :class="stat.tone"
+              >
+                {{ stat.value }}
+              </p>
+            </div>
+          </div>
+          <p
+            v-if="unanswered > 0"
+            class="text-control font-semibold text-destructive"
+          >
+            Masih ada {{ unanswered }} soal belum dijawab. Soal kosong bernilai
+            0.
+          </p>
+          <p class="text-xs text-muted-foreground">
+            Jawaban tidak dapat diubah setelah dikumpulkan.
           </p>
           <p
             v-if="gateNotice"
@@ -633,7 +767,7 @@ function statusOf(question: PaperQuestion | null): string {
             :disabled="submitting"
             @click="confirmSubmit = false"
           >
-            Batal
+            Periksa Lagi
           </Button>
           <Button
             size="sm"
