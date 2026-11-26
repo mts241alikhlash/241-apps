@@ -10,6 +10,8 @@ import {
   type ScheduleAccessUser,
 } from '../../../../exam-schedule/application/schedule-scope.service.js'
 import type { ExamSchedule } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
+import { assertClassroomsInGrade } from '../create-activity/create-activity.use-case.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 
 export interface AssignActivityClassroomsCommand {
@@ -24,6 +26,7 @@ export class AssignActivityClassroomsUseCase {
     private readonly activities: ExamActivityRepository,
     @Inject(forwardRef(() => ScheduleScopeService))
     private readonly scheduleScope: ScheduleScopeService,
+    private readonly academic: IAcademicLookupPort,
   ) {}
 
   async execute(
@@ -38,6 +41,11 @@ export class AssignActivityClassroomsUseCase {
     if (command.classroomIds.length === 0) {
       throw new BadRequestException('Pilih minimal satu kelas')
     }
+    await assertClassroomsInGrade(
+      this.academic,
+      current.gradeId,
+      command.classroomIds,
+    )
     const schedules = await this.activities.assignClassrooms({
       activityId: command.activityId,
       classroomIds: command.classroomIds,

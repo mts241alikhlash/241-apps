@@ -29,6 +29,13 @@ const CLASSROOM_7B = {
   name: 'VII B',
 }
 
+const CLASSROOM_8A = {
+  id: '88888888-8888-4888-8888-888888888881',
+  gradeId: '33333333-3333-4333-8333-333333333333',
+  academicYearId: YEAR_ID,
+  name: 'VIII A',
+}
+
 function seeded(
   overrides: Partial<ExamActivity> = {},
 ): FakeExamActivityRepository {
@@ -67,15 +74,13 @@ function makeUseCase(
     findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
     employeeExists: () => Promise.resolve(true),
   } as IEmployeeIdentityReadPort
-  const scope = new ScheduleScopeService(
-    employees,
-    new FakeAcademicLookup({
-      semesterId: SEMESTER_ID,
-      assignments,
-      classrooms: [CLASSROOM_7A, CLASSROOM_7B],
-    }),
-  )
-  return new AttachActivityPackageUseCase(repo, scope)
+  const academic = new FakeAcademicLookup({
+    semesterId: SEMESTER_ID,
+    assignments,
+    classrooms: [CLASSROOM_7A, CLASSROOM_7B, CLASSROOM_8A],
+  })
+  const scope = new ScheduleScopeService(employees, academic)
+  return new AttachActivityPackageUseCase(repo, scope, academic)
 }
 
 const input = {
@@ -145,6 +150,22 @@ describe('AttachActivityPackageUseCase', () => {
         classroomIds: [],
       }),
     ).rejects.toBeInstanceOf(BadRequestException)
+    expect(repo.attachments).toEqual([])
+  })
+
+  it('refuses an unknown classroom or one of another grade', async () => {
+    const repo = seeded()
+    for (const classroomIds of [
+      ['99999999-9999-4999-8999-999999999999'],
+      [CLASSROOM_7A.id, CLASSROOM_8A.id],
+    ]) {
+      await expect(
+        makeUseCase(repo).execute({ ...input, classroomIds }),
+      ).rejects.toMatchObject({
+        constructor: BadRequestException,
+        message: 'Kelas tidak ditemukan atau bukan tingkat kegiatan ini',
+      })
+    }
     expect(repo.attachments).toEqual([])
   })
 

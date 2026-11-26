@@ -142,8 +142,8 @@ function build(
     {} as UpdateActivityPolicyUseCase,
     {} as RotateActivityTokenUseCase,
     { execute: issue } as unknown as IssueParticipantNumbersUseCase,
-    new AttachActivityPackageUseCase(repo, scope),
-    new AssignActivityClassroomsUseCase(repo, scope),
+    new AttachActivityPackageUseCase(repo, scope, academic),
+    new AssignActivityClassroomsUseCase(repo, scope, academic),
     scope,
   )
 

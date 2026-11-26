@@ -105,6 +105,16 @@ async function createSchedules(
   })
 }
 
+async function lockActivity(
+  tx: Prisma.TransactionClient,
+  activityId: string,
+): Promise<boolean> {
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM exam_activities WHERE id = ${activityId}::uuid FOR UPDATE
+  `
+  return rows.length > 0
+}
+
 async function missingClassrooms(
   tx: Prisma.TransactionClient,
   activityId: string,
@@ -236,6 +246,7 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   ) {
     const { activityId, packageId, classroomIds, actorId } = input
     return this.prisma.$transaction(async (tx) => {
+      if (!(await lockActivity(tx, activityId))) return null
       const before = await tx.examActivity.findUnique({
         where: { id: activityId },
       })
@@ -272,6 +283,7 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   ) {
     const { activityId, classroomIds } = input
     return this.prisma.$transaction(async (tx) => {
+      if (!(await lockActivity(tx, activityId))) return null
       const activity = await tx.examActivity.findUnique({
         where: { id: activityId },
       })

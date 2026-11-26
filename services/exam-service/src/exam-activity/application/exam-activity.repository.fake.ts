@@ -92,7 +92,7 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
         .filter((row) => row.activityId === input.activityId)
         .map((row) => row.classroomId),
     )
-    for (const classroomId of input.classroomIds) {
+    for (const classroomId of new Set(input.classroomIds)) {
       if (!have.has(classroomId)) this.addSchedule(activity, classroomId)
     }
     return Promise.resolve(
@@ -200,7 +200,7 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
         .filter((row) => row.activityId === input.activityId)
         .map((row) => row.classroomId),
     )
-    for (const classroomId of input.classroomIds) {
+    for (const classroomId of new Set(input.classroomIds)) {
       if (!have.has(classroomId)) this.addSchedule(updated, classroomId)
     }
     return Promise.resolve(updated)

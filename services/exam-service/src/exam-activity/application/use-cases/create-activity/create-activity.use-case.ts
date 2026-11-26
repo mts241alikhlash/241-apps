@@ -13,6 +13,7 @@ import type {
 } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
+import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import {
   DEFAULT_POLICIES,
@@ -35,6 +36,21 @@ export async function assertPackageReady(
   if (!READY_PACKAGE_STATUSES.has(packageStatus)) {
     throw new UnprocessableEntityException(
       'Paket soal belum disetujui. Ajukan dan minta persetujuan dulu',
+    )
+  }
+}
+
+export async function assertClassroomsInGrade(
+  academic: IAcademicLookupPort,
+  gradeId: string,
+  classroomIds: string[],
+): Promise<void> {
+  const ids = [...new Set(classroomIds)]
+  const rooms = await academic.classroomsByIds(ids)
+  const valid = rooms.filter((room) => room.gradeId === gradeId)
+  if (valid.length !== ids.length) {
+    throw new BadRequestException(
+      'Kelas tidak ditemukan atau bukan tingkat kegiatan ini',
     )
   }
 }

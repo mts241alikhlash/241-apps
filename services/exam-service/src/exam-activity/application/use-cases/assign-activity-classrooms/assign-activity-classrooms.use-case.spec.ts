@@ -59,19 +59,32 @@ function seeded(
   return repo
 }
 
+const CLASSROOM_8A = {
+  id: '88888888-8888-4888-8888-888888888881',
+  gradeId: '33333333-3333-4333-8333-333333333333',
+  academicYearId: YEAR_ID,
+  name: 'VIII A',
+}
+
+function make(
+  repo: FakeExamActivityRepository,
+  assignments: { subjectId: string; classroomId: string }[] = [],
+) {
+  const { scope: sc, academic } = scope(assignments)
+  return new AssignActivityClassroomsUseCase(repo, sc, academic)
+}
+
 function scope(assignments: { subjectId: string; classroomId: string }[] = []) {
   const employees = {
     findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
     employeeExists: () => Promise.resolve(true),
   } as IEmployeeIdentityReadPort
-  return new ScheduleScopeService(
-    employees,
-    new FakeAcademicLookup({
-      semesterId: SEMESTER_ID,
-      assignments,
-      classrooms: [CLASSROOM_7A, CLASSROOM_7B],
-    }),
-  )
+  const academic = new FakeAcademicLookup({
+    semesterId: SEMESTER_ID,
+    assignments,
+    classrooms: [CLASSROOM_7A, CLASSROOM_7B, CLASSROOM_8A],
+  })
+  return { scope: new ScheduleScopeService(employees, academic), academic }
 }
 
 const input = {
@@ -83,10 +96,7 @@ const input = {
 describe('AssignActivityClassroomsUseCase', () => {
   it('creates one schedule per classroom from the activity', async () => {
     const repo = seeded({ deliveryMode: 'OFFLINE', offlineKind: 'WRITTEN' })
-    const rows = await new AssignActivityClassroomsUseCase(
-      repo,
-      scope(),
-    ).execute(input)
+    const rows = await make(repo).execute(input)
 
     expect(rows).toHaveLength(2)
     expect(rows.map((row) => row.classroomId)).toEqual(input.classroomIds)
@@ -105,17 +115,14 @@ describe('AssignActivityClassroomsUseCase', () => {
 
   it('copies the activity package onto the new schedules', async () => {
     const repo = seeded({ packageId: 'package-1' })
-    const rows = await new AssignActivityClassroomsUseCase(
-      repo,
-      scope(),
-    ).execute(input)
+    const rows = await make(repo).execute(input)
 
     expect(rows.every((row) => row.packageId === 'package-1')).toBe(true)
   })
 
   it('is idempotent and keeps the existing schedules', async () => {
     const repo = seeded()
-    const useCase = new AssignActivityClassroomsUseCase(repo, scope())
+    const useCase = make(repo)
     const first = await useCase.execute({
       ...input,
       classroomIds: [CLASSROOM_7A.id],
@@ -128,10 +135,37 @@ describe('AssignActivityClassroomsUseCase', () => {
     expect(repo.scheduleRecords).toHaveLength(2)
   })
 
+  it('dedupes duplicate classroom ids', async () => {
+    const repo = seeded()
+    const rows = await make(repo).execute({
+      ...input,
+      classroomIds: [CLASSROOM_7A.id, CLASSROOM_7A.id],
+    })
+
+    expect(rows).toHaveLength(1)
+    expect(repo.scheduleRecords).toHaveLength(1)
+  })
+
+  it('refuses an unknown classroom or one of another grade', async () => {
+    const repo = seeded()
+    for (const classroomIds of [
+      ['99999999-9999-4999-8999-999999999999'],
+      [CLASSROOM_7A.id, CLASSROOM_8A.id],
+    ]) {
+      await expect(
+        make(repo).execute({ ...input, classroomIds }),
+      ).rejects.toMatchObject({
+        constructor: BadRequestException,
+        message: 'Kelas tidak ditemukan atau bukan tingkat kegiatan ini',
+      })
+    }
+    expect(repo.scheduleRecords).toEqual([])
+  })
+
   it('rejects an empty classroom list', async () => {
     const repo = seeded()
     await expect(
-      new AssignActivityClassroomsUseCase(repo, scope()).execute({
+      make(repo).execute({
         ...input,
         classroomIds: [],
       }),
@@ -143,7 +177,7 @@ describe('AssignActivityClassroomsUseCase', () => {
 
   it('refuses an unknown activity', async () => {
     await expect(
-      new AssignActivityClassroomsUseCase(seeded(), scope()).execute({
+      make(seeded()).execute({
         ...input,
         activityId: 'activity-2',
       }),
@@ -158,10 +192,9 @@ describe('AssignActivityClassroomsUseCase', () => {
       permissions: ['exam-schedules.manage'],
     }
     await expect(
-      new AssignActivityClassroomsUseCase(
-        repo,
-        scope([{ subjectId: 'subject-inf', classroomId: CLASSROOM_7A.id }]),
-      ).execute({
+      make(repo, [
+        { subjectId: 'subject-inf', classroomId: CLASSROOM_7A.id },
+      ]).execute({
         actor: teacherA,
         activityId: 'activity-1',
         classroomIds: [CLASSROOM_7B.id],
@@ -172,9 +205,9 @@ describe('AssignActivityClassroomsUseCase', () => {
 
   it('lets a package attached later update both schedules without duplicates', async () => {
     const repo = seeded()
-    const sc = scope()
-    await new AssignActivityClassroomsUseCase(repo, sc).execute(input)
-    await new AttachActivityPackageUseCase(repo, sc).execute({
+    const { scope: sc, academic } = scope()
+    await new AssignActivityClassroomsUseCase(repo, sc, academic).execute(input)
+    await new AttachActivityPackageUseCase(repo, sc, academic).execute({
       actor: SCHEDULE_ADMIN_USER,
       activityId: 'activity-1',
       packageId: 'package-1',

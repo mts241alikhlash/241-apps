@@ -122,4 +122,37 @@ suite('PrismaExamActivityRepository against a real database', () => {
     expect(rows).toHaveLength(2)
     expect(rows.every((row) => row.packageId === pkg.id)).toBe(true)
   })
+
+  it('keeps one regular schedule per classroom under concurrent calls', async () => {
+    const activity = await newActivity('ONLINE')
+    const [a, b] = [id(), id()]
+    const pkg = await prisma.examPackage.create({
+      data: {
+        title: 'db spec race',
+        subjectId: id(),
+        gradeId: id(),
+        status: 'APPROVED',
+        createdById: actorId,
+      },
+    })
+    packageIds.push(pkg.id)
+    const call = (classroomIds: string[]) =>
+      repo.assignClassrooms({ activityId: activity.id, classroomIds, actorId })
+
+    await Promise.all(Array.from({ length: 8 }, () => call([a, b])))
+    await Promise.all([
+      call([a, b]),
+      repo.attachPackage({
+        activityId: activity.id,
+        packageId: pkg.id,
+        classroomIds: [a, b],
+        actorId,
+      }),
+    ])
+
+    const rows = await prisma.examSchedule.findMany({
+      where: { activityId: activity.id, kind: 'REGULAR' },
+    })
+    expect(rows.map((row) => row.classroomId).sort()).toEqual([a, b].sort())
+  })
 })
