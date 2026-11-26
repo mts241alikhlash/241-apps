@@ -144,12 +144,37 @@ suite('Delivery mode constraints against a real database', () => {
       enteredAt: NOW,
     }
     const created = await prisma.examOfflineResult.create({ data })
-    expect(created.publicationStatus).toBe('PENDING')
+    expect(created.publicationStatus).toBeNull()
     expect(created.publicationAttempts).toBe(0)
     expect(created.rawScore).toBeNull()
     await expect(prisma.examOfflineResult.create({ data })).rejects.toThrow(
       /Unique constraint/,
     )
+  })
+
+  it('stores every offline publication state and refuses any other', async () => {
+    const row = await schedule('OFFLINE', null)
+    for (const status of ['PENDING', 'SENT', 'FAILED']) {
+      const studentId = id()
+      await prisma.$executeRaw`
+        INSERT INTO exam_offline_results
+          (id, schedule_id, student_id, entered_by_id, entered_at, updated_at, publication_status)
+        VALUES (${id()}::uuid, ${row.id}::uuid, ${studentId}::uuid, ${userId}::uuid, now(), now(),
+          ${status}::"OfflinePublicationStatus")
+      `
+      const stored = await prisma.examOfflineResult.findUniqueOrThrow({
+        where: { scheduleId_studentId: { scheduleId: row.id, studentId } },
+      })
+      expect(stored.publicationStatus).toBe(status)
+    }
+    await expect(
+      prisma.$executeRaw`
+        INSERT INTO exam_offline_results
+          (id, schedule_id, student_id, entered_by_id, entered_at, updated_at, publication_status)
+        VALUES (${id()}::uuid, ${row.id}::uuid, ${id()}::uuid, ${userId}::uuid, now(), now(),
+          ${'QUEUED'}::"OfflinePublicationStatus")
+      `,
+    ).rejects.toThrow(/invalid input value for enum/)
   })
 
   it('lists a schedule without a package in its event window with a null title, and keeps it out of grading', async () => {

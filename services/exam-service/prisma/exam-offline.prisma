@@ -1,17 +1,23 @@
+enum OfflinePublicationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
 model ExamOfflineResult {
-  id                  String                 @id @default(uuid()) @db.Uuid
-  scheduleId          String                 @map("schedule_id") @db.Uuid
-  studentId           String                 @map("student_id") @db.Uuid
-  rawScore            Float?                 @map("raw_score")
-  note                String                 @default("") @db.VarChar(300)
-  enteredById         String                 @map("entered_by_id") @db.Uuid
-  enteredAt           DateTime               @map("entered_at")
-  updatedAt           DateTime               @updatedAt @map("updated_at")
-  publicationStatus   ScorePublicationStatus @default(PENDING) @map("publication_status")
-  publicationAttempts Int                    @default(0) @map("publication_attempts")
-  publicationError    String?                @map("publication_error") @db.VarChar(300)
-  lastAttemptAt       DateTime?              @map("last_attempt_at")
-  sentAt              DateTime?              @map("sent_at")
+  id                  String                    @id @default(uuid()) @db.Uuid
+  scheduleId          String                    @map("schedule_id") @db.Uuid
+  studentId           String                    @map("student_id") @db.Uuid
+  rawScore            Float?                    @map("raw_score")
+  note                String                    @default("") @db.VarChar(300)
+  enteredById         String                    @map("entered_by_id") @db.Uuid
+  enteredAt           DateTime                  @map("entered_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+  publicationStatus   OfflinePublicationStatus? @map("publication_status")
+  publicationAttempts Int                       @default(0) @map("publication_attempts")
+  publicationError    String?                   @map("publication_error") @db.VarChar(300)
+  lastAttemptAt       DateTime?                 @map("last_attempt_at")
+  sentAt              DateTime?                 @map("sent_at")
 
   schedule ExamSchedule @relation(fields: [scheduleId], references: [id])
 
