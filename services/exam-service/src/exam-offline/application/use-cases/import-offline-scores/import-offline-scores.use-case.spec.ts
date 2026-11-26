@@ -4,13 +4,16 @@ import {
   PayloadTooLargeException,
 } from '@nestjs/common'
 import ExcelJS from 'exceljs'
+import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 import {
   CLASSROOM_7A,
+  CLASSROOM_7B,
   NOW,
   OTHER_SUBJECT,
   SCHEDULE_ID,
   STUDENTS,
+  SUBJECT_ID,
   TEACHER,
   buildOffline,
   offlineSchedule,
@@ -65,8 +68,9 @@ describe('ImportOfflineScoresUseCase', () => {
     })
 
     expect(result.saved).toBe(2)
-    expect(result.rejected).toEqual([
-      { row: 6, participantNumber: '7-002', reason: 'Siswa tidak hadir' },
+    expect(result.rejected).toEqual([])
+    expect(result.skipped).toEqual([
+      { row: 6, participantNumber: '7-002', reason: 'TIDAK_HADIR' },
     ])
     expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)).toMatchObject({
       rawScore: 45,
@@ -94,8 +98,10 @@ describe('ImportOfflineScoresUseCase', () => {
     const result = await run(useCase, { buffer, originalName: 'nilai.xlsx' })
 
     expect(result.saved).toBe(1)
+    expect(result.skipped).toEqual([
+      { row: 3, participantNumber: '7-002', reason: 'KOSONG' },
+    ])
     expect(result.rejected).toEqual([
-      { row: 3, participantNumber: '7-002', reason: 'kosong' },
       {
         row: 4,
         participantNumber: '9-999',
@@ -157,7 +163,7 @@ describe('ImportOfflineScoresUseCase', () => {
       ),
     )
 
-    expect(result).toEqual({ saved: 1, rejected: [] })
+    expect(result).toEqual({ saved: 1, rejected: [], skipped: [] })
     expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)).toMatchObject({
       rawScore: 42.5,
       note: 'kata "bagus"',
@@ -240,5 +246,104 @@ describe('ImportOfflineScoresUseCase', () => {
     await expect(
       run(useCase, csv('No. Peserta,Score\n7-001,40\n')),
     ).rejects.toMatchObject({ code: 'SCHEDULE_NOT_OFFLINE' })
+  })
+
+  it('still rejects a real number for an absent student', async () => {
+    const { world, useCase } = setup()
+    world.markAbsent(STUDENTS.budi)
+
+    const result = await run(
+      useCase,
+      csv('No. Peserta,Score\n7-002,TIDAK HADIR\n'),
+    )
+    const again = await run(useCase, csv('No. Peserta,Score\n7-002,30\n'))
+
+    expect(result.skipped).toEqual([
+      { row: 2, participantNumber: '7-002', reason: 'TIDAK_HADIR' },
+    ])
+    expect(again.rejected).toEqual([
+      { row: 2, participantNumber: '7-002', reason: 'Siswa tidak hadir' },
+    ])
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.budi)).toBeUndefined()
+  })
+
+  it('treats the absent marker of a present student as not a number', async () => {
+    const { useCase } = setup()
+
+    const result = await run(
+      useCase,
+      csv('No. Peserta,Score\n7-001,TIDAK HADIR\n'),
+    )
+
+    expect(result.rejected).toEqual([
+      { row: 2, participantNumber: '7-001', reason: 'Nilai bukan angka' },
+    ])
+  })
+
+  it('never clears a sent score through a blank cell', async () => {
+    const { world, useCase } = setup()
+    const sent = await world.results.save({
+      scheduleId: SCHEDULE_ID,
+      studentId: STUDENTS.ani,
+      rawScore: 40,
+      note: 'lama',
+      enteredById: 't',
+      enteredAt: NOW,
+    })
+    world.results.rows.set(sent.id, { ...sent, publicationStatus: 'SENT' })
+
+    const result = await run(useCase, csv('No. Peserta,Score,Note\n7-001,,\n'))
+
+    expect(result.skipped).toEqual([
+      { row: 2, participantNumber: '7-001', reason: 'KOSONG' },
+    ])
+    expect(world.results.rows.get(sent.id)).toMatchObject({
+      rawScore: 40,
+      note: 'lama',
+      publicationStatus: 'SENT',
+    })
+  })
+
+  it('keeps the stored note when the file has no note column', async () => {
+    const { world, useCase } = setup()
+    await world.results.save({
+      scheduleId: SCHEDULE_ID,
+      studentId: STUDENTS.ani,
+      rawScore: 40,
+      note: 'jangan hilang',
+      enteredById: 't',
+      enteredAt: NOW,
+    })
+
+    await run(useCase, csv('No. Peserta,Score\n7-001,45\n7-002,30\n'))
+
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)).toMatchObject({
+      rawScore: 45,
+      note: 'jangan hilang',
+    })
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.budi)?.note).toBe('')
+  })
+
+  it('refuses an archive the guard rejects before the workbook is read', async () => {
+    const { world, useCase } = setup()
+    const zip = new JSZip()
+    for (let index = 0; index < 1001; index += 1) {
+      zip.file(`part-${index}.txt`, 'x')
+    }
+    const buffer = await zip.generateAsync({ type: 'nodebuffer' })
+
+    await expect(
+      run(useCase, { buffer, originalName: 'nilai.xlsx' }),
+    ).rejects.toThrow('Berkas berisi terlalu banyak bagian')
+    expect(world.results.rows.size).toBe(0)
+  })
+
+  it('refuses a teacher of the same subject in another classroom', async () => {
+    const { useCase } = setup({
+      taught: [{ subjectId: SUBJECT_ID, classroomId: CLASSROOM_7B.id }],
+    })
+    await expect(
+      run(useCase, csv('No. Peserta,Score\n7-001,40\n')),
+    ).rejects.toBeInstanceOf(NotFoundException)
   })
 })

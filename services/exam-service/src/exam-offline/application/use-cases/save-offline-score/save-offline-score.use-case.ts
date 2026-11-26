@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { ApiConflictException } from '../../../../core/filters/api-exception.js'
 import type { GradingUser } from '../../../../exam-grading/application/grading-scope.service.js'
 import type { OfflineRosterRow } from '../../../domain/entities/offline-result.entity.js'
 import {
@@ -19,7 +20,7 @@ export interface SaveOfflineScoreInput {
   scheduleId: string
   studentId: string
   rawScore: number | null
-  note?: string
+  note?: string | null
 }
 
 @Injectable()
@@ -42,6 +43,13 @@ export class SaveOfflineScoreUseCase {
     if (row.state === 'ABSENT') {
       throw new ConflictException('Siswa tidak hadir, nilai tidak bisa diisi')
     }
+    const existing = roster.results.get(row.studentId)
+    if (input.rawScore === null && existing?.publicationStatus === 'SENT') {
+      throw new ApiConflictException(
+        'OFFLINE_SCORE_PUBLISHED',
+        'Nilai sudah terkirim; ganti dengan nilai baru',
+      )
+    }
     if (input.rawScore !== null) {
       const problem = offlineScoreProblem(
         input.rawScore,
@@ -49,7 +57,10 @@ export class SaveOfflineScoreUseCase {
       )
       if (problem !== null) throw new BadRequestException(problem)
     }
-    const note = (input.note ?? '').trim()
+    const note =
+      input.note === undefined
+        ? (existing?.note ?? '')
+        : (input.note ?? '').trim()
     if (note.length > OFFLINE_NOTE_MAX) {
       throw new BadRequestException('Catatan maksimal 300 karakter')
     }
@@ -59,7 +70,7 @@ export class SaveOfflineScoreUseCase {
       studentId: row.studentId,
       rawScore: input.rawScore,
       note,
-      existing: roster.results.get(row.studentId),
+      existing,
       actorId: user.id,
       at: now,
     })

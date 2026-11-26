@@ -3,6 +3,8 @@ import ExcelJS from 'exceljs'
 import { describe, expect, it } from 'vitest'
 import {
   CLASSROOM_7A,
+  CLASSROOM_7B,
+  SUBJECT_ID,
   NOW,
   OTHER_SUBJECT,
   SCHEDULE_ID,
@@ -97,6 +99,15 @@ describe('BuildScoreSheetUseCase', () => {
       taught: [{ subjectId: OTHER_SUBJECT, classroomId: CLASSROOM_7A.id }],
     })
 
+    await expect(useCase.execute(TEACHER, SCHEDULE_ID)).rejects.toBeInstanceOf(
+      NotFoundException,
+    )
+  })
+
+  it('refuses a teacher of the same subject in another classroom', async () => {
+    const { useCase } = setup({
+      taught: [{ subjectId: SUBJECT_ID, classroomId: CLASSROOM_7B.id }],
+    })
     await expect(useCase.execute(TEACHER, SCHEDULE_ID)).rejects.toBeInstanceOf(
       NotFoundException,
     )

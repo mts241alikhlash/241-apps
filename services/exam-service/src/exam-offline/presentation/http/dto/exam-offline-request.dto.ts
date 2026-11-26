@@ -26,11 +26,17 @@ export class SaveOfflineScoreDto {
   @IsNumber({ allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2 })
   rawScore!: number | null
 
-  @ApiPropertyOptional({ maxLength: 300 })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    maxLength: 300,
+    description:
+      'Omitted keeps the stored note; null or an empty string clears it',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(300)
-  note?: string
+  note?: string | null
 }
 
 export class RequestOfflinePublicationDto {

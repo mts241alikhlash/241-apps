@@ -6,6 +6,8 @@ import {
 import { describe, expect, it } from 'vitest'
 import {
   CLASSROOM_7A,
+  CLASSROOM_7B,
+  SUBJECT_ID,
   NOW,
   OTHER_SUBJECT,
   SCHEDULE_ID,
@@ -195,5 +197,50 @@ describe('SaveOfflineScoreUseCase', () => {
       rawScore: null,
       publicationStatus: null,
     })
+  })
+
+  it('refuses to clear a score that was already sent', async () => {
+    const { world, useCase } = setup()
+    await save(useCase, 40)
+    const first = world.results.find(SCHEDULE_ID, STUDENTS.ani)!
+    world.results.rows.set(first.id, { ...first, publicationStatus: 'SENT' })
+
+    await expect(
+      save(useCase, null, STUDENTS.ani, LATER),
+    ).rejects.toMatchObject({
+      code: 'OFFLINE_SCORE_PUBLISHED',
+      message: 'Nilai sudah terkirim; ganti dengan nilai baru',
+    })
+    expect(world.results.rows.get(first.id)).toMatchObject({
+      rawScore: 40,
+      publicationStatus: 'SENT',
+    })
+  })
+
+  it('keeps the note when it is omitted and clears it on null or empty', async () => {
+    const { world, useCase } = setup()
+    await save(useCase, 40, STUDENTS.ani, NOW, 'pertama')
+
+    await save(useCase, 41, STUDENTS.ani, LATER)
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.note).toBe('pertama')
+
+    await useCase.execute(TEACHER, {
+      scheduleId: SCHEDULE_ID,
+      studentId: STUDENTS.ani,
+      rawScore: 41,
+      note: null,
+    })
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.note).toBe('')
+
+    await save(useCase, 41, STUDENTS.ani, LATER, 'kedua')
+    await save(useCase, 41, STUDENTS.ani, LATER, '')
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.note).toBe('')
+  })
+
+  it('refuses a teacher of the same subject in another classroom', async () => {
+    const { useCase } = setup({
+      taught: [{ subjectId: SUBJECT_ID, classroomId: CLASSROOM_7B.id }],
+    })
+    await expect(save(useCase, 40)).rejects.toBeInstanceOf(NotFoundException)
   })
 })

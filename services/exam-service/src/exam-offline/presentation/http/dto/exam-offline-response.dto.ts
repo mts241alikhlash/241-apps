@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { EXAM_OFFLINE_KINDS } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import type { OfflinePublicationCounts } from '../../../application/use-cases/request-offline-publication/request-offline-publication.use-case.js'
-import type {
-  OfflineImportRejection,
-  OfflineImportResult,
+import {
+  OFFLINE_IMPORT_SKIP_REASONS,
+  type OfflineImportRejection,
+  type OfflineImportResult,
+  type OfflineImportSkip,
+  type OfflineImportSkipReason,
 } from '../../../application/use-cases/import-offline-scores/import-offline-scores.use-case.js'
 import {
   OFFLINE_PUBLICATION_STATUSES,
@@ -89,16 +92,42 @@ export class OfflineImportRejectionDto {
   }
 }
 
+export class OfflineImportSkipDto {
+  @ApiProperty({ description: 'The 1-based row of the spreadsheet' })
+  row!: number
+  @ApiProperty({ type: String, nullable: true })
+  participantNumber!: string | null
+  @ApiProperty({
+    enum: OFFLINE_IMPORT_SKIP_REASONS,
+    description:
+      'KOSONG: blank score, nothing changed; TIDAK_HADIR: absent student marked as such',
+  })
+  reason!: OfflineImportSkipReason
+
+  static fromDomain(domain: OfflineImportSkip): OfflineImportSkipDto {
+    const dto = new OfflineImportSkipDto()
+    dto.row = domain.row
+    dto.participantNumber = domain.participantNumber
+    dto.reason = domain.reason
+    return dto
+  }
+}
+
 export class OfflineImportResultDto {
   @ApiProperty() saved!: number
   @ApiProperty({ type: [OfflineImportRejectionDto] })
   rejected!: OfflineImportRejectionDto[]
+  @ApiProperty({ type: [OfflineImportSkipDto] })
+  skipped!: OfflineImportSkipDto[]
 
   static fromDomain(domain: OfflineImportResult): OfflineImportResultDto {
     const dto = new OfflineImportResultDto()
     dto.saved = domain.saved
     dto.rejected = domain.rejected.map((row) =>
       OfflineImportRejectionDto.fromDomain(row),
+    )
+    dto.skipped = domain.skipped.map((row) =>
+      OfflineImportSkipDto.fromDomain(row),
     )
     return dto
   }

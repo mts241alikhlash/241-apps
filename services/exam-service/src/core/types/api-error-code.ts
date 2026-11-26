@@ -30,6 +30,7 @@ export const API_ERROR_CODES = [
   'SCHEDULE_CANCELLED',
   'SCHEDULE_NOT_OFFLINE',
   'OFFLINE_SCORES_MISSING',
+  'OFFLINE_SCORE_PUBLISHED',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

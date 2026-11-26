@@ -104,6 +104,8 @@ describe('ExamOfflineController', () => {
     [{ rawScore: 40 }],
     [{ rawScore: 12.25, note: 'baik' }],
     [{ rawScore: null }],
+    [{ rawScore: 40, note: null }],
+    [{ rawScore: 40, note: '' }],
   ])('accepts the score body %j', async (body) => {
     expect(await errorsOf(body)).toEqual([])
   })
@@ -111,6 +113,9 @@ describe('ExamOfflineController', () => {
   it.each([
     [{ rawScore: '40' }],
     [{ rawScore: true }],
+    [{ rawScore: Number.NaN }],
+    [{ rawScore: Number.POSITIVE_INFINITY }],
+    [{ note: 'tanpa nilai' }],
     [{}],
     [{ rawScore: 1.234 }],
     [{ rawScore: 40, note: 'x'.repeat(301) }],
@@ -192,6 +197,7 @@ describe('ExamOfflineController', () => {
           reason: 'No. Peserta tidak terdaftar di kelas ini',
         },
       ],
+      skipped: [],
     })
     expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.rawScore).toBe(40)
   })

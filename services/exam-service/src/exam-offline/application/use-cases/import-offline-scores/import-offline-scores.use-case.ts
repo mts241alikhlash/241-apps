@@ -12,6 +12,7 @@ import {
 import { IOfflineResultRepository } from '../../../domain/repositories/offline-result.repository.js'
 import {
   OFFLINE_IMPORT_MAX_BYTES,
+  SCORE_SHEET_ABSENT,
   fromSheetText,
 } from '../../../domain/score-sheet.js'
 import { OfflineRosterReader } from '../../offline-roster.reader.js'
@@ -32,10 +33,26 @@ export interface OfflineImportRejection {
   reason: string
 }
 
+export const OFFLINE_IMPORT_SKIP_REASONS = ['KOSONG', 'TIDAK_HADIR'] as const
+export type OfflineImportSkipReason =
+  (typeof OFFLINE_IMPORT_SKIP_REASONS)[number]
+
+export interface OfflineImportSkip {
+  row: number
+  participantNumber: string | null
+  reason: OfflineImportSkipReason
+}
+
 export interface OfflineImportResult {
   saved: number
   rejected: OfflineImportRejection[]
+  skipped: OfflineImportSkip[]
 }
+
+type RowCheck =
+  | { reason: string }
+  | { skip: OfflineImportSkipReason }
+  | { student: OfflineRosterRow; rawScore: number; note: string | null }
 
 const NUMBER = /^-?\d+(?:[.,]\d+)?$/u
 
@@ -82,29 +99,35 @@ export class ImportOfflineScoresUseCase {
     }
 
     const rejected: OfflineImportRejection[] = []
+    const skipped: OfflineImportSkip[] = []
     let saved = 0
     for (const line of lines) {
       const checked = this.check(line, byNumber, seen, roster.activity.maxScore)
+      const where = {
+        row: line.row,
+        participantNumber: line.participantNumber || null,
+      }
       if ('reason' in checked) {
-        rejected.push({
-          row: line.row,
-          participantNumber: line.participantNumber || null,
-          reason: checked.reason,
-        })
+        rejected.push({ ...where, reason: checked.reason })
         continue
       }
+      if ('skip' in checked) {
+        skipped.push({ ...where, reason: checked.skip })
+        continue
+      }
+      const existing = roster.results.get(checked.student.studentId)
       await writeOfflineScore(this.results, {
         scheduleId: roster.schedule.id,
         studentId: checked.student.studentId,
         rawScore: checked.rawScore,
-        note: checked.note,
-        existing: roster.results.get(checked.student.studentId),
+        note: checked.note ?? existing?.note ?? '',
+        existing,
         actorId: user.id,
         at: now,
       })
       saved += 1
     }
-    return { saved, rejected }
+    return { saved, rejected, skipped }
   }
 
   private check(
@@ -112,9 +135,7 @@ export class ImportOfflineScoresUseCase {
     byNumber: Map<string, OfflineRosterRow>,
     seen: Map<string, number>,
     maxScore: number,
-  ):
-    | { reason: string }
-    | { student: OfflineRosterRow; rawScore: number; note: string } {
+  ): RowCheck {
     const key = numberKey(line.participantNumber)
     if (key === '') return { reason: 'No. Peserta kosong' }
     if ((seen.get(key) ?? 0) > 1) {
@@ -124,14 +145,18 @@ export class ImportOfflineScoresUseCase {
     if (student === undefined) {
       return { reason: 'No. Peserta tidak terdaftar di kelas ini' }
     }
-    if (student.state === 'ABSENT') return { reason: 'Siswa tidak hadir' }
-    if (line.score === '') return { reason: 'kosong' }
+    if (line.score === '') return { skip: 'KOSONG' }
+    if (student.state === 'ABSENT') {
+      return line.score.toUpperCase() === SCORE_SHEET_ABSENT
+        ? { skip: 'TIDAK_HADIR' }
+        : { reason: 'Siswa tidak hadir' }
+    }
     if (!NUMBER.test(line.score)) return { reason: 'Nilai bukan angka' }
     const rawScore = Number(line.score.replace(',', '.'))
     const problem = offlineScoreProblem(rawScore, maxScore)
     if (problem !== null) return { reason: problem }
-    const note = fromSheetText(line.note.trim())
-    if (note.length > OFFLINE_NOTE_MAX) {
+    const note = line.note === null ? null : fromSheetText(line.note.trim())
+    if (note !== null && note.length > OFFLINE_NOTE_MAX) {
       return { reason: 'Catatan maksimal 300 karakter' }
     }
     return { student, rawScore, note }

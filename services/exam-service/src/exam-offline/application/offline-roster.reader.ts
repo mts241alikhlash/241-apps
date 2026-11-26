@@ -145,8 +145,7 @@ export class OfflineRosterReader {
         state,
         rawScore: state === 'ABSENT' ? null : (result?.rawScore ?? null),
         note: state === 'ABSENT' || !result?.note ? null : result.note,
-        publication:
-          state === 'ABSENT' ? null : (result?.publicationStatus ?? null),
+        publication: result?.publicationStatus ?? null,
       }
     })
     return { schedule, activity, rows: rows.sort(compareRows), results }

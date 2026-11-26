@@ -2,6 +2,8 @@ import { ConflictException, NotFoundException } from '@nestjs/common'
 import { describe, expect, it } from 'vitest'
 import {
   CLASSROOM_7A,
+  CLASSROOM_7B,
+  SUBJECT_ID,
   NOW,
   OTHER_SUBJECT,
   SCHEDULE_ID,
@@ -131,5 +133,36 @@ describe('GetOfflineRosterUseCase', () => {
     const useCase = new GetOfflineRosterUseCase(world.reader)
 
     await expect(useCase.execute(TEACHER, SCHEDULE_ID)).resolves.toEqual([])
+  })
+
+  it('shows the stored publication of an absent student', async () => {
+    const { world, useCase } = setup()
+    const sent = await world.results.save({
+      scheduleId: SCHEDULE_ID,
+      studentId: STUDENTS.budi,
+      rawScore: 30,
+      note: '',
+      enteredById: 't',
+      enteredAt: NOW,
+    })
+    world.results.rows.set(sent.id, { ...sent, publicationStatus: 'SENT' })
+    world.markAbsent(STUDENTS.budi)
+
+    const rows = await useCase.execute(TEACHER, SCHEDULE_ID)
+
+    expect(rows.find((row) => row.studentId === STUDENTS.budi)).toMatchObject({
+      state: 'ABSENT',
+      rawScore: null,
+      publication: 'SENT',
+    })
+  })
+
+  it('hides the schedule from a teacher of the same subject in another classroom', async () => {
+    const { useCase } = setup({
+      taught: [{ subjectId: SUBJECT_ID, classroomId: CLASSROOM_7B.id }],
+    })
+    await expect(useCase.execute(TEACHER, SCHEDULE_ID)).rejects.toBeInstanceOf(
+      NotFoundException,
+    )
   })
 })

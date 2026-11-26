@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
-import { assertSafeArchive } from '../../question-import/application/parsers/archive-guard.js'
+import { normalizeArchive } from '../../question-import/application/parsers/archive-guard.js'
 import {
   OFFLINE_IMPORT_MAX_ROWS,
   SCORE_SHEET_NAME,
@@ -10,7 +10,7 @@ export interface ScoreSheetRow {
   row: number
   participantNumber: string
   score: string
-  note: string
+  note: string | null
 }
 
 interface Table {
@@ -38,10 +38,10 @@ function headerKey(value: string): string {
 }
 
 async function readXlsx(buffer: Buffer): Promise<Table> {
-  await assertSafeArchive(buffer)
+  const checked = await normalizeArchive(buffer)
   const book = new ExcelJS.Workbook()
   try {
-    await book.xlsx.load(buffer as unknown as ExcelJS.Buffer)
+    await book.xlsx.load(checked as unknown as ExcelJS.Buffer)
   } catch {
     throw new BadRequestException('Berkas Excel tidak bisa dibaca')
   }
@@ -173,9 +173,9 @@ export async function parseScoreSheet(
       row,
       participantNumber: table.cell(row, header.number),
       score: table.cell(row, header.score),
-      note: header.note === undefined ? '' : table.cell(row, header.note),
+      note: header.note === undefined ? null : table.cell(row, header.note),
     }
-    if (line.participantNumber === '' && line.score === '' && line.note === '')
+    if (line.participantNumber === '' && line.score === '' && !line.note)
       continue
     rows.push(line)
     if (rows.length > OFFLINE_IMPORT_MAX_ROWS) {
