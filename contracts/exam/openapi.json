@@ -145,6 +145,70 @@
         ]
       }
     },
+    "/exam-activities/readiness": {
+      "get": {
+        "operationId": "ExamActivityController_readinessOfDay",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Day in Asia/Jakarta",
+            "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2026-11-30",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ActivityReadinessDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Check what is still missing before the activities of a day",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
     "/exam-activities/{id}": {
       "get": {
         "operationId": "ExamActivityController_findOne",
@@ -247,6 +311,66 @@
           }
         ],
         "summary": "Change the status of an activity",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}/auto-status": {
+      "patch": {
+        "operationId": "ExamActivityController_switchAutoStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateActivityAutoStatusRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Switch automatic opening and closing",
         "tags": [
           "Exam Activities"
         ]
@@ -356,6 +480,66 @@
           }
         ],
         "summary": "Attach an approved package and create the classroom schedules",
+        "tags": [
+          "Exam Activities"
+        ]
+      }
+    },
+    "/exam-activities/{id}/classrooms": {
+      "post": {
+        "operationId": "ExamActivityController_assign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignActivityClassroomsRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExamActivityDetailDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create the missing classroom schedules of an activity",
         "tags": [
           "Exam Activities"
         ]
@@ -6739,6 +6923,341 @@
         ]
       }
     },
+    "/exam-offline/schedules": {
+      "get": {
+        "operationId": "ExamOfflineController_schedules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OfflineScheduleRowDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The offline exams the caller may grade, with score counts",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
+    "/exam-offline/schedules/{id}/roster": {
+      "get": {
+        "operationId": "ExamOfflineController_roster",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OfflineRosterRowDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "The seated students of an offline exam with their scores",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
+    "/exam-offline/schedules/{id}/students/{studentId}": {
+      "put": {
+        "operationId": "ExamOfflineController_save",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "studentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveOfflineScoreDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OfflineRosterRowDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enter, change or clear the score of one student",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
+    "/exam-offline/schedules/{id}/import": {
+      "post": {
+        "operationId": "ExamOfflineController_importScores",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OfflineImportResultDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import scores from a filled score sheet (.xlsx or .csv) matched on No. Peserta",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
+    "/exam-offline/schedules/{id}/sheet": {
+      "get": {
+        "operationId": "ExamOfflineController_sheet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The score sheet",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download the prefilled score sheet (.xlsx)",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
+    "/exam-offline/schedules/{id}/publish": {
+      "post": {
+        "operationId": "ExamOfflineController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOfflinePublicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/OfflinePublicationCountsDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "OFFLINE_SCORES_MISSING: some students have no score yet"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Queue the scores of an offline exam for sending to assessment-service",
+        "tags": [
+          "Exam Offline"
+        ]
+      }
+    },
     "/exam-imports/template": {
       "get": {
         "operationId": "QuestionImportController_template",
@@ -7331,6 +7850,12 @@
           "minSubmitMinutes": {
             "type": "number"
           },
+          "autoOpenLeadMinutes": {
+            "type": "number"
+          },
+          "autoCloseGraceMinutes": {
+            "type": "number"
+          },
           "shuffleQuestions": {
             "type": "boolean"
           },
@@ -7351,6 +7876,8 @@
           "tokenSlotSeconds",
           "lateToleranceMinutes",
           "minSubmitMinutes",
+          "autoOpenLeadMinutes",
+          "autoCloseGraceMinutes",
           "shuffleQuestions",
           "shuffleChoices",
           "allowWeb"
@@ -7384,6 +7911,27 @@
             "type": "string",
             "nullable": true,
             "format": "uuid"
+          },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
+          "offlineKind": {
+            "nullable": true,
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number"
+          },
+          "autoStatus": {
+            "type": "boolean"
           },
           "type": {
             "enum": [
@@ -7450,6 +7998,10 @@
           "gradeId",
           "subjectId",
           "packageId",
+          "deliveryMode",
+          "offlineKind",
+          "maxScore",
+          "autoStatus",
           "type",
           "category",
           "tokenMode",
@@ -7461,6 +8013,76 @@
           "status",
           "subjectName",
           "gradeName"
+        ]
+      },
+      "ActivityReadinessCheckDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "enum": [
+              "PACKAGE",
+              "SCHEDULES",
+              "SEATS",
+              "NUMBERS",
+              "SUPERVISORS",
+              "TECHNICIANS",
+              "LATE_TOLERANCE"
+            ],
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "ok",
+          "detail"
+        ]
+      },
+      "ActivityReadinessDto": {
+        "type": "object",
+        "properties": {
+          "activityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "gradeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityReadinessCheckDto"
+            }
+          }
+        },
+        "required": [
+          "activityId",
+          "subjectName",
+          "gradeName",
+          "startsAt",
+          "deliveryMode",
+          "checks"
         ]
       },
       "ExamActivityScheduleDto": {
@@ -7523,6 +8145,27 @@
             "type": "string",
             "nullable": true,
             "format": "uuid"
+          },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
+          "offlineKind": {
+            "nullable": true,
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number"
+          },
+          "autoStatus": {
+            "type": "boolean"
           },
           "type": {
             "enum": [
@@ -7595,6 +8238,10 @@
           "gradeId",
           "subjectId",
           "packageId",
+          "deliveryMode",
+          "offlineKind",
+          "maxScore",
+          "autoStatus",
           "type",
           "category",
           "tokenMode",
@@ -7624,6 +8271,17 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "UpdateActivityAutoStatusRequestDto": {
+        "type": "object",
+        "properties": {
+          "autoStatus": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "autoStatus"
         ]
       },
       "IssueParticipantNumbersResponseDto": {
@@ -7706,6 +8364,32 @@
             "type": "number",
             "minimum": 1,
             "maximum": 1440
+          },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string",
+            "default": "ONLINE"
+          },
+          "offlineKind": {
+            "nullable": true,
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+          },
+          "autoStatus": {
+            "type": "boolean",
+            "default": true
           }
         },
         "required": [
@@ -7737,6 +8421,22 @@
         },
         "required": [
           "packageId",
+          "classroomIds"
+        ]
+      },
+      "AssignActivityClassroomsRequestDto": {
+        "type": "object",
+        "properties": {
+          "classroomIds": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
           "classroomIds"
         ]
       },
@@ -7787,6 +8487,16 @@
             "type": "number",
             "minimum": 0,
             "maximum": 180
+          },
+          "autoOpenLeadMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 60
+          },
+          "autoCloseGraceMinutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 240
           },
           "shuffleQuestions": {
             "type": "boolean"
@@ -7840,12 +8550,21 @@
             "type": "string",
             "format": "uuid"
           },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
           "packageId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "packageTitle": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "classroomId": {
             "type": "string",
@@ -7937,6 +8656,7 @@
         },
         "required": [
           "id",
+          "deliveryMode",
           "packageId",
           "packageTitle",
           "classroomId",
@@ -10450,6 +11170,21 @@
             "nullable": true,
             "format": "uuid"
           },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
+          "offlineKind": {
+            "nullable": true,
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
           "packageTitle": {
             "type": "string",
             "nullable": true
@@ -10479,10 +11214,12 @@
             "type": "number"
           },
           "startedCount": {
-            "type": "number"
+            "type": "number",
+            "nullable": true
           },
           "submittedCount": {
-            "type": "number"
+            "type": "number",
+            "nullable": true
           },
           "absentCount": {
             "type": "number"
@@ -10491,6 +11228,8 @@
         "required": [
           "scheduleId",
           "activityId",
+          "deliveryMode",
+          "offlineKind",
           "packageTitle",
           "gradeId",
           "subjectName",
@@ -11550,6 +12289,26 @@
           "makeup": {
             "type": "boolean",
             "description": "True for a makeup sitting"
+          },
+          "deliveryMode": {
+            "enum": [
+              "ONLINE",
+              "OFFLINE"
+            ],
+            "type": "string"
+          },
+          "hasPackage": {
+            "type": "boolean",
+            "description": "False while no question package is attached; never startable then"
+          },
+          "offlineKind": {
+            "nullable": true,
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string",
+            "description": "Set for an offline exam only"
           }
         },
         "required": [
@@ -11573,7 +12332,10 @@
           "roomName",
           "seatNumber",
           "participantNumber",
-          "makeup"
+          "makeup",
+          "deliveryMode",
+          "hasPackage",
+          "offlineKind"
         ]
       },
       "SebProofDto": {
@@ -12955,6 +13717,7 @@
           },
           "packageId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "durationMinutes": {
@@ -13334,6 +14097,245 @@
         },
         "required": [
           "score"
+        ]
+      },
+      "OfflineScheduleRowDto": {
+        "type": "object",
+        "properties": {
+          "scheduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "classroomName": {
+            "type": "string",
+            "nullable": true
+          },
+          "offlineKind": {
+            "enum": [
+              "WRITTEN",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "registered": {
+            "type": "number"
+          },
+          "scored": {
+            "type": "number"
+          },
+          "absent": {
+            "type": "number"
+          },
+          "missing": {
+            "type": "number"
+          },
+          "published": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "scheduleId",
+          "activityId",
+          "subjectName",
+          "classroomName",
+          "offlineKind",
+          "maxScore",
+          "startsAt",
+          "endsAt",
+          "registered",
+          "scored",
+          "absent",
+          "missing",
+          "published"
+        ]
+      },
+      "OfflineRosterRowDto": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "enum": [
+              "SCORED",
+              "ABSENT",
+              "MISSING"
+            ],
+            "type": "string"
+          },
+          "rawScore": {
+            "type": "number",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "publication": {
+            "nullable": true,
+            "enum": [
+              "PENDING",
+              "SENT",
+              "FAILED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "studentId",
+          "participantNumber",
+          "name",
+          "state",
+          "rawScore",
+          "note",
+          "publication"
+        ]
+      },
+      "SaveOfflineScoreDto": {
+        "type": "object",
+        "properties": {
+          "rawScore": {
+            "type": "number",
+            "nullable": true,
+            "description": "From 0 up to the maximum score of the activity, at most two decimals; null clears the score"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 300,
+            "description": "Omitted keeps the stored note; null or an empty string clears it"
+          }
+        },
+        "required": [
+          "rawScore"
+        ]
+      },
+      "OfflineImportRejectionDto": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "number",
+            "description": "The 1-based row of the spreadsheet"
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "row",
+          "participantNumber",
+          "reason"
+        ]
+      },
+      "OfflineImportSkipDto": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "number",
+            "description": "The 1-based row of the spreadsheet"
+          },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "reason": {
+            "enum": [
+              "KOSONG",
+              "TIDAK_HADIR"
+            ],
+            "type": "string",
+            "description": "KOSONG: blank score, nothing changed; TIDAK_HADIR: absent student marked as such"
+          }
+        },
+        "required": [
+          "row",
+          "participantNumber",
+          "reason"
+        ]
+      },
+      "OfflineImportResultDto": {
+        "type": "object",
+        "properties": {
+          "saved": {
+            "type": "number"
+          },
+          "rejected": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfflineImportRejectionDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfflineImportSkipDto"
+            }
+          }
+        },
+        "required": [
+          "saved",
+          "rejected",
+          "skipped"
+        ]
+      },
+      "RequestOfflinePublicationDto": {
+        "type": "object",
+        "properties": {
+          "confirmMissing": {
+            "type": "boolean",
+            "description": "Send even when some students have no score yet"
+          }
+        }
+      },
+      "OfflinePublicationCountsDto": {
+        "type": "object",
+        "properties": {
+          "queued": {
+            "type": "number"
+          },
+          "missing": {
+            "type": "number"
+          },
+          "absent": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "queued",
+          "missing",
+          "absent"
         ]
       },
       "ImportErrorDto": {
