@@ -1,6 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { ExamScheduleModule } from '../exam-schedule/exam-schedule.module.js'
 import { ExamSessionModule } from '../exam-session/exam-session.module.js'
+import { AdvanceActivityStatusUseCase } from './application/use-cases/advance-activity-status/advance-activity-status.use-case.js'
+import { ActivityLifecycleJob } from './infrastructure/jobs/activity-lifecycle.job.js'
 import { AssignActivityClassroomsUseCase } from './application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from './application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from './application/use-cases/create-activity/create-activity.use-case.js'
@@ -34,6 +36,8 @@ import { ExamPolicyPresetController } from './presentation/http/exam-policy-pres
     IssueParticipantNumbersUseCase,
     AttachActivityPackageUseCase,
     AssignActivityClassroomsUseCase,
+    AdvanceActivityStatusUseCase,
+    ActivityLifecycleJob,
   ],
   exports: [ExamActivityRepository],
 })

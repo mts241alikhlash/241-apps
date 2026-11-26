@@ -124,6 +124,14 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve(this.stored)
   }
 
+  findDueForAdvance() {
+    return Promise.resolve([])
+  }
+
+  updateStatusIf() {
+    return Promise.resolve(false)
+  }
+
   listSchedules() {
     return Promise.resolve([
       {

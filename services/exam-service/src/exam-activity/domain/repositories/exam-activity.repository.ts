@@ -19,6 +19,7 @@ export interface ActivityAuditEntry {
     | 'UPDATE_POLICY'
     | 'ROTATE_TOKEN'
     | 'UPDATE_STATUS'
+    | 'AUTO_STATUS'
   before: unknown
   after: unknown
 }
@@ -84,6 +85,14 @@ export abstract class ExamActivityRepository {
     status: ActivityStatus,
     actorId: string,
   ): Promise<ExamActivity | null>
+  abstract findDueForAdvance(now: Date): Promise<ExamActivity[]>
+  abstract updateStatusIf(
+    id: string,
+    expected: ActivityStatus,
+    next: ActivityStatus,
+    actorId: string,
+    reason: string,
+  ): Promise<boolean>
 }
 
 export interface ActivityScheduleCopy {

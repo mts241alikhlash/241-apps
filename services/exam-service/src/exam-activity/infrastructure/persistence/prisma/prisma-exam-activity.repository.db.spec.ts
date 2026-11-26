@@ -155,4 +155,80 @@ suite('PrismaExamActivityRepository against a real database', () => {
     })
     expect(rows.map((row) => row.classroomId).sort()).toEqual([a, b].sort())
   })
+
+  it('changes status once under compare-and-set and audits only that change', async () => {
+    const activity = await newActivity('ONLINE')
+    await prisma.examActivity.update({
+      where: { id: activity.id },
+      data: { status: 'SCHEDULED' },
+    })
+    const system = '00000000-0000-0000-0000-000000000000'
+
+    const results = await Promise.all([
+      repo.updateStatusIf(
+        activity.id,
+        'SCHEDULED',
+        'ACTIVE',
+        system,
+        'AUTO_OPEN',
+      ),
+      repo.updateStatusIf(
+        activity.id,
+        'SCHEDULED',
+        'ACTIVE',
+        system,
+        'AUTO_OPEN',
+      ),
+    ])
+    const stale = await repo.updateStatusIf(
+      activity.id,
+      'SCHEDULED',
+      'ACTIVE',
+      system,
+      'AUTO_OPEN',
+    )
+
+    expect(results.filter(Boolean)).toHaveLength(1)
+    expect(stale).toBe(false)
+    expect(
+      (await prisma.examActivity.findUnique({ where: { id: activity.id } }))
+        ?.status,
+    ).toBe('ACTIVE')
+    const logs = await prisma.examActivityAuditLog.findMany({
+      where: { activityId: activity.id, action: 'AUTO_STATUS' },
+    })
+    expect(logs).toHaveLength(1)
+    expect(logs[0]).toMatchObject({
+      actorId: system,
+      before: { status: 'SCHEDULED' },
+      after: { status: 'ACTIVE', reason: 'AUTO_OPEN' },
+    })
+  })
+
+  it('finds only auto scheduled-soon and active-ended activities as due', async () => {
+    const now = new Date('2026-11-10T02:00:00Z')
+    const scheduled = await newActivity('ONLINE')
+    const active = await newActivity('ONLINE')
+    const manual = await newActivity('ONLINE')
+    const draft = await newActivity('ONLINE')
+    await prisma.examActivity.update({
+      where: { id: scheduled.id },
+      data: { status: 'SCHEDULED' },
+    })
+    await prisma.examActivity.update({
+      where: { id: active.id },
+      data: { status: 'ACTIVE', endsAt: new Date('2026-11-10T01:30:00Z') },
+    })
+    await prisma.examActivity.update({
+      where: { id: manual.id },
+      data: { status: 'SCHEDULED', autoStatus: false },
+    })
+
+    const due = (await repo.findDueForAdvance(now)).map((row) => row.id)
+
+    expect(due).toContain(scheduled.id)
+    expect(due).toContain(active.id)
+    expect(due).not.toContain(manual.id)
+    expect(due).not.toContain(draft.id)
+  })
 })

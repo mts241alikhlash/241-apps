@@ -24,6 +24,8 @@ import {
   parsePolicy,
 } from '../../../domain/policies/exam-policy.policy.js'
 
+const MAX_LEAD_MS = 60 * 60_000
+
 interface ActivityRow {
   id: string
   semesterId: string
@@ -395,6 +397,49 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         },
       })
       return toEntity(updated)
+    })
+  }
+
+  async findDueForAdvance(now: Date) {
+    const rows = await this.prisma.examActivity.findMany({
+      where: {
+        autoStatus: true,
+        OR: [
+          {
+            status: 'SCHEDULED',
+            startsAt: { lte: new Date(now.getTime() + MAX_LEAD_MS) },
+          },
+          { status: 'ACTIVE', endsAt: { lte: now } },
+        ],
+      },
+      orderBy: { startsAt: 'asc' },
+    })
+    return rows.map(toEntity)
+  }
+
+  async updateStatusIf(
+    id: string,
+    expected: ActivityStatus,
+    next: ActivityStatus,
+    actorId: string,
+    reason: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.examActivity.updateMany({
+        where: { id, status: expected },
+        data: { status: next },
+      })
+      if (count === 0) return false
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId: id,
+          actorId,
+          action: 'AUTO_STATUS',
+          before: { status: expected },
+          after: { status: next, reason },
+        },
+      })
+      return true
     })
   }
 }

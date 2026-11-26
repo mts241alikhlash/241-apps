@@ -252,4 +252,47 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     this.activities.set(id, updated)
     return Promise.resolve(updated)
   }
+
+  readonly autoAudits: {
+    activityId: string
+    actorId: string
+    before: ActivityStatus
+    after: ActivityStatus
+    reason: string
+  }[] = []
+
+  findDueForAdvance(now: Date) {
+    return Promise.resolve(
+      [...this.activities.values()].filter(
+        (activity) =>
+          activity.autoStatus &&
+          ((activity.status === 'SCHEDULED' &&
+            activity.startsAt.getTime() <= now.getTime() + 60 * 60_000) ||
+            (activity.status === 'ACTIVE' &&
+              activity.endsAt.getTime() <= now.getTime())),
+      ),
+    )
+  }
+
+  updateStatusIf(
+    id: string,
+    expected: ActivityStatus,
+    next: ActivityStatus,
+    actorId: string,
+    reason: string,
+  ) {
+    const activity = this.activities.get(id)
+    if (activity?.status !== expected) {
+      return Promise.resolve(false)
+    }
+    this.activities.set(id, { ...activity, status: next })
+    this.autoAudits.push({
+      activityId: id,
+      actorId,
+      before: expected,
+      after: next,
+      reason,
+    })
+    return Promise.resolve(true)
+  }
 }
