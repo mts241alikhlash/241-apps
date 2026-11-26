@@ -11,6 +11,7 @@ import { computeSessionResult } from '../../../../exam-session/domain/policies/c
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
 import {
+  byPosition,
   isBlankAnswer,
   isManual,
   toGradingItem,
@@ -58,11 +59,13 @@ export class GradeAnswerUseCase {
       throw new ConflictException('Sesi ujian belum selesai')
     }
 
-    const sources = await loadPaperSources(
-      this.schedules,
-      this.packages,
-      this.questions,
-      session.scheduleId,
+    const sources = byPosition(
+      await loadPaperSources(
+        this.schedules,
+        this.packages,
+        this.questions,
+        session.scheduleId,
+      ),
     )
     const index = sources.findIndex((row) => row.questionId === questionId)
     const source = sources[index]
