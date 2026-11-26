@@ -22,6 +22,8 @@ import type { ExamActivity } from '../../../domain/entities/exam-activity.entity
 import {
   ACTIVITY_STATUSES,
   ACTIVITY_TOKEN_MODES,
+  EXAM_DELIVERY_MODES,
+  EXAM_OFFLINE_KINDS,
 } from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamPolicy } from '../../../domain/policies/exam-policy.policy.js'
 
@@ -72,6 +74,36 @@ export class CreateActivityRequestDto {
   @Min(1)
   @Max(1440)
   durationMinutes!: number
+
+  @ApiPropertyOptional({ enum: EXAM_DELIVERY_MODES, default: 'ONLINE' })
+  @IsOptional()
+  @IsIn([...EXAM_DELIVERY_MODES])
+  deliveryMode?: ExamActivity['deliveryMode']
+
+  @ApiPropertyOptional({ enum: EXAM_OFFLINE_KINDS, nullable: true })
+  @IsOptional()
+  @IsIn([...EXAM_OFFLINE_KINDS])
+  offlineKind?: ExamActivity['offlineKind']
+
+  @ApiPropertyOptional({ minimum: 1, maximum: 1000, default: 100 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  maxScore?: number
+
+  @ApiPropertyOptional({ default: true })
+  @IsOptional()
+  @IsBoolean()
+  autoStatus?: boolean
+}
+
+export class AssignActivityClassroomsRequestDto {
+  @ApiProperty({ type: [String], format: 'uuid' })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUUID('4', { each: true })
+  classroomIds!: string[]
 }
 
 export class AttachActivityPackageRequestDto {
@@ -225,6 +257,14 @@ export class ExamActivityDto {
   @ApiProperty({ format: 'uuid' }) gradeId!: string
   @ApiProperty({ format: 'uuid' }) subjectId!: string
   @ApiProperty({ format: 'uuid', nullable: true }) packageId!: string | null
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES })
+  deliveryMode!: ExamActivity['deliveryMode']
+
+  @ApiProperty({ enum: EXAM_OFFLINE_KINDS, nullable: true })
+  offlineKind!: ExamActivity['offlineKind']
+
+  @ApiProperty() maxScore!: number
+  @ApiProperty() autoStatus!: boolean
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
   @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ enum: ACTIVITY_TOKEN_MODES })
@@ -256,6 +296,10 @@ export class ExamActivityDto {
     dto.gradeId = activity.gradeId
     dto.subjectId = activity.subjectId
     dto.packageId = activity.packageId
+    dto.deliveryMode = activity.deliveryMode
+    dto.offlineKind = activity.offlineKind
+    dto.maxScore = activity.maxScore
+    dto.autoStatus = activity.autoStatus
     dto.type = activity.type
     dto.category = categoryOf(activity.type)
     dto.tokenMode = activity.tokenMode

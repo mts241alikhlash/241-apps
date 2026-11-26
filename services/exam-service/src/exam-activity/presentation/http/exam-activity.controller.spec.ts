@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { ForbiddenException } from '@nestjs/common'
+import { ForbiddenException, ValidationPipe } from '@nestjs/common'
 import {
   PERMISSIONS_ANY_KEY,
   PERMISSIONS_KEY,
@@ -18,6 +18,7 @@ import {
 import type { IEmployeeIdentityReadPort } from '../../../platform/employee-identity/employee-identity.port.js'
 import { IParticipantNumberPort } from '../../../platform/participant-number/participant-number.port.js'
 import { FakeExamActivityRepository } from '../../application/exam-activity.repository.fake.js'
+import { AssignActivityClassroomsUseCase } from '../../application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import type { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
@@ -30,6 +31,7 @@ import type {
 import type { CloseActivitySessionsUseCase } from '../../../exam-session/application/use-cases/close-activity-sessions/close-activity-sessions.use-case.js'
 import type { ExamActivity } from '../../domain/entities/exam-activity.entity.js'
 import { DEFAULT_POLICIES } from '../../domain/policies/exam-policy.policy.js'
+import { AssignActivityClassroomsRequestDto } from './dto/exam-activity.dto.js'
 import { ExamActivityController } from './exam-activity.controller.js'
 
 const CLASSROOM_7B = {
@@ -141,6 +143,7 @@ function build(
     {} as RotateActivityTokenUseCase,
     { execute: issue } as unknown as IssueParticipantNumbersUseCase,
     new AttachActivityPackageUseCase(repo, scope),
+    new AssignActivityClassroomsUseCase(repo, scope),
     scope,
   )
 
@@ -151,6 +154,7 @@ const exactExpected: Record<string, string[]> = {
   changeStatus: ['exam-schedules.manage'],
   create: ['exam-schedules.manage'],
   attach: ['exam-schedules.manage'],
+  assign: ['exam-schedules.manage'],
   policy: ['exam-schedules.manage-all'],
   rotate: ['exam-schedules.manage-all'],
 }
@@ -389,6 +393,67 @@ describe('ExamActivityController', () => {
     await expect(
       controller.changeStatus(teacher, ownedDraft.id, { status: 'SCHEDULED' }),
     ).resolves.toMatchObject({ status: 'SCHEDULED' })
+  })
+
+  it('assigns classrooms to an offline activity and answers with the detail', async () => {
+    const { repo, controller } = build()
+    const offline = makeActivity({
+      id: 'a-offline',
+      packageId: null,
+      deliveryMode: 'OFFLINE',
+      offlineKind: 'WRITTEN',
+      createdById: teacher.id,
+    })
+    repo.activities.set(offline.id, offline)
+
+    const detail = await controller.assign(teacher, offline.id, {
+      classroomIds: [CLASSROOM_7A.id],
+    })
+    await controller.assign(teacher, offline.id, {
+      classroomIds: [CLASSROOM_7A.id],
+    })
+
+    expect(detail.schedules.map((row) => row.classroomId)).toEqual([
+      CLASSROOM_7A.id,
+    ])
+    expect(repo.scheduleRecords).toHaveLength(1)
+    await expect(
+      controller.assign(teacher, makeActivity({ id: 'x' }).id, {
+        classroomIds: [CLASSROOM_7A.id],
+      }),
+    ).rejects.toBeDefined()
+    await expect(
+      controller.assign(teacher, offline.id, {
+        classroomIds: [CLASSROOM_8A.id],
+      }),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+  })
+
+  it.each([
+    [{ classroomIds: [] }],
+    [{}],
+    [{ classroomIds: ['not-a-uuid'] }],
+    [{ classroomIds: 'x' }],
+  ])('rejects the assign body %j', async (body) => {
+    const pipe = new ValidationPipe({ whitelist: true })
+
+    await expect(
+      pipe.transform(body, {
+        type: 'body',
+        metatype: AssignActivityClassroomsRequestDto,
+      }),
+    ).rejects.toBeDefined()
+  })
+
+  it('accepts a list of classroom uuids', async () => {
+    const pipe = new ValidationPipe({ whitelist: true })
+
+    await expect(
+      pipe.transform(
+        { classroomIds: [CLASSROOM_7A.id] },
+        { type: 'body', metatype: AssignActivityClassroomsRequestDto },
+      ),
+    ).resolves.toEqual({ classroomIds: [CLASSROOM_7A.id] })
   })
 
   it('prevents Teacher A (7A) from listing, inspecting, or closing Teacher B (7B) activity in the same grade and subject', async () => {

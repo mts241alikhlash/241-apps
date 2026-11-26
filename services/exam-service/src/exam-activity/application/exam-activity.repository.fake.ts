@@ -9,6 +9,7 @@ import {
   DEFAULT_POLICIES,
   type ExamPolicy,
 } from '../domain/policies/exam-policy.policy.js'
+import type { ExamSchedule } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ActivityEventRef } from '../domain/policies/activity-rules.policy.js'
 import type {
   ActivityStatus,
@@ -36,6 +37,72 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
       },
     ]),
   )
+
+  readonly scheduleRecords: ExamSchedule[] = []
+
+  private addSchedule(
+    activity: ExamActivity,
+    classroomId: string,
+  ): ExamSchedule {
+    const record: ExamSchedule = {
+      id: randomUUID(),
+      deliveryMode: activity.deliveryMode,
+      packageId: activity.packageId,
+      packageTitle: null,
+      subjectId: activity.subjectId,
+      classroomId,
+      semesterId: activity.semesterId,
+      eventId: activity.eventId,
+      startsAt: activity.startsAt,
+      endsAt: activity.endsAt,
+      durationMinutes: activity.durationMinutes,
+      type: activity.type,
+      kind: 'REGULAR',
+      makeupOfId: null,
+      tokenRotation: 0,
+      activityId: activity.id,
+      minSubmitMinutes: 0,
+      status: 'SCHEDULED',
+      createdById: activity.createdById,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    this.scheduleRecords.push(record)
+    this.activitySchedules.set(activity.id, [
+      ...(this.activitySchedules.get(activity.id) ?? []),
+      {
+        id: record.id,
+        classroomId,
+        startsAt: activity.startsAt,
+        endsAt: activity.endsAt,
+      },
+    ])
+    return record
+  }
+
+  assignClassrooms(input: {
+    activityId: string
+    classroomIds: string[]
+    actorId: string
+  }) {
+    const activity = this.activities.get(input.activityId)
+    if (activity === undefined) return Promise.resolve(null)
+    const have = new Set(
+      this.scheduleRecords
+        .filter((row) => row.activityId === input.activityId)
+        .map((row) => row.classroomId),
+    )
+    for (const classroomId of input.classroomIds) {
+      if (!have.has(classroomId)) this.addSchedule(activity, classroomId)
+    }
+    return Promise.resolve(
+      this.scheduleRecords.filter(
+        (row) =>
+          row.activityId === input.activityId &&
+          input.classroomIds.includes(row.classroomId),
+      ),
+    )
+  }
 
   readonly packageStatuses = new Map<string, string>()
   readonly missingPackages = new Set<string>()
@@ -93,15 +160,12 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
       autoStatus: input.activity.autoStatus ?? true,
     }
     this.activities.set(activity.id, activity)
-    this.activitySchedules.set(
-      activity.id,
-      input.classroomIds.map((classroomId) => ({
-        id: randomUUID(),
-        classroomId,
-        startsAt: activity.startsAt,
-        endsAt: activity.endsAt,
-      })),
-    )
+    this.activitySchedules.set(activity.id, [])
+    if (activity.packageId !== null) {
+      for (const classroomId of input.classroomIds) {
+        this.addSchedule(activity, classroomId)
+      }
+    }
     return Promise.resolve(activity)
   }
 
@@ -126,15 +190,19 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     })
     const updated: ExamActivity = { ...activity, packageId: input.packageId }
     this.activities.set(input.activityId, updated)
-    this.activitySchedules.set(
-      input.activityId,
-      input.classroomIds.map((classroomId) => ({
-        id: randomUUID(),
-        classroomId,
-        startsAt: activity.startsAt,
-        endsAt: activity.endsAt,
-      })),
+    for (const row of this.scheduleRecords) {
+      if (row.activityId === input.activityId && row.packageId === null) {
+        row.packageId = input.packageId
+      }
+    }
+    const have = new Set(
+      this.scheduleRecords
+        .filter((row) => row.activityId === input.activityId)
+        .map((row) => row.classroomId),
     )
+    for (const classroomId of input.classroomIds) {
+      if (!have.has(classroomId)) this.addSchedule(updated, classroomId)
+    }
     return Promise.resolve(updated)
   }
 

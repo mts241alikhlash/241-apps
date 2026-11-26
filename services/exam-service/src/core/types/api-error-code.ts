@@ -25,6 +25,7 @@ export const API_ERROR_CODES = [
   'ACTIVITY_HAS_PACKAGE',
   'OFFLINE_NOT_STARTABLE',
   'PACKAGE_MISSING',
+  'OFFLINE_NO_PACKAGE',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

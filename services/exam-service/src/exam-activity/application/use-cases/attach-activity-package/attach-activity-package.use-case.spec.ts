@@ -148,6 +148,35 @@ describe('AttachActivityPackageUseCase', () => {
     expect(repo.attachments).toEqual([])
   })
 
+  it('refuses an offline activity', async () => {
+    const repo = seeded({ deliveryMode: 'OFFLINE', offlineKind: 'WRITTEN' })
+
+    await expect(makeUseCase(repo).execute(input)).rejects.toMatchObject({
+      response: { code: 'OFFLINE_NO_PACKAGE' },
+    })
+    expect(repo.attachments).toEqual([])
+  })
+
+  it('creates only the schedules that are missing', async () => {
+    const repo = seeded()
+    await repo.assignClassrooms({
+      activityId: 'activity-1',
+      classroomIds: [CLASSROOM_7A.id],
+      actorId: 'admin-1',
+    })
+
+    await makeUseCase(repo).execute(input)
+
+    expect(repo.scheduleRecords.map((row) => row.classroomId)).toEqual([
+      CLASSROOM_7A.id,
+      CLASSROOM_7B.id,
+    ])
+    expect(repo.scheduleRecords.map((row) => row.packageId)).toEqual([
+      'package-1',
+      'package-1',
+    ])
+  })
+
   it('blocks Teacher A (7A) from attaching a package to classroom 7B', async () => {
     const repo = seeded({ createdById: 'teacher-a' })
     const teacherA: ScheduleAccessUser = {

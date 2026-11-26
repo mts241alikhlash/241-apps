@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { Prisma } from '../../../../generated/prisma/client.js'
 import {
+  SCHEDULE_INCLUDE,
+  toSchedule,
+} from '../../../../exam-schedule/infrastructure/persistence/prisma/prisma-exam-schedule.mapper.js'
+import {
   EXAM_TYPES,
   type ExamCategory,
   type ExamType,
@@ -78,14 +82,16 @@ async function createSchedules(
     endsAt: Date
     durationMinutes: number
     type: ExamActivity['type']
+    deliveryMode: ExamDeliveryMode
     createdById: string
   },
-  packageId: string,
+  packageId: string | null,
   classroomIds: string[],
 ) {
   await tx.examSchedule.createMany({
     data: classroomIds.map((classroomId) => ({
       packageId,
+      deliveryMode: activity.deliveryMode,
       classroomId,
       semesterId: activity.semesterId,
       eventId: activity.eventId,
@@ -97,6 +103,19 @@ async function createSchedules(
       activityId: activity.id,
     })),
   })
+}
+
+async function missingClassrooms(
+  tx: Prisma.TransactionClient,
+  activityId: string,
+  classroomIds: string[],
+): Promise<string[]> {
+  const existing = await tx.examSchedule.findMany({
+    where: { activityId, kind: 'REGULAR' },
+    select: { classroomId: true },
+  })
+  const have = new Set(existing.map((row) => row.classroomId))
+  return [...new Set(classroomIds)].filter((id) => !have.has(id))
 }
 
 @Injectable()
@@ -225,7 +244,16 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         where: { id: activityId },
         data: { packageId },
       })
-      await createSchedules(tx, updated, packageId, classroomIds)
+      await tx.examSchedule.updateMany({
+        where: { activityId, kind: 'REGULAR', packageId: null },
+        data: { packageId },
+      })
+      await createSchedules(
+        tx,
+        updated,
+        packageId,
+        await missingClassrooms(tx, activityId, classroomIds),
+      )
       await tx.examActivityAuditLog.create({
         data: {
           activityId,
@@ -236,6 +264,34 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         },
       })
       return toEntity(updated)
+    })
+  }
+
+  async assignClassrooms(
+    input: Parameters<ExamActivityRepository['assignClassrooms']>[0],
+  ) {
+    const { activityId, classroomIds } = input
+    return this.prisma.$transaction(async (tx) => {
+      const activity = await tx.examActivity.findUnique({
+        where: { id: activityId },
+      })
+      if (activity === null) return null
+      await createSchedules(
+        tx,
+        activity,
+        activity.packageId,
+        await missingClassrooms(tx, activityId, classroomIds),
+      )
+      const rows = await tx.examSchedule.findMany({
+        where: {
+          activityId,
+          kind: 'REGULAR',
+          classroomId: { in: classroomIds },
+        },
+        include: SCHEDULE_INCLUDE,
+        orderBy: { createdAt: 'asc' },
+      })
+      return rows.map(toSchedule)
     })
   }
 

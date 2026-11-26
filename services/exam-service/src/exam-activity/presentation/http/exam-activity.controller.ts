@@ -30,6 +30,7 @@ import {
   ScheduleScopeService,
   type ScheduleAccessUser,
 } from '../../../exam-schedule/application/schedule-scope.service.js'
+import { AssignActivityClassroomsUseCase } from '../../application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from '../../application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from '../../application/use-cases/create-activity/create-activity.use-case.js'
 import { IssueParticipantNumbersUseCase } from '../../application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
@@ -40,6 +41,7 @@ import {
   UpdateActivityPolicyUseCase,
 } from '../../application/use-cases/update-activity-policy/update-activity-policy.use-case.js'
 import {
+  AssignActivityClassroomsRequestDto,
   AttachActivityPackageRequestDto,
   CreateActivityRequestDto,
   ExamActivityDetailDto,
@@ -63,6 +65,7 @@ export class ExamActivityController {
     private readonly rotateToken: RotateActivityTokenUseCase,
     private readonly issueParticipantNumbers: IssueParticipantNumbersUseCase,
     private readonly attachPackage: AttachActivityPackageUseCase,
+    private readonly assignClassrooms: AssignActivityClassroomsUseCase,
     @Inject(forwardRef(() => ScheduleScopeService))
     private readonly scheduleScope: ScheduleScopeService,
   ) {}
@@ -166,6 +169,10 @@ export class ExamActivityController {
       startsAt: new Date(dto.startsAt),
       endsAt: new Date(dto.endsAt),
       durationMinutes: dto.durationMinutes,
+      deliveryMode: dto.deliveryMode,
+      offlineKind: dto.offlineKind,
+      maxScore: dto.maxScore,
+      autoStatus: dto.autoStatus,
     })
     return ExamActivityDto.of(activity)
   }
@@ -190,6 +197,28 @@ export class ExamActivityController {
       classroomIds: dto.classroomIds,
     })
     return ExamActivityDto.of(activity)
+  }
+
+  @Post(':id/classrooms')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('exam-schedules.manage')
+  @ApiOperation({
+    summary: 'Create the missing classroom schedules of an activity',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiResponse({ status: 200, type: ExamActivityDetailDto })
+  async assign(
+    @CurrentUser() user: ScheduleAccessUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AssignActivityClassroomsRequestDto,
+  ): Promise<ExamActivityDetailDto> {
+    await this.assignClassrooms.execute({
+      actor: user,
+      activityId: id,
+      classroomIds: dto.classroomIds,
+    })
+    const detail = await this.listActivities.findOne(id, user)
+    return ExamActivityDetailDto.ofDetail(detail.activity, detail.schedules)
   }
 
   @Patch(':id/policy')

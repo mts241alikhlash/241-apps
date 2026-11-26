@@ -45,8 +45,9 @@ export class UpdateActivityStatusUseCase {
       classroomIds,
     })
     if (
+      current.deliveryMode === 'ONLINE' &&
       current.packageId === null &&
-      (status === 'SCHEDULED' || status === 'ACTIVE')
+      status === 'ACTIVE'
     ) {
       throw new UnprocessableEntityException('Pasang paket soal dulu')
     }

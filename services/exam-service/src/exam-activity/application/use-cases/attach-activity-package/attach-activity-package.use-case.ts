@@ -36,6 +36,12 @@ export class AttachActivityPackageUseCase {
     }
     const scope = await this.scheduleScope.forUser(command.actor)
     await scope.assertCanManageActivity(current, command.classroomIds)
+    if (current.deliveryMode === 'OFFLINE') {
+      throw new ApiConflictException(
+        'OFFLINE_NO_PACKAGE',
+        'Kegiatan luring tidak memakai paket soal',
+      )
+    }
     if (current.packageId !== null) {
       throw new ApiConflictException(
         'ACTIVITY_HAS_PACKAGE',

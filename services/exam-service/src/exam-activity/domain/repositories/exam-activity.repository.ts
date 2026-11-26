@@ -2,6 +2,7 @@ import type {
   ExamCategory,
   ExamType,
 } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import type { ExamSchedule } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
 import type { ActivityEventRef } from '../policies/activity-rules.policy.js'
 import type {
@@ -58,6 +59,11 @@ export abstract class ExamActivityRepository {
     classroomIds: string[]
     actorId: string
   }): Promise<ExamActivity | null>
+  abstract assignClassrooms(input: {
+    activityId: string
+    classroomIds: string[]
+    actorId: string
+  }): Promise<ExamSchedule[] | null>
   abstract findById(id: string): Promise<ExamActivity | null>
   abstract updatePolicy(
     id: string,
