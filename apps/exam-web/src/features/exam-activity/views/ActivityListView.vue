@@ -640,6 +640,7 @@ onMounted(load)
             v-if="readinessDate !== ''"
             :event-id="readinessEventId"
             :date="readinessDate"
+            :activity-ids="inScope.map((item) => item.id)"
           />
         </div>
 

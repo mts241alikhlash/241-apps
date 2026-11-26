@@ -66,9 +66,6 @@ const canAttach = computed(
     !isOffline.value &&
     detail.value.packageId === null,
 )
-const sharesWithoutPackage = computed(
-  () => detail.value?.status === 'DRAFT' && canAttach.value,
-)
 const assignedIds = computed(() =>
   (detail.value?.schedules ?? []).map((item) => item.classroomId),
 )
@@ -343,11 +340,18 @@ onMounted(load)
             terbagi, berlangsung, atau selesai.
           </p>
           <p
-            v-if="sharesWithoutPackage && canManage"
+            v-if="canAttach && canManage && detail.status === 'DRAFT'"
             class="text-control text-muted-foreground"
           >
-            Jadwal dibagikan tanpa paket soal; ujian baru bisa dibuka setelah
-            paket dipasang.
+            Jadwal bisa dibagikan tanpa paket soal; ujian baru bisa dibuka
+            setelah paket dipasang.
+          </p>
+          <p
+            v-else-if="canAttach && canManage && detail.status === 'SCHEDULED'"
+            class="text-control text-muted-foreground"
+          >
+            Jadwal sudah dibagikan tanpa paket soal; ujian baru bisa dibuka
+            setelah paket dipasang.
           </p>
 
           <div class="shrink-0 space-y-1">

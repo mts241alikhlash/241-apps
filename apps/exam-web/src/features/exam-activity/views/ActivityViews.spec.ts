@@ -250,6 +250,36 @@ describe('ActivityListView', () => {
     wrapper.unmount()
   })
 
+  it('limits the readiness panel to the listed activities', async () => {
+    list.mockResolvedValue([
+      sampleDetail({ id: 'act-daily', type: 'DAILY', category: 'NON_EXAM' }),
+    ])
+    readiness.mockResolvedValue([
+      {
+        activityId: 'act-daily',
+        subjectName: 'Listed',
+        gradeName: null,
+        startsAt: '2026-11-27T01:00:00.000Z',
+        deliveryMode: 'ONLINE',
+        checks: [],
+      },
+      {
+        activityId: 'other',
+        subjectName: 'Stranger',
+        gradeName: null,
+        startsAt: '2026-11-27T01:00:00.000Z',
+        deliveryMode: 'ONLINE',
+        checks: [],
+      },
+    ])
+    const wrapper = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.find('[data-activity="act-daily"]').exists()).toBe(true)
+    expect(wrapper.find('[data-activity="other"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('calls examActivityApi.list({ category }) with route.meta.category and navigates to the section create route', async () => {
     const wrapper = mount(ActivityListView, { global: { stubs } })
     await flushPromises()
@@ -347,7 +377,8 @@ describe('ActivityDetailView', () => {
     const draft = mount(ActivityDetailView, { global: { stubs } })
     await flushPromises()
     expect(buttonTexts(draft)).toContain('Bagikan jadwal')
-    expect(draft.text()).toContain('Jadwal dibagikan tanpa paket soal')
+    expect(draft.text()).toContain('Jadwal bisa dibagikan tanpa paket soal')
+    expect(draft.text()).not.toContain('sudah dibagikan')
     draft.unmount()
 
     get.mockResolvedValue(sampleDetail({ status: 'SCHEDULED' }))
@@ -355,6 +386,18 @@ describe('ActivityDetailView', () => {
     await flushPromises()
     expect(buttonTexts(scheduled)).not.toContain('Bagikan jadwal')
     scheduled.unmount()
+  })
+
+  it('says the timetable was already shared for a scheduled activity without a package', async () => {
+    permissions.add('exam-schedules.manage-all')
+    get.mockResolvedValue(
+      sampleDetail({ status: 'SCHEDULED', packageId: null }),
+    )
+    const wrapper = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Jadwal sudah dibagikan tanpa paket soal')
+    wrapper.unmount()
   })
 
   it('shows Pasang paket for an online activity without a package, never for an offline one', async () => {

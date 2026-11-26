@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
@@ -31,7 +31,8 @@ import type {
 
 const { hasPermission } = useAuthSession()
 const route = useRoute()
-const { category } = useRouteCategory()
+const router = useRouter()
+const { category, sectionPrefix } = useRouteCategory()
 const fixedEventId = computed(() =>
   typeof route.query.periode === 'string' ? route.query.periode : '',
 )
@@ -104,8 +105,28 @@ async function submit(payload: ActivityCreatePayload): Promise<void> {
   submitting.value = true
   error.value = null
   try {
-    await examActivityApi.create(payload)
-    toast.success('Kegiatan disimpan dan jadwal kelas dibuat')
+    const created = await examActivityApi.create(payload)
+    const needsAssign =
+      !payload.packageId && (payload.classroomIds ?? []).length > 0
+    if (!needsAssign) {
+      toast.success(
+        payload.packageId
+          ? 'Kegiatan disimpan dan jadwal kelas dibuat'
+          : 'Kegiatan disimpan',
+      )
+    } else {
+      try {
+        await examActivityApi.assignClassrooms(created.id, {
+          classroomIds: [...(payload.classroomIds ?? [])],
+        })
+        toast.success('Kegiatan disimpan dan jadwal kelas dibuat')
+      } catch (err: unknown) {
+        toast.error(
+          `Kegiatan sudah disimpan, tetapi kelas belum ditetapkan: ${messageOf(err, 'terjadi kesalahan')}. Gunakan Tetapkan kelas di halaman detail kegiatan.`,
+        )
+      }
+    }
+    void router.push(`${sectionPrefix.value}/activities/${created.id}`)
   } catch (err: unknown) {
     error.value = messageOf(err, 'Kegiatan gagal disimpan.')
     toast.error(error.value)

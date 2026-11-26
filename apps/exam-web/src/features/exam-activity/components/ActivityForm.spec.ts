@@ -245,6 +245,20 @@ describe('ActivityForm delivery mode', () => {
     wrapper.unmount()
   })
 
+  it('fixes the token to Token tetap for Offline', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+    await emitFrom(wrapper, 'offlineKind', 'SelectStub', 'WRITTEN')
+
+    expect(wrapper.find('[data-field="tokenMode"]').exists()).toBe(false)
+    await submitForm(wrapper)
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
+      tokenMode: 'STATIC',
+    })
+    wrapper.unmount()
+  })
+
   it('states the effective timings as numbers', () => {
     const wrapper = open()
 

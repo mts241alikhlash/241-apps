@@ -158,7 +158,7 @@ describe('ActivityStatusDialog', () => {
     wrapper.unmount()
   })
 
-  it('shows the server message when an online activity without a package is refused ACTIVE', async () => {
+  it('shows the server message when the server refuses ACTIVE for an online activity without a package', async () => {
     updateStatus.mockRejectedValue({
       response: {
         status: 409,
@@ -166,11 +166,18 @@ describe('ActivityStatusDialog', () => {
       },
     })
     const wrapper = open(activity({ packageId: null, status: 'SCHEDULED' }))
+    await wrapper
+      .get('[data-field="status"]')
+      .findComponent({ name: 'SelectStub' })
+      .vm.$emit('update:modelValue', 'ACTIVE')
+    await flushPromises()
     await submit(wrapper)
 
+    expect(updateStatus).toHaveBeenCalledWith('act-1', 'ACTIVE')
     expect(wrapper.get('[role="alert"]').text()).toContain(
       'Pasang paket soal sebelum membuka ujian',
     )
+    expect(wrapper.emitted('saved')).toBeUndefined()
     wrapper.unmount()
   })
 

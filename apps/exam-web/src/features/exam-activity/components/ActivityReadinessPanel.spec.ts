@@ -123,6 +123,29 @@ describe('ActivityReadinessPanel', () => {
     wrapper.unmount()
   })
 
+  it('titles the panel with the date and announces changes politely', async () => {
+    readiness.mockResolvedValue([row])
+    const wrapper = mountPanel()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Kesiapan 27 November 2026')
+    expect(wrapper.find('[aria-live="polite"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('shows only the activities it was told about', async () => {
+    readiness.mockResolvedValue([row, { ...row, activityId: 'a2' }])
+    const wrapper = mount(ActivityReadinessPanel, {
+      props: { eventId: '', date: '2026-11-27', activityIds: ['a1'] },
+      global: { stubs },
+    })
+    await flushPromises()
+
+    expect(wrapper.find('[data-activity="a1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-activity="a2"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('reloads when the date changes', async () => {
     readiness.mockResolvedValue([])
     const wrapper = mountPanel()

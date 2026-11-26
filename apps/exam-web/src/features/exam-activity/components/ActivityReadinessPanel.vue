@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { CircleCheck, RefreshCw, TriangleAlert } from '@lucide/vue'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -13,7 +13,11 @@ import { examActivityApi } from '../api/examActivityApi'
 import type { ActivityReadiness } from '../types'
 import DeliveryBadge from './DeliveryBadge.vue'
 
-const props = defineProps<{ eventId: string; date: string }>()
+const props = defineProps<{
+  eventId: string
+  date: string
+  activityIds?: string[]
+}>()
 
 const CHECK_LABELS: Record<ActivityReadiness['checks'][number]['key'], string> =
   {
@@ -28,6 +32,20 @@ const CHECK_LABELS: Record<ActivityReadiness['checks'][number]['key'], string> =
 
 const rows = ref<ActivityReadiness[]>([])
 const loading = ref(true)
+
+const visibleRows = computed(() =>
+  props.activityIds === undefined
+    ? rows.value
+    : rows.value.filter((row) => props.activityIds?.includes(row.activityId)),
+)
+
+const title = computed(
+  () =>
+    `Kesiapan ${new Intl.DateTimeFormat('id-ID', {
+      timeZone: 'UTC',
+      dateStyle: 'long',
+    }).format(new Date(`${props.date}T00:00:00Z`))}`,
+)
 const error = ref<string | null>(null)
 let requestId = 0
 
@@ -75,7 +93,7 @@ onMounted(load)
     class="shrink-0"
   >
     <CardHeader standard>
-      <CardTitle size="md">Kesiapan Hari Ini</CardTitle>
+      <CardTitle size="md">{{ title }}</CardTitle>
       <Button
         variant="outline"
         class="shrink-0"
@@ -86,7 +104,10 @@ onMounted(load)
         Segarkan
       </Button>
     </CardHeader>
-    <CardContent variant="standard">
+    <CardContent
+      variant="standard"
+      aria-live="polite"
+    >
       <p
         v-if="error !== null"
         role="alert"
@@ -101,7 +122,7 @@ onMounted(load)
         Memuat kesiapan…
       </p>
       <p
-        v-else-if="rows.length === 0"
+        v-else-if="visibleRows.length === 0"
         class="text-control text-muted-foreground"
       >
         Tidak ada kegiatan pada hari ini.
@@ -111,7 +132,7 @@ onMounted(load)
         class="grid gap-3"
       >
         <li
-          v-for="row in rows"
+          v-for="row in visibleRows"
           :key="row.activityId"
           :data-activity="row.activityId"
           class="rounded-md border p-3"

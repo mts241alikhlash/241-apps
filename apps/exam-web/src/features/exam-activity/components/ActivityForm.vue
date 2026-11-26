@@ -136,7 +136,7 @@ const formSchema = toTypedSchema(
       type: z.string().min(1, 'Jenis wajib dipilih'),
       eventId: z.string().optional(),
       presetName: z.string(),
-      tokenMode: z.string(),
+      tokenMode: z.string().optional(),
       startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
       startTime: z.string().min(1, 'Jam mulai wajib diisi'),
       endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
@@ -361,7 +361,11 @@ const onSubmit = handleSubmit((form) => {
     type: form.type as ExamType,
     classroomIds: [...form.classroomIds],
     presetName: (exam ? form.type : form.presetName) as PresetName,
-    tokenMode: (exam ? 'ROTATING' : form.tokenMode) as ActivityTokenMode,
+    tokenMode: (offline
+      ? 'STATIC'
+      : exam
+        ? 'ROTATING'
+        : form.tokenMode) as ActivityTokenMode,
     startsAt: new Date(`${form.startDate}T${form.startTime}`).toISOString(),
     endsAt: new Date(`${form.endDate}T${form.endTime}`).toISOString(),
     durationMinutes: form.durationMinutes,
@@ -787,7 +791,19 @@ const onSubmit = handleSubmit((form) => {
     </FloatingField>
 
     <FloatingLabelField
-      v-if="isExamType"
+      v-if="isOffline"
+      label="Jenis token"
+      for="activity-token-offline"
+      floating
+    >
+      <Input
+        id="activity-token-offline"
+        model-value="Token tetap"
+        disabled
+      />
+    </FloatingLabelField>
+    <FloatingLabelField
+      v-else-if="isExamType"
       label="Jenis token"
       for="activity-token-fixed"
       floating
