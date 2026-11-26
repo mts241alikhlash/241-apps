@@ -53,6 +53,7 @@ suite('Delivery mode constraints against a real database', () => {
   async function activity(
     deliveryMode: 'ONLINE' | 'OFFLINE',
     offlineKind: 'WRITTEN' | 'PRACTICAL' | null,
+    packageId: string | null = null,
   ) {
     const row = await prisma.examActivity.create({
       data: {
@@ -67,6 +68,7 @@ suite('Delivery mode constraints against a real database', () => {
         createdById: userId,
         deliveryMode,
         offlineKind,
+        packageId,
       },
     })
     activityIds.push(row.id)
@@ -84,7 +86,9 @@ suite('Delivery mode constraints against a real database', () => {
   })
 
   it('rejects an offline schedule that has a package', async () => {
-    await expect(schedule('OFFLINE', await pkg())).rejects.toThrow()
+    await expect(schedule('OFFLINE', await pkg())).rejects.toThrow(
+      /exam_schedules_offline_without_package_check/,
+    )
   })
 
   it('accepts an offline schedule without a package', async () => {
@@ -99,11 +103,21 @@ suite('Delivery mode constraints against a real database', () => {
   })
 
   it('rejects an offline activity without an offline kind', async () => {
-    await expect(activity('OFFLINE', null)).rejects.toThrow()
+    await expect(activity('OFFLINE', null)).rejects.toThrow(
+      /exam_activities_offline_kind_check/,
+    )
   })
 
   it('rejects an online activity with an offline kind', async () => {
-    await expect(activity('ONLINE', 'WRITTEN')).rejects.toThrow()
+    await expect(activity('ONLINE', 'WRITTEN')).rejects.toThrow(
+      /exam_activities_offline_kind_check/,
+    )
+  })
+
+  it('rejects an offline activity that has a package', async () => {
+    await expect(activity('OFFLINE', 'WRITTEN', await pkg())).rejects.toThrow(
+      /exam_activities_offline_without_package_check/,
+    )
   })
 
   it('accepts an offline activity with a kind and applies defaults', async () => {
@@ -130,6 +144,8 @@ suite('Delivery mode constraints against a real database', () => {
     expect(created.publicationStatus).toBe('PENDING')
     expect(created.publicationAttempts).toBe(0)
     expect(created.rawScore).toBeNull()
-    await expect(prisma.examOfflineResult.create({ data })).rejects.toThrow()
+    await expect(prisma.examOfflineResult.create({ data })).rejects.toThrow(
+      /Unique constraint/,
+    )
   })
 })

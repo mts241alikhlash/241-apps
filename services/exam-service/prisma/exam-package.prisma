@@ -122,7 +122,7 @@ model ExamSchedule {
   updatedAt       DateTime           @updatedAt @map("updated_at")
 
   package      ExamPackage?              @relation(fields: [packageId], references: [id])
-  activity    ExamActivity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  activity     ExamActivity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
   event        ExamEvent?                @relation(fields: [eventId], references: [id])
   makeupOf     ExamSchedule?             @relation("Makeups", fields: [makeupOfId], references: [id], onDelete: Restrict)
   makeups      ExamSchedule[]            @relation("Makeups")
