@@ -2,6 +2,7 @@ import { unwrap } from '@mts241alikhlash/web-shared/utils/service-client'
 import { examClient } from '@/shared/api/clients'
 import type {
   ActivityCreatePayload,
+  ActivityCreateRequest,
   ActivityPolicyPayload,
   ActivityStatus,
   AttachPackagePayload,
@@ -18,7 +19,11 @@ export const examActivityApi = {
     ),
 
   create: (body: ActivityCreatePayload) =>
-    unwrap(examClient.POST('/exam-activities', { body })),
+    unwrap(
+      examClient.POST('/exam-activities', {
+        body: body as ActivityCreateRequest,
+      }),
+    ),
 
   attachPackage: (id: string, body: AttachPackagePayload) =>
     unwrap(

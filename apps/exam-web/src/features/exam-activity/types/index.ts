@@ -58,7 +58,18 @@ export interface EventOption {
   type: ExamType
 }
 
-export type ActivityCreatePayload = Schemas['CreateActivityRequestDto']
+export type ActivityCreateRequest = Schemas['CreateActivityRequestDto']
+
+export type ActivityCreatePayload = Omit<
+  Schemas['CreateActivityRequestDto'],
+  'autoStatus' | 'deliveryMode' | 'maxScore'
+> &
+  Partial<
+    Pick<
+      Schemas['CreateActivityRequestDto'],
+      'autoStatus' | 'deliveryMode' | 'maxScore'
+    >
+  >
 
 export type ActivityPolicyPayload = Schemas['UpdateActivityPolicyRequestDto']
 

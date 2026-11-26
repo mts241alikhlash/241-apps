@@ -59,6 +59,7 @@ const activitySchedule = (
   classroomName: gradeName,
   createdAt: '2026-11-24T00:00:00.000Z',
   createdById: '',
+  deliveryMode: 'ONLINE',
   durationMinutes: 75,
   endsAt: '2026-11-24T01:15:00.000Z',
   eventId: 'e1',
@@ -85,7 +86,7 @@ describe('buildAttendanceDays', () => {
     const days = buildAttendanceDays(
       pack,
       [activitySchedule('a1', 'grade-7', 'Kelas 7', 'Akidah Akhlak')],
-      (item) => item.packageTitle,
+      (item) => item.packageTitle ?? '',
       gradeClassrooms,
     )
 
@@ -103,7 +104,7 @@ describe('buildAttendanceDays', () => {
     const days = buildAttendanceDays(
       pack,
       [activitySchedule('s1', 'cls-9a', 'IX-A', 'Matematika')],
-      (item) => item.packageTitle,
+      (item) => item.packageTitle ?? '',
     )
 
     expect(days).toHaveLength(1)

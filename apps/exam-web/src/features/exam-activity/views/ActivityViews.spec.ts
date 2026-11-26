@@ -92,6 +92,10 @@ const sampleDetail = (
   overrides: Partial<ExamActivityDetail> = {},
 ): ExamActivityDetail => ({
   id: 'act-1',
+  autoStatus: true,
+  deliveryMode: 'ONLINE',
+  offlineKind: null,
+  maxScore: 100,
   semesterId: 'sem-1',
   eventId: 'ev-1',
   gradeId: 'grade-7',
@@ -120,6 +124,8 @@ const sampleDetail = (
     shuffleQuestions: true,
     shuffleChoices: true,
     allowWeb: true,
+    autoCloseGraceMinutes: 0,
+    autoOpenLeadMinutes: 0,
   },
   schedules: [
     {

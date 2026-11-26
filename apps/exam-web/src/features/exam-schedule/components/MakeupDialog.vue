@@ -96,7 +96,7 @@ const { handleSubmit, isSubmitting, values, setFieldValue } = useForm({
   validationSchema: formSchema,
   initialValues: {
     reason: form.reason.value,
-    packageId: props.schedule.packageId,
+    packageId: props.schedule.packageId ?? '',
     startDate: '',
     startTime: '',
     endDate: '',

@@ -145,6 +145,7 @@ const existing: ExamSchedule = {
   makeupOfId: null,
   hasSessions: false,
   createdById: 'u1',
+  deliveryMode: 'ONLINE',
   createdAt: '2026-10-30T00:00:00.000Z',
   updatedAt: '2026-10-30T00:00:00.000Z',
 }
