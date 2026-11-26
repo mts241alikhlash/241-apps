@@ -3,6 +3,16 @@ enum ActivityTokenMode {
   STATIC
 }
 
+enum ExamDeliveryMode {
+  ONLINE
+  OFFLINE
+}
+
+enum ExamOfflineKind {
+  WRITTEN
+  PRACTICAL
+}
+
 enum ActivityStatus {
   DRAFT
   SCHEDULED
@@ -37,6 +47,10 @@ model ExamActivity {
   startsAt        DateTime          @map("starts_at")
   endsAt          DateTime          @map("ends_at")
   durationMinutes Int               @map("duration_minutes")
+  deliveryMode    ExamDeliveryMode  @default(ONLINE) @map("delivery_mode")
+  offlineKind     ExamOfflineKind?  @map("offline_kind")
+  maxScore        Float             @default(100) @map("max_score")
+  autoStatus      Boolean           @default(true) @map("auto_status")
   status          ActivityStatus    @default(DRAFT)
   createdById     String            @map("created_by_id") @db.Uuid
   createdAt       DateTime          @default(now()) @map("created_at")

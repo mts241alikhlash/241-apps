@@ -102,7 +102,8 @@ enum MakeupReason {
 
 model ExamSchedule {
   id              String             @id @default(uuid()) @db.Uuid
-  packageId       String             @map("package_id") @db.Uuid
+  packageId       String?            @map("package_id") @db.Uuid
+  deliveryMode    ExamDeliveryMode   @default(ONLINE) @map("delivery_mode")
   classroomId     String             @map("classroom_id") @db.Uuid
   semesterId      String             @map("semester_id") @db.Uuid
   eventId         String?            @map("event_id") @db.Uuid
@@ -120,13 +121,14 @@ model ExamSchedule {
   createdAt       DateTime           @default(now()) @map("created_at")
   updatedAt       DateTime           @updatedAt @map("updated_at")
 
-  package      ExamPackage               @relation(fields: [packageId], references: [id])
-  activity     ExamActivity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  package      ExamPackage?              @relation(fields: [packageId], references: [id])
+  activity    ExamActivity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
   event        ExamEvent?                @relation(fields: [eventId], references: [id])
   makeupOf     ExamSchedule?             @relation("Makeups", fields: [makeupOfId], references: [id], onDelete: Restrict)
   makeups      ExamSchedule[]            @relation("Makeups")
   sessions     ExamSession[]
   participants ExamScheduleParticipant[]
+  offlineResults ExamOfflineResult[]
 
   @@index([classroomId, startsAt])
   @@index([packageId])
