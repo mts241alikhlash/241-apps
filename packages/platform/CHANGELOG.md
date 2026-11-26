@@ -1,5 +1,13 @@
 # @mts241alikhlash/platform
 
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies [2746853]
+  - @mts241alikhlash/web-shared@0.2.2
+  - @mts241alikhlash/ui@0.3.1
+
 ## 0.2.6
 
 ### Patch Changes
