@@ -24,6 +24,7 @@ import {
 import {
   ApiOperation,
   ApiProperty,
+  ApiPropertyOptional,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
@@ -60,6 +61,10 @@ export class ActiveEnrollmentSummary {
   studentUserId!: string | null
 
   @ApiProperty({ nullable: true }) studentNis!: string | null
+
+  @ApiPropertyOptional({ nullable: true }) studentNisn?: string | null
+
+  @ApiPropertyOptional({ nullable: true }) studentGender?: string | null
 
   @ApiProperty({
     nullable: true,
@@ -442,7 +447,10 @@ function toSummary(enrollment: {
   student?: {
     userId?: string | null
     nis?: string | null
-    user?: { profile?: { name?: string | null } | null } | null
+    nisn?: string | null
+    user?: {
+      profile?: { name?: string | null; gender?: string | null } | null
+    } | null
   } | null
 }): ActiveEnrollmentSummary {
   return {
@@ -453,6 +461,8 @@ function toSummary(enrollment: {
     status: enrollment.status ?? null,
     studentUserId: enrollment.student?.userId ?? null,
     studentNis: enrollment.student?.nis ?? null,
+    studentNisn: enrollment.student?.nisn ?? null,
+    studentGender: enrollment.student?.user?.profile?.gender ?? null,
     studentName: enrollment.student?.user?.profile?.name ?? null,
   }
 }
