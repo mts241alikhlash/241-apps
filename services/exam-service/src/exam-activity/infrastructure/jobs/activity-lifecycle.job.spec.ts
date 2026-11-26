@@ -56,4 +56,38 @@ describe('ActivityLifecycleJob', () => {
     expect(error).toHaveBeenCalledTimes(1)
     expect(execute).toHaveBeenCalledTimes(2)
   })
+
+  it('logs opened and closed ids', async () => {
+    const log = vi
+      .spyOn(Logger.prototype, 'log')
+      .mockImplementation(() => undefined)
+    const execute = vi
+      .fn()
+      .mockResolvedValue({ opened: ['a1', 'a2'], closed: ['a3'], blocked: [] })
+
+    await build(execute).run()
+
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('a1, a2'))
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('a3'))
+  })
+
+  it('warns about blocked ids only when the set changes', async () => {
+    const warn = vi
+      .spyOn(Logger.prototype, 'warn')
+      .mockImplementation(() => undefined)
+    const execute = vi
+      .fn()
+      .mockResolvedValueOnce({ opened: [], closed: [], blocked: ['a1'] })
+      .mockResolvedValueOnce({ opened: [], closed: [], blocked: ['a1'] })
+      .mockResolvedValueOnce({ opened: [], closed: [], blocked: ['a1', 'a2'] })
+      .mockResolvedValueOnce(EMPTY)
+      .mockResolvedValueOnce({ opened: [], closed: [], blocked: ['a1'] })
+    const job = build(execute)
+
+    for (let i = 0; i < 5; i += 1) await job.run()
+
+    expect(warn).toHaveBeenCalledTimes(3)
+    expect(warn).toHaveBeenNthCalledWith(1, expect.stringContaining('a1'))
+    expect(warn).toHaveBeenNthCalledWith(2, expect.stringContaining('a2'))
+  })
 })

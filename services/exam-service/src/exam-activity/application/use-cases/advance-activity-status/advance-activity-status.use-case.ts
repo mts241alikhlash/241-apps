@@ -59,10 +59,11 @@ export class AdvanceActivityStatusUseCase {
     const online = activity.deliveryMode === 'ONLINE'
 
     if (activity.status === 'SCHEDULED') {
-      if (!online) {
-        if (time >= closeAt) await this.close(activity, result)
+      if (time >= closeAt) {
+        await this.close(activity, result)
         return
       }
+      if (!online) return
       if (time < openAt || time >= activity.endsAt.getTime()) return
       if (!(await this.packageReady(activity))) {
         result.blocked.push(activity.id)
@@ -104,7 +105,7 @@ export class AdvanceActivityStatusUseCase {
     )
     if (!changed) return
     result.closed.push(activity.id)
-    if (activity.deliveryMode === 'ONLINE') {
+    if (activity.status === 'ACTIVE' && activity.deliveryMode === 'ONLINE') {
       await this.closeSessions.execute(activity.id, SYSTEM_ACTOR_ID)
     }
   }

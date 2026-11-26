@@ -228,6 +228,29 @@ describe('AdvanceActivityStatusUseCase', () => {
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
 
+  it('closes a never-opened online activity after the grace without closing sessions', async () => {
+    const { repo, useCase, closeSessions } = build(
+      activity('a1', 'SCHEDULED'),
+      activity('a2', 'SCHEDULED', { packageId: null }),
+      activity('a3', 'SCHEDULED', { autoStatus: false }),
+    )
+
+    const early = await useCase.execute(minutes(ENDS, 14))
+    const result = await useCase.execute(minutes(ENDS, 15))
+
+    expect(early.closed).toEqual([])
+    expect(early.blocked).toEqual([])
+    expect(result.closed.sort()).toEqual(['a1', 'a2'])
+    expect(result.blocked).toEqual([])
+    expect(repo.activities.get('a3')?.status).toBe('SCHEDULED')
+    expect(repo.autoAudits[0]).toMatchObject({
+      before: 'SCHEDULED',
+      after: 'CLOSED',
+      reason: 'AUTO_CLOSE',
+    })
+    expect(closeSessions.execute).not.toHaveBeenCalled()
+  })
+
   it('does not open offline activities', async () => {
     const { repo, useCase } = build(
       activity('a1', 'SCHEDULED', {

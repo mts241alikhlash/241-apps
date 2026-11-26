@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto'
+import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { vi } from 'vitest'
 import { describe, expect, it } from 'vitest'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { DEFAULT_POLICIES } from '../../../domain/policies/exam-policy.policy.js'
@@ -230,5 +232,51 @@ suite('PrismaExamActivityRepository against a real database', () => {
     expect(due).toContain(active.id)
     expect(due).not.toContain(manual.id)
     expect(due).not.toContain(draft.id)
+  })
+
+  it('excludes by time and skips a corrupt policy without failing the run', async () => {
+    const now = new Date('2026-11-10T02:00:00Z')
+    const far = await newActivity('ONLINE')
+    const running = await newActivity('ONLINE')
+    const corrupt = await newActivity('ONLINE')
+    const healthy = await newActivity('ONLINE')
+    await prisma.examActivity.update({
+      where: { id: far.id },
+      data: {
+        status: 'SCHEDULED',
+        startsAt: new Date('2026-11-10T03:01:00Z'),
+        endsAt: new Date('2026-11-10T05:00:00Z'),
+      },
+    })
+    await prisma.examActivity.update({
+      where: { id: running.id },
+      data: { status: 'ACTIVE', endsAt: new Date('2026-11-10T04:00:00Z') },
+    })
+    await prisma.examActivity.update({
+      where: { id: corrupt.id },
+      data: {
+        status: 'SCHEDULED',
+        policy: { gapRecordedMs: 600000, gapTokenMs: 30000 },
+      },
+    })
+    await prisma.examActivity.update({
+      where: { id: healthy.id },
+      data: { status: 'SCHEDULED' },
+    })
+    const error = vi
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined)
+
+    const due = (await repo.findDueForAdvance(now)).map((row) => row.id)
+
+    expect(due).not.toContain(far.id)
+    expect(due).not.toContain(running.id)
+    expect(due).not.toContain(corrupt.id)
+    expect(due).toContain(healthy.id)
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining(corrupt.id),
+      expect.anything(),
+    )
+    error.mockRestore()
   })
 })

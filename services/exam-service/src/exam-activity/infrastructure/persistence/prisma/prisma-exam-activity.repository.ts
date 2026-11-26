@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { Prisma } from '../../../../generated/prisma/client.js'
 import {
@@ -18,7 +18,10 @@ import type {
   ExamDeliveryMode,
   ExamOfflineKind,
 } from '../../../domain/entities/exam-activity.entity.js'
-import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
+import type {
+  AutoStatusReason,
+  ExamActivityRepository,
+} from '../../../domain/repositories/exam-activity.repository.js'
 import {
   DEFAULT_POLICIES,
   parsePolicy,
@@ -132,6 +135,8 @@ async function missingClassrooms(
 
 @Injectable()
 export class PrismaExamActivityRepository implements ExamActivityRepository {
+  private readonly logger = new Logger(PrismaExamActivityRepository.name)
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findPreset(name: string) {
@@ -414,7 +419,17 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
       },
       orderBy: { startsAt: 'asc' },
     })
-    return rows.map(toEntity)
+    return rows.flatMap((row) => {
+      try {
+        return [toEntity(row)]
+      } catch (error) {
+        this.logger.error(
+          `Kebijakan kegiatan ${row.id} tidak valid, dilewati`,
+          error instanceof Error ? error.stack : String(error),
+        )
+        return []
+      }
+    })
   }
 
   async updateStatusIf(
@@ -422,7 +437,7 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     expected: ActivityStatus,
     next: ActivityStatus,
     actorId: string,
-    reason: string,
+    reason: AutoStatusReason,
   ) {
     return this.prisma.$transaction(async (tx) => {
       const { count } = await tx.examActivity.updateMany({

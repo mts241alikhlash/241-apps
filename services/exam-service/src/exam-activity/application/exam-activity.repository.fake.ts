@@ -18,6 +18,7 @@ import type {
 } from '../domain/entities/exam-activity.entity.js'
 import {
   type ActivityScheduleSummary,
+  type AutoStatusReason,
   ExamActivityRepository,
   type PolicyPresetRecord,
 } from '../domain/repositories/exam-activity.repository.js'
@@ -258,7 +259,7 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     actorId: string
     before: ActivityStatus
     after: ActivityStatus
-    reason: string
+    reason: AutoStatusReason
   }[] = []
 
   findDueForAdvance(now: Date) {
@@ -279,7 +280,7 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     expected: ActivityStatus,
     next: ActivityStatus,
     actorId: string,
-    reason: string,
+    reason: AutoStatusReason,
   ) {
     const activity = this.activities.get(id)
     if (activity?.status !== expected) {

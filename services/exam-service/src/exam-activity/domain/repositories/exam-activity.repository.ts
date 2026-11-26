@@ -12,6 +12,8 @@ import type {
   NewExamActivity,
 } from '../entities/exam-activity.entity.js'
 
+export type AutoStatusReason = 'AUTO_OPEN' | 'AUTO_CLOSE'
+
 export interface ActivityAuditEntry {
   action:
     | 'CREATE_ACTIVITY'
@@ -91,7 +93,7 @@ export abstract class ExamActivityRepository {
     expected: ActivityStatus,
     next: ActivityStatus,
     actorId: string,
-    reason: string,
+    reason: AutoStatusReason,
   ): Promise<boolean>
 }
 
