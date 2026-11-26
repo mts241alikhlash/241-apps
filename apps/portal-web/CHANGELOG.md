@@ -1,5 +1,15 @@
 # portal-web
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies [2746853]
+  - @mts241alikhlash/web-shared@0.2.2
+  - @mts241alikhlash/platform@0.2.7
+  - @mts241alikhlash/ui@0.3.1
+  - @mts241alikhlash/reference-data@0.1.10
+
 ## 0.1.11
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @mts241alikhlash/exam-api
 
+## 0.8.5
+
+### Patch Changes
+
+- 9d66ce9: Assessment UI refresh: the assessment item, grading, weight, attendance, rapor and dashboard views are reworked, with a weight list page, score notes and an academic period filter; assessment items filter by several teaching assignments and carry graded and student counts; enrollment summaries carry NISN and gender; exam grading shows the participant number.
+
 ## 0.8.4
 
 ### Patch Changes

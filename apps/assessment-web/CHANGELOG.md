@@ -1,5 +1,17 @@
 # assessment-web
 
+## 0.1.12
+
+### Patch Changes
+
+- 9d66ce9: Assessment UI refresh: the assessment item, grading, weight, attendance, rapor and dashboard views are reworked, with a weight list page, score notes and an academic period filter; assessment items filter by several teaching assignments and carry graded and student counts; enrollment summaries carry NISN and gender; exam grading shows the participant number.
+- 2746853: RDM Excel bridge, service part: assessment items gain materi and KKTP and unique names per class and subject; a teacher fills RDM's sumatif and SAS templates from assessment scores, downloads an RDM-layout workbook for any subject and imports it back with a preview; RDM settings choose which assessment types go to sumatif and SAS; enrollment summaries carry NISN; new permissions `assessment-items.rdm`, `assessment-settings.read` and `assessment-settings.update`.
+- 2746853: RDM Excel bridge, web part: assessment item form adds materi and KKTP fields, shows a rename warning when an item has scores, and surfaces duplicate or blank name errors on the name field; assessment items view adds the RDM menu to fill RDM templates, download RDM-layout workbooks, and preview/import workbooks; adds the `/settings/rdm` RDM settings page to map assessment types to the Sumatif and SAS templates.
+- Updated dependencies [2746853]
+  - @mts241alikhlash/web-shared@0.2.2
+  - @mts241alikhlash/platform@0.2.7
+  - @mts241alikhlash/ui@0.3.1
+
 ## 0.1.11
 
 ### Patch Changes
