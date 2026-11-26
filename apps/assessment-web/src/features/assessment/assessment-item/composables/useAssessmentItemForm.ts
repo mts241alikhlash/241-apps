@@ -3,11 +3,15 @@ import { storeToRefs } from 'pinia'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
+import type { TeachingAssignment } from '@/features/lookup/teaching-assignment/types'
 import { assessmentItemService } from '../services/assessmentItemService'
 import { useAssessmentItemStore } from '../stores/assessmentItemStore'
 import type { AssessmentItem, AssessmentType } from '../types'
 
 interface AssessmentItemFormValues {
+  gradeId: string
+  classroomId: string
+  subjectId: string
   name: string
   type: AssessmentType
   weight: number
@@ -15,9 +19,13 @@ interface AssessmentItemFormValues {
 }
 
 export function useAssessmentItemForm(options: {
-  teachingAssignmentId: () => string | null
+  assignments: () => TeachingAssignment[]
+  gradeIdForClassroom: (classroomId: string | null) => string | null
+  initialClassroomId: () => string | null
+  initialSubjectId: () => string | null
   editData?: () => AssessmentItem | null
   isOpen?: () => boolean
+  defaultType?: () => AssessmentType
   onSuccess?: () => void | Promise<void>
 }) {
   const store = useAssessmentItemStore()
@@ -25,6 +33,9 @@ export function useAssessmentItemForm(options: {
 
   const formSchema = toTypedSchema(
     z.object({
+      gradeId: z.string().min(1, 'Tingkat wajib dipilih.'),
+      classroomId: z.string().min(1, 'Kelas wajib dipilih.'),
+      subjectId: z.string().min(1, 'Mata pelajaran wajib dipilih.'),
       name: z
         .string()
         .min(1, 'Nama tugas wajib diisi.')
@@ -38,11 +49,14 @@ export function useAssessmentItemForm(options: {
     }),
   )
 
-  const form = useForm({
+  const form = useForm<AssessmentItemFormValues>({
     validationSchema: formSchema,
     initialValues: {
+      gradeId: '',
+      classroomId: '',
+      subjectId: '',
       name: '',
-      type: 'DAILY',
+      type: options.defaultType?.() ?? 'DAILY',
       weight: 1,
       maxScore: 100,
     },
@@ -54,15 +68,37 @@ export function useAssessmentItemForm(options: {
       if (isOpen === false) return
       formError.value = null
       if (data) {
+        const assignment = options
+          .assignments()
+          .find((a) => a.id === data.teachingAssignmentId)
+        const classroomId =
+          assignment?.classroomId ??
+          data.teachingAssignment?.classroom?.id ??
+          data.teachingAssignmentId
         form.setValues({
+          gradeId: options.gradeIdForClassroom(classroomId) ?? classroomId,
+          classroomId,
+          subjectId:
+            assignment?.subjectId ??
+            data.teachingAssignment?.subject?.id ??
+            data.teachingAssignmentId,
           name: data.name,
           type: data.type,
           weight: data.weight,
           maxScore: data.maxScore,
         })
       } else {
+        const initialClassroom = options.initialClassroomId()
         form.resetForm({
-          values: { name: '', type: 'DAILY', weight: 1, maxScore: 100 },
+          values: {
+            gradeId: options.gradeIdForClassroom(initialClassroom) ?? '',
+            classroomId: initialClassroom ?? '',
+            subjectId: options.initialSubjectId() ?? '',
+            name: '',
+            type: options.defaultType?.() ?? 'DAILY',
+            weight: 1,
+            maxScore: 100,
+          },
         })
       }
     },
@@ -81,8 +117,17 @@ export function useAssessmentItemForm(options: {
         maxScore: values.maxScore,
       }
 
-      const teachingAssignmentId = options.teachingAssignmentId()
-      if (!editItem && !teachingAssignmentId) {
+      const targetAssignment = editItem
+        ? undefined
+        : options
+            .assignments()
+            .find(
+              (a) =>
+                a.classroomId === values.classroomId &&
+                a.subjectId === values.subjectId,
+            )
+
+      if (!editItem && !targetAssignment) {
         store.formError =
           'Belum ada jadwal mengajar untuk kelas dan mata pelajaran ini.'
         return
@@ -91,7 +136,7 @@ export function useAssessmentItemForm(options: {
       const result = await assessmentItemService.saveItem(
         editItem
           ? fields
-          : { ...fields, teachingAssignmentId: teachingAssignmentId! },
+          : { ...fields, teachingAssignmentId: targetAssignment!.id },
         editItem?.id,
       )
       if (result.success) {

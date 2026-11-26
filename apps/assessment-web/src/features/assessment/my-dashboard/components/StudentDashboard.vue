@@ -78,7 +78,7 @@ const attendanceItems = computed(() => {
       value: recap.excused,
       icon: FileText,
       iconColor: 'text-info',
-      bgColor: '',
+      bgColor: 'bg-info/10',
       valueColor: 'text-info',
     },
     {
@@ -87,7 +87,7 @@ const attendanceItems = computed(() => {
       value: recap.sick,
       icon: FileText,
       iconColor: 'text-muted-foreground',
-      bgColor: '',
+      bgColor: 'bg-muted/30',
       valueColor: 'text-muted-foreground',
     },
   ]
@@ -99,7 +99,7 @@ const totalAttendance = computed(() =>
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <Card class="shadow-none">
       <CardContent variant="standard">
         <div
@@ -128,7 +128,6 @@ const totalAttendance = computed(() =>
             v-if="data.latestReportCard && canOpenOwnReportCard"
             as-child
             variant="outline"
-            size="sm"
           >
             <RouterLink :to="{ name: 'my-rapor' }">
               <FileText class="size-4" />
@@ -141,27 +140,22 @@ const totalAttendance = computed(() =>
 
     <Separator />
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-4 lg:grid-cols-2">
       <TodayLessonsCard
         :lessons="data.todayLessons"
         :is-weekly-holiday="isWeeklyHoliday"
         :loading="loading"
       />
 
-      <div class="space-y-6">
+      <div class="space-y-4">
         <Card
           gap="none"
           class="shadow-none"
         >
-          <CardHeader
-            standard
-            class="py-3.5"
-          >
-            <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2">
-                <UserCheck class="size-4 text-muted-foreground" />
-                <CardTitle size="md"> Rekap Kehadiran </CardTitle>
-              </div>
+          <CardHeader standard>
+            <div class="flex items-center gap-2">
+              <UserCheck class="size-4 text-muted-foreground" />
+              <CardTitle size="md">Rekap Kehadiran</CardTitle>
             </div>
           </CardHeader>
           <CardContent variant="standard">
@@ -177,7 +171,7 @@ const totalAttendance = computed(() =>
             </div>
             <p
               v-else-if="totalAttendance === 0"
-              class="py-6 text-center text-sm text-muted-foreground"
+              class="py-6 text-center text-control text-muted-foreground"
             >
               Belum ada catatan kehadiran semester ini.
             </p>
@@ -197,7 +191,7 @@ const totalAttendance = computed(() =>
                   :class="item.iconColor"
                 />
                 <p
-                  class="text-xl font-semibold"
+                  class="text-xl font-semibold tabular-nums"
                   :class="item.valueColor"
                 >
                   {{ item.value }}
@@ -214,25 +208,20 @@ const totalAttendance = computed(() =>
           gap="none"
           class="shadow-none"
         >
-          <CardHeader
-            standard
-            class="py-3.5"
-          >
-            <div class="flex items-center gap-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <ClipboardList class="size-4 text-muted-foreground" />
-                  <CardTitle size="md"> Nilai Terbaru </CardTitle>
-                </div>
-                <RouterLink
-                  v-if="canOpenOwnScores"
-                  :to="{ name: 'my-scores' }"
-                  class="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Lihat Semua
-                  <ChevronRight class="size-3.5" />
-                </RouterLink>
+          <CardHeader standard>
+            <div class="flex w-full items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <ClipboardList class="size-4 text-muted-foreground" />
+                <CardTitle size="md">Nilai Terbaru</CardTitle>
               </div>
+              <RouterLink
+                v-if="canOpenOwnScores"
+                :to="{ name: 'my-scores' }"
+                class="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Lihat Semua
+                <ChevronRight class="size-3.5" />
+              </RouterLink>
             </div>
           </CardHeader>
           <CardContent variant="standard">
@@ -248,7 +237,7 @@ const totalAttendance = computed(() =>
             </div>
             <p
               v-else-if="data.latestScores.length === 0"
-              class="py-6 text-center text-sm text-muted-foreground"
+              class="py-6 text-center text-control text-muted-foreground"
             >
               Belum ada nilai yang masuk.
             </p>
@@ -259,7 +248,7 @@ const totalAttendance = computed(() =>
               <li
                 v-for="score in data.latestScores"
                 :key="score.id"
-                class="flex items-center gap-3 rounded-lg border px-4 py-2.5"
+                class="flex items-center gap-3 rounded-lg border px-4 py-2"
               >
                 <div class="min-w-0 flex-1">
                   <p class="truncate text-sm font-medium">

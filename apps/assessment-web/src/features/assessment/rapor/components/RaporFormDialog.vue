@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { watch } from 'vue'
+import { FormattedNumberInput } from '@mts241alikhlash/ui'
 import {
   Dialog,
   DialogBody,
@@ -9,11 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { ScrollArea } from '@mts241alikhlash/ui/scroll-area'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Label } from '@mts241alikhlash/ui/label'
-import { Input } from '@mts241alikhlash/ui/input'
 import { Textarea } from '@mts241alikhlash/ui/textarea'
+import { Loader2 } from '@lucide/vue'
 import { useRapor } from '../composables/useRapor'
 import type { RaporData } from '../types'
 
@@ -26,31 +29,55 @@ const emit = defineEmits<{ 'update:open': [value: boolean] }>()
 
 const { updateRapor, isSaving } = useRapor()
 
-const employeeNote = ref('')
-const rank = ref<number | ''>('')
-
-watch(
-  () => props.open,
-  (isOpen) => {
-    if (isOpen && props.rapor) {
-      employeeNote.value = props.rapor.employeeNote ?? ''
-      rank.value = props.rapor.rank ?? ''
-    }
-  },
+const formSchema = toTypedSchema(
+  z.object({
+    rank: z
+      .number({ invalid_type_error: 'Peringkat harus berupa angka.' })
+      .int('Peringkat harus bilangan bulat.')
+      .min(1, 'Peringkat minimal 1.')
+      .optional(),
+    employeeNote: z
+      .string()
+      .max(500, 'Catatan maksimal 500 karakter.')
+      .optional(),
+  }),
 )
 
-const handleSave = async () => {
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    rank: undefined as number | undefined,
+    employeeNote: '',
+  },
+})
+
+watch(
+  () => [props.open, props.rapor] as const,
+  ([isOpen, rapor]) => {
+    if (isOpen && rapor) {
+      resetForm({
+        values: {
+          rank: rapor.rank ?? undefined,
+          employeeNote: rapor.employeeNote ?? '',
+        },
+      })
+    }
+  },
+  { immediate: true },
+)
+
+const onSubmit = handleSubmit(async (values) => {
   if (!props.rapor) return
 
   const res = await updateRapor(props.rapor.id, {
-    employeeNote: employeeNote.value || undefined,
-    rank: rank.value !== '' ? Number(rank.value) : undefined,
+    employeeNote: values.employeeNote?.trim() || undefined,
+    rank: values.rank,
   })
 
   if (res.success) {
     emit('update:open', false)
   }
-}
+})
 </script>
 
 <template>
@@ -62,77 +89,100 @@ const handleSave = async () => {
       }
     "
   >
-    <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+    <DialogContent
+      size="md"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>Edit Rapor</DialogTitle>
         <DialogDescription>
           Perbarui catatan wali kelas dan peringkat untuk
-          <span class="font-semibold text-primary">{{
-            rapor?.enrollment?.student?.user?.profile?.name || 'Siswa'
-          }}</span>
-          .
+          {{ rapor?.enrollment?.student?.user?.profile?.name || 'Siswa' }}.
         </DialogDescription>
       </DialogHeader>
 
-      <ScrollArea class="flex-1 min-h-0">
-        <DialogBody class="space-y-4">
-          <div
-            v-if="rapor"
-            class="rounded-lg border bg-muted/30 p-3 text-sm space-y-1"
-          >
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">Kelas</span>
-              <span class="font-medium">{{
-                rapor.enrollment?.classroom?.displayName || '-'
-              }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">Rata-rata</span>
-              <span class="font-medium">{{
+      <DialogBody class="space-y-4">
+        <dl
+          v-if="rapor"
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+        >
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Kelas</dt>
+            <dd class="font-medium">
+              {{ rapor.enrollment?.classroom?.displayName || '-' }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Rata-rata</dt>
+            <dd class="font-medium tabular-nums">
+              {{
                 rapor.totalAverage !== null
                   ? Number(rapor.totalAverage).toFixed(2)
                   : '-'
-              }}</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-muted-foreground">Peringkat</span>
-              <span class="font-medium">{{ rapor.rank ?? '-' }}</span>
-            </div>
+              }}
+            </dd>
           </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Peringkat</dt>
+            <dd class="font-medium tabular-nums">{{ rapor.rank ?? '-' }}</dd>
+          </div>
+        </dl>
 
-          <form
-            id="rapor-form"
-            class="grid gap-4 py-2"
-            @submit.prevent="handleSave"
+        <form
+          id="rapor-form"
+          class="space-y-3"
+          @submit.prevent="onSubmit"
+        >
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="rank"
+            label="Peringkat (Opsional)"
           >
-            <div class="space-y-2">
-              <Label for="rank">Peringkat (Opsional)</Label>
-              <Input
-                id="rank"
-                v-model="rank"
-                type="number"
-                min="1"
-                placeholder="Masukkan peringkat siswa"
-              />
+            <div class="content-start">
+              <FormControl>
+                <FormattedNumberInput
+                  :model-value="value ?? null"
+                  numeric
+                  :max-digits="4"
+                  @update:model-value="
+                    (v) =>
+                      handleChange(
+                        v === undefined ||
+                          v === null ||
+                          v === '' ||
+                          Number(v) === 0
+                          ? undefined
+                          : Number(v),
+                      )
+                  "
+                />
+              </FormControl>
             </div>
-            <div class="space-y-2">
-              <Label for="employeeNote">Catatan Wali Kelas (Opsional)</Label>
-              <Textarea
-                id="employeeNote"
-                v-model="employeeNote"
-                placeholder="Masukkan catatan pengembangan atau pesan untuk siswa..."
-                class="min-h-[120px] resize-none"
-              />
+          </FloatingField>
+          <FloatingField
+            v-slot="{ componentField }"
+            name="employeeNote"
+            label="Catatan Wali Kelas (Opsional)"
+          >
+            <div class="content-start">
+              <FormControl>
+                <Textarea
+                  v-bind="componentField"
+                  rows="4"
+                  maxlength="500"
+                />
+              </FormControl>
             </div>
-          </form>
-        </DialogBody>
-      </ScrollArea>
+          </FloatingField>
+        </form>
+      </DialogBody>
 
       <DialogFooter
         standard
-        class="sm:justify-between"
+        class="justify-between"
       >
         <Button
+          type="button"
           variant="outline"
           :disabled="isSaving"
           @click="emit('update:open', false)"
@@ -144,10 +194,10 @@ const handleSave = async () => {
           form="rapor-form"
           :disabled="isSaving"
         >
-          <span
+          <Loader2
             v-if="isSaving"
-            class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"
-          ></span>
+            class="size-4 animate-spin"
+          />
           Simpan
         </Button>
       </DialogFooter>

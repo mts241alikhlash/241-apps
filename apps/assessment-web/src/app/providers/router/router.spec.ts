@@ -127,11 +127,23 @@ describe('exam routes', () => {
     expect(buildRouter().resolve('/bank-soal').name).toBe('not-found')
   })
 
-  it('shows the exam menu section only through exam-scores', () => {
-    const section = menuSections.find((candidate) => candidate.key === 'exam')
+  it('groups the exam pages under Penilaian with exam scores behind exam-scores.read', () => {
+    const assessment = menuSections.find(
+      (candidate) => candidate.key === 'assessment',
+    )
+    const examGroup = assessment?.items.find(
+      (item) => item.key === 'assessment-exam',
+    )
 
+    expect(menuSections.some((candidate) => candidate.key === 'exam')).toBe(
+      false,
+    )
     expect(
-      section?.items.map((item) => [item.url, item.requiredPermission]),
-    ).toEqual([['/nilai-ujian', 'exam-scores.read']])
+      examGroup?.items?.map((item) => [item.url, item.requiredPermission]),
+    ).toEqual([
+      ['/assessment/exam-tasks', 'assessment-items.read'],
+      ['/assessment/exam-items', 'student-scores.read'],
+      ['/nilai-ujian', 'exam-scores.read'],
+    ])
   })
 })

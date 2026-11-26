@@ -13,7 +13,7 @@ export const studentScoreRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/student-scores/:assessmentItemId/grade',
+    path: '/assessment/items/:assessmentItemId/grade',
     name: 'student-score-grading',
     component: () => import('./views/StudentScoreGradingView.vue'),
     meta: {
@@ -22,7 +22,7 @@ export const studentScoreRoutes: RouteRecordRaw[] = [
       requiredPermission: 'student-scores.read',
       breadcrumbs: [
         { title: 'Penilaian', href: '#' },
-        { title: 'Nilai Siswa', href: '/student-scores' },
+        { title: 'Butir Penilaian', href: '/assessment/items' },
         { title: 'Input Nilai' },
       ],
     },

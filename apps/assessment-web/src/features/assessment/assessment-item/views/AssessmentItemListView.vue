@@ -1,12 +1,30 @@
 <script setup lang="ts">
 import type { FilterOption } from '@mts241alikhlash/web-shared/types/filter.types'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
+import { EVERY_CLASSROOM } from '@/features/lookup/teaching-assignment'
 import AssessmentItemFormDialog from '../components/AssessmentItemFormDialog.vue'
 import { createAssessmentItemColumns } from '../components/columns'
 import { useAssessmentItem } from '../composables/useAssessmentItem'
 import type { AssessmentItem } from '../types'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty, SearchInput } from '@mts241alikhlash/ui'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card, CardHeader, CardTitle } from '@mts241alikhlash/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
   SelectContent,
@@ -15,11 +33,31 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { useRoleGuard } from '@mts241alikhlash/platform/auth'
-import { AssessmentWeightDialog } from '@/features/assessment/assessment-weight'
-import { Plus, Scale } from '@lucide/vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { Filter, Plus } from '@lucide/vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import {
+  ASSESSMENT_TYPE_LABELS,
+  buildGradeFilterOptions,
+  CATEGORY_TYPES,
+  categoryFromRoute,
+  compareAssessmentItems,
+  gradeIdOf,
+  isTypeInCategory,
+} from '../constants/category'
 
+const route = useRoute()
 const { can } = useRoleGuard()
+
+const category = computed(() => categoryFromRoute(route.meta))
+const isExam = computed(() => category.value === 'EXAM')
+const pageTitle = computed(() =>
+  isExam.value ? 'Daftar Ujian' : 'Daftar Tugas',
+)
+const itemNoun = computed(() => (isExam.value ? 'ujian' : 'tugas'))
+const allowedTypes = computed(() =>
+  category.value ? CATEGORY_TYPES[category.value] : undefined,
+)
 
 const {
   items,
@@ -28,27 +66,67 @@ const {
   classrooms,
   subjects,
   semesters,
-  selectedClassroomId,
-  selectedSubjectId,
   selectedSemesterId,
   assignments,
-  teachingAssignment,
   fetchRelatedData,
-  fetchItems,
+  fetchAssignmentsForSemester,
+  fetchGradingItems,
   deleteItem,
 } = useAssessmentItem()
+
+const EVERY_GRADE = '__all__'
+const EVERY_SUBJECT = '__all__'
+const EVERY_TYPE = '__all__'
+const selectedGradeId = ref<string>(EVERY_GRADE)
+const taskClassroomId = ref<string>(EVERY_CLASSROOM)
+const taskSubjectId = ref<string>(EVERY_SUBJECT)
+const selectedType = ref<string>(EVERY_TYPE)
+
+const filterId = useId()
+const mobileFilterId = useId()
+const search = ref('')
+const filterOpen = ref(false)
+const relatedLoading = ref(false)
+const page = ref(1)
+const pageSize = ref(25)
+
+const openForm = ref(false)
+const editingItem = ref<AssessmentItem | null>(null)
+
+const classroomObjectById = computed(
+  () => new Map(classrooms.value.map((c) => [c.id, c])),
+)
+
+const gradeFilterOptions = computed<FilterOption[]>(() => {
+  const allowed = new Set(
+    assignments.value
+      .filter(
+        (a) =>
+          taskSubjectId.value === EVERY_SUBJECT ||
+          a.subjectId === taskSubjectId.value,
+      )
+      .map((a) => a.classroomId),
+  )
+  return buildGradeFilterOptions(classrooms.value, allowed)
+})
 
 const classroomFilterOptions = computed<FilterOption[]>(() => {
   const allowed = new Set(
     assignments.value
       .filter(
         (a) =>
-          !selectedSubjectId.value || a.subjectId === selectedSubjectId.value,
+          taskSubjectId.value === EVERY_SUBJECT ||
+          a.subjectId === taskSubjectId.value,
       )
       .map((a) => a.classroomId),
   )
   return classrooms.value
-    .filter((c) => allowed.has(c.id))
+    .filter(
+      (c) =>
+        allowed.has(c.id) &&
+        (selectedGradeId.value === EVERY_GRADE ||
+          gradeIdOf(c) === selectedGradeId.value),
+    )
     .map((c) => ({ value: c.id, label: c.code ?? '-' }))
 })
 
@@ -57,8 +135,11 @@ const subjectFilterOptions = computed<FilterOption[]>(() => {
     assignments.value
       .filter(
         (a) =>
-          !selectedClassroomId.value ||
-          a.classroomId === selectedClassroomId.value,
+          (selectedGradeId.value === EVERY_GRADE ||
+            gradeIdOf(classroomObjectById.value.get(a.classroomId)) ===
+              selectedGradeId.value) &&
+          (taskClassroomId.value === EVERY_CLASSROOM ||
+            a.classroomId === taskClassroomId.value),
       )
       .map((a) => a.subjectId),
   )
@@ -70,67 +151,202 @@ const subjectFilterOptions = computed<FilterOption[]>(() => {
     }))
 })
 
-const openForm = ref(false)
-const editingItem = ref<AssessmentItem | null>(null)
-
-const weightDialogOpen = ref(false)
-
-const isFilterReady = computed(() =>
-  Boolean(selectedClassroomId.value && selectedSubjectId.value),
+const hasGradeChoice = computed(() => gradeFilterOptions.value.length > 1)
+const hasClassroomChoice = computed(
+  () => classroomFilterOptions.value.length > 1,
 )
-
-const activeSemester = computed(
-  () => semesters.value.find((s) => s.id === selectedSemesterId.value) ?? null,
-)
-
-const academicYearLabel = computed(
-  () => activeSemester.value?.academicYear?.name ?? null,
-)
-
-const semesterLabel = computed(() => {
-  const name = activeSemester.value?.type.name
-  if (name === 'ODD') return 'Ganjil'
-  if (name === 'EVEN') return 'Genap'
-  return name ?? null
-})
-
 const hasSubjectChoice = computed(() => subjectFilterOptions.value.length > 1)
 
+const typeFilterOptions = computed<FilterOption[]>(() => {
+  const types = category.value
+    ? CATEGORY_TYPES[category.value]
+    : (Object.keys(ASSESSMENT_TYPE_LABELS) as AssessmentItem['type'][])
+  return types.map((type) => ({
+    value: type,
+    label: ASSESSMENT_TYPE_LABELS[type],
+  }))
+})
+
+const typeModel = computed({
+  get: () => selectedType.value,
+  set: (value: string) => {
+    selectedType.value = value || EVERY_TYPE
+  },
+})
+
+const semesterModel = computed({
+  get: () => selectedSemesterId.value ?? '',
+  set: (value: string) => {
+    selectedSemesterId.value = value || null
+  },
+})
+
+const gradeModel = computed({
+  get: () => selectedGradeId.value,
+  set: (value: string) => {
+    selectedGradeId.value = value || EVERY_GRADE
+  },
+})
+
+const classroomModel = computed({
+  get: () => taskClassroomId.value,
+  set: (value: string) => {
+    taskClassroomId.value = value || EVERY_CLASSROOM
+  },
+})
+
+const subjectModel = computed({
+  get: () => taskSubjectId.value,
+  set: (value: string) => {
+    taskSubjectId.value = value || EVERY_SUBJECT
+  },
+})
+
+const matchingAssignments = computed(() =>
+  assignments.value.filter(
+    (a) =>
+      (selectedGradeId.value === EVERY_GRADE ||
+        gradeIdOf(classroomObjectById.value.get(a.classroomId)) ===
+          selectedGradeId.value) &&
+      (taskClassroomId.value === EVERY_CLASSROOM ||
+        a.classroomId === taskClassroomId.value) &&
+      (taskSubjectId.value === EVERY_SUBJECT ||
+        a.subjectId === taskSubjectId.value),
+  ),
+)
+
+const subjectById = computed(
+  () => new Map(subjects.value.map((s) => [s.id, s.name])),
+)
+const classroomById = computed(
+  () => new Map(classrooms.value.map((c) => [c.id, c.code ?? c.name ?? '-'])),
+)
+
+const initialDialogClassroomId = computed(() =>
+  taskClassroomId.value !== EVERY_CLASSROOM
+    ? taskClassroomId.value
+    : classroomFilterOptions.value.length === 1
+      ? classroomFilterOptions.value[0].value
+      : null,
+)
+
+const initialDialogSubjectId = computed(() =>
+  taskSubjectId.value !== EVERY_SUBJECT
+    ? taskSubjectId.value
+    : subjectFilterOptions.value.length === 1
+      ? subjectFilterOptions.value[0].value
+      : null,
+)
+
+const isFilterReady = computed(() => Boolean(selectedSemesterId.value))
+
 const waitingFor = computed(() => {
+  if (relatedLoading.value) return null
   if (!selectedSemesterId.value) {
-    return 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
+    return semesters.value.length === 0
+      ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
+      : 'Pilih tahun ajaran dan semester terlebih dahulu.'
   }
-  if (!selectedClassroomId.value) return 'Pilih kelas untuk menampilkan tugas.'
-  if (!selectedSubjectId.value) return 'Pilih mata pelajaran terlebih dahulu.'
-  if (!teachingAssignment.value) {
-    return 'Tidak ada jadwal mengajar untuk kelas dan mata pelajaran ini di semester berjalan, jadi belum ada tugas yang bisa dibuat.'
+  if (matchingAssignments.value.length === 0) {
+    return 'Tidak ada jadwal mengajar pada semester atau filter yang dipilih.'
   }
   return null
 })
-const selectedSubjectLabel = computed(
+
+const subjectNameByAssignment = computed(
   () =>
-    subjects.value.find((s) => s.id === selectedSubjectId.value)?.name ?? null,
+    new Map(
+      assignments.value.map((a) => [
+        a.id,
+        subjectById.value.get(a.subjectId) ?? '-',
+      ]),
+    ),
 )
 
-const weightSubjectName = computed(
+const classroomNameByAssignment = computed(
   () =>
-    subjects.value.find((s) => s.id === selectedSubjectId.value)?.name ??
-    undefined,
+    new Map(
+      assignments.value.map((a) => [
+        a.id,
+        classroomById.value.get(a.classroomId) ?? '-',
+      ]),
+    ),
 )
-const weightClassroomName = computed(
-  () =>
-    classrooms.value.find((c) => c.id === selectedClassroomId.value)?.code ??
-    undefined,
-)
+
+const subjectName = (item: AssessmentItem): string =>
+  item.teachingAssignment?.subject?.name ??
+  subjectNameByAssignment.value.get(item.teachingAssignmentId) ??
+  '-'
+
+const classroomName = (item: AssessmentItem): string =>
+  item.teachingAssignment?.classroom?.code ??
+  item.teachingAssignment?.classroom?.name ??
+  classroomNameByAssignment.value.get(item.teachingAssignmentId) ??
+  '-'
 
 const canCreate = computed(() => can('assessment-items.create'))
 const canUpdate = computed(() => can('assessment-items.update'))
 const canDelete = computed(() => can('assessment-items.delete'))
 
+const filteredItems = computed(() => {
+  if (waitingFor.value) return []
+  const byCategory = items.value.filter(
+    (item) =>
+      isTypeInCategory(item.type, category.value) &&
+      (selectedType.value === EVERY_TYPE || item.type === selectedType.value),
+  )
+  const keyword = search.value.trim().toLocaleLowerCase('id')
+  const matched = keyword
+    ? byCategory.filter(
+        (item) =>
+          item.name.toLocaleLowerCase('id').includes(keyword) ||
+          subjectName(item).toLocaleLowerCase('id').includes(keyword) ||
+          classroomName(item).toLocaleLowerCase('id').includes(keyword),
+      )
+    : byCategory
+  return matched.sort((left, right) =>
+    compareAssessmentItems(left, right, subjectName, classroomName),
+  )
+})
+
+const pagedItems = computed(() => {
+  const start = (page.value - 1) * pageSize.value
+  return filteredItems.value.slice(start, start + pageSize.value)
+})
+
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (hasGradeChoice.value && selectedGradeId.value !== EVERY_GRADE) {
+    count += 1
+  }
+  if (hasClassroomChoice.value && taskClassroomId.value !== EVERY_CLASSROOM) {
+    count += 1
+  }
+  if (hasSubjectChoice.value && taskSubjectId.value !== EVERY_SUBJECT) {
+    count += 1
+  }
+  if (selectedType.value !== EVERY_TYPE) {
+    count += 1
+  }
+  return count
+})
+
+const emptyMessage = computed(() => {
+  if (waitingFor.value) return waitingFor.value
+  if (search.value.trim()) {
+    return `Tidak ada ${itemNoun.value} yang cocok dengan pencarian.`
+  }
+  return isExam.value ? 'Belum ada butir ujian.' : 'Belum ada tugas.'
+})
+
 const columns = computed(() =>
   createAssessmentItemColumns({
     canUpdate: canUpdate.value,
     canDelete: canDelete.value,
+    typeFirst: true,
+    nameLabel: isExam.value ? 'Nama Ujian' : 'Nama Tugas',
+    subjectName,
+    classroomName,
     onEdit: (item) => {
       editingItem.value = item
       openForm.value = true
@@ -142,15 +358,33 @@ const columns = computed(() =>
       setLoading(false)
       if (result.success) {
         closeAlert()
-        void fetchItems()
+        void handleFilter()
       }
     },
   }),
 )
 
+function changePageSize(size: number) {
+  pageSize.value = size
+  page.value = 1
+}
+
+function resetFilters() {
+  if (hasGradeChoice.value) {
+    selectedGradeId.value = EVERY_GRADE
+  }
+  if (hasClassroomChoice.value) {
+    taskClassroomId.value = EVERY_CLASSROOM
+  }
+  if (hasSubjectChoice.value) {
+    taskSubjectId.value = EVERY_SUBJECT
+  }
+  selectedType.value = EVERY_TYPE
+}
+
 async function handleFilter() {
   if (!isFilterReady.value) return
-  await fetchItems()
+  await fetchGradingItems(matchingAssignments.value.map((a) => a.id))
 }
 
 function openAddForm() {
@@ -165,173 +399,342 @@ watch(openForm, (isOpen) => {
   }
 })
 
-function reconcile(
-  selected: typeof selectedSubjectId,
-  options: FilterOption[],
-) {
-  if (selected.value && !options.some((o) => o.value === selected.value)) {
-    selected.value = null
+function reconcileGrade(options: FilterOption[]) {
+  if (options.length === 1) {
+    selectedGradeId.value = options[0].value
+    return
   }
-  if (!selected.value && options.length === 1) {
-    selected.value = options[0].value
+  if (
+    selectedGradeId.value !== EVERY_GRADE &&
+    !options.some((o) => o.value === selectedGradeId.value)
+  ) {
+    selectedGradeId.value = EVERY_GRADE
   }
 }
 
-watch(classroomFilterOptions, (options) =>
-  reconcile(selectedClassroomId, options),
-)
-watch(subjectFilterOptions, (options) => reconcile(selectedSubjectId, options))
+function reconcileClassroom(options: FilterOption[]) {
+  if (options.length === 1) {
+    taskClassroomId.value = options[0].value
+    return
+  }
+  if (
+    taskClassroomId.value !== EVERY_CLASSROOM &&
+    !options.some((o) => o.value === taskClassroomId.value)
+  ) {
+    taskClassroomId.value = EVERY_CLASSROOM
+  }
+}
 
-watch([selectedClassroomId, selectedSubjectId, selectedSemesterId], () => {
+function reconcileSubject(options: FilterOption[]) {
+  if (options.length === 1) {
+    taskSubjectId.value = options[0].value
+    return
+  }
+  if (
+    taskSubjectId.value !== EVERY_SUBJECT &&
+    !options.some((o) => o.value === taskSubjectId.value)
+  ) {
+    taskSubjectId.value = EVERY_SUBJECT
+  }
+}
+
+watch(gradeFilterOptions, reconcileGrade, { immediate: true })
+watch(classroomFilterOptions, reconcileClassroom, { immediate: true })
+watch(subjectFilterOptions, reconcileSubject, { immediate: true })
+
+watch(category, () => {
+  selectedType.value = EVERY_TYPE
+})
+
+watch(
+  [
+    search,
+    selectedGradeId,
+    taskClassroomId,
+    taskSubjectId,
+    selectedType,
+    selectedSemesterId,
+    category,
+  ],
+  () => {
+    page.value = 1
+  },
+  { flush: 'sync' },
+)
+
+watch(selectedSemesterId, async (next) => {
+  if (relatedLoading.value) return
+  await fetchAssignmentsForSemester(next)
+  reconcileGrade(gradeFilterOptions.value)
+  reconcileClassroom(classroomFilterOptions.value)
+  reconcileSubject(subjectFilterOptions.value)
+  if (isFilterReady.value) {
+    await handleFilter()
+  }
+})
+
+watch([selectedGradeId, taskClassroomId, taskSubjectId], () => {
+  if (relatedLoading.value) return
   if (isFilterReady.value) void handleFilter()
 })
 
-onMounted(fetchRelatedData)
+onMounted(async () => {
+  relatedLoading.value = true
+  try {
+    await fetchRelatedData()
+    reconcileGrade(gradeFilterOptions.value)
+    reconcileClassroom(classroomFilterOptions.value)
+    reconcileSubject(subjectFilterOptions.value)
+  } finally {
+    relatedLoading.value = false
+  }
+  if (isFilterReady.value) {
+    await handleFilter()
+  }
+})
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader plain>
-        <CardTitle size="lg"> Tugas </CardTitle>
-        <div class="flex items-center gap-2">
-          <Button
-            v-if="teachingAssignment && canCreate"
-            variant="outline"
-            size="icon"
-            class="sm:hidden"
-            aria-label="Bobot penilaian"
-            @click="weightDialogOpen = true"
-          >
-            <Scale class="size-4" />
-          </Button>
-          <Button
-            v-if="teachingAssignment && canCreate"
-            variant="outline"
-            class="hidden sm:inline-flex"
-            @click="weightDialogOpen = true"
-          >
-            <Scale class="size-4" />
-            Bobot Penilaian
-          </Button>
-          <Button
-            v-if="!waitingFor && canCreate"
-            size="icon"
-            class="sm:hidden"
-            aria-label="Tambah item penilaian"
-            @click="openAddForm"
-          >
-            <Plus class="size-4" />
-          </Button>
-          <Button
-            v-if="!waitingFor && canCreate"
-            class="hidden sm:inline-flex"
-            @click="openAddForm"
-          >
-            <Plus class="size-4" />
-            Tambah Tugas
-          </Button>
-        </div>
+      <CardHeader standard>
+        <CardTitle class="font-semibold">{{ pageTitle }}</CardTitle>
+        <Button
+          v-if="!waitingFor && canCreate"
+          class="shrink-0"
+          @click="openAddForm"
+        >
+          <Plus class="size-4" />
+          Tambah
+        </Button>
       </CardHeader>
 
-      <div class="space-y-4 p-0 sm:px-0">
-        <div class="hidden lg:flex lg:flex-row lg:items-center gap-3 mb-6">
-          <template v-if="academicYearLabel">
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
+      >
+        <DataTable
+          mobile="cards"
+          :columns="columns"
+          :data="pagedItems"
+          :page="page"
+          :page-size="pageSize"
+          :total-items="filteredItems.length"
+          :is-loading="relatedLoading || loading"
+          :item-label="itemNoun"
+          @update:page="page = $event"
+          @update:page-size="changePageSize"
+        >
+          <template #filters>
+            <AcademicPeriodFilter
+              v-model:semester-id="semesterModel"
+              :semesters="semesters"
+            />
+
+            <FloatingLabelField
+              v-if="hasGradeChoice"
+              label="Tingkat"
+              :for="`${filterId}-grade`"
+              class="w-fit min-w-28"
+              floating
             >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
+              <Select v-model="gradeModel">
+                <SelectTrigger
+                  :id="`${filterId}-grade`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Semua tingkat" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="EVERY_GRADE"> Semua </SelectItem>
+                  <SelectItem
+                    v-for="g in gradeFilterOptions"
+                    :key="g.value"
+                    :value="g.value"
+                  >
+                    {{ g.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+
+            <FloatingLabelField
+              v-if="hasClassroomChoice"
+              label="Kelas"
+              :for="`${filterId}-classroom`"
+              class="w-fit min-w-28"
+              floating
             >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
+              <Select v-model="classroomModel">
+                <SelectTrigger
+                  :id="`${filterId}-classroom`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Semua kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="EVERY_CLASSROOM"> Semua </SelectItem>
+                  <SelectItem
+                    v-for="c in classroomFilterOptions"
+                    :key="c.value"
+                    :value="c.value"
+                  >
+                    {{ c.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+
+            <FloatingLabelField
+              v-if="hasSubjectChoice"
+              label="Mata Pelajaran"
+              :for="`${filterId}-subject`"
+              class="w-fit min-w-44"
+              floating
+            >
+              <Select v-model="subjectModel">
+                <SelectTrigger
+                  :id="`${filterId}-subject`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Semua mapel" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="EVERY_SUBJECT"> Semua </SelectItem>
+                  <SelectItem
+                    v-for="sub in subjectFilterOptions"
+                    :key="sub.value"
+                    :value="sub.value"
+                  >
+                    {{ sub.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+
+            <FloatingLabelField
+              label="Tipe"
+              :for="`${filterId}-type`"
+              class="w-fit min-w-32"
+              floating
+            >
+              <Select v-model="typeModel">
+                <SelectTrigger
+                  :id="`${filterId}-type`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Semua tipe" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem :value="EVERY_TYPE"> Semua </SelectItem>
+                  <SelectItem
+                    v-for="t in typeFilterOptions"
+                    :key="t.value"
+                    :value="t.value"
+                  >
+                    {{ t.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
           </template>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control text-destructive"
-          >
-            Belum ada semester aktif
-          </div>
-
-          <Select v-model="selectedClassroomId">
-            <SelectTrigger class="w-[92px]">
-              <SelectValue placeholder="Kelas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="c in classroomFilterOptions"
-                :key="c.value"
-                :value="c.value"
-              >
-                {{ c.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            v-if="hasSubjectChoice"
-            v-model="selectedSubjectId"
-          >
-            <SelectTrigger class="w-[220px]">
-              <SelectValue placeholder="Pilih Mata Pelajaran" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="sub in subjectFilterOptions"
-                :key="sub.value"
-                :value="sub.value"
-              >
-                {{ sub.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <div
-            v-else-if="selectedSubjectLabel"
-            class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
-          >
-            <span class="text-muted-foreground">Mapel</span>
-            <span class="font-semibold">{{ selectedSubjectLabel }}</span>
-          </div>
-        </div>
-
-        <div class="flex lg:hidden flex-col gap-3 mb-6">
-          <div
-            v-if="academicYearLabel"
-            class="flex items-center justify-center gap-2"
-          >
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
+          <template #header-right>
+            <SearchInput
+              v-model="search"
+              class="sm:w-48"
+              :label="`Cari nama ${itemNoun}`"
+            />
+          </template>
+          <template #mobile-toolbar>
+            <SearchInput
+              v-model="search"
+              :label="`Cari nama ${itemNoun}`"
+              class="w-full"
+            />
+          </template>
+          <template #mobile-filter>
+            <Button
+              variant="outline"
+              class="relative shrink-0"
+              @click="filterOpen = true"
             >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
-            >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
-          </div>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
-          >
-            Belum ada semester aktif
-          </div>
+              <Filter class="size-4" />
+              Filter
+              <span
+                v-if="activeFiltersCount"
+                class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
+              >
+                {{ activeFiltersCount }}
+              </span>
+            </Button>
+          </template>
+          <template #empty>
+            <DataTableEmpty :message="emptyMessage" />
+          </template>
+        </DataTable>
+      </CardContent>
+      <CardFooter plain />
+    </Card>
 
-          <div class="flex justify-center">
-            <Select v-model="selectedClassroomId">
-              <SelectTrigger class="rounded-r-none border-r-0 min-w-0">
-                <SelectValue placeholder="Kelas" />
+    <Dialog v-model:open="filterOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Filter {{ pageTitle }}</DialogTitle>
+          <DialogDescription>
+            Pilih periode, tingkat, kelas, mata pelajaran, dan tipe untuk
+            menampilkan data.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <AcademicPeriodFilter
+            v-model:semester-id="semesterModel"
+            :semesters="semesters"
+            full-width
+          />
+
+          <FloatingLabelField
+            v-if="hasGradeChoice"
+            label="Tingkat"
+            :for="`${mobileFilterId}-grade`"
+            floating
+          >
+            <Select v-model="gradeModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-grade`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Semua tingkat" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem :value="EVERY_GRADE"> Semua </SelectItem>
+                <SelectItem
+                  v-for="g in gradeFilterOptions"
+                  :key="g.value"
+                  :value="g.value"
+                >
+                  {{ g.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+
+          <FloatingLabelField
+            v-if="hasClassroomChoice"
+            label="Kelas"
+            :for="`${mobileFilterId}-classroom`"
+            floating
+          >
+            <Select v-model="classroomModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-classroom`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Semua kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem :value="EVERY_CLASSROOM"> Semua </SelectItem>
                 <SelectItem
                   v-for="c in classroomFilterOptions"
                   :key="c.value"
@@ -341,15 +744,23 @@ onMounted(fetchRelatedData)
                 </SelectItem>
               </SelectContent>
             </Select>
+          </FloatingLabelField>
 
-            <Select
-              v-if="hasSubjectChoice"
-              v-model="selectedSubjectId"
-            >
-              <SelectTrigger class="rounded-l-none min-w-0">
-                <SelectValue placeholder="Mapel" />
+          <FloatingLabelField
+            v-if="hasSubjectChoice"
+            label="Mata Pelajaran"
+            :for="`${mobileFilterId}-subject`"
+            floating
+          >
+            <Select v-model="subjectModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-subject`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Semua mapel" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem :value="EVERY_SUBJECT"> Semua </SelectItem>
                 <SelectItem
                   v-for="sub in subjectFilterOptions"
                   :key="sub.value"
@@ -359,54 +770,65 @@ onMounted(fetchRelatedData)
                 </SelectItem>
               </SelectContent>
             </Select>
-            <div
-              v-else-if="selectedSubjectLabel"
-              class="flex items-center gap-2 rounded-l-none rounded-r-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control min-w-0"
-            >
-              <span class="text-muted-foreground shrink-0">Mapel</span>
-              <span class="font-semibold truncate">{{
-                selectedSubjectLabel
-              }}</span>
-            </div>
-          </div>
-        </div>
+          </FloatingLabelField>
 
-        <DataTable
-          v-if="!waitingFor"
-          :columns="columns"
-          :data="items"
-          :is-loading="loading"
-          item-label="tugas"
-          filter-column="name"
-          filter-placeholder="Cari nama tugas..."
-        />
-
-        <div
-          v-else
-          class="flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/20 px-6 py-16 text-center"
+          <FloatingLabelField
+            label="Tipe"
+            :for="`${mobileFilterId}-type`"
+            floating
+          >
+            <Select v-model="typeModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-type`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Semua tipe" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem :value="EVERY_TYPE"> Semua </SelectItem>
+                <SelectItem
+                  v-for="t in typeFilterOptions"
+                  :key="t.value"
+                  :value="t.value"
+                >
+                  {{ t.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
         >
-          <h3 class="text-lg font-semibold text-foreground">Belum ada tugas</h3>
-          <p class="mt-2 max-w-md text-sm text-muted-foreground">
-            {{ waitingFor }}
-          </p>
-        </div>
+          <Button
+            variant="outline"
+            :disabled="activeFiltersCount === 0"
+            @click="resetFilters"
+          >
+            Atur Ulang
+          </Button>
+          <Button @click="filterOpen = false"> Tutup </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
-        <AssessmentItemFormDialog
-          v-if="canCreate || canUpdate"
-          v-model:open="openForm"
-          :teaching-assignment-id="teachingAssignment?.id ?? null"
-          :edit-data="editingItem"
-          @save-success="fetchItems"
-        />
-
-        <AssessmentWeightDialog
-          v-if="teachingAssignment"
-          v-model:open="weightDialogOpen"
-          :teaching-assignment-id="teachingAssignment.id"
-          :subject-name="weightSubjectName"
-          :classroom-name="weightClassroomName"
-        />
-      </div>
-    </Card>
+    <AssessmentItemFormDialog
+      v-if="canCreate || canUpdate"
+      v-model:open="openForm"
+      :assignments="assignments"
+      :classrooms="classrooms"
+      :subjects="subjects"
+      :initial-classroom-id="initialDialogClassroomId"
+      :initial-subject-id="initialDialogSubjectId"
+      :edit-data="editingItem"
+      :allowed-types="allowedTypes"
+      :default-type="
+        selectedType !== EVERY_TYPE
+          ? (selectedType as AssessmentItem['type'])
+          : undefined
+      "
+      @save-success="handleFilter"
+    />
   </div>
 </template>

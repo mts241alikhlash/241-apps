@@ -7,8 +7,8 @@ export const myDashboardRoutes: RouteRecordRaw[] = [
     component: () => import('./views/MyDashboardView.vue'),
     meta: {
       requiresAuth: true,
-      title: 'Dashboard',
-      breadcrumbs: [{ title: 'Dashboard' }],
+      title: 'Dasbor',
+      breadcrumbs: [{ title: 'Dasbor' }],
     },
   },
 ]

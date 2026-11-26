@@ -1,6 +1,8 @@
 export interface StudentScoreRosterItem {
   enrollmentId: string
   nis: string
+  nisn?: string
+  gender?: string | null
   studentName: string
   scoreId: string | null
   score: number | null
@@ -56,4 +58,11 @@ export interface StudentScoreItem {
       } | null
     }
   }
+}
+
+export interface StudentNoteTarget {
+  enrollmentId: string
+  studentName: string
+  nis: string
+  note: string | null
 }

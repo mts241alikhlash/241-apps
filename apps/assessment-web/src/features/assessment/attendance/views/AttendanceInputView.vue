@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { FilterOption } from '@mts241alikhlash/web-shared/types/filter.types'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import AttendanceInputTable from '../components/AttendanceInputTable.vue'
 import { useAttendance } from '../composables/useAttendance'
 import { toDateInputValue } from '@mts241alikhlash/web-shared/utils/utils'
+import { DatePicker } from '@mts241alikhlash/ui'
 import {
   Card,
   CardContent,
@@ -21,7 +23,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@mts241alikhlash/ui/alert-dialog'
-import { DatePicker } from '@mts241alikhlash/ui'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@mts241alikhlash/ui/empty'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
   SelectContent,
@@ -29,8 +46,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { Loader2, Save } from '@lucide/vue'
-import { onMounted, computed, ref, watch } from 'vue'
+import { Filter, Loader2, Save } from '@lucide/vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
 import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 
 const { can } = useRoleGuard()
@@ -50,27 +67,35 @@ const {
   bulkSaveAttendance,
 } = useAttendance()
 
+const filterId = useId()
+const mobileFilterId = useId()
+const filterOpen = ref(false)
+const relatedLoading = ref(false)
+const confirmOpen = ref(false)
+
 const activeSemester = computed(
   () => semesters.value.find((s) => s.id === selectedSemesterId.value) ?? null,
 )
 
-const academicYearLabel = computed(
-  () => activeSemester.value?.academicYear?.name ?? null,
-)
-
-const semesterLabel = computed(() => {
-  const name = activeSemester.value?.type?.name
-  if (name === 'ODD') return 'Ganjil'
-  if (name === 'EVEN') return 'Genap'
-  return name ?? null
-})
-
 const classroomFilterOptions = computed<FilterOption[]>(() =>
-  classrooms.value.map((c) => ({
-    value: c.id,
-    label: c.code ?? '-',
-  })),
+  classrooms.value
+    .filter(
+      (c) =>
+        !activeSemester.value ||
+        c.academicYearId === activeSemester.value.academicYearId,
+    )
+    .map((c) => ({
+      value: c.id,
+      label: c.code ?? '-',
+    })),
 )
+
+const classroomModel = computed({
+  get: () => selectedClassroomId.value ?? '',
+  set: (value: string) => {
+    selectedClassroomId.value = value
+  },
+})
 
 const isFilterReady = computed(() =>
   Boolean(
@@ -78,17 +103,49 @@ const isFilterReady = computed(() =>
   ),
 )
 
+const activeFiltersCount = computed(
+  () =>
+    Number(Boolean(selectedSemesterId.value)) +
+    Number(Boolean(selectedClassroomId.value)) +
+    Number(Boolean(selectedDate.value)),
+)
+
+const emptyMessage = computed(() => {
+  if (relatedLoading.value) return 'Memuat data...'
+  if (!selectedSemesterId.value) {
+    return semesters.value.length === 0
+      ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
+      : 'Pilih tahun ajaran dan semester terlebih dahulu.'
+  }
+  if (!selectedClassroomId.value) {
+    return 'Pilih kelas untuk menampilkan daftar input kehadiran.'
+  }
+  return 'Belum ada data siswa pada kelas ini.'
+})
+
+watch(classroomFilterOptions, (options) => {
+  if (
+    selectedClassroomId.value &&
+    !options.some((o) => o.value === selectedClassroomId.value)
+  ) {
+    selectedClassroomId.value = ''
+  }
+  if (!selectedClassroomId.value && options.length > 0) {
+    selectedClassroomId.value = options[0]?.value ?? ''
+  }
+})
+
 watch([selectedSemesterId, selectedClassroomId, selectedDate], () => {
   if (isFilterReady.value) {
     void loadAttendanceInput()
+  } else {
+    inputRows.value = []
   }
 })
 
 const undecidedCount = computed(
   () => inputRows.value.filter((row) => row.needsDecision).length,
 )
-
-const confirmOpen = ref(false)
 
 function handleSaveClick() {
   if (undecidedCount.value > 0) {
@@ -103,165 +160,147 @@ async function confirmSave() {
   await bulkSaveAttendance()
 }
 
-onMounted(async () => {
-  await fetchFilterOptions()
-  const activeSemester = semesters.value.find((s) => s.isActive)
-  if (activeSemester) {
-    selectedSemesterId.value = activeSemester.id
-  }
-  if (!selectedClassroomId.value && classrooms.value.length > 0) {
-    selectedClassroomId.value = classrooms.value[0].id
+function resetFilters() {
+  if (classroomFilterOptions.value.length > 1) {
+    selectedClassroomId.value = ''
   }
   selectedDate.value = toDateInputValue()
+}
+
+onMounted(async () => {
+  relatedLoading.value = true
+  try {
+    await fetchFilterOptions()
+    const defaultSemester =
+      semesters.value.find((s) => s.isActive) ?? semesters.value[0]
+    if (defaultSemester && !selectedSemesterId.value) {
+      selectedSemesterId.value = defaultSemester.id
+    }
+    if (!selectedClassroomId.value && classroomFilterOptions.value.length > 0) {
+      selectedClassroomId.value = classroomFilterOptions.value[0]?.value ?? ''
+    }
+    selectedDate.value ||= toDateInputValue()
+  } finally {
+    relatedLoading.value = false
+  }
 })
 </script>
 
 <template>
-  <div
-    v-if="!canRecordAttendance"
-    class="space-y-6 p-4 sm:p-6"
-  >
-    <Card class="overflow-hidden">
-      <div class="p-10 text-center text-sm text-muted-foreground">
-        Anda tidak memiliki izin untuk menginput kehadiran.
-      </div>
-    </Card>
-  </div>
-
-  <div
-    v-else
-    class="space-y-6 p-4 sm:p-6"
-  >
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
+      v-if="!canRecordAttendance"
       gap="none"
-      class="overflow-hidden"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle size="lg"> Input Kehadiran </CardTitle>
+        <CardTitle class="font-semibold">Input Kehadiran</CardTitle>
+      </CardHeader>
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
+      >
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>Akses ditolak</EmptyTitle>
+            <EmptyDescription>
+              Anda tidak memiliki izin untuk menginput kehadiran.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      </CardContent>
+      <CardFooter plain />
+    </Card>
+
+    <Card
+      v-else
+      gap="none"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
+    >
+      <CardHeader standard>
+        <CardTitle class="font-semibold">Input Kehadiran</CardTitle>
       </CardHeader>
 
-      <div class="space-y-6 px-4 py-5 sm:px-6">
-        <div class="hidden lg:flex lg:flex-row lg:items-center gap-3">
-          <template v-if="academicYearLabel">
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
-            >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
-            >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
-          </template>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control text-destructive"
-          >
-            Belum ada semester aktif
-          </div>
-
-          <Select v-model="selectedClassroomId">
-            <SelectTrigger class="w-[120px]">
-              <SelectValue placeholder="Pilih Kelas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="c in classroomFilterOptions"
-                :key="c.value"
-                :value="c.value"
-              >
-                {{ c.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <DatePicker
-            v-model="selectedDate"
-            class="w-[160px]"
-          />
-        </div>
-
-        <div class="flex lg:hidden flex-col gap-3">
-          <div
-            v-if="academicYearLabel"
-            class="flex items-center justify-center gap-2"
-          >
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
-            >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
-            >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
-          </div>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
-          >
-            Belum ada semester aktif
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <Select v-model="selectedClassroomId">
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="Kelas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="c in classroomFilterOptions"
-                  :key="c.value"
-                  :value="c.value"
-                >
-                  {{ c.label }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            <DatePicker
-              v-model="selectedDate"
-              class="w-full"
-            />
-          </div>
-        </div>
-
-        <Card
-          v-if="!isFilterReady"
-          class="shadow-none"
-        >
-          <CardContent class="py-10 text-center text-muted-foreground">
-            {{
-              !selectedSemesterId
-                ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
-                : 'Pilih kelas untuk menampilkan daftar input kehadiran.'
-            }}
-          </CardContent>
-        </Card>
-
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
+      >
         <AttendanceInputTable
-          v-else
           v-model:rows="inputRows"
-          :loading="loading"
-        />
-      </div>
+          :loading="relatedLoading || loading"
+          :empty-message="emptyMessage"
+        >
+          <template #filters>
+            <AcademicPeriodFilter
+              v-model:semester-id="selectedSemesterId"
+              :semesters="semesters"
+            />
+
+            <FloatingLabelField
+              label="Kelas"
+              :for="`${filterId}-classroom`"
+              class="w-fit min-w-28"
+              floating
+            >
+              <Select v-model="classroomModel">
+                <SelectTrigger
+                  :id="`${filterId}-classroom`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Pilih kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="c in classroomFilterOptions"
+                    :key="c.value"
+                    :value="c.value"
+                  >
+                    {{ c.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+
+            <FloatingLabelField
+              label="Tanggal"
+              :for="`${filterId}-date`"
+              class="w-40"
+              :floating="Boolean(selectedDate)"
+            >
+              <DatePicker
+                :id="`${filterId}-date`"
+                v-model="selectedDate"
+              />
+            </FloatingLabelField>
+          </template>
+          <template #mobile-filter>
+            <Button
+              variant="outline"
+              class="relative shrink-0"
+              @click="filterOpen = true"
+            >
+              <Filter class="size-4" />
+              Filter
+              <span
+                v-if="activeFiltersCount"
+                class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
+              >
+                {{ activeFiltersCount }}
+              </span>
+            </Button>
+          </template>
+        </AttendanceInputTable>
+      </CardContent>
 
       <CardFooter
         v-if="isFilterReady && inputRows.length > 0"
-        standard
+        class="justify-between"
       >
         <p
           v-if="undecidedCount > 0"
-          class="mr-auto text-sm text-warning"
+          class="text-control text-warning"
         >
           {{ undecidedCount }} siswa belum dipastikan kehadirannya
         </p>
+        <span v-else />
 
         <Button
           :disabled="isSaving || loading || inputRows.length === 0"
@@ -278,7 +317,77 @@ onMounted(async () => {
           Simpan Kehadiran
         </Button>
       </CardFooter>
+      <CardFooter
+        v-else
+        plain
+      />
     </Card>
+
+    <Dialog v-model:open="filterOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Filter Kehadiran</DialogTitle>
+          <DialogDescription>
+            Pilih periode, kelas, dan tanggal untuk mengisi kehadiran siswa.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <AcademicPeriodFilter
+            v-model:semester-id="selectedSemesterId"
+            :semesters="semesters"
+            full-width
+          />
+
+          <FloatingLabelField
+            label="Kelas"
+            :for="`${mobileFilterId}-classroom`"
+            floating
+          >
+            <Select v-model="classroomModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-classroom`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Pilih kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="c in classroomFilterOptions"
+                  :key="c.value"
+                  :value="c.value"
+                >
+                  {{ c.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+
+          <FloatingLabelField
+            label="Tanggal"
+            :for="`${mobileFilterId}-date`"
+            :floating="Boolean(selectedDate)"
+          >
+            <DatePicker
+              :id="`${mobileFilterId}-date`"
+              v-model="selectedDate"
+            />
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
+        >
+          <Button
+            variant="outline"
+            :disabled="activeFiltersCount === 0"
+            @click="resetFilters"
+          >
+            Atur Ulang
+          </Button>
+          <Button @click="filterOpen = false"> Tutup </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     <AlertDialog :open="confirmOpen">
       <AlertDialogContent>

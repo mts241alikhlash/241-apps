@@ -23,6 +23,17 @@ function gateTime(value: string) {
   })
 }
 
+function gateText(row: AttendanceInputRow): string {
+  if (row.needsDecision) return 'Perlu Keputusan'
+  if (row.fromGate) {
+    return row.gateCheckInAt
+      ? `Gerbang (${gateTime(row.gateCheckInAt)})`
+      : 'Gerbang'
+  }
+  if (row.gateCheckInAt) return `Tap ${gateTime(row.gateCheckInAt)}`
+  return '-'
+}
+
 export interface AttendanceInputColumnCallbacks {
   onStatusChange: (enrollmentId: string, status: AttendanceStatus) => void
   onNoteChange: (enrollmentId: string, note: string) => void
@@ -59,36 +70,31 @@ export function createAttendanceInputColumns(
     {
       accessorKey: 'nis',
       header: 'NIS',
-      meta: { align: 'center' },
+      meta: {
+        align: 'center',
+        mobileLabel: 'NIS',
+        mobileValue: (row: AttendanceInputRow) => row.nis || '-',
+      },
       cell: ({ row }) => row.original.nis || '-',
     },
     {
       accessorKey: 'studentName',
       header: 'Nama Siswa',
-      meta: { align: 'left' },
-      cell: ({ row }) =>
-        h(
-          'span',
-          { class: 'font-medium text-foreground text-xs' },
-          row.original.studentName,
-        ),
+      meta: { align: 'left', strong: true, mobileLabel: 'Nama Siswa' },
+      cell: ({ row }) => row.original.studentName,
     },
     {
       id: 'gateStatus',
       header: 'Keterangan',
-      meta: { align: 'center' },
+      meta: {
+        align: 'center',
+        mobileLabel: 'Keterangan',
+        mobileValue: gateText,
+      },
       cell: ({ row }) => {
         const r = row.original
         if (r.needsDecision) {
-          return h(
-            Badge,
-            {
-              variant: 'outline',
-              class:
-                'border-warning bg-warning/10 text-warning font-medium text-xs px-2 py-0.5',
-            },
-            () => 'Perlu Keputusan',
-          )
+          return h(Badge, { variant: 'warning' }, () => 'Perlu Keputusan')
         }
 
         if (r.fromGate) {
@@ -96,19 +102,11 @@ export function createAttendanceInputColumns(
             'div',
             { class: 'flex items-center justify-center gap-1.5' },
             [
-              h(
-                Badge,
-                {
-                  variant: 'outline',
-                  class:
-                    'border-info bg-info/10 text-info font-medium text-xs px-2 py-0.5',
-                },
-                () => 'Gerbang',
-              ),
+              h(Badge, { variant: 'info' }, () => 'Gerbang'),
               r.gateCheckInAt
                 ? h(
                     'span',
-                    { class: 'text-muted-foreground text-xs font-normal' },
+                    { class: 'text-muted-foreground tabular-nums' },
                     gateTime(r.gateCheckInAt),
                   )
                 : null,
@@ -119,18 +117,18 @@ export function createAttendanceInputColumns(
         if (r.gateCheckInAt) {
           return h(
             'span',
-            { class: 'text-muted-foreground text-xs font-normal' },
+            { class: 'text-muted-foreground tabular-nums' },
             `Tap ${gateTime(r.gateCheckInAt)}`,
           )
         }
 
-        return h('span', { class: 'text-muted-foreground text-xs' }, '-')
+        return h('span', { class: 'text-muted-foreground' }, '-')
       },
     },
     {
       id: 'status',
       header: 'Status',
-      meta: { align: 'center' },
+      meta: { align: 'center', mobileLabel: 'Status' },
       cell: ({ row }) => {
         const r = row.original
         return h('div', { class: 'flex justify-center' }, [
@@ -144,7 +142,7 @@ export function createAttendanceInputColumns(
               },
             },
             () => [
-              h(SelectTrigger, { class: 'w-[130px]' }, () => [h(SelectValue)]),
+              h(SelectTrigger, { class: 'w-32' }, () => [h(SelectValue)]),
               h(SelectContent, () =>
                 ATTENDANCE_STATUS_OPTIONS.map((option) =>
                   h(
@@ -152,7 +150,6 @@ export function createAttendanceInputColumns(
                     {
                       key: option.value,
                       value: option.value,
-                      class: 'text-xs',
                     },
                     () => option.label,
                   ),
@@ -166,13 +163,13 @@ export function createAttendanceInputColumns(
     {
       id: 'note',
       header: 'Catatan',
-      meta: { align: 'left' },
+      meta: { align: 'left', mobileLabel: 'Catatan' },
       cell: ({ row }) => {
         const r = row.original
         return h(Input, {
           modelValue: r.note,
           placeholder: 'Catatan...',
-          class: 'h-8 text-xs min-w-[150px]',
+          class: 'min-w-36',
           'onUpdate:modelValue': (val: string | number) =>
             callbacks.onNoteChange(r.enrollmentId, String(val)),
         })

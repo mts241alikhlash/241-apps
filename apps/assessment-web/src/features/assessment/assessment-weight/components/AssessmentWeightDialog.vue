@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import * as z from 'zod'
+import { FormattedNumberInput } from '@mts241alikhlash/ui'
+import { Badge } from '@mts241alikhlash/ui/badge'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
@@ -9,20 +14,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { Input } from '@mts241alikhlash/ui/input'
-import { Badge } from '@mts241alikhlash/ui/badge'
+import { FloatingField, FormControl } from '@mts241alikhlash/ui/form'
 import { CheckCircle2, Loader2, RotateCcw } from '@lucide/vue'
 import { computed, watch } from 'vue'
 import { useAssessmentWeights } from '../composables/useAssessmentWeights'
-import { ASSESSMENT_TYPE_LABELS, ASSESSMENT_TYPE_ORDER } from '../types'
+import {
+  ASSESSMENT_TYPE_LABELS,
+  ASSESSMENT_TYPE_ORDER,
+  ASSESSMENT_WEIGHT_TOTAL,
+} from '../types'
 
 const props = defineProps<{
-  teachingAssignmentId: string
+  teachingAssignmentId: string | null
   subjectName?: string
-  classroomName?: string
+  classroomCode?: string
 }>()
 
 const open = defineModel<boolean>('open', { required: true })
+
+const emit = defineEmits<{
+  saved: [teachingAssignmentId: string]
+}>()
 
 const {
   weights,
@@ -36,11 +48,48 @@ const {
   applyDefault,
 } = useAssessmentWeights()
 
-watch(open, (isOpen) => {
-  if (isOpen && props.teachingAssignmentId) {
-    void fetch(props.teachingAssignmentId)
-  }
+const weightRule = z
+  .number({ invalid_type_error: 'Bobot harus berupa angka.' })
+  .min(0, 'Bobot minimal 0%.')
+  .max(100, 'Bobot maksimal 100%.')
+
+const formSchema = toTypedSchema(
+  z
+    .object({
+      DAILY: weightRule,
+      ASSIGNMENT: weightRule,
+      PRACTICAL: weightRule,
+      MIDTERM: weightRule,
+      FINAL: weightRule,
+    })
+    .refine(
+      (vals) =>
+        ASSESSMENT_TYPE_ORDER.reduce((sum, type) => sum + vals[type], 0) ===
+        ASSESSMENT_WEIGHT_TOTAL,
+      { message: 'Total bobot harus 100%.', path: ['FINAL'] },
+    ),
+)
+
+const { handleSubmit, resetForm, setValues } = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    DAILY: 0,
+    ASSIGNMENT: 0,
+    PRACTICAL: 0,
+    MIDTERM: 0,
+    FINAL: 0,
+  },
 })
+
+watch(
+  [open, () => props.teachingAssignmentId],
+  async ([isOpen, assignmentId]) => {
+    if (!isOpen || !assignmentId) return
+    await fetch(assignmentId)
+    resetForm({ values: { ...weights.value } })
+  },
+  { immediate: true },
+)
 
 const TYPE_COLORS: Record<string, string> = {
   DAILY: 'bg-info',
@@ -50,12 +99,15 @@ const TYPE_COLORS: Record<string, string> = {
   FINAL: 'bg-destructive',
 }
 
-const TYPE_BADGE_CLASSES: Record<string, string> = {
-  DAILY: 'bg-info text-info border-info',
-  ASSIGNMENT: 'bg-success text-success border-success',
-  PRACTICAL: 'bg-warning text-warning border-warning',
-  MIDTERM: 'bg-muted text-muted-foreground border-border',
-  FINAL: 'bg-destructive text-destructive border-destructive',
+const TYPE_BADGE_VARIANTS: Record<
+  string,
+  'info' | 'success' | 'warning' | 'secondary' | 'destructive'
+> = {
+  DAILY: 'info',
+  ASSIGNMENT: 'success',
+  PRACTICAL: 'warning',
+  MIDTERM: 'secondary',
+  FINAL: 'destructive',
 }
 
 const SAMPLE_SCORES: Record<string, number> = {
@@ -79,222 +131,232 @@ const sampleResult = computed(() => {
   return (sum / 100).toFixed(1)
 })
 
-function setWeight(type: string, value: string | number) {
-  const parsed = Number(value)
+function setWeight(
+  type: (typeof ASSESSMENT_TYPE_ORDER)[number],
+  value: number,
+) {
   weights.value = {
     ...weights.value,
-    [type]: Number.isNaN(parsed) ? 0 : Math.min(Math.max(parsed, 0), 100),
+    [type]: Math.min(Math.max(value, 0), 100),
   }
 }
 
-async function handleSave() {
-  const saved = await save(props.teachingAssignmentId)
-  if (saved) open.value = false
+function handleApplyDefault() {
+  applyDefault()
+  setValues({ ...weights.value })
 }
+
+const onSubmit = handleSubmit(async (values) => {
+  if (!props.teachingAssignmentId) return
+  weights.value = { ...values }
+  const saved = await save(props.teachingAssignmentId)
+  if (saved) {
+    emit('saved', props.teachingAssignmentId)
+    open.value = false
+  }
+})
 </script>
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+    <DialogContent
+      size="xl"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>Bobot Penilaian</DialogTitle>
         <DialogDescription>
-          Atur bobot tiap jenis penilaian agar total 100%.
+          <template v-if="subjectName && classroomCode">
+            Atur bobot tiap jenis penilaian untuk {{ subjectName }} ({{
+              classroomCode
+            }}) agar total 100%.
+          </template>
+          <template v-else>
+            Atur bobot tiap jenis penilaian agar total 100%.
+          </template>
         </DialogDescription>
       </DialogHeader>
 
-      <DialogBody class="space-y-3">
+      <DialogBody class="space-y-4">
         <div
-          v-if="loading"
-          class="flex items-center justify-center py-8 text-muted-foreground"
+          v-if="!teachingAssignmentId || loading"
+          class="flex items-center justify-center py-6 text-muted-foreground"
         >
           <Loader2 class="size-5 animate-spin" />
         </div>
 
-        <template v-else>
-          <div
-            v-if="subjectName || classroomName"
-            class="rounded-md border bg-muted/30 px-3 py-2.5 text-sm space-y-1"
-          >
-            <div
-              v-if="subjectName"
-              class="flex gap-2"
-            >
-              <span class="text-muted-foreground w-28 shrink-0"
-                >Mata Pelajaran</span
-              >
-              <span class="text-muted-foreground">:</span>
-              <span class="font-medium">{{ subjectName }}</span>
-            </div>
-            <div
-              v-if="classroomName"
-              class="flex gap-2"
-            >
-              <span class="text-muted-foreground w-28 shrink-0">Kelas</span>
-              <span class="text-muted-foreground">:</span>
-              <span class="font-medium">{{ classroomName }}</span>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs font-medium text-muted-foreground"
-                >Distribusi Bobot</span
-              >
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                class="gap-1.5 text-muted-foreground"
-                @click="applyDefault"
-              >
-                <RotateCcw class="size-3" />
-                Isi Standar
-              </Button>
-            </div>
-            <div
-              v-for="type in ASSESSMENT_TYPE_ORDER"
-              :key="type"
-              class="flex items-center gap-2"
-            >
-              <Badge
-                variant="outline"
-                class="w-[4.5rem] justify-center shrink-0 font-medium"
-                :class="TYPE_BADGE_CLASSES[type]"
-              >
-                {{ ASSESSMENT_TYPE_LABELS[type] }}
-              </Badge>
-              <div
-                class="flex-1 h-1.5 rounded-full bg-muted/50 overflow-hidden"
-              >
-                <div
-                  class="h-full rounded-full transition-all duration-300 ease-out"
-                  :class="TYPE_COLORS[type]"
-                  :style="{ width: `${weights[type]}%` }"
-                />
-              </div>
-              <div class="relative w-[4.5rem] shrink-0">
-                <Input
-                  :id="`weight-${type}`"
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="pr-6 text-right text-xs"
-                  :model-value="weights[type]"
-                  @update:model-value="(val) => setWeight(type, val)"
-                />
-                <span
-                  class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none"
+        <form
+          v-else
+          id="assessment-weight-form"
+          class="grid gap-4 sm:grid-cols-[1.2fr_1fr] sm:items-start"
+          @submit.prevent="onSubmit"
+        >
+          <div class="space-y-3">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-control font-medium text-muted-foreground"
+                  >Distribusi Bobot</span
                 >
-                  %
-                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  class="text-muted-foreground"
+                  @click="handleApplyDefault"
+                >
+                  <RotateCcw class="size-4" />
+                  Isi Standar
+                </Button>
+              </div>
+              <div
+                v-for="type in ASSESSMENT_TYPE_ORDER"
+                :key="type"
+                class="flex items-center gap-2"
+              >
+                <Badge
+                  :variant="TYPE_BADGE_VARIANTS[type] ?? 'outline'"
+                  class="w-20 justify-start shrink-0"
+                >
+                  {{ ASSESSMENT_TYPE_LABELS[type] }}
+                </Badge>
+                <div
+                  class="flex-1 h-1.5 rounded-full bg-muted/50 overflow-hidden"
+                >
+                  <div
+                    class="h-full rounded-full transition-all duration-300 ease-out"
+                    :class="TYPE_COLORS[type]"
+                    :style="{ width: `${weights[type]}%` }"
+                  />
+                </div>
+                <FloatingField
+                  v-slot="{ value, handleChange }"
+                  :name="type"
+                  :label="ASSESSMENT_TYPE_LABELS[type]"
+                  hide-label
+                  class="w-24 shrink-0"
+                >
+                  <FormControl>
+                    <FormattedNumberInput
+                      :model-value="value"
+                      numeric
+                      suffix="%"
+                      :max-digits="3"
+                      class="text-right tabular-nums"
+                      @update:model-value="
+                        (next) => {
+                          const numeric =
+                            next === undefined
+                              ? 0
+                              : Math.min(Math.max(Number(next), 0), 100)
+                          handleChange(numeric)
+                          setWeight(type, numeric)
+                        }
+                      "
+                    />
+                  </FormControl>
+                </FloatingField>
               </div>
             </div>
-          </div>
 
-          <div
-            class="flex items-center justify-between rounded-md px-3 py-2 text-xs transition-colors"
-            :class="
-              isBalanced
-                ? 'bg-success border border-success'
-                : total > 100
-                  ? 'bg-destructive/5 border border-destructive/20'
-                  : 'bg-muted/50 border border-border'
-            "
-          >
-            <div class="flex items-center gap-1.5">
-              <CheckCircle2
-                v-if="isBalanced"
-                class="size-3.5 text-success"
-              />
-              <span
-                class="font-medium"
-                :class="isBalanced ? 'text-success' : ''"
-              >
-                Total
-              </span>
-            </div>
-            <span
-              class="font-semibold"
+            <div
+              class="flex items-center justify-between rounded-md border px-3 py-2 text-control transition-colors"
               :class="
                 isBalanced
-                  ? 'text-success'
+                  ? 'bg-success/10 border-success/30 text-success'
                   : total > 100
-                    ? 'text-destructive'
-                    : ''
+                    ? 'bg-destructive/10 border-destructive/30 text-destructive'
+                    : 'bg-muted/30 border-border'
               "
             >
-              {{ total }}%
-              <span
-                v-if="!isBalanced"
-                class="font-normal ml-1"
-                :class="
-                  total > 100 ? 'text-destructive/70' : 'text-muted-foreground'
-                "
-              >
-                ({{
-                  remaining > 0 ? `kurang ${remaining}` : `lebih ${-remaining}`
-                }})
+              <div class="flex items-center gap-1.5">
+                <CheckCircle2
+                  v-if="isBalanced"
+                  class="size-4 text-success"
+                />
+                <span class="font-medium">Total</span>
+              </div>
+              <span class="font-semibold tabular-nums">
+                {{ total }}%
+                <span
+                  v-if="!isBalanced"
+                  class="font-normal ml-1"
+                  :class="
+                    total > 100
+                      ? 'text-destructive/80'
+                      : 'text-muted-foreground'
+                  "
+                >
+                  ({{
+                    remaining > 0
+                      ? `kurang ${remaining}`
+                      : `lebih ${-remaining}`
+                  }})
+                </span>
               </span>
-            </span>
+            </div>
           </div>
 
-          <div
-            v-if="sampleResult"
-            class="rounded-md border bg-muted/30 px-3 py-2.5 text-xs space-y-1.5"
-          >
-            <span class="font-medium text-xs">Simulasi Nilai</span>
-            <div class="space-y-0.5">
-              <div
-                v-for="type in usedTypes"
-                :key="type"
-                class="flex items-center justify-between text-muted-foreground"
-              >
-                <span>{{ ASSESSMENT_TYPE_LABELS[type] }}</span>
-                <span>
-                  {{ SAMPLE_SCORES[type] }} × {{ weights[type] }}% =
-                  <span class="text-foreground font-medium">
-                    {{
-                      (
-                        ((SAMPLE_SCORES[type] ?? 0) * weights[type]) /
-                        100
-                      ).toFixed(1)
-                    }}
+          <div class="rounded-md border bg-muted/30 p-3 text-control space-y-2">
+            <span class="block font-medium">Simulasi Nilai</span>
+            <template v-if="sampleResult">
+              <div class="space-y-1">
+                <div
+                  v-for="type in usedTypes"
+                  :key="type"
+                  class="flex items-center justify-between text-muted-foreground"
+                >
+                  <span>{{ ASSESSMENT_TYPE_LABELS[type] }}</span>
+                  <span class="tabular-nums">
+                    {{ SAMPLE_SCORES[type] }} × {{ weights[type] }}% =
+                    <span class="text-foreground font-medium">
+                      {{
+                        (
+                          ((SAMPLE_SCORES[type] ?? 0) * weights[type]) /
+                          100
+                        ).toFixed(1)
+                      }}
+                    </span>
                   </span>
-                </span>
+                </div>
               </div>
-            </div>
-            <div
-              class="border-t pt-1.5 flex items-center justify-between text-sm"
+              <div class="border-t pt-2 flex items-center justify-between">
+                <span class="font-medium">Nilai Akhir</span>
+                <span class="font-semibold tabular-nums">{{
+                  sampleResult
+                }}</span>
+              </div>
+            </template>
+            <p
+              v-else
+              class="text-muted-foreground"
             >
-              <span class="font-medium">Nilai Akhir</span>
-              <span class="font-semibold">{{ sampleResult }}</span>
-            </div>
+              Atur total bobot hingga tepat 100% untuk melihat simulasi nilai
+              akhir.
+            </p>
           </div>
-        </template>
+        </form>
       </DialogBody>
 
       <DialogFooter
         standard
-        class="sm:justify-between"
+        class="justify-between"
       >
         <Button
           type="button"
           variant="outline"
-          size="sm"
           @click="open = false"
         >
           Batal
         </Button>
         <Button
-          type="button"
-          size="sm"
-          :disabled="!isBalanced || isSaving || loading"
-          @click="handleSave"
+          type="submit"
+          form="assessment-weight-form"
+          :disabled="
+            !teachingAssignmentId || !isBalanced || isSaving || loading
+          "
         >
           <Loader2
             v-if="isSaving"
-            class="size-3.5 animate-spin"
+            class="size-4 animate-spin"
           />
           Simpan
         </Button>

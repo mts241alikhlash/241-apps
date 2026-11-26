@@ -24,11 +24,9 @@ const deltaIcon = computed(() => {
   return props.monthDelta > 0 ? TrendingUp : TrendingDown
 })
 
-const deltaClass = computed(() => {
-  if (props.monthDelta === null || props.monthDelta === 0) return ''
-  return props.monthDelta > 0
-    ? 'border-transparent bg-success text-success'
-    : 'border-transparent bg-destructive text-destructive'
+const deltaVariant = computed<'secondary' | 'success' | 'destructive'>(() => {
+  if (props.monthDelta === null || props.monthDelta === 0) return 'secondary'
+  return props.monthDelta > 0 ? 'success' : 'destructive'
 })
 </script>
 
@@ -44,7 +42,7 @@ const deltaClass = computed(() => {
           </div>
           <div>
             <p class="text-xs font-medium text-muted-foreground">Total Siswa</p>
-            <p class="text-2xl font-semibold">
+            <p class="text-2xl font-semibold tabular-nums">
               {{ totalStudents }}
             </p>
           </div>
@@ -62,17 +60,15 @@ const deltaClass = computed(() => {
               </p>
               <Badge
                 v-if="monthDelta !== null"
-                variant="secondary"
-                :class="deltaClass"
+                :variant="deltaVariant"
               >
-                <component
-                  :is="deltaIcon"
-                  class="size-3"
-                />
+                <component :is="deltaIcon" />
                 {{ monthDelta > 0 ? '+' : '' }}{{ monthDelta }}%
               </Badge>
             </div>
-            <p class="mt-1 text-2xl font-semibold">{{ classPercentage }}%</p>
+            <p class="mt-1 text-2xl font-semibold tabular-nums">
+              {{ classPercentage }}%
+            </p>
             <Progress
               :model-value="classPercentage"
               class="mt-2 h-1.5"
@@ -86,7 +82,7 @@ const deltaClass = computed(() => {
       <CardContent variant="standard">
         <div class="flex items-start gap-3">
           <div
-            class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-destructive"
+            class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-destructive/10"
           >
             <Users class="size-4 text-destructive" />
           </div>
@@ -94,7 +90,7 @@ const deltaClass = computed(() => {
             <p class="text-xs font-medium text-muted-foreground">
               Total Alpha (Bulan Ini)
             </p>
-            <p class="text-2xl font-semibold">{{ totalAbsent }}</p>
+            <p class="text-2xl font-semibold tabular-nums">{{ totalAbsent }}</p>
           </div>
         </div>
       </CardContent>

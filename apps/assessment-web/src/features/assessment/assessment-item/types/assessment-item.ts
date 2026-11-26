@@ -8,6 +8,21 @@ export interface AssessmentItem {
   type: AssessmentType
   weight: number
   maxScore: number
+  gradedCount?: number
+  studentCount?: number
+  teachingAssignment?: {
+    id: string
+    subject?: {
+      id: string
+      code: string | null
+      name: string
+    }
+    classroom?: {
+      id: string
+      code: string
+      name: string | null
+    }
+  }
   createdAt: string
   updatedAt: string
 }

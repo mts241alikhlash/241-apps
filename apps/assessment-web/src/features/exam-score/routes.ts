@@ -10,6 +10,7 @@ export const examScoreRoutes: RouteRecordRaw[] = [
       requiresAuth: true,
       requiredPermission: 'exam-scores.read',
       breadcrumbs: [
+        { title: 'Penilaian', href: '#' },
         { title: 'Ujian', href: '#' },
         { title: 'Nilai Ujian', href: '/nilai-ujian' },
       ],

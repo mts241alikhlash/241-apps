@@ -11,12 +11,28 @@ export const useAssessmentItemStore = defineStore('assessmentItem', () => {
   const isSaving = ref(false)
   const formError = ref<string | null>(null)
 
+  const allClassrooms = ref<
+    {
+      id: string
+      name: string | null
+      code?: string
+      gradeId?: string
+      grade?: { level: number; name: string } | null
+      classroomLevelId?: string
+      classroomLevel?: { level?: number; name: string } | null
+    }[]
+  >([])
+  const allSubjects = ref<{ id: string; name: string }[]>([])
+
   const classrooms = ref<
     {
       id: string
       name: string | null
       code?: string
-      classroomLevel?: { name: string }
+      gradeId?: string
+      grade?: { level: number; name: string } | null
+      classroomLevelId?: string
+      classroomLevel?: { level?: number; name: string } | null
     }[]
   >([])
   const subjects = ref<{ id: string; name: string }[]>([])
@@ -36,6 +52,8 @@ export const useAssessmentItemStore = defineStore('assessmentItem', () => {
     loading,
     isSaving,
     formError,
+    allClassrooms,
+    allSubjects,
     classrooms,
     subjects,
     semesters,

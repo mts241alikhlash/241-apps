@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, toRefs } from 'vue'
+import type { AcceptableValue } from '@mts241alikhlash/ui/select'
+import type { TeachingAssignment } from '@/features/lookup/teaching-assignment/types'
 import { useAssessmentItemForm } from '../composables/useAssessmentItemForm'
 import type { AssessmentItem } from '../types'
 import { Alert, AlertDescription, AlertTitle } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
-import { ScrollArea } from '@mts241alikhlash/ui/scroll-area'
 import { Input } from '@mts241alikhlash/ui/input'
 import {
   Select,
@@ -24,10 +26,26 @@ import {
 import { FormControl, FloatingField } from '@mts241alikhlash/ui/form'
 import { AlertCircle, Loader2 } from '@lucide/vue'
 
+interface ClassroomOption {
+  id: string
+  code?: string
+  name: string | null
+  gradeId?: string
+  grade?: { level: number; name: string } | null
+  classroomLevelId?: string
+  classroomLevel?: { level?: number; name: string } | null
+}
+
 const props = defineProps<{
   open: boolean
-  teachingAssignmentId: string | null
+  assignments: TeachingAssignment[]
+  classrooms: ClassroomOption[]
+  subjects: { id: string; name: string }[]
+  initialClassroomId: string | null
+  initialSubjectId: string | null
   editData?: AssessmentItem | null
+  allowedTypes?: AssessmentItem['type'][]
+  defaultType?: AssessmentItem['type']
 }>()
 
 const emit = defineEmits<{
@@ -42,7 +60,7 @@ const open = computed({
 
 const { editData } = toRefs(props)
 
-const assessmentTypeOptions: {
+const allAssessmentTypeOptions: {
   value: AssessmentItem['type']
   label: string
 }[] = [
@@ -53,43 +71,294 @@ const assessmentTypeOptions: {
   { value: 'FINAL', label: 'UAS' },
 ]
 
+const assessmentTypeOptions = computed(() => {
+  if (!props.allowedTypes?.length) return allAssessmentTypeOptions
+  return allAssessmentTypeOptions.filter((opt) =>
+    props.allowedTypes?.includes(opt.value),
+  )
+})
+
+const isExamOnly = computed(
+  () =>
+    Boolean(props.allowedTypes?.length) &&
+    props.allowedTypes!.every((t) => t === 'MIDTERM' || t === 'FINAL'),
+)
+
+function gradeIdOf(classroom: ClassroomOption): string {
+  return classroom.gradeId ?? classroom.classroomLevelId ?? ''
+}
+
+function gradeIdForClassroom(classroomId: string | null): string | null {
+  if (!classroomId) {
+    return gradeOptions.value.length === 1 ? gradeOptions.value[0].value : null
+  }
+  const classroom = props.classrooms.find((c) => c.id === classroomId)
+  if (!classroom) return null
+  return gradeIdOf(classroom) || null
+}
+
+const assignedClassroomIds = computed(
+  () => new Set(props.assignments.map((a) => a.classroomId)),
+)
+
+const gradeOptions = computed(() => {
+  const grades = new Map<
+    string,
+    { value: string; label: string; level: number }
+  >()
+  for (const classroom of props.classrooms) {
+    if (!assignedClassroomIds.value.has(classroom.id)) continue
+    const id = gradeIdOf(classroom)
+    if (!id || grades.has(id)) continue
+    const label = classroom.grade?.name ?? classroom.classroomLevel?.name ?? '-'
+    const level = classroom.grade?.level ?? classroom.classroomLevel?.level ?? 0
+    grades.set(id, { value: id, label, level })
+  }
+  return [...grades.values()].sort(
+    (a, b) => a.level - b.level || a.label.localeCompare(b.label, 'id'),
+  )
+})
+
+function classroomOptionsFor(gradeId: string) {
+  return props.classrooms
+    .filter(
+      (c) =>
+        assignedClassroomIds.value.has(c.id) &&
+        (!gradeId || gradeIdOf(c) === gradeId),
+    )
+    .map((c) => ({ value: c.id, label: c.code ?? c.name ?? '-' }))
+}
+
+function subjectOptionsFor(classroomId: string) {
+  const allowed = new Set(
+    props.assignments
+      .filter((a) => !classroomId || a.classroomId === classroomId)
+      .map((a) => a.subjectId),
+  )
+  return props.subjects
+    .filter((s) => allowed.has(s.id))
+    .map((s) => ({ value: s.id, label: s.name }))
+}
+
 const itemForm = useAssessmentItemForm({
-  teachingAssignmentId: () => props.teachingAssignmentId,
+  assignments: () => props.assignments,
+  gradeIdForClassroom,
+  initialClassroomId: () => props.initialClassroomId,
+  initialSubjectId: () => props.initialSubjectId,
   editData: () => editData.value ?? null,
   isOpen: () => props.open,
+  defaultType: () =>
+    props.defaultType ?? assessmentTypeOptions.value[0]?.value ?? 'DAILY',
   onSuccess: () => {
     emit('save-success')
     open.value = false
   },
 })
+
+function handleGradeChange(nextGradeId: AcceptableValue) {
+  const value = typeof nextGradeId === 'string' ? nextGradeId : ''
+  itemForm.form.setFieldValue('gradeId', value)
+  const validClassrooms = classroomOptionsFor(value)
+  if (validClassrooms.length === 1) {
+    handleClassroomChange(validClassrooms[0].value)
+    return
+  }
+  const currentClassroom = itemForm.form.values.classroomId
+  if (
+    currentClassroom &&
+    !validClassrooms.some((c) => c.value === currentClassroom)
+  ) {
+    itemForm.form.setFieldValue('classroomId', '')
+    itemForm.form.setFieldValue('subjectId', '')
+  }
+}
+
+function handleClassroomChange(nextClassroomId: AcceptableValue) {
+  const value = typeof nextClassroomId === 'string' ? nextClassroomId : ''
+  itemForm.form.setFieldValue('classroomId', value)
+  const validSubjects = subjectOptionsFor(value)
+  const currentSubject = itemForm.form.values.subjectId
+  if (validSubjects.length === 1) {
+    itemForm.form.setFieldValue('subjectId', validSubjects[0].value)
+    return
+  }
+  if (
+    currentSubject &&
+    !validSubjects.some((subject) => subject.value === currentSubject)
+  ) {
+    itemForm.form.setFieldValue('subjectId', '')
+  }
+}
 </script>
 
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+    <DialogContent
+      size="md"
+      @open-auto-focus.prevent
+    >
       <DialogHeader standard>
         <DialogTitle>{{
-          itemForm.isEditing.value ? 'Ubah Tugas' : 'Tambah Tugas'
+          itemForm.isEditing.value
+            ? isExamOnly
+              ? 'Ubah Ujian'
+              : 'Ubah Tugas'
+            : isExamOnly
+              ? 'Tambah Ujian'
+              : 'Tambah Tugas'
         }}</DialogTitle>
         <DialogDescription>
           {{
             itemForm.isEditing.value
-              ? 'Perbarui informasi tugas. Klik simpan untuk menerapkan.'
-              : 'Tambahkan tugas/komponen penilaian baru untuk mata pelajaran ini.'
+              ? 'Perbarui informasi butir penilaian. Klik simpan untuk menerapkan.'
+              : 'Tambahkan butir penilaian baru untuk mata pelajaran ini.'
           }}
         </DialogDescription>
       </DialogHeader>
 
-      <ScrollArea class="flex-1 min-h-0">
+      <DialogBody>
         <form
           id="assessment-item-form"
-          class="space-y-4 px-6 py-4"
+          class="space-y-4"
           @submit.prevent="itemForm.onSubmit"
         >
+          <template v-if="!itemForm.isEditing.value">
+            <div class="grid gap-4 sm:grid-cols-2">
+              <FloatingField
+                v-slot="{ value }"
+                name="gradeId"
+                label="Tingkat"
+                required
+              >
+                <div class="content-start">
+                  <Select
+                    :model-value="value || undefined"
+                    @update:model-value="handleGradeChange"
+                  >
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem
+                        v-for="grade in gradeOptions"
+                        :key="grade.value"
+                        :value="grade.value"
+                      >
+                        {{ grade.label }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </FloatingField>
+
+              <FloatingField
+                v-slot="{ value }"
+                name="classroomId"
+                label="Kelas"
+                required
+              >
+                <div class="content-start">
+                  <Select
+                    :model-value="value || undefined"
+                    :disabled="!itemForm.form.values.gradeId"
+                    @update:model-value="handleClassroomChange"
+                  >
+                    <FormControl>
+                      <SelectTrigger class="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem
+                        v-for="cls in classroomOptionsFor(
+                          itemForm.form.values.gradeId,
+                        )"
+                        :key="cls.value"
+                        :value="cls.value"
+                      >
+                        {{ cls.label }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </FloatingField>
+            </div>
+          </template>
+
+          <div
+            :class="
+              !itemForm.isEditing.value ? 'grid gap-4 sm:grid-cols-2' : ''
+            "
+          >
+            <FloatingField
+              v-if="!itemForm.isEditing.value"
+              v-slot="{ value, handleChange }"
+              name="subjectId"
+              label="Mata Pelajaran"
+              required
+            >
+              <div class="content-start">
+                <Select
+                  :model-value="value || undefined"
+                  :disabled="!itemForm.form.values.classroomId"
+                  @update:model-value="handleChange"
+                >
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem
+                      v-for="sub in subjectOptionsFor(
+                        itemForm.form.values.classroomId,
+                      )"
+                      :key="sub.value"
+                      :value="sub.value"
+                    >
+                      {{ sub.label }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </FloatingField>
+
+            <FloatingField
+              v-slot="{ value, handleChange }"
+              name="type"
+              label="Tipe"
+              required
+            >
+              <div class="content-start">
+                <Select
+                  :model-value="value"
+                  @update:model-value="handleChange"
+                >
+                  <FormControl>
+                    <SelectTrigger class="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem
+                      v-for="opt in assessmentTypeOptions"
+                      :key="opt.value"
+                      :value="opt.value"
+                    >
+                      {{ opt.label }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </FloatingField>
+          </div>
+
           <FloatingField
             v-slot="{ value, handleChange }"
             name="name"
-            label="Nama Tugas"
+            :label="isExamOnly ? 'Nama Ujian' : 'Nama Tugas'"
             required
           >
             <div class="content-start">
@@ -99,35 +368,6 @@ const itemForm = useAssessmentItemForm({
                   @update:model-value="handleChange"
                 />
               </FormControl>
-            </div>
-          </FloatingField>
-
-          <FloatingField
-            v-slot="{ value, handleChange }"
-            name="type"
-            label="Tipe"
-            required
-          >
-            <div class="content-start">
-              <Select
-                :model-value="value"
-                @update:model-value="handleChange"
-              >
-                <FormControl>
-                  <SelectTrigger class="w-full">
-                    <SelectValue placeholder="Pilih tipe" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem
-                    v-for="opt in assessmentTypeOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                  >
-                    {{ opt.label }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </FloatingField>
 
@@ -171,18 +411,17 @@ const itemForm = useAssessmentItemForm({
           <Alert
             v-if="itemForm.formError.value"
             variant="destructive"
-            class="mt-2"
           >
             <AlertCircle class="size-4" />
             <AlertTitle>Kesalahan Sistem</AlertTitle>
             <AlertDescription>{{ itemForm.formError.value }}</AlertDescription>
           </Alert>
         </form>
-      </ScrollArea>
+      </DialogBody>
 
       <DialogFooter
         standard
-        class="sm:justify-between"
+        class="justify-between"
       >
         <Button
           type="button"

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -31,52 +32,54 @@ onMounted(() => void raporService.fetchMine())
 </script>
 
 <template>
-  <div class="p-4 md:p-5 lg:p-6">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-hidden"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle size="lg"> Rapor Saya </CardTitle>
-
-        <div
-          v-if="
-            summary && summary.published > 0 && summary.averageScore !== null
-          "
-          class="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-1.5 border"
-        >
-          <span class="text-xs text-muted-foreground font-medium"
-            >Rata-rata:</span
-          >
-          <span class="text-base font-semibold">
-            {{ summary.averageScore.toFixed(2) }}
-          </span>
-        </div>
+        <CardTitle class="font-semibold">Rapor Saya</CardTitle>
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-4"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
-        <Card
-          v-if="!loading && rapors.length === 0"
-          class="shadow-none"
+        <dl
+          v-if="
+            summary && summary.published > 0 && summary.averageScore !== null
+          "
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
         >
-          <CardContent class="py-10 text-center text-muted-foreground">
-            Belum ada rapor yang diterbitkan untuk Anda. Rapor akan muncul di
-            sini setelah wali kelas menerbitkannya.
-          </CardContent>
-        </Card>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Rata-rata</dt>
+            <dd class="font-medium tabular-nums">
+              {{ summary.averageScore.toFixed(2) }}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Rapor Terbit</dt>
+            <dd class="font-medium tabular-nums">{{ summary.published }}</dd>
+          </div>
+        </dl>
 
         <DataTable
-          v-else
+          mobile="cards"
           :columns="tableColumns"
           :data="rapors"
           :is-loading="loading"
           item-label="rapor"
           hide-per-page
-        />
+          :row-clickable="() => true"
+          @row-click="openDetail"
+        >
+          <template #empty>
+            <DataTableEmpty
+              message="Belum ada rapor yang diterbitkan untuk Anda. Rapor akan muncul di sini setelah wali kelas menerbitkannya."
+            />
+          </template>
+        </DataTable>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <RaporDetailDialog

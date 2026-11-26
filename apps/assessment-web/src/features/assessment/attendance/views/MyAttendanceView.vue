@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Button, TooltipButton } from '@mts241alikhlash/ui'
+import { Badge } from '@mts241alikhlash/ui/badge'
 import {
   Card,
+  CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardContent,
 } from '@mts241alikhlash/ui/card'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import AttendanceDetailDialog from '../components/AttendanceDetailDialog.vue'
 import {
   Select,
@@ -22,12 +25,13 @@ import {
   UserCheck,
   UserX,
 } from '@lucide/vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import { toast } from 'vue-sonner'
 import { getIndonesianErrorMessage } from '@mts241alikhlash/web-shared/utils/error-handler'
 import { attendanceApi } from '../api/attendanceApi'
 import type { Attendance, AttendanceStatus } from '../types'
 
+const filterId = useId()
 const rows = ref<Attendance[]>([])
 const loading = ref(false)
 
@@ -70,36 +74,41 @@ const selectedYear = ref(new Date().getFullYear())
 
 const STATUS_CONFIG: Record<
   AttendanceStatus,
-  { label: string; class: string; badgeClass: string; icon: typeof UserCheck }
+  {
+    label: string
+    class: string
+    badgeVariant: 'success' | 'warning' | 'info' | 'secondary' | 'destructive'
+    icon: typeof UserCheck
+  }
 > = {
   PRESENT: {
     label: 'Hadir',
     class: 'text-success',
-    badgeClass: 'border-success bg-success/10 text-success',
+    badgeVariant: 'success',
     icon: UserCheck,
   },
   LATE: {
     label: 'Terlambat',
     class: 'text-warning',
-    badgeClass: 'border-warning bg-warning/10 text-warning',
+    badgeVariant: 'warning',
     icon: Clock,
   },
   SICK: {
     label: 'Sakit',
     class: 'text-info',
-    badgeClass: 'border-info bg-info/10 text-info',
+    badgeVariant: 'info',
     icon: FileText,
   },
   EXCUSED: {
     label: 'Izin',
     class: 'text-muted-foreground',
-    badgeClass: 'border-border bg-muted-foreground text-muted-foreground',
+    badgeVariant: 'secondary',
     icon: FileText,
   },
   ABSENT: {
     label: 'Alpa',
     class: 'text-destructive',
-    badgeClass: 'border-destructive bg-destructive/10 text-destructive',
+    badgeVariant: 'destructive',
     icon: UserX,
   },
 }
@@ -299,47 +308,44 @@ onMounted(() => void load())
 </script>
 
 <template>
-  <div class="p-4 md:p-5 lg:p-6">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-hidden"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle size="lg"> Kehadiran Saya </CardTitle>
+        <CardTitle class="font-semibold">Kehadiran Saya</CardTitle>
       </CardHeader>
 
       <CardContent
-        variant="standard"
-        class="space-y-6"
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+        <dl
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+        >
           <div
             v-for="item in statItems"
             :key="item.label"
-            class="rounded-xl border p-4 bg-card"
+            class="flex flex-col gap-0.5"
           >
-            <p class="text-xs font-medium text-muted-foreground">
-              {{ item.label }}
-            </p>
-            <p
-              class="text-2xl font-semibold mt-1"
+            <dt class="text-control text-muted-foreground">{{ item.label }}</dt>
+            <dd
+              class="font-medium tabular-nums"
               :class="item.color"
             >
               {{ item.value }}
-            </p>
+            </dd>
           </div>
-        </div>
+        </dl>
 
-        <div
-          class="flex flex-wrap items-center justify-center sm:justify-between gap-3 sm:gap-4"
-        >
-          <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div class="flex items-center gap-2">
             <TooltipButton
               label="Bulan Sebelumnya"
               variant="outline"
               @click="prevMonth"
             >
-              <ChevronLeft class="h-4 w-4" />
+              <ChevronLeft class="size-4" />
             </TooltipButton>
             <Button
               variant="outline"
@@ -352,62 +358,78 @@ onMounted(() => void load())
               variant="outline"
               @click="nextMonth"
             >
-              <ChevronRight class="h-4 w-4" />
+              <ChevronRight class="size-4" />
             </TooltipButton>
           </div>
 
-          <div class="flex items-center justify-center gap-2">
-            <Select
-              :model-value="selectedMonth.toString()"
-              @update:model-value="(val) => (selectedMonth = Number(val))"
+          <div class="flex items-end gap-2">
+            <FloatingLabelField
+              label="Bulan"
+              :for="`${filterId}-month`"
+              class="w-36"
+              floating
             >
-              <SelectTrigger class="w-[130px] sm:w-[150px]">
-                <SelectValue placeholder="Pilih Bulan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="(month, idx) in months"
-                  :key="idx"
-                  :value="idx.toString()"
+              <Select
+                :model-value="selectedMonth.toString()"
+                @update:model-value="(val) => (selectedMonth = Number(val))"
+              >
+                <SelectTrigger
+                  :id="`${filterId}-month`"
+                  class="w-full"
                 >
-                  {{ month }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+                  <SelectValue placeholder="Pilih Bulan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="(month, idx) in months"
+                    :key="idx"
+                    :value="idx.toString()"
+                  >
+                    {{ month }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
 
-            <Select
-              :model-value="selectedYear.toString()"
-              @update:model-value="(val) => (selectedYear = Number(val))"
+            <FloatingLabelField
+              label="Tahun"
+              :for="`${filterId}-year`"
+              class="w-24"
+              floating
             >
-              <SelectTrigger class="w-[100px]">
-                <SelectValue placeholder="Pilih Tahun" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="year in years"
-                  :key="year"
-                  :value="year"
+              <Select
+                :model-value="selectedYear.toString()"
+                @update:model-value="(val) => (selectedYear = Number(val))"
+              >
+                <SelectTrigger
+                  :id="`${filterId}-year`"
+                  class="w-full"
                 >
-                  {{ year }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+                  <SelectValue placeholder="Pilih Tahun" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="year in years"
+                    :key="year"
+                    :value="year"
+                  >
+                    {{ year }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
           </div>
         </div>
 
-        <div class="border rounded-xl bg-background overflow-hidden">
+        <div class="border rounded-md bg-card overflow-hidden">
           <div
-            class="grid grid-cols-7 border-b bg-table-header text-center font-semibold text-xs"
+            class="grid grid-cols-7 border-b bg-table-header text-center font-medium text-control"
           >
             <div
               v-for="(day, idx) in dayNames"
               :key="day"
-              class="py-2.5 border-r last:border-r-0"
-              :class="
-                idx === 6
-                  ? 'text-destructive font-semibold'
-                  : 'text-muted-foreground'
-              "
+              class="py-2 border-r last:border-r-0"
+              :class="idx === 6 ? 'text-destructive' : 'text-muted-foreground'"
             >
               {{ day }}
             </div>
@@ -417,28 +439,26 @@ onMounted(() => void load())
             <div
               v-for="(day, idx) in calendarDays"
               :key="day.dateStr + '-' + idx"
-              class="min-h-[90px] sm:min-h-[105px] p-1.5 sm:p-2 border-b border-r flex flex-col justify-between transition-colors relative"
+              class="min-h-24 p-1.5 sm:p-2 border-b border-r flex flex-col justify-between transition-colors relative"
               :class="[
                 (idx + 1) % 7 === 0 ? 'border-r-0' : '',
                 !day.isCurrentMonth
-                  ? 'bg-muted/15 text-muted-foreground/40'
+                  ? 'bg-muted/20 text-muted-foreground/40'
                   : day.isSunday
-                    ? 'bg-destructive/[0.02]'
-                    : 'bg-background hover:bg-muted/10',
-                day.attendances.length > 0
-                  ? 'cursor-pointer hover:shadow-xs'
-                  : '',
+                    ? 'bg-destructive/5'
+                    : 'bg-card hover:bg-muted/20',
+                day.attendances.length > 0 ? 'cursor-pointer' : '',
               ]"
               @click="handleDayClick(day)"
             >
               <div class="flex items-center justify-between">
                 <span
-                  class="text-xs sm:text-sm font-semibold inline-flex size-6 sm:size-7 items-center justify-center rounded-full"
+                  class="text-control font-medium inline-flex size-6 items-center justify-center rounded-full tabular-nums"
                   :class="[
                     day.isToday
-                      ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
+                      ? 'bg-primary text-primary-foreground font-semibold'
                       : day.isSunday && day.isCurrentMonth
-                        ? 'text-destructive font-semibold'
+                        ? 'text-destructive'
                         : !day.isCurrentMonth
                           ? 'text-muted-foreground/40'
                           : 'text-foreground',
@@ -449,7 +469,7 @@ onMounted(() => void load())
 
                 <span
                   v-if="day.attendances.length > 1"
-                  class="text-xs text-muted-foreground font-medium"
+                  class="text-xs text-muted-foreground tabular-nums"
                 >
                   {{ day.attendances.length }} sesi
                 </span>
@@ -460,28 +480,26 @@ onMounted(() => void load())
                   v-for="(att, aIdx) in day.attendances.slice(0, 2)"
                   :key="att.id ?? aIdx"
                 >
-                  <div
-                    class="rounded-md px-1.5 py-0.5 border text-center text-xs sm:text-xs font-semibold leading-tight flex items-center justify-center gap-1 truncate"
-                    :class="
-                      STATUS_CONFIG[att.status]?.badgeClass ??
-                      'bg-muted border-border'
-                    "
-                  >
-                    <span>{{
-                      STATUS_CONFIG[att.status]?.label ?? att.status
-                    }}</span>
+                  <div class="flex justify-center">
+                    <Badge
+                      :variant="
+                        STATUS_CONFIG[att.status]?.badgeVariant ?? 'outline'
+                      "
+                    >
+                      {{ STATUS_CONFIG[att.status]?.label ?? att.status }}
+                    </Badge>
                   </div>
 
                   <p
                     v-if="att.note"
-                    class="text-xs text-muted-foreground truncate italic text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground truncate text-center px-0.5 leading-tight"
                     :title="att.note"
                   >
                     {{ att.note }}
                   </p>
                   <p
                     v-else-if="att.schedule?.timeSlot?.name"
-                    class="text-xs text-muted-foreground/80 truncate text-center px-0.5 leading-tight"
+                    class="text-xs text-muted-foreground truncate text-center px-0.5 leading-tight"
                   >
                     {{ att.schedule.timeSlot.name }}
                   </p>
@@ -498,6 +516,7 @@ onMounted(() => void load())
           </div>
         </div>
       </CardContent>
+      <CardFooter plain />
     </Card>
 
     <AttendanceDetailDialog

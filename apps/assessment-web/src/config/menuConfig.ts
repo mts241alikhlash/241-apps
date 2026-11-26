@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   ListChecks,
   Medal,
+  Scale,
 } from '@lucide/vue'
 
 export type {
@@ -32,18 +33,52 @@ export const menuSections: MenuSection[] = [
     label: 'menu.section.assessment',
     items: [
       {
-        key: 'assessment-items',
-        title: 'menu.assessmentItems',
-        url: '/assessment/items',
+        key: 'assessment-classwork',
+        title: 'menu.assessmentClasswork',
+        url: '#',
         icon: ListChecks,
-        requiredPermission: 'assessment-items.read',
+        items: [
+          {
+            title: 'menu.assessmentTasks',
+            url: '/assessment/tasks',
+            requiredPermission: 'assessment-items.read',
+          },
+          {
+            title: 'menu.assessmentItems',
+            url: '/assessment/items',
+            requiredPermission: 'student-scores.read',
+          },
+        ],
       },
       {
-        key: 'student-scores',
-        title: 'menu.studentScores',
-        url: '/student-scores',
-        icon: ClipboardList,
-        requiredPermission: 'student-scores.read',
+        key: 'assessment-exam',
+        title: 'menu.assessmentExam',
+        url: '#',
+        icon: Medal,
+        items: [
+          {
+            title: 'menu.examAssessmentTasks',
+            url: '/assessment/exam-tasks',
+            requiredPermission: 'assessment-items.read',
+          },
+          {
+            title: 'menu.examAssessmentItems',
+            url: '/assessment/exam-items',
+            requiredPermission: 'student-scores.read',
+          },
+          {
+            title: 'menu.examScores',
+            url: '/nilai-ujian',
+            requiredPermission: 'exam-scores.read',
+          },
+        ],
+      },
+      {
+        key: 'assessment-weights',
+        title: 'menu.assessmentWeights',
+        url: '/assessment/weights',
+        icon: Scale,
+        requiredPermission: 'assessment-items.read',
       },
       {
         key: 'report-card',
@@ -51,19 +86,6 @@ export const menuSections: MenuSection[] = [
         url: '/report-card',
         icon: FileText,
         requiredPermission: 'report-cards.read',
-      },
-    ],
-  },
-  {
-    key: 'exam',
-    label: 'menu.section.exam',
-    items: [
-      {
-        key: 'exam-scores',
-        title: 'menu.examScores',
-        url: '/nilai-ujian',
-        icon: Medal,
-        requiredPermission: 'exam-scores.read',
       },
     ],
   },

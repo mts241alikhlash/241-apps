@@ -18,26 +18,39 @@ export function createTodayLessonColumns(
     {
       id: 'dayDate',
       header: 'Hari, Tanggal',
-      meta: { align: 'left' },
+      meta: {
+        align: 'left',
+        mobileLabel: 'Hari, Tanggal',
+        mobileValue: () => `${dayLabel}, ${dateLabel}`,
+      },
       cell: () => `${dayLabel}, ${dateLabel}`,
     },
     {
       id: 'time',
       header: 'Waktu',
-      meta: { align: 'center' },
+      meta: {
+        align: 'center',
+        mobileLabel: 'Waktu',
+        mobileValue: (row: MyDashboardLesson) =>
+          `${row.startTime} - ${row.endTime}`,
+      },
       cell: ({ row }) => `${row.original.startTime} - ${row.original.endTime}`,
     },
     {
       id: 'subjectName',
       accessorKey: 'subjectName',
       header: 'Mata Pelajaran',
-      meta: { align: 'left' },
+      meta: { align: 'left', strong: true, mobileLabel: 'Mata Pelajaran' },
     },
     {
       id: 'classroomCode',
       accessorKey: 'classroomCode',
       header: 'Kelas',
-      meta: { align: 'center' },
+      meta: {
+        align: 'center',
+        mobileLabel: 'Kelas',
+        mobileValue: (row: MyDashboardLesson) => row.classroomCode ?? '-',
+      },
       cell: ({ row }) => row.original.classroomCode ?? '-',
     },
   ]

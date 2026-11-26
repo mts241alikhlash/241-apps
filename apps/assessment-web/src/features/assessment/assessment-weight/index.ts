@@ -1,4 +1,5 @@
 export { assessmentWeightApi } from './api/assessmentWeightApi'
+export { assessmentWeightRoutes } from './routes'
 export { useAssessmentWeights } from './composables/useAssessmentWeights'
 export { default as AssessmentWeightDialog } from './components/AssessmentWeightDialog.vue'
 export type { AssessmentWeight, ReplaceAssessmentWeightsPayload } from './types'

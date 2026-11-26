@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import type { FilterOption } from '@mts241alikhlash/web-shared/types/filter.types'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import AttendanceRecapTab from '../components/AttendanceRecapTab.vue'
 import { useAttendance } from '../composables/useAttendance'
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@mts241alikhlash/ui/empty'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
 import {
   Select,
   SelectContent,
@@ -15,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@mts241alikhlash/ui/select'
-import { onMounted, computed, watch } from 'vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
 
 const MONTH_OPTIONS: FilterOption[] = [
   'Januari',
@@ -48,32 +57,37 @@ const {
   fetchRecap,
 } = useAttendance()
 
+const filterId = useId()
+const relatedLoading = ref(false)
+
 const activeSemester = computed(
   () => semesters.value.find((s) => s.id === selectedSemesterId.value) ?? null,
 )
 
-const academicYearLabel = computed(
-  () => activeSemester.value?.academicYear?.name ?? null,
-)
-
-const semesterLabel = computed(() => {
-  const name = activeSemester.value?.type?.name
-  if (name === 'ODD') return 'Ganjil'
-  if (name === 'EVEN') return 'Genap'
-  return name ?? null
-})
-
 const classroomFilterOptions = computed<FilterOption[]>(() =>
-  classrooms.value.map((c) => ({
-    value: c.id,
-    label: c.code ?? '-',
-  })),
+  classrooms.value
+    .filter(
+      (c) =>
+        !activeSemester.value ||
+        c.academicYearId === activeSemester.value.academicYearId,
+    )
+    .map((c) => ({
+      value: c.id,
+      label: c.code ?? '-',
+    })),
 )
 
 const yearFilterOptions = computed<FilterOption[]>(() => {
   const current = new Date().getFullYear()
   const years = [current - 2, current - 1, current, current + 1]
   return years.map((y) => ({ value: String(y), label: String(y) }))
+})
+
+const classroomModel = computed({
+  get: () => selectedClassroomId.value ?? '',
+  set: (value: string) => {
+    selectedClassroomId.value = value
+  },
 })
 
 const selectedMonthStr = computed({
@@ -94,135 +108,79 @@ const isFilterReady = computed(() =>
   Boolean(selectedClassroomId.value && selectedSemesterId.value),
 )
 
+watch(classroomFilterOptions, (options) => {
+  if (
+    selectedClassroomId.value &&
+    !options.some((o) => o.value === selectedClassroomId.value)
+  ) {
+    selectedClassroomId.value = ''
+  }
+  if (!selectedClassroomId.value && options.length > 0) {
+    selectedClassroomId.value = options[0]?.value ?? ''
+  }
+})
+
 watch(
   [selectedSemesterId, selectedClassroomId, selectedMonth, selectedYear],
   () => {
     if (isFilterReady.value) {
       void fetchRecap()
+    } else {
+      recapItems.value = []
+      trendData.value = []
     }
   },
 )
 
 onMounted(async () => {
-  await fetchFilterOptions()
-  const activeSemester = semesters.value.find((s) => s.isActive)
-  if (activeSemester) {
-    selectedSemesterId.value = activeSemester.id
-  }
-  if (!selectedClassroomId.value && classrooms.value.length > 0) {
-    selectedClassroomId.value = classrooms.value[0].id
+  relatedLoading.value = true
+  try {
+    await fetchFilterOptions()
+    const defaultSemester =
+      semesters.value.find((s) => s.isActive) ?? semesters.value[0]
+    if (defaultSemester && !selectedSemesterId.value) {
+      selectedSemesterId.value = defaultSemester.id
+    }
+    if (!selectedClassroomId.value && classroomFilterOptions.value.length > 0) {
+      selectedClassroomId.value = classroomFilterOptions.value[0]?.value ?? ''
+    }
+  } finally {
+    relatedLoading.value = false
   }
 })
 </script>
 
 <template>
-  <div class="space-y-6 p-4 sm:p-6">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-hidden"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
       <CardHeader standard>
-        <CardTitle size="lg"> Rekapitulasi Kehadiran </CardTitle>
+        <CardTitle class="font-semibold">Rekapitulasi Kehadiran</CardTitle>
       </CardHeader>
 
-      <div class="space-y-6 px-4 py-5 sm:px-6">
-        <div class="hidden lg:flex lg:flex-row lg:items-center gap-3">
-          <template v-if="academicYearLabel">
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
-            >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-2 rounded-md border bg-muted/30 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control"
-            >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
-          </template>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-3 min-h-[var(--control-h-lg,2.25rem)] whitespace-nowrap text-control text-destructive"
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
+      >
+        <div class="flex flex-wrap items-end gap-2">
+          <AcademicPeriodFilter
+            v-model:semester-id="selectedSemesterId"
+            :semesters="semesters"
+          />
+
+          <FloatingLabelField
+            label="Kelas"
+            :for="`${filterId}-classroom`"
+            class="w-fit min-w-28"
+            floating
           >
-            Belum ada semester aktif
-          </div>
-
-          <Select v-model="selectedClassroomId">
-            <SelectTrigger class="w-[120px]">
-              <SelectValue placeholder="Pilih Kelas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="c in classroomFilterOptions"
-                :key="c.value"
-                :value="c.value"
+            <Select v-model="classroomModel">
+              <SelectTrigger
+                :id="`${filterId}-classroom`"
+                class="w-full"
               >
-                {{ c.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select v-model="selectedMonthStr">
-            <SelectTrigger class="w-[130px]">
-              <SelectValue placeholder="Bulan" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="m in MONTH_OPTIONS"
-                :key="m.value"
-                :value="m.value"
-              >
-                {{ m.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select v-model="selectedYearStr">
-            <SelectTrigger class="w-[110px]">
-              <SelectValue placeholder="Tahun" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="y in yearFilterOptions"
-                :key="y.value"
-                :value="y.value"
-              >
-                {{ y.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div class="flex lg:hidden flex-col gap-3">
-          <div
-            v-if="academicYearLabel"
-            class="flex items-center justify-center gap-2"
-          >
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
-            >
-              <span class="text-muted-foreground">Tahun Ajaran</span>
-              <span class="font-semibold">{{ academicYearLabel }}</span>
-            </div>
-            <div
-              class="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs"
-            >
-              <span class="text-muted-foreground">Semester</span>
-              <span class="font-semibold">{{ semesterLabel }}</span>
-            </div>
-          </div>
-          <div
-            v-else
-            class="flex items-center rounded-md border border-destructive/40 bg-destructive/5 px-2.5 min-h-[var(--control-h-md,2rem)] text-xs text-destructive"
-          >
-            Belum ada semester aktif
-          </div>
-
-          <div class="grid grid-cols-3 gap-2">
-            <Select v-model="selectedClassroomId">
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="Kelas" />
+                <SelectValue placeholder="Pilih kelas" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem
@@ -234,9 +192,19 @@ onMounted(async () => {
                 </SelectItem>
               </SelectContent>
             </Select>
+          </FloatingLabelField>
 
+          <FloatingLabelField
+            label="Bulan"
+            :for="`${filterId}-month`"
+            class="w-fit min-w-32"
+            floating
+          >
             <Select v-model="selectedMonthStr">
-              <SelectTrigger class="w-full">
+              <SelectTrigger
+                :id="`${filterId}-month`"
+                class="w-full"
+              >
                 <SelectValue placeholder="Bulan" />
               </SelectTrigger>
               <SelectContent>
@@ -249,9 +217,19 @@ onMounted(async () => {
                 </SelectItem>
               </SelectContent>
             </Select>
+          </FloatingLabelField>
 
+          <FloatingLabelField
+            label="Tahun"
+            :for="`${filterId}-year`"
+            class="w-fit min-w-24"
+            floating
+          >
             <Select v-model="selectedYearStr">
-              <SelectTrigger class="w-full">
+              <SelectTrigger
+                :id="`${filterId}-year`"
+                class="w-full"
+              >
                 <SelectValue placeholder="Tahun" />
               </SelectTrigger>
               <SelectContent>
@@ -264,31 +242,34 @@ onMounted(async () => {
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FloatingLabelField>
         </div>
 
-        <Card
-          v-if="!isFilterReady"
-          class="shadow-none"
-        >
-          <CardContent class="py-10 text-center text-muted-foreground">
-            {{
-              !selectedSemesterId
-                ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
-                : 'Pilih kelas untuk menampilkan rekapitulasi kehadiran.'
-            }}
-          </CardContent>
-        </Card>
+        <Empty v-if="!isFilterReady && !relatedLoading">
+          <EmptyHeader>
+            <EmptyTitle>Belum ada data</EmptyTitle>
+            <EmptyDescription>
+              {{
+                !selectedSemesterId
+                  ? semesters.length === 0
+                    ? 'Belum ada semester aktif. Aktifkan satu lewat menu Periode Akademik.'
+                    : 'Pilih tahun ajaran dan semester terlebih dahulu.'
+                  : 'Pilih kelas untuk menampilkan rekapitulasi kehadiran.'
+              }}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
 
         <AttendanceRecapTab
           v-else
           :recap-items="recapItems"
           :class-percentage="classPercentage"
           :month-delta="monthDelta"
-          :recap-loading="recapLoading"
+          :recap-loading="relatedLoading || recapLoading"
           :trend-data="trendData"
         />
-      </div>
+      </CardContent>
+      <CardFooter plain />
     </Card>
   </div>
 </template>
