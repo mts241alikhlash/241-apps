@@ -4,7 +4,7 @@ import LetterheadKop from '@/features/exam-room/components/LetterheadKop.vue'
 import { CARD_HEADER } from '@/features/exam-room/components/cardHeader'
 import { gradeOfClassroom } from '@/features/exam-shared/classroomName'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
-import { formatPrintDate, formatPrintRange } from '../format'
+import { formatPrintDate, formatPrintTime } from '../format'
 import type { PrintPack, PrintSchedule } from '../types'
 
 const props = defineProps<{
@@ -21,7 +21,8 @@ interface Entry {
 interface Slot {
   key: string
   number: number
-  time: string
+  startsAt: string
+  endsAt: string
   cells: Entry[][]
 }
 
@@ -88,7 +89,8 @@ const days = computed<Day[]>(() => {
         .map(([slotKey, slotItems], index): Slot => ({
           key: slotKey,
           number: index + 1,
-          time: formatPrintRange(slotItems[0].startsAt, slotItems[0].endsAt),
+          startsAt: slotItems[0].startsAt,
+          endsAt: slotItems[0].endsAt,
           cells: grades.value.map((grade) => {
             const mine = slotItems.filter(
               (item) => gradeOfClassroom(item.classroomName) === grade,
@@ -160,7 +162,14 @@ const days = computed<Day[]>(() => {
               >
                 {{ day.label }}
               </td>
-              <td class="col-time">{{ slot.time }}</td>
+              <td class="col-time">
+                <span class="time-line">
+                  Mulai {{ formatPrintTime(slot.startsAt) }}
+                </span>
+                <span class="time-line">
+                  Selesai {{ formatPrintTime(slot.endsAt) }}
+                </span>
+              </td>
               <td
                 v-for="(cell, index) in slot.cells"
                 :key="index"
@@ -239,6 +248,10 @@ const days = computed<Day[]>(() => {
   width: 28mm;
   white-space: nowrap;
   color: #475569;
+}
+
+.time-line {
+  display: block;
 }
 
 .entry {

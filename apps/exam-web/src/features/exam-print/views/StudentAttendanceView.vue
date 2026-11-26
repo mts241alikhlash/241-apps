@@ -50,7 +50,7 @@ import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
 import { buildPrintEventColumns } from '../components/printEventColumns'
 import AttendanceSheet from '../documents/AttendanceSheet.vue'
-import { formatPrintDate, formatPrintRange } from '../format'
+import { formatPrintDate } from '../format'
 import { waitForPrintImages } from '../printImages'
 import { examPrintService } from '../services/examPrintService'
 import type { PrintPack, PrintSchedule } from '../types'
@@ -601,11 +601,6 @@ const sheetDate = computed(() =>
     ? '-'
     : formatPrintDate(previewRoom.value.startsAt),
 )
-const sheetRange = computed(() =>
-  previewRoom.value === null
-    ? '-'
-    : formatPrintRange(previewRoom.value.startsAt, previewRoom.value.endsAt),
-)
 
 watch(
   eventId,
@@ -848,7 +843,8 @@ void loadEvents()
               :room-name="previewRoom.roomName"
               :date="sheetDate"
               :packages="previewRoom.subject"
-              :time-range="sheetRange"
+              :starts-at="previewRoom.startsAt"
+              :ends-at="previewRoom.endsAt"
               :students="previewRoom.students"
               :paginate="false"
               :supervisor-name="previewRoom.supervisorName"
@@ -876,7 +872,8 @@ void loadEvents()
         :room-name="previewRoom.roomName"
         :date="sheetDate"
         :packages="previewRoom.subject"
-        :time-range="sheetRange"
+        :starts-at="previewRoom.startsAt"
+        :ends-at="previewRoom.endsAt"
         :students="previewRoom.students"
         :supervisor-name="previewRoom.supervisorName"
         :technician-name="previewRoom.technicianName"
@@ -895,7 +892,8 @@ void loadEvents()
           :room-name="room.roomName"
           :date="formatPrintDate(room.startsAt)"
           :packages="room.subject"
-          :time-range="formatPrintRange(room.startsAt, room.endsAt)"
+          :starts-at="room.startsAt"
+          :ends-at="room.endsAt"
           :students="room.students"
           :supervisor-name="room.supervisorName"
           :technician-name="room.technicianName"

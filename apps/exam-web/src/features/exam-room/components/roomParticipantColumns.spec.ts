@@ -295,8 +295,12 @@ describe('absence without a schedule', () => {
     const props = node.props as {
       items: { label: string; disabled?: boolean }[]
     }
-    expect(
-      props.items.find((item) => item.label === 'Catat Absen')?.disabled,
-    ).toBe(true)
+    const item = props.items.find((entry) =>
+      entry.label.startsWith('Ujian offline'),
+    )
+    expect(item?.label).toBe(
+      'Ujian offline: tandai tidak hadir di Berita Acara',
+    )
+    expect(item?.disabled).toBe(true)
   })
 })

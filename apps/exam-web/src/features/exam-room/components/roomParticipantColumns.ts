@@ -406,7 +406,9 @@ export function buildRoomParticipantColumns(
         }
         items.push(
           {
-            label: 'Catat Absen',
+            label: target.scheduleId
+              ? 'Catat Absen'
+              : 'Ujian offline: tandai tidak hadir di Berita Acara',
             icon: UserX,
             disabled: target.session !== null || !target.scheduleId,
             onClick: () => options.onAbsence(target),
