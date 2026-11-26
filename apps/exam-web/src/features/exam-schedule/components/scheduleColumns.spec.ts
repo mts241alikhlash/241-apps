@@ -217,6 +217,22 @@ describe('buildScheduleColumns', () => {
       ).toContain('Susulan')
     })
 
+    it('does not offer a makeup of an offline schedule or of one without a package', () => {
+      const options = { ...ended, canMakeup: true }
+
+      expect(
+        labels(
+          actionProps(
+            options,
+            schedule({ deliveryMode: 'OFFLINE', packageId: null }),
+          ),
+        ),
+      ).not.toContain('Susulan')
+      expect(
+        labels(actionProps(options, schedule({ packageId: null }))),
+      ).not.toContain('Susulan')
+    })
+
     it('does not offer a makeup of a makeup, of a cancelled schedule, or without the permission', () => {
       const options = { ...ended, canMakeup: true }
 

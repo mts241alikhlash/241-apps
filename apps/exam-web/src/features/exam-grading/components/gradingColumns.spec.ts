@@ -93,6 +93,9 @@ describe('grading columns', () => {
       expect(labels({ canMakeup: () => true }, makeup)).toEqual([])
       expect(labels({ canParticipants: true }, makeup)).toEqual(['Peserta'])
       expect(labels({ canParticipants: true }, schedule)).toEqual([])
+      expect(
+        labels({ canMakeup: () => true }, { ...schedule, packageId: null }),
+      ).toEqual([])
     })
 
     it('calls the handlers with the row, and still opens the exam', () => {

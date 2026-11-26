@@ -2,7 +2,8 @@ import { unwrap } from '@mts241alikhlash/web-shared/utils/service-client'
 import { examClient } from '@/shared/api/clients'
 import type {
   ActivityCreatePayload,
-  ActivityCreateRequest,
+  ActivityReadinessQuery,
+  AssignClassroomsPayload,
   ActivityPolicyPayload,
   ActivityStatus,
   AttachPackagePayload,
@@ -19,11 +20,7 @@ export const examActivityApi = {
     ),
 
   create: (body: ActivityCreatePayload) =>
-    unwrap(
-      examClient.POST('/exam-activities', {
-        body: body as ActivityCreateRequest,
-      }),
-    ),
+    unwrap(examClient.POST('/exam-activities', { body })),
 
   attachPackage: (id: string, body: AttachPackagePayload) =>
     unwrap(
@@ -40,6 +37,25 @@ export const examActivityApi = {
         body: { status },
       }),
     ),
+
+  assignClassrooms: (id: string, body: AssignClassroomsPayload) =>
+    unwrap(
+      examClient.POST('/exam-activities/{id}/classrooms', {
+        params: { path: { id } },
+        body,
+      }),
+    ),
+
+  setAutoStatus: (id: string, autoStatus: boolean) =>
+    unwrap(
+      examClient.PATCH('/exam-activities/{id}/auto-status', {
+        params: { path: { id } },
+        body: { autoStatus },
+      }),
+    ),
+
+  readiness: (query: ActivityReadinessQuery) =>
+    unwrap(examClient.GET('/exam-activities/readiness', { params: { query } })),
 
   updatePolicy: (id: string, body: ActivityPolicyPayload) =>
     unwrap(

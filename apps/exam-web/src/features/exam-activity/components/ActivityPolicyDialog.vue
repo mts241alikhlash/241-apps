@@ -42,6 +42,8 @@ type NumberKey =
   | 'tokenSlotSeconds'
   | 'lateToleranceMinutes'
   | 'minSubmitMinutes'
+  | 'autoOpenLeadMinutes'
+  | 'autoCloseGraceMinutes'
 
 type SwitchKey = 'shuffleQuestions' | 'shuffleChoices' | 'allowWeb'
 
@@ -126,6 +128,22 @@ const NUMBER_FIELDS: NumberField[] = [
     min: 0,
     max: 180,
     fallback: 0,
+  },
+  {
+    key: 'autoOpenLeadMinutes',
+    label: 'Dibuka otomatis sebelum mulai',
+    suffix: ' menit',
+    min: 0,
+    max: 60,
+    fallback: 5,
+  },
+  {
+    key: 'autoCloseGraceMinutes',
+    label: 'Ditutup otomatis setelah selesai',
+    suffix: ' menit',
+    min: 0,
+    max: 240,
+    fallback: 15,
   },
 ]
 

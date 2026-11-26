@@ -35,11 +35,12 @@ import {
 const props = defineProps<{
   open: boolean
   activity: ExamActivityRecord | null
+  presetStatus?: ActivityStatus
 }>()
 
 const emit = defineEmits<{ 'update:open': [value: boolean]; saved: [] }>()
 
-const PACKAGE_REQUIRED: ActivityStatus[] = ['ACTIVE', 'SCHEDULED']
+const PACKAGE_REQUIRED: ActivityStatus[] = ['ACTIVE']
 
 const formSchema = toTypedSchema(
   z.object({
@@ -55,7 +56,9 @@ const endedAndOpen = (item: ExamActivityRecord | null): boolean =>
   Date.now() >= new Date(item.endsAt).getTime()
 
 const initialStatus = (item: ExamActivityRecord | null): ActivityStatus =>
-  endedAndOpen(item) ? 'CLOSED' : (item?.status ?? 'DRAFT')
+  endedAndOpen(item)
+    ? 'CLOSED'
+    : (props.presetStatus ?? item?.status ?? 'DRAFT')
 
 const { handleSubmit, isSubmitting, values, resetForm } = useForm({
   validationSchema: formSchema,
@@ -72,7 +75,15 @@ watch(
   },
 )
 
-const needsPackage = computed(() => props.activity?.packageId === null)
+const isOffline = computed(() => props.activity?.deliveryMode === 'OFFLINE')
+
+const needsPackage = computed(
+  () => !isOffline.value && props.activity?.packageId === null,
+)
+
+const sharesWithoutPackage = computed(
+  () => needsPackage.value && values.status === 'SCHEDULED',
+)
 
 const windowState = computed<'before' | 'during' | 'after'>(() => {
   const item = props.activity
@@ -90,11 +101,17 @@ const stopsRunning = computed(
 )
 
 const opensBefore = computed(
-  () => values.status === 'ACTIVE' && windowState.value === 'before',
+  () =>
+    !isOffline.value &&
+    values.status === 'ACTIVE' &&
+    windowState.value === 'before',
 )
 
 const opensAfter = computed(
-  () => values.status !== 'CLOSED' && windowState.value === 'after',
+  () =>
+    !isOffline.value &&
+    values.status !== 'CLOSED' &&
+    windowState.value === 'after',
 )
 
 const onSubmit = handleSubmit(async (form) => {
@@ -134,6 +151,18 @@ const onSubmit = handleSubmit(async (form) => {
           variant="destructive"
         >
           <AlertDescription>{{ saveError }}</AlertDescription>
+        </Alert>
+        <Alert v-if="isOffline">
+          <AlertDescription>
+            Ujian offline tidak dibuka di aplikasi. Status hanya menandai jadwal
+            terbagi, berlangsung, atau selesai.
+          </AlertDescription>
+        </Alert>
+        <Alert v-else-if="sharesWithoutPackage">
+          <AlertDescription>
+            Jadwal dibagikan tanpa paket soal; ujian baru bisa dibuka setelah
+            paket dipasang.
+          </AlertDescription>
         </Alert>
         <Alert
           v-if="stopsRunning"
@@ -200,8 +229,7 @@ const onSubmit = handleSubmit(async (form) => {
             v-if="needsPackage"
             class="text-control text-muted-foreground"
           >
-            Pasang paket soal dulu untuk memakai status Terjadwal atau
-            Berlangsung.
+            Pasang paket soal dulu untuk memakai status Berlangsung.
           </p>
         </form>
       </DialogBody>

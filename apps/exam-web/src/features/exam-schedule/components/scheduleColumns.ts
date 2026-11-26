@@ -74,6 +74,8 @@ export function scheduleActions(
   if (
     schedule.kind === 'REGULAR' &&
     schedule.status === 'SCHEDULED' &&
+    schedule.deliveryMode === 'ONLINE' &&
+    schedule.packageId !== null &&
     options.canMakeup
   ) {
     items.push({

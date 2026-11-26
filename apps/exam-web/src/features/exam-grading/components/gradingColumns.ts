@@ -131,6 +131,7 @@ export function buildGradingScheduleColumns(options: {
         const items = []
         if (
           row.original.kind === 'REGULAR' &&
+          row.original.packageId !== null &&
           options.canMakeup?.(row.original)
         ) {
           items.push({

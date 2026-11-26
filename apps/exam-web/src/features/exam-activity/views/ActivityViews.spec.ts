@@ -6,23 +6,33 @@ import { ActionCell } from '@mts241alikhlash/ui'
 import ActivityListView from './ActivityListView.vue'
 import ActivityDetailView from './ActivityDetailView.vue'
 import ActivityPolicyDialog from '../components/ActivityPolicyDialog.vue'
+import ActivityStatusDialog from '../components/ActivityStatusDialog.vue'
 import type { ExamActivityDetail } from '../types'
 
-const { list, get, updatePolicy, permissions, push, routeState } = vi.hoisted(
-  () => ({
-    list: vi.fn(),
-    get: vi.fn(),
-    updatePolicy: vi.fn(),
-    permissions: new Set<string>(),
-    push: vi.fn(),
-    routeState: {
-      meta: { category: 'NON_EXAM' },
-      params: { id: 'act-1' },
-      path: '/classwork/activities',
-      query: {},
-    },
-  }),
-)
+const {
+  list,
+  get,
+  updatePolicy,
+  setAutoStatus,
+  readiness,
+  permissions,
+  push,
+  routeState,
+} = vi.hoisted(() => ({
+  list: vi.fn(),
+  get: vi.fn(),
+  updatePolicy: vi.fn(),
+  setAutoStatus: vi.fn(),
+  readiness: vi.fn(),
+  permissions: new Set<string>(),
+  push: vi.fn(),
+  routeState: {
+    meta: { category: 'NON_EXAM' },
+    params: { id: 'act-1' },
+    path: '/classwork/activities',
+    query: {},
+  },
+}))
 
 vi.mock('vue-router', () => ({
   useRouter: () => ({ push }),
@@ -46,8 +56,11 @@ vi.mock('../api/examActivityApi', () => ({
     list,
     get,
     updatePolicy,
+    setAutoStatus,
+    readiness,
   },
 }))
+vi.mock('vue-sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const button = defineComponent({
@@ -82,6 +95,13 @@ const stubs = {
   AlertDialogCancel: button,
   AlertDialogAction: button,
   Plus: true,
+  Switch: defineComponent({
+    name: 'SwitchStub',
+    props: { modelValue: Boolean },
+    emits: ['update:modelValue'],
+    template:
+      '<button type="button" role="switch" :aria-checked="String(modelValue)" @click="$emit(\'update:modelValue\', !modelValue)" />',
+  }),
   Tooltip: passthrough,
   TooltipProvider: passthrough,
   TooltipTrigger: passthrough,
@@ -142,6 +162,7 @@ const sampleDetail = (
 describe('ActivityListView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    readiness.mockResolvedValue([])
     permissions.clear()
     permissions.add('exam-schedules.manage')
     routeState.meta.category = 'NON_EXAM'
@@ -165,6 +186,67 @@ describe('ActivityListView', () => {
       wrapper.findComponent(ActionCell).props('items') as { label: string }[]
     ).map((item) => item.label)
     expect(labels).toContain('Pasang Paket')
+    wrapper.unmount()
+  })
+
+  const rowLabels = (wrapper: ReturnType<typeof mount>) =>
+    (
+      wrapper.findComponent(ActionCell).props('items') as { label: string }[]
+    ).map((item) => item.label)
+
+  it('offers Bagikan Jadwal only for a draft and opens the status dialog on Scheduled', async () => {
+    list.mockResolvedValue([sampleDetail({ status: 'DRAFT' })])
+    const draft = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+    expect(rowLabels(draft)).toContain('Bagikan Jadwal')
+
+    const item = (
+      draft.findComponent(ActionCell).props('items') as {
+        label: string
+        onClick: () => void
+      }[]
+    ).find((entry) => entry.label === 'Bagikan Jadwal')!
+    item.onClick()
+    await flushPromises()
+    expect(
+      draft.findComponent(ActivityStatusDialog).props('presetStatus'),
+    ).toBe('SCHEDULED')
+    draft.unmount()
+
+    list.mockResolvedValue([sampleDetail({ status: 'SCHEDULED' })])
+    const scheduled = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+    expect(rowLabels(scheduled)).not.toContain('Bagikan Jadwal')
+    scheduled.unmount()
+  })
+
+  it('hides Pasang Paket for an offline activity and shows the delivery badge', async () => {
+    list.mockResolvedValue([
+      sampleDetail({
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'WRITTEN',
+        packageId: null,
+      }),
+    ])
+    const wrapper = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(rowLabels(wrapper)).not.toContain('Pasang Paket')
+    expect(wrapper.text()).toContain('Offline')
+    expect(wrapper.text()).toContain('Written')
+    expect(wrapper.text()).not.toContain('Menunggu paket')
+    wrapper.unmount()
+  })
+
+  it('shows the readiness panel of the day for managers', async () => {
+    const wrapper = mount(ActivityListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(readiness).toHaveBeenCalledWith(
+      expect.objectContaining({
+        date: expect.stringMatching(/^\d{4}-\d\d-\d\d$/),
+      }),
+    )
     wrapper.unmount()
   })
 
@@ -253,6 +335,87 @@ describe('ActivityDetailView', () => {
     expect(wrapper.text()).toContain('VII A')
     expect(wrapper.text()).not.toContain('Ubah')
     expect(wrapper.text()).not.toContain('Ganti token')
+    wrapper.unmount()
+  })
+
+  const buttonTexts = (wrapper: ReturnType<typeof mount>) =>
+    wrapper.findAll('button').map((item) => item.text())
+
+  it('shows Bagikan jadwal only for a draft, with a note when an online activity has no package', async () => {
+    permissions.add('exam-schedules.manage-all')
+    get.mockResolvedValue(sampleDetail({ status: 'DRAFT', packageId: null }))
+    const draft = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(draft)).toContain('Bagikan jadwal')
+    expect(draft.text()).toContain('Jadwal dibagikan tanpa paket soal')
+    draft.unmount()
+
+    get.mockResolvedValue(sampleDetail({ status: 'SCHEDULED' }))
+    const scheduled = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(scheduled)).not.toContain('Bagikan jadwal')
+    scheduled.unmount()
+  })
+
+  it('shows Pasang paket for an online activity without a package, never for an offline one', async () => {
+    permissions.add('exam-schedules.manage-all')
+    get.mockResolvedValue(sampleDetail({ packageId: null }))
+    const online = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(online)).toContain('Pasang paket')
+    online.unmount()
+
+    get.mockResolvedValue(
+      sampleDetail({
+        packageId: null,
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'PRACTICAL',
+        maxScore: 80,
+      }),
+    )
+    const offline = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(offline)).not.toContain('Pasang paket')
+    expect(offline.text()).toContain('Offline')
+    expect(offline.text()).toContain('Practical')
+    expect(offline.text()).toContain('Ujian offline tidak dibuka di aplikasi')
+    expect(offline.text()).toContain('80')
+    offline.unmount()
+  })
+
+  it('offers Tetapkan kelas and hides every action from non-managers', async () => {
+    permissions.add('exam-schedules.manage-all')
+    get.mockResolvedValue(sampleDetail({ schedules: [] }))
+    const manager = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(manager)).toContain('Tetapkan kelas')
+    manager.unmount()
+
+    permissions.clear()
+    permissions.add('exam-events.read')
+    const reader = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+    expect(buttonTexts(reader)).not.toContain('Tetapkan kelas')
+    expect(reader.find('[role="switch"]').attributes('disabled')).toBeDefined()
+    reader.unmount()
+  })
+
+  it('calls the auto status route from the switch and shows the failure', async () => {
+    permissions.add('exam-schedules.manage-all')
+    setAutoStatus.mockResolvedValue({})
+    const wrapper = mount(ActivityDetailView, { global: { stubs } })
+    await flushPromises()
+
+    await wrapper.get('[role="switch"]').trigger('click')
+    await flushPromises()
+    expect(setAutoStatus).toHaveBeenCalledWith('act-1', false)
+
+    setAutoStatus.mockRejectedValue({
+      response: { status: 409, data: { message: 'Tidak bisa diubah' } },
+    })
+    await wrapper.get('[role="switch"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.get('[role="alert"]').text()).toContain('Tidak bisa diubah')
     wrapper.unmount()
   })
 

@@ -112,15 +112,65 @@ describe('ActivityStatusDialog', () => {
     wrapper.unmount()
   })
 
-  it('does not allow activation without a package', () => {
-    const wrapper = open(activity({ packageId: null, status: 'DRAFT' }))
+  it('does not allow activating an online activity without a package, but allows scheduling it', () => {
+    const wrapper = open(
+      activity({ packageId: null, status: 'DRAFT', deliveryMode: 'ONLINE' }),
+    )
 
     const disabled = wrapper
       .findAll('option')
       .filter((option) => option.attributes('disabled') !== undefined)
       .map((option) => option.attributes('value'))
-    expect(disabled).toEqual(['SCHEDULED', 'ACTIVE'])
+    expect(disabled).toEqual(['ACTIVE'])
     expect(wrapper.text()).toContain('Pasang paket soal dulu')
+    wrapper.unmount()
+  })
+
+  it('opens on the preset status and explains sharing without a package', async () => {
+    updateStatus.mockResolvedValue(undefined)
+    const wrapper = mount(ActivityStatusDialog, {
+      props: {
+        open: true,
+        activity: activity({ packageId: null, status: 'DRAFT' }),
+        presetStatus: 'SCHEDULED',
+      },
+      global: { stubs },
+    })
+
+    expect(wrapper.text()).toContain(
+      'Jadwal dibagikan tanpa paket soal; ujian baru bisa dibuka setelah paket dipasang',
+    )
+    await submit(wrapper)
+    expect(updateStatus).toHaveBeenCalledWith('act-1', 'SCHEDULED')
+    wrapper.unmount()
+  })
+
+  it('explains that offline exams are not opened in the app and allows every status', () => {
+    const wrapper = open(
+      activity({ packageId: null, status: 'DRAFT', deliveryMode: 'OFFLINE' }),
+    )
+
+    expect(wrapper.text()).toContain('Ujian offline tidak dibuka di aplikasi')
+    const disabled = wrapper
+      .findAll('option')
+      .filter((option) => option.attributes('disabled') !== undefined)
+    expect(disabled).toHaveLength(0)
+    wrapper.unmount()
+  })
+
+  it('shows the server message when an online activity without a package is refused ACTIVE', async () => {
+    updateStatus.mockRejectedValue({
+      response: {
+        status: 409,
+        data: { message: 'Pasang paket soal sebelum membuka ujian' },
+      },
+    })
+    const wrapper = open(activity({ packageId: null, status: 'SCHEDULED' }))
+    await submit(wrapper)
+
+    expect(wrapper.get('[role="alert"]').text()).toContain(
+      'Pasang paket soal sebelum membuka ujian',
+    )
     wrapper.unmount()
   })
 
