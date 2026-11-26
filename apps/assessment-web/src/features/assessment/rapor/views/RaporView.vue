@@ -1,20 +1,38 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, h, onMounted, ref, useId, watch } from 'vue'
+import { Download, Filter, Loader2, ToggleLeft, ToggleRight } from '@lucide/vue'
 import {
-  Search,
-  Loader2,
-  Eye,
-  Pencil,
-  ToggleLeft,
-  ToggleRight,
-  Download,
-} from '@lucide/vue'
-import { DataTable } from '@mts241alikhlash/ui'
+  ActionCell,
+  DataTable,
+  DataTableEmpty,
+  SearchInput,
+} from '@mts241alikhlash/ui'
+import { AcademicPeriodFilter } from '@/features/lookup/semester'
 import { Button } from '@mts241alikhlash/ui/button'
-import { Card, CardHeader, CardTitle } from '@mts241alikhlash/ui/card'
-import { Label } from '@mts241alikhlash/ui/label'
-import { AppCombobox } from '@mts241alikhlash/ui'
-import type { ComboboxOption } from '@mts241alikhlash/ui'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@mts241alikhlash/ui/card'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@mts241alikhlash/ui/dialog'
+import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@mts241alikhlash/ui/select'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,11 +72,14 @@ const {
   setPageSize,
 } = useRapor()
 
+const filterId = useId()
+const mobileFilterId = useId()
+const search = ref('')
+const filterOpen = ref(false)
 const openForm = ref(false)
 const openDetail = ref(false)
 const editingData = ref<RaporData | null>(null)
 const detailData = ref<RaporData | null>(null)
-const hasDisplayedData = ref(false)
 const showBulkConfirm = ref(false)
 const { can } = useRoleGuard()
 
@@ -66,22 +87,36 @@ const isFilterReady = computed(
   () => Boolean(selectedClassroomId.value) && Boolean(selectedSemesterId.value),
 )
 
-const activeSemesters = computed(() => {
-  return semesters.value.map((sem) => ({
-    id: sem.id,
-    name: `${sem.academicYear?.name ?? ''} - ${sem.type.name}`,
-  }))
+const activeSemester = computed(
+  () => semesters.value.find((s) => s.id === selectedSemesterId.value) ?? null,
+)
+
+const classroomOptions = computed(() =>
+  classrooms.value
+    .filter(
+      (c) =>
+        !activeSemester.value ||
+        c.academicYearId === activeSemester.value.academicYearId,
+    )
+    .map((c) => ({
+      value: c.id,
+      label: c.code ?? c.displayName,
+    })),
+)
+
+const semesterModel = computed({
+  get: () => selectedSemesterId.value ?? '',
+  set: (value: string) => {
+    selectedSemesterId.value = value || null
+  },
 })
 
-const raporSemesterOptions = computed<ComboboxOption[]>(() =>
-  activeSemesters.value.map((s) => ({ value: s.id, label: s.name })),
-)
-const raporClassroomOptions = computed<ComboboxOption[]>(() =>
-  classrooms.value.map((c) => ({
-    value: c.id,
-    label: c.code ?? c.displayName,
-  })),
-)
+const classroomModel = computed({
+  get: () => selectedClassroomId.value ?? '',
+  set: (value: string) => {
+    selectedClassroomId.value = value || null
+  },
+})
 
 const stats = computed(() => ({
   total: totalItems.value,
@@ -90,69 +125,102 @@ const stats = computed(() => ({
   avgAll: summary.value?.averageScore ?? null,
 }))
 
-const tableColumns = [
+const activeFiltersCount = computed(
+  () =>
+    Number(Boolean(selectedSemesterId.value)) +
+    Number(Boolean(selectedClassroomId.value)),
+)
+
+const filteredRapors = computed(() => {
+  if (!isFilterReady.value) return []
+  const keyword = search.value.trim().toLocaleLowerCase('id')
+  if (!keyword) return rapors.value
+  return rapors.value.filter((item) => {
+    const name = item.enrollment?.student?.user?.profile?.name ?? ''
+    const nis = item.enrollment?.student?.nis ?? ''
+    return (
+      name.toLocaleLowerCase('id').includes(keyword) ||
+      nis.toLocaleLowerCase('id').includes(keyword)
+    )
+  })
+})
+
+const emptyMessage = computed(() => {
+  if (!selectedSemesterId.value)
+    return 'Pilih tahun ajaran dan semester terlebih dahulu.'
+  if (!selectedClassroomId.value)
+    return 'Pilih kelas untuk menampilkan data rapor.'
+  if (search.value.trim()) return 'Tidak ada siswa yang cocok dengan pencarian.'
+  return 'Belum ada data rapor untuk kelas ini.'
+})
+
+function openRaporDetail(rapor: RaporData) {
+  detailData.value = rapor
+  openDetail.value = true
+}
+
+const canEdit = computed(
+  () => can('report-cards.update') || can('report-cards.delete'),
+)
+
+const tableColumns = computed(() => [
   ...columns,
   {
     id: 'actions',
-    enableHiding: false,
+    header: 'Aksi',
+    enableSorting: false,
+    meta: { align: 'center' as const },
     cell: ({ row }: { row: { original: RaporData } }) => {
       const rapor = row.original
-      return [
-        {
-          label: 'Lihat Detail',
-          icon: Eye,
-          onClick: () => {
-            detailData.value = rapor
-            openDetail.value = true
-          },
+      return h(ActionCell, {
+        viewLabel: 'Lihat Detail',
+        editLabel: 'Edit',
+        hideEdit: !canEdit.value,
+        hideDelete: true,
+        onView: () => openRaporDetail(rapor),
+        onEdit: () => {
+          editingData.value = rapor
+          openForm.value = true
         },
-        ...(can('report-cards.update') || can('report-cards.delete')
-          ? [
-              {
-                label: 'Edit',
-                icon: Pencil,
-                onClick: () => {
-                  editingData.value = rapor
-                  openForm.value = true
+        items: [
+          ...(canEdit.value
+            ? [
+                {
+                  label: rapor.isPublished ? 'Unpublish' : 'Publish',
+                  icon: rapor.isPublished ? ToggleLeft : ToggleRight,
+                  onClick: () => {
+                    if (!rapor.isPublished && rapor.totalAverage === null) {
+                      toast.error(
+                        'Rapor belum bisa dipublish karena nilai belum digenerate.',
+                      )
+                      return
+                    }
+                    void togglePublish(rapor.id, rapor.isPublished)
+                  },
                 },
-              },
-              {
-                label: rapor.isPublished ? 'Unpublish' : 'Publish',
-                icon: rapor.isPublished ? ToggleLeft : ToggleRight,
-                onClick: () => {
-                  if (!rapor.isPublished && rapor.totalAverage === null) {
-                    toast.error(
-                      'Rapor belum bisa dipublish karena nilai belum digenerate.',
-                    )
-                    return
-                  }
-                  void togglePublish(rapor.id, rapor.isPublished)
+              ]
+            : []),
+          ...(rapor.isPublished
+            ? [
+                {
+                  label: 'Export PDF',
+                  icon: Download,
+                  onClick: () => {
+                    const studentName =
+                      rapor.enrollment?.student?.user?.profile?.name ?? 'Siswa'
+                    void exportReportCard(rapor.id, studentName)
+                  },
                 },
-              },
-            ]
-          : []),
-        ...(rapor.isPublished
-          ? [
-              {
-                label: 'Export PDF',
-                icon: Download,
-                onClick: () => {
-                  const studentName =
-                    rapor.enrollment?.student?.user?.profile?.name ?? 'Siswa'
-                  void exportReportCard(rapor.id, studentName)
-                },
-              },
-            ]
-          : []),
-      ]
+              ]
+            : []),
+        ],
+      })
     },
   },
-]
+])
 
-async function handleFilter() {
-  if (!isFilterReady.value) return
-  hasDisplayedData.value = true
-  await fetchRapors()
+function resetFilters() {
+  selectedClassroomId.value = null
 }
 
 async function handleGenerateBulk() {
@@ -168,171 +236,269 @@ watch(openDetail, (isOpen) => {
   if (!isOpen) detailData.value = null
 })
 
+watch(classroomOptions, (options) => {
+  if (
+    selectedClassroomId.value &&
+    !options.some((o) => o.value === selectedClassroomId.value)
+  ) {
+    selectedClassroomId.value = null
+  }
+  if (!selectedClassroomId.value && options.length === 1) {
+    selectedClassroomId.value = options[0]?.value ?? null
+  }
+})
+
 watch([selectedClassroomId, selectedSemesterId], () => {
-  hasDisplayedData.value = false
+  currentPage.value = 1
+  if (isFilterReady.value) {
+    void fetchRapors()
+  } else {
+    rapors.value = []
+    totalItems.value = 0
+    summary.value = null
+  }
 })
 
 onMounted(async () => {
   await fetchFilterOptions()
-  const activeSemester = semesters.value.find(
-    (s) => s.type?.name === 'ODD' || s.type?.name === 'EVEN',
-  )
-  if (!selectedSemesterId.value && activeSemester) {
-    selectedSemesterId.value = activeSemester.id
+  const defaultSemester =
+    semesters.value.find((s) => s.isActive) ??
+    semesters.value.find(
+      (s) => s.type?.name === 'ODD' || s.type?.name === 'EVEN',
+    ) ??
+    semesters.value[0]
+  if (!selectedSemesterId.value && defaultSemester) {
+    selectedSemesterId.value = defaultSemester.id
   }
 })
 </script>
 
 <template>
-  <div class="px-4 pb-4 pt-1 sm:px-6 sm:pb-6 sm:pt-2">
+  <div class="flex min-h-0 flex-1 flex-col">
     <Card
       gap="none"
-      class="overflow-visible rounded-none border-0 bg-transparent shadow-none ring-0"
+      class="flex min-h-0 flex-1 flex-col overflow-hidden"
     >
-      <CardHeader plain>
-        <div>
-          <CardTitle size="lg">Rapor Siswa</CardTitle>
-        </div>
+      <CardHeader standard>
+        <CardTitle class="font-semibold">Rapor Siswa</CardTitle>
+        <Button
+          v-if="
+            isFilterReady &&
+            (can('report-cards.create') || can('report-cards.update'))
+          "
+          class="shrink-0"
+          :disabled="isGenerating"
+          @click="showBulkConfirm = true"
+        >
+          <Loader2
+            v-if="isGenerating"
+            class="size-4 animate-spin"
+          />
+          Generate Rapor Massal
+        </Button>
       </CardHeader>
 
-      <div class="space-y-4 p-0 sm:px-0">
-        <div class="flex flex-col sm:flex-row gap-4 items-end">
-          <div class="space-y-2 flex-1 max-w-[250px]">
-            <Label>Tahun Ajaran & Semester</Label>
-            <AppCombobox
-              v-model="selectedSemesterId"
-              :options="raporSemesterOptions"
-              placeholder="Pilih Semester"
-              search-placeholder="Cari semester..."
-              empty-text="Semester tidak ditemukan."
-            />
-          </div>
-
-          <div class="space-y-2 flex-1 max-w-[250px]">
-            <Label>Kelas</Label>
-            <AppCombobox
-              v-model="selectedClassroomId"
-              :options="raporClassroomOptions"
-              placeholder="Pilih Kelas"
-              search-placeholder="Cari kelas..."
-              empty-text="Kelas tidak ditemukan."
-            />
-          </div>
-
-          <Button
-            :disabled="!isFilterReady || loading"
-            class="w-full sm:w-auto"
-            @click="handleFilter"
-          >
-            <Search class="h-4 w-4" /> Tampilkan
-          </Button>
-
-          <div class="flex-1"></div>
-
-          <Button
-            v-if="
-              hasDisplayedData &&
-              (can('report-cards.create') || can('report-cards.update'))
-            "
-            variant="outline"
-            :disabled="!isFilterReady || isGenerating"
-            class="w-full sm:w-auto"
-            @click="showBulkConfirm = true"
-          >
-            <Loader2
-              v-if="isGenerating"
-              class="h-4 w-4 animate-spin"
-            />
-            Generate Rapor Massal
-          </Button>
-        </div>
-
-        <div
-          v-if="hasDisplayedData && stats.total > 0"
-          class="grid grid-cols-2 sm:grid-cols-4 gap-4"
+      <CardContent
+        class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
+      >
+        <dl
+          v-if="isFilterReady && stats.total > 0"
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
         >
-          <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-semibold">{{ stats.total }}</p>
-            <p class="text-xs text-muted-foreground">Total Siswa</p>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Total Siswa</dt>
+            <dd class="font-medium tabular-nums">{{ stats.total }}</dd>
           </div>
-          <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-semibold text-success">
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Published</dt>
+            <dd class="font-medium tabular-nums text-success">
               {{ stats.published }}
-            </p>
-            <p class="text-xs text-muted-foreground">Published</p>
+            </dd>
           </div>
-          <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-semibold text-warning">
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Draft</dt>
+            <dd class="font-medium tabular-nums text-warning">
               {{ stats.draft }}
-            </p>
-            <p class="text-xs text-muted-foreground">Draft</p>
+            </dd>
           </div>
-          <div class="rounded-lg border p-4 text-center">
-            <p class="text-2xl font-semibold">
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Rata-rata Kelas</dt>
+            <dd class="font-medium tabular-nums">
               {{ stats.avgAll !== null ? stats.avgAll.toFixed(2) : '-' }}
-            </p>
-            <p class="text-xs text-muted-foreground">Rata-rata Kelas</p>
+            </dd>
           </div>
-        </div>
+        </dl>
 
         <DataTable
-          v-if="hasDisplayedData"
+          mobile="cards"
           :columns="tableColumns"
-          :data="rapors"
+          :data="filteredRapors"
           :is-loading="loading"
           :total-items="totalItems"
           :page="currentPage"
           :page-size="pageSize"
-          search-key="name"
-          search-placeholder="Cari nama siswa..."
+          item-label="rapor"
+          :row-clickable="() => true"
+          @row-click="openRaporDetail"
           @update:page="setPage"
           @update:page-size="setPageSize"
-        />
-
-        <div
-          v-else-if="!loading"
-          class="flex flex-col items-center justify-center p-12 text-center border rounded-lg border-dashed bg-muted/30"
         >
-          <h3 class="mt-4 text-lg font-semibold">Belum Ada Data</h3>
-          <p class="text-sm text-muted-foreground">
-            Pilih semester dan kelas, lalu klik Tampilkan untuk melihat data
-            rapor.
-          </p>
-        </div>
-      </div>
+          <template #filters>
+            <AcademicPeriodFilter
+              v-model:semester-id="semesterModel"
+              :semesters="semesters"
+            />
+
+            <FloatingLabelField
+              label="Kelas"
+              :for="`${filterId}-classroom`"
+              class="w-fit min-w-28"
+              floating
+            >
+              <Select v-model="classroomModel">
+                <SelectTrigger
+                  :id="`${filterId}-classroom`"
+                  class="w-full"
+                >
+                  <SelectValue placeholder="Pilih kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="c in classroomOptions"
+                    :key="c.value"
+                    :value="c.value"
+                  >
+                    {{ c.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FloatingLabelField>
+          </template>
+          <template #header-right>
+            <SearchInput
+              v-model="search"
+              class="sm:w-48"
+              label="Cari nama atau NIS"
+            />
+          </template>
+          <template #mobile-toolbar>
+            <SearchInput
+              v-model="search"
+              label="Cari nama atau NIS"
+              class="w-full"
+            />
+          </template>
+          <template #mobile-filter>
+            <Button
+              variant="outline"
+              class="relative shrink-0"
+              @click="filterOpen = true"
+            >
+              <Filter class="size-4" />
+              Filter
+              <span
+                v-if="activeFiltersCount"
+                class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
+              >
+                {{ activeFiltersCount }}
+              </span>
+            </Button>
+          </template>
+          <template #empty>
+            <DataTableEmpty :message="emptyMessage" />
+          </template>
+        </DataTable>
+      </CardContent>
+      <CardFooter plain />
     </Card>
-  </div>
 
-  <RaporFormDialog
-    v-if="can('report-cards.create')"
-    v-model:open="openForm"
-    :rapor="editingData"
-  />
+    <Dialog v-model:open="filterOpen">
+      <DialogContent size="md">
+        <DialogHeader standard>
+          <DialogTitle>Filter Rapor</DialogTitle>
+          <DialogDescription>
+            Pilih tahun ajaran, semester, dan kelas untuk menampilkan data
+            rapor.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-4">
+          <AcademicPeriodFilter
+            v-model:semester-id="semesterModel"
+            :semesters="semesters"
+            full-width
+          />
 
-  <RaporDetailDialog
-    v-model:open="openDetail"
-    :rapor="detailData"
-  />
-
-  <AlertDialog
-    :open="showBulkConfirm"
-    @update:open="showBulkConfirm = $event"
-  >
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Generate Rapor Massal?</AlertDialogTitle>
-        <AlertDialogDescription>
-          Rapor akan di-generate untuk semua siswa di kelas ini. Nilai rata-rata
-          dan peringkat akan dihitung otomatis berdasarkan data nilai yang sudah
-          ada. Rapor yang sudah ada akan diperbarui.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel>Batal</AlertDialogCancel>
-        <AlertDialogAction @click="handleGenerateBulk"
-          >Ya, Generate</AlertDialogAction
+          <FloatingLabelField
+            label="Kelas"
+            :for="`${mobileFilterId}-classroom`"
+            floating
+          >
+            <Select v-model="classroomModel">
+              <SelectTrigger
+                :id="`${mobileFilterId}-classroom`"
+                class="w-full"
+              >
+                <SelectValue placeholder="Pilih kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="c in classroomOptions"
+                  :key="c.value"
+                  :value="c.value"
+                >
+                  {{ c.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </FloatingLabelField>
+        </DialogBody>
+        <DialogFooter
+          standard
+          class="justify-between"
         >
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+          <Button
+            variant="outline"
+            :disabled="!selectedClassroomId"
+            @click="resetFilters"
+          >
+            Atur Ulang
+          </Button>
+          <Button @click="filterOpen = false"> Tutup </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <RaporFormDialog
+      v-if="can('report-cards.create')"
+      v-model:open="openForm"
+      :rapor="editingData"
+    />
+
+    <RaporDetailDialog
+      v-model:open="openDetail"
+      :rapor="detailData"
+    />
+
+    <AlertDialog
+      :open="showBulkConfirm"
+      @update:open="showBulkConfirm = $event"
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Generate Rapor Massal?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Rapor akan di-generate untuk semua siswa di kelas ini. Nilai
+            rata-rata dan peringkat akan dihitung otomatis berdasarkan data
+            nilai yang sudah ada. Rapor yang sudah ada akan diperbarui.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogAction @click="handleGenerateBulk"
+            >Ya, Generate</AlertDialogAction
+          >
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
 </template>

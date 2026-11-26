@@ -156,9 +156,8 @@ export function buildGradingScheduleColumns(options: {
 }
 
 const studentText = (row: GradingSessionRow) =>
-  [row.studentName ?? 'Siswa tidak ditemukan', row.studentNis]
-    .filter(Boolean)
-    .join(' · ')
+  row.studentName ?? 'Siswa tidak ditemukan'
+const numberText = (row: GradingSessionRow) => row.participantNumber ?? '-'
 const scoreText = (row: GradingSessionRow) =>
   row.rawScore === null || row.maxScore === null
     ? '-'
@@ -169,9 +168,20 @@ export function buildGradingSessionColumns(options: {
 }): ColumnDef<GradingSessionRow>[] {
   return [
     {
+      id: 'participantNumber',
+      header: 'No. Peserta',
+      meta: {
+        align: 'center',
+        strong: true,
+        mobileLabel: 'No. Peserta',
+        mobileValue: numberText,
+      },
+      cell: ({ row }) => numberText(row.original),
+    },
+    {
       id: 'student',
-      header: 'Siswa',
-      meta: { align: 'left', strong: true },
+      header: 'Nama Siswa',
+      meta: { align: 'left', strong: true, mobile: 'title' },
       cell: ({ row }) => studentText(row.original),
     },
     {

@@ -35,7 +35,10 @@ export function useAssessmentItem() {
     assignments,
     teachingAssignment,
     fetchRelatedData: assessmentItemService.fetchRelatedData,
+    fetchAssignmentsForSemester:
+      assessmentItemService.fetchAssignmentsForSemester,
     fetchItems: assessmentItemService.fetchItems,
+    fetchGradingItems: assessmentItemService.fetchGradingItems,
     saveItem: assessmentItemService.saveItem,
     deleteItem: assessmentItemService.deleteItem,
   }

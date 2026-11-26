@@ -10,7 +10,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
@@ -24,7 +23,7 @@ const props = defineProps<{
 const chartConfig = {
   percentage: {
     label: 'Persentase Kehadiran',
-    color: '#2563eb',
+    color: 'var(--chart-1)',
   },
 } satisfies ChartConfig
 
@@ -40,18 +39,24 @@ const tooltipTemplate = componentToString(chartConfig, ChartTooltipContent, {
 </script>
 
 <template>
-  <Card class="shadow-none border">
-    <CardHeader class="pb-3">
-      <CardTitle size="md"> Tren Persentase Kehadiran </CardTitle>
-      <CardDescription class="text-xs text-muted-foreground">
-        Perkembangan rata-rata tingkat kehadiran siswa per bulan sepanjang
-        semester aktif
-      </CardDescription>
+  <Card
+    gap="none"
+    class="shadow-none"
+  >
+    <CardHeader standard>
+      <CardTitle size="md">Tren Persentase Kehadiran</CardTitle>
     </CardHeader>
-    <CardContent class="pt-0">
+    <CardContent
+      variant="standard"
+      class="space-y-3"
+    >
+      <p class="text-control text-muted-foreground">
+        Perkembangan rata-rata tingkat kehadiran siswa per bulan sepanjang
+        semester aktif.
+      </p>
       <div
         v-if="trendData && trendData.length > 0"
-        class="h-[280px] w-full"
+        class="h-64 w-full"
       >
         <ChartContainer
           :config="chartConfig"
@@ -66,14 +71,14 @@ const tooltipTemplate = componentToString(chartConfig, ChartTooltipContent, {
             <VisArea
               :x="x"
               :y="y"
-              color="#2563eb"
+              color="var(--chart-1)"
               :opacity="0.15"
               curve-type="monotoneX"
             />
             <VisLine
               :x="x"
               :y="y"
-              color="#2563eb"
+              color="var(--chart-1)"
               :stroke-width="2"
               curve-type="monotoneX"
             />
@@ -95,18 +100,18 @@ const tooltipTemplate = componentToString(chartConfig, ChartTooltipContent, {
             <ChartCrosshair
               v-if="tooltipTemplate"
               :template="tooltipTemplate"
-              color="#2563eb"
+              color="var(--chart-1)"
             />
             <ChartTooltip />
           </VisXYContainer>
         </ChartContainer>
       </div>
-      <div
+      <p
         v-else
-        class="py-12 text-center text-sm text-muted-foreground"
+        class="py-6 text-center text-control text-muted-foreground"
       >
         Belum ada data kehadiran pada semester ini untuk ditampilkan.
-      </div>
+      </p>
     </CardContent>
   </Card>
 </template>

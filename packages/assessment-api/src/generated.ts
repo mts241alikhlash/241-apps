@@ -554,9 +554,11 @@ export interface components {
         };
         AssessmentItemResponseDto: {
             _count?: components["schemas"]["AssessmentItemResponseCountDto"];
+            gradedCount?: number;
             id: string;
             maxScore: number;
             name: string;
+            studentCount?: number;
             teachingAssignment?: components["schemas"]["AssessmentItemResponseTeachingAssignmentDto"];
             teachingAssignmentId: string;
             /** @enum {string} */
@@ -1330,7 +1332,9 @@ export interface components {
         };
         StudentScoreRosterResponseItemsDto: {
             enrollmentId: string;
+            gender?: string | null;
             nis: string;
+            nisn?: string;
             note: string | null;
             score: number | null;
             scoreId: string | null;
@@ -1371,6 +1375,8 @@ export interface operations {
                 limit?: number;
                 page?: number;
                 teachingAssignmentId?: string;
+                /** @description Comma-separated on the query string */
+                teachingAssignmentIds?: string[];
                 type?: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
             };
             header?: never;

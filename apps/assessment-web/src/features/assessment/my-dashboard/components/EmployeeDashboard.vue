@@ -9,8 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@mts241alikhlash/ui/card'
-import { Progress } from '@mts241alikhlash/ui/progress'
-
+import { Progress } from '@mts241alikhlash/ui'
 import { Skeleton } from '@mts241alikhlash/ui/skeleton'
 import {
   BookOpen,
@@ -21,7 +20,7 @@ import {
   School,
   Users,
 } from '@lucide/vue'
-import { DataTable } from '@mts241alikhlash/ui'
+import { DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import { createTodayLessonColumns } from './todayLessonColumns'
 import type {
   MyDashboardUngradedAssessment,
@@ -53,7 +52,7 @@ const hiddenUngraded = computed(
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card class="shadow-none">
         <CardContent variant="standard">
@@ -72,7 +71,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Kelas Diampu
               </p>
-              <p class="mt-1 text-2xl font-semibold">
+              <p class="mt-1 text-2xl font-semibold tabular-nums">
                 {{ data.load.classroomCount }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -80,7 +79,7 @@ const hiddenUngraded = computed(
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-info/10"
             >
               <School class="size-4 text-info" />
             </div>
@@ -105,7 +104,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Mata Pelajaran
               </p>
-              <p class="mt-1 text-2xl font-semibold">
+              <p class="mt-1 text-2xl font-semibold tabular-nums">
                 {{ data.load.subjectCount }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -113,7 +112,7 @@ const hiddenUngraded = computed(
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success/10"
             >
               <BookOpen class="size-4 text-success" />
             </div>
@@ -138,7 +137,7 @@ const hiddenUngraded = computed(
               <p class="text-xs font-medium text-muted-foreground">
                 Belum Dinilai
               </p>
-              <p class="mt-1 text-2xl font-semibold">
+              <p class="mt-1 text-2xl font-semibold tabular-nums">
                 {{ data.ungradedTotal }}
               </p>
               <p class="mt-0.5 text-xs text-muted-foreground">
@@ -146,7 +145,7 @@ const hiddenUngraded = computed(
               </p>
             </div>
             <div
-              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-warning"
+              class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-warning/10"
             >
               <PencilLine class="size-4 text-warning" />
             </div>
@@ -159,43 +158,45 @@ const hiddenUngraded = computed(
       gap="none"
       class="shadow-none"
     >
-      <CardHeader
-        standard
-        class="py-3.5"
-      >
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <Clock class="size-4 text-muted-foreground" />
-            <CardTitle size="md"> Jadwal Hari Ini </CardTitle>
-          </div>
+      <CardHeader standard>
+        <div class="flex items-center gap-2">
+          <Clock class="size-4 text-muted-foreground" />
+          <CardTitle size="md">Jadwal Hari Ini</CardTitle>
         </div>
       </CardHeader>
-      <CardContent class="pt-4 px-4 pb-5">
+      <CardContent variant="standard">
         <DataTable
+          mobile="cards"
           :columns="todayLessonColumns"
           :data="data.todayLessons"
           :is-loading="loading"
           item-label="jadwal"
           hide-per-page
           hide-pagination
-        />
+        >
+          <template #empty>
+            <DataTableEmpty
+              :message="
+                isWeeklyHoliday
+                  ? 'Hari ini libur mingguan.'
+                  : 'Tidak ada jadwal hari ini.'
+              "
+            />
+          </template>
+        </DataTable>
       </CardContent>
     </Card>
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-4 lg:grid-cols-2">
       <Card
         v-if="data.supervisedClassrooms.length > 0"
+        gap="none"
         class="shadow-none"
       >
-        <CardHeader
-          standard
-          class="py-3.5"
-        >
-          <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2">
-              <Users class="size-4 text-muted-foreground" />
-              <CardTitle size="md"> Perwalian Kelas </CardTitle>
-            </div>
+        <CardHeader standard>
+          <div class="flex items-center gap-2">
+            <Users class="size-4 text-muted-foreground" />
+            <CardTitle size="md">Perwalian Kelas</CardTitle>
           </div>
         </CardHeader>
         <CardContent variant="standard">
@@ -203,7 +204,7 @@ const hiddenUngraded = computed(
             <li
               v-for="classroom in data.supervisedClassrooms"
               :key="classroom.id"
-              class="flex items-center justify-between rounded-lg border px-4 py-2.5"
+              class="flex items-center justify-between rounded-lg border px-4 py-2"
             >
               <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium">
@@ -231,31 +232,26 @@ const hiddenUngraded = computed(
         gap="none"
         class="shadow-none"
       >
-        <CardHeader
-          standard
-          class="py-3.5"
-        >
-          <div class="flex items-center gap-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <PencilLine class="size-4 text-muted-foreground" />
-                <CardTitle size="md"> Penilaian Belum Selesai </CardTitle>
-              </div>
-              <RouterLink
-                v-if="canGrade && data.ungradedTotal > 0"
-                :to="{ name: 'assessment-grading' }"
-                class="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Lihat Semua
-                <ChevronRight class="size-3.5" />
-              </RouterLink>
+        <CardHeader standard>
+          <div class="flex w-full items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <PencilLine class="size-4 text-muted-foreground" />
+              <CardTitle size="md">Penilaian Belum Selesai</CardTitle>
             </div>
+            <RouterLink
+              v-if="canGrade && data.ungradedTotal > 0"
+              to="/assessment/items"
+              class="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Lihat Semua
+              <ChevronRight class="size-3.5" />
+            </RouterLink>
           </div>
         </CardHeader>
         <CardContent variant="standard">
           <div
             v-if="data.ungradedAssessments.length === 0"
-            class="flex flex-col items-center gap-2 py-8 text-center text-sm text-muted-foreground"
+            class="flex flex-col items-center gap-2 py-6 text-center text-control text-muted-foreground"
           >
             <CheckCircle2 class="size-8 text-success opacity-70" />
             <p>Semua penilaian sudah lengkap.</p>
@@ -293,7 +289,9 @@ const hiddenUngraded = computed(
                       {{ item.subjectName }} · {{ item.classroomCode }}
                     </p>
                   </div>
-                  <span class="shrink-0 text-xs text-muted-foreground">
+                  <span
+                    class="shrink-0 text-xs text-muted-foreground tabular-nums"
+                  >
                     {{ item.gradedCount }}/{{ item.studentCount }}
                   </span>
                 </div>

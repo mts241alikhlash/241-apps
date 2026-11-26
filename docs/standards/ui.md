@@ -26,9 +26,9 @@ Applies to every page and component in `apps/` and to `packages/ui`. The compone
 **Why.** One field pattern and one error treatment.
 **Check.** `pnpm exec check-field-style src` (reports `FormField` + `FormLabel` pairs); a component used without its import renders as an unknown element and `vue-tsc` stays silent, so check imports when converting by script.
 
-**Rule.** A row is never a link: no `row-clickable`, no click handler on the row or the card, no `cursor-pointer` on data. Every detail view is reached through the row action — one action is a direct button, two or more use `ActionCell` (edit, delete with its own confirmation, `manageLabel`, custom entries through `items`). No hand-written dropdowns in columns.
-**Why.** Consistent row menus.
-**Check.** review.
+**Rule.** A row may open its detail on click as a shortcut (`@row-click` on `DataTable`), never as the only way in. Every detail view is also reached through the row action, which is the keyboard and screen-reader path — one action is a direct button, two or more use `ActionCell` (edit, delete with its own confirmation, `manageLabel`, custom entries through `items`). Interactive children never trigger the row click: buttons, links, inputs and `[role="button"]`/`[role="menuitem"]` are ignored, and a custom control inside a row sets `data-row-click-ignore`. Rows without a destination are excluded with `rowClickable`, so they get no `cursor-pointer`. No hand-written dropdowns in columns.
+**Why.** A larger click target is faster for pointer users, and the row action keeps the page usable without a pointer and consistent across tables.
+**Check.** review: a table with `@row-click` still has a row action, and a row without a destination is not clickable.
 
 **Rule.** Dates use `DatePicker` (`dd/mm/yyyy`) and ranges `DateRangePicker`. A unit on a numeric field is display only, inside the input: `FormattedNumberInput` (`prefix`, `suffix`, `thousands`, `numeric`, `max-digits`); the stored value is plain digits, never a hand-placed unit `<span>` or a unit in the label. File upload areas use `FileDropzone`.
 **Why.** Values stay clean and inputs look the same everywhere.

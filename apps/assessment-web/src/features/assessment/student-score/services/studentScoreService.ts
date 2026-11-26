@@ -39,11 +39,15 @@ export const studentScoreService = {
         .map((row) => ({
           enrollmentId: row.enrollmentId,
           score: row.score ?? undefined,
-          note: row.note?.trim() ? row.note.trim() : undefined,
+          note: row.note?.trim()
+            ? row.note.trim()
+            : row.scoreId
+              ? ''
+              : undefined,
         }))
 
       if (records.length === 0) {
-        return { success: true }
+        return { success: false, empty: true }
       }
 
       const { can } = useRoleGuard()
@@ -62,6 +66,7 @@ export const studentScoreService = {
         error,
         'Gagal menyimpan nilai siswa.',
       )
+      toast.error(store.formError)
       return { success: false, error: store.formError }
     } finally {
       store.isSaving = false

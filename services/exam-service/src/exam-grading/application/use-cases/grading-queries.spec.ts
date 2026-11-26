@@ -1,5 +1,9 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import {
+  FakeParticipantNumber,
+  STUDENT_ID,
+} from '../../../exam-session/application/exam-session.test-support.js'
+import {
   STAFF,
   SEMESTER_ID,
   SUBJECT_ID,
@@ -22,9 +26,21 @@ describe('grading queries', () => {
       w.sessions,
       w.academic,
     )
-  const listSessions = (w: ReturnType<typeof build>) =>
-    new ListGradingSessionsUseCase(w.scope, w.schedules, w.sessions, w.students)
-  const getSession = (w: ReturnType<typeof build>) =>
+  const listSessions = (
+    w: ReturnType<typeof build>,
+    numbers?: Map<string, string>,
+  ) =>
+    new ListGradingSessionsUseCase(
+      w.scope,
+      w.schedules,
+      w.sessions,
+      w.students,
+      new FakeParticipantNumber({ numbers: numbers ?? new Map() }),
+    )
+  const getSession = (
+    w: ReturnType<typeof build>,
+    numbers?: Map<string, string>,
+  ) =>
     new GetGradingSessionUseCase(
       w.scope,
       w.schedules,
@@ -32,8 +48,12 @@ describe('grading queries', () => {
       w.questions,
       w.sessions,
       w.students,
+      new FakeParticipantNumber({ numbers: numbers ?? new Map() }),
     )
-  const listScheduleDetails = (w: ReturnType<typeof build>) =>
+  const listScheduleDetails = (
+    w: ReturnType<typeof build>,
+    numbers?: Map<string, string>,
+  ) =>
     new ListScheduleGradingDetailsUseCase(
       w.scope,
       w.schedules,
@@ -41,6 +61,7 @@ describe('grading queries', () => {
       w.questions,
       w.sessions,
       w.students,
+      new FakeParticipantNumber({ numbers: numbers ?? new Map() }),
     )
 
   describe('schedules', () => {
@@ -238,6 +259,22 @@ describe('grading queries', () => {
       })
     })
 
+    it('lists the participant number, null when none is issued', async () => {
+      const w = build()
+      const { schedule, questionIds } = await paperWithManual(w)
+      submitted(w, schedule, { [questionIds[1]]: { text: 'jawab' } })
+      const query = { page: 1, limit: 10 }
+
+      const issued = await listSessions(
+        w,
+        new Map([[STUDENT_ID, '26-0001']]),
+      ).execute(TEACHER, schedule.id, query)
+      const none = await listSessions(w).execute(TEACHER, schedule.id, query)
+
+      expect(issued.data[0].participantNumber).toBe('26-0001')
+      expect(none.data[0].participantNumber).toBeNull()
+    })
+
     it('keeps the row when the student is missing from student-service', async () => {
       const w = build()
       w.students.refsByIds = () => Promise.resolve([])
@@ -389,6 +426,22 @@ describe('grading queries', () => {
       expect(details[0].session.sessionId).toBe('ses-1')
       expect(details[0].items[1].answer).toEqual({ text: 'uraian 1' })
       expect(refsSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('carries the participant number of each student', async () => {
+      const w = build()
+      const { schedule, questionIds } = await paperWithManual(w)
+      submitted(w, schedule, { [questionIds[1]]: { text: 'jawab' } })
+      const numbers = new Map([[STUDENT_ID, '26-0001']])
+
+      const one = await getSession(w, numbers).execute(TEACHER, 'ses-1')
+      const all = await listScheduleDetails(w, numbers).execute(
+        TEACHER,
+        schedule.id,
+      )
+
+      expect(one.session.participantNumber).toBe('26-0001')
+      expect(all[0].session.participantNumber).toBe('26-0001')
     })
 
     it('returns an empty list without student lookup when no finished sessions exist', async () => {

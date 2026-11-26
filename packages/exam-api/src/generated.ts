@@ -2348,6 +2348,7 @@ export interface components {
         GradingSessionRowDto: {
             awaitingGrading: boolean;
             maxScore: number | null;
+            participantNumber: string | null;
             /** @enum {string|null} */
             publication: "PENDING" | "SENT" | null;
             rawScore: number | null;
@@ -2365,6 +2366,7 @@ export interface components {
         };
         GradingSessionSummaryDto: {
             maxScore: number | null;
+            participantNumber: string | null;
             rawScore: number | null;
             /** Format: uuid */
             scheduleId: string;

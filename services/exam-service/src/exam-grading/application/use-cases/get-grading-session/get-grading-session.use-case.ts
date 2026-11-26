@@ -7,6 +7,7 @@ import { loadPaperSources } from '../../../../exam-session/application/load-pape
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
 import {
@@ -29,6 +30,7 @@ export class GetGradingSessionUseCase {
     private readonly questions: IQuestionRepository,
     private readonly sessions: IExamSessionRepository,
     private readonly students: IStudentDirectoryPort,
+    private readonly participantNumbers: IParticipantNumberPort,
   ) {}
 
   async execute(
@@ -55,7 +57,7 @@ export class GetGradingSessionUseCase {
       throw new ConflictException('Sesi ujian belum selesai')
     }
 
-    const [sources, answers, refs] = await Promise.all([
+    const [sources, answers, refs, numbers] = await Promise.all([
       loadPaperSources(
         this.schedules,
         this.packages,
@@ -64,8 +66,26 @@ export class GetGradingSessionUseCase {
       ),
       this.sessions.listAnswers(session.id),
       this.students.refsByIds([session.studentId]),
+      this.numbersOf([session.studentId], schedule.semesterId),
     ])
 
-    return toGradingSessionDetail(session, sources, answers, refs[0] ?? null)
+    return toGradingSessionDetail(
+      session,
+      sources,
+      answers,
+      refs[0] ?? null,
+      numbers.get(session.studentId) ?? null,
+    )
+  }
+
+  private async numbersOf(
+    studentIds: string[],
+    semesterId: string,
+  ): Promise<Map<string, string>> {
+    try {
+      return await this.participantNumbers.findNumbers(studentIds, semesterId)
+    } catch {
+      return new Map()
+    }
   }
 }

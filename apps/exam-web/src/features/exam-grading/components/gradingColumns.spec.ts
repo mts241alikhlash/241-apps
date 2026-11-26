@@ -32,6 +32,7 @@ const session = (
   studentId: 'st1',
   studentName: 'Ahmad Fauzi',
   studentNis: '2024001',
+  participantNumber: '26-0001',
   status: 'SUBMITTED',
   submittedAt: '2026-11-02T03:00:00.000Z',
   rawScore: null,
@@ -186,5 +187,22 @@ describe('grading columns', () => {
 
     expect(text(session())).toBe('-')
     expect(text(session({ violationCount: 4 }))).toBe('4×')
+  })
+
+  it('shows the participant number and the name in separate columns, without the nis', () => {
+    const built = buildGradingSessionColumns({ onOpen: vi.fn() })
+    const ids = built.map((column) => column.id)
+    const text = (id: string, row: GradingSessionRow) =>
+      (
+        built.find((column) => column.id === id)!.meta as {
+          mobileValue?: (value: GradingSessionRow) => string
+        }
+      ).mobileValue?.(row)
+
+    expect(ids.slice(0, 2)).toEqual(['participantNumber', 'student'])
+    expect(text('participantNumber', session())).toBe('26-0001')
+    expect(
+      text('participantNumber', session({ participantNumber: null })),
+    ).toBe('-')
   })
 })

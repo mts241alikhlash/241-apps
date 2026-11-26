@@ -45,17 +45,66 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
       .map((row) => refs.assignment(row.teachingAssignmentId))
       .filter((assignment) => assignment !== null)
 
-    const userRefs = await resolveUserRefs(
-      assignments
-        .map((assignment) => assignment.employeeUserId)
-        .filter((userId): userId is string => userId !== null),
-      this.profileLookupPort,
+    const classroomsBySemester = new Map<string, Set<string>>()
+    for (const assignment of assignments) {
+      const classroomSet =
+        classroomsBySemester.get(assignment.semesterId) ?? new Set<string>()
+      classroomSet.add(assignment.classroomId)
+      classroomsBySemester.set(assignment.semesterId, classroomSet)
+    }
+
+    const [userRefs, gradedGroups, semesterCounts] = await Promise.all([
+      resolveUserRefs(
+        assignments
+          .map((assignment) => assignment.employeeUserId)
+          .filter((userId): userId is string => userId !== null),
+        this.profileLookupPort,
+      ),
+      this.prisma.studentScore.groupBy({
+        by: ['assessmentItemId'],
+        where: {
+          assessmentItemId: { in: rows.map((row) => row.id) },
+          deletedAt: null,
+          score: { not: null },
+        },
+        _count: { _all: true },
+      }),
+      Promise.all(
+        [...classroomsBySemester.entries()].map(
+          async ([semesterId, classroomIds]) => ({
+            semesterId,
+            counts: await this.enrollmentLookup.countByClassrooms(
+              [...classroomIds],
+              semesterId,
+            ),
+          }),
+        ),
+      ),
+    ])
+
+    const gradedCountByItem = new Map(
+      gradedGroups.map((group) => [group.assessmentItemId, group._count._all]),
     )
+    const studentCountByClassroom = new Map<string, number>()
+    for (const { semesterId, counts } of semesterCounts) {
+      for (const entry of counts) {
+        studentCountByClassroom.set(
+          `${semesterId}:${entry.classroomId}`,
+          entry.count,
+        )
+      }
+    }
 
     return rows.map((row) => {
       const assignment = refs.assignment(row.teachingAssignmentId)
       return {
         ...row,
+        gradedCount: gradedCountByItem.get(row.id) ?? 0,
+        studentCount: assignment
+          ? (studentCountByClassroom.get(
+              `${assignment.semesterId}:${assignment.classroomId}`,
+            ) ?? 0)
+          : undefined,
         teachingAssignment: assignment
           ? toAssignmentRef(assignment, userRefs)
           : undefined,
@@ -64,12 +113,22 @@ export class PrismaAssessmentItemRepository extends IAssessmentItemRepository {
   }
 
   async findAll(query: AssessmentItemQueryInput) {
-    const { page = 1, limit = 10, teachingAssignmentId, type } = query
+    const {
+      page = 1,
+      limit = 10,
+      teachingAssignmentId,
+      teachingAssignmentIds,
+      type,
+    } = query
     const skip = (page - 1) * limit
 
     const where: Prisma.AssessmentItemWhereInput = {
       deletedAt: null,
-      ...(teachingAssignmentId && { teachingAssignmentId }),
+      ...(teachingAssignmentIds?.length
+        ? { teachingAssignmentId: { in: teachingAssignmentIds } }
+        : teachingAssignmentId
+          ? { teachingAssignmentId }
+          : {}),
       ...(type && { type }),
     }
 

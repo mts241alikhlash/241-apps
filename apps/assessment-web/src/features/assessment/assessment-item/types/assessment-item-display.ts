@@ -4,5 +4,6 @@ export interface AssessmentItemQueryParams {
   page?: number
   limit?: number
   teachingAssignmentId?: string
+  teachingAssignmentIds?: string
   type?: AssessmentType
 }

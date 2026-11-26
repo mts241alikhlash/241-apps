@@ -1,34 +1,30 @@
 <script setup lang="ts">
-import { SearchInput } from '@mts241alikhlash/ui'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@mts241alikhlash/ui/table'
-import { Input } from '@mts241alikhlash/ui/input'
-import { Button } from '@mts241alikhlash/ui/button'
-import { Skeleton } from '@mts241alikhlash/ui/skeleton'
-import { Loader2, Save, Users } from '@lucide/vue'
+import { DataTable, DataTableEmpty, SearchInput } from '@mts241alikhlash/ui'
 import { computed, ref } from 'vue'
-import type { StudentScoreRosterItem } from '../types'
+import {
+  createStudentScoreInputColumns,
+  type StudentScoreTableRow,
+} from './studentScoreInputColumns'
+import StudentScoreNoteDialog from './StudentScoreNoteDialog.vue'
+import type { StudentNoteTarget, StudentScoreRosterItem } from '../types'
 
 const props = defineProps<{
   rows: StudentScoreRosterItem[]
   loading: boolean
-  isSaving: boolean
   maxScore: number
-  canSave?: boolean
 }>()
 
 const emit = defineEmits<{
   'update:rows': [value: StudentScoreRosterItem[]]
-  save: []
 }>()
 
-function updateRowScore(index: number, value: string) {
+const searchQuery = ref('')
+const noteDialogOpen = ref(false)
+const noteTarget = ref<StudentNoteTarget | null>(null)
+
+function handleScoreChange(enrollmentId: string, value: string) {
+  const index = props.rows.findIndex((r) => r.enrollmentId === enrollmentId)
+  if (index === -1) return
   const row = props.rows[index]
   if (!row) return
 
@@ -45,167 +41,95 @@ function updateRowScore(index: number, value: string) {
   emit('update:rows', updated)
 }
 
-const searchQuery = ref('')
-
-const visibleRows = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase()
-  const withIndex = props.rows.map((row, index) => ({ row, index }))
-  if (!query) return withIndex
-
-  return withIndex.filter(
-    ({ row }) =>
-      row.studentName.toLowerCase().includes(query) ||
-      row.nis.toLowerCase().includes(query),
-  )
-})
-
-const scoredCount = computed(
-  () => props.rows.filter((row) => row.score !== null).length,
-)
-
-function updateRowNote(index: number, note: string) {
+function handleNoteChange(enrollmentId: string, note: string) {
+  const index = props.rows.findIndex((r) => r.enrollmentId === enrollmentId)
+  if (index === -1) return
   const row = props.rows[index]
   if (!row) return
+
   const updated = [...props.rows]
   updated[index] = { ...row, note }
   emit('update:rows', updated)
 }
+
+function openNoteDialog(row: StudentScoreTableRow) {
+  noteTarget.value = {
+    enrollmentId: row.enrollmentId,
+    studentName: row.studentName,
+    nis: row.nis,
+    note: row.note,
+  }
+  noteDialogOpen.value = true
+}
+
+const columns = computed(() =>
+  createStudentScoreInputColumns({
+    maxScore: props.maxScore,
+    onScoreChange: handleScoreChange,
+    onEditNote: openNoteDialog,
+  }),
+)
+
+const tableData = computed<StudentScoreTableRow[]>(() => {
+  const keyword = searchQuery.value.trim().toLocaleLowerCase('id')
+  const filtered = keyword
+    ? props.rows.filter(
+        (row) =>
+          row.studentName.toLocaleLowerCase('id').includes(keyword) ||
+          row.nis.toLocaleLowerCase('id').includes(keyword) ||
+          (row.nisn ?? '').toLocaleLowerCase('id').includes(keyword),
+      )
+    : props.rows
+
+  return filtered.map((row, index) => ({
+    ...row,
+    id: row.enrollmentId,
+    rowNumber: index + 1,
+  }))
+})
+
+const emptyMessage = computed(() =>
+  props.rows.length === 0
+    ? 'Kelas ini belum punya siswa aktif di semester berjalan.'
+    : 'Tidak ada siswa yang cocok dengan pencarian.',
+)
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <p class="text-sm text-muted-foreground text-center sm:text-left">
-        <strong class="text-foreground">{{ scoredCount }}</strong>
-        dari
-        <strong class="text-foreground">{{ rows.length }}</strong>
-        siswa sudah dinilai
-      </p>
+  <DataTable
+    mobile="cards"
+    :columns="columns"
+    :data="tableData"
+    :is-loading="loading"
+    item-label="siswa"
+    :hide-per-page="true"
+    :hide-pagination="true"
+    :page-size="500"
+  >
+    <template #header-right>
       <SearchInput
         v-model="searchQuery"
-        label="Cari nama / NIS"
+        class="sm:w-48"
+        label="Cari nama, NIS, NISN"
         :disabled="rows.length === 0"
-        class="sm:ml-auto"
       />
-    </div>
+    </template>
+    <template #mobile-toolbar>
+      <SearchInput
+        v-model="searchQuery"
+        class="w-full"
+        label="Cari nama, NIS, NISN"
+        :disabled="rows.length === 0"
+      />
+    </template>
+    <template #empty>
+      <DataTableEmpty :message="emptyMessage" />
+    </template>
+  </DataTable>
 
-    <div class="border rounded-md bg-background overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead class="hidden sm:table-cell w-28 px-4 text-center"
-              >NIS</TableHead
-            >
-            <TableHead class="px-4">Nama Siswa</TableHead>
-            <TableHead class="w-1/3 sm:w-32 px-4 text-center">Nilai</TableHead>
-            <TableHead class="hidden sm:table-cell w-56 px-4"
-              >Catatan</TableHead
-            >
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <template v-if="loading">
-            <TableRow
-              v-for="i in 5"
-              :key="`skeleton-${i}`"
-            >
-              <TableCell class="hidden sm:table-cell px-4 py-2.5">
-                <Skeleton class="h-5 w-full" />
-              </TableCell>
-              <TableCell class="px-4 py-2.5">
-                <Skeleton class="h-5 w-full" />
-              </TableCell>
-              <TableCell class="px-4 py-2.5">
-                <Skeleton class="h-5 w-full" />
-              </TableCell>
-              <TableCell class="hidden sm:table-cell px-4 py-2.5">
-                <Skeleton class="h-5 w-full" />
-              </TableCell>
-            </TableRow>
-          </template>
-
-          <TableRow
-            v-for="{ row, index } in visibleRows"
-            v-else
-            :key="row.enrollmentId"
-            class="transition-colors hover:bg-muted/30"
-          >
-            <TableCell class="hidden sm:table-cell px-4 py-2.5 text-center">
-              {{ row.nis }}
-            </TableCell>
-            <TableCell class="px-4 py-2.5">{{ row.studentName }}</TableCell>
-            <TableCell class="px-4 py-2.5">
-              <Input
-                type="number"
-                min="0"
-                :max="maxScore"
-                :model-value="row.score ?? ''"
-                :placeholder="`0 - ${maxScore}`"
-                class="min-w-[80px] text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                @update:model-value="
-                  (val) => updateRowScore(index, String(val))
-                "
-              />
-            </TableCell>
-            <TableCell class="hidden sm:table-cell px-4 py-2.5">
-              <Input
-                :model-value="row.note ?? ''"
-                placeholder="Catatan..."
-                @update:model-value="
-                  (val) => updateRowNote(index, val as string)
-                "
-              />
-            </TableCell>
-          </TableRow>
-
-          <TableRow v-if="!loading && visibleRows.length === 0">
-            <TableCell
-              :colspan="4"
-              class="h-32 px-4 text-center"
-            >
-              <div
-                class="flex flex-col items-center gap-2 text-muted-foreground"
-              >
-                <Users class="size-8 opacity-40" />
-                <p class="text-sm font-medium text-foreground">
-                  {{
-                    rows.length === 0
-                      ? 'Tidak ada siswa terdaftar'
-                      : 'Tidak ada siswa yang cocok'
-                  }}
-                </p>
-                <p class="text-xs">
-                  {{
-                    rows.length === 0
-                      ? 'Kelas ini belum punya siswa aktif di semester berjalan.'
-                      : 'Coba ubah kata pencarian.'
-                  }}
-                </p>
-              </div>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
-
-    <div
-      v-if="rows.length > 0 && canSave !== false"
-      class="flex justify-end"
-    >
-      <Button
-        :disabled="isSaving"
-        @click="$emit('save')"
-      >
-        <Loader2
-          v-if="isSaving"
-          class="size-4 animate-spin"
-        />
-        <Save
-          v-else
-          class="size-4"
-        />
-        {{ isSaving ? 'Menyimpan...' : 'Simpan Semua' }}
-      </Button>
-    </div>
-  </div>
+  <StudentScoreNoteDialog
+    v-model:open="noteDialogOpen"
+    :student="noteTarget"
+    @apply="handleNoteChange"
+  />
 </template>

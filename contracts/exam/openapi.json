@@ -13045,6 +13045,10 @@
             "type": "string",
             "nullable": true
           },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "status": {
             "enum": [
               "IN_PROGRESS",
@@ -13087,6 +13091,7 @@
           "studentId",
           "studentName",
           "studentNis",
+          "participantNumber",
           "status",
           "submittedAt",
           "rawScore",
@@ -13145,6 +13150,10 @@
             "type": "string",
             "nullable": true
           },
+          "participantNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -13169,6 +13178,7 @@
           "studentId",
           "studentName",
           "studentNis",
+          "participantNumber",
           "status",
           "rawScore",
           "maxScore"

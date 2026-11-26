@@ -183,6 +183,18 @@ onMounted(load)
             class="flex shrink-0 flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
           >
             <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">No. Peserta</dt>
+              <dd class="font-medium">
+                {{ detail.session.participantNumber ?? '-' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Nama Siswa</dt>
+              <dd class="font-medium">
+                {{ detail.session.studentName ?? '-' }}
+              </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
               <dt class="text-control text-muted-foreground">Nilai</dt>
               <dd class="font-medium">
                 {{

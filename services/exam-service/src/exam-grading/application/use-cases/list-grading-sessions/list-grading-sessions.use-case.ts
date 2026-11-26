@@ -5,6 +5,7 @@ import type {
   ExamSessionStatus,
 } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import type { PaginatedResult } from '@mts241alikhlash/nest-core/domain'
 import {
@@ -17,6 +18,7 @@ export interface GradingSessionRow {
   studentId: string
   studentName: string | null
   studentNis: string | null
+  participantNumber: string | null
   status: ExamSession['status']
   submittedAt: Date | null
   rawScore: number | null
@@ -33,6 +35,7 @@ export class ListGradingSessionsUseCase {
     private readonly schedules: IExamScheduleRepository,
     private readonly sessions: IExamSessionRepository,
     private readonly students: IStudentDirectoryPort,
+    private readonly participantNumbers: IParticipantNumberPort,
   ) {}
 
   async execute(
@@ -59,9 +62,11 @@ export class ListGradingSessionsUseCase {
       query.limit,
       query.status,
     )
-    const [refs, publications] = await Promise.all([
-      this.students.refsByIds(page.data.map((row) => row.studentId)),
+    const studentIds = page.data.map((row) => row.studentId)
+    const [refs, publications, numbers] = await Promise.all([
+      this.students.refsByIds(studentIds),
       this.sessions.publicationStatuses(page.data.map((row) => row.id)),
+      this.numbersOf(studentIds, schedule.semesterId),
     ])
     const refOf = new Map(refs.map((ref) => [ref.id, ref]))
 
@@ -72,6 +77,7 @@ export class ListGradingSessionsUseCase {
         studentId: row.studentId,
         studentName: refOf.get(row.studentId)?.name ?? null,
         studentNis: refOf.get(row.studentId)?.nis ?? null,
+        participantNumber: numbers.get(row.studentId) ?? null,
         status: row.status,
         submittedAt: row.submittedAt,
         rawScore: row.rawScore,
@@ -80,6 +86,18 @@ export class ListGradingSessionsUseCase {
         violationCount: row.violationCount,
         publication: publications.get(row.id) ?? null,
       })),
+    }
+  }
+
+  private async numbersOf(
+    studentIds: string[],
+    semesterId: string,
+  ): Promise<Map<string, string>> {
+    if (studentIds.length === 0) return new Map()
+    try {
+      return await this.participantNumbers.findNumbers(studentIds, semesterId)
+    } catch {
+      return new Map()
     }
   }
 }

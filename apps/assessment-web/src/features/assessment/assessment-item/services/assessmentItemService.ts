@@ -10,6 +10,56 @@ import { PAGINATION } from '@mts241alikhlash/web-shared/constants/pagination'
 import { toast } from 'vue-sonner'
 
 export const assessmentItemService = {
+  fetchAssignmentsForSemester: async (semesterId: string | null) => {
+    const store = useAssessmentItemStore()
+    if (!semesterId) {
+      store.assignments = []
+      store.classrooms = []
+      store.subjects = []
+      store.items = []
+      store.totalItems = 0
+      store.teachingAssignment = null
+      return
+    }
+
+    try {
+      const { rows: assignments } = await loadAssignments({
+        semesterId,
+        limit: PAGINATION.REFERENCE_LIMIT,
+      })
+      store.assignments = assignments
+
+      const subjectIds = new Set(assignments.map((a) => a.subjectId))
+      const classroomIds = new Set(assignments.map((a) => a.classroomId))
+      store.subjects = store.allSubjects.filter((subject) =>
+        subjectIds.has(subject.id),
+      )
+      store.classrooms = store.allClassrooms.filter((classroom) =>
+        classroomIds.has(classroom.id),
+      )
+
+      if (
+        store.selectedClassroomId &&
+        !classroomIds.has(store.selectedClassroomId)
+      ) {
+        store.selectedClassroomId = null
+      }
+      if (store.selectedSubjectId && !subjectIds.has(store.selectedSubjectId)) {
+        store.selectedSubjectId = null
+      }
+      if (!store.selectedClassroomId && store.classrooms.length === 1) {
+        store.selectedClassroomId = store.classrooms[0]?.id ?? null
+      }
+      if (!store.selectedSubjectId && store.subjects.length === 1) {
+        store.selectedSubjectId = store.subjects[0]?.id ?? null
+      }
+    } catch (err: unknown) {
+      toast.error(
+        getIndonesianErrorMessage(err, 'Gagal memuat jadwal mengajar.'),
+      )
+    }
+  },
+
   fetchRelatedData: async () => {
     const store = useAssessmentItemStore()
 
@@ -19,36 +69,18 @@ export const assessmentItemService = {
         subjectApi.getSubjects({ limit: PAGINATION.REFERENCE_LIMIT }),
         semesterApi.getSemesters({ limit: PAGINATION.REFERENCE_LIMIT }),
       ])
-      const allClassrooms = classroomRes.data?.data ?? []
-      const allSubjects = subjectRes.data?.data ?? []
+      store.allClassrooms = classroomRes.data?.data ?? []
+      store.allSubjects = subjectRes.data?.data ?? []
       store.semesters = semesterRes.data?.data ?? []
 
       store.selectedSemesterId ??=
-        store.semesters.find((semester) => semester.isActive)?.id ?? null
+        store.semesters.find((semester) => semester.isActive)?.id ??
+        store.semesters[0]?.id ??
+        null
 
-      const { rows: assignments } = await loadAssignments({
-        ...(store.selectedSemesterId
-          ? { semesterId: store.selectedSemesterId }
-          : {}),
-        limit: PAGINATION.REFERENCE_LIMIT,
-      })
-      store.assignments = assignments
-
-      const subjectIds = new Set(assignments.map((a) => a.subjectId))
-      const classroomIds = new Set(assignments.map((a) => a.classroomId))
-      store.subjects = allSubjects.filter((subject) =>
-        subjectIds.has(subject.id),
+      await assessmentItemService.fetchAssignmentsForSemester(
+        store.selectedSemesterId,
       )
-      store.classrooms = allClassrooms.filter((classroom) =>
-        classroomIds.has(classroom.id),
-      )
-
-      if (store.classrooms.length === 1) {
-        store.selectedClassroomId ??= store.classrooms[0].id
-      }
-      if (store.subjects.length === 1) {
-        store.selectedSubjectId ??= store.subjects[0].id
-      }
     } catch (err: unknown) {
       toast.error(
         getIndonesianErrorMessage(err, 'Gagal memuat data referensi.'),
@@ -94,6 +126,47 @@ export const assessmentItemService = {
         limit: PAGINATION.CHILD_ENTITY_LIMIT,
       })
       store.items = itemsRes.data?.data ?? []
+      store.totalItems = store.items.length
+    } catch (err: unknown) {
+      toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar tugas.'))
+    } finally {
+      store.loading = false
+    }
+  },
+
+  fetchGradingItems: async (teachingAssignmentIds: string[]) => {
+    const store = useAssessmentItemStore()
+    if (teachingAssignmentIds.length === 0) {
+      store.items = []
+      store.totalItems = 0
+      return
+    }
+
+    store.loading = true
+    try {
+      if (teachingAssignmentIds.length === 1) {
+        const itemsRes = await assessmentItemApi.getAssessmentItems({
+          teachingAssignmentId: teachingAssignmentIds[0],
+          limit: 1000,
+        })
+        store.items = itemsRes.data?.data ?? []
+        store.totalItems = store.items.length
+        return
+      }
+
+      const chunks: string[][] = []
+      for (let i = 0; i < teachingAssignmentIds.length; i += 40) {
+        chunks.push(teachingAssignmentIds.slice(i, i + 40))
+      }
+      const responses = await Promise.all(
+        chunks.map((chunk) =>
+          assessmentItemApi.getAssessmentItems({
+            teachingAssignmentIds: chunk.join(','),
+            limit: 1000,
+          }),
+        ),
+      )
+      store.items = responses.flatMap((res) => res.data?.data ?? [])
       store.totalItems = store.items.length
     } catch (err: unknown) {
       toast.error(getIndonesianErrorMessage(err, 'Gagal memuat daftar tugas.'))

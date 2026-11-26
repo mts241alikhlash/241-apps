@@ -6,6 +6,8 @@ export interface EnrollmentSummary {
   status: string | null
   studentUserId: string | null
   studentNis: string | null
+  studentNisn?: string | null
+  studentGender?: string | null
   studentName: string | null
 }
 

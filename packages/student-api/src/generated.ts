@@ -895,10 +895,12 @@ export interface components {
             id: string;
             semesterId: string;
             status: Record<string, never> | null;
+            studentGender?: Record<string, never> | null;
             studentId: string;
             /** @description Resolved from identity-service by this service, not joined. */
             studentName: Record<string, never> | null;
             studentNis: Record<string, never> | null;
+            studentNisn?: Record<string, never> | null;
             /** @description The account behind the student, for callers resolving a name */
             studentUserId: Record<string, never> | null;
         };

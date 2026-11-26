@@ -25,15 +25,10 @@ const isEmpty = computed(() => props.lessons.length === 0)
     gap="none"
     class="shadow-none"
   >
-    <CardHeader
-      standard
-      class="py-3.5"
-    >
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2">
-          <Clock class="size-4 text-muted-foreground" />
-          <CardTitle size="md"> Jadwal Hari Ini </CardTitle>
-        </div>
+    <CardHeader standard>
+      <div class="flex items-center gap-2">
+        <Clock class="size-4 text-muted-foreground" />
+        <CardTitle size="md">Jadwal Hari Ini</CardTitle>
       </div>
     </CardHeader>
     <CardContent variant="standard">
@@ -50,7 +45,7 @@ const isEmpty = computed(() => props.lessons.length === 0)
 
       <div
         v-else-if="isEmpty"
-        class="flex flex-col items-center gap-2 py-8 text-center text-sm text-muted-foreground"
+        class="flex flex-col items-center gap-2 py-6 text-center text-control text-muted-foreground"
       >
         <CalendarOff class="size-8 opacity-40" />
         <p v-if="isWeeklyHoliday">Hari ini libur mingguan.</p>
@@ -64,9 +59,11 @@ const isEmpty = computed(() => props.lessons.length === 0)
         <li
           v-for="lesson in lessons"
           :key="lesson.id"
-          class="flex items-center gap-3 rounded-lg border px-4 py-2.5"
+          class="flex items-center gap-3 rounded-lg border px-4 py-2"
         >
-          <div class="w-24 shrink-0 text-sm font-medium text-muted-foreground">
+          <div
+            class="w-24 shrink-0 text-sm font-medium text-muted-foreground tabular-nums"
+          >
             {{ lesson.startTime }} - {{ lesson.endTime }}
           </div>
           <div class="min-w-0 flex-1">
@@ -78,7 +75,7 @@ const isEmpty = computed(() => props.lessons.length === 0)
           <Badge
             v-if="lesson.room"
             variant="secondary"
-            class="shrink-0 gap-1 font-normal"
+            class="shrink-0"
           >
             <DoorClosed class="size-3" />
             {{ lesson.room }}

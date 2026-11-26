@@ -3875,6 +3875,14 @@
             "type": "object",
             "nullable": true
           },
+          "studentNisn": {
+            "type": "object",
+            "nullable": true
+          },
+          "studentGender": {
+            "type": "object",
+            "nullable": true
+          },
           "studentName": {
             "type": "object",
             "nullable": true,

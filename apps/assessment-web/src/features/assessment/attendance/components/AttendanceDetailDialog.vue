@@ -52,48 +52,32 @@ const formattedDate = computed(() => {
     :open="open"
     @update:open="(val) => emit('update:open', val)"
   >
-    <DialogContent class="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+    <DialogContent size="md">
       <DialogHeader standard>
-        <DialogTitle class="text-base font-semibold"
-          >Detail Kehadiran</DialogTitle
-        >
-        <DialogDescription
-          >Rincian kehadiran siswa pada sesi ini.</DialogDescription
-        >
+        <DialogTitle>Detail Kehadiran</DialogTitle>
+        <DialogDescription>
+          Rincian kehadiran siswa pada tanggal {{ formattedDate }}.
+        </DialogDescription>
       </DialogHeader>
 
-      <DialogBody class="space-y-4 text-xs">
-        <div class="flex items-start gap-2">
-          <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
-            Hari
-          </span>
-          <span class="font-medium text-foreground shrink-0 leading-5">:</span>
-          <span
-            class="flex-1 min-w-0 font-semibold text-foreground break-words leading-5"
-          >
-            {{ dayName }}
-          </span>
-        </div>
+      <DialogBody class="space-y-4">
+        <dl
+          class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 rounded-md border bg-muted/30 px-4 py-2"
+        >
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Hari</dt>
+            <dd class="font-medium">{{ dayName }}</dd>
+          </div>
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-control text-muted-foreground">Tanggal</dt>
+            <dd class="font-medium">{{ formattedDate }}</dd>
+          </div>
+        </dl>
 
-        <div class="flex items-start gap-2">
-          <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
-            Tanggal
-          </span>
-          <span class="font-medium text-foreground shrink-0 leading-5">:</span>
-          <span
-            class="flex-1 min-w-0 font-medium text-foreground break-words leading-5"
-          >
-            {{ formattedDate }}
-          </span>
-        </div>
-
-        <div class="flex items-start gap-2">
-          <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
-            Kehadiran
-          </span>
-          <span class="font-medium text-foreground shrink-0 leading-5">:</span>
-          <div class="flex-1 min-w-0 leading-5 text-foreground">
-            <template v-if="attendances.length === 1">
+        <div class="space-y-2 text-control">
+          <div class="space-y-1">
+            <p class="text-muted-foreground font-medium">Kehadiran</p>
+            <div v-if="attendances.length === 1">
               <span class="font-medium">
                 {{
                   STATUS_LABEL[attendances[0].status] ?? attendances[0].status
@@ -101,73 +85,72 @@ const formattedDate = computed(() => {
               </span>
               <span
                 v-if="attendances[0].schedule?.timeSlot?.name"
-                class="text-muted-foreground text-xs ml-1.5"
+                class="text-muted-foreground ml-1.5"
               >
                 ({{ attendances[0].schedule.timeSlot.name }})
               </span>
-            </template>
-            <template v-else-if="attendances.length > 1">
-              <div class="space-y-1.5 w-full">
-                <div
-                  v-for="(att, idx) in attendances"
-                  :key="att.id ?? idx"
-                  class="flex items-center gap-1.5"
+            </div>
+            <div
+              v-else-if="attendances.length > 1"
+              class="space-y-1"
+            >
+              <div
+                v-for="(att, idx) in attendances"
+                :key="att.id ?? idx"
+                class="flex items-center gap-1.5"
+              >
+                <span class="font-medium">
+                  {{ STATUS_LABEL[att.status] ?? att.status }}
+                </span>
+                <span
+                  v-if="att.schedule?.timeSlot?.name"
+                  class="text-muted-foreground"
                 >
-                  <span class="font-medium">
-                    {{ STATUS_LABEL[att.status] ?? att.status }}
-                  </span>
-                  <span
-                    v-if="att.schedule?.timeSlot?.name"
-                    class="text-muted-foreground text-xs"
-                  >
-                    ({{ att.schedule.timeSlot.name }})
-                  </span>
-                </div>
+                  ({{ att.schedule.timeSlot.name }})
+                </span>
               </div>
-            </template>
-            <span
+            </div>
+            <p
               v-else
               class="text-muted-foreground"
-              >-</span
             >
+              -
+            </p>
           </div>
-        </div>
 
-        <div class="flex items-start gap-2">
-          <span class="w-[90px] shrink-0 font-medium text-foreground leading-5">
-            Catatan
-          </span>
-          <span class="font-medium text-foreground shrink-0 leading-5">:</span>
-          <div class="flex-1 min-w-0 leading-5 text-foreground">
-            <template v-if="attendances.length === 1">
-              <span class="break-words font-medium">
-                {{ attendances[0].note || '-' }}
-              </span>
-            </template>
-            <template v-else-if="attendances.length > 1">
-              <div class="space-y-1">
-                <div
-                  v-for="(att, idx) in attendances"
-                  :key="att.id ?? idx"
-                  class="text-xs"
+          <div class="space-y-1">
+            <p class="text-muted-foreground font-medium">Catatan</p>
+            <p
+              v-if="attendances.length === 1"
+              class="break-words"
+            >
+              {{ attendances[0].note || '-' }}
+            </p>
+            <div
+              v-else-if="attendances.length > 1"
+              class="space-y-1"
+            >
+              <div
+                v-for="(att, idx) in attendances"
+                :key="att.id ?? idx"
+              >
+                <span
+                  v-if="att.schedule?.timeSlot?.name"
+                  class="text-muted-foreground font-medium"
                 >
-                  <span
-                    v-if="att.schedule?.timeSlot?.name"
-                    class="text-muted-foreground font-medium"
-                  >
-                    {{ att.schedule.timeSlot.name }}:
-                  </span>
-                  <span class="ml-1 text-foreground">
-                    {{ att.note || '-' }}
-                  </span>
-                </div>
+                  {{ att.schedule.timeSlot.name }}:
+                </span>
+                <span class="ml-1">
+                  {{ att.note || '-' }}
+                </span>
               </div>
-            </template>
-            <span
+            </div>
+            <p
               v-else
               class="text-muted-foreground"
-              >-</span
             >
+              -
+            </p>
           </div>
         </div>
       </DialogBody>
@@ -175,7 +158,6 @@ const formattedDate = computed(() => {
       <DialogFooter standard>
         <Button
           variant="outline"
-          size="sm"
           @click="emit('update:open', false)"
         >
           Tutup

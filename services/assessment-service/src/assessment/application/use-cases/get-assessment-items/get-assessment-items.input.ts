@@ -4,4 +4,5 @@ import { PaginationQueryInput } from '@mts241alikhlash/nest-core/domain'
 export interface GetAssessmentItemsInput extends PaginationQueryInput {
   type?: AssessmentType
   teachingAssignmentId?: string
+  teachingAssignmentIds?: string[]
 }

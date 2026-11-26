@@ -9,4 +9,10 @@ export interface AssessmentItemColumnActions {
   onGrade?: (item: AssessmentItem) => void
   canUpdate?: boolean
   canDelete?: boolean
+  typeFirst?: boolean
+  hideType?: boolean
+  nameLabel?: string
+  subjectName?: (item: AssessmentItem) => string
+  classroomName?: (item: AssessmentItem) => string
+  showStatus?: boolean
 }

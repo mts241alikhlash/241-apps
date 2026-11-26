@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { ssoAuthRoutes } from '@mts241alikhlash/platform/auth'
 import { assessmentItemRoutes } from '@/features/assessment/assessment-item'
+import { assessmentWeightRoutes } from '@/features/assessment/assessment-weight'
 import { examScoreRoutes } from '@/features/exam-score'
 import { attendanceRoutes } from '@/features/assessment/attendance'
 import { myDashboardRoutes } from '@/features/assessment/my-dashboard'
@@ -20,6 +21,7 @@ export const routes: RouteRecordRaw[] = [
     children: [
       ...myDashboardRoutes,
       ...assessmentItemRoutes,
+      ...assessmentWeightRoutes,
       ...studentScoreRoutes,
       ...examScoreRoutes,
       ...raporRoutes,
