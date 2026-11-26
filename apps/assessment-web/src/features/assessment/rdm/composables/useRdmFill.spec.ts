@@ -1,4 +1,7 @@
+// @vitest-environment happy-dom
+import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
 import { rdmService } from '../services/rdmService'
 import type * as RdmServiceModule from '../services/rdmService'
 import type { RdmCandidateItem, RdmFillResponse } from '../types'
@@ -32,6 +35,20 @@ function makeCandidate(
   }
 }
 
+function mountComposable<T>(factory: () => T): T {
+  let state: T | undefined
+  mount(
+    defineComponent({
+      setup() {
+        state = factory()
+        return () => null
+      },
+    }),
+  )
+  if (state === undefined) throw new Error('composable did not run')
+  return state
+}
+
 describe('useRdmFill', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -43,7 +60,7 @@ describe('useRdmFill', () => {
       sas: [makeCandidate(4, 'FINAL')],
     })
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
 
     expect(fill.selectedIds.value).toEqual(['item-1', 'item-2', 'item-3'])
@@ -57,7 +74,7 @@ describe('useRdmFill', () => {
       sas: [],
     })
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
 
     expect(fill.selectedIds.value).toEqual([])
@@ -72,6 +89,26 @@ describe('useRdmFill', () => {
     expect(fill.selectedIds.value).toHaveLength(15)
     expect(fill.selectedIds.value).not.toContain('item-16')
     expect(fill.selectionError.value).toBe('Maksimal 15 penilaian per file RDM')
+  })
+
+  it('clears a selection error when a new file switches the template kind', async () => {
+    const sixteen = Array.from({ length: 16 }, (_, i) => makeCandidate(i + 1))
+    vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({
+      sumatif: sixteen,
+      sas: [makeCandidate(99, 'FINAL')],
+    })
+
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
+    await fill.loadCandidates()
+    for (let i = 1; i <= 16; i += 1) {
+      fill.toggleItem(`item-${i}`)
+    }
+    expect(fill.selectionError.value).toBe('Maksimal 15 penilaian per file RDM')
+
+    fill.setFile(new File(['tpl'], 'Template SAS-IX.A-Informatika.xlsx'))
+
+    expect(fill.templateKind.value).toBe('sas')
+    expect(fill.selectionError.value).toBeNull()
   })
 
   it('submits file and selected itemIds, stores fill result, and switches to sas without sending sumatif ids', async () => {
@@ -101,7 +138,7 @@ describe('useRdmFill', () => {
     }
     vi.mocked(rdmService.fillTemplate).mockResolvedValueOnce(response)
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
 
     const file = new File(['x'], 'Template Nilai Sumatif-7A-MTK.xlsx')
@@ -147,7 +184,7 @@ describe('useRdmFill', () => {
       },
     })
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
     fill.setFile(new File(['x'], 'template.xlsx'))
     await fill.submit()
@@ -164,7 +201,7 @@ describe('useRdmFill', () => {
       sas: [],
     })
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
 
     const noFileResult = await fill.submit()
@@ -186,7 +223,7 @@ describe('useRdmFill', () => {
       sas: [],
     })
 
-    const fill = useRdmFill(() => 'ta-1')
+    const fill = mountComposable(() => useRdmFill(() => 'ta-1'))
     await fill.loadCandidates()
     fill.setFile(new File(['x'], 'Template Sumatif.xlsx'))
 

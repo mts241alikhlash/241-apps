@@ -67,6 +67,7 @@ watch(
 const canSubmit = computed(() => {
   if (
     !fill.selectedFile.value ||
+    fill.fileError.value ||
     fill.isSubmitting.value ||
     fill.loadingCandidates.value
   ) {

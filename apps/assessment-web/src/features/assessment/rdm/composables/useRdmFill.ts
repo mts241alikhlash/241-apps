@@ -117,6 +117,7 @@ export function useRdmFill(teachingAssignmentId: () => string) {
   function setFile(file: File | null): void {
     form.setFieldValue('file', file, false)
     form.setFieldError('file', undefined)
+    form.setFieldError('itemIds', undefined)
     error.value = null
     result.value = null
     if (file) {

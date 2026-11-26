@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
-import { flushPromises } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
 import { toast } from 'vue-sonner'
 import { rdmService } from '../services/rdmService'
 import type * as RdmServiceModule from '../services/rdmService'
@@ -36,6 +37,20 @@ async function waitForForm() {
   await flushPromises()
 }
 
+function mountComposable<T>(factory: () => T): T {
+  let state: T | undefined
+  mount(
+    defineComponent({
+      setup() {
+        state = factory()
+        return () => null
+      },
+    }),
+  )
+  if (state === undefined) throw new Error('composable did not run')
+  return state
+}
+
 describe('useRdmSetting', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -47,7 +62,7 @@ describe('useRdmSetting', () => {
       sasType: 'FINAL',
     })
 
-    const setting = useRdmSetting()
+    const setting = mountComposable(() => useRdmSetting())
     await setting.load()
 
     expect(setting.sasType.value).toBe('FINAL')
@@ -61,7 +76,7 @@ describe('useRdmSetting', () => {
       sasType: 'FINAL',
     })
 
-    const setting = useRdmSetting()
+    const setting = mountComposable(() => useRdmSetting())
     await setting.load()
 
     setting.toggleSumatif('DAILY', false)
@@ -84,7 +99,7 @@ describe('useRdmSetting', () => {
       sasType: 'FINAL',
     })
 
-    const setting = useRdmSetting()
+    const setting = mountComposable(() => useRdmSetting())
     await setting.load()
 
     setting.form.setFieldValue('sumatifTypes', ['DAILY', 'FINAL'])
@@ -117,7 +132,7 @@ describe('useRdmSetting', () => {
         sasType: 'MIDTERM',
       })
 
-    const setting = useRdmSetting()
+    const setting = mountComposable(() => useRdmSetting())
     await setting.load()
 
     setting.toggleSumatif('PRACTICAL', true)

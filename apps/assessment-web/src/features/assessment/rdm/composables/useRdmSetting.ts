@@ -70,10 +70,6 @@ export function useRdmSetting() {
   const sumatifTypes = computed(() => form.values.sumatifTypes ?? [])
   const sasType = computed(() => form.values.sasType ?? null)
 
-  const hasEmptySumatif = computed(
-    () => sasType.value !== null && sumatifTypes.value.length === 0,
-  )
-
   const isValid = computed(
     () =>
       rdmSettingSchema.safeParse({
@@ -179,7 +175,6 @@ export function useRdmSetting() {
     saving,
     loadError,
     saveError,
-    hasEmptySumatif,
     isValid,
     load,
     toggleSumatif,
