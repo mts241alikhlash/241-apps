@@ -13,6 +13,7 @@ export interface GradingSessionDetail {
     studentId: string
     studentName: string | null
     studentNis: string | null
+    participantNumber: string | null
     status: string
     rawScore: number | null
     maxScore: number | null
@@ -105,6 +106,7 @@ export function toGradingSessionDetail(
   sources: PaperSource[],
   answers: ExamAnswerRecord[],
   ref: StudentRef | null,
+  participantNumber: string | null,
 ): GradingSessionDetail {
   const answerOf = new Map(answers.map((row) => [row.questionId, row]))
   return {
@@ -114,6 +116,7 @@ export function toGradingSessionDetail(
       studentId: session.studentId,
       studentName: ref?.name ?? null,
       studentNis: ref?.nis ?? null,
+      participantNumber,
       status: session.status,
       rawScore: session.rawScore,
       maxScore: session.maxScore,

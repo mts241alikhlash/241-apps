@@ -4,6 +4,7 @@ import { IExamPackageRepository } from '../../../../exam-package/domain/reposito
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import type { ExamAnswerRecord } from '../../../../exam-session/domain/entities/exam-session.entity.js'
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
+import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import { IStudentDirectoryPort } from '../../../../platform/student-directory/student-directory.port.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
 import {
@@ -30,6 +31,7 @@ export class ListScheduleGradingDetailsUseCase {
     private readonly questions: IQuestionRepository,
     private readonly sessions: IExamSessionRepository,
     private readonly students: IStudentDirectoryPort,
+    private readonly participantNumbers: IParticipantNumberPort,
   ) {}
 
   async execute(
@@ -59,7 +61,7 @@ export class ListScheduleGradingDetailsUseCase {
     const studentIds = [
       ...new Set(sessions.map((session) => session.studentId)),
     ]
-    const [sources, answers, refs] = await Promise.all([
+    const [sources, answers, refs, numbers] = await Promise.all([
       loadPaperSources(
         this.schedules,
         this.packages,
@@ -68,6 +70,7 @@ export class ListScheduleGradingDetailsUseCase {
       ),
       this.sessions.listAnswersBySessionIds(sessionIds),
       this.students.refsByIds(studentIds),
+      this.numbersOf(studentIds, schedule.semesterId),
     ])
 
     const answersBySession = new Map<string, ExamAnswerRecord[]>()
@@ -84,7 +87,19 @@ export class ListScheduleGradingDetailsUseCase {
         sources,
         answersBySession.get(session.id) ?? [],
         refOf.get(session.studentId) ?? null,
+        numbers.get(session.studentId) ?? null,
       ),
     )
+  }
+
+  private async numbersOf(
+    studentIds: string[],
+    semesterId: string,
+  ): Promise<Map<string, string>> {
+    try {
+      return await this.participantNumbers.findNumbers(studentIds, semesterId)
+    } catch {
+      return new Map()
+    }
   }
 }

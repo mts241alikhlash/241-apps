@@ -88,6 +88,8 @@ export class GradingSessionRowDto {
   @ApiProperty({ format: 'uuid' }) studentId!: string
   @ApiProperty({ type: String, nullable: true }) studentName!: string | null
   @ApiProperty({ type: String, nullable: true }) studentNis!: string | null
+  @ApiProperty({ type: String, nullable: true })
+  participantNumber!: string | null
   @ApiProperty({ enum: SESSION_STATUSES }) status!: GradingSessionRow['status']
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   submittedAt!: string | null
@@ -104,6 +106,7 @@ export class GradingSessionRowDto {
     dto.studentId = domain.studentId
     dto.studentName = domain.studentName
     dto.studentNis = domain.studentNis
+    dto.participantNumber = domain.participantNumber
     dto.status = domain.status
     dto.submittedAt = domain.submittedAt?.toISOString() ?? null
     dto.rawScore = domain.rawScore
@@ -196,6 +199,8 @@ export class GradingSessionSummaryDto {
   @ApiProperty({ format: 'uuid' }) studentId!: string
   @ApiProperty({ type: String, nullable: true }) studentName!: string | null
   @ApiProperty({ type: String, nullable: true }) studentNis!: string | null
+  @ApiProperty({ type: String, nullable: true })
+  participantNumber!: string | null
   @ApiProperty({ enum: SESSION_STATUSES }) status!: string
   @ApiProperty({ type: Number, nullable: true }) rawScore!: number | null
   @ApiProperty({ type: Number, nullable: true }) maxScore!: number | null

@@ -77,6 +77,7 @@ const sampleDetail: GradingDetail = {
     studentId: 'stu-1',
     studentName: 'Ahmad',
     studentNis: '1001',
+    participantNumber: '26-0001',
     status: 'SUBMITTED',
     rawScore: 80,
     maxScore: 100,
@@ -123,6 +124,19 @@ describe('GradingDetailView read-only vs grade permissions', () => {
     expect(
       wrapper.get('[data-test="grade-dialog"]').attributes('data-can-grade'),
     ).toBe('false')
+    wrapper.unmount()
+  })
+
+  it('shows the participant number and the name, not the nis', async () => {
+    permissions.add('exam-grading.read')
+    permissions.add('exam-grading.read-all')
+    const wrapper = mount(GradingDetailView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('No. Peserta')
+    expect(wrapper.text()).toContain('26-0001')
+    expect(wrapper.text()).toContain('Nama Siswa')
+    expect(wrapper.text()).not.toContain('1001')
     wrapper.unmount()
   })
 
