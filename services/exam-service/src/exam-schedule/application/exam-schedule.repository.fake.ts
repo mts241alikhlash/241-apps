@@ -283,6 +283,24 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     )
   }
 
+  findOfflineBySemester(semesterId: string) {
+    return Promise.resolve(
+      [...this.schedules.values()]
+        .filter(
+          (row) =>
+            row.semesterId === semesterId &&
+            row.deliveryMode === 'OFFLINE' &&
+            row.kind === 'REGULAR' &&
+            row.status !== 'CANCELLED',
+        )
+        .sort(
+          (a, b) =>
+            a.startsAt.getTime() - b.startsAt.getTime() ||
+            a.id.localeCompare(b.id),
+        ),
+    )
+  }
+
   listIdsByPackage(packageId: string) {
     return Promise.resolve(
       [...this.schedules.values()]

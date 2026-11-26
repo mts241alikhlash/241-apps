@@ -28,6 +28,8 @@ export const API_ERROR_CODES = [
   'OFFLINE_NO_PACKAGE',
   'OFFLINE_NO_TOKEN',
   'SCHEDULE_CANCELLED',
+  'SCHEDULE_NOT_OFFLINE',
+  'OFFLINE_SCORES_MISSING',
 ] as const
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number]

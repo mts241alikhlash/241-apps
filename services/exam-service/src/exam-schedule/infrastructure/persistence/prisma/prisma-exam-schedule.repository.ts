@@ -361,6 +361,20 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     return rows.map(toSchedule)
   }
 
+  async findOfflineBySemester(semesterId: string): Promise<ExamSchedule[]> {
+    const rows = await this.prisma.examSchedule.findMany({
+      where: {
+        semesterId,
+        deliveryMode: 'OFFLINE',
+        kind: 'REGULAR',
+        status: { not: 'CANCELLED' },
+      },
+      include: SCHEDULE_INCLUDE,
+      orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+    })
+    return rows.map(toSchedule)
+  }
+
   async listIdsByPackage(packageId: string): Promise<string[]> {
     const rows = await this.prisma.examSchedule.findMany({
       where: { packageId },

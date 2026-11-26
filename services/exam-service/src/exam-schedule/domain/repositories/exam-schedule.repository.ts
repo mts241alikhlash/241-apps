@@ -105,4 +105,5 @@ export abstract class IExamScheduleRepository {
     from: Date,
     to: Date,
   ): Promise<ExamSchedule[]>
+  abstract findOfflineBySemester(semesterId: string): Promise<ExamSchedule[]>
 }

@@ -152,6 +152,27 @@ suite('Delivery mode constraints against a real database', () => {
     )
   })
 
+  it('finds the offline regular schedules of a semester that are not cancelled', async () => {
+    const repository = new PrismaExamScheduleRepository(prisma)
+    const offline = await schedule('OFFLINE', null)
+    const cancelled = await schedule('OFFLINE', null)
+    const online = await schedule('ONLINE', null)
+    const semesterId = offline.semesterId
+    await prisma.examSchedule.updateMany({
+      where: { id: { in: [cancelled.id, online.id] } },
+      data: { semesterId },
+    })
+    await prisma.examSchedule.update({
+      where: { id: cancelled.id },
+      data: { status: 'CANCELLED' },
+    })
+
+    const found = await repository.findOfflineBySemester(semesterId)
+
+    expect(found.map((row) => row.id)).toEqual([offline.id])
+    expect(found[0]).toMatchObject({ deliveryMode: 'OFFLINE', packageId: null })
+  })
+
   it('stores every offline publication state and refuses any other', async () => {
     const row = await schedule('OFFLINE', null)
     for (const status of ['PENDING', 'SENT', 'FAILED']) {
