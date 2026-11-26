@@ -50,6 +50,11 @@ function selectFileOnInput(file: File) {
   input!.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
+async function waitForForm() {
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  await flushPromises()
+}
+
 describe('RdmFillDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -104,14 +109,14 @@ describe('RdmFillDialog', () => {
 
     const file = new File(['tpl'], 'Template Nilai Sumatif-7A-MTK.xlsx')
     selectFileOnInput(file)
-    await flushPromises()
+    await waitForForm()
 
     const submitBtn = Array.from(
       document.body.querySelectorAll<HTMLButtonElement>('button'),
     ).find((btn) => btn.textContent?.includes('Isi Template'))
     expect(submitBtn).toBeDefined()
     submitBtn!.click()
-    await flushPromises()
+    await waitForForm()
 
     expect(rdmService.fillTemplate).toHaveBeenCalledWith({
       teachingAssignmentId: 'ta-1',
@@ -154,7 +159,7 @@ describe('RdmFillDialog', () => {
     })
     await flushPromises()
     selectFileOnInput(new File(['tpl'], 'Template Nilai Sumatif-7A.xlsx'))
-    await flushPromises()
+    await waitForForm()
 
     const submitButton = () =>
       Array.from(
@@ -163,12 +168,44 @@ describe('RdmFillDialog', () => {
     expect(submitButton()?.disabled).toBe(true)
 
     resolvers[0]?.({ sumatif: [], sas: [] })
-    await flushPromises()
+    await waitForForm()
     expect(submitButton()?.disabled).toBe(true)
 
     submitButton()?.click()
-    await flushPromises()
+    await waitForForm()
     expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('refuses submit without a file and shows zod file error when submitted', async () => {
+    vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({
+      sumatif: [makeCandidate(1)],
+      sas: [],
+    })
+
+    const wrapper = mount(RdmFillDialog, {
+      props: { open: true, teachingAssignmentId: 'ta-1' },
+      attachTo: document.body,
+    })
+    await flushPromises()
+
+    const submitBtn = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>('button'),
+    ).find((btn) => btn.textContent?.includes('Isi Template'))
+    expect(submitBtn?.disabled).toBe(true)
+
+    const form = document.body.querySelector<HTMLFormElement>('#rdm-fill-form')
+    expect(form).not.toBeNull()
+    form!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await waitForForm()
+
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+    expect(document.body.textContent).toContain(
+      'Pilih file template RDM (.xlsx)',
+    )
 
     wrapper.unmount()
   })
@@ -197,15 +234,54 @@ describe('RdmFillDialog', () => {
     for (let i = 0; i < 15; i += 1) {
       checkboxes[i].click()
     }
-    await flushPromises()
+    await waitForForm()
 
     checkboxes[15].click()
-    await flushPromises()
+    await waitForForm()
 
     expect(checkboxes[15].getAttribute('aria-checked')).toBe('false')
     expect(document.body.textContent).toContain(
       'Maksimal 15 penilaian per file RDM',
     )
+
+    wrapper.unmount()
+  })
+
+  it('shows zod message when Sumatif selection is cleared and refuses submit', async () => {
+    vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({
+      sumatif: [makeCandidate(1), makeCandidate(2)],
+      sas: [],
+    })
+
+    const wrapper = mount(RdmFillDialog, {
+      props: { open: true, teachingAssignmentId: 'ta-1' },
+      attachTo: document.body,
+    })
+    await flushPromises()
+
+    selectFileOnInput(new File(['tpl'], 'Template Nilai Sumatif-7A.xlsx'))
+    await waitForForm()
+
+    const clearBtn = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>('button'),
+    ).find((btn) => btn.textContent?.includes('Kosongkan'))
+    expect(clearBtn).toBeDefined()
+    clearBtn!.click()
+    await waitForForm()
+
+    expect(document.body.textContent).toContain('Pilih minimal satu penilaian')
+
+    const submitBtn = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>('button'),
+    ).find((btn) => btn.textContent?.includes('Isi Template'))
+    expect(submitBtn?.disabled).toBe(true)
+
+    const form = document.body.querySelector<HTMLFormElement>('#rdm-fill-form')
+    form!.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    )
+    await waitForForm()
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
@@ -243,13 +319,13 @@ describe('RdmFillDialog', () => {
     await flushPromises()
 
     selectFileOnInput(new File(['sas'], 'Template SAS-7A-MTK.xlsx'))
-    await flushPromises()
+    await waitForForm()
 
     const submitBtn = Array.from(
       document.body.querySelectorAll<HTMLButtonElement>('button'),
     ).find((btn) => btn.textContent?.includes('Isi Template'))
     submitBtn!.click()
-    await flushPromises()
+    await waitForForm()
 
     const text = document.body.textContent ?? ''
     expect(text).toContain(RDM_STEPS_TEXT)
@@ -280,13 +356,13 @@ describe('RdmFillDialog', () => {
     await flushPromises()
 
     selectFileOnInput(new File(['x'], 'Template Nilai Sumatif-7A-MTK.xlsx'))
-    await flushPromises()
+    await waitForForm()
 
     const submitBtn = Array.from(
       document.body.querySelectorAll<HTMLButtonElement>('button'),
     ).find((btn) => btn.textContent?.includes('Isi Template'))
     submitBtn!.click()
-    await flushPromises()
+    await waitForForm()
 
     expect(document.body.textContent).toContain(
       'Template SAS membutuhkan tepat satu penilaian jenis FINAL. Saat ini ada 0.',

@@ -157,4 +157,59 @@ describe('useRdmFill', () => {
     )
     expect(fill.result.value).toBeNull()
   })
+
+  it('refuses submit without a valid xlsx file', async () => {
+    vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({
+      sumatif: [makeCandidate(1)],
+      sas: [],
+    })
+
+    const fill = useRdmFill(() => 'ta-1')
+    await fill.loadCandidates()
+
+    const noFileResult = await fill.submit()
+    expect(noFileResult).toBeNull()
+    expect(fill.fileError.value).toBe('Pilih file template RDM (.xlsx)')
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+
+    fill.setFile(new File(['x'], 'notes.txt'))
+    const wrongExtResult = await fill.submit()
+    expect(wrongExtResult).toBeNull()
+    expect(fill.fileError.value).toBe('Pilih file template RDM (.xlsx)')
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+  })
+
+  it('refuses submit when sumatif items are empty or exceed 15, or when sas count is not 1', async () => {
+    const sixteen = Array.from({ length: 16 }, (_, i) => makeCandidate(i + 1))
+    vi.mocked(rdmService.getCandidates).mockResolvedValueOnce({
+      sumatif: sixteen,
+      sas: [],
+    })
+
+    const fill = useRdmFill(() => 'ta-1')
+    await fill.loadCandidates()
+    fill.setFile(new File(['x'], 'Template Sumatif.xlsx'))
+
+    const emptyResult = await fill.submit()
+    expect(emptyResult).toBeNull()
+    expect(fill.selectionError.value).toBe('Pilih minimal satu penilaian')
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+
+    fill.form.setFieldValue(
+      'itemIds',
+      sixteen.map((item) => item.id),
+    )
+    const overLimitResult = await fill.submit()
+    expect(overLimitResult).toBeNull()
+    expect(fill.selectionError.value).toBe('Maksimal 15 penilaian per file RDM')
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+
+    fill.setTemplateKind('sas')
+    const invalidSasResult = await fill.submit()
+    expect(invalidSasResult).toBeNull()
+    expect(fill.selectionError.value).toBe(
+      'Template SAS membutuhkan tepat satu penilaian SAS (saat ini ada 0).',
+    )
+    expect(rdmService.fillTemplate).not.toHaveBeenCalled()
+  })
 })

@@ -60,6 +60,11 @@ function findSaveButton(): HTMLButtonElement | undefined {
   )
 }
 
+async function waitForForm() {
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  await flushPromises()
+}
+
 describe('RdmSettingView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -141,7 +146,7 @@ describe('RdmSettingView', () => {
     wrapper.unmount()
   })
 
-  it('requires at least one Sumatif type and sends PUT body with success toast on save', async () => {
+  it('requires at least one Sumatif type under the Sumatif field and sends PUT body with success toast on save', async () => {
     vi.mocked(rdmService.getSettings).mockResolvedValueOnce({
       sumatifTypes: ['DAILY'],
       sasType: 'FINAL',
@@ -158,21 +163,26 @@ describe('RdmSettingView', () => {
     const radios = getRadios()
 
     checkboxes[0].click()
-    await flushPromises()
+    await waitForForm()
     expect(findSaveButton()?.disabled).toBe(true)
-    expect(document.body.textContent).toContain(
-      'Pilih minimal satu jenis penilaian untuk Sumatif',
+
+    const sumatifFieldItem = document.body.querySelector(
+      '[data-slot="form-item"]',
     )
+    expect(
+      sumatifFieldItem?.querySelector('[data-slot="form-message"]')
+        ?.textContent,
+    ).toContain('Pilih minimal satu jenis penilaian untuk Sumatif')
 
     checkboxes[0].click()
     checkboxes[2].click()
     radios[3].click()
-    await flushPromises()
+    await waitForForm()
 
     const saveBtn = findSaveButton()
     expect(saveBtn?.disabled).toBe(false)
     saveBtn!.click()
-    await flushPromises()
+    await waitForForm()
 
     expect(rdmService.updateSettings).toHaveBeenCalledWith({
       sumatifTypes: ['DAILY', 'PRACTICAL'],
@@ -183,7 +193,7 @@ describe('RdmSettingView', () => {
     wrapper.unmount()
   })
 
-  it('shows API error messages verbatim', async () => {
+  it('shows API error messages verbatim and keeps user choices on failed save', async () => {
     vi.mocked(rdmService.getSettings).mockResolvedValueOnce({
       sumatifTypes: ['DAILY'],
       sasType: 'FINAL',
@@ -200,13 +210,18 @@ describe('RdmSettingView', () => {
     const wrapper = mount(RdmSettingView, { attachTo: document.body })
     await flushPromises()
 
+    const checkboxes = getCheckboxes()
+    checkboxes[1].click()
+    await waitForForm()
+
     const saveBtn = findSaveButton()
     saveBtn!.click()
-    await flushPromises()
+    await waitForForm()
 
     expect(document.body.textContent).toContain(
       'Jenis penilaian SAS tidak boleh juga dipakai untuk Sumatif',
     )
+    expect(checkboxes[1].getAttribute('aria-checked')).toBe('true')
 
     wrapper.unmount()
   })
@@ -225,6 +240,31 @@ describe('RdmSettingView', () => {
     expect(saveBtn === undefined || saveBtn.disabled).toBe(true)
     expect(getCheckboxes().every((cb) => cb.disabled)).toBe(true)
     expect(getRadios().every((r) => r.disabled)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('shows load error and retries loading settings', async () => {
+    vi.mocked(rdmService.getSettings)
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({
+        sumatifTypes: ['DAILY'],
+        sasType: 'FINAL',
+      })
+
+    const wrapper = mount(RdmSettingView, { attachTo: document.body })
+    await flushPromises()
+
+    expect(document.body.textContent).toContain('Gagal memuat pengaturan RDM.')
+    const retryBtn = Array.from(document.body.querySelectorAll('button')).find(
+      (btn) => btn.textContent?.includes('Coba Lagi'),
+    )
+    expect(retryBtn).toBeDefined()
+    retryBtn!.click()
+    await flushPromises()
+
+    expect(rdmService.getSettings).toHaveBeenCalledTimes(2)
+    expect(getCheckboxes()).toHaveLength(5)
 
     wrapper.unmount()
   })

@@ -15,6 +15,12 @@ import {
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
 import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@mts241alikhlash/ui/form'
+import {
   Table,
   TableBody,
   TableCell,
@@ -69,7 +75,10 @@ const canSubmit = computed(() => {
   if (fill.templateKind.value === 'sas') {
     return fill.sasCandidates.value.length === 1
   }
-  return fill.selectedIds.value.length > 0
+  return (
+    fill.selectedIds.value.length > 0 &&
+    fill.selectedIds.value.length <= RDM_MAX_SUMATIF_ITEMS
+  )
 })
 
 function handleFileChange(event: Event) {
@@ -100,146 +109,188 @@ function handleResetFlow() {
 
       <DialogBody class="space-y-4">
         <template v-if="!fill.result.value">
-          <FileDropzone
-            accept=".xlsx"
-            hint="File .xlsx yang diunduh dari RDM (maksimal 2 MB)"
-            placeholder="Pilih atau tarik template RDM (.xlsx)"
-            :file-name="fill.selectedFile.value?.name ?? null"
-            :disabled="fill.isSubmitting.value"
-            clearable
-            aria-label="Pilih template RDM"
-            @change="handleFileChange"
-            @clear="fill.setFile(null)"
-          />
-
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-control font-medium text-foreground">
-              Jenis Template
-            </span>
-            <div class="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                :variant="
-                  fill.templateKind.value === 'sumatif' ? 'default' : 'outline'
-                "
-                @click="fill.setTemplateKind('sumatif')"
-              >
-                Sumatif
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                :variant="
-                  fill.templateKind.value === 'sas' ? 'default' : 'outline'
-                "
-                @click="fill.setTemplateKind('sas')"
-              >
-                SAS
-              </Button>
-            </div>
-          </div>
-
-          <div
-            v-if="fill.loadingCandidates.value"
-            class="flex items-center gap-2 text-control text-muted-foreground"
+          <form
+            id="rdm-fill-form"
+            class="space-y-4"
+            @submit.prevent="fill.onSubmit"
           >
-            <Loader2 class="size-4 animate-spin" />
-            Memuat daftar penilaian...
-          </div>
-
-          <template v-else-if="fill.templateKind.value === 'sumatif'">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between gap-2">
-                <span class="text-control font-medium">
-                  Pilih Penilaian Sumatif
-                </span>
-                <div class="flex items-center gap-2">
-                  <span class="text-control text-muted-foreground tabular-nums">
-                    Dipilih: {{ fill.selectedIds.value.length }}/{{
-                      RDM_MAX_SUMATIF_ITEMS
-                    }}
-                  </span>
-                  <Button
-                    v-if="fill.selectedIds.value.length > 0"
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    @click="fill.clearSelection()"
-                  >
-                    Kosongkan
-                  </Button>
-                </div>
-              </div>
-
-              <div
-                v-if="fill.sumatifCandidates.value.length === 0"
-                class="rounded-md border bg-muted/30 p-3 text-control text-muted-foreground"
-              >
-                Belum ada penilaian sumatif untuk jadwal mengajar ini.
-              </div>
-
-              <div
-                v-else
-                class="max-h-56 space-y-1.5 overflow-y-auto rounded-md border p-2"
-              >
-                <label
-                  v-for="item in fill.sumatifCandidates.value"
-                  :key="item.id"
-                  class="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 text-control hover:bg-muted/30"
-                >
-                  <Checkbox
-                    :model-value="fill.selectedIds.value.includes(item.id)"
-                    @update:model-value="fill.toggleItem(item.id)"
+            <FormField
+              v-slot="{ errorMessage }"
+              name="file"
+            >
+              <FormItem>
+                <FormControl>
+                  <FileDropzone
+                    accept=".xlsx"
+                    hint="File .xlsx yang diunduh dari RDM (maksimal 2 MB)"
+                    placeholder="Pilih atau tarik template RDM (.xlsx)"
+                    :file-name="fill.selectedFile.value?.name ?? null"
+                    :disabled="fill.isSubmitting.value"
+                    :invalid="Boolean(errorMessage)"
+                    clearable
+                    aria-label="Pilih template RDM"
+                    @change="handleFileChange"
+                    @clear="fill.setFile(null)"
                   />
-                  <span class="min-w-0 flex-1 truncate font-medium">
-                    {{ item.name }}
-                  </span>
-                  <span class="shrink-0 text-muted-foreground">
-                    {{ ASSESSMENT_TYPE_LABELS[item.type] }}
-                  </span>
-                </label>
-              </div>
-            </div>
-          </template>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-          <template v-else>
+            <FormField name="templateKind">
+              <FormItem>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-control font-medium text-foreground">
+                    Jenis Template
+                  </span>
+                  <FormControl>
+                    <div class="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        :variant="
+                          fill.templateKind.value === 'sumatif'
+                            ? 'default'
+                            : 'outline'
+                        "
+                        @click="fill.setTemplateKind('sumatif')"
+                      >
+                        Sumatif
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        :variant="
+                          fill.templateKind.value === 'sas'
+                            ? 'default'
+                            : 'outline'
+                        "
+                        @click="fill.setTemplateKind('sas')"
+                      >
+                        SAS
+                      </Button>
+                    </div>
+                  </FormControl>
+                </div>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+
             <div
-              v-if="fill.sasCandidates.value.length === 1"
-              class="rounded-md border bg-muted/30 px-3 py-2 text-control"
+              v-if="fill.loadingCandidates.value"
+              class="flex items-center gap-2 text-control text-muted-foreground"
             >
-              Penilaian SAS:
-              <span class="font-medium">{{
-                fill.sasCandidates.value[0].name
-              }}</span>
+              <Loader2 class="size-4 animate-spin" />
+              Memuat daftar penilaian...
             </div>
-            <Alert
+
+            <FormField
               v-else
-              class="border-warning/30 bg-warning/10 text-warning"
+              name="itemIds"
             >
-              <AlertTriangle class="size-4" />
-              <AlertDescription class="text-warning">
-                Template SAS membutuhkan tepat satu penilaian SAS (saat ini ada
-                {{ fill.sasCandidates.value.length }}).
-              </AlertDescription>
+              <FormItem>
+                <template v-if="fill.templateKind.value === 'sumatif'">
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-control font-medium">
+                        Pilih Penilaian Sumatif
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <span
+                          class="text-control text-muted-foreground tabular-nums"
+                        >
+                          Dipilih: {{ fill.selectedIds.value.length }}/{{
+                            RDM_MAX_SUMATIF_ITEMS
+                          }}
+                        </span>
+                        <Button
+                          v-if="fill.selectedIds.value.length > 0"
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          @click="fill.clearSelection()"
+                        >
+                          Kosongkan
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="fill.sumatifCandidates.value.length === 0"
+                      class="rounded-md border bg-muted/30 p-3 text-control text-muted-foreground"
+                    >
+                      Belum ada penilaian sumatif untuk jadwal mengajar ini.
+                    </div>
+
+                    <FormControl v-else>
+                      <div
+                        class="max-h-56 space-y-1.5 overflow-y-auto rounded-md border p-2"
+                      >
+                        <label
+                          v-for="item in fill.sumatifCandidates.value"
+                          :key="item.id"
+                          class="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 text-control hover:bg-muted/30"
+                        >
+                          <Checkbox
+                            :model-value="
+                              fill.selectedIds.value.includes(item.id)
+                            "
+                            @update:model-value="fill.toggleItem(item.id)"
+                          />
+                          <span class="min-w-0 flex-1 truncate font-medium">
+                            {{ item.name }}
+                          </span>
+                          <span class="shrink-0 text-muted-foreground">
+                            {{ ASSESSMENT_TYPE_LABELS[item.type] }}
+                          </span>
+                        </label>
+                      </div>
+                    </FormControl>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div
+                    v-if="fill.sasCandidates.value.length === 1"
+                    class="rounded-md border bg-muted/30 px-3 py-2 text-control"
+                  >
+                    Penilaian SAS:
+                    <span class="font-medium">{{
+                      fill.sasCandidates.value[0].name
+                    }}</span>
+                  </div>
+                  <Alert
+                    v-else
+                    class="border-warning/30 bg-warning/10 text-warning"
+                  >
+                    <AlertTriangle class="size-4" />
+                    <AlertDescription class="text-warning">
+                      Template SAS membutuhkan tepat satu penilaian SAS (saat
+                      ini ada {{ fill.sasCandidates.value.length }}).
+                    </AlertDescription>
+                  </Alert>
+                </template>
+
+                <Alert
+                  v-if="fill.selectionError.value"
+                  variant="destructive"
+                >
+                  <AlertCircle class="size-4" />
+                  <AlertDescription>{{
+                    fill.selectionError.value
+                  }}</AlertDescription>
+                </Alert>
+              </FormItem>
+            </FormField>
+
+            <Alert
+              v-if="fill.error.value"
+              variant="destructive"
+            >
+              <AlertCircle class="size-4" />
+              <AlertDescription>{{ fill.error.value }}</AlertDescription>
             </Alert>
-          </template>
-
-          <Alert
-            v-if="fill.selectionError.value"
-            variant="destructive"
-          >
-            <AlertCircle class="size-4" />
-            <AlertDescription>{{ fill.selectionError.value }}</AlertDescription>
-          </Alert>
-
-          <Alert
-            v-if="fill.error.value"
-            variant="destructive"
-          >
-            <AlertCircle class="size-4" />
-            <AlertDescription>{{ fill.error.value }}</AlertDescription>
-          </Alert>
+          </form>
         </template>
 
         <template v-else>
@@ -353,9 +404,9 @@ function handleResetFlow() {
             Batal
           </Button>
           <Button
-            type="button"
+            type="submit"
+            form="rdm-fill-form"
             :disabled="!canSubmit"
-            @click="fill.submit()"
           >
             <Loader2
               v-if="fill.isSubmitting.value"

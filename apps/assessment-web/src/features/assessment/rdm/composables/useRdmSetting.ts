@@ -1,5 +1,8 @@
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
+import * as z from 'zod'
 import type { AssessmentType } from '@/features/assessment/assessment-item'
 import { ASSESSMENT_TYPE_ORDER } from '@/features/assessment/assessment-item/constants/category'
 import { extractRdmErrorMessage, rdmService } from '../services/rdmService'
@@ -8,6 +11,31 @@ import type { RdmSetting } from '../types'
 const ORDERED_ASSESSMENT_TYPES = (
   Object.keys(ASSESSMENT_TYPE_ORDER) as AssessmentType[]
 ).sort((a, b) => ASSESSMENT_TYPE_ORDER[a] - ASSESSMENT_TYPE_ORDER[b])
+
+const assessmentTypeSchema = z.enum([
+  'DAILY',
+  'ASSIGNMENT',
+  'PRACTICAL',
+  'MIDTERM',
+  'FINAL',
+])
+
+export const rdmSettingSchema = z
+  .object({
+    sumatifTypes: z
+      .array(assessmentTypeSchema)
+      .min(1, 'Pilih minimal satu jenis penilaian untuk Sumatif'),
+    sasType: assessmentTypeSchema,
+  })
+  .refine((data) => !data.sumatifTypes.includes(data.sasType), {
+    message: 'Jenis penilaian SAS tidak boleh juga dipakai untuk Sumatif',
+    path: ['sumatifTypes'],
+  })
+
+interface RdmSettingFormValues {
+  sumatifTypes: AssessmentType[]
+  sasType: AssessmentType | undefined
+}
 
 export function isAssessmentType(value: string): value is AssessmentType {
   return value in ASSESSMENT_TYPE_ORDER
@@ -23,19 +51,35 @@ function normalizeSumatifTypes(
 }
 
 export function useRdmSetting() {
-  const sumatifTypes = ref<AssessmentType[]>([])
-  const sasType = ref<AssessmentType | null>(null)
   const loading = ref(false)
   const saving = ref(false)
   const loadError = ref<string | null>(null)
   const saveError = ref<string | null>(null)
+
+  const form = useForm<RdmSettingFormValues>({
+    validationSchema: toTypedSchema(rdmSettingSchema),
+    initialValues: {
+      sumatifTypes: [],
+      sasType: undefined,
+    },
+  })
+
+  form.defineField('sumatifTypes')
+  form.defineField('sasType')
+
+  const sumatifTypes = computed(() => form.values.sumatifTypes ?? [])
+  const sasType = computed(() => form.values.sasType ?? null)
 
   const hasEmptySumatif = computed(
     () => sasType.value !== null && sumatifTypes.value.length === 0,
   )
 
   const isValid = computed(
-    () => sasType.value !== null && sumatifTypes.value.length > 0,
+    () =>
+      rdmSettingSchema.safeParse({
+        sumatifTypes: sumatifTypes.value,
+        sasType: sasType.value,
+      }).success,
   )
 
   async function load(): Promise<void> {
@@ -44,11 +88,16 @@ export function useRdmSetting() {
     saveError.value = null
     try {
       const setting = await rdmService.getSettings()
-      sasType.value = setting.sasType
-      sumatifTypes.value = normalizeSumatifTypes(
-        setting.sumatifTypes,
-        setting.sasType,
-      )
+      form.resetForm({
+        values: {
+          sumatifTypes: normalizeSumatifTypes(
+            setting.sumatifTypes,
+            setting.sasType,
+          ),
+          sasType: setting.sasType,
+        },
+      })
+      await nextTick()
     } catch (err: unknown) {
       loadError.value = await extractRdmErrorMessage(
         err,
@@ -65,45 +114,64 @@ export function useRdmSetting() {
     const next = checked
       ? [...sumatifTypes.value, type]
       : sumatifTypes.value.filter((item) => item !== type)
-    sumatifTypes.value = normalizeSumatifTypes(next, sasType.value)
+    form.setFieldValue(
+      'sumatifTypes',
+      normalizeSumatifTypes(next, sasType.value),
+    )
   }
 
   function setSasType(type: AssessmentType): void {
     saveError.value = null
-    sasType.value = type
-    sumatifTypes.value = normalizeSumatifTypes(sumatifTypes.value, type)
+    form.setFieldValue('sasType', type)
+    form.setFieldValue(
+      'sumatifTypes',
+      normalizeSumatifTypes(sumatifTypes.value, type),
+    )
   }
 
-  async function save(): Promise<boolean> {
-    if (!isValid.value || saving.value || sasType.value === null) return false
+  let lastSaveSucceeded = false
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    lastSaveSucceeded = false
+    if (saving.value || !values.sasType) return
 
     saving.value = true
     saveError.value = null
     const payload: RdmSetting = {
-      sumatifTypes: [...sumatifTypes.value],
-      sasType: sasType.value,
+      sumatifTypes: [...values.sumatifTypes],
+      sasType: values.sasType,
     }
     try {
       const updated = await rdmService.updateSettings(payload)
-      sasType.value = updated.sasType
-      sumatifTypes.value = normalizeSumatifTypes(
-        updated.sumatifTypes,
-        updated.sasType,
-      )
+      form.resetForm({
+        values: {
+          sumatifTypes: normalizeSumatifTypes(
+            updated.sumatifTypes,
+            updated.sasType,
+          ),
+          sasType: updated.sasType,
+        },
+      })
       toast.success('Pengaturan RDM berhasil disimpan.')
-      return true
+      lastSaveSucceeded = true
     } catch (err: unknown) {
       saveError.value = await extractRdmErrorMessage(
         err,
         'Gagal menyimpan pengaturan RDM.',
       )
-      return false
     } finally {
       saving.value = false
     }
+  })
+
+  async function save(): Promise<boolean> {
+    lastSaveSucceeded = false
+    await onSubmit()
+    return lastSaveSucceeded
   }
 
   return {
+    form,
     assessmentTypes: ORDERED_ASSESSMENT_TYPES,
     sumatifTypes,
     sasType,
@@ -116,6 +184,7 @@ export function useRdmSetting() {
     load,
     toggleSumatif,
     setSasType,
+    onSubmit,
     save,
   }
 }

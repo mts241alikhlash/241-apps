@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, useId } from 'vue'
-import { AlertCircle, AlertTriangle, Loader2 } from '@lucide/vue'
+import { AlertCircle, Loader2 } from '@lucide/vue'
 import { useRoleGuard } from '@mts241alikhlash/platform/auth'
 import { Alert, AlertDescription } from '@mts241alikhlash/ui/alert'
 import { Button } from '@mts241alikhlash/ui/button'
@@ -12,6 +12,12 @@ import {
   CardTitle,
 } from '@mts241alikhlash/ui/card'
 import { Checkbox } from '@mts241alikhlash/ui/checkbox'
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@mts241alikhlash/ui/form'
 import { RadioGroup, RadioGroupItem } from '@mts241alikhlash/ui/radio-group'
 import { ASSESSMENT_TYPE_LABELS } from '@/features/assessment/assessment-item/constants/category'
 import { isAssessmentType, useRdmSetting } from '../composables/useRdmSetting'
@@ -28,12 +34,11 @@ const {
   saving,
   loadError,
   saveError,
-  hasEmptySumatif,
   isValid,
   load,
   toggleSumatif,
   setSasType,
-  save,
+  onSubmit,
 } = useRdmSetting()
 
 const sasModel = computed<string>({
@@ -96,97 +101,106 @@ onMounted(() => {
           Memuat pengaturan RDM...
         </div>
 
-        <template v-else>
+        <form
+          v-else
+          id="rdm-setting-form"
+          class="space-y-4"
+          @submit.prevent="onSubmit"
+        >
           <div class="grid gap-4 md:grid-cols-2">
-            <section class="space-y-3 rounded-md border p-4">
-              <div class="space-y-1">
-                <h4 class="text-md font-semibold">Template Sumatif</h4>
-                <p class="text-control text-muted-foreground">
-                  Pilih satu atau beberapa jenis penilaian untuk dikirim ke
-                  template Nilai Sumatif RDM.
-                </p>
-              </div>
+            <FormField name="sumatifTypes">
+              <FormItem class="flex flex-col gap-3 rounded-md border p-4">
+                <div class="space-y-1">
+                  <h4 class="text-md font-semibold">Template Sumatif</h4>
+                  <p class="text-control text-muted-foreground">
+                    Pilih satu atau beberapa jenis penilaian untuk dikirim ke
+                    template Nilai Sumatif RDM.
+                  </p>
+                </div>
 
-              <div class="space-y-2">
-                <label
-                  v-for="type in assessmentTypes"
-                  :key="type"
-                  :for="`${idPrefix}-sumatif-${type}`"
-                  class="flex items-center gap-3 rounded-md border px-3 py-2 text-control transition-colors"
-                  :class="
-                    type === sasType || !canUpdate || saving
-                      ? 'cursor-not-allowed bg-muted/30 text-muted-foreground opacity-60'
-                      : 'cursor-pointer hover:bg-muted/30'
-                  "
-                >
-                  <Checkbox
-                    :id="`${idPrefix}-sumatif-${type}`"
-                    :model-value="
-                      sumatifTypes.includes(type) && type !== sasType
-                    "
-                    :disabled="type === sasType || !canUpdate || saving"
-                    @update:model-value="toggleSumatif(type, $event === true)"
-                  />
-                  <span class="min-w-0 flex-1 font-medium">
-                    {{ ASSESSMENT_TYPE_LABELS[type] }}
-                  </span>
-                  <span
-                    v-if="type === sasType"
-                    class="shrink-0 text-muted-foreground"
-                  >
-                    Dipakai untuk SAS
-                  </span>
-                </label>
-              </div>
-            </section>
+                <FormControl>
+                  <div class="space-y-2">
+                    <label
+                      v-for="type in assessmentTypes"
+                      :key="type"
+                      :for="`${idPrefix}-sumatif-${type}`"
+                      class="flex items-center gap-3 rounded-md border px-3 py-2 text-control transition-colors"
+                      :class="
+                        type === sasType || !canUpdate || saving
+                          ? 'cursor-not-allowed bg-muted/30 text-muted-foreground opacity-60'
+                          : 'cursor-pointer hover:bg-muted/30'
+                      "
+                    >
+                      <Checkbox
+                        :id="`${idPrefix}-sumatif-${type}`"
+                        :model-value="
+                          sumatifTypes.includes(type) && type !== sasType
+                        "
+                        :disabled="type === sasType || !canUpdate || saving"
+                        @update:model-value="
+                          toggleSumatif(type, $event === true)
+                        "
+                      />
+                      <span class="min-w-0 flex-1 font-medium">
+                        {{ ASSESSMENT_TYPE_LABELS[type] }}
+                      </span>
+                      <span
+                        v-if="type === sasType"
+                        class="shrink-0 text-muted-foreground"
+                      >
+                        Dipakai untuk SAS
+                      </span>
+                    </label>
+                  </div>
+                </FormControl>
 
-            <section class="space-y-3 rounded-md border p-4">
-              <div class="space-y-1">
-                <h4 class="text-md font-semibold">Template SAS</h4>
-                <p class="text-control text-muted-foreground">
-                  Pilih satu jenis penilaian untuk dikirim ke template Nilai SAS
-                  RDM.
-                </p>
-              </div>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-              <RadioGroup
-                v-model="sasModel"
-                :disabled="!canUpdate || saving"
-                class="gap-2"
-              >
-                <label
-                  v-for="type in assessmentTypes"
-                  :key="type"
-                  :for="`${idPrefix}-sas-${type}`"
-                  class="flex items-center gap-3 rounded-md border px-3 py-2 text-control transition-colors"
-                  :class="
-                    !canUpdate || saving
-                      ? 'cursor-not-allowed bg-muted/30 text-muted-foreground opacity-60'
-                      : 'cursor-pointer hover:bg-muted/30 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/5'
-                  "
-                >
-                  <RadioGroupItem
-                    :id="`${idPrefix}-sas-${type}`"
-                    :value="type"
+            <FormField name="sasType">
+              <FormItem class="flex flex-col gap-3 rounded-md border p-4">
+                <div class="space-y-1">
+                  <h4 class="text-md font-semibold">Template SAS</h4>
+                  <p class="text-control text-muted-foreground">
+                    Pilih satu jenis penilaian untuk dikirim ke template Nilai
+                    SAS RDM.
+                  </p>
+                </div>
+
+                <FormControl>
+                  <RadioGroup
+                    v-model="sasModel"
                     :disabled="!canUpdate || saving"
-                  />
-                  <span class="min-w-0 flex-1 font-medium">
-                    {{ ASSESSMENT_TYPE_LABELS[type] }}
-                  </span>
-                </label>
-              </RadioGroup>
-            </section>
-          </div>
+                    class="gap-2"
+                  >
+                    <label
+                      v-for="type in assessmentTypes"
+                      :key="type"
+                      :for="`${idPrefix}-sas-${type}`"
+                      class="flex items-center gap-3 rounded-md border px-3 py-2 text-control transition-colors"
+                      :class="
+                        !canUpdate || saving
+                          ? 'cursor-not-allowed bg-muted/30 text-muted-foreground opacity-60'
+                          : 'cursor-pointer hover:bg-muted/30 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/5'
+                      "
+                    >
+                      <RadioGroupItem
+                        :id="`${idPrefix}-sas-${type}`"
+                        :value="type"
+                        :disabled="!canUpdate || saving"
+                      />
+                      <span class="min-w-0 flex-1 font-medium">
+                        {{ ASSESSMENT_TYPE_LABELS[type] }}
+                      </span>
+                    </label>
+                  </RadioGroup>
+                </FormControl>
 
-          <Alert
-            v-if="hasEmptySumatif"
-            class="border-warning/30 bg-warning/10 text-warning"
-          >
-            <AlertTriangle class="size-4" />
-            <AlertDescription class="text-warning">
-              Pilih minimal satu jenis penilaian untuk Sumatif.
-            </AlertDescription>
-          </Alert>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
 
           <Alert
             v-if="saveError"
@@ -195,14 +209,14 @@ onMounted(() => {
             <AlertCircle class="size-4" />
             <AlertDescription>{{ saveError }}</AlertDescription>
           </Alert>
-        </template>
+        </form>
       </CardContent>
 
       <CardFooter v-if="canUpdate">
         <Button
-          type="button"
+          type="submit"
+          form="rdm-setting-form"
           :disabled="!canSave"
-          @click="save"
         >
           <Loader2
             v-if="saving"
