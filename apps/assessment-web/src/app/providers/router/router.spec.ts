@@ -147,3 +147,24 @@ describe('exam routes', () => {
     ])
   })
 })
+
+describe('rdm settings route', () => {
+  it('routes /settings/rdm as rdm-settings behind assessment-settings.read', () => {
+    const resolved = buildRouter().resolve('/settings/rdm')
+    const meta = resolved.matched.at(-1)?.meta
+
+    expect(resolved.name).toBe('rdm-settings')
+    expect(meta?.requiresAuth).toBe(true)
+    expect(meta?.requiredPermission).toBe('assessment-settings.read')
+    expect(meta?.breadcrumbs).toBeDefined()
+  })
+
+  it('registers /settings/rdm in the menu with assessment-settings.read', () => {
+    const item = menuSections
+      .flatMap((section) => section.items)
+      .find((entry) => entry.url === '/settings/rdm')
+
+    expect(item).toBeDefined()
+    expect(item?.requiredPermission).toBe('assessment-settings.read')
+  })
+})

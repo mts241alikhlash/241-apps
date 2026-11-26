@@ -1,7 +1,9 @@
+import { Prisma } from '../../../../generated/prisma/client.js'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { IEnrollmentLookupPort } from '../../../../platform/enrollment-lookup/enrollment-lookup.port.js'
 import type {
   BulkStudentScoreRecord,
+  ItemEnrollmentScore,
   StudentScoreRosterItem,
 } from '../../../domain/repositories/student-score.repository.js'
 
@@ -45,14 +47,16 @@ export async function buildScoreRoster(
 }
 
 export async function upsertScores(
-  prisma: PrismaService,
+  prisma: PrismaService | Prisma.TransactionClient,
   assessmentItemId: string,
   records: BulkStudentScoreRecord[],
   correctedById: string | null = null,
+  insideTransaction = false,
 ): Promise<{ saved: number }> {
-  const results = await prisma.$transaction(
+  if (records.length === 0) return { saved: 0 }
+  const buildQueries = (client: PrismaService | Prisma.TransactionClient) =>
     records.map((record) =>
-      prisma.studentScore.upsert({
+      client.studentScore.upsert({
         where: {
           enrollmentId_assessmentItemId: {
             enrollmentId: record.enrollmentId,
@@ -75,7 +79,36 @@ export async function upsertScores(
           correctedAt: correctedById ? new Date() : null,
         },
       }),
-    ),
-  )
+    )
+
+  if (
+    !insideTransaction &&
+    '$transaction' in prisma &&
+    typeof prisma.$transaction === 'function'
+  ) {
+    const results = await prisma.$transaction(buildQueries(prisma))
+    return { saved: results.length }
+  }
+  const results = await Promise.all(buildQueries(prisma))
   return { saved: results.length }
+}
+
+export async function findScoresForItems(
+  prisma: PrismaService,
+  assessmentItemIds: string[],
+  enrollmentIds: string[],
+): Promise<ItemEnrollmentScore[]> {
+  if (assessmentItemIds.length === 0 || enrollmentIds.length === 0) return []
+  return prisma.studentScore.findMany({
+    where: {
+      assessmentItemId: { in: assessmentItemIds },
+      enrollmentId: { in: enrollmentIds },
+      deletedAt: null,
+    },
+    select: {
+      assessmentItemId: true,
+      enrollmentId: true,
+      score: true,
+    },
+  })
 }

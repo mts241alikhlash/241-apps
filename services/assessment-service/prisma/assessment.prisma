@@ -44,6 +44,8 @@ model AssessmentItem {
   /// double, and both still sit inside whatever the DAILY weight is.
   weight               Float          @default(1)
   maxScore             Float          @default(100) @map("max_score")
+  material             String?        @db.VarChar(500)
+  kktp                 Int?
   deletedAt            DateTime?      @map("deleted_at")
 
   studentScores StudentScore[]
@@ -168,4 +170,13 @@ model ExamScore {
   @@index([classroomId, subjectId, semesterId])
   @@index([studentId])
   @@map("exam_scores")
+}
+
+model RdmSetting {
+  id           Int              @id @default(1)
+  sumatifTypes AssessmentType[] @map("sumatif_types")
+  sasType      AssessmentType   @map("sas_type")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  @@map("rdm_settings")
 }

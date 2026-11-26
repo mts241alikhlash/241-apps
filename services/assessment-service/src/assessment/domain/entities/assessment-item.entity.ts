@@ -8,6 +8,8 @@ export interface AssessmentItemEntity {
   type: `${AssessmentType}`
   weight: number
   maxScore: number
+  material: string | null
+  kktp: number | null
   deletedAt: Date | null
 }
 

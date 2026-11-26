@@ -16,6 +16,8 @@ interface AssessmentItemFormValues {
   type: AssessmentType
   weight: number
   maxScore: number
+  material: string
+  kktp: number | null
 }
 
 export function useAssessmentItemForm(options: {
@@ -46,6 +48,17 @@ export function useAssessmentItemForm(options: {
         .number()
         .min(1, 'Skor maksimal minimal 1.')
         .max(100, 'Skor maksimal tidak boleh lebih dari 100.'),
+      material: z
+        .string()
+        .max(500, 'Ringkasan materi maksimal 500 karakter.')
+        .optional(),
+      kktp: z
+        .number({ invalid_type_error: 'KKTP harus berupa angka.' })
+        .int('KKTP harus bilangan bulat.')
+        .min(0, 'KKTP minimal 0.')
+        .max(100, 'KKTP maksimal 100.')
+        .nullable()
+        .optional(),
     }),
   )
 
@@ -59,6 +72,8 @@ export function useAssessmentItemForm(options: {
       type: options.defaultType?.() ?? 'DAILY',
       weight: 1,
       maxScore: 100,
+      material: '',
+      kktp: null,
     },
   })
 
@@ -86,6 +101,8 @@ export function useAssessmentItemForm(options: {
           type: data.type,
           weight: data.weight,
           maxScore: data.maxScore,
+          material: data.material ?? '',
+          kktp: data.kktp ?? null,
         })
       } else {
         const initialClassroom = options.initialClassroomId()
@@ -98,6 +115,8 @@ export function useAssessmentItemForm(options: {
             type: options.defaultType?.() ?? 'DAILY',
             weight: 1,
             maxScore: 100,
+            material: '',
+            kktp: null,
           },
         })
       }
@@ -107,14 +126,29 @@ export function useAssessmentItemForm(options: {
 
   const isEditing = computed(() => !!options.editData?.())
 
+  const showRenameWarning = computed(() => {
+    const editItem = options.editData?.()
+    if (!editItem) return false
+    const hasScores =
+      (editItem.gradedCount ?? 0) > 0 ||
+      (editItem._count?.studentScores ?? 0) > 0
+    if (!hasScores) return false
+    const typedName = (form.values.name ?? '').trim().toLowerCase()
+    const savedName = editItem.name.trim().toLowerCase()
+    return typedName !== savedName
+  })
+
   const onSubmit = form.handleSubmit(
     async (values: AssessmentItemFormValues) => {
       const editItem = options.editData?.()
+      const trimmedMaterial = values.material?.trim() ?? ''
       const fields = {
         name: values.name,
         type: values.type,
         weight: values.weight,
         maxScore: values.maxScore,
+        material: trimmedMaterial.length > 0 ? trimmedMaterial : null,
+        kktp: values.kktp ?? null,
       }
 
       const targetAssignment = editItem
@@ -144,9 +178,20 @@ export function useAssessmentItemForm(options: {
           await options.onSuccess()
         }
         form.resetForm()
+        return
+      }
+      if ('fieldErrors' in result && result.fieldErrors?.name) {
+        form.setFieldError('name', result.fieldErrors.name)
       }
     },
   )
 
-  return { form, isSaving, formError, isEditing, onSubmit }
+  return {
+    form,
+    isSaving,
+    formError,
+    isEditing,
+    showRenameWarning,
+    onSubmit,
+  }
 }

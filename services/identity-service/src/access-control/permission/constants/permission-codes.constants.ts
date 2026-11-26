@@ -445,6 +445,12 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
   },
   {
     module: 'assessment-items',
+    action: 'rdm',
+    code: 'assessment-items.rdm',
+    description: 'Use the RDM Excel bridge on own teaching assignments',
+  },
+  {
+    module: 'assessment-items',
     action: 'read',
     code: 'assessment-items.read',
     description: 'Read assessment items',
@@ -454,6 +460,19 @@ export const SYSTEM_PERMISSIONS: SystemPermission[] = [
     action: 'update',
     code: 'assessment-items.update',
     description: 'Update assessment items',
+  },
+
+  {
+    module: 'assessment-settings',
+    action: 'read',
+    code: 'assessment-settings.read',
+    description: 'Read RDM settings',
+  },
+  {
+    module: 'assessment-settings',
+    action: 'update',
+    code: 'assessment-settings.update',
+    description: 'Update RDM settings',
   },
 
   {

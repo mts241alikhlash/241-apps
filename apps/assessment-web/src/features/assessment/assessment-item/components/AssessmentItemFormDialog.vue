@@ -24,7 +24,8 @@ import {
   SelectValue,
 } from '@mts241alikhlash/ui/select'
 import { FormControl, FloatingField } from '@mts241alikhlash/ui/form'
-import { AlertCircle, Loader2 } from '@lucide/vue'
+import { Textarea } from '@mts241alikhlash/ui/textarea'
+import { AlertCircle, AlertTriangle, Loader2 } from '@lucide/vue'
 
 interface ClassroomOption {
   id: string
@@ -371,6 +372,38 @@ function handleClassroomChange(nextClassroomId: AcceptableValue) {
             </div>
           </FloatingField>
 
+          <Alert
+            v-if="itemForm.showRenameWarning.value"
+            class="border-warning/30 bg-warning/10 text-warning"
+          >
+            <AlertTriangle class="size-4" />
+            <AlertDescription class="text-warning">
+              Nama ini dipakai sebagai nama TP/LM di RDM. Kalau sudah dikirim ke
+              RDM, mengganti nama akan membuat TP/LM baru di sana. Nama untuk
+              RDM maksimal 50 karakter.
+            </AlertDescription>
+          </Alert>
+
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="material"
+            label="Ringkasan TP/Lingkup Materi"
+          >
+            <div class="content-start space-y-1">
+              <FormControl>
+                <Textarea
+                  rows="3"
+                  maxlength="500"
+                  :model-value="value ?? ''"
+                  @update:model-value="(v) => handleChange(String(v))"
+                />
+              </FormControl>
+              <p class="text-right text-control text-muted-foreground">
+                Opsional · {{ String(value ?? '').length }}/500
+              </p>
+            </div>
+          </FloatingField>
+
           <div class="grid gap-4 sm:grid-cols-2">
             <FloatingField
               v-slot="{ value, handleChange }"
@@ -407,6 +440,35 @@ function handleClassroomChange(nextClassroomId: AcceptableValue) {
               </div>
             </FloatingField>
           </div>
+
+          <FloatingField
+            v-slot="{ value, handleChange }"
+            name="kktp"
+            label="Nilai Batas Ketercapaian (KKTP)"
+          >
+            <div class="content-start space-y-1">
+              <FormControl>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  :model-value="value ?? ''"
+                  @update:model-value="
+                    (v) =>
+                      handleChange(
+                        v === '' || v === null || v === undefined
+                          ? null
+                          : Number(v),
+                      )
+                  "
+                />
+              </FormControl>
+              <p class="text-control text-muted-foreground">
+                Opsional, bilangan bulat 0–100.
+              </p>
+            </div>
+          </FloatingField>
 
           <Alert
             v-if="itemForm.formError.value"

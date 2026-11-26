@@ -41,6 +41,109 @@ export interface paths {
         patch: operations["AssessmentItemController_update"];
         trace?: never;
     };
+    "/assessment-items/rdm/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List assessment items offered for RDM sumatif and SAS templates */
+        get: operations["RdmController_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/fill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Fill an RDM Excel template with assessment items and scores */
+        post: operations["RdmController_fill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import an RDM-layout Excel workbook in one transaction */
+        post: operations["RdmController_importConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/import/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview importing an RDM-layout Excel workbook without writing */
+        post: operations["RdmController_importPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-items/rdm/workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an offline Excel workbook in RDM layout */
+        get: operations["RdmController_workbook"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assessment-settings/rdm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get school-wide RDM settings */
+        get: operations["RdmSettingController_get"];
+        /** Replace school-wide RDM settings */
+        put: operations["RdmSettingController_replace"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/assessment-weights": {
         parameters: {
             query?: never;
@@ -556,6 +659,8 @@ export interface components {
             _count?: components["schemas"]["AssessmentItemResponseCountDto"];
             gradedCount?: number;
             id: string;
+            kktp: number | null;
+            material: string | null;
             maxScore: number;
             name: string;
             studentCount?: number;
@@ -763,6 +868,8 @@ export interface components {
             records: components["schemas"]["BulkStudentScoreRecordDto"][];
         };
         CreateAssessmentItemDto: {
+            kktp?: number | null;
+            material?: string | null;
             /** @default 100 */
             maxScore: number;
             name: string;
@@ -1019,6 +1126,73 @@ export interface components {
             latestScores: components["schemas"]["DashboardScoreResponseDto"][];
             todayLessons: components["schemas"]["DashboardLessonResponseDto"][];
         };
+        RdmCandidateItemDto: {
+            id: string;
+            kktp: number | null;
+            material: string | null;
+            maxScore: number;
+            name: string;
+            /** @enum {string} */
+            type: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+        };
+        RdmCandidatesResponseDto: {
+            sas: components["schemas"]["RdmCandidateItemDto"][];
+            sumatif: components["schemas"]["RdmCandidateItemDto"][];
+        };
+        RdmFillResponseDto: {
+            fileBase64: string;
+            fileName: string;
+            summary: components["schemas"]["RdmFillSummaryDto"];
+        };
+        RdmFillSheetSummaryDto: {
+            itemId: string;
+            itemName: string;
+            sheetName: string;
+            written: number;
+        };
+        RdmFillSummaryDto: {
+            ambiguousRows: number[];
+            classSubjectWarning: string | null;
+            itemsNotSent: components["schemas"]["RdmItemRefDto"][];
+            /** @enum {string} */
+            kind: "sumatif" | "sas";
+            missingStudents: string[];
+            sheets: components["schemas"]["RdmFillSheetSummaryDto"][];
+            unmatchedRows: number[];
+        };
+        RdmImportPreviewDto: {
+            classSubjectWarning: string | null;
+            invalidValues: components["schemas"]["RdmImportRowIssueDto"][];
+            sheets: components["schemas"]["RdmImportSheetPreviewDto"][];
+            unmatchedRows: components["schemas"]["RdmImportRowIssueDto"][];
+        };
+        RdmImportResponseDto: {
+            itemsCreated: number;
+            itemsUpdated: number;
+            scoresWritten: number;
+        };
+        RdmImportRowIssueDto: {
+            row: number;
+            sheetName: string;
+        };
+        RdmImportSheetPreviewDto: {
+            /** @enum {string} */
+            action: "create" | "update";
+            itemId: string | null;
+            name: string;
+            scoresToWrite: number;
+            sheetName: string;
+            unchanged: number;
+        };
+        RdmItemRefDto: {
+            id: string;
+            name: string;
+        };
+        RdmSettingResponseDto: {
+            /** @enum {string} */
+            sasType: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+            sumatifTypes: ("DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL")[];
+        };
         ReceiveExamScoreDto: {
             /** Format: uuid */
             classroomId: string;
@@ -1052,6 +1226,15 @@ export interface components {
             teachingAssignmentId: string;
             /** @description The complete set. Types left out contribute nothing. The listed weights must total 100. */
             weights: components["schemas"]["AssessmentWeightRecordDto"][];
+        };
+        ReplaceRdmSettingDto: {
+            /**
+             * @description Assessment type mapped to the RDM SAS sheet
+             * @enum {string}
+             */
+            sasType: "DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL";
+            /** @description Assessment types mapped to RDM Sumatif sheets */
+            sumatifTypes: ("DAILY" | "MIDTERM" | "FINAL" | "ASSIGNMENT" | "PRACTICAL")[];
         };
         ReportCardAverageDto: {
             enrollmentId: string;
@@ -1236,6 +1419,8 @@ export interface components {
         StudentScoreResponseAssessmentItemDto: {
             _count?: components["schemas"]["StudentScoreResponseAssessmentItemCountDto"];
             id: string;
+            kktp: number | null;
+            material: string | null;
             maxScore: number;
             name: string;
             teachingAssignment?: components["schemas"]["StudentScoreResponseAssessmentItemTeachingAssignmentDto"];
@@ -1341,6 +1526,8 @@ export interface components {
             studentName: string;
         };
         UpdateAssessmentItemDto: {
+            kktp?: number | null;
+            material?: string | null;
             maxScore?: number;
             name?: string;
             /** @enum {string} */
@@ -1503,6 +1690,217 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["AssessmentItemResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_candidates: {
+        parameters: {
+            query: {
+                teachingAssignmentId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmCandidatesResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_fill: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    itemIds?: string[];
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmFillResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_importConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmImportResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_importPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    teachingAssignmentId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmImportPreviewDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmController_workbook: {
+        parameters: {
+            query: {
+                kind: "sumatif" | "sas";
+                teachingAssignmentId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returns an RDM-layout Excel workbook */
+            200: {
+                headers: {
+                    /** @description Attachment filename with ASCII fallback and UTF-8 encoding */
+                    "Content-Disposition"?: string;
+                    /** @description Count of eligible items omitted past the sheet limit */
+                    "X-Rdm-Items-Not-Included"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    RdmSettingController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmSettingResponseDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    RdmSettingController_replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceRdmSettingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RdmSettingResponseDto"];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */

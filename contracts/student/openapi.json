@@ -3897,6 +3897,7 @@
           "status",
           "studentUserId",
           "studentNis",
+          "studentNisn",
           "studentName"
         ]
       },

@@ -26,6 +26,7 @@ import {
 } from './prisma-assessment.includes.js'
 import {
   buildScoreRoster,
+  findScoresForItems,
   upsertScores,
 } from './prisma-student-score.roster.js'
 
@@ -309,6 +310,13 @@ export class PrismaStudentScoreRepository extends IStudentScoreRepository {
     correctedById: string | null = null,
   ) {
     return upsertScores(this.prisma, assessmentItemId, records, correctedById)
+  }
+
+  async findScoresForItems(
+    assessmentItemIds: string[],
+    enrollmentIds: string[],
+  ) {
+    return findScoresForItems(this.prisma, assessmentItemIds, enrollmentIds)
   }
 }
 

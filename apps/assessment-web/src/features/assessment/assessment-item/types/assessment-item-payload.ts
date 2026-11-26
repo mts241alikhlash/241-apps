@@ -5,6 +5,8 @@ export interface AssessmentItemUpdatePayload {
   type: AssessmentType
   weight?: number
   maxScore?: number
+  material?: string | null
+  kktp?: number | null
 }
 
 export interface AssessmentItemCreatePayload extends AssessmentItemUpdatePayload {

@@ -53,6 +53,7 @@ const TEACHER_CODES = (): string[] => [
   'assessment-items.create',
   'assessment-items.update',
   'assessment-items.delete',
+  'assessment-items.rdm',
   'student-scores.read',
   'student-scores.create',
   'student-scores.update',

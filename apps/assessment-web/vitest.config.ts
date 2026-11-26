@@ -1,7 +1,14 @@
 import { vue } from '@mts241alikhlash/vitest-config'
 import { defineConfig, mergeConfig } from 'vitest/config'
 
-const DOM_SPECS = ['**/InstitutionDashboard.spec.ts']
+const DOM_SPECS = [
+  '**/InstitutionDashboard.spec.ts',
+  '**/AssessmentItemFormDialog.spec.ts',
+  '**/AssessmentItemListView.spec.ts',
+  '**/rdmService.spec.ts',
+  '**/RdmFillDialog.spec.ts',
+  '**/RdmImportDialog.spec.ts',
+]
 
 export default mergeConfig(
   vue({ root: import.meta.dirname }),

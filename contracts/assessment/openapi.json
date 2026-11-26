@@ -2857,6 +2857,407 @@
           "Dashboards"
         ]
       }
+    },
+    "/assessment-items/rdm/candidates": {
+      "get": {
+        "operationId": "RdmController_candidates",
+        "parameters": [
+          {
+            "name": "teachingAssignmentId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmCandidatesResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List assessment items offered for RDM sumatif and SAS templates",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/workbook": {
+      "get": {
+        "operationId": "RdmController_workbook",
+        "parameters": [
+          {
+            "name": "teachingAssignmentId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sumatif",
+                "sas"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an RDM-layout Excel workbook",
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename with ASCII fallback and UTF-8 encoding",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Rdm-Items-Not-Included": {
+                "description": "Count of eligible items omitted past the sheet limit",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download an offline Excel workbook in RDM layout",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/fill": {
+      "post": {
+        "operationId": "RdmController_fill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "itemIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmFillResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fill an RDM Excel template with assessment items and scores",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/import/preview": {
+      "post": {
+        "operationId": "RdmController_importPreview",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmImportPreviewDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Preview importing an RDM-layout Excel workbook without writing",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-items/rdm/import": {
+      "post": {
+        "operationId": "RdmController_importConfirm",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "teachingAssignmentId"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "teachingAssignmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmImportResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Import an RDM-layout Excel workbook in one transaction",
+        "tags": [
+          "RDM"
+        ]
+      }
+    },
+    "/assessment-settings/rdm": {
+      "get": {
+        "operationId": "RdmSettingController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmSettingResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get school-wide RDM settings",
+        "tags": [
+          "RDM Settings"
+        ]
+      },
+      "put": {
+        "operationId": "RdmSettingController_replace",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceRdmSettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RdmSettingResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Replace school-wide RDM settings",
+        "tags": [
+          "RDM Settings"
+        ]
+      }
     }
   },
   "info": {
@@ -3064,6 +3465,14 @@
           "maxScore": {
             "type": "number"
           },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
+          },
           "gradedCount": {
             "type": "number"
           },
@@ -3077,7 +3486,9 @@
           "name",
           "type",
           "weight",
-          "maxScore"
+          "maxScore",
+          "material",
+          "kktp"
         ]
       },
       "AssessmentItemListResponseDto": {
@@ -3137,6 +3548,17 @@
             "minimum": 1,
             "maximum": 100,
             "default": 100
+          },
+          "material": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 100
           }
         },
         "required": [
@@ -3169,6 +3591,17 @@
           "maxScore": {
             "type": "number",
             "minimum": 1,
+            "maximum": 100
+          },
+          "material": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
             "maximum": 100
           }
         }
@@ -3431,6 +3864,14 @@
           },
           "maxScore": {
             "type": "number"
+          },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
           }
         },
         "required": [
@@ -3439,7 +3880,9 @@
           "name",
           "type",
           "weight",
-          "maxScore"
+          "maxScore",
+          "material",
+          "kktp"
         ]
       },
       "StudentScoreResponseEnrollmentStudentUserProfileDto": {
@@ -5752,6 +6195,348 @@
           "scoreCompleteness",
           "attendanceToday",
           "examScores"
+        ]
+      },
+      "RdmCandidateItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          },
+          "maxScore": {
+            "type": "number"
+          },
+          "material": {
+            "type": "string",
+            "nullable": true
+          },
+          "kktp": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "maxScore",
+          "material",
+          "kktp"
+        ]
+      },
+      "RdmCandidatesResponseDto": {
+        "type": "object",
+        "properties": {
+          "sumatif": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmCandidateItemDto"
+            }
+          },
+          "sas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmCandidateItemDto"
+            }
+          }
+        },
+        "required": [
+          "sumatif",
+          "sas"
+        ]
+      },
+      "RdmFillSheetSummaryDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string"
+          },
+          "itemName": {
+            "type": "string"
+          },
+          "written": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "itemId",
+          "itemName",
+          "written"
+        ]
+      },
+      "RdmItemRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "RdmFillSummaryDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "sumatif",
+              "sas"
+            ],
+            "type": "string"
+          },
+          "classSubjectWarning": {
+            "type": "string",
+            "nullable": true
+          },
+          "sheets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmFillSheetSummaryDto"
+            }
+          },
+          "unmatchedRows": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "ambiguousRows": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "missingStudents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "itemsNotSent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmItemRefDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "classSubjectWarning",
+          "sheets",
+          "unmatchedRows",
+          "ambiguousRows",
+          "missingStudents",
+          "itemsNotSent"
+        ]
+      },
+      "RdmFillResponseDto": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "fileBase64": {
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/RdmFillSummaryDto"
+          }
+        },
+        "required": [
+          "fileName",
+          "fileBase64",
+          "summary"
+        ]
+      },
+      "RdmImportSheetPreviewDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "create",
+              "update"
+            ],
+            "type": "string"
+          },
+          "itemId": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoresToWrite": {
+            "type": "number"
+          },
+          "unchanged": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "name",
+          "action",
+          "itemId",
+          "scoresToWrite",
+          "unchanged"
+        ]
+      },
+      "RdmImportRowIssueDto": {
+        "type": "object",
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "row": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sheetName",
+          "row"
+        ]
+      },
+      "RdmImportPreviewDto": {
+        "type": "object",
+        "properties": {
+          "classSubjectWarning": {
+            "type": "string",
+            "nullable": true
+          },
+          "sheets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportSheetPreviewDto"
+            }
+          },
+          "unmatchedRows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportRowIssueDto"
+            }
+          },
+          "invalidValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RdmImportRowIssueDto"
+            }
+          }
+        },
+        "required": [
+          "classSubjectWarning",
+          "sheets",
+          "unmatchedRows",
+          "invalidValues"
+        ]
+      },
+      "RdmImportResponseDto": {
+        "type": "object",
+        "properties": {
+          "itemsCreated": {
+            "type": "number"
+          },
+          "itemsUpdated": {
+            "type": "number"
+          },
+          "scoresWritten": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "itemsCreated",
+          "itemsUpdated",
+          "scoresWritten"
+        ]
+      },
+      "RdmSettingResponseDto": {
+        "type": "object",
+        "properties": {
+          "sumatifTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DAILY",
+                "MIDTERM",
+                "FINAL",
+                "ASSIGNMENT",
+                "PRACTICAL"
+              ]
+            }
+          },
+          "sasType": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "sumatifTypes",
+          "sasType"
+        ]
+      },
+      "ReplaceRdmSettingDto": {
+        "type": "object",
+        "properties": {
+          "sumatifTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DAILY",
+                "MIDTERM",
+                "FINAL",
+                "ASSIGNMENT",
+                "PRACTICAL"
+              ]
+            },
+            "description": "Assessment types mapped to RDM Sumatif sheets"
+          },
+          "sasType": {
+            "enum": [
+              "DAILY",
+              "MIDTERM",
+              "FINAL",
+              "ASSIGNMENT",
+              "PRACTICAL"
+            ],
+            "type": "string",
+            "description": "Assessment type mapped to the RDM SAS sheet"
+          }
+        },
+        "required": [
+          "sumatifTypes",
+          "sasType"
         ]
       }
     }

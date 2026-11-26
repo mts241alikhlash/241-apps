@@ -59,6 +59,7 @@
     "dotenv": "catalog:",
     "exceljs": "catalog:",
     "helmet": "catalog:",
+    "jszip": "catalog:",
     "nestjs-pino": "catalog:",
     "passport": "catalog:",
     "passport-jwt": "catalog:",

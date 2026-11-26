@@ -30,6 +30,7 @@ import { ReportCardModule } from './report-card/report-card.module.js'
 import { MyDashboardModule } from './my-dashboard/my-dashboard.module.js'
 import { AcademicLookupModule } from './platform/academic-lookup/academic-lookup.module.js'
 import { EnrollmentLookupModule } from './platform/enrollment-lookup/enrollment-lookup.module.js'
+import { RdmModule } from './rdm/rdm.module.js'
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { EnrollmentLookupModule } from './platform/enrollment-lookup/enrollment-
     AttendanceModule,
     ReportCardModule,
     MyDashboardModule,
+    RdmModule,
   ],
   controllers: [],
   providers: [

@@ -5,4 +5,6 @@ export interface UpdateAssessmentItemInput {
   type?: AssessmentType
   weight?: number
   maxScore?: number
+  material?: string | null
+  kktp?: number | null
 }

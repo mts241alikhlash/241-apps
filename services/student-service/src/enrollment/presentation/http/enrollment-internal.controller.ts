@@ -62,7 +62,7 @@ export class ActiveEnrollmentSummary {
 
   @ApiProperty({ nullable: true }) studentNis!: string | null
 
-  @ApiPropertyOptional({ nullable: true }) studentNisn?: string | null
+  @ApiProperty({ nullable: true }) studentNisn!: string | null
 
   @ApiPropertyOptional({ nullable: true }) studentGender?: string | null
 
