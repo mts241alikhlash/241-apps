@@ -129,7 +129,10 @@ export function offlineSchedule(
 }
 
 export function buildOffline(
-  options: { taught?: { subjectId: string; classroomId: string }[] } = {},
+  options: {
+    taught?: { subjectId: string; classroomId: string }[]
+    names?: Record<string, string>
+  } = {},
 ) {
   const schedules = new FakeExamScheduleRepository(
     new FakeExamPackageRepository(),
@@ -152,12 +155,20 @@ export function buildOffline(
     employeeExists: () => Promise.resolve(true),
   } as IEmployeeIdentityReadPort
   const scope = new GradingScopeService(employees, academic)
-  const students = new FakeStudentDirectory([
-    { id: STUDENTS.budi, nis: '1', name: 'Budi' },
-    { id: STUDENTS.ani, nis: '2', name: 'Ani' },
-    { id: STUDENTS.citra, nis: '3', name: 'Citra' },
-    { id: STUDENTS.dodi, nis: '4', name: 'Dodi' },
-  ])
+  const names: Record<string, string> = {
+    [STUDENTS.budi]: 'Budi',
+    [STUDENTS.ani]: 'Ani',
+    [STUDENTS.citra]: 'Citra',
+    [STUDENTS.dodi]: 'Dodi',
+    ...options.names,
+  }
+  const students = new FakeStudentDirectory(
+    Object.entries(names).map(([id, name], index) => ({
+      id,
+      nis: String(index + 1),
+      name,
+    })),
+  )
   const numbers = new FakeNumbers()
   activities.activities.set(ACTIVITY_ID, offlineActivity())
   schedules.schedules.set(SCHEDULE_ID, offlineSchedule())

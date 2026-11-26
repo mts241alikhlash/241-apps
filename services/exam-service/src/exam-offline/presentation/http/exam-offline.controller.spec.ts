@@ -4,7 +4,9 @@ import {
   PERMISSIONS_KEY,
 } from '@mts241alikhlash/nest-core/access-control'
 import { plainToInstance } from 'class-transformer'
+import { BadRequestException, StreamableFile } from '@nestjs/common'
 import { validate } from 'class-validator'
+import type { Response } from 'express'
 import { describe, expect, it } from 'vitest'
 import {
   SCHEDULE_ID,
@@ -13,10 +15,16 @@ import {
   buildOffline,
   seatAll,
 } from '../../application/exam-offline.test-support.js'
+import { BuildScoreSheetUseCase } from '../../application/use-cases/build-score-sheet/build-score-sheet.use-case.js'
+import { ImportOfflineScoresUseCase } from '../../application/use-cases/import-offline-scores/import-offline-scores.use-case.js'
+import { RequestOfflinePublicationUseCase } from '../../application/use-cases/request-offline-publication/request-offline-publication.use-case.js'
 import { GetOfflineRosterUseCase } from '../../application/use-cases/get-offline-roster/get-offline-roster.use-case.js'
 import { ListOfflineSchedulesUseCase } from '../../application/use-cases/list-offline-schedules/list-offline-schedules.use-case.js'
 import { SaveOfflineScoreUseCase } from '../../application/use-cases/save-offline-score/save-offline-score.use-case.js'
-import { SaveOfflineScoreDto } from './dto/exam-offline-request.dto.js'
+import {
+  RequestOfflinePublicationDto,
+  SaveOfflineScoreDto,
+} from './dto/exam-offline-request.dto.js'
 import { ExamOfflineController } from './exam-offline.controller.js'
 
 const READ = [
@@ -30,13 +38,27 @@ const expected: Record<string, string[]> = {
   schedules: READ,
   roster: READ,
   save: WRITE,
+  importScores: WRITE,
+  sheet: READ,
+  publish: WRITE,
 }
 
-async function errorsOf(body: Record<string, unknown>) {
-  const dto = plainToInstance(SaveOfflineScoreDto, body, {
+async function errorsOf(
+  body: Record<string, unknown>,
+  type: new () => object = SaveOfflineScoreDto,
+) {
+  const dto = plainToInstance(type, body, {
     enableImplicitConversion: true,
   })
   return validate(dto, { whitelist: true, forbidNonWhitelisted: true })
+}
+
+function fakeResponse() {
+  const headers: Record<string, string> = {}
+  const res = {
+    set: (values: Record<string, string>) => Object.assign(headers, values),
+  } as unknown as Response
+  return { headers, res }
 }
 
 function controller() {
@@ -55,6 +77,9 @@ function controller() {
       ),
       new GetOfflineRosterUseCase(world.reader),
       new SaveOfflineScoreUseCase(world.reader, world.results),
+      new ImportOfflineScoresUseCase(world.reader, world.results),
+      new BuildScoreSheetUseCase(world.reader, world.academic),
+      new RequestOfflinePublicationUseCase(world.reader, world.results),
     ),
   }
 }
@@ -123,5 +148,80 @@ describe('ExamOfflineController', () => {
       registered: 3,
       missing: 3,
     })
+  })
+
+  it.each([[{}], [{ confirmMissing: true }], [{ confirmMissing: false }]])(
+    'accepts the publish body %j',
+    async (body) => {
+      expect(await errorsOf(body, RequestOfflinePublicationDto)).toEqual([])
+    },
+  )
+
+  it.each([
+    [{ confirmMissing: 'true' }],
+    [{ confirmMissing: 1 }],
+    [{ all: true }],
+  ])('refuses the publish body %j', async (body) => {
+    expect(
+      (await errorsOf(body, RequestOfflinePublicationDto)).length,
+    ).toBeGreaterThan(0)
+  })
+
+  it('refuses an import without a file', async () => {
+    const { controller: http } = controller()
+    await expect(
+      http.importScores(TEACHER, SCHEDULE_ID, undefined),
+    ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('imports the uploaded buffer by its original name', async () => {
+    const { world, controller: http } = controller()
+
+    const result = await http.importScores(TEACHER, SCHEDULE_ID, {
+      buffer: Buffer.from('No. Peserta,Score\n7-001,40\n7-999,10\n'),
+      originalname: 'nilai.csv',
+      size: 30,
+    } as Express.Multer.File)
+
+    expect(result).toEqual({
+      saved: 1,
+      rejected: [
+        {
+          row: 3,
+          participantNumber: '7-999',
+          reason: 'No. Peserta tidak terdaftar di kelas ini',
+        },
+      ],
+    })
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.rawScore).toBe(40)
+  })
+
+  it('serves the sheet as an xlsx attachment with a safe name', async () => {
+    const { controller: http } = controller()
+    const { headers, res } = fakeResponse()
+
+    const file = await http.sheet(TEACHER, SCHEDULE_ID, res)
+
+    expect(file).toBeInstanceOf(StreamableFile)
+    expect(headers).toMatchObject({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition':
+        'attachment; filename="score-sheet-tafsir-vii-a.xlsx"',
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store',
+    })
+  })
+
+  it('queues the publication and answers with the counts', async () => {
+    const { controller: http } = controller()
+    await http.save(TEACHER, SCHEDULE_ID, STUDENTS.ani, { rawScore: 40 })
+
+    await expect(http.publish(TEACHER, SCHEDULE_ID, {})).rejects.toMatchObject({
+      code: 'OFFLINE_SCORES_MISSING',
+    })
+    await expect(
+      http.publish(TEACHER, SCHEDULE_ID, { confirmMissing: true }),
+    ).resolves.toEqual({ queued: 1, missing: 2, absent: 0 })
   })
 })

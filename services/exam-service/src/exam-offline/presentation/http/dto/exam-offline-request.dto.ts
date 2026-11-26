@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import {
+  IsBoolean,
   IsNumber,
   IsOptional,
   IsString,
@@ -30,4 +31,14 @@ export class SaveOfflineScoreDto {
   @IsString()
   @MaxLength(300)
   note?: string
+}
+
+export class RequestOfflinePublicationDto {
+  @ApiPropertyOptional({
+    description: 'Send even when some students have no score yet',
+  })
+  @Transform(raw('confirmMissing'))
+  @IsOptional()
+  @IsBoolean()
+  confirmMissing?: boolean
 }

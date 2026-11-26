@@ -1,0 +1,244 @@
+import {
+  BadRequestException,
+  NotFoundException,
+  PayloadTooLargeException,
+} from '@nestjs/common'
+import ExcelJS from 'exceljs'
+import { describe, expect, it } from 'vitest'
+import {
+  CLASSROOM_7A,
+  NOW,
+  OTHER_SUBJECT,
+  SCHEDULE_ID,
+  STUDENTS,
+  TEACHER,
+  buildOffline,
+  offlineSchedule,
+  seatAll,
+} from '../../exam-offline.test-support.js'
+import { BuildScoreSheetUseCase } from '../build-score-sheet/build-score-sheet.use-case.js'
+import { ImportOfflineScoresUseCase } from './import-offline-scores.use-case.js'
+
+function setup(options: Parameters<typeof buildOffline>[0] = {}) {
+  const world = buildOffline(options)
+  seatAll(world)
+  return {
+    world,
+    useCase: new ImportOfflineScoresUseCase(world.reader, world.results),
+    sheet: new BuildScoreSheetUseCase(world.reader, world.academic),
+  }
+}
+
+const csv = (text: string, originalName = 'nilai.csv') => ({
+  buffer: Buffer.from(text, 'utf8'),
+  originalName,
+})
+
+const run = (
+  useCase: ImportOfflineScoresUseCase,
+  file: { buffer: Buffer; originalName: string },
+) => useCase.execute(TEACHER, { scheduleId: SCHEDULE_ID, file }, NOW)
+
+async function xlsx(rows: (string | number | null)[][]): Promise<Buffer> {
+  const book = new ExcelJS.Workbook()
+  const sheet = book.addWorksheet('Lembar')
+  for (const row of rows) sheet.addRow(row)
+  return Buffer.from(await book.xlsx.writeBuffer())
+}
+
+describe('ImportOfflineScoresUseCase', () => {
+  it('round-trips the generated score sheet once it is filled in', async () => {
+    const { world, useCase, sheet } = setup()
+    world.markAbsent(STUDENTS.budi)
+    const built = await sheet.execute(TEACHER, SCHEDULE_ID)
+    const book = new ExcelJS.Workbook()
+    await book.xlsx.load(built.buffer as unknown as ExcelJS.Buffer)
+    const page = book.getWorksheet('Score Sheet')!
+    page.getCell('C5').value = 45
+    page.getCell('D5').value = 'baik'
+    page.getCell('C7').value = 38.5
+    const filled = Buffer.from(await book.xlsx.writeBuffer())
+
+    const result = await run(useCase, {
+      buffer: filled,
+      originalName: built.filename,
+    })
+
+    expect(result.saved).toBe(2)
+    expect(result.rejected).toEqual([
+      { row: 6, participantNumber: '7-002', reason: 'Siswa tidak hadir' },
+    ])
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)).toMatchObject({
+      rawScore: 45,
+      note: 'baik',
+      enteredById: TEACHER.id,
+    })
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.citra)?.rawScore).toBe(38.5)
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.budi)).toBeUndefined()
+  })
+
+  it('lists every bad row with its spreadsheet row and saves the good ones', async () => {
+    const { world, useCase } = setup()
+    world.markAbsent(STUDENTS.citra)
+    const buffer = await xlsx([
+      ['No. Peserta', 'Nama', 'Nilai', 'Catatan'],
+      ['7-001', 'Ani', 40, ''],
+      ['7-002', 'Budi', null, ''],
+      ['9-999', 'Asing', 30, ''],
+      ['7-003', 'Citra', 20, ''],
+      ['7-004', 'Ganda', 10, ''],
+      ['7-004', 'Ganda', 12, ''],
+      ['7-001x', 'Typo', 'empat', ''],
+    ])
+
+    const result = await run(useCase, { buffer, originalName: 'nilai.xlsx' })
+
+    expect(result.saved).toBe(1)
+    expect(result.rejected).toEqual([
+      { row: 3, participantNumber: '7-002', reason: 'kosong' },
+      {
+        row: 4,
+        participantNumber: '9-999',
+        reason: 'No. Peserta tidak terdaftar di kelas ini',
+      },
+      { row: 5, participantNumber: '7-003', reason: 'Siswa tidak hadir' },
+      {
+        row: 6,
+        participantNumber: '7-004',
+        reason: 'No. Peserta ganda di berkas',
+      },
+      {
+        row: 7,
+        participantNumber: '7-004',
+        reason: 'No. Peserta ganda di berkas',
+      },
+      {
+        row: 8,
+        participantNumber: '7-001x',
+        reason: 'No. Peserta tidak terdaftar di kelas ini',
+      },
+    ])
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.rawScore).toBe(40)
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.budi)).toBeUndefined()
+  })
+
+  it('refuses a score above the maximum, a negative one and a non-numeric one', async () => {
+    const { world, useCase } = setup()
+
+    const result = await run(
+      useCase,
+      csv('No. Peserta,Score,Note\n7-001,51,\n7-002,-1,\n7-003,empat puluh,\n'),
+    )
+
+    expect(result.saved).toBe(0)
+    expect(result.rejected).toEqual([
+      {
+        row: 2,
+        participantNumber: '7-001',
+        reason: 'Nilai harus antara 0 dan 50',
+      },
+      {
+        row: 3,
+        participantNumber: '7-002',
+        reason: 'Nilai harus antara 0 dan 50',
+      },
+      { row: 4, participantNumber: '7-003', reason: 'Nilai bukan angka' },
+    ])
+    expect(world.results.rows.size).toBe(0)
+  })
+
+  it('reads a semicolon csv with a comma decimal, quotes and a BOM', async () => {
+    const { world, useCase } = setup()
+
+    const result = await run(
+      useCase,
+      csv(
+        '﻿No. Peserta;Nama;Score;Note\r\n7-001;"Ani; A";42,5;"kata ""bagus"""\r\n',
+      ),
+    )
+
+    expect(result).toEqual({ saved: 1, rejected: [] })
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)).toMatchObject({
+      rawScore: 42.5,
+      note: 'kata "bagus"',
+    })
+  })
+
+  it('takes back the formula guard of a note', async () => {
+    const { world, useCase } = setup()
+
+    await run(useCase, csv("No. Peserta,Score,Note\n7-001,40,'=1+1\n"))
+
+    expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.note).toBe('=1+1')
+  })
+
+  it('refuses a file over 5 MB', async () => {
+    const { useCase } = setup()
+    await expect(
+      run(useCase, {
+        buffer: Buffer.alloc(5 * 1024 * 1024 + 1, 0x41),
+        originalName: 'nilai.csv',
+      }),
+    ).rejects.toBeInstanceOf(PayloadTooLargeException)
+  })
+
+  it('refuses more than 500 rows', async () => {
+    const { useCase } = setup()
+    const body = Array.from({ length: 501 }, () => '7-001,40').join('\n')
+    await expect(
+      run(useCase, csv(`No. Peserta,Score\n${body}\n`)),
+    ).rejects.toThrow('Maksimal 500 baris per berkas')
+  })
+
+  it.each([
+    ['a wrong extension', csv('No. Peserta,Score\n7-001,40\n', 'nilai.pdf')],
+    ['a csv named xlsx', csv('No. Peserta,Score\n7-001,40\n', 'nilai.xlsx')],
+    [
+      'a broken xlsx',
+      {
+        buffer: Buffer.concat([
+          Buffer.from('PK\u0003\u0004'),
+          Buffer.alloc(64),
+        ]),
+        originalName: 'nilai.xlsx',
+      },
+    ],
+    ['binary content', csv('\u0000\u0001\u0002', 'nilai.csv')],
+    ['no header', csv('Nama,Nilai\nAni,40\n')],
+  ])('refuses %s with 400', async (_label, file) => {
+    const { useCase } = setup()
+    await expect(run(useCase, file)).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('refuses an xlsx that is named csv', async () => {
+    const { useCase } = setup()
+    const buffer = await xlsx([
+      ['No. Peserta', 'Score'],
+      ['7-001', 40],
+    ])
+    await expect(
+      run(useCase, { buffer, originalName: 'nilai.csv' }),
+    ).rejects.toBeInstanceOf(BadRequestException)
+  })
+
+  it('refuses a teacher of another subject before reading the file', async () => {
+    const { world, useCase } = setup({
+      taught: [{ subjectId: OTHER_SUBJECT, classroomId: CLASSROOM_7A.id }],
+    })
+    await expect(
+      run(useCase, csv('No. Peserta,Score\n7-001,40\n')),
+    ).rejects.toBeInstanceOf(NotFoundException)
+    expect(world.results.rows.size).toBe(0)
+  })
+
+  it('refuses an online schedule', async () => {
+    const { world, useCase } = setup()
+    world.schedules.schedules.set(
+      SCHEDULE_ID,
+      offlineSchedule({ deliveryMode: 'ONLINE', packageId: 'p' }),
+    )
+    await expect(
+      run(useCase, csv('No. Peserta,Score\n7-001,40\n')),
+    ).rejects.toMatchObject({ code: 'SCHEDULE_NOT_OFFLINE' })
+  })
+})

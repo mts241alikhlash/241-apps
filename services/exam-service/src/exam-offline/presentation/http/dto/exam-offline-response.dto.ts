@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { EXAM_OFFLINE_KINDS } from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
+import type { OfflinePublicationCounts } from '../../../application/use-cases/request-offline-publication/request-offline-publication.use-case.js'
+import type {
+  OfflineImportRejection,
+  OfflineImportResult,
+} from '../../../application/use-cases/import-offline-scores/import-offline-scores.use-case.js'
 import {
   OFFLINE_PUBLICATION_STATUSES,
   OFFLINE_STUDENT_STATES,
@@ -64,6 +69,53 @@ export class OfflineRosterRowDto {
     dto.rawScore = domain.rawScore
     dto.note = domain.note
     dto.publication = domain.publication
+    return dto
+  }
+}
+
+export class OfflineImportRejectionDto {
+  @ApiProperty({ description: 'The 1-based row of the spreadsheet' })
+  row!: number
+  @ApiProperty({ type: String, nullable: true })
+  participantNumber!: string | null
+  @ApiProperty() reason!: string
+
+  static fromDomain(domain: OfflineImportRejection): OfflineImportRejectionDto {
+    const dto = new OfflineImportRejectionDto()
+    dto.row = domain.row
+    dto.participantNumber = domain.participantNumber
+    dto.reason = domain.reason
+    return dto
+  }
+}
+
+export class OfflineImportResultDto {
+  @ApiProperty() saved!: number
+  @ApiProperty({ type: [OfflineImportRejectionDto] })
+  rejected!: OfflineImportRejectionDto[]
+
+  static fromDomain(domain: OfflineImportResult): OfflineImportResultDto {
+    const dto = new OfflineImportResultDto()
+    dto.saved = domain.saved
+    dto.rejected = domain.rejected.map((row) =>
+      OfflineImportRejectionDto.fromDomain(row),
+    )
+    return dto
+  }
+}
+
+export class OfflinePublicationCountsDto {
+  @ApiProperty() queued!: number
+  @ApiProperty() missing!: number
+  @ApiProperty() absent!: number
+
+  static fromDomain(
+    domain: OfflinePublicationCounts,
+  ): OfflinePublicationCountsDto {
+    const dto = new OfflinePublicationCountsDto()
+    dto.queued = domain.queued
+    dto.missing = domain.missing
+    dto.absent = domain.absent
     return dto
   }
 }
