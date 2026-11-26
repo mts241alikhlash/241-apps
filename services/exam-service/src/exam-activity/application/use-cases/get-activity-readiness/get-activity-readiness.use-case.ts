@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import type { ScheduleAccessUser } from '../../../../exam-schedule/application/schedule-scope.service.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
@@ -63,13 +63,18 @@ export class GetActivityReadinessUseCase {
     user: ScheduleAccessUser,
     query: { eventId?: string; date: string },
   ): Promise<ActivityReadiness[]> {
-    const { from, to } = this.schoolTime.dayRange(
-      new Date(`${query.date}T00:00:00.000Z`),
-    )
+    const day = new Date(`${query.date}T00:00:00.000Z`)
+    if (
+      Number.isNaN(day.getTime()) ||
+      day.toISOString().slice(0, 10) !== query.date
+    ) {
+      throw new BadRequestException('Tanggal tidak valid')
+    }
+    const { from, to } = this.schoolTime.dayRange(day)
     const rows = (await this.list.listNamed(user)).filter(
       (row) =>
         row.activity.startsAt >= from &&
-        row.activity.startsAt < to &&
+        row.activity.startsAt <= to &&
         (query.eventId === undefined || row.activity.eventId === query.eventId),
     )
     if (rows.length === 0) return []

@@ -1,5 +1,6 @@
 import { SchoolTimeService } from '@mts241alikhlash/nest-core/time'
 import type { ConfigService } from '@nestjs/config'
+import { BadRequestException } from '@nestjs/common'
 import { describe, expect, it } from 'vitest'
 import {
   CLASSROOM_7A,
@@ -467,6 +468,45 @@ describe('GetActivityReadinessUseCase', () => {
     const rows = await useCase.execute(teacher, { date: '2026-11-10' })
 
     expect(rows.map((row) => row.activityId)).toEqual(['daily'])
+  })
+
+  it.each(['2026-13-45', '2026-02-31', '2026-02-29', 'garbage'])(
+    'rejects the impossible date %s with 400',
+    async (date) => {
+      const { useCase } = await setup()
+
+      await expect(
+        useCase.execute(SCHEDULE_ADMIN_USER, { date }),
+      ).rejects.toThrow(new BadRequestException('Tanggal tidak valid'))
+    },
+  )
+
+  it.each(['2028-02-29', '2026-11-10'])(
+    'accepts the real day %s',
+    async (date) => {
+      const { useCase } = await setup()
+
+      await expect(
+        useCase.execute(SCHEDULE_ADMIN_USER, { date }),
+      ).resolves.toBeInstanceOf(Array)
+    },
+  )
+
+  it('keeps an activity starting in the last millisecond of the day', async () => {
+    const { useCase, activities, event } = await setup()
+    activities.activities.clear()
+    activities.activities.set(
+      'last-ms',
+      activityRow('last-ms', event.id, {
+        startsAt: new Date('2026-11-10T16:59:59.999Z'),
+      }),
+    )
+
+    const rows = await useCase.execute(SCHEDULE_ADMIN_USER, {
+      date: '2026-11-10',
+    })
+
+    expect(rows.map((row) => row.activityId)).toEqual(['last-ms'])
   })
 
   it('returns an empty list when nothing falls on the day', async () => {
