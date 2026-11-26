@@ -1,5 +1,11 @@
 # exam-service
 
+## 0.9.2
+
+### Patch Changes
+
+- 561ee83: A supervisor without another exam read permission sees the exam periods of their upcoming supervision slots in `GET /exam-events`, not only during an active slot, as the in-memory repository already did.
+
 ## 0.9.1
 
 ### Patch Changes
