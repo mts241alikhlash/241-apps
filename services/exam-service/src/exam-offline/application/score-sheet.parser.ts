@@ -70,7 +70,7 @@ function withoutElements(xml: string, names: string[]): string {
   let kept = ''
   let from = 0
   for (let found = open.exec(xml); found !== null; found = open.exec(xml)) {
-    kept += xml.slice(from, found.index)
+    kept += xml.slice(from, found.index) + ' '
     from = open.lastIndex
     if (found[0].endsWith('/>')) continue
     const close = new RegExp(`</(?:[\\w.-]+:)?${found[1]}\\s*>`, 'gu')

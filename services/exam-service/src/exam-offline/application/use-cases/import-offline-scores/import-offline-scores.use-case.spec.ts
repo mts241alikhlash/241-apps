@@ -346,6 +346,78 @@ describe('ImportOfflineScoresUseCase', () => {
     },
   )
 
+  it.each([
+    [
+      'mergeCells split by cols',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><merge<cols></cols>Cells count="1"><mergeCell ref="C2:C3"/></mergeCells>',
+      /<mergeCells[\s>]/u,
+    ],
+    [
+      'mergeCells split by drawing',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><merge<drawing/>Cells count="1"><mergeCell ref="C2:C3"/></mergeCells>',
+      /<mergeCells[\s>]/u,
+    ],
+    [
+      'cols split by mergeCells',
+      SHEET,
+      '<sheetData>',
+      '<co<mergeCells/>ls><col min="1" max="3" width="9"/></cols><sheetData>',
+      /<cols[\s>]/u,
+    ],
+    [
+      'dataValidations split by cols',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><data<cols/>Validations count="1"><dataValidation type="whole" sqref="A1:A2"><formula1>0</formula1></dataValidation></dataValidations>',
+      /<dataValidations[\s>]/u,
+    ],
+    [
+      'definedNames split by definedNames',
+      BOOK,
+      '</sheets>',
+      '</sheets><defined<definedNames/>Names><definedName name="kecil">Lembar!$A$1:$A$2</definedName></definedNames>',
+      /<definedNames[\s>]/u,
+    ],
+  ])(
+    'never joins the text around a stripped element into %s',
+    async (_, part, find, add, tag) => {
+      const { useCase } = setup()
+      const zip = await JSZip.loadAsync(
+        await xlsx([
+          ['No. Peserta', 'Score'],
+          ['7-001', 40],
+        ]),
+      )
+      await insert(part, find, add)(zip)
+      const buffer = await zip.generateAsync({ type: 'nodebuffer' })
+      const load = vi.spyOn(
+        Object.getPrototypeOf(new ExcelJS.Workbook().xlsx) as ExcelJS.Xlsx,
+        'load',
+      )
+      try {
+        await run(useCase, { buffer, originalName: 'nilai.xlsx' }).catch(
+          (error: unknown) => {
+            expect(error).toBeInstanceOf(BadRequestException)
+          },
+        )
+        for (const [handed] of load.mock.calls) {
+          const xml = await (
+            await JSZip.loadAsync(handed)
+          )
+            .file(part)!
+            .async('string')
+          expect(xml).not.toMatch(tag)
+        }
+      } finally {
+        load.mockRestore()
+      }
+    },
+  )
+
   it('drops comments, drawings, tables and sheet relationships before ExcelJS reads the workbook', async () => {
     const { result, handed } = await handedToExcel((zip) => {
       zip.file(
