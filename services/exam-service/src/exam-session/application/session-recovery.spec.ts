@@ -1171,6 +1171,40 @@ describe('resume', () => {
     })
   })
 
+  it('resumes a late start after the activity ends, before its own end', async () => {
+    const f = await setup()
+    const schedule = f.schedules.schedules.get(f.schedule.id)!
+    const activity = await activityFor(f.activities, schedule)
+    const activityEnd = activity.endsAt
+    f.schedules.schedules.set(schedule.id, {
+      ...schedule,
+      activityId: activity.id,
+      endsAt: new Date(activityEnd.getTime() + 60 * 60_000),
+    })
+    const room = f.rooms.rooms.get(f.roomA.id)!
+    const session = seed(f.sessions, f.schedule.id, {
+      roomId: f.roomA.id,
+      requiresTokenReentry: true,
+      deadline: new Date(activityEnd.getTime() + 30 * 60_000),
+      finalizeAt: new Date(activityEnd.getTime() + 40 * 60_000),
+    })
+    const later = new Date(activityEnd.getTime() + 15 * 60_000)
+    const code = new RoomAccessCodeService(SECRET).codeFor(
+      room.id,
+      room.tokenRotation,
+      later,
+    ).code
+
+    const resumed = await build(f).execute(
+      { id: STUDENT_USER.id },
+      session.id,
+      { accessCode: code, deviceId: 'device-1' },
+      later,
+    )
+
+    expect(resumed.session.requiresTokenReentry).toBe(false)
+  })
+
   it('refuses to resume before the window opens', async () => {
     const f = await setup()
     const schedule = f.schedules.schedules.get(f.schedule.id)!

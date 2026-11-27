@@ -35,7 +35,7 @@ export class SessionAccessService {
       )
     }
     const current = await this.finalizer.finalizeIfDue(session, now)
-    await this.lifecycle.assertOpen(current.scheduleId, now)
+    await this.lifecycle.assertSessionOpen(current, now)
     if (
       current.status === 'IN_PROGRESS' &&
       current.deviceId !== actor.deviceId

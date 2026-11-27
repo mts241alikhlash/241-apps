@@ -68,7 +68,7 @@ export class ResumeExamSessionUseCase {
         'Sesi ujian tidak ditemukan',
       )
     }
-    await this.lifecycle.assertOpen(found.scheduleId, now)
+    await this.lifecycle.assertSessionOpen(found, now)
     const session = await this.finalizer.finalizeIfDue(found, now)
     if (session.lockedByViolation) {
       throw new ForbiddenException({
