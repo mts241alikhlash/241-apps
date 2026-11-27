@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ServiceRequestError } from '@mts241alikhlash/web-shared/utils/service-client'
 
-const { getQuestions, submit } = vi.hoisted(() => ({
+const { getQuestions, getAnswers, submit } = vi.hoisted(() => ({
   getQuestions: vi.fn(),
+  getAnswers: vi.fn(),
   submit: vi.fn(),
 }))
 
 vi.mock('../api/studentExamApi', () => ({
-  studentExamApi: { getQuestions, submit },
+  studentExamApi: { getQuestions, getAnswers, submit },
 }))
 vi.mock('./deviceId', () => ({ deviceId: () => 'dev' }))
 
@@ -56,5 +57,26 @@ describe('studentExamService errors', () => {
     expect(error).toBeInstanceOf(ExamApiError)
     expect(error.code).toBe('MIN_SUBMIT')
     expect(error.message).toBe('Belum waktunya')
+  })
+
+  it('keeps the code when the paper or the answers fail to load', async () => {
+    const lost = new ServiceRequestError(409, {
+      message: 'Waktu ujian sudah berakhir',
+      code: 'SESSION_LOST',
+    })
+    getQuestions.mockRejectedValue(lost)
+    getAnswers.mockRejectedValue(lost)
+
+    for (const load of [
+      studentExamService.getQuestions,
+      studentExamService.getAnswers,
+    ]) {
+      const error = await load('s').catch((e: unknown) => e)
+      expect(error).toBeInstanceOf(ExamApiError)
+      expect(error).toMatchObject({
+        code: 'SESSION_LOST',
+        message: 'Waktu ujian sudah berakhir',
+      })
+    }
   })
 })

@@ -33,6 +33,7 @@ export interface UseExamSessionOptions {
   storage?: () => Storage
   monotonic?: () => number
   onTokenReentry?: () => void
+  onDeadlineChanged?: (deadline: number, serverTime: string) => void
 }
 
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 15_000
@@ -43,6 +44,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   const rows = shallowRef(new Map<string, AnswerRow>())
   const loading = ref(true)
   const error = ref<string | null>(null)
+  const errorCode = ref<string | null>(null)
   const submitted = ref(false)
   const submitting = ref(false)
   const remaining = ref(0)
@@ -127,6 +129,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     sessionId = nextSessionId
     loading.value = true
     error.value = null
+    errorCode.value = null
     try {
       const [paper, saved] = await Promise.all([
         studentExamService.getQuestions(nextSessionId),
@@ -160,6 +163,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
       publish(restoredRows)
       startAutoSync()
     } catch (cause) {
+      errorCode.value = cause instanceof ExamApiError ? cause.code : null
       error.value =
         cause instanceof Error ? cause.message : 'Soal gagal dimuat.'
     } finally {
@@ -214,6 +218,11 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
       if (result.requiresTokenReentry) {
         stopHeartbeat()
         options.onTokenReentry?.()
+      }
+      const next = Date.parse(result.deadline)
+      if (!timeUp.value && Number.isFinite(next) && next !== deadline) {
+        startClock(next, result.serverTime)
+        options.onDeadlineChanged?.(next, result.serverTime)
       }
     } catch {
       return
@@ -310,6 +319,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     answers,
     loading,
     error,
+    errorCode,
     submitted,
     submitting,
     remaining,

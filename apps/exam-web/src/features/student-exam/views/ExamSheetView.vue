@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -53,6 +53,7 @@ const durationMinutes = ref<number | null>(null)
 const timeUpOpen = ref(false)
 const timeUpError = ref<string | null>(null)
 const offline = ref(false)
+const timeUpAutoRetry = ref(true)
 
 const TIME_UP_RETRY_MS = 10_000
 const TIME_UP_RETRY_MAX_MS = 60_000
@@ -69,6 +70,24 @@ const session = useExamSession({
     showList.value = false
     timeUpOpen.value = true
     void sendTimeUp()
+  },
+  onDeadlineChanged: (deadline, serverTime) => {
+    const key = `cbt:deadline:${sessionId}`
+    try {
+      const stored = JSON.parse(
+        window.sessionStorage.getItem(key) ?? '{}',
+      ) as Partial<StoredExamSession>
+      window.sessionStorage.setItem(
+        key,
+        JSON.stringify({
+          ...stored,
+          deadline,
+          serverTime: Date.parse(serverTime),
+        }),
+      )
+    } catch {
+      return
+    }
   },
   onTokenReentry: () => {
     if (!scheduleId) return
@@ -203,13 +222,10 @@ function finish(answersStored: boolean) {
   timeUpTimer = null
   notStored.value = !answersStored
   window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
-  const quitUrl = sebQuitUrl()
-  if (quitUrl) {
-    window.location.assign(quitUrl)
-    return
-  }
   timeUpOpen.value = false
   finished.value = true
+  const quitUrl = sebQuitUrl()
+  if (quitUrl) void nextTick(() => window.location.assign(quitUrl))
 }
 
 async function sendTimeUp() {
@@ -222,7 +238,10 @@ async function sendTimeUp() {
     if (questions.value.length === 0) {
       await session.load(sessionId)
       if (questions.value.length === 0) {
-        throw new Error(error.value ?? 'Soal gagal dimuat.')
+        throw new ExamApiError(
+          error.value ?? 'Soal gagal dimuat.',
+          session.errorCode.value,
+        )
       }
     }
     const result = await session.submit(sessionId)
@@ -240,6 +259,10 @@ async function sendTimeUp() {
     offline.value = !navigator.onLine
     timeUpError.value =
       cause instanceof Error ? cause.message : 'Ujian gagal dikumpulkan.'
+    timeUpAutoRetry.value =
+      code !== API_ERROR_CODES.SESSION_LOCKED_BY_VIOLATION &&
+      code !== API_ERROR_CODES.TOKEN_REENTRY_REQUIRED
+    if (!timeUpAutoRetry.value) return
     timeUpFailures += 1
     timeUpTimer = setTimeout(
       () => void sendTimeUp(),
@@ -289,6 +312,7 @@ async function submitNow() {
   } finally {
     submitting.value = false
     confirmSubmit.value = false
+    if (timeUpOpen.value && !finished.value) void sendTimeUp()
   }
 }
 
@@ -306,6 +330,16 @@ function leaveConfirmed() {
 }
 
 const wide = useWideScreen()
+
+const timeUpStatus = computed(() => {
+  if (submitting.value || !timeUpError.value) return 'Jawaban sedang dikirim…'
+  if (offline.value) {
+    return 'Menunggu koneksi… Jawaban tetap tersimpan di perangkat ini.'
+  }
+  return timeUpAutoRetry.value
+    ? 'Jawaban akan dikirim ulang otomatis.'
+    : 'Hubungi pengawas, lalu tekan Kirim ulang.'
+})
 
 const submitLabel = computed(() =>
   submitting.value
@@ -908,27 +942,19 @@ function statusOf(question: PaperQuestion | null): string {
         </DialogHeader>
         <DialogBody class="space-y-2">
           <p
-            v-if="!timeUpError || submitting"
+            v-if="timeUpError && !submitting"
+            role="alert"
+            class="text-control text-destructive"
+          >
+            {{ timeUpError }}
+          </p>
+          <p
             class="text-control"
+            :class="timeUpError && !submitting ? 'text-muted-foreground' : ''"
             aria-live="polite"
           >
-            Jawaban sedang dikirim…
+            {{ timeUpStatus }}
           </p>
-          <template v-else>
-            <p
-              role="alert"
-              class="text-control text-destructive"
-            >
-              {{ timeUpError }}
-            </p>
-            <p class="text-control text-muted-foreground">
-              {{
-                offline
-                  ? 'Menunggu koneksi… Jawaban tetap tersimpan di perangkat ini.'
-                  : 'Jawaban akan dikirim ulang otomatis.'
-              }}
-            </p>
-          </template>
         </DialogBody>
         <DialogFooter
           v-if="timeUpError && !submitting"

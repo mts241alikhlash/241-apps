@@ -35,7 +35,11 @@ function memoryStorage(): Storage {
 }
 
 function setup(
-  options: { monotonic?: () => number; onExpired?: () => void } = {},
+  options: {
+    monotonic?: () => number
+    onExpired?: () => void
+    onDeadlineChanged?: (deadline: number, serverTime: string) => void
+  } = {},
 ) {
   const storage = memoryStorage()
   const session = useExamSession({
@@ -44,6 +48,7 @@ function setup(
     newClientId: () => 'client-1',
     monotonic: options.monotonic,
     onExpired: options.onExpired,
+    onDeadlineChanged: options.onDeadlineChanged,
   })
   return { session, storage }
 }
@@ -372,5 +377,64 @@ describe('useExamSession time up', () => {
 
     await vi.advanceTimersByTimeAsync(30_000)
     expect(service.saveAnswersBatch).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useExamSession load errors', () => {
+  it('keeps the code of a failed load', async () => {
+    service.getQuestions.mockRejectedValue(
+      new ExamApiError('Waktu ujian sudah berakhir', 'SESSION_LOST'),
+    )
+    const { session } = setup()
+
+    await session.load('s1')
+
+    expect(session.error.value).toBe('Waktu ujian sudah berakhir')
+    expect(session.errorCode.value).toBe('SESSION_LOST')
+  })
+})
+
+describe('useExamSession deadline from the heartbeat', () => {
+  const serverTime = '2026-11-01T02:29:58.000Z'
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    service.heartbeat.mockReset()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('moves the lock when staff extend the time', async () => {
+    const onExpired = vi.fn()
+    const onDeadlineChanged = vi.fn()
+    const extended = '2026-11-01T02:40:00.000Z'
+    service.heartbeat.mockResolvedValue({
+      requiresTokenReentry: false,
+      lockedByViolation: false,
+      absentSince: null,
+      deadline: extended,
+      serverTime: '2026-11-01T02:29:59.000Z',
+    })
+    const { session } = setup({
+      monotonic: () => Date.now(),
+      onExpired,
+      onDeadlineChanged,
+    })
+    await session.load('s1')
+    session.startClock(Date.parse('2026-11-01T02:30:00.000Z'), serverTime)
+    session.startHeartbeat('s1', 1_000)
+
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(onDeadlineChanged).toHaveBeenCalledWith(
+      Date.parse(extended),
+      '2026-11-01T02:29:59.000Z',
+    )
+    expect(onExpired).not.toHaveBeenCalled()
+    expect(session.answersLocked.value).toBe(false)
+    expect(session.remaining.value).toBeGreaterThan(9 * 60_000)
+    session.stopHeartbeat()
   })
 })

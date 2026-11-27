@@ -20,8 +20,16 @@ const state = vi.hoisted(() => ({
   answersLocked: { value: false },
   answer: vi.fn(),
   startHeartbeat: vi.fn(),
+  startClock: vi.fn(),
   submit: vi.fn(),
-  options: null as null | Record<string, () => unknown>,
+  load: vi.fn(),
+  refs: null as null | {
+    loading: { value: boolean }
+    error: { value: string | null }
+    errorCode: { value: string | null }
+    questions: { value: unknown[] }
+  },
+  options: null as null | Record<string, (...args: never[]) => unknown>,
 }))
 
 const router = vi.hoisted(() => ({ replace: vi.fn() }))
@@ -32,15 +40,21 @@ vi.mock('vue-router', () => ({
 }))
 
 vi.mock('../composables/useExamSession', () => ({
-  useExamSession: (options: Record<string, () => unknown>) => {
+  useExamSession: (options: Record<string, (...args: never[]) => unknown>) => {
     state.options = options
     const answers = ref(new Map<string, AnswerPayload>())
     const submitting = ref(false)
+    const questions = ref<unknown[]>([question])
+    const loading = ref(false)
+    const error = ref<string | null>(null)
+    const errorCode = ref<string | null>(null)
+    state.refs = { loading, error, errorCode, questions }
     return {
-      questions: ref([question]),
+      questions,
       answers,
-      loading: ref(false),
-      error: ref(null),
+      loading,
+      error,
+      errorCode,
       submitted: ref(false),
       remaining: ref(600_000),
       remainingLabel: computed(() => '10:00'),
@@ -57,9 +71,9 @@ vi.mock('../composables/useExamSession', () => ({
       canSubmit: computed(() => true),
       answersLocked: computed(() => state.answersLocked.value),
       submitting,
-      startClock: vi.fn(),
+      startClock: state.startClock,
       stopClock: vi.fn(),
-      load: vi.fn(() => Promise.resolve()),
+      load: state.load,
       answer: state.answer,
       submit: state.submit,
       startHeartbeat: state.startHeartbeat,
@@ -70,7 +84,14 @@ vi.mock('../composables/useExamSession', () => ({
   },
 }))
 
+import { ExamApiError } from '../services/studentExamService'
 import ExamSheetView from './ExamSheetView.vue'
+
+beforeEach(() => {
+  state.load.mockReset()
+  state.load.mockResolvedValue(undefined)
+  state.startClock.mockReset()
+})
 
 function storeSession(extra: Record<string, unknown> = {}) {
   window.sessionStorage.setItem(
@@ -207,6 +228,12 @@ describe('ExamSheetView when time is up', () => {
     return document.body.querySelector('[role="dialog"][data-state="open"]')
   }
 
+  function findButton(label: string, within = 'body') {
+    return [...document.body.querySelectorAll(`${within} button`)].find(
+      (node) => node.textContent?.trim() === label,
+    ) as HTMLButtonElement | undefined
+  }
+
   function retryButton() {
     return [...document.body.querySelectorAll('button')].find(
       (node) => node.textContent?.trim() === 'Kirim ulang',
@@ -321,5 +348,150 @@ describe('ExamSheetView when time is up', () => {
     expect(view.text()).toContain('Ujian sudah dikumpulkan')
     expect(view.text()).toContain('Jawaban terakhir belum tersimpan')
     expect(dialog()).toBeNull()
+  })
+
+  it('sends after a manual submit that was in flight at time up fails', async () => {
+    let failManual: (cause: unknown) => void = () => undefined
+    state.submit
+      .mockReturnValueOnce(
+        new Promise((_, reject) => {
+          failManual = reject
+        }),
+      )
+      .mockResolvedValueOnce({ answersStored: true })
+    const view = mountAttached()
+    await flushPromises()
+    findButton('Kumpulkan')!.click()
+    await flushPromises()
+    findButton('Kumpulkan', '[role="dialog"]')!.click()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+    failManual(new Error('Server sedang sibuk.'))
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(10_000)
+    await flushPromises()
+
+    expect(state.submit).toHaveBeenCalledTimes(2)
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+  })
+
+  it('waits for the paper and the local answers before it sends after a reload', async () => {
+    let finishLoad: () => void = () => undefined
+    state.load.mockImplementation(() => {
+      state.refs!.loading.value = true
+      return new Promise<void>((resolve) => {
+        finishLoad = () => {
+          state.refs!.loading.value = false
+          resolve()
+        }
+      })
+    })
+    state.startClock.mockImplementation(() => {
+      state.refs!.loading.value = true
+      state.options!.onExpired()
+    })
+    state.submit.mockResolvedValue({ answersStored: true })
+    const view = mountAttached()
+    await flushPromises()
+
+    expect(dialog()?.textContent).toContain('Waktu habis')
+    expect(state.submit).not.toHaveBeenCalled()
+
+    finishLoad()
+    await flushPromises()
+
+    expect(state.submit).toHaveBeenCalledTimes(1)
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+  })
+
+  it('finishes without an empty hand-in when the paper load answers SESSION_LOST', async () => {
+    state.load.mockImplementation(() => {
+      state.refs!.questions.value = []
+      state.refs!.error.value = 'Waktu ujian sudah berakhir'
+      state.refs!.errorCode.value = 'SESSION_LOST'
+      return Promise.resolve()
+    })
+    const view = mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(state.submit).not.toHaveBeenCalled()
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+    expect(view.text()).toContain('Jawaban terakhir belum tersimpan')
+  })
+
+  it('keeps Kirim ulang but stops retrying on a gate error', async () => {
+    state.submit.mockRejectedValue(
+      new ExamApiError(
+        'Sesi terkunci karena pelanggaran. Hubungi Teknisi Ruangan',
+        'SESSION_LOCKED_BY_VIOLATION',
+      ),
+    )
+    mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+    await vi.advanceTimersByTimeAsync(120_000)
+
+    expect(state.submit).toHaveBeenCalledTimes(1)
+    expect(
+      document.body.querySelector('[role="alert"]')?.textContent,
+    ).toContain('Sesi terkunci karena pelanggaran')
+    expect(retryButton()).toBeDefined()
+  })
+
+  it('shows the finished text and closes the dialog before it leaves for the quit URL', async () => {
+    vi.stubEnv('VITE_SEB_QUIT_URL', 'https://quit.example/done')
+    const seen: { open: boolean; text: string }[] = []
+    const view = mountAttached()
+    const assign = vi.fn(() => {
+      seen.push({ open: dialog() !== null, text: view.text() })
+    })
+    vi.stubGlobal('location', { ...window.location, assign })
+    state.submit.mockResolvedValue({ answersStored: true })
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(assign).toHaveBeenCalledWith('https://quit.example/done')
+    expect(seen[0]?.open).toBe(false)
+    expect(seen[0]?.text).toContain('Ujian sudah dikumpulkan')
+  })
+
+  it('announces the send status in one live region that stays in place', async () => {
+    state.submit.mockRejectedValueOnce(new Error('Server sedang sibuk.'))
+    mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    const live = () => document.body.querySelector('[aria-live="polite"]')
+    await vi.waitFor(() => expect(live()).not.toBeNull())
+    const before = live()
+    await flushPromises()
+
+    expect(live()).toBe(before)
+    expect(live()?.textContent).toContain(
+      'Jawaban akan dikirim ulang otomatis.',
+    )
+  })
+
+  it('stores a new deadline from the server for a reload', () => {
+    mountAttached()
+
+    state.options!.onDeadlineChanged(
+      ...([2_000_000_600_000, '2026-11-01T02:29:59.000Z'] as never[]),
+    )
+
+    const stored = JSON.parse(
+      window.sessionStorage.getItem('cbt:deadline:s1') ?? '{}',
+    ) as { deadline: number; serverTime: number }
+    expect(stored.deadline).toBe(2_000_000_600_000)
+    expect(stored.serverTime).toBe(Date.parse('2026-11-01T02:29:59.000Z'))
   })
 })
