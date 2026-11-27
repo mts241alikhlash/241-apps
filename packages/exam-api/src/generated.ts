@@ -3116,6 +3116,7 @@ export interface components {
             absence: components["schemas"]["RoomMonitorAbsenceDto"] | null;
             classroomName: string | null;
             nis: string | null;
+            offline: boolean;
             packageTitle: string;
             participantNumber: string | null;
             /** Format: uuid */

@@ -76,6 +76,28 @@ describe('GetOfflineRosterUseCase', () => {
     expect(rows[2]).toMatchObject({ state: 'MISSING', note: null })
   })
 
+  it('shows a student absent once the room monitor records the absence on the offline schedule', async () => {
+    const { world, useCase } = setup()
+    const report = await world.rooms.createReport({
+      roomId: 'room-1',
+      supervisorSlotId: 'slot-1',
+    })
+    await world.rooms.recordAbsence({
+      reportId: report.id,
+      studentId: STUDENTS.citra,
+      scheduleId: SCHEDULE_ID,
+      reason: 'PERMITTED',
+      note: null,
+      recordedBy: 'sup-1',
+    })
+
+    const rows = await useCase.execute(TEACHER, SCHEDULE_ID)
+
+    expect(rows.find((row) => row.studentId === STUDENTS.citra)?.state).toBe(
+      'ABSENT',
+    )
+  })
+
   it('gives null numbers when the participant number lookup fails and sorts by name', async () => {
     const { world, useCase } = setup()
     world.numbers.failure = new Error('student-service down')

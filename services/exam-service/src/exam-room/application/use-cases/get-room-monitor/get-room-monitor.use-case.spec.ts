@@ -23,6 +23,8 @@ import {
 } from '../../room-monitor.test-support.js'
 import { FakeParticipantNumber } from '../../../../exam-session/application/exam-session.test-support.js'
 import { GetRoomMonitorUseCase } from './get-room-monitor.use-case.js'
+import { RoomReportService } from '../../room-report.service.js'
+import { FakeRoomReportFileStorage } from '../../room-report-file-storage.fake.js'
 
 const SUPERVISOR_USER: RoomStaffUser = {
   id: SUPERVISOR_ID,
@@ -444,17 +446,16 @@ describe('GetRoomMonitorUseCase', () => {
     })
   })
 
-  it('leaves offline and unpackaged schedules out of the roster and the exam window', async () => {
+  it('leaves unpackaged online schedules out of the roster and the exam window', async () => {
     const { fixture, monitor } = await build()
-    const offline = fixture.scheduleByClassroom.get(CLASSROOM_7A.id)!
-    fixture.schedules.schedules.set(offline.id, {
-      ...offline,
-      deliveryMode: 'OFFLINE',
+    const unpackaged = fixture.scheduleByClassroom.get(CLASSROOM_7A.id)!
+    fixture.schedules.schedules.set(unpackaged.id, {
+      ...unpackaged,
       packageId: null,
       packageTitle: null,
     })
     fixture.schedules.schedules.set('unseated-unpackaged', {
-      ...offline,
+      ...unpackaged,
       id: 'unseated-unpackaged',
       classroomId: 'classroom-without-seats',
       packageId: null,
@@ -475,17 +476,93 @@ describe('GetRoomMonitorUseCase', () => {
       packageTitle: '',
       subjectName: null,
       totalQuestions: 0,
+      offline: false,
       session: null,
     })
     expect(eighth).toMatchObject({
       scheduleId: fixture.scheduleByClassroom.get(CLASSROOM_8A.id)!.id,
       packageTitle: 'UAS Matematika',
       totalQuestions: 40,
+      offline: false,
     })
     expect(result.meta.window).toEqual({
       startsAt: '2026-11-02T01:30:00.000Z',
       endsAt: '2026-11-02T03:00:00.000Z',
     })
     expect(result.meta.summary.totalRegistered).toBe(120)
+  })
+
+  it('lists offline participants with their schedule, outside the not-started count and the exam window', async () => {
+    const { fixture, monitor } = await build()
+    const online = fixture.scheduleByClassroom.get(CLASSROOM_7A.id)!
+    fixture.schedules.schedules.set(online.id, {
+      ...online,
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+      endsAt: new Date('2026-11-02T05:00:00.000Z'),
+    })
+    const offlineSeats = (
+      await fixture.rooms.listSeatsByRoom(fixture.room.id)
+    ).filter((seat) => seat.classroomId === CLASSROOM_7A.id).length
+    const reports = new RoomReportService(
+      fixture.rooms,
+      fixture.schedules,
+      fixture.sessions,
+      new RoomAccessService(fixture.rooms),
+      new FakeRoomReportFileStorage(),
+    )
+    const context = await reports.loadEditable(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      fixture.slotId,
+      MONITOR_NOW,
+    )
+    await reports.recordAbsence(
+      context,
+      {
+        studentId: fixture.studentIds[0],
+        scheduleId: online.id,
+        reason: 'SICK',
+        note: null,
+      },
+      SUPERVISOR_ID,
+    )
+
+    const result = await monitor.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      { page: 1, limit: 3 },
+      MONITOR_NOW,
+    )
+    const notStarted = await monitor.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      { page: 1, limit: 100, status: 'NOT_STARTED' },
+      MONITOR_NOW,
+    )
+
+    const [seventh, eighth] = result.data
+    expect(seventh).toMatchObject({
+      studentId: fixture.studentIds[0],
+      scheduleId: online.id,
+      offline: true,
+      packageTitle: '',
+      totalQuestions: 0,
+      session: null,
+      absence: { reason: 'SICK', note: null },
+    })
+    expect(eighth.offline).toBe(false)
+    expect(result.meta.window).toEqual({
+      startsAt: '2026-11-02T01:30:00.000Z',
+      endsAt: '2026-11-02T03:00:00.000Z',
+    })
+    expect(offlineSeats).toBeGreaterThan(0)
+    expect(result.meta.summary).toMatchObject({
+      totalRegistered: 120,
+      notStartedCount: 120 - offlineSeats,
+      absentMarkedCount: 1,
+    })
+    expect(notStarted.meta.total).toBe(120 - offlineSeats)
   })
 })

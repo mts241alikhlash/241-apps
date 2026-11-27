@@ -148,6 +148,7 @@ export class RoomMonitorParticipantDto {
   @ApiProperty() packageTitle!: string
   @ApiProperty({ format: 'uuid' }) scheduleId!: string
   @ApiProperty() totalQuestions!: number
+  @ApiProperty() offline!: boolean
   @ApiProperty({ type: () => RoomMonitorSessionDto, nullable: true })
   session!: RoomMonitorSessionDto | null
   @ApiProperty({ type: () => RoomMonitorAbsenceDto, nullable: true })
@@ -165,6 +166,7 @@ export class RoomMonitorParticipantDto {
     dto.packageTitle = domain.packageTitle
     dto.scheduleId = domain.scheduleId
     dto.totalQuestions = domain.totalQuestions
+    dto.offline = domain.offline
     dto.session =
       domain.session === null
         ? null

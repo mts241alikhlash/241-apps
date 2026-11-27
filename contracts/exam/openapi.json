@@ -10921,6 +10921,9 @@
           "totalQuestions": {
             "type": "number"
           },
+          "offline": {
+            "type": "boolean"
+          },
           "session": {
             "nullable": true,
             "type": "object",
@@ -10951,6 +10954,7 @@
           "packageTitle",
           "scheduleId",
           "totalQuestions",
+          "offline",
           "session",
           "absence"
         ]

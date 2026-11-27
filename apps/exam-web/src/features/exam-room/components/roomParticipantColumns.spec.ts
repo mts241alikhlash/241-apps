@@ -50,6 +50,7 @@ const participant = (
   packageTitle: 'UAS Ganjil',
   scheduleId: 's1',
   totalQuestions: 50,
+  offline: false,
   session: session(),
   absence: null,
   ...overrides,
@@ -287,20 +288,68 @@ describe('clientLabel', () => {
   })
 })
 
-describe('absence without a schedule', () => {
-  it('disables Catat Absen when the row has no schedule to attach it to', () => {
-    const node = cellOf('actions', { supervise: true })({
-      row: { original: participant({ scheduleId: '', session: null }) },
-    }) as VNode
-    const props = node.props as {
-      items: { label: string; disabled?: boolean }[]
-    }
-    const item = props.items.find((entry) =>
-      entry.label.startsWith('Ujian offline'),
+function absenceItem(row: RoomMonitorParticipant) {
+  const node = cellOf('actions', { supervise: true })({
+    row: { original: row },
+  }) as VNode
+  const props = node.props as {
+    items: { label: string; disabled?: boolean }[]
+  }
+  return props.items[1]
+}
+
+describe('absence action', () => {
+  it('disables it with a neutral label when the row has no exam in the slot', () => {
+    const item = absenceItem(
+      participant({ scheduleId: '', packageTitle: '', session: null }),
     )
-    expect(item?.label).toBe(
-      'Ujian offline: tandai tidak hadir di Berita Acara',
+    expect(item).toEqual(
+      expect.objectContaining({
+        label: 'Tidak ada jadwal ujian pada jam ini',
+        disabled: true,
+      }),
     )
-    expect(item?.disabled).toBe(true)
+  })
+
+  it('enables Catat Absen on an offline row that has no session by design', () => {
+    const item = absenceItem(
+      participant({
+        scheduleId: 'offline-1',
+        packageTitle: '',
+        totalQuestions: 0,
+        offline: true,
+        session: null,
+      }),
+    )
+    expect(item).toEqual(
+      expect.objectContaining({ label: 'Catat Absen', disabled: false }),
+    )
+  })
+})
+
+describe('offline rows', () => {
+  const offlineRow = participant({
+    scheduleId: 'offline-1',
+    packageTitle: '',
+    totalQuestions: 0,
+    offline: true,
+    session: null,
+  })
+
+  it('shows Offline instead of Belum Mulai', () => {
+    expect(cellText('status', offlineRow)).toBe('Offline')
+  })
+
+  it('still shows the absence first', () => {
+    expect(
+      cellText('status', {
+        ...offlineRow,
+        absence: { reason: 'SICK', note: null },
+      }),
+    ).toBe('Tidak Hadir: Sakit')
+  })
+
+  it('shows no question progress', () => {
+    expect(cellText('progress', offlineRow)).toBe('-')
   })
 })

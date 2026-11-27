@@ -56,6 +56,7 @@ describe('RecordAbsenceDialog', () => {
           packageTitle: 'UAS',
           scheduleId: 'sch1',
           totalQuestions: 10,
+          offline: false,
           session: null,
           absence: null,
         },
