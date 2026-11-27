@@ -28,10 +28,10 @@ const SPACE = 32
 const ZIP_SIGNATURE = Buffer.from([0x50, 0x4b, 0x03, 0x04])
 const TOO_MANY = `Maksimal ${OFFLINE_IMPORT_MAX_ROWS} baris per berkas`
 const MISMATCH = 'Isi berkas tidak sesuai dengan jenisnya'
-const PART_LIMIT = {
-  parts:
-    /xl\/(worksheets\/|sharedStrings\.xml|comments\d+\.xml|tables\/|drawings\/)/iu,
-  maxBytes: OFFLINE_IMPORT_MAX_BYTES,
+const ARCHIVE_LIMITS = {
+  partBytes: OFFLINE_IMPORT_MAX_BYTES,
+  totalBytes: 4 * OFFLINE_IMPORT_MAX_BYTES,
+  maxSheets: 3,
   message: 'Berkas terlalu besar untuk diimpor',
 }
 const COLUMNS = {
@@ -45,7 +45,7 @@ function headerKey(value: string): string {
 }
 
 async function readXlsx(buffer: Buffer): Promise<Table> {
-  const checked = await normalizeArchive(buffer, PART_LIMIT)
+  const checked = await normalizeArchive(buffer, ARCHIVE_LIMITS)
   const book = new ExcelJS.Workbook()
   try {
     await book.xlsx.load(checked as unknown as ExcelJS.Buffer)

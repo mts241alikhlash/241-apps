@@ -123,8 +123,11 @@ const autoWarning = computed(() => {
   const startsAt = new Date(item.startsAt).getTime()
   const endsAt = new Date(item.endsAt).getTime()
   const closeAt = endsAt + item.policy.autoCloseGraceMinutes * MINUTE_MS
-  if (values.status === 'ACTIVE' && now >= closeAt) {
-    return 'Status otomatis aktif: kegiatan akan ditutup lagi otomatis dalam satu menit.'
+  if (now >= closeAt && values.status === 'ACTIVE') {
+    return 'Status otomatis aktif: kegiatan akan ditutup otomatis setelah tidak ada siswa yang masih mengerjakan.'
+  }
+  if (now >= closeAt && values.status === 'SCHEDULED') {
+    return 'Status otomatis aktif: kegiatan akan ditutup otomatis dalam satu menit.'
   }
   const opens =
     values.status === 'SCHEDULED' &&

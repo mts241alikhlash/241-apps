@@ -7,9 +7,12 @@ const MAX_XML_BYTES = 20 * 1024 * 1024
 
 export const TOO_BIG = 'Isi berkas terlalu besar setelah diekstrak'
 
-export interface PartLimit {
-  parts: RegExp
-  maxBytes: number
+const WORKSHEET = /xl\/worksheets\/sheet\d+\.xml/iu
+
+export interface ArchiveLimits {
+  partBytes: number
+  totalBytes: number
+  maxSheets: number
   message: string
 }
 
@@ -48,7 +51,10 @@ function inflateWithin(
   })
 }
 
-async function openChecked(buffer: Buffer): Promise<JSZip.JSZipObject[]> {
+async function openChecked(
+  buffer: Buffer,
+  limits?: ArchiveLimits,
+): Promise<JSZip.JSZipObject[]> {
   let zip: JSZip
   try {
     zip = await JSZip.loadAsync(buffer)
@@ -65,7 +71,16 @@ async function openChecked(buffer: Buffer): Promise<JSZip.JSZipObject[]> {
     (total, entry) => total + (entry._data?.uncompressedSize ?? 0),
     0,
   )
-  if (declared > MAX_EXPANDED_BYTES) throw new BadRequestException(TOO_BIG)
+  if (declared > (limits?.totalBytes ?? MAX_EXPANDED_BYTES)) {
+    throw new BadRequestException(limits?.message ?? TOO_BIG)
+  }
+  if (
+    limits !== undefined &&
+    entries.filter((entry) => WORKSHEET.test(entry.name)).length >
+      limits.maxSheets
+  ) {
+    throw new BadRequestException(limits.message)
+  }
   return entries
 }
 
@@ -85,27 +100,27 @@ async function inflateEntries(
   buffer: Buffer,
   xml: XmlBudget,
   keep: (name: string) => boolean,
-  partLimit?: PartLimit,
+  limits?: ArchiveLimits,
 ): Promise<Map<string, Buffer>> {
-  const entries = await openChecked(buffer)
+  const entries = await openChecked(buffer, limits)
+  const total = limits?.totalBytes ?? MAX_EXPANDED_BYTES
   const files = new Map<string, Buffer>()
   let expanded = 0
   let xmlExpanded = 0
   for (const entry of entries) {
     if (entry.dir) continue
     const counted = xml.isXml(entry.name)
-    const remaining = MAX_EXPANDED_BYTES - expanded
+    const remaining = total - expanded
     const budget = counted
       ? Math.min(remaining, xml.partLimit(entry.name), xml.total - xmlExpanded)
       : remaining
-    const tight = partLimit?.parts.test(entry.name) === true
-    const limit = tight ? Math.min(budget, partLimit.maxBytes) : budget
+    const limit = Math.min(budget, limits?.partBytes ?? budget)
     const chunks: Buffer[] | undefined = keep(entry.name) ? [] : undefined
     const seen = await inflateWithin(
       entry,
       limit,
       chunks,
-      tight ? partLimit.message : TOO_BIG,
+      limits?.message ?? TOO_BIG,
     )
     expanded += seen
     if (counted) xmlExpanded += seen
@@ -136,9 +151,9 @@ export async function assertSafeArchive(buffer: Buffer): Promise<void> {
 
 export async function normalizeArchive(
   buffer: Buffer,
-  partLimit?: PartLimit,
+  limits?: ArchiveLimits,
 ): Promise<Buffer> {
   return rebuildArchive(
-    await inflateEntries(buffer, DEFAULT_XML, () => true, partLimit),
+    await inflateEntries(buffer, DEFAULT_XML, () => true, limits),
   )
 }

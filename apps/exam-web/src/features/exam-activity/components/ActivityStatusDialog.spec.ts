@@ -231,8 +231,10 @@ describe('ActivityStatusDialog', () => {
     }
     const OPENS =
       'Status otomatis aktif: kegiatan akan dibuka otomatis dalam satu menit'
+    const CLOSES_AFTER_WORK =
+      'Status otomatis aktif: kegiatan akan ditutup otomatis setelah tidak ada siswa yang masih mengerjakan'
     const CLOSES =
-      'Status otomatis aktif: kegiatan akan ditutup lagi otomatis dalam satu menit'
+      'Status otomatis aktif: kegiatan akan ditutup otomatis dalam satu menit'
 
     it('warns that scheduling inside the window opens the activity', async () => {
       const wrapper = open(auto())
@@ -273,10 +275,32 @@ describe('ActivityStatusDialog', () => {
       )
       await choose(wrapper, 'ACTIVE')
 
-      expect(wrapper.text()).toContain(CLOSES)
+      expect(wrapper.text()).toContain(CLOSES_AFTER_WORK)
       expect(wrapper.text()).not.toContain(OPENS)
       wrapper.unmount()
     })
+
+    it.each([
+      ['online', 'ONLINE' as const],
+      ['offline', 'OFFLINE' as const],
+    ])(
+      'warns that scheduling an %s activity past the end and grace closes it',
+      async (_, deliveryMode) => {
+        const wrapper = open(
+          auto({
+            status: 'CLOSED',
+            deliveryMode,
+            startsAt: minutes(-180),
+            endsAt: minutes(-120),
+          }),
+        )
+        await choose(wrapper, 'SCHEDULED')
+
+        expect(wrapper.text()).toContain(CLOSES)
+        expect(wrapper.text()).not.toContain(OPENS)
+        wrapper.unmount()
+      },
+    )
 
     it('stays quiet when activating within the grace', async () => {
       const wrapper = open(

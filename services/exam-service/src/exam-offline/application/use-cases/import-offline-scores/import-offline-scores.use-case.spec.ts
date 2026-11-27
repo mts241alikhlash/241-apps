@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common'
 import ExcelJS from 'exceljs'
 import JSZip from 'jszip'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   CLASSROOM_7A,
   CLASSROOM_7B,
@@ -190,13 +190,33 @@ describe('ImportOfflineScoresUseCase', () => {
     )
   })
 
+  const KB = 1024
+  const MB = 1024 * KB
+  const range = (from: number, count: number, size: number, name: string) =>
+    Object.fromEntries(
+      Array.from({ length: count }, (_, index) => [
+        name.replace('N', String(from + index)),
+        size,
+      ]),
+    )
+
   it.each([
-    'xl/worksheets/sheet1.xml',
-    'xl/sharedStrings.xml',
-    'xl/comments1.xml',
+    ['sheet1.xml past 1 MB', { 'xl/worksheets/sheet1.xml': MB + 1 }],
+    ['sharedStrings.xml past 1 MB', { 'xl/sharedStrings.xml': MB + 1 }],
+    ['comments1.xml past 1 MB', { 'xl/comments1.xml': MB + 1 }],
+    ['a 19 MB styles.xml', { 'xl/styles.xml': 19 * MB }],
+    [
+      '59 extra sheets of about 1 MB',
+      range(2, 59, 1000 * KB, 'xl/worksheets/sheetN.xml'),
+    ],
+    [
+      'five parts under 1 MB but past 4 MB together',
+      range(1, 5, 900 * KB, 'xl/custom/partN.xml'),
+    ],
+    ['four worksheet parts', range(2, 3, KB, 'xl/worksheets/sheetN.xml')],
   ])(
-    'refuses a workbook whose %s expands past 1 MB before reading it',
-    async (part) => {
+    'refuses a workbook with %s before reading it',
+    async (_, parts: Record<string, number>) => {
       const { world, useCase } = setup()
       const zip = await JSZip.loadAsync(
         await xlsx([
@@ -204,18 +224,26 @@ describe('ImportOfflineScoresUseCase', () => {
           ['7-001', 40],
         ]),
       )
-      zip.file(part, `<?xml version="1.0"?><x>${' '.repeat(1024 * 1024)}</x>`)
+      for (const [part, size] of Object.entries(parts)) {
+        zip.file(part, `<?xml version="1.0"?><x>${' '.repeat(size)}</x>`)
+      }
       const buffer = await zip.generateAsync({
         type: 'nodebuffer',
         compression: 'DEFLATE',
       })
-      expect(buffer.length).toBeLessThan(64 * 1024)
+      expect(buffer.length).toBeLessThan(MB)
+      const workbookRead = vi.spyOn(ExcelJS.Workbook.prototype, 'xlsx', 'get')
 
-      await expect(
-        run(useCase, { buffer, originalName: 'nilai.xlsx' }),
-      ).rejects.toThrow(
-        new BadRequestException('Berkas terlalu besar untuk diimpor'),
-      )
+      try {
+        await expect(
+          run(useCase, { buffer, originalName: 'nilai.xlsx' }),
+        ).rejects.toThrow(
+          new BadRequestException('Berkas terlalu besar untuk diimpor'),
+        )
+        expect(workbookRead).not.toHaveBeenCalled()
+      } finally {
+        workbookRead.mockRestore()
+      }
       expect(world.results.rows.size).toBe(0)
     },
   )
