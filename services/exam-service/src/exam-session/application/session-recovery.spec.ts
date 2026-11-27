@@ -844,6 +844,20 @@ describe('session heartbeat', () => {
     expect(stored?.lastSeenAt).toEqual(NOW)
   })
 
+  it('reports the current deadline so the client follows an extension', async () => {
+    const f = await setup()
+    const extended = new Date('2026-11-02T03:45:00.000Z')
+    const session = seed(f.sessions, f.schedule.id, { deadline: extended })
+
+    const beat = await buildBeat(f).execute(
+      { id: STUDENT_USER.id, deviceId: 'device-1' },
+      session.id,
+      NOW,
+    )
+
+    expect(beat.deadline).toEqual(extended)
+  })
+
   it('reports an existing lock without clearing it', async () => {
     const f = await setup()
     const session = seed(f.sessions, f.schedule.id, {

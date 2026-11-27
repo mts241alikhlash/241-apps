@@ -12217,6 +12217,9 @@
             "type": "string",
             "nullable": true
           },
+          "deadline": {
+            "type": "string"
+          },
           "serverTime": {
             "type": "string"
           }
@@ -12225,6 +12228,7 @@
           "lockedByViolation",
           "requiresTokenReentry",
           "absentSince",
+          "deadline",
           "serverTime"
         ]
       },

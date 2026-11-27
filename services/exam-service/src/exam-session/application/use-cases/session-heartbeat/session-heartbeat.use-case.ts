@@ -7,6 +7,7 @@ export interface SessionHeartbeat {
   lockedByViolation: boolean
   requiresTokenReentry: boolean
   absentSince: Date | null
+  deadline: Date
   serverTime: Date
 }
 
@@ -29,6 +30,7 @@ export class SessionHeartbeatUseCase {
         lockedByViolation: session.lockedByViolation,
         requiresTokenReentry: session.requiresTokenReentry,
         absentSince: session.absentSince,
+        deadline: session.deadline,
         serverTime: now,
       }
     }
@@ -40,6 +42,7 @@ export class SessionHeartbeatUseCase {
       lockedByViolation: patched.lockedByViolation,
       requiresTokenReentry: patched.requiresTokenReentry,
       absentSince: patched.absentSince,
+      deadline: patched.deadline,
       serverTime: now,
     }
   }

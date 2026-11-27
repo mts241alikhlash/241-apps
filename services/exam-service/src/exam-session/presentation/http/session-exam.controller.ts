@@ -241,6 +241,7 @@ export class SessionExamController {
       lockedByViolation: beat.lockedByViolation,
       requiresTokenReentry: beat.requiresTokenReentry,
       absentSince: beat.absentSince?.toISOString() ?? null,
+      deadline: beat.deadline.toISOString(),
       serverTime: beat.serverTime.toISOString(),
     }
   }

@@ -3152,6 +3152,7 @@ export interface components {
         };
         SessionHeartbeatDto: {
             absentSince: string | null;
+            deadline: string;
             lockedByViolation: boolean;
             requiresTokenReentry: boolean;
             serverTime: string;
