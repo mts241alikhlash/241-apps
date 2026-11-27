@@ -512,8 +512,8 @@ describe('ImportQuestionsUseCase', () => {
       zip.file(
         name,
         sheet.replace(
-          '</sheetData>',
-          '</sheetData><mergeCells count="1"><mergeCell ref="C2:Z50000"/></mergeCells>',
+          '<sheetData>',
+          '<cols><col min="1" max="3000000" width="9"/></cols><sheetData>',
         ),
       )
       const bomb = await zip.generateAsync({ type: 'nodebuffer' })
@@ -526,10 +526,44 @@ describe('ImportQuestionsUseCase', () => {
       const loaded = await JSZip.loadAsync(load.mock.calls[0][0])
       load.mockRestore()
 
-      expect(await loaded.file(name)!.async('string')).not.toContain(
-        'mergeCell',
-      )
+      expect(await loaded.file(name)!.async('string')).not.toContain('<col')
       expect(preview).toMatchObject({ total: 1, errors: [] })
+    })
+
+    it('reads a Jenis merged over two rows, as before the guard', async () => {
+      const { useCase } = build()
+      const book = new ExcelJS.Workbook()
+      const identity = book.addWorksheet('Identitas')
+      identityRows(IDENTITY).forEach((row) => identity.addRow(row))
+      const sheet = book.addWorksheet('Soal')
+      sheet.addRow(HEADERS)
+      ;[1, 2, 3, 4, 5, 6, 7].forEach((n) => sheet.addRow(pg(n)))
+      sheet.mergeCells('B2:B3')
+      const merged = Buffer.from(await book.xlsx.writeBuffer())
+
+      const preview = await useCase.preview(TEACHER, input(merged))
+
+      expect(preview).toMatchObject({
+        total: 7,
+        errors: [],
+        counts: { MULTIPLE_CHOICE: 7 },
+      })
+    })
+
+    it('still imports a file with a cell note', async () => {
+      const { useCase } = build()
+      const book = new ExcelJS.Workbook()
+      const identity = book.addWorksheet('Identitas')
+      identityRows(IDENTITY).forEach((row) => identity.addRow(row))
+      const sheet = book.addWorksheet('Soal')
+      sheet.addRow(HEADERS)
+      sheet.addRow(pg(1))
+      sheet.getCell('C2').note = 'Catatan guru'
+      const noted = Buffer.from(await book.xlsx.writeBuffer())
+
+      await expect(
+        useCase.preview(TEACHER, input(noted)),
+      ).resolves.toMatchObject({ total: 1, errors: [] })
     })
 
     it('refuses a malformed worksheet before ExcelJS reads it', async () => {

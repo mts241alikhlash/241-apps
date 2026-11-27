@@ -5,7 +5,7 @@ const MAX_ENTRIES = 1000
 const MAX_EXPANDED_BYTES = 60 * 1024 * 1024
 const MAX_XML_BYTES = 20 * 1024 * 1024
 
-const TOO_BIG = 'Isi berkas terlalu besar setelah diekstrak'
+export const TOO_BIG = 'Isi berkas terlalu besar setelah diekstrak'
 
 interface DeclaredEntry {
   _data?: { uncompressedSize?: number }
@@ -77,7 +77,7 @@ const DEFAULT_XML: XmlBudget = {
 async function inflateEntries(
   buffer: Buffer,
   xml: XmlBudget,
-  keep: boolean,
+  keep: (name: string) => boolean,
 ): Promise<Map<string, Buffer>> {
   const entries = await openChecked(buffer)
   const files = new Map<string, Buffer>()
@@ -90,7 +90,7 @@ async function inflateEntries(
     const limit = counted
       ? Math.min(remaining, xml.partLimit(entry.name), xml.total - xmlExpanded)
       : remaining
-    const chunks: Buffer[] | undefined = keep ? [] : undefined
+    const chunks: Buffer[] | undefined = keep(entry.name) ? [] : undefined
     const seen = await inflateWithin(entry, limit, chunks)
     expanded += seen
     if (counted) xmlExpanded += seen
@@ -102,8 +102,9 @@ async function inflateEntries(
 export function inflateArchive(
   buffer: Buffer,
   xml: XmlBudget = DEFAULT_XML,
+  keep: (name: string) => boolean = () => true,
 ): Promise<Map<string, Buffer>> {
-  return inflateEntries(buffer, xml, true)
+  return inflateEntries(buffer, xml, keep)
 }
 
 export function rebuildArchive(files: Map<string, Buffer>): Promise<Buffer> {
@@ -115,7 +116,7 @@ export function rebuildArchive(files: Map<string, Buffer>): Promise<Buffer> {
 }
 
 export async function assertSafeArchive(buffer: Buffer): Promise<void> {
-  await inflateEntries(buffer, DEFAULT_XML, false)
+  await inflateEntries(buffer, DEFAULT_XML, () => false)
 }
 
 export async function normalizeArchive(buffer: Buffer): Promise<Buffer> {
