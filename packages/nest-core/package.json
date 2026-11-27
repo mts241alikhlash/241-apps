@@ -157,7 +157,7 @@
     "@nestjs/terminus": "catalog:",
     "@nestjs/testing": "catalog:",
     "@nestjs/throttler": "catalog:",
-    "@prisma/client": "7.10.0",
+    "@prisma/client": "7.10.1",
     "@types/bcrypt": "catalog:",
     "@types/express": "catalog:",
     "@types/node": "catalog:",
