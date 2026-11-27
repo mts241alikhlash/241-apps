@@ -5,20 +5,27 @@ import {
 } from '@mts241alikhlash/nest-core/access-control'
 import { ExamMakeupController } from './exam-makeup.controller.js'
 
+const READ = [
+  'exam-grading.read',
+  'exam-grading.read-all',
+  'exam-grading.manage-all',
+  'exam-schedules.manage-all',
+  'exam-events.manage',
+  'exam-events.read',
+]
+const WRITE = [
+  'exam-grading.grade',
+  'exam-grading.manage-all',
+  'exam-schedules.manage-all',
+  'exam-events.manage',
+]
+
 const anyExpected: Record<string, string[]> = {
-  absentees: [
-    'exam-grading.read',
-    'exam-grading.read-all',
-    'exam-grading.manage-all',
-  ],
-  makeup: ['exam-grading.grade', 'exam-grading.manage-all'],
-  participants: [
-    'exam-grading.read',
-    'exam-grading.read-all',
-    'exam-grading.manage-all',
-  ],
-  addToMakeup: ['exam-grading.grade', 'exam-grading.manage-all'],
-  removeFromMakeup: ['exam-grading.grade', 'exam-grading.manage-all'],
+  absentees: READ,
+  makeup: WRITE,
+  participants: READ,
+  addToMakeup: WRITE,
+  removeFromMakeup: WRITE,
 }
 
 describe('ExamMakeupController permissions', () => {

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import MakeupParticipantsDialog from './MakeupParticipantsDialog.vue'
+import type { ExamType } from '@/features/exam-shared/examType'
 
 const { loadParticipants, removeParticipant, permissions } = vi.hoisted(() => ({
   loadParticipants: vi.fn(),
@@ -69,9 +70,9 @@ const rows = [
 const buttonByText = (host: Wrapper, text: string) =>
   host.findAll('button').find((candidate) => candidate.text() === text)
 
-async function open() {
+async function open(type: ExamType = 'DAILY') {
   const wrapper = mount(MakeupParticipantsDialog, {
-    props: { open: true, scheduleId: 'm1', title: 'UTS (Susulan)' },
+    props: { open: true, scheduleId: 'm1', title: 'UTS (Susulan)', type },
     global: { stubs },
   })
   await flushPromises()
@@ -116,6 +117,34 @@ describe('MakeupParticipantsDialog', () => {
     const wrapper = await open()
 
     expect(buttonByText(wrapper, 'Tutup')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  const removable = (wrapper: VueWrapper) => {
+    const columns = wrapper
+      .getComponent({ name: 'DataTable' })
+      .props('columns') as { id: string; cell: (context: unknown) => unknown }[]
+    const actions = columns.find((column) => column.id === 'actions')!
+    return actions.cell({ row: { original: rows[0] } }) !== null
+  }
+
+  it('lets a teacher remove students from a makeup of non-exam work only', async () => {
+    const classwork = await open('DAILY')
+    expect(removable(classwork)).toBe(true)
+    classwork.unmount()
+
+    const exam = await open('FINAL')
+    expect(removable(exam)).toBe(false)
+    exam.unmount()
+  })
+
+  it('lets the exam committee remove students from a makeup of an exam', async () => {
+    permissions.clear()
+    permissions.add('exam-events.manage')
+    permissions.add('exam-grading.read')
+    const wrapper = await open('FINAL')
+
+    expect(removable(wrapper)).toBe(true)
     wrapper.unmount()
   })
 })

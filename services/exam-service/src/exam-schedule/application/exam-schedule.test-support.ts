@@ -122,6 +122,12 @@ export const STAFF_USER: GradingUser = {
   ],
 }
 
+export const COMMITTEE_USER: GradingUser = {
+  id: 'committee-user',
+  roles: ['Admin Istiqra'],
+  permissions: ['exam-events.manage', 'exam-grading.read'],
+}
+
 export function makeupScope(
   taught: { subjectId: string; classroomId: string }[] = [
     { subjectId: SUBJECT_ID, classroomId: CLASSROOM_7A.id },
@@ -131,11 +137,10 @@ export function makeupScope(
     findEmployeeIdByUserId: () => Promise.resolve('emp-1'),
     employeeExists: () => Promise.resolve(true),
   } as IEmployeeIdentityReadPort
+  const academic = new FakeAcademicLookup({ assignments: taught })
   return new MakeupScopeService(
-    new GradingScopeService(
-      employees,
-      new FakeAcademicLookup({ assignments: taught }),
-    ),
+    new GradingScopeService(employees, academic),
+    new ScheduleScopeService(employees, academic),
   )
 }
 

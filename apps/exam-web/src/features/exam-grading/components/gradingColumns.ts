@@ -25,7 +25,7 @@ const classroomText = (row: GradingSchedule) => row.classroomName ?? '-'
 export function buildGradingScheduleColumns(options: {
   subjectName?: (schedule: GradingSchedule) => string
   onOpen: (schedule: GradingSchedule) => void
-  canMakeup?: boolean
+  canMakeup?: (schedule: GradingSchedule) => boolean
   canParticipants?: boolean
   onMakeup?: (schedule: GradingSchedule) => void
   onParticipants?: (schedule: GradingSchedule) => void
@@ -129,7 +129,10 @@ export function buildGradingScheduleColumns(options: {
       meta: { align: 'center' },
       cell: ({ row }) => {
         const items = []
-        if (options.canMakeup && row.original.kind === 'REGULAR') {
+        if (
+          row.original.kind === 'REGULAR' &&
+          options.canMakeup?.(row.original)
+        ) {
           items.push({
             label: 'Susulan',
             icon: UserRoundPlus,

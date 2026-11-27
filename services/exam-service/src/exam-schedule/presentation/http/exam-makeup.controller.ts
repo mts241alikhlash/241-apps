@@ -52,6 +52,9 @@ export class ExamMakeupController {
     'exam-grading.read',
     'exam-grading.read-all',
     'exam-grading.manage-all',
+    'exam-schedules.manage-all',
+    'exam-events.manage',
+    'exam-events.read',
   )
   @ApiOperation({
     summary: 'The students of the classroom who can still sit a makeup',
@@ -68,7 +71,12 @@ export class ExamMakeupController {
   }
 
   @Post(':id/makeups')
-  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
+  @RequireAnyPermission(
+    'exam-grading.grade',
+    'exam-grading.manage-all',
+    'exam-schedules.manage-all',
+    'exam-events.manage',
+  )
   @ApiOperation({
     summary: 'Create a makeup of an exam for students who did not sit it',
   })
@@ -99,6 +107,9 @@ export class ExamMakeupController {
     'exam-grading.read',
     'exam-grading.read-all',
     'exam-grading.manage-all',
+    'exam-schedules.manage-all',
+    'exam-events.manage',
+    'exam-events.read',
   )
   @ApiOperation({ summary: 'The students on a makeup, with live status' })
   @ApiParam({ name: 'id', format: 'uuid' })
@@ -114,7 +125,12 @@ export class ExamMakeupController {
 
   @Post(':id/participants')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
+  @RequireAnyPermission(
+    'exam-grading.grade',
+    'exam-grading.manage-all',
+    'exam-schedules.manage-all',
+    'exam-events.manage',
+  )
   @ApiOperation({ summary: 'Add students to a makeup' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiResponse({ status: 204 })
@@ -136,7 +152,12 @@ export class ExamMakeupController {
 
   @Delete(':id/participants/:studentId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @RequireAnyPermission('exam-grading.grade', 'exam-grading.manage-all')
+  @RequireAnyPermission(
+    'exam-grading.grade',
+    'exam-grading.manage-all',
+    'exam-schedules.manage-all',
+    'exam-events.manage',
+  )
   @ApiOperation({ summary: 'Remove a student who has not started the makeup' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiParam({ name: 'studentId', format: 'uuid' })

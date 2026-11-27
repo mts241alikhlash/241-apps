@@ -22,6 +22,8 @@ import {
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
+import { categoryOf, type ExamType } from '@/features/exam-shared/examType'
+import { canManageMakeup } from '@/features/exam-shared/makeupAccess'
 import { examScheduleService } from '../services/examScheduleService'
 import type { MakeupParticipant } from '../types'
 import { buildParticipantColumns } from './participantColumns'
@@ -30,6 +32,7 @@ const props = defineProps<{
   open: boolean
   scheduleId: string
   title: string
+  type: ExamType
 }>()
 
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
@@ -76,7 +79,7 @@ async function confirmRemove() {
 
 const columns = computed(() =>
   buildParticipantColumns({
-    canRemove: hasPermission('exam-grading.grade'),
+    canRemove: canManageMakeup(categoryOf(props.type), hasPermission),
     onRemove: (participant) => {
       removeTarget.value = participant
     },
