@@ -47,13 +47,11 @@ export class SeatFlagService {
     }
     const patch = { allowLateEntry: true }
     const session = (await this.sessions.listByRoom(room.id))
-      .filter((row) => row.studentId === request.studentId)
-      .sort(
-        (a, b) =>
-          Number(b.status === 'IN_PROGRESS') -
-            Number(a.status === 'IN_PROGRESS') ||
-          b.startedAt.getTime() - a.startedAt.getTime(),
-      )[0]
+      .filter(
+        (row) =>
+          row.studentId === request.studentId && row.status === 'IN_PROGRESS',
+      )
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())[0]
     if (session === undefined) {
       const flagged = await this.rooms.setSeatFlagsWithAudit(
         room.eventId,

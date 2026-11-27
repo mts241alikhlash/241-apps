@@ -770,6 +770,34 @@ describe('allow flags before the session starts', () => {
     ).resolves.toMatchObject({ sessionId: 'current' })
   })
 
+  it('audits on the seat, not on an older finished session, when the current exam has not started', async () => {
+    const f = await setup()
+    await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, f.schedule.id, {
+      id: 'earlier',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+      status: 'SUBMITTED',
+      startedAt: new Date('2026-11-02T00:00:00.000Z'),
+    })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('earlier')?.allowLateEntry).toBe(false)
+    expect(await f.rooms.listAuditLogs('earlier')).toEqual([])
+    expect(await f.rooms.listAuditLogsByRoom(f.roomA.id)).toMatchObject([
+      { action: 'ALLOW_LATE_ENTRY', metadata: { sessionStarted: false } },
+    ])
+    expect(
+      (await f.rooms.findSeat(f.roomA.eventId, STUDENT_ID))?.allowLateEntry,
+    ).toBe(true)
+  })
+
   it('flags the only session of a student', async () => {
     const f = await setup()
     const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
