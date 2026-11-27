@@ -3,11 +3,16 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common'
+import { ApiConflictException } from '../../../../core/filters/api-exception.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
 import type { ExamAnswerRecord } from '../../../domain/entities/exam-session.entity.js'
 import { assertAnswerShape } from '../../../domain/policies/validate-answer-shape.policy.js'
+import {
+  TIME_UP_MESSAGE,
+  isWorkingTimeOver,
+} from '../../../domain/policies/session-times.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { loadPaperSources } from '../../load-paper-sources.js'
 import {
@@ -43,6 +48,9 @@ export class SaveAnswerUseCase {
       now.getTime() >= session.finalizeAt.getTime()
     ) {
       throw new ConflictException('Waktu pengiriman jawaban sudah habis')
+    }
+    if (isWorkingTimeOver(session, now)) {
+      throw new ApiConflictException('TIME_UP', TIME_UP_MESSAGE)
     }
 
     const replay = await this.sessions.findAnswerByClientId(

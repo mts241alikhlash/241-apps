@@ -98,6 +98,7 @@ export class SubmitExamSessionUseCase {
         session.id,
         { answers: input.pendingAnswers },
         now,
+        true,
       )
       if (batch.skipped.length > 0) {
         throw new ApiConflictException(
