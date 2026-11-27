@@ -116,6 +116,14 @@ describe('MakeupScopeService', () => {
     ).rejects.toThrow('Anda tidak mengajar mapel ini di kelas ini')
   })
 
+  it('refuses a teacher who does not teach the class writing a makeup of an exam', async () => {
+    const scope = makeupScope([])
+
+    await expect(
+      scope.assertCanWrite(TEACHER_USER, examSchedule),
+    ).rejects.toMatchObject({ code: 'EXAM_ADMIN_ONLY' })
+  })
+
   it('lets exam-grading.manage-all write makeups of an exam', async () => {
     const scope = makeupScope([])
 
