@@ -504,6 +504,51 @@ describe('ImportQuestionsUseCase', () => {
   })
 
   describe('guards', () => {
+    it('hands ExcelJS a file whose layout bombs were stripped, and still imports it', async () => {
+      const { useCase } = build()
+      const zip = await JSZip.loadAsync(await xlsx([pg(1)]))
+      const name = 'xl/worksheets/sheet2.xml'
+      const sheet = await zip.file(name)!.async('string')
+      zip.file(
+        name,
+        sheet.replace(
+          '</sheetData>',
+          '</sheetData><mergeCells count="1"><mergeCell ref="C2:Z50000"/></mergeCells>',
+        ),
+      )
+      const bomb = await zip.generateAsync({ type: 'nodebuffer' })
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const load = vi.spyOn(xlsxProto, 'load')
+
+      const preview = await useCase.preview(TEACHER, input(bomb))
+      const loaded = await JSZip.loadAsync(load.mock.calls[0][0])
+      load.mockRestore()
+
+      expect(await loaded.file(name)!.async('string')).not.toContain(
+        'mergeCell',
+      )
+      expect(preview).toMatchObject({ total: 1, errors: [] })
+    })
+
+    it('refuses a malformed worksheet before ExcelJS reads it', async () => {
+      const { useCase } = build()
+      const zip = await JSZip.loadAsync(await xlsx([pg(1)]))
+      zip.file('xl/worksheets/sheet2.xml', '<worksheet><sheetData>')
+      const broken = await zip.generateAsync({ type: 'nodebuffer' })
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const load = vi.spyOn(xlsxProto, 'load')
+
+      await expect(useCase.preview(TEACHER, input(broken))).rejects.toThrow(
+        new BadRequestException('Berkas Excel tidak bisa dibaca'),
+      )
+      expect(load).not.toHaveBeenCalled()
+      load.mockRestore()
+    })
+
     it('refuses a subject and grade the teacher does not teach before reading the file', async () => {
       const { questions, useCase } = build({ pairs: [] })
 

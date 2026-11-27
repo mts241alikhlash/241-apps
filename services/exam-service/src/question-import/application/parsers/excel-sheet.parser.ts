@@ -106,7 +106,8 @@ export async function parseExcelSheet(buffer: Buffer): Promise<ImportSheet> {
 
   let counted = 0
   for (let number = 2; number <= sheet.rowCount; number += 1) {
-    const row = sheet.getRow(number)
+    const row = sheet.findRow(number)
+    if (row === undefined) continue
     try {
       const question = parseRow(row, columns)
       if (question === null) continue

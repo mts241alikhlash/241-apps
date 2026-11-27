@@ -17,12 +17,9 @@ function isXml(name: string): boolean {
 
 function inflateWithin(
   entry: JSZip.JSZipObject,
-  remaining: number,
+  limit: number,
   collect?: Buffer[],
 ): Promise<number> {
-  const limit = isXml(entry.name)
-    ? Math.min(remaining, MAX_XML_BYTES)
-    : remaining
   return new Promise((resolve, reject) => {
     const stream = entry.nodeStream()
     let seen = 0
@@ -65,30 +62,62 @@ async function openChecked(buffer: Buffer): Promise<JSZip.JSZipObject[]> {
   return entries
 }
 
-export async function assertSafeArchive(buffer: Buffer): Promise<void> {
-  const entries = await openChecked(buffer)
+export interface XmlBudget {
+  isXml: (name: string) => boolean
+  partLimit: (name: string) => number
+  total: number
+}
 
+const DEFAULT_XML: XmlBudget = {
+  isXml,
+  partLimit: () => MAX_XML_BYTES,
+  total: MAX_EXPANDED_BYTES,
+}
+
+async function inflateEntries(
+  buffer: Buffer,
+  xml: XmlBudget,
+  keep: boolean,
+): Promise<Map<string, Buffer>> {
+  const entries = await openChecked(buffer)
+  const files = new Map<string, Buffer>()
   let expanded = 0
+  let xmlExpanded = 0
   for (const entry of entries) {
     if (entry.dir) continue
-    expanded += await inflateWithin(entry, MAX_EXPANDED_BYTES - expanded)
+    const counted = xml.isXml(entry.name)
+    const remaining = MAX_EXPANDED_BYTES - expanded
+    const limit = counted
+      ? Math.min(remaining, xml.partLimit(entry.name), xml.total - xmlExpanded)
+      : remaining
+    const chunks: Buffer[] | undefined = keep ? [] : undefined
+    const seen = await inflateWithin(entry, limit, chunks)
+    expanded += seen
+    if (counted) xmlExpanded += seen
+    if (chunks !== undefined) files.set(entry.name, Buffer.concat(chunks))
   }
+  return files
+}
+
+export function inflateArchive(
+  buffer: Buffer,
+  xml: XmlBudget = DEFAULT_XML,
+): Promise<Map<string, Buffer>> {
+  return inflateEntries(buffer, xml, true)
+}
+
+export function rebuildArchive(files: Map<string, Buffer>): Promise<Buffer> {
+  const rebuilt = new JSZip()
+  for (const [name, content] of files) {
+    rebuilt.file(name, content, { createFolders: false })
+  }
+  return rebuilt.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
+}
+
+export async function assertSafeArchive(buffer: Buffer): Promise<void> {
+  await inflateEntries(buffer, DEFAULT_XML, false)
 }
 
 export async function normalizeArchive(buffer: Buffer): Promise<Buffer> {
-  const entries = await openChecked(buffer)
-  const rebuilt = new JSZip()
-
-  let expanded = 0
-  for (const entry of entries) {
-    if (entry.dir) continue
-    const chunks: Buffer[] = []
-    expanded += await inflateWithin(
-      entry,
-      MAX_EXPANDED_BYTES - expanded,
-      chunks,
-    )
-    rebuilt.file(entry.name, Buffer.concat(chunks), { createFolders: false })
-  }
-  return rebuilt.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
+  return rebuildArchive(await inflateArchive(buffer))
 }

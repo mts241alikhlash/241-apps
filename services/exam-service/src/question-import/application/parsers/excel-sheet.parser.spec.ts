@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { parseExcelSheet } from './excel-sheet.parser.js'
 
 const HEADERS = [
@@ -260,5 +260,24 @@ describe('parseExcelSheet', () => {
     await expect(parseExcelSheet(await workbook({ rows }))).rejects.toThrow(
       new BadRequestException('Maksimal 500 soal per berkas'),
     )
+  })
+
+  it('reads a row far down the sheet without creating the rows above it', async () => {
+    const book = new ExcelJS.Workbook()
+    const identity = book.addWorksheet('Identitas')
+    IDENTITY.forEach((row) => identity.addRow(row))
+    const sheet = book.addWorksheet('Soal')
+    sheet.addRow(HEADERS)
+    sheet.getRow(200_000).values = PG_ROW
+    const buffer = Buffer.from(await book.xlsx.writeBuffer())
+    const worksheetProto = Object.getPrototypeOf(sheet) as ExcelJS.Worksheet
+    const getRow = vi.spyOn(worksheetProto, 'getRow')
+
+    const parsed = await parseExcelSheet(buffer)
+    const calls = getRow.mock.calls.length
+    getRow.mockRestore()
+
+    expect(parsed.questions.map((question) => question.row)).toEqual([200_000])
+    expect(calls).toBeLessThan(100)
   })
 })
