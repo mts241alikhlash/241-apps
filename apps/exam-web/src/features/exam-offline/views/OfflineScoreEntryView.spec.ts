@@ -39,6 +39,21 @@ vi.mock('../components/ScoreImportDialog.vue', () => ({
   }),
 }))
 
+vi.mock('../components/PublishScoresDialog.vue', () => ({
+  default: defineComponent({
+    name: 'PublishScoresDialogStub',
+    props: {
+      open: Boolean,
+      missingNames: { type: Array, default: () => [] },
+      message: { type: String, default: null },
+      busy: Boolean,
+    },
+    emits: ['update:open', 'confirm'],
+    template:
+      '<div v-if="open" data-test="publish-dialog" :data-missing="missingNames.join(\',\')" :data-message="message ?? \'\'"><button data-test="confirm-publish" @click="$emit(\'confirm\')" /></div>',
+  }),
+}))
+
 const schedule: OfflineSchedule = {
   scheduleId: 's1',
   activityId: 'act',
@@ -254,5 +269,79 @@ describe('OfflineScoreEntryView', () => {
     const labels = wrapper.findAll('button').map((item) => item.text())
     expect(labels).toContain('Unduh lembar nilai (.xlsx)')
     expect(labels).not.toContain('Impor nilai')
+    expect(labels).not.toContain('Kirim ke penilaian')
+  })
+
+  const publishButton = (wrapper: VueWrapper) =>
+    wrapper
+      .findAll('button')
+      .find((item) => item.text() === 'Kirim ke penilaian')!
+
+  it('names the students left out and sends with their exclusion confirmed', async () => {
+    service.publish.mockResolvedValue({
+      success: true,
+      data: { queued: 2, missing: 1, absent: 2 },
+    })
+    const wrapper = await mountView()
+    await publishButton(wrapper).trigger('click')
+    const dialog = wrapper.get('[data-test="publish-dialog"]')
+    expect(dialog.attributes('data-missing')).toBe('Citra')
+    await wrapper.get('[data-test="confirm-publish"]').trigger('click')
+    await flushPromises()
+    expect(service.publish).toHaveBeenCalledWith('s1', true)
+    expect(wrapper.find('[data-test="publish-dialog"]').exists()).toBe(false)
+    expect(wrapper.get('[data-test="publish-result"]').text()).toBe(
+      '2 nilai masuk antrean pengiriman ke penilaian; 2 siswa tidak hadir tidak dikirim.',
+    )
+    expect(service.loadRoster).toHaveBeenCalledTimes(2)
+  })
+
+  it('sends without confirming anything when every present student has a score', async () => {
+    service.loadRoster.mockResolvedValue({
+      success: true,
+      data: roster().filter((item) => item.state !== 'MISSING'),
+    })
+    service.publish.mockResolvedValue({
+      success: true,
+      data: { queued: 2, missing: 0, absent: 2 },
+    })
+    const wrapper = await mountView()
+    await publishButton(wrapper).trigger('click')
+    expect(
+      wrapper.get('[data-test="publish-dialog"]').attributes('data-missing'),
+    ).toBe('')
+    await wrapper.get('[data-test="confirm-publish"]').trigger('click')
+    await flushPromises()
+    expect(service.publish).toHaveBeenCalledWith('s1', false)
+  })
+
+  it('reopens the dialog with the server message when scores went missing meanwhile', async () => {
+    service.loadRoster.mockResolvedValueOnce({
+      success: true,
+      data: roster().filter((item) => item.state !== 'MISSING'),
+    })
+    service.publish.mockResolvedValue({
+      success: false,
+      error: 'Belum dinilai: Citra',
+      missing: true,
+    })
+    const wrapper = await mountView()
+    await publishButton(wrapper).trigger('click')
+    await wrapper.get('[data-test="confirm-publish"]').trigger('click')
+    await flushPromises()
+    const dialog = wrapper.get('[data-test="publish-dialog"]')
+    expect(dialog.attributes('data-message')).toBe('Belum dinilai: Citra')
+    expect(dialog.attributes('data-missing')).toBe('Citra')
+  })
+
+  it('cannot send while a row is still being saved', async () => {
+    const wrapper = await mountView()
+    const input = scoreInputs(wrapper)[3]
+    await input.setValue('45')
+    await input.trigger('blur')
+    expect(publishButton(wrapper).attributes('disabled')).toBeDefined()
+    await vi.waitFor(() => expect(service.save).toHaveBeenCalled())
+    await flushPromises()
+    expect(publishButton(wrapper).attributes('disabled')).toBeUndefined()
   })
 })

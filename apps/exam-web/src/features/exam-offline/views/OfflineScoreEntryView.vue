@@ -13,6 +13,7 @@ import {
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { useBreadcrumbs } from '@mts241alikhlash/web-shared/composables/useBreadcrumbs'
 import { buildOfflineEntryColumns } from '../components/offlineScoreColumns'
+import PublishScoresDialog from '../components/PublishScoresDialog.vue'
 import ScoreImportDialog from '../components/ScoreImportDialog.vue'
 import { useOfflineScoreEntry } from '../composables/useOfflineScoreEntry'
 import { examOfflineService } from '../services/examOfflineService'
@@ -44,12 +45,44 @@ const {
   rowStates,
   counts,
   absentSentRows,
+  missingRows,
+  pending,
 } = entry
 void entry.load()
 
 const importOpen = ref(false)
 const downloading = ref(false)
 const pasteSummary = ref('')
+const publishOpen = ref(false)
+const publishing = ref(false)
+const publishMessage = ref<string | null>(null)
+const publishResult = ref('')
+
+const missingNames = computed(() =>
+  missingRows.value.map((item) => item.name ?? item.participantNumber ?? '-'),
+)
+
+function openPublish() {
+  publishMessage.value = null
+  publishOpen.value = true
+}
+
+async function publish() {
+  publishing.value = true
+  const outcome = await examOfflineService.publish(
+    scheduleId.value,
+    missingRows.value.length > 0,
+  )
+  publishing.value = false
+  if (!outcome.success) {
+    if (outcome.missing) await entry.reloadRoster()
+    publishMessage.value = outcome.error
+    return
+  }
+  publishOpen.value = false
+  publishResult.value = `${outcome.data.queued} nilai masuk antrean pengiriman ke penilaian; ${outcome.data.absent} siswa tidak hadir tidak dikirim.`
+  await entry.reloadRoster()
+}
 
 const title = computed(() =>
   schedule.value
@@ -141,6 +174,13 @@ async function download() {
           />
           <CardTitle class="font-semibold">{{ title }}</CardTitle>
         </div>
+        <Button
+          v-if="canWrite"
+          :disabled="loading || pending || publishing || loadError !== null"
+          @click="openPublish"
+        >
+          Kirim ke penilaian
+        </Button>
       </CardHeader>
       <CardContent
         class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
@@ -210,15 +250,19 @@ async function download() {
             data-test="paste-summary"
             class="text-control text-muted-foreground empty:hidden"
             role="status"
-          >
-            {{ pasteSummary }}
-          </p>
+            v-text="pasteSummary"
+          />
+          <p
+            data-test="publish-result"
+            class="text-control empty:hidden"
+            role="status"
+            v-text="publishResult"
+          />
           <p
             class="sr-only"
             aria-live="assertive"
-          >
-            {{ lastError }}
-          </p>
+            v-text="lastError"
+          />
 
           <DataTable
             mobile="cards"
@@ -242,6 +286,15 @@ async function download() {
       :schedule-id="scheduleId"
       @update:open="importOpen = $event"
       @imported="entry.reloadRoster()"
+    />
+
+    <PublishScoresDialog
+      :open="publishOpen"
+      :missing-names="missingNames"
+      :message="publishMessage"
+      :busy="publishing"
+      @update:open="publishOpen = $event"
+      @confirm="publish"
     />
   </div>
 </template>
