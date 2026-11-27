@@ -127,6 +127,7 @@ describe('menuConfig RBAC visibility', () => {
       '/exam/monitoring',
       '/exam/reports',
       '/exam/grading',
+      '/exam/offline-scores',
       '/exam/print/schedule',
       '/exam/print/cards',
       '/exam/print/desks',
@@ -152,6 +153,7 @@ describe('menuConfig RBAC visibility', () => {
     expect(urls).toEqual([
       '/exam/packages',
       '/exam/grading',
+      '/exam/offline-scores',
       '/exam/print/grading-sheet',
       '/exam/print/student-recap',
       '/classwork/activities',

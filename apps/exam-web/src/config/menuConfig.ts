@@ -3,6 +3,7 @@ import {
   ClipboardPen,
   Layers,
   ListChecks,
+  NotebookPen,
   Package,
   Printer,
   ShieldCheck,
@@ -134,6 +135,17 @@ export const menuSections: MenuSection[] = [
         title: 'menu.examGrading',
         url: '/exam/grading',
         icon: ClipboardPen,
+        requiredAnyPermission: [
+          'exam-grading.read',
+          'exam-grading.read-all',
+          'exam-grading.manage-all',
+        ],
+      },
+      {
+        key: 'exam-offline-scores',
+        title: 'menu.examOfflineScores',
+        url: '/exam/offline-scores',
+        icon: NotebookPen,
         requiredAnyPermission: [
           'exam-grading.read',
           'exam-grading.read-all',

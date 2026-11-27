@@ -5,6 +5,7 @@ import { examPrintRoutes } from '@/features/exam-print'
 import { examPackageRoutes } from '@/features/exam-package'
 import { examEventRoutes } from '@/features/exam-event'
 import { examGradingRoutes } from '@/features/exam-grading'
+import { examOfflineRoutes } from '@/features/exam-offline'
 import { examParticipantRoutes } from '@/features/exam-participant'
 import { examPresetRoutes } from '@/features/exam-preset'
 import { examSebRoutes } from '@/features/exam-seb'
@@ -52,6 +53,7 @@ export const routes: RouteRecordRaw[] = [
       ...examRoomRoutes,
       ...examPrintRoutes,
       ...examGradingRoutes,
+      ...examOfflineRoutes,
       ...examParticipantRoutes,
       ...examPresetRoutes,
       ...examSebRoutes,

@@ -22,6 +22,7 @@ export default {
     examRoomsLive: 'All Rooms Monitoring',
     examSchedules: 'Schedules',
     examGrading: 'Grading',
+    examOfflineScores: 'Offline Scores',
     classworkActivities: 'Activities',
     classworkSchedules: 'Schedules',
     classworkGrading: 'Grading',

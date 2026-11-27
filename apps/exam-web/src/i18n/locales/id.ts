@@ -22,6 +22,7 @@ export default {
     examRoomsLive: 'Monitoring Semua Ruang',
     examSchedules: 'Jadwal',
     examGrading: 'Penilaian',
+    examOfflineScores: 'Nilai Offline',
     classworkActivities: 'Kegiatan',
     classworkSchedules: 'Jadwal',
     classworkGrading: 'Penilaian',
