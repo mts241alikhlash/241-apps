@@ -5,5 +5,6 @@ export class SessionHeartbeatDto {
   @ApiProperty() requiresTokenReentry!: boolean
   @ApiProperty({ nullable: true, type: String })
   absentSince!: string | null
+  @ApiProperty() deadline!: string
   @ApiProperty() serverTime!: string
 }

@@ -471,6 +471,54 @@ describe('SubmitExamSessionUseCase', () => {
     expect(listAnswers).not.toHaveBeenCalled()
   })
 
+  it('hands in a web session in the grace with the answers it carries', async () => {
+    const { useCase } = await setup()
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    const result = await useCase.execute(
+      STUDENT_USER,
+      'a',
+      {
+        pendingAnswers: [
+          { questionId: questionIds[0], clientId: 'c1', answer: { key: 'B' } },
+        ],
+        expectedAnswerCount: 1,
+      },
+      new Date('2026-11-02T03:35:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      status: 'GRADED',
+      answersStored: true,
+      confirmedAnswerCount: 1,
+    })
+    expect([...sessions.answers.values()][0]).toMatchObject({
+      clientId: 'c1',
+      receivedAfterDeadline: true,
+    })
+  })
+
+  it('answers a web session after finalizeAt without storing the carried answers', async () => {
+    const { useCase } = await setup()
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    const result = await useCase.execute(
+      STUDENT_USER,
+      'a',
+      {
+        pendingAnswers: [
+          { questionId: questionIds[0], clientId: 'c1', answer: { key: 'B' } },
+        ],
+        expectedAnswerCount: 1,
+      },
+      new Date('2026-11-02T03:40:00.000Z'),
+    )
+
+    expect(result).toMatchObject({ answersStored: false })
+    expect(result.status).not.toBe('IN_PROGRESS')
+    expect(sessions.answers.size).toBe(0)
+  })
+
   it('refuses to hand in the session of someone else', async () => {
     const { useCase } = await setup()
 

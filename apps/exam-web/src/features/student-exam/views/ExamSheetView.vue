@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@mts241alikhlash/ui/button'
 import {
@@ -11,6 +11,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogBody,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -49,12 +50,44 @@ const gateNotice = ref<string | null>(null)
 const doubtful = ref(new Set<string>())
 const examTitle = ref<string | null>(null)
 const durationMinutes = ref<number | null>(null)
+const timeUpOpen = ref(false)
+const timeUpError = ref<string | null>(null)
+const offline = ref(false)
+const timeUpAutoRetry = ref(true)
+
+const TIME_UP_RETRY_MS = 10_000
+const TIME_UP_RETRY_MAX_MS = 60_000
+let timeUpFailures = 0
+let timeUpTimer: ReturnType<typeof setTimeout> | null = null
 
 let scheduleId: string | null = null
 
 const session = useExamSession({
   onExpired: () => {
-    if (!finished.value) void submitNow()
+    if (finished.value) return
+    confirmSubmit.value = false
+    confirmLeave.value = false
+    showList.value = false
+    timeUpOpen.value = true
+    void sendTimeUp()
+  },
+  onDeadlineChanged: (deadline, serverTime) => {
+    const key = `cbt:deadline:${sessionId}`
+    try {
+      const stored = JSON.parse(
+        window.sessionStorage.getItem(key) ?? '{}',
+      ) as Partial<StoredExamSession>
+      window.sessionStorage.setItem(
+        key,
+        JSON.stringify({
+          ...stored,
+          deadline,
+          serverTime: Date.parse(serverTime),
+        }),
+      )
+    } catch {
+      return
+    }
   },
   onTokenReentry: () => {
     if (!scheduleId) return
@@ -99,6 +132,7 @@ onMounted(async () => {
     session.startHeartbeat(sessionId, stored.heartbeatIntervalMs ?? undefined)
   }
   await session.load(sessionId)
+  if (timeUpOpen.value) void sendTimeUp()
 })
 
 const current = computed<PaperQuestion | null>(
@@ -183,21 +217,84 @@ function goNext() {
   go(index.value + 1)
 }
 
+function finish(answersStored: boolean) {
+  clearTimeout(timeUpTimer ?? undefined)
+  timeUpTimer = null
+  notStored.value = !answersStored
+  window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
+  timeUpOpen.value = false
+  finished.value = true
+  const quitUrl = sebQuitUrl()
+  if (quitUrl) void nextTick(() => window.location.assign(quitUrl))
+}
+
+async function sendTimeUp() {
+  clearTimeout(timeUpTimer ?? undefined)
+  timeUpTimer = null
+  if (submitting.value || loading.value || finished.value) return
+  submitting.value = true
+  timeUpError.value = null
+  try {
+    if (questions.value.length === 0) {
+      await session.load(sessionId)
+      if (questions.value.length === 0) {
+        throw new ExamApiError(
+          error.value ?? 'Soal gagal dimuat.',
+          session.errorCode.value,
+        )
+      }
+    }
+    const result = await session.submit(sessionId)
+    timeUpFailures = 0
+    finish(result.answersStored)
+  } catch (cause) {
+    const code = cause instanceof ExamApiError ? cause.code : null
+    if (
+      code === API_ERROR_CODES.WINDOW_CLOSED ||
+      code === API_ERROR_CODES.SESSION_LOST
+    ) {
+      finish(false)
+      return
+    }
+    offline.value = !navigator.onLine
+    timeUpError.value =
+      cause instanceof Error ? cause.message : 'Ujian gagal dikumpulkan.'
+    timeUpAutoRetry.value =
+      code !== API_ERROR_CODES.SESSION_LOCKED_BY_VIOLATION &&
+      code !== API_ERROR_CODES.TOKEN_REENTRY_REQUIRED
+    if (!timeUpAutoRetry.value) return
+    timeUpFailures += 1
+    timeUpTimer = setTimeout(
+      () => void sendTimeUp(),
+      Math.min(
+        TIME_UP_RETRY_MS * 2 ** (timeUpFailures - 1),
+        TIME_UP_RETRY_MAX_MS,
+      ),
+    )
+  } finally {
+    submitting.value = false
+  }
+}
+
+function onOnline() {
+  offline.value = false
+  session.onConnectivityChanged(true)
+  if (timeUpOpen.value && timeUpError.value) void sendTimeUp()
+}
+
+function onOffline() {
+  offline.value = true
+  session.onConnectivityChanged(false)
+}
+
 async function submitNow() {
-  if (submitting.value || answersLocked.value) return
+  if (submitting.value || session.submitted.value) return
   submitting.value = true
   submitError.value = null
   gateNotice.value = null
   try {
     const result = await session.submit(sessionId)
-    notStored.value = !result.answersStored
-    window.sessionStorage.removeItem(`cbt:deadline:${sessionId}`)
-    const quitUrl = sebQuitUrl()
-    if (quitUrl) {
-      window.location.assign(quitUrl)
-      return
-    }
-    finished.value = true
+    finish(result.answersStored)
   } catch (cause) {
     const code = cause instanceof ExamApiError ? cause.code : null
     if (code === API_ERROR_CODES.MIN_SUBMIT) {
@@ -215,6 +312,7 @@ async function submitNow() {
   } finally {
     submitting.value = false
     confirmSubmit.value = false
+    if (timeUpOpen.value && !finished.value) void sendTimeUp()
   }
 }
 
@@ -232,6 +330,16 @@ function leaveConfirmed() {
 }
 
 const wide = useWideScreen()
+
+const timeUpStatus = computed(() => {
+  if (submitting.value || !timeUpError.value) return 'Jawaban sedang dikirim…'
+  if (offline.value) {
+    return 'Menunggu koneksi… Jawaban tetap tersimpan di perangkat ini.'
+  }
+  return timeUpAutoRetry.value
+    ? 'Jawaban akan dikirim ulang otomatis.'
+    : 'Hubungi pengawas, lalu tekan Kirim ulang.'
+})
 
 const submitLabel = computed(() =>
   submitting.value
@@ -253,7 +361,7 @@ const nextLabel = computed(() =>
 
 function onKeydown(event: KeyboardEvent) {
   if (event.defaultPrevented || showList.value) return
-  if (confirmSubmit.value || confirmLeave.value) return
+  if (confirmSubmit.value || confirmLeave.value || timeUpOpen.value) return
   const target = event.target as HTMLElement | null
   if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return
   if (event.key === 'ArrowRight') {
@@ -265,8 +373,17 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('online', onOnline)
+  window.addEventListener('offline', onOffline)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('online', onOnline)
+  window.removeEventListener('offline', onOffline)
+  clearTimeout(timeUpTimer ?? undefined)
+})
 
 function statusOf(question: PaperQuestion | null): string {
   if (!question) return ''
@@ -278,11 +395,7 @@ function statusOf(question: PaperQuestion | null): string {
 </script>
 
 <template>
-  <div
-    class="relative flex h-svh flex-col overflow-hidden bg-background"
-    @online="session.onConnectivityChanged(true)"
-    @offline="session.onConnectivityChanged(false)"
-  >
+  <div class="relative flex h-svh flex-col overflow-hidden bg-background">
     <img
       src="/istiqra.webp"
       alt=""
@@ -810,6 +923,49 @@ function statusOf(question: PaperQuestion | null): string {
             @click="leaveConfirmed"
             >Keluar</Button
           >
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    <Dialog :open="timeUpOpen && !finished">
+      <DialogContent
+        size="md"
+        :show-close-button="false"
+        @escape-key-down.prevent
+        @pointer-down-outside.prevent
+        @interact-outside.prevent
+      >
+        <DialogHeader standard>
+          <DialogTitle>Waktu habis</DialogTitle>
+          <DialogDescription>
+            Jawaban dikirim otomatis dan tidak dapat diubah lagi.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody class="space-y-2">
+          <p
+            v-if="timeUpError && !submitting"
+            role="alert"
+            class="text-control text-destructive"
+          >
+            {{ timeUpError }}
+          </p>
+          <p
+            class="text-control"
+            :class="timeUpError && !submitting ? 'text-muted-foreground' : ''"
+            aria-live="polite"
+          >
+            {{ timeUpStatus }}
+          </p>
+        </DialogBody>
+        <DialogFooter
+          v-if="timeUpError && !submitting"
+          standard
+        >
+          <Button
+            size="sm"
+            @click="sendTimeUp"
+          >
+            Kirim ulang
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

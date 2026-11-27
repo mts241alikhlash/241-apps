@@ -149,7 +149,40 @@ describe('SaveAnswersBatchUseCase', () => {
     })
   })
 
-  it('flags an answer that arrives after the deadline', async () => {
+  it('saves a web batch before the deadline', async () => {
+    const { useCase, questionIds } = await setup()
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    const result = await useCase.execute(
+      STUDENT_USER,
+      'a',
+      { answers: [answerOf(questionIds[0], 'c1')] },
+      new Date('2026-11-02T03:29:59.999Z'),
+    )
+
+    expect(result.confirmed[0].receivedAfterDeadline).toBe(false)
+  })
+
+  it('refuses a web batch from the deadline on with TIME_UP', async () => {
+    const { useCase, questionIds } = await setup()
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    await expect(
+      useCase.execute(
+        STUDENT_USER,
+        'a',
+        { answers: [answerOf(questionIds[0], 'c1')] },
+        new Date('2026-11-02T03:30:00.000Z'),
+      ),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: 'TIME_UP',
+      message: 'Waktu mengerjakan sudah habis. Kumpulkan jawaban.',
+    })
+    expect(sessions.answers.size).toBe(0)
+  })
+
+  it('flags an Istiqra answer that arrives after the deadline', async () => {
     const { useCase, questionIds } = await setup()
 
     const result = await useCase.execute(

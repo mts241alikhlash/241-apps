@@ -106,10 +106,32 @@ describe('SaveAnswerUseCase', () => {
     expect(sessions.answers.size).toBe(0)
   })
 
-  it('accepts and flags an answer after the deadline', async () => {
+  it('accepts and flags an Istiqra answer after the deadline', async () => {
     const result = await save({}, new Date('2026-11-02T03:35:00.000Z'))
 
     expect(result.receivedAfterDeadline).toBe(true)
+  })
+
+  it('saves a web answer before the deadline', async () => {
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    const result = await save({}, new Date('2026-11-02T03:29:59.999Z'))
+
+    expect(result.receivedAfterDeadline).toBe(false)
+    expect(sessions.answers.size).toBe(1)
+  })
+
+  it('refuses a web answer from the deadline on with TIME_UP', async () => {
+    sessions.sessions.set('a', sessionFor(schedule, { id: 'a', client: 'SEB' }))
+
+    await expect(
+      save({}, new Date('2026-11-02T03:30:00.000Z')),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: 'TIME_UP',
+      message: 'Waktu mengerjakan sudah habis. Kumpulkan jawaban.',
+    })
+    expect(sessions.answers.size).toBe(0)
   })
 
   it('rejects an answer after finalizeAt', async () => {

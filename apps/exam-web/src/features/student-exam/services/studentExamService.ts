@@ -49,7 +49,10 @@ export class ExamApiError extends Error {
 export const API_ERROR_CODES = {
   MIN_SUBMIT: 'MIN_SUBMIT',
   WINDOW_CLOSED: 'WINDOW_CLOSED',
+  TIME_UP: 'TIME_UP',
   SESSION_LOST: 'SESSION_LOST',
+  SESSION_LOCKED_BY_VIOLATION: 'SESSION_LOCKED_BY_VIOLATION',
+  TOKEN_REENTRY_REQUIRED: 'TOKEN_REENTRY_REQUIRED',
 } as const
 
 function codeOf(error: unknown): string | null {
@@ -132,9 +135,11 @@ export const studentExamService = {
     try {
       return await studentExamApi.getQuestions(sessionId, deviceId())
     } catch (error) {
-      throw new Error(examErrorMessage(error, 'Soal gagal dimuat.'), {
-        cause: error,
-      })
+      throw new ExamApiError(
+        examErrorMessage(error, 'Soal gagal dimuat.'),
+        codeOf(error),
+        { cause: error },
+      )
     }
   },
 
@@ -142,9 +147,11 @@ export const studentExamService = {
     try {
       return await studentExamApi.getAnswers(sessionId, deviceId())
     } catch (error) {
-      throw new Error(examErrorMessage(error, 'Jawaban gagal dimuat.'), {
-        cause: error,
-      })
+      throw new ExamApiError(
+        examErrorMessage(error, 'Jawaban gagal dimuat.'),
+        codeOf(error),
+        { cause: error },
+      )
     }
   },
 
@@ -159,9 +166,11 @@ export const studentExamService = {
         pendingLocalCount,
       })
     } catch (error) {
-      throw new Error(examErrorMessage(error, 'Jawaban gagal disimpan.'), {
-        cause: error,
-      })
+      throw new ExamApiError(
+        examErrorMessage(error, 'Jawaban gagal disimpan.'),
+        codeOf(error),
+        { cause: error },
+      )
     }
   },
 

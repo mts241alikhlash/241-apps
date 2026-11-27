@@ -3,6 +3,10 @@ import { ApiConflictException } from '../../../../core/filters/api-exception.js'
 import { IExamPackageRepository } from '../../../../exam-package/domain/repositories/exam-package.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IQuestionRepository } from '../../../../question/domain/repositories/question.repository.js'
+import {
+  TIME_UP_MESSAGE,
+  isWorkingTimeOver,
+} from '../../../domain/policies/session-times.policy.js'
 import { assertAnswerShape } from '../../../domain/policies/validate-answer-shape.policy.js'
 import {
   IExamSessionRepository,
@@ -59,6 +63,7 @@ export class SaveAnswersBatchUseCase {
     sessionId: string,
     input: SaveAnswersBatchInput,
     now: Date = new Date(),
+    carriedBySubmit = false,
   ): Promise<SaveAnswersBatchResult> {
     const session = await this.access.loadWritable(user, sessionId, now)
     if (
@@ -69,6 +74,9 @@ export class SaveAnswersBatchUseCase {
         'WINDOW_CLOSED',
         'Waktu pengiriman jawaban sudah habis',
       )
+    }
+    if (!carriedBySubmit && isWorkingTimeOver(session, now)) {
+      throw new ApiConflictException('TIME_UP', TIME_UP_MESSAGE)
     }
 
     const latest = new Map<string, SaveAnswerBatchInputItem>()

@@ -13,9 +13,12 @@ const service = vi.hoisted(() => ({
   heartbeat: vi.fn(),
 }))
 
-vi.mock('../services/studentExamService', () => ({
+vi.mock('../services/studentExamService', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   studentExamService: service,
 }))
+
+import { ExamApiError } from '../services/studentExamService'
 
 function memoryStorage(): Storage {
   const map = new Map<string, string>()
@@ -31,13 +34,21 @@ function memoryStorage(): Storage {
   }
 }
 
-function setup(options: { monotonic?: () => number } = {}) {
+function setup(
+  options: {
+    monotonic?: () => number
+    onExpired?: () => void
+    onDeadlineChanged?: (deadline: number, serverTime: string) => void
+  } = {},
+) {
   const storage = memoryStorage()
   const session = useExamSession({
     storage: () => storage,
     isOnline: () => true,
     newClientId: () => 'client-1',
     monotonic: options.monotonic,
+    onExpired: options.onExpired,
+    onDeadlineChanged: options.onDeadlineChanged,
   })
   return { session, storage }
 }
@@ -281,5 +292,149 @@ describe('useExamSession heartbeat', () => {
 
     await vi.advanceTimersByTimeAsync(90_000)
     expect(service.heartbeat).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useExamSession time up', () => {
+  const serverTime = '2026-11-01T02:29:58.000Z'
+  const deadline = Date.parse('2026-11-01T02:30:00.000Z')
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    service.saveAnswersBatch.mockResolvedValue({
+      confirmed: [],
+      skipped: [],
+      confirmedCount: 0,
+      serverTime,
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('is not locked before the clock starts', async () => {
+    const { session } = setup({ monotonic: () => Date.now() })
+    await session.load('s1')
+
+    expect(session.expired.value).toBe(false)
+    expect(session.answersLocked.value).toBe(false)
+  })
+
+  it('locks the answers once the time is up', async () => {
+    const onExpired = vi.fn()
+    const { session } = setup({ monotonic: () => Date.now(), onExpired })
+    await session.load('s1')
+    session.startClock(deadline, serverTime)
+    expect(session.answer(paper.questions[0], { key: 'A' })).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(2_000)
+
+    expect(onExpired).toHaveBeenCalledTimes(1)
+    expect(session.expired.value).toBe(true)
+    expect(session.answersLocked.value).toBe(true)
+    expect(session.answer(paper.questions[0], { key: 'B' })).toBe(false)
+    expect(session.answers.value.get('q1')).toEqual({ key: 'A' })
+  })
+
+  it('stops syncing single answers once the time is up', async () => {
+    const { session } = setup({ monotonic: () => Date.now() })
+    await session.load('s1')
+    session.startClock(deadline, serverTime)
+    await vi.advanceTimersByTimeAsync(1_000)
+    session.answer(paper.questions[0], { key: 'A' })
+
+    await vi.advanceTimersByTimeAsync(1_000)
+    session.onConnectivityChanged(true)
+    await vi.advanceTimersByTimeAsync(30_000)
+    await session.syncNow()
+
+    expect(service.saveAnswersBatch).not.toHaveBeenCalled()
+    expect(session.sync.value.pendingCount).toBe(1)
+  })
+
+  it('treats a TIME_UP refusal of a save as the end of the working time', async () => {
+    const onExpired = vi.fn()
+    const { session } = setup({ monotonic: () => Date.now(), onExpired })
+    await session.load('s1')
+    session.startClock(Date.parse('2026-11-01T02:40:00.000Z'), serverTime)
+    service.saveAnswersBatch.mockRejectedValue(
+      new ExamApiError(
+        'Waktu mengerjakan sudah habis. Kumpulkan jawaban.',
+        'TIME_UP',
+      ),
+    )
+    session.answer(paper.questions[0], { key: 'A' })
+
+    await vi.advanceTimersByTimeAsync(1_500)
+
+    expect(service.saveAnswersBatch).toHaveBeenCalledTimes(1)
+    expect(onExpired).toHaveBeenCalledTimes(1)
+    expect(session.expired.value).toBe(true)
+    expect(session.answersLocked.value).toBe(true)
+    expect(session.error.value).toBeNull()
+    expect(session.sync.value.pendingCount).toBe(1)
+
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(service.saveAnswersBatch).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useExamSession load errors', () => {
+  it('keeps the code of a failed load', async () => {
+    service.getQuestions.mockRejectedValue(
+      new ExamApiError('Waktu ujian sudah berakhir', 'SESSION_LOST'),
+    )
+    const { session } = setup()
+
+    await session.load('s1')
+
+    expect(session.error.value).toBe('Waktu ujian sudah berakhir')
+    expect(session.errorCode.value).toBe('SESSION_LOST')
+  })
+})
+
+describe('useExamSession deadline from the heartbeat', () => {
+  const serverTime = '2026-11-01T02:29:58.000Z'
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    service.heartbeat.mockReset()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('moves the lock when staff extend the time', async () => {
+    const onExpired = vi.fn()
+    const onDeadlineChanged = vi.fn()
+    const extended = '2026-11-01T02:40:00.000Z'
+    service.heartbeat.mockResolvedValue({
+      requiresTokenReentry: false,
+      lockedByViolation: false,
+      absentSince: null,
+      deadline: extended,
+      serverTime: '2026-11-01T02:29:59.000Z',
+    })
+    const { session } = setup({
+      monotonic: () => Date.now(),
+      onExpired,
+      onDeadlineChanged,
+    })
+    await session.load('s1')
+    session.startClock(Date.parse('2026-11-01T02:30:00.000Z'), serverTime)
+    session.startHeartbeat('s1', 1_000)
+
+    await vi.advanceTimersByTimeAsync(5_000)
+
+    expect(onDeadlineChanged).toHaveBeenCalledWith(
+      Date.parse(extended),
+      '2026-11-01T02:29:59.000Z',
+    )
+    expect(onExpired).not.toHaveBeenCalled()
+    expect(session.answersLocked.value).toBe(false)
+    expect(session.remaining.value).toBeGreaterThan(9 * 60_000)
+    session.stopHeartbeat()
   })
 })

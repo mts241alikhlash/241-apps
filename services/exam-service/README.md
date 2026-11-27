@@ -21,6 +21,7 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - `SebVerifier.verify` compares `configKeyHash` with `sha256(pageUrl + configKey)` for each active `SebConfig`, using `timingSafeEqual`. The `pageUrl` origin must be in the exam-web origin list. A failed SEB check does not count as a wrong token attempt.
 - SEB endpoints: `GET/POST /seb-configs`, `PATCH/DELETE /seb-configs/:id` (`exam-schedules.manage-all`); `GET /seb-configs/active` and `GET /seb-configs/:id/file` (`exam-sessions.take`); `GET /public/seb-configs/:id/file` serves only active configurations without auth; `POST /seb-configs/check` (`exam-schedules.manage-all`). The Config Key is a weak barrier, derivable from the `.seb` file ([ADR 0011](../../docs/adr/0011-web-exams-run-in-safe-exam-browser.md)).
 - Permissions are explicit per action (review, schedule, grade); see the seed for the codes.
+- Time up: a standalone answer save (single or batch) of a web (`SEB`) session is refused from its `deadline` on with 409 `TIME_UP` ('Waktu mengerjakan sudah habis. Kumpulkan jawaban.'). The hand-in stays open until `finalizeAt` and still stores the answers it carries, flagged `receivedAfterDeadline`. Istiqra (`ISTIQRA`) sessions keep accepting saves until `finalizeAt`, because Istiqra 0.2.10 reads any other 409 code on a save as a lost session.
 
 ### Question import
 
