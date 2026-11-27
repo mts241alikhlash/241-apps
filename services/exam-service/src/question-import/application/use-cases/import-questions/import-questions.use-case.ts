@@ -71,6 +71,14 @@ interface Analysis {
   duplicates: number[]
 }
 
+let excelParses: Promise<unknown> = Promise.resolve()
+
+function oneAtATime<T>(task: () => Promise<T>): Promise<T> {
+  const run = excelParses.then(task)
+  excelParses = run.catch(() => undefined)
+  return run
+}
+
 @Injectable()
 export class ImportQuestionsUseCase {
   constructor(
@@ -179,7 +187,9 @@ export class ImportQuestionsUseCase {
     const images = this.imageSaver(user, options.saveImages)
     let sheet: ImportSheet
     if (isExcel) {
-      sheet = await parseExcelSheet(await prepareXlsx(input.buffer))
+      sheet = await oneAtATime(async () =>
+        parseExcelSheet(await prepareXlsx(input.buffer)),
+      )
     } else {
       await assertSafeArchive(input.buffer)
       sheet = await parseWordSheet(input.buffer, images.save)

@@ -566,6 +566,46 @@ describe('ImportQuestionsUseCase', () => {
       ).resolves.toMatchObject({ total: 1, errors: [] })
     })
 
+    it('parses one Excel file at a time, and a failing parse does not block the next', async () => {
+      const { useCase } = build()
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const { load: original } = xlsxProto
+      const events: string[] = []
+      let calls = 0
+      const load = vi
+        .spyOn(xlsxProto, 'load')
+        .mockImplementation(async function (
+          this: ExcelJS.Xlsx,
+          data: ExcelJS.Buffer,
+        ) {
+          calls += 1
+          const call = calls
+          events.push(`start ${call}`)
+          await new Promise((resolve) => setTimeout(resolve, 20))
+          events.push(`end ${call}`)
+          if (call === 1) throw new Error('rusak')
+          return original.call(this, data)
+        })
+
+      const [failed, passed] = await Promise.allSettled([
+        useCase.preview(TEACHER, input(await xlsx([pg(1)]))),
+        useCase.preview(TEACHER, input(await xlsx([pg(1)]))),
+      ])
+      load.mockRestore()
+
+      expect(events).toEqual(['start 1', 'end 1', 'start 2', 'end 2'])
+      expect(failed).toMatchObject({
+        status: 'rejected',
+        reason: new BadRequestException('Berkas Excel tidak bisa dibaca'),
+      })
+      expect(passed).toMatchObject({
+        status: 'fulfilled',
+        value: { total: 1 },
+      })
+    })
+
     it('refuses a malformed worksheet before ExcelJS reads it', async () => {
       const { useCase } = build()
       const zip = await JSZip.loadAsync(await xlsx([pg(1)]))

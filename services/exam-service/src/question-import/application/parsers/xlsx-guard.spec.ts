@@ -363,4 +363,19 @@ describe('prepareXlsx', () => {
       ),
     ).rejects.toThrow(UNREADABLE)
   })
+
+  it('refuses styles with more than 20000 elements', async () => {
+    const zip = await JSZip.loadAsync(template)
+    const styles = await zip.file('xl/styles.xml')!.async('string')
+    zip.file(
+      'xl/styles.xml',
+      styles.replace('</cellXfs>', `${'<xf/>'.repeat(20_001)}</cellXfs>`),
+    )
+
+    await expect(
+      prepareXlsx(await zip.generateAsync({ type: 'nodebuffer' })),
+    ).rejects.toThrow(
+      new BadRequestException('Berkas Excel berisi terlalu banyak gaya sel'),
+    )
+  })
 })

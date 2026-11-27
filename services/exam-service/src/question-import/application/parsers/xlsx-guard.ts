@@ -14,6 +14,7 @@ const MAX_CELLS = 20_000
 const MAX_ROWS = 2_000
 const MAX_SHEET_ELEMENTS = 60_000
 const MAX_STRING_ELEMENTS = 150_000
+const MAX_STYLE_ELEMENTS = 20_000
 const MAX_MERGED_CELLS = 5_000
 const MAX_MERGE_ROW = 2_000
 const SAX_CHUNK = 64 * 1024
@@ -22,18 +23,20 @@ const WIDE_MERGE =
   'Sel gabungan di berkas Excel terlalu luas. Pisahkan sel gabungan lalu unggah lagi'
 const TOO_MANY_CELLS = 'Berkas Excel berisi terlalu banyak sel atau baris'
 const TOO_MANY_STRINGS = 'Berkas Excel berisi terlalu banyak teks'
+const TOO_MANY_STYLES = 'Berkas Excel berisi terlalu banyak gaya sel'
 
 const READ_AS_WORKSHEET = /xl\/worksheets\/sheet\d+[.]xml/iu
 const WORKSHEET = /^\/?xl\/worksheets\/sheet\d+\.xml$/u
 const WORKBOOK = /^\/?xl\/workbook\.xml$/u
 const SHARED_STRINGS = /^\/?xl\/sharedStrings\.xml$/u
+const STYLES = /^\/?xl\/styles\.xml$/u
 const FLAT_MEDIA = /^\/?xl\/media\/[^/]+$/u
 const KEPT = [
   /^\/?\[Content_Types\]\.xml$/u,
   /^\/?_rels\/\.rels$/u,
   /^\/?docProps\/(?:app|core)\.xml$/u,
   /^\/?xl\/_rels\/workbook\.xml\.rels$/u,
-  /^\/?xl\/styles\.xml$/u,
+  STYLES,
   /^\/?xl\/theme\/theme\d+\.xml$/u,
   WORKBOOK,
   SHARED_STRINGS,
@@ -269,14 +272,17 @@ export async function prepareXlsx(buffer: Buffer): Promise<Buffer> {
   if (sheetBytes > MAX_WORKSHEET_BYTES) throw new BadRequestException(TOO_BIG)
   const books = names.filter((name) => WORKBOOK.test(name))
   for (const name of books) await assertWellFormed(files.get(name)!)
-  let strings = 0
-  for (const name of names.filter((name) => SHARED_STRINGS.test(name))) {
-    await assertWellFormed(files.get(name)!, () => {
-      strings += 1
-      if (strings > MAX_STRING_ELEMENTS) {
-        throw new BadRequestException(TOO_MANY_STRINGS)
-      }
-    })
+  for (const [pattern, limit, message] of [
+    [SHARED_STRINGS, MAX_STRING_ELEMENTS, TOO_MANY_STRINGS],
+    [STYLES, MAX_STYLE_ELEMENTS, TOO_MANY_STYLES],
+  ] as const) {
+    let elements = 0
+    for (const name of names.filter((name) => pattern.test(name))) {
+      await assertWellFormed(files.get(name)!, () => {
+        elements += 1
+        if (elements > limit) throw new BadRequestException(message)
+      })
+    }
   }
   const tally: SheetTally = { elements: 0, cells: 0, rows: 0, merged: 0 }
   for (const name of sheets) {

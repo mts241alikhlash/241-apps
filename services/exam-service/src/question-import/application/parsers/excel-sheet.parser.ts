@@ -17,10 +17,14 @@ import { parseGradeLevel } from '../../domain/policies/validate-sheet.policy.js'
 
 const CHOICE_COLUMNS = ['A', 'B', 'C', 'D', 'E'] as const
 
+function textOf(cell: ExcelJS.Cell): string {
+  return cell.isMerged && cell.master.value === null ? '' : cell.text
+}
+
 function readColumns(row: ExcelJS.Row): Map<string, number> {
   const columns = new Map<string, number>()
   row.eachCell((cell, column) => {
-    columns.set(cell.text.trim().toLowerCase(), column)
+    columns.set(textOf(cell).trim().toLowerCase(), column)
   })
   return columns
 }
@@ -31,7 +35,7 @@ function parseRow(
 ): ParsedQuestion | null {
   const text = (column: string): string => {
     const index = columns.get(column)
-    return index === undefined ? '' : row.getCell(index).text.trim()
+    return index === undefined ? '' : textOf(row.getCell(index)).trim()
   }
 
   const typeName = text('jenis')
@@ -65,8 +69,8 @@ function readIdentity(book: ExcelJS.Workbook): SheetIdentity {
   const values = new Map<string, string>()
   sheet?.eachRow((row) => {
     values.set(
-      row.getCell(1).text.trim().toLowerCase(),
-      row.getCell(2).text.trim(),
+      textOf(row.getCell(1)).trim().toLowerCase(),
+      textOf(row.getCell(2)).trim(),
     )
   })
   const version = values.get('versi template') ?? ''

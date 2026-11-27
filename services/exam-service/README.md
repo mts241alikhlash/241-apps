@@ -32,7 +32,7 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - Excel files are bounded before ExcelJS reads them (`xlsx-guard.ts`), measured while inflating:
   - Every part except a flat `xl/media/*` file counts as XML: 1 MB per part (4 MB for `xl/sharedStrings.xml` only), 8 MB in total, and 2 MB for all worksheets together.
   - At most 8 worksheets, and only at `xl/worksheets/sheetN.xml`: any other name that ExcelJS would read as a sheet is refused.
-  - Across the worksheets: at most 20,000 cells, 2,000 rows and 60,000 elements. Shared strings: at most 150,000 elements. Over a limit is a 400.
+  - Across the worksheets: at most 20,000 cells, 2,000 rows and 60,000 elements. Shared strings: at most 150,000 elements; styles: at most 20,000. Over a limit is a 400. Only one Excel file is parsed at a time per process.
   - The workbook, worksheets and shared strings must be well-formed XML, else 400 `Berkas Excel tidak bisa dibaca`.
   - Merged cells are kept so that merged text reads as before, when every range lies within columns A to Z and rows 1 to 2000 and all merges cover at most 5,000 cells. Otherwise the file is refused with `Sel gabungan di berkas Excel terlalu luas`.
   - Removed before reading: column widths, row and column breaks, views, filters, data validations, conditional formats, hyperlinks, drawings, table parts, `extLst` and defined names. Only the workbook, its relationships, styles, theme, document properties, shared strings and worksheets are handed to ExcelJS, so comments, drawings, tables and media are dropped. The import reads only cell values.
