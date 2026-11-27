@@ -36,6 +36,7 @@ export default {
     examPrintStudentAttendance: 'Daftar Hadir Peserta',
     examPrintStaffAttendance: 'Daftar Hadir Pengawas',
     examPrintGradingSheet: 'Lembar Pemeriksaan Uraian',
+    examPrintScoreSheet: 'Score Sheet',
     examPrintQuestionKeys: 'Daftar Soal dan Kunci',
     examPrintStudentRecap: 'Rekap Soal Siswa',
     examSeb: 'Safe Exam Browser',

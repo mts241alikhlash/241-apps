@@ -190,7 +190,11 @@ describe('route permission guards', () => {
       'exam-grading.read-all',
       'exam-grading.manage-all',
     ])
-    for (const path of ['/exam/offline-scores', '/exam/offline-scores/s1']) {
+    for (const path of [
+      '/exam/offline-scores',
+      '/exam/offline-scores/s1',
+      '/exam/print/score-sheet',
+    ]) {
       expect(instance.resolve(path).meta.requiredAnyPermission).toEqual([
         'exam-grading.read',
         'exam-grading.read-all',
@@ -350,6 +354,15 @@ describe('menu', () => {
           ],
           [
             '/exam/print/grading-sheet',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
+            '/exam/print/score-sheet',
             undefined,
             [
               'exam-grading.read',

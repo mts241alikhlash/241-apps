@@ -36,6 +36,7 @@ export default {
     examPrintStudentAttendance: 'Participant Attendance',
     examPrintStaffAttendance: 'Supervisor Attendance',
     examPrintGradingSheet: 'Essay Grading Sheet',
+    examPrintScoreSheet: 'Score Sheet',
     examPrintQuestionKeys: 'Questions and Answer Keys',
     examPrintStudentRecap: 'Student Question Recap',
     examSeb: 'Safe Exam Browser',

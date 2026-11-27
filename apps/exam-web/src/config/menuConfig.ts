@@ -193,6 +193,15 @@ export const menuSections: MenuSection[] = [
             ],
           },
           {
+            title: 'menu.examPrintScoreSheet',
+            url: '/exam/print/score-sheet',
+            requiredAnyPermission: [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          },
+          {
             title: 'menu.examPrintQuestionKeys',
             url: '/exam/print/question-keys',
             requiredAnyPermission: ['exam-events.manage', 'exam-events.read'],
