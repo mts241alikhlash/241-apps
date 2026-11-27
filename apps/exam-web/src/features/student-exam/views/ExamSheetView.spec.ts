@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { computed, ref } from 'vue'
 import type { AnswerPayload, PaperQuestion } from '../types'
@@ -184,5 +184,142 @@ describe('ExamSheetView keeps the session alive', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Ujian sudah dikumpulkan')
+  })
+})
+
+describe('ExamSheetView when time is up', () => {
+  let wrapper: ReturnType<typeof mountView> | null = null
+
+  function mountAttached() {
+    wrapper = mount(ExamSheetView, {
+      attachTo: document.body,
+      global: {
+        stubs: {
+          QuestionListDialog: true,
+          SessionQuestionHtml: true,
+        },
+      },
+    })
+    return wrapper
+  }
+
+  function dialog() {
+    return document.body.querySelector('[role="dialog"][data-state="open"]')
+  }
+
+  function retryButton() {
+    return [...document.body.querySelectorAll('button')].find(
+      (node) => node.textContent?.trim() === 'Kirim ulang',
+    )
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    state.submit.mockReset()
+    vi.useFakeTimers()
+    vi.stubEnv('VITE_SEB_QUIT_URL', '')
+    window.sessionStorage.clear()
+    storeSession()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    wrapper = null
+    document.body.innerHTML = ''
+    vi.useRealTimers()
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+
+  it('opens a dialog that cannot be dismissed while the answers are sent', async () => {
+    state.submit.mockReturnValue(new Promise(() => undefined))
+    mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(dialog()?.textContent).toContain('Waktu habis')
+    expect(dialog()?.textContent).toContain('Jawaban sedang dikirim…')
+    expect(state.submit).toHaveBeenCalledWith('s1')
+    expect(document.body.querySelector('[data-slot="dialog-close"]')).toBeNull()
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await flushPromises()
+
+    expect(dialog()?.textContent).toContain('Waktu habis')
+  })
+
+  it('shows the error, offers Kirim ulang and retries on its own until it is sent', async () => {
+    state.submit
+      .mockRejectedValueOnce(new Error('Server sedang sibuk.'))
+      .mockResolvedValueOnce({ answersStored: true })
+    const view = mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    const alert = document.body.querySelector('[role="alert"]')
+    expect(alert?.textContent).toContain('Server sedang sibuk.')
+    expect(retryButton()).toBeDefined()
+    expect(dialog()?.textContent).toContain('Waktu habis')
+
+    await vi.advanceTimersByTimeAsync(10_000)
+    await flushPromises()
+
+    expect(state.submit).toHaveBeenCalledTimes(2)
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+    expect(dialog()).toBeNull()
+  })
+
+  it('sends again at once on Kirim ulang', async () => {
+    state.submit
+      .mockRejectedValueOnce(new Error('Server sedang sibuk.'))
+      .mockResolvedValueOnce({ answersStored: true })
+    const view = mountAttached()
+    await flushPromises()
+    state.options!.onExpired()
+    await flushPromises()
+
+    retryButton()!.click()
+    await flushPromises()
+
+    expect(state.submit).toHaveBeenCalledTimes(2)
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+  })
+
+  it('waits for the connection and sends when it is back', async () => {
+    const onLine = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
+    state.submit
+      .mockRejectedValueOnce(new Error('Tidak dapat terhubung.'))
+      .mockResolvedValueOnce({ answersStored: true })
+    const view = mountAttached()
+    await flushPromises()
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(dialog()?.textContent).toContain('Menunggu koneksi…')
+
+    onLine.mockReturnValue(true)
+    window.dispatchEvent(new Event('online'))
+    await flushPromises()
+
+    expect(state.submit).toHaveBeenCalledTimes(2)
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+    onLine.mockRestore()
+  })
+
+  it('shows the finished state when the server already closed the session', async () => {
+    state.submit.mockResolvedValueOnce({ answersStored: false })
+    const view = mountAttached()
+    await flushPromises()
+
+    state.options!.onExpired()
+    await flushPromises()
+
+    expect(view.text()).toContain('Ujian sudah dikumpulkan')
+    expect(view.text()).toContain('Jawaban terakhir belum tersimpan')
+    expect(dialog()).toBeNull()
   })
 })

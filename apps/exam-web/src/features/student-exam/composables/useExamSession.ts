@@ -1,5 +1,9 @@
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
-import { studentExamService } from '../services/studentExamService'
+import {
+  API_ERROR_CODES,
+  ExamApiError,
+  studentExamService,
+} from '../services/studentExamService'
 import {
   createServerClock,
   secondsUntilSubmitAllowed,
@@ -43,6 +47,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   const submitting = ref(false)
   const remaining = ref(0)
   const submitGateSeconds = ref(0)
+  const timeUp = ref(false)
 
   const newClientId = options.newClientId ?? (() => crypto.randomUUID())
   const isOnline = options.isOnline ?? (() => navigator.onLine)
@@ -63,7 +68,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
 
   const answeredCount = computed(() => countAnsweredRows(rows.value))
   const remainingLabel = computed(() => formatRemaining(remaining.value))
-  const expired = computed(() => remaining.value <= 0)
+  const expired = computed(() => timeUp.value)
   const sync = computed(() => syncSummary(rows.value))
   const syncSummaryLabel = computed(() => syncLabel(sync.value))
   const submitGateMinutes = computed(() =>
@@ -73,7 +78,9 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     () =>
       !submitting.value && !submitted.value && submitGateSeconds.value === 0,
   )
-  const answersLocked = computed(() => submitting.value || submitted.value)
+  const answersLocked = computed(
+    () => submitting.value || submitted.value || timeUp.value,
+  )
 
   function publish(next: Map<string, AnswerRow>) {
     rows.value = new Map(next)
@@ -95,14 +102,20 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
     const tick = () => {
       remaining.value = Math.max(0, deadline - clock.now())
       refreshGate()
-      if (remaining.value <= 0) {
-        stopClock()
-        options.onExpired?.()
-      }
+      if (remaining.value <= 0) expire()
     }
     tick()
     stopClock()
     ticker = setInterval(tick, 1000)
+  }
+
+  function expire() {
+    stopClock()
+    stopAutoSync()
+    remaining.value = 0
+    if (timeUp.value) return
+    timeUp.value = true
+    options.onExpired?.()
   }
 
   function stopClock() {
@@ -156,6 +169,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
 
   function startAutoSync() {
     stopAutoSync()
+    if (timeUp.value) return
     syncTicker = setInterval(() => void syncNow(), SYNC_INTERVAL_MS)
   }
 
@@ -167,6 +181,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   }
 
   function scheduleSync() {
+    if (timeUp.value) return
     clearTimeout(debounceTimer ?? undefined)
     debounceTimer = setTimeout(() => {
       debounceTimer = null
@@ -206,7 +221,7 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
   }
 
   async function syncNow() {
-    if (syncing || submitted.value || !sessionId) return
+    if (syncing || submitted.value || timeUp.value || !sessionId) return
     if (pendingRows(rows.value).length === 0) return
     if (!isOnline()) return
     syncing = true
@@ -220,6 +235,13 @@ export function useExamSession(options: UseExamSessionOptions = {}) {
       )
       error.value = null
     } catch (cause) {
+      if (
+        cause instanceof ExamApiError &&
+        cause.code === API_ERROR_CODES.TIME_UP
+      ) {
+        expire()
+        return
+      }
       error.value =
         cause instanceof Error ? cause.message : 'Jawaban gagal disimpan.'
     } finally {

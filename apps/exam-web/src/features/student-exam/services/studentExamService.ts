@@ -49,6 +49,7 @@ export class ExamApiError extends Error {
 export const API_ERROR_CODES = {
   MIN_SUBMIT: 'MIN_SUBMIT',
   WINDOW_CLOSED: 'WINDOW_CLOSED',
+  TIME_UP: 'TIME_UP',
   SESSION_LOST: 'SESSION_LOST',
 } as const
 
@@ -159,9 +160,11 @@ export const studentExamService = {
         pendingLocalCount,
       })
     } catch (error) {
-      throw new Error(examErrorMessage(error, 'Jawaban gagal disimpan.'), {
-        cause: error,
-      })
+      throw new ExamApiError(
+        examErrorMessage(error, 'Jawaban gagal disimpan.'),
+        codeOf(error),
+        { cause: error },
+      )
     }
   },
 
