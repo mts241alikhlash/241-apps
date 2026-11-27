@@ -254,7 +254,9 @@ describe('useOfflineScoreEntry', () => {
       ['s1', 'a', { rawScore: 41 }],
       ['s1', 'd', { rawScore: 43 }],
     ])
-    expect(summary).toBe('2 nilai ditempel, 1 baris bukan angka dilewati.')
+    expect(summary).toBe(
+      '2 nilai ditempel. 1 baris tanpa angka dilewati: Citra.',
+    )
   })
 
   it('lets a blank cell use up the row of an absent student (case B)', async () => {
@@ -287,7 +289,7 @@ describe('useOfflineScoreEntry', () => {
     expect(entry.drafts.b.score).toBe('')
     expect(entry.drafts.c.score).toBe('42')
     expect(summary).toBe(
-      '2 nilai ditempel, 1 nilai jatuh pada siswa tidak hadir dilewati.',
+      '2 nilai ditempel. 1 nilai jatuh pada siswa tidak hadir dan dilewati: Budi.',
     )
   })
 
@@ -297,10 +299,11 @@ describe('useOfflineScoreEntry', () => {
     await vi.runAllTimersAsync()
     expect(entry.drafts.c.score).toBe('')
     expect(entry.drafts.d.score).toBe('20')
-    expect(summary).toBe('1 nilai ditempel, 1 baris kosong dilewati.')
+    expect(summary).toBe('1 nilai ditempel. 1 baris kosong dilewati.')
 
-    entry.paste('c', '99\n21')
+    const invalid = entry.paste('c', '99\n21')
     await vi.runAllTimersAsync()
+    expect(invalid).toBe('1 nilai ditempel. 1 nilai tidak valid pada: Citra.')
     expect(entry.drafts.c.score).toBe('99')
     expect(entry.rowStates.c.status).toBe('invalid')
     expect(service.save.mock.calls).toEqual([
@@ -309,13 +312,47 @@ describe('useOfflineScoreEntry', () => {
     ])
   })
 
+  it('does not count a value with three decimals as pasted', async () => {
+    const entry = await setup()
+    const summary = entry.paste('c', '12,345\n20')
+    await vi.runAllTimersAsync()
+    expect(summary).toBe('1 nilai ditempel. 1 nilai tidak valid pada: Citra.')
+    expect(entry.rowStates.c.status).toBe('invalid')
+  })
+
+  it('names the present students whose row a blank or text line used up', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', '\nTIDAK HADIR\nS\n43')
+    await vi.runAllTimersAsync()
+    expect(summary).toBe(
+      '1 nilai ditempel. 2 baris tanpa angka dilewati: Ahmad, Citra.',
+    )
+  })
+
+  it('names at most five absent students that a number fell on', async () => {
+    const absentees = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'].map((name) =>
+      row({ studentId: name, name, state: 'ABSENT' }),
+    )
+    service.loadRoster.mockResolvedValue({
+      success: true,
+      data: [...absentees, row({ studentId: 'z', name: 'Zaid' })],
+    })
+    const entry = await setup()
+    const summary = entry.paste('A1', '1\n2\n3\n4\n5\n6\n7\n8')
+    await vi.runAllTimersAsync()
+    expect(entry.drafts.z.score).toBe('8')
+    expect(summary).toBe(
+      '1 nilai ditempel. 7 nilai jatuh pada siswa tidak hadir dan dilewati: A1, A2, A3, A4, A5 dan 2 lainnya.',
+    )
+  })
+
   it('counts pasted values that do not fit below the last student', async () => {
     const entry = await setup()
     const summary = entry.paste('d', '10\n11\n12')
     await vi.runAllTimersAsync()
     expect(entry.drafts.d.score).toBe('10')
     expect(summary).toBe(
-      '1 nilai ditempel, 2 nilai melebihi jumlah siswa tidak dipakai.',
+      '1 nilai ditempel. 2 nilai melebihi jumlah siswa tidak dipakai.',
     )
   })
 
@@ -374,6 +411,19 @@ describe('useOfflineScoreEntry', () => {
     entry.commit('a')
     await vi.runAllTimersAsync()
     expect(entry.drafts.a).toEqual({ score: '40', note: 'remedial' })
+    expect(entry.rowStates.a).toEqual({
+      status: 'error',
+      message:
+        'Nilai sudah terkirim; ganti dengan nilai baru. Catatan belum tersimpan.',
+    })
+    expect(entry.blockingRows.value.map((item) => item.name)).toEqual(['Ahmad'])
+    entry.commit('a')
+    await vi.runAllTimersAsync()
+    expect(service.save).toHaveBeenLastCalledWith('s1', 'a', {
+      rawScore: 40,
+      note: 'remedial',
+    })
+    expect(entry.blockingRows.value).toEqual([])
   })
 
   it('announces the same error again when it repeats', async () => {

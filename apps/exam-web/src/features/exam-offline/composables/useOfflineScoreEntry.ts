@@ -26,6 +26,18 @@ const NUMBER_LINE = /^-?\d+([.,]\d+)?$/
 
 const HEADER_LINE = /^(score|nilai|skor)$/i
 
+const NAMED_LIMIT = 5
+
+const NOTE_UNSAVED = 'Catatan belum tersimpan.'
+
+function namesOf(list: OfflineRosterRow[]): string {
+  const names = list.map((item) => item.name ?? item.participantNumber ?? '-')
+  const shown = names.slice(0, NAMED_LIMIT).join(', ')
+  return names.length > NAMED_LIMIT
+    ? `${shown} dan ${names.length - NAMED_LIMIT} lainnya`
+    : shown
+}
+
 const scoreText = (value: number | null) =>
   value === null ? '' : String(value).replace('.', ',')
 
@@ -192,10 +204,14 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
       return
     }
     const row = rowOf(studentId)
+    let message = result.error
     if (result.code === SCORE_PUBLISHED_CODE && row) {
       drafts[studentId].score = scoreText(row.rawScore)
+      if (drafts[studentId].note !== (row.note ?? '')) {
+        message = `${result.error}. ${NOTE_UNSAVED}`
+      }
     }
-    setState(studentId, 'error', result.error)
+    setState(studentId, 'error', message)
     await announce(`${row?.name ?? 'Siswa'}: ${result.error}`)
     if (again.delete(studentId)) await save(studentId)
   }
@@ -231,37 +247,50 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
       0,
     )
     let applied = 0
-    let notNumber = 0
-    let empty = 0
-    let onAbsent = 0
     let overflow = 0
+    let textLines = 0
+    const invalid: OfflineRosterRow[] = []
+    const withoutNumber: OfflineRosterRow[] = []
+    const onAbsent: OfflineRosterRow[] = []
     lines.forEach((line, index) => {
       const target = rows.value[start + index]
       const numeric = NUMBER_LINE.test(line)
       if (target === undefined) {
         if (numeric) overflow += 1
       } else if (target.state === 'ABSENT') {
-        if (numeric) onAbsent += 1
-      } else if (line === '') {
-        empty += 1
+        if (numeric) onAbsent.push(target)
       } else if (!numeric) {
-        notNumber += 1
+        if (line !== '') textLines += 1
+        withoutNumber.push(target)
       } else {
         setScore(target.studentId, line)
-        applied += 1
+        if (parseScore(line, maxScore.value).ok) applied += 1
+        else invalid.push(target)
         commit(target.studentId)
       }
     })
-    const parts = [`${applied} nilai ditempel`]
-    if (notNumber > 0) parts.push(`${notNumber} baris bukan angka dilewati`)
-    if (empty > 0) parts.push(`${empty} baris kosong dilewati`)
-    if (onAbsent > 0) {
-      parts.push(`${onAbsent} nilai jatuh pada siswa tidak hadir dilewati`)
+    const parts = [`${applied} nilai ditempel.`]
+    if (invalid.length > 0) {
+      parts.push(
+        `${invalid.length} nilai tidak valid pada: ${namesOf(invalid)}.`,
+      )
+    }
+    if (textLines > 0) {
+      parts.push(
+        `${withoutNumber.length} baris tanpa angka dilewati: ${namesOf(withoutNumber)}.`,
+      )
+    } else if (withoutNumber.length > 0) {
+      parts.push(`${withoutNumber.length} baris kosong dilewati.`)
+    }
+    if (onAbsent.length > 0) {
+      parts.push(
+        `${onAbsent.length} nilai jatuh pada siswa tidak hadir dan dilewati: ${namesOf(onAbsent)}.`,
+      )
     }
     if (overflow > 0) {
-      parts.push(`${overflow} nilai melebihi jumlah siswa tidak dipakai`)
+      parts.push(`${overflow} nilai melebihi jumlah siswa tidak dipakai.`)
     }
-    return `${parts.join(', ')}.`
+    return parts.join(' ')
   }
 
   const pending = computed(
