@@ -50,12 +50,12 @@ describe('ScoreImportDialog', () => {
     expect(button('Unggah')?.disabled).toBe(true)
   })
 
-  it('refuses a file above 5 MB', async () => {
+  it('refuses a file above 1 MB', async () => {
     mountDialog()
     await flushPromises()
-    choose(sized('nilai.xlsx', 5 * 1024 * 1024 + 1))
+    choose(sized('nilai.xlsx', 1024 * 1024 + 1))
     await flushPromises()
-    expect(document.body.textContent).toContain('Ukuran berkas maksimal 5 MB.')
+    expect(document.body.textContent).toContain('Ukuran berkas maksimal 1 MB.')
     expect(button('Unggah')?.disabled).toBe(true)
   })
 

@@ -151,8 +151,8 @@ export class ActivityReadinessCheckDto {
 
 export class ActivityReadinessDto {
   @ApiProperty({ format: 'uuid' }) activityId!: string
-  @ApiProperty({ nullable: true }) subjectName!: string | null
-  @ApiProperty({ nullable: true }) gradeName!: string | null
+  @ApiProperty({ type: String, nullable: true }) subjectName!: string | null
+  @ApiProperty({ type: String, nullable: true }) gradeName!: string | null
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ enum: EXAM_DELIVERY_MODES })
   deliveryMode!: ActivityReadiness['deliveryMode']

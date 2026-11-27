@@ -178,14 +178,71 @@ describe('ImportOfflineScoresUseCase', () => {
     expect(world.results.find(SCHEDULE_ID, STUDENTS.ani)?.note).toBe('=1+1')
   })
 
-  it('refuses a file over 5 MB', async () => {
+  it('refuses a file over 1 MB', async () => {
     const { useCase } = setup()
     await expect(
       run(useCase, {
-        buffer: Buffer.alloc(5 * 1024 * 1024 + 1, 0x41),
+        buffer: Buffer.alloc(1024 * 1024 + 1, 0x41),
         originalName: 'nilai.csv',
       }),
-    ).rejects.toBeInstanceOf(PayloadTooLargeException)
+    ).rejects.toThrow(
+      new PayloadTooLargeException('Ukuran berkas maksimal 1 MB'),
+    )
+  })
+
+  it.each([
+    'xl/worksheets/sheet1.xml',
+    'xl/sharedStrings.xml',
+    'xl/comments1.xml',
+  ])(
+    'refuses a workbook whose %s expands past 1 MB before reading it',
+    async (part) => {
+      const { world, useCase } = setup()
+      const zip = await JSZip.loadAsync(
+        await xlsx([
+          ['No. Peserta', 'Score'],
+          ['7-001', 40],
+        ]),
+      )
+      zip.file(part, `<?xml version="1.0"?><x>${' '.repeat(1024 * 1024)}</x>`)
+      const buffer = await zip.generateAsync({
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+      })
+      expect(buffer.length).toBeLessThan(64 * 1024)
+
+      await expect(
+        run(useCase, { buffer, originalName: 'nilai.xlsx' }),
+      ).rejects.toThrow(
+        new BadRequestException('Berkas terlalu besar untuk diimpor'),
+      )
+      expect(world.results.rows.size).toBe(0)
+    },
+  )
+
+  it('keeps a filled sheet of 500 rows under the part limit', async () => {
+    const { useCase } = setup()
+    const rows = Array.from({ length: 500 }, (_, index) => [
+      `7-${String(index + 1).padStart(3, '0')}`,
+      `Nama Lengkap Peserta Ujian Nomor ${index + 1} Bin Fulan Al-Ikhlash`,
+      87.5,
+      `Catatan guru untuk peserta ${index + 1}: jawaban rapi, perlu latihan lagi`,
+    ])
+    const buffer = await xlsx([
+      ['No. Peserta', 'Nama', 'Score', 'Note'],
+      ...rows,
+    ])
+    const zip = await JSZip.loadAsync(buffer)
+    for (const part of ['xl/worksheets/sheet1.xml', 'xl/sharedStrings.xml']) {
+      const size = (await zip.file(part)!.async('nodebuffer')).length
+      expect(size).toBeLessThan(1024 * 1024)
+    }
+
+    const result = await run(useCase, { buffer, originalName: 'nilai.xlsx' })
+
+    expect(result.saved + result.rejected.length + result.skipped.length).toBe(
+      500,
+    )
   })
 
   it('refuses more than 500 rows', async () => {

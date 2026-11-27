@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
 import { normalizeArchive } from '../../question-import/application/parsers/archive-guard.js'
 import {
+  OFFLINE_IMPORT_MAX_BYTES,
   OFFLINE_IMPORT_MAX_ROWS,
   SCORE_SHEET_NAME,
 } from '../domain/score-sheet.js'
@@ -27,6 +28,12 @@ const SPACE = 32
 const ZIP_SIGNATURE = Buffer.from([0x50, 0x4b, 0x03, 0x04])
 const TOO_MANY = `Maksimal ${OFFLINE_IMPORT_MAX_ROWS} baris per berkas`
 const MISMATCH = 'Isi berkas tidak sesuai dengan jenisnya'
+const PART_LIMIT = {
+  parts:
+    /xl\/(worksheets\/|sharedStrings\.xml|comments\d+\.xml|tables\/|drawings\/)/iu,
+  maxBytes: OFFLINE_IMPORT_MAX_BYTES,
+  message: 'Berkas terlalu besar untuk diimpor',
+}
 const COLUMNS = {
   number: ['nopeserta'],
   score: ['score', 'nilai'],
@@ -38,7 +45,7 @@ function headerKey(value: string): string {
 }
 
 async function readXlsx(buffer: Buffer): Promise<Table> {
-  const checked = await normalizeArchive(buffer)
+  const checked = await normalizeArchive(buffer, PART_LIMIT)
   const book = new ExcelJS.Workbook()
   try {
     await book.xlsx.load(checked as unknown as ExcelJS.Buffer)

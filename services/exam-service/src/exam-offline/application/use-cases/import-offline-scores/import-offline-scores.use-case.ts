@@ -72,7 +72,7 @@ export class ImportOfflineScoresUseCase {
   ): Promise<OfflineImportResult> {
     const roster = await this.reader.load(user, input.scheduleId, 'write')
     if (input.file.buffer.length > OFFLINE_IMPORT_MAX_BYTES) {
-      throw new PayloadTooLargeException('Ukuran berkas maksimal 5 MB')
+      throw new PayloadTooLargeException('Ukuran berkas maksimal 1 MB')
     }
     const lines = await parseScoreSheet(
       input.file.buffer,

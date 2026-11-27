@@ -100,11 +100,11 @@ export class CreateActivityUseCase {
     const maxScore = command.maxScore ?? 100
     if (offline) {
       if (!command.offlineKind) {
-        throw new BadRequestException('Jenis kegiatan luring wajib dipilih')
+        throw new BadRequestException('Jenis kegiatan Offline wajib dipilih')
       }
       if (command.packageId) {
         throw new BadRequestException(
-          'Kegiatan luring tidak memakai paket soal',
+          'Kegiatan Offline tidak memakai paket soal',
         )
       }
       if (!Number.isInteger(maxScore) || maxScore < 1 || maxScore > 1000) {

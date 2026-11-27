@@ -173,7 +173,10 @@ describe('AttachActivityPackageUseCase', () => {
     const repo = seeded({ deliveryMode: 'OFFLINE', offlineKind: 'WRITTEN' })
 
     await expect(makeUseCase(repo).execute(input)).rejects.toMatchObject({
-      response: { code: 'OFFLINE_NO_PACKAGE' },
+      response: {
+        code: 'OFFLINE_NO_PACKAGE',
+        message: 'Kegiatan Offline tidak memakai paket soal',
+      },
     })
     expect(repo.attachments).toEqual([])
   })

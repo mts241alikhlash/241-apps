@@ -62,7 +62,7 @@ watch(
 function problemOf(chosen: File): string | null {
   if (!/\.(xlsx|csv)$/i.test(chosen.name))
     return 'Pilih berkas .xlsx atau .csv.'
-  if (chosen.size > IMPORT_MAX_BYTES) return 'Ukuran berkas maksimal 5 MB.'
+  if (chosen.size > IMPORT_MAX_BYTES) return 'Ukuran berkas maksimal 1 MB.'
   return null
 }
 
@@ -123,7 +123,7 @@ function close(open: boolean) {
             :invalid="problem !== null"
             :disabled="uploading"
             aria-label="Pilih berkas nilai"
-            hint=".xlsx atau .csv, maks. 5 MB, 500 baris"
+            hint=".xlsx atau .csv, maks. 1 MB, 500 baris"
             @change="pick"
             @clear="clear"
           />

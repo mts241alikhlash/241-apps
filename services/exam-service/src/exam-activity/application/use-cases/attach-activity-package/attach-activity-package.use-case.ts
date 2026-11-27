@@ -44,7 +44,7 @@ export class AttachActivityPackageUseCase {
     if (current.deliveryMode === 'OFFLINE') {
       throw new ApiConflictException(
         'OFFLINE_NO_PACKAGE',
-        'Kegiatan luring tidak memakai paket soal',
+        'Kegiatan Offline tidak memakai paket soal',
       )
     }
     if (current.packageId !== null) {

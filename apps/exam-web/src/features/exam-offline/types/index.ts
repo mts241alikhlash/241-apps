@@ -46,7 +46,7 @@ export const SCORE_PUBLISHED_CODE = 'OFFLINE_SCORE_PUBLISHED'
 
 export const SCORES_MISSING_CODE = 'OFFLINE_SCORES_MISSING'
 
-export const IMPORT_MAX_BYTES = 5 * 1024 * 1024
+export const IMPORT_MAX_BYTES = 1024 * 1024
 
 export const IMPORT_ACCEPT = '.xlsx,.csv'
 

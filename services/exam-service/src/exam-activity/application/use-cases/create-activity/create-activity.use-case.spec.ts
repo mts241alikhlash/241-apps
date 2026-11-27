@@ -471,13 +471,17 @@ describe('CreateActivityUseCase', () => {
 
     it('requires the offline kind', async () => {
       const { repo, result } = run({ offlineKind: undefined })
-      await expect(result).rejects.toBeInstanceOf(BadRequestException)
+      await expect(result).rejects.toThrow(
+        new BadRequestException('Jenis kegiatan Offline wajib dipilih'),
+      )
       expect(repo.created).toEqual([])
     })
 
     it('forbids a package', async () => {
       const { repo, result } = run({ packageId: 'package-1' })
-      await expect(result).rejects.toBeInstanceOf(BadRequestException)
+      await expect(result).rejects.toThrow(
+        new BadRequestException('Kegiatan Offline tidak memakai paket soal'),
+      )
       expect(repo.created).toEqual([])
     })
 

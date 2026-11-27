@@ -7,6 +7,12 @@ const MAX_XML_BYTES = 20 * 1024 * 1024
 
 export const TOO_BIG = 'Isi berkas terlalu besar setelah diekstrak'
 
+export interface PartLimit {
+  parts: RegExp
+  maxBytes: number
+  message: string
+}
+
 interface DeclaredEntry {
   _data?: { uncompressedSize?: number }
 }
@@ -19,6 +25,7 @@ function inflateWithin(
   entry: JSZip.JSZipObject,
   limit: number,
   collect?: Buffer[],
+  message: string = TOO_BIG,
 ): Promise<number> {
   return new Promise((resolve, reject) => {
     const stream = entry.nodeStream()
@@ -27,7 +34,7 @@ function inflateWithin(
       seen += chunk.length
       if (seen > limit) {
         stream.pause()
-        reject(new BadRequestException(TOO_BIG))
+        reject(new BadRequestException(message))
         return
       }
       collect?.push(chunk)
@@ -78,6 +85,7 @@ async function inflateEntries(
   buffer: Buffer,
   xml: XmlBudget,
   keep: (name: string) => boolean,
+  partLimit?: PartLimit,
 ): Promise<Map<string, Buffer>> {
   const entries = await openChecked(buffer)
   const files = new Map<string, Buffer>()
@@ -87,11 +95,18 @@ async function inflateEntries(
     if (entry.dir) continue
     const counted = xml.isXml(entry.name)
     const remaining = MAX_EXPANDED_BYTES - expanded
-    const limit = counted
+    const budget = counted
       ? Math.min(remaining, xml.partLimit(entry.name), xml.total - xmlExpanded)
       : remaining
+    const tight = partLimit?.parts.test(entry.name) === true
+    const limit = tight ? Math.min(budget, partLimit.maxBytes) : budget
     const chunks: Buffer[] | undefined = keep(entry.name) ? [] : undefined
-    const seen = await inflateWithin(entry, limit, chunks)
+    const seen = await inflateWithin(
+      entry,
+      limit,
+      chunks,
+      tight ? partLimit.message : TOO_BIG,
+    )
     expanded += seen
     if (counted) xmlExpanded += seen
     if (chunks !== undefined) files.set(entry.name, Buffer.concat(chunks))
@@ -119,6 +134,11 @@ export async function assertSafeArchive(buffer: Buffer): Promise<void> {
   await inflateEntries(buffer, DEFAULT_XML, () => false)
 }
 
-export async function normalizeArchive(buffer: Buffer): Promise<Buffer> {
-  return rebuildArchive(await inflateArchive(buffer))
+export async function normalizeArchive(
+  buffer: Buffer,
+  partLimit?: PartLimit,
+): Promise<Buffer> {
+  return rebuildArchive(
+    await inflateEntries(buffer, DEFAULT_XML, () => true, partLimit),
+  )
 }

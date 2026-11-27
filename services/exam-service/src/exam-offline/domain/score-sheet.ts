@@ -5,7 +5,7 @@ export const SCORE_SHEET_HEADERS = ['No. Peserta', 'Nama', 'Score', 'Note']
 export const SCORE_SHEET_ABSENT = 'TIDAK HADIR'
 export const SCORE_SHEET_MIME =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-export const OFFLINE_IMPORT_MAX_BYTES = 5 * 1024 * 1024
+export const OFFLINE_IMPORT_MAX_BYTES = 1024 * 1024
 export const OFFLINE_IMPORT_MAX_ROWS = 500
 
 export const OFFLINE_KIND_LABELS: Record<ExamOfflineKind, string> = {
