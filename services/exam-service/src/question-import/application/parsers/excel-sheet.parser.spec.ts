@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { parseExcelSheet } from './excel-sheet.parser.js'
 
 const HEADERS = [
@@ -260,5 +260,63 @@ describe('parseExcelSheet', () => {
     await expect(parseExcelSheet(await workbook({ rows }))).rejects.toThrow(
       new BadRequestException('Maksimal 500 soal per berkas'),
     )
+  })
+
+  it('reads a row far down the sheet without creating the rows above it', async () => {
+    const book = new ExcelJS.Workbook()
+    const identity = book.addWorksheet('Identitas')
+    IDENTITY.forEach((row) => identity.addRow(row))
+    const sheet = book.addWorksheet('Soal')
+    sheet.addRow(HEADERS)
+    sheet.getRow(200_000).values = PG_ROW
+    const buffer = Buffer.from(await book.xlsx.writeBuffer())
+    const worksheetProto = Object.getPrototypeOf(sheet) as ExcelJS.Worksheet
+    const getRow = vi.spyOn(worksheetProto, 'getRow')
+
+    const parsed = await parseExcelSheet(buffer)
+    const calls = getRow.mock.calls.length
+    getRow.mockRestore()
+
+    expect(parsed.questions.map((question) => question.row)).toEqual([200_000])
+    expect(calls).toBeLessThan(100)
+  })
+
+  it('reads an empty merged header as blank instead of failing', async () => {
+    const book = new ExcelJS.Workbook()
+    const identity = book.addWorksheet('Identitas')
+    IDENTITY.forEach((row) => identity.addRow(row))
+    const sheet = book.addWorksheet('Soal')
+    sheet.addRow(HEADERS)
+    sheet.addRow(PG_ROW)
+    sheet.mergeCells('L1:M1')
+
+    const parsed = await parseExcelSheet(
+      Buffer.from(await book.xlsx.writeBuffer()),
+    )
+
+    expect(parsed.questions).toHaveLength(1)
+    expect(parsed.errors).toEqual([])
+  })
+
+  it('reports a row error for an empty merge over data rows', async () => {
+    const book = new ExcelJS.Workbook()
+    const identity = book.addWorksheet('Identitas')
+    IDENTITY.forEach((row) => identity.addRow(row))
+    const sheet = book.addWorksheet('Soal')
+    sheet.addRow(HEADERS)
+    sheet.addRow(PG_ROW)
+    sheet.addRow([3, null, 'Soal tiga', '4', '5', null, null, null, 'A'])
+    sheet.addRow([4, null, 'Soal empat', '4', '5', null, null, null, 'A'])
+    sheet.mergeCells('B3:B4')
+
+    const parsed = await parseExcelSheet(
+      Buffer.from(await book.xlsx.writeBuffer()),
+    )
+
+    expect(parsed.questions).toHaveLength(1)
+    expect(parsed.errors).toEqual([
+      { row: 3, reason: 'Jenis soal tidak dikenal' },
+      { row: 4, reason: 'Jenis soal tidak dikenal' },
+    ])
   })
 })

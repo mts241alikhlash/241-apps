@@ -542,6 +542,44 @@ describe('StartExamSessionUseCase', () => {
       expect(sessions.sessions.size).toBe(0)
     })
 
+    it('lets a released late starter continue on a new device after the activity ends, but refuses a student without a session', async () => {
+      const activity = await attach()
+      const minutes = (count: number) =>
+        new Date(ENDS.getTime() + count * 60_000)
+      schedules.schedules.set(schedule.id, {
+        ...schedules.schedules.get(schedule.id)!,
+        endsAt: minutes(60),
+      })
+      sessions.sessions.set(
+        'late',
+        sessionFor(schedule, {
+          id: 'late',
+          deviceId: null,
+          startedAt: minutes(-60),
+          deadline: minutes(30),
+          finalizeAt: minutes(40),
+        }),
+      )
+      const later = minutes(10)
+      const restart = () =>
+        build().execute(
+          STUDENT_USER,
+          schedule.id,
+          {
+            accessCode: codes.codeFor(`activity:${activity.id}`, 0, later).code,
+            deviceId: 'device-2',
+          },
+          later,
+        )
+
+      await expect(restart()).resolves.toMatchObject({ sessionId: 'late' })
+      expect(sessions.sessions.get('late')?.deviceId).toBe('device-2')
+
+      sessions.sessions.delete('late')
+      await expect(restart()).rejects.toMatchObject({ code: 'WINDOW_CLOSED' })
+      expect(sessions.sessions.size).toBe(0)
+    })
+
     it('lets the student start inside the activity window', async () => {
       const activity = await attach()
 

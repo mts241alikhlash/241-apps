@@ -48,11 +48,9 @@ import {
   duplicateRows,
   validateIdentity,
 } from '../../../domain/policies/validate-sheet.policy.js'
-import {
-  assertSafeArchive,
-  normalizeArchive,
-} from '../../parsers/archive-guard.js'
+import { assertSafeArchive } from '../../parsers/archive-guard.js'
 import { parseExcelSheet } from '../../parsers/excel-sheet.parser.js'
+import { prepareXlsx } from '../../parsers/xlsx-guard.js'
 import { parseWordSheet } from '../../parsers/word-sheet.parser.js'
 import type {
   ImportPreview,
@@ -71,6 +69,14 @@ interface Analysis {
   good: NewQuestionInput[]
   errors: { row: number; reason: string }[]
   duplicates: number[]
+}
+
+let excelParses: Promise<unknown> = Promise.resolve()
+
+function oneAtATime<T>(task: () => Promise<T>): Promise<T> {
+  const run = excelParses.then(task)
+  excelParses = run.catch(() => undefined)
+  return run
 }
 
 @Injectable()
@@ -181,7 +187,9 @@ export class ImportQuestionsUseCase {
     const images = this.imageSaver(user, options.saveImages)
     let sheet: ImportSheet
     if (isExcel) {
-      sheet = await parseExcelSheet(await normalizeArchive(input.buffer))
+      sheet = await oneAtATime(async () =>
+        parseExcelSheet(await prepareXlsx(input.buffer)),
+      )
     } else {
       await assertSafeArchive(input.buffer)
       sheet = await parseWordSheet(input.buffer, images.save)

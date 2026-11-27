@@ -504,6 +504,125 @@ describe('ImportQuestionsUseCase', () => {
   })
 
   describe('guards', () => {
+    it('hands ExcelJS a file whose layout bombs were stripped, and still imports it', async () => {
+      const { useCase } = build()
+      const zip = await JSZip.loadAsync(await xlsx([pg(1)]))
+      const name = 'xl/worksheets/sheet2.xml'
+      const sheet = await zip.file(name)!.async('string')
+      zip.file(
+        name,
+        sheet.replace(
+          '<sheetData>',
+          '<cols><col min="1" max="3000000" width="9"/></cols><sheetData>',
+        ),
+      )
+      const bomb = await zip.generateAsync({ type: 'nodebuffer' })
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const load = vi.spyOn(xlsxProto, 'load')
+
+      const preview = await useCase.preview(TEACHER, input(bomb))
+      const loaded = await JSZip.loadAsync(load.mock.calls[0][0])
+      load.mockRestore()
+
+      expect(await loaded.file(name)!.async('string')).not.toContain('<col')
+      expect(preview).toMatchObject({ total: 1, errors: [] })
+    })
+
+    it('reads a Jenis merged over two rows, as before the guard', async () => {
+      const { useCase } = build()
+      const book = new ExcelJS.Workbook()
+      const identity = book.addWorksheet('Identitas')
+      identityRows(IDENTITY).forEach((row) => identity.addRow(row))
+      const sheet = book.addWorksheet('Soal')
+      sheet.addRow(HEADERS)
+      ;[1, 2, 3, 4, 5, 6, 7].forEach((n) => sheet.addRow(pg(n)))
+      sheet.mergeCells('B2:B3')
+      const merged = Buffer.from(await book.xlsx.writeBuffer())
+
+      const preview = await useCase.preview(TEACHER, input(merged))
+
+      expect(preview).toMatchObject({
+        total: 7,
+        errors: [],
+        counts: { MULTIPLE_CHOICE: 7 },
+      })
+    })
+
+    it('still imports a file with a cell note', async () => {
+      const { useCase } = build()
+      const book = new ExcelJS.Workbook()
+      const identity = book.addWorksheet('Identitas')
+      identityRows(IDENTITY).forEach((row) => identity.addRow(row))
+      const sheet = book.addWorksheet('Soal')
+      sheet.addRow(HEADERS)
+      sheet.addRow(pg(1))
+      sheet.getCell('C2').note = 'Catatan guru'
+      const noted = Buffer.from(await book.xlsx.writeBuffer())
+
+      await expect(
+        useCase.preview(TEACHER, input(noted)),
+      ).resolves.toMatchObject({ total: 1, errors: [] })
+    })
+
+    it('parses one Excel file at a time, and a failing parse does not block the next', async () => {
+      const { useCase } = build()
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const { load: original } = xlsxProto
+      const events: string[] = []
+      let calls = 0
+      const load = vi
+        .spyOn(xlsxProto, 'load')
+        .mockImplementation(async function (
+          this: ExcelJS.Xlsx,
+          data: ExcelJS.Buffer,
+        ) {
+          calls += 1
+          const call = calls
+          events.push(`start ${call}`)
+          await new Promise((resolve) => setTimeout(resolve, 20))
+          events.push(`end ${call}`)
+          if (call === 1) throw new Error('rusak')
+          return original.call(this, data)
+        })
+
+      const [failed, passed] = await Promise.allSettled([
+        useCase.preview(TEACHER, input(await xlsx([pg(1)]))),
+        useCase.preview(TEACHER, input(await xlsx([pg(1)]))),
+      ])
+      load.mockRestore()
+
+      expect(events).toEqual(['start 1', 'end 1', 'start 2', 'end 2'])
+      expect(failed).toMatchObject({
+        status: 'rejected',
+        reason: new BadRequestException('Berkas Excel tidak bisa dibaca'),
+      })
+      expect(passed).toMatchObject({
+        status: 'fulfilled',
+        value: { total: 1 },
+      })
+    })
+
+    it('refuses a malformed worksheet before ExcelJS reads it', async () => {
+      const { useCase } = build()
+      const zip = await JSZip.loadAsync(await xlsx([pg(1)]))
+      zip.file('xl/worksheets/sheet2.xml', '<worksheet><sheetData>')
+      const broken = await zip.generateAsync({ type: 'nodebuffer' })
+      const xlsxProto = Object.getPrototypeOf(
+        new ExcelJS.Workbook().xlsx,
+      ) as ExcelJS.Xlsx
+      const load = vi.spyOn(xlsxProto, 'load')
+
+      await expect(useCase.preview(TEACHER, input(broken))).rejects.toThrow(
+        new BadRequestException('Berkas Excel tidak bisa dibaca'),
+      )
+      expect(load).not.toHaveBeenCalled()
+      load.mockRestore()
+    })
+
     it('refuses a subject and grade the teacher does not teach before reading the file', async () => {
       const { questions, useCase } = build({ pairs: [] })
 

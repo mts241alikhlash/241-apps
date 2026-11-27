@@ -4,9 +4,10 @@ import { ExamActivityRepository } from '../../exam-activity/domain/repositories/
 import type { ExamSchedule } from '../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { IExamScheduleRepository } from '../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { ApiConflictException } from '../../core/filters/api-exception.js'
+import type { ExamSession } from '../domain/entities/exam-session.entity.js'
 import {
+  examLifecycle,
   lifecycleWindow,
-  scheduleLifecycle,
 } from '../domain/policies/exam-lifecycle.policy.js'
 
 export interface WindowClosedPlace {
@@ -38,10 +39,24 @@ export class LifecycleGate {
     return { owner, activity, eventId: activity?.eventId ?? owner.eventId }
   }
 
+  assertSessionOpen(
+    session: Pick<ExamSession, 'scheduleId' | 'status' | 'finalizeAt'>,
+    now: Date,
+    place?: (eventId: string | null) => Promise<WindowClosedPlace>,
+  ): Promise<void> {
+    return this.assertOpen(
+      session.scheduleId,
+      now,
+      place,
+      session.status === 'IN_PROGRESS' ? session.finalizeAt : undefined,
+    )
+  }
+
   async assertOpen(
     target: string | ExamSchedule | null,
     now: Date,
     place?: (eventId: string | null) => Promise<WindowClosedPlace>,
+    runsUntil?: Date,
   ): Promise<void> {
     const schedule =
       typeof target === 'string'
@@ -49,7 +64,17 @@ export class LifecycleGate {
         : target
     if (schedule === null) return
     const { activity, eventId } = await this.sourceOf(schedule)
-    if (scheduleLifecycle(schedule, activity, now) === 'OPEN') return
+    const window = lifecycleWindow(schedule, activity)
+    const endsAt =
+      runsUntil !== undefined && runsUntil > window.endsAt
+        ? runsUntil
+        : window.endsAt
+    const lifecycle = examLifecycle(
+      activity?.status ?? 'ACTIVE',
+      { startsAt: window.startsAt, endsAt },
+      now,
+    )
+    if (lifecycle === 'OPEN') return
     const where = place === undefined ? {} : await place(eventId)
     const room = where.roomName == null ? '' : ` di ${where.roomName}`
     const number =
@@ -57,7 +82,7 @@ export class LifecycleGate {
         ? ''
         : `, nomor peserta ${where.participantNumber}`
     const reason =
-      now.getTime() < lifecycleWindow(schedule, activity).startsAt.getTime()
+      now.getTime() < window.startsAt.getTime()
         ? 'Ujian belum dibuka'
         : 'Waktu ujian sudah berakhir'
     throw new ApiConflictException('WINDOW_CLOSED', `${reason}${room}${number}`)

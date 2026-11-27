@@ -46,9 +46,12 @@ export class SeatFlagService {
       throw new NotFoundException('Siswa tidak terdaftar di ruangan ini')
     }
     const patch = { allowLateEntry: true }
-    const session = (await this.sessions.listByRoom(room.id)).find(
-      (row) => row.studentId === request.studentId,
-    )
+    const session = (await this.sessions.listByRoom(room.id))
+      .filter(
+        (row) =>
+          row.studentId === request.studentId && row.status === 'IN_PROGRESS',
+      )
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())[0]
     if (session === undefined) {
       const flagged = await this.rooms.setSeatFlagsWithAudit(
         room.eventId,

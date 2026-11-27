@@ -705,6 +705,117 @@ describe('allow flags before the session starts', () => {
       ),
     ).resolves.toMatchObject({ sessionId: expect.any(String) })
   })
+
+  function codeAt(f: Fixtures) {
+    return {
+      accessCode: new RoomAccessCodeService(SECRET).codeFor(
+        f.roomA.id,
+        roomRotationOf(f),
+        NOW,
+      ).code,
+      deviceId: 'device-1',
+    }
+  }
+
+  it('flags the current session when an older one shares the room', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, f.schedule.id, {
+      id: 'earlier',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+      status: 'SUBMITTED',
+      startedAt: new Date('2026-11-02T00:00:00.000Z'),
+    })
+    seed(f.sessions, row.id, {
+      id: 'current',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).rejects.toMatchObject({ response: { code: 'LATE_ENTRY_FORBIDDEN' } })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('current')?.allowLateEntry).toBe(true)
+    expect(
+      (await f.rooms.findSeat(f.roomA.eventId, STUDENT_ID))?.allowLateEntry,
+    ).toBe(true)
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).resolves.toMatchObject({ sessionId: 'current' })
+  })
+
+  it('honours a seat flagged after the session was created', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, row.id, {
+      id: 'current',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+    await f.rooms.setSeatFlags(f.roomA.eventId, STUDENT_ID, {
+      allowLateEntry: true,
+    })
+
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).resolves.toMatchObject({ sessionId: 'current' })
+  })
+
+  it('audits on the seat, not on an older finished session, when the current exam has not started', async () => {
+    const f = await setup()
+    await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, f.schedule.id, {
+      id: 'earlier',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+      status: 'SUBMITTED',
+      startedAt: new Date('2026-11-02T00:00:00.000Z'),
+    })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('earlier')?.allowLateEntry).toBe(false)
+    expect(await f.rooms.listAuditLogs('earlier')).toEqual([])
+    expect(await f.rooms.listAuditLogsByRoom(f.roomA.id)).toMatchObject([
+      { action: 'ALLOW_LATE_ENTRY', metadata: { sessionStarted: false } },
+    ])
+    expect(
+      (await f.rooms.findSeat(f.roomA.eventId, STUDENT_ID))?.allowLateEntry,
+    ).toBe(true)
+  })
+
+  it('flags the only session of a student', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, row.id, {
+      id: 'only',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('only')?.allowLateEntry).toBe(true)
+  })
 })
 
 describe('session heartbeat', () => {
@@ -759,7 +870,7 @@ describe('call suspension', () => {
       new FakeSessionFinalizer(),
       f.schedules,
     )
-    return new SuspendSessionUseCase(access, f.sessions, f.rooms)
+    return new SuspendSessionUseCase(access, f.sessions, f.rooms, f.schedules)
   }
 
   const report = (seconds: number) => ({
@@ -828,6 +939,33 @@ describe('call suspension', () => {
     expect(result.deadline).toEqual(session.deadline)
     expect((await f.sessions.findById(session.id))?.extraMinutes).toBe(180)
     expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(1)
+  })
+
+  it('never moves the deadline past the schedule end with repeated calls', async () => {
+    const f = await setup()
+    const scheduleEnd = f.schedules.schedules.get(f.schedule.id)!.endsAt
+    const session = seed(f.sessions, f.schedule.id, {
+      deadline: new Date(scheduleEnd.getTime() - 5 * 60_000),
+      finalizeAt: new Date(scheduleEnd.getTime() + 5 * 60_000),
+    })
+    const useCase = build(f)
+
+    for (let call = 0; call < 12; call += 1) {
+      await useCase.execute(
+        ACTOR,
+        session.id,
+        { reason: 'CALL', seconds: 900, clientId: `call-${call}` },
+        new Date(scheduleEnd.getTime() - 4 * 60_000),
+      )
+    }
+
+    const stored = await f.sessions.findById(session.id)
+    expect(stored?.deadline).toEqual(scheduleEnd)
+    expect(stored?.finalizeAt).toEqual(
+      new Date(scheduleEnd.getTime() + 10 * 60_000),
+    )
+    expect(stored?.extraMinutes).toBe(5)
+    expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(12)
   })
 
   it('refuses a session that is not running', async () => {
@@ -1169,6 +1307,40 @@ describe('resume', () => {
       status: 409,
       response: { code: 'WINDOW_CLOSED' },
     })
+  })
+
+  it('resumes a late start after the activity ends, before its own end', async () => {
+    const f = await setup()
+    const schedule = f.schedules.schedules.get(f.schedule.id)!
+    const activity = await activityFor(f.activities, schedule)
+    const activityEnd = activity.endsAt
+    f.schedules.schedules.set(schedule.id, {
+      ...schedule,
+      activityId: activity.id,
+      endsAt: new Date(activityEnd.getTime() + 60 * 60_000),
+    })
+    const room = f.rooms.rooms.get(f.roomA.id)!
+    const session = seed(f.sessions, f.schedule.id, {
+      roomId: f.roomA.id,
+      requiresTokenReentry: true,
+      deadline: new Date(activityEnd.getTime() + 30 * 60_000),
+      finalizeAt: new Date(activityEnd.getTime() + 40 * 60_000),
+    })
+    const later = new Date(activityEnd.getTime() + 15 * 60_000)
+    const code = new RoomAccessCodeService(SECRET).codeFor(
+      room.id,
+      room.tokenRotation,
+      later,
+    ).code
+
+    const resumed = await build(f).execute(
+      { id: STUDENT_USER.id },
+      session.id,
+      { accessCode: code, deviceId: 'device-1' },
+      later,
+    )
+
+    expect(resumed.session.requiresTokenReentry).toBe(false)
   })
 
   it('refuses to resume before the window opens', async () => {

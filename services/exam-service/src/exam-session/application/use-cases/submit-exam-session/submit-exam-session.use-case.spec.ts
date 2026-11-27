@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common'
+import { FakeExamActivityRepository } from '../../../../exam-activity/application/exam-activity.repository.fake.js'
 import { DEFAULT_POLICIES } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { FakeExamPackageRepository } from '../../../../exam-package/application/exam-package.repository.fake.js'
 import { FakeExamScheduleRepository } from '../../../../exam-schedule/application/exam-schedule.repository.fake.js'
@@ -6,8 +7,10 @@ import { FakeQuestionRepository } from '../../../../question/application/questio
 import type { ExamSchedule } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import { FakeExamSessionRepository } from '../../exam-session.repository.fake.js'
 import {
+  ENDS,
   NOW,
   STUDENT_USER,
+  activityFor,
   choiceSpec,
   schedulePaper,
   sessionFor,
@@ -26,7 +29,10 @@ describe('SubmitExamSessionUseCase', () => {
   let schedule: ExamSchedule
   let questionIds: string[]
 
-  async function setup(count = 1) {
+  async function setup(
+    count = 1,
+    activities = new FakeExamActivityRepository(),
+  ) {
     packages = new FakeExamPackageRepository()
     schedules = new FakeExamScheduleRepository(packages)
     questions = new FakeQuestionRepository()
@@ -44,7 +50,7 @@ describe('SubmitExamSessionUseCase', () => {
       packages,
       questions,
     )
-    const access = sessionAccess(sessions, finalizer, schedules)
+    const access = sessionAccess(sessions, finalizer, schedules, activities)
     const saveBatch = new SaveAnswersBatchUseCase(
       access,
       schedules,
@@ -74,6 +80,47 @@ describe('SubmitExamSessionUseCase', () => {
       answersStored: true,
       serverTime: NOW,
     })
+  })
+
+  it('saves and hands in a late start after the activity ends, before its own end', async () => {
+    const activities = new FakeExamActivityRepository()
+    const { useCase, saveBatch } = await setup(1, activities)
+    const activity = await activityFor(activities, schedule)
+    const extendedEnd = new Date(ENDS.getTime() + 60 * 60_000)
+    schedules.schedules.set(schedule.id, {
+      ...schedule,
+      activityId: activity.id,
+      endsAt: extendedEnd,
+    })
+    sessions.sessions.set(
+      'a',
+      sessionFor(schedule, {
+        id: 'a',
+        startedAt: new Date(ENDS.getTime() - 60 * 60_000),
+        deadline: new Date(ENDS.getTime() + 30 * 60_000),
+        finalizeAt: new Date(ENDS.getTime() + 40 * 60_000),
+      }),
+    )
+    const afterActivity = new Date(ENDS.getTime() + 15 * 60_000)
+
+    await saveBatch.execute(
+      STUDENT_USER,
+      'a',
+      {
+        answers: [
+          { questionId: questionIds[0], clientId: 'c1', answer: { key: 'B' } },
+        ],
+      },
+      afterActivity,
+    )
+    const result = await useCase.execute(
+      STUDENT_USER,
+      'a',
+      { expectedAnswerCount: 1 },
+      afterActivity,
+    )
+
+    expect(result).toMatchObject({ status: 'GRADED', confirmedAnswerCount: 1 })
   })
 
   it('answers the same on a repeat', async () => {
