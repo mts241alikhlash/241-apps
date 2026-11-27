@@ -42,11 +42,12 @@ export class LifecycleGate {
   assertSessionOpen(
     session: Pick<ExamSession, 'scheduleId' | 'status' | 'finalizeAt'>,
     now: Date,
+    place?: (eventId: string | null) => Promise<WindowClosedPlace>,
   ): Promise<void> {
     return this.assertOpen(
       session.scheduleId,
       now,
-      undefined,
+      place,
       session.status === 'IN_PROGRESS' ? session.finalizeAt : undefined,
     )
   }

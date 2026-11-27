@@ -110,9 +110,17 @@ export class StartExamSessionUseCase {
     if (schedule.status !== 'SCHEDULED') {
       throw new ForbiddenException('Jadwal ujian sudah dibatalkan')
     }
-    await this.lifecycle.assertOpen(schedule, now, (eventId) =>
-      this.whereabouts(eventId, studentId, enrollment.semesterId),
+    const existing = await this.sessions.findByScheduleAndStudent(
+      schedule.id,
+      studentId,
     )
+    const place = (eventId: string | null) =>
+      this.whereabouts(eventId, studentId, enrollment.semesterId)
+    if (existing?.status === 'IN_PROGRESS') {
+      await this.lifecycle.assertSessionOpen(existing, now, place)
+    } else {
+      await this.lifecycle.assertOpen(schedule, now, place)
+    }
 
     const policy =
       tryParsePolicy(schedule.activityPolicy) ?? DEFAULT_POLICIES.MIDTERM
@@ -155,10 +163,6 @@ export class StartExamSessionUseCase {
     }
     if (!correct) throw new ForbiddenException('Token ujian salah')
 
-    const existing = await this.sessions.findByScheduleAndStudent(
-      schedule.id,
-      studentId,
-    )
     this.assertLate(
       eventId,
       existing?.allowLateEntry === true || seat?.allowLateEntry === true,
