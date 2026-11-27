@@ -1,5 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common'
 import {
+  choiceSpec,
   FakeParticipantNumber,
   STUDENT_ID,
 } from '../../../exam-session/application/exam-session.test-support.js'
@@ -10,7 +11,9 @@ import {
   CLASSROOM_7A,
   TEACHER,
   build,
+  essaySpec,
   paperWithManual,
+  shortSpec,
   submitted,
 } from '../exam-grading.test-support.js'
 import { GetGradingSessionUseCase } from './get-grading-session/get-grading-session.use-case.js'
@@ -465,6 +468,49 @@ describe('grading queries', () => {
       await expect(
         listScheduleDetails(w).execute(TEACHER, 'missing'),
       ).rejects.toThrow(NotFoundException)
+    })
+  })
+
+  describe('package order', () => {
+    const scrambled = async () => {
+      const w = build()
+      const { schedule } = await paperWithManual(w, [
+        choiceSpec('A'),
+        choiceSpec('B'),
+        shortSpec,
+        essaySpec,
+      ])
+      const original = w.questions.findPinned.bind(w.questions)
+      w.questions.findPinned = async (pins) => (await original(pins)).reverse()
+      submitted(w, schedule, {})
+      return { w, schedule }
+    }
+    const expected = [
+      '<p>Soal 1</p>',
+      '<p>Soal 2</p>',
+      '<p>Soal 3</p>',
+      '<p>Soal 4</p>',
+    ]
+
+    it('lists one session by package position numbered from one', async () => {
+      const { w } = await scrambled()
+
+      const detail = await getSession(w).execute(TEACHER, 'ses-1')
+
+      expect(detail.items.map((item) => item.bodyHtml)).toEqual(expected)
+      expect(detail.items.map((item) => item.number)).toEqual([1, 2, 3, 4])
+    })
+
+    it('lists the batch by package position numbered from one', async () => {
+      const { w, schedule } = await scrambled()
+
+      const [detail] = await listScheduleDetails(w).execute(
+        TEACHER,
+        schedule.id,
+      )
+
+      expect(detail.items.map((item) => item.bodyHtml)).toEqual(expected)
+      expect(detail.items.map((item) => item.number)).toEqual([1, 2, 3, 4])
     })
   })
 })

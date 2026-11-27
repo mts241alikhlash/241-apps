@@ -101,6 +101,9 @@ export function toGradingItem(
   }
 }
 
+export const byPosition = (sources: PaperSource[]): PaperSource[] =>
+  [...sources].sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+
 export function toGradingSessionDetail(
   session: ExamSession,
   sources: PaperSource[],
@@ -121,7 +124,7 @@ export function toGradingSessionDetail(
       rawScore: session.rawScore,
       maxScore: session.maxScore,
     },
-    items: sources.map((source, index) =>
+    items: byPosition(sources).map((source, index) =>
       toGradingItem(source, index + 1, answerOf.get(source.questionId) ?? null),
     ),
   }

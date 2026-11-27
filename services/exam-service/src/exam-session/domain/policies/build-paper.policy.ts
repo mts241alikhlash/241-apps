@@ -13,6 +13,7 @@ export interface PaperSource {
   bodyHtml: string
   content: QuestionContent
   points: number
+  position?: number
   resolution?: ItemResolution
   overrideContent?: QuestionContent | null
 }

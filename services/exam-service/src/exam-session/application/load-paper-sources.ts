@@ -31,6 +31,7 @@ export async function loadPaperSources(
       bodyHtml: question.bodyHtml,
       content: question.content,
       points: question.points,
+      position: item?.position,
       resolution: item?.resolution ?? 'NORMAL',
       overrideContent:
         item?.resolution === 'KEY_OVERRIDE' && item.overrideContent != null
