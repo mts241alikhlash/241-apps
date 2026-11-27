@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
+import excelParseSax from 'exceljs/lib/utils/parse-sax.js'
 import JSZip from 'jszip'
 import { normalizeArchive } from '../../question-import/application/parsers/archive-guard.js'
 import {
@@ -29,6 +30,11 @@ const SPACE = 32
 const ZIP_SIGNATURE = Buffer.from([0x50, 0x4b, 0x03, 0x04])
 const TOO_MANY = `Maksimal ${OFFLINE_IMPORT_MAX_ROWS} baris per berkas`
 const MISMATCH = 'Isi berkas tidak sesuai dengan jenisnya'
+const UNREADABLE = 'Berkas Excel tidak bisa dibaca'
+const SAX_CHUNK = 64 * 1024
+const parseSax = excelParseSax as (
+  chunks: Iterable<string>,
+) => AsyncIterable<unknown[]>
 const ARCHIVE_LIMITS = {
   partBytes: OFFLINE_IMPORT_MAX_BYTES,
   totalBytes: 4 * OFFLINE_IMPORT_MAX_BYTES,
@@ -62,11 +68,25 @@ function headerKey(value: string): string {
   return value.toLowerCase().replace(/[^a-z]/gu, '')
 }
 
-function withoutElements(xml: string, names: string[]): string {
-  const open = new RegExp(
-    `<(?:[\\w.-]+:)?(${names.join('|')})(?=[\\s/>])[^<>]*>`,
-    'gu',
-  )
+const opener = (names: string[]) =>
+  new RegExp(`<(?:[\\w.-]+:)?(${names.join('|')})(?=[\\s/>])[^<>]*>`, 'gu')
+
+async function assertWellFormed(xml: string): Promise<void> {
+  function* chunks() {
+    for (let at = 0; at < xml.length; at += SAX_CHUNK) {
+      yield xml.slice(at, at + SAX_CHUNK)
+    }
+  }
+  try {
+    for await (const events of parseSax(chunks())) events.length = 0
+  } catch {
+    throw new BadRequestException(UNREADABLE)
+  }
+}
+
+async function withoutElements(xml: string, names: string[]): Promise<string> {
+  await assertWellFormed(xml)
+  const open = opener(names)
   let kept = ''
   let from = 0
   for (let found = open.exec(xml); found !== null; found = open.exec(xml)) {
@@ -75,13 +95,13 @@ function withoutElements(xml: string, names: string[]): string {
     if (found[0].endsWith('/>')) continue
     const close = new RegExp(`</(?:[\\w.-]+:)?${found[1]}\\s*>`, 'gu')
     close.lastIndex = from
-    if (close.exec(xml) === null) {
-      throw new BadRequestException('Berkas Excel tidak bisa dibaca')
-    }
+    if (close.exec(xml) === null) throw new BadRequestException(UNREADABLE)
     from = close.lastIndex
     open.lastIndex = from
   }
-  return kept + xml.slice(from)
+  const result = kept + xml.slice(from)
+  if (opener(names).test(result)) throw new BadRequestException(UNREADABLE)
+  return result
 }
 
 async function cellDataOnly(buffer: Buffer): Promise<Buffer> {
@@ -92,10 +112,10 @@ async function cellDataOnly(buffer: Buffer): Promise<Buffer> {
       zip.remove(entry.name)
     } else if (WORKSHEET_PART.test(entry.name)) {
       const xml = await entry.async('string')
-      zip.file(entry.name, withoutElements(xml, LAYOUT_TAGS))
+      zip.file(entry.name, await withoutElements(xml, LAYOUT_TAGS))
     } else if (WORKBOOK_PART.test(entry.name)) {
       const xml = await entry.async('string')
-      zip.file(entry.name, withoutElements(xml, ['definedNames']))
+      zip.file(entry.name, await withoutElements(xml, ['definedNames']))
     }
   }
   return zip.generateAsync({ type: 'nodebuffer' })
@@ -109,7 +129,7 @@ async function readXlsx(buffer: Buffer): Promise<Table> {
   try {
     await book.xlsx.load(checked as unknown as ExcelJS.Buffer)
   } catch {
-    throw new BadRequestException('Berkas Excel tidak bisa dibaca')
+    throw new BadRequestException(UNREADABLE)
   }
   const sheet = book.getWorksheet(SCORE_SHEET_NAME) ?? book.worksheets.at(0)
   if (sheet === undefined) {

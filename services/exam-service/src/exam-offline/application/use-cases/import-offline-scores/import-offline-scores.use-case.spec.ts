@@ -382,6 +382,41 @@ describe('ImportOfflineScoresUseCase', () => {
       '</sheets><defined<definedNames/>Names><definedName name="kecil">Lembar!$A$1:$A$2</definedName></definedNames>',
       /<definedNames[\s>]/u,
     ],
+    [
+      'mergeCells holding cols inside its open tag',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><mergeCells<cols/>><mergeCell ref="C2:C3"/></mergeCells>',
+      /<mergeCells[\s>]/u,
+    ],
+    [
+      'mergeCells holding cols between its attributes',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><mergeCells <cols/>count="1"><mergeCell ref="C2:C3"/></mergeCells>',
+      /<mergeCells[\s>]/u,
+    ],
+    [
+      'cols holding drawing inside its open tag',
+      SHEET,
+      '<sheetData>',
+      '<cols<drawing/>><col min="1" max="3" width="9"/></cols><sheetData>',
+      /<cols[\s>]/u,
+    ],
+    [
+      'dataValidations holding picture between its attributes',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><dataValidations <picture r:id="x"/>count="1"><dataValidation type="whole" sqref="A1:A2"><formula1>0</formula1></dataValidation></dataValidations>',
+      /<dataValidations[\s>]/u,
+    ],
+    [
+      'definedNames holding definedNames inside its open tag',
+      BOOK,
+      '</sheets>',
+      '</sheets><definedNames<definedNames/>><definedName name="kecil">Lembar!$A$1:$A$2</definedName></definedNames>',
+      /<definedNames[\s>]/u,
+    ],
   ])(
     'never joins the text around a stripped element into %s',
     async (_, part, find, add, tag) => {
@@ -417,6 +452,26 @@ describe('ImportOfflineScoresUseCase', () => {
       }
     },
   )
+
+  it('refuses a malformed sheet even when the broken part would be stripped', async () => {
+    const { useCase } = setup()
+    const zip = await JSZip.loadAsync(
+      await xlsx([
+        ['No. Peserta', 'Score'],
+        ['7-001', 40],
+      ]),
+    )
+    await insert(
+      SHEET,
+      '<sheetData>',
+      '<cols><col min="1" <x/></cols><sheetData>',
+    )(zip)
+    const buffer = await zip.generateAsync({ type: 'nodebuffer' })
+
+    await expect(
+      run(useCase, { buffer, originalName: 'nilai.xlsx' }),
+    ).rejects.toThrow(new BadRequestException('Berkas Excel tidak bisa dibaca'))
+  })
 
   it('drops comments, drawings, tables and sheet relationships before ExcelJS reads the workbook', async () => {
     const { result, handed } = await handedToExcel((zip) => {
