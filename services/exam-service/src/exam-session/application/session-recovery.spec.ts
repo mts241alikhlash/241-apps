@@ -705,6 +705,89 @@ describe('allow flags before the session starts', () => {
       ),
     ).resolves.toMatchObject({ sessionId: expect.any(String) })
   })
+
+  function codeAt(f: Fixtures) {
+    return {
+      accessCode: new RoomAccessCodeService(SECRET).codeFor(
+        f.roomA.id,
+        roomRotationOf(f),
+        NOW,
+      ).code,
+      deviceId: 'device-1',
+    }
+  }
+
+  it('flags the current session when an older one shares the room', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, f.schedule.id, {
+      id: 'earlier',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+      status: 'SUBMITTED',
+      startedAt: new Date('2026-11-02T00:00:00.000Z'),
+    })
+    seed(f.sessions, row.id, {
+      id: 'current',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).rejects.toMatchObject({ response: { code: 'LATE_ENTRY_FORBIDDEN' } })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('current')?.allowLateEntry).toBe(true)
+    expect(
+      (await f.rooms.findSeat(f.roomA.eventId, STUDENT_ID))?.allowLateEntry,
+    ).toBe(true)
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).resolves.toMatchObject({ sessionId: 'current' })
+  })
+
+  it('honours a seat flagged after the session was created', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, row.id, {
+      id: 'current',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+    await f.rooms.setSeatFlags(f.roomA.eventId, STUDENT_ID, {
+      allowLateEntry: true,
+    })
+
+    await expect(
+      startUseCase(f).execute(STUDENT_USER, row.id, codeAt(f), NOW),
+    ).resolves.toMatchObject({ sessionId: 'current' })
+  })
+
+  it('flags the only session of a student', async () => {
+    const f = await setup()
+    const row = await eventSchedule(f, new Date('2026-11-02T01:00:00.000Z'))
+    await seatOnly(f)
+    seed(f.sessions, row.id, {
+      id: 'only',
+      roomId: f.roomA.id,
+      seatNumber: 1,
+    })
+
+    await new AllowLateEntryUseCase(flagsOf(f)).execute(TECH_A, {
+      roomId: f.roomA.id,
+      studentId: STUDENT_ID,
+      reason: 'Terjebak macet di jalan',
+    })
+
+    expect(f.sessions.sessions.get('only')?.allowLateEntry).toBe(true)
+  })
 })
 
 describe('session heartbeat', () => {

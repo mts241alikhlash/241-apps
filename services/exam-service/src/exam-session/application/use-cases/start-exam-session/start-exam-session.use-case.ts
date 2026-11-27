@@ -161,7 +161,7 @@ export class StartExamSessionUseCase {
     )
     this.assertLate(
       eventId,
-      existing ?? seat,
+      existing?.allowLateEntry === true || seat?.allowLateEntry === true,
       now,
       schedule.startsAt,
       policy.lateToleranceMinutes,
@@ -238,7 +238,7 @@ export class StartExamSessionUseCase {
 
   private assertLate(
     eventId: string | null,
-    seat: { allowLateEntry: boolean } | null,
+    allowLateEntry: boolean,
     now: Date,
     scheduleStartsAt: Date,
     lateToleranceMinutes: number,
@@ -249,7 +249,7 @@ export class StartExamSessionUseCase {
       now,
       scheduleStartsAt,
       lateToleranceMinutes,
-      allowLateEntry: seat?.allowLateEntry ?? false,
+      allowLateEntry,
       startedAt,
     })
   }
