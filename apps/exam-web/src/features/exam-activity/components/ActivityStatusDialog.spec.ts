@@ -205,4 +205,91 @@ describe('ActivityStatusDialog', () => {
     expect(wrapper.emitted('update:open')).toBeUndefined()
     wrapper.unmount()
   })
+
+  describe('auto status warnings', () => {
+    const minutes = (offset: number) =>
+      new Date(Date.now() + offset * 60_000).toISOString()
+    const auto = (overrides: Partial<ExamActivityRecord> = {}) =>
+      activity({
+        status: 'DRAFT',
+        deliveryMode: 'ONLINE',
+        autoStatus: true,
+        policy: {
+          autoOpenLeadMinutes: 5,
+          autoCloseGraceMinutes: 15,
+        } as ExamActivityRecord['policy'],
+        startsAt: minutes(-10),
+        endsAt: minutes(60),
+        ...overrides,
+      })
+    const choose = async (wrapper: ReturnType<typeof open>, status: string) => {
+      await wrapper
+        .get('[data-field="status"]')
+        .findComponent({ name: 'SelectStub' })
+        .vm.$emit('update:modelValue', status)
+      await flushPromises()
+    }
+    const OPENS =
+      'Status otomatis aktif: kegiatan akan dibuka otomatis dalam satu menit'
+    const CLOSES =
+      'Status otomatis aktif: kegiatan akan ditutup lagi otomatis dalam satu menit'
+
+    it('warns that scheduling inside the window opens the activity', async () => {
+      const wrapper = open(auto())
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it('warns within the open lead before the start', async () => {
+      const wrapper = open(auto({ startsAt: minutes(3), endsAt: minutes(60) }))
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it.each([
+      ['auto status is off', { autoStatus: false }],
+      ['the activity is offline', { deliveryMode: 'OFFLINE' as const }],
+      ['no package is attached', { packageId: null }],
+      ['the open lead has not come', { startsAt: minutes(30) }],
+    ])('stays quiet when %s', async (_, overrides) => {
+      const wrapper = open(auto(overrides))
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).not.toContain('Status otomatis aktif')
+      wrapper.unmount()
+    })
+
+    it('warns that activating past the end and grace closes it again', async () => {
+      const wrapper = open(
+        auto({
+          status: 'CLOSED',
+          startsAt: minutes(-180),
+          endsAt: minutes(-120),
+        }),
+      )
+      await choose(wrapper, 'ACTIVE')
+
+      expect(wrapper.text()).toContain(CLOSES)
+      expect(wrapper.text()).not.toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it('stays quiet when activating within the grace', async () => {
+      const wrapper = open(
+        auto({
+          status: 'CLOSED',
+          startsAt: minutes(-70),
+          endsAt: minutes(-10),
+        }),
+      )
+      await choose(wrapper, 'ACTIVE')
+
+      expect(wrapper.text()).not.toContain('Status otomatis aktif')
+      wrapper.unmount()
+    })
+  })
 })

@@ -114,6 +114,29 @@ const opensAfter = computed(
     windowState.value === 'after',
 )
 
+const MINUTE_MS = 60_000
+
+const autoWarning = computed(() => {
+  const item = props.activity
+  if (!item?.autoStatus) return null
+  const now = Date.now()
+  const startsAt = new Date(item.startsAt).getTime()
+  const endsAt = new Date(item.endsAt).getTime()
+  const closeAt = endsAt + item.policy.autoCloseGraceMinutes * MINUTE_MS
+  if (values.status === 'ACTIVE' && now >= closeAt) {
+    return 'Status otomatis aktif: kegiatan akan ditutup lagi otomatis dalam satu menit.'
+  }
+  const opens =
+    values.status === 'SCHEDULED' &&
+    !isOffline.value &&
+    item.packageId !== null &&
+    now >= startsAt - item.policy.autoOpenLeadMinutes * MINUTE_MS &&
+    now < endsAt
+  return opens
+    ? 'Status otomatis aktif: kegiatan akan dibuka otomatis dalam satu menit.'
+    : null
+})
+
 const onSubmit = handleSubmit(async (form) => {
   const item = props.activity
   if (item === null) return
@@ -184,6 +207,9 @@ const onSubmit = handleSubmit(async (form) => {
             Kegiatan belum waktunya. Siswa baru bisa masuk saat jendela waktu
             dibuka.
           </AlertDescription>
+        </Alert>
+        <Alert v-if="autoWarning">
+          <AlertDescription>{{ autoWarning }}</AlertDescription>
         </Alert>
 
         <form

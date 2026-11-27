@@ -91,14 +91,36 @@ const endClock = computed(() =>
     .replace('.', ':'),
 )
 
-const subjects = computed(() =>
+const subjectsOf = (
+  rows: RoomReport['schedules'],
+  label: (row: RoomReport['schedules'][number], name: string) => string,
+) =>
   [
     ...new Set(
-      props.report.schedules
-        .map((row) => row.subjectName ?? row.packageTitle)
-        .filter((name): name is string => name !== null),
+      rows.flatMap((row) => {
+        const name = row.subjectName ?? row.packageTitle
+        return name === null ? [] : [label(row, name)]
+      }),
     ),
-  ].join(', '),
+  ].join(', ')
+
+const offlineWords = { WRITTEN: 'tertulis', PRACTICAL: 'praktik' } as const
+
+const onlineSubjects = computed(() =>
+  subjectsOf(
+    props.report.schedules.filter((row) => row.deliveryMode !== 'OFFLINE'),
+    (_, name) => name,
+  ),
+)
+
+const offlineSubjects = computed(() =>
+  subjectsOf(
+    props.report.schedules.filter((row) => row.deliveryMode === 'OFFLINE'),
+    (row, name) =>
+      row.offlineKind === null
+        ? name
+        : `${name} (${offlineWords[row.offlineKind]})`,
+  ),
 )
 
 const kindLabels = { WRITTEN: 'Written', PRACTICAL: 'Practical' } as const
@@ -214,11 +236,21 @@ const registeredWord = computed(() => spell(registered.value))
         </tbody>
       </table>
 
-      <p class="text-justify leading-relaxed">
+      <p
+        v-if="onlineSubjects"
+        class="text-justify leading-relaxed"
+      >
         Ujian dilaksanakan menggunakan aplikasi ujian madrasah. Peserta
-        mengerjakan ujian mata pelajaran {{ subjects }} melalui akun
+        mengerjakan ujian mata pelajaran {{ onlineSubjects }} melalui akun
         masing-masing dan mengumpulkan jawaban secara daring. Token ujian
         diumumkan oleh pengawas ruangan pada saat ujian dimulai.
+      </p>
+      <p
+        v-if="offlineSubjects"
+        class="text-justify leading-relaxed"
+      >
+        Ujian mata pelajaran {{ offlineSubjects }} dilaksanakan secara luring
+        tanpa aplikasi.
       </p>
 
       <section class="space-y-1">

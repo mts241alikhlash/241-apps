@@ -5,6 +5,22 @@ import { defineComponent } from 'vue'
 import { floatingFieldStub } from '@/test-support/floatingFieldStub'
 import ActivityForm from './ActivityForm.vue'
 
+const presetList = vi.hoisted(() =>
+  vi.fn(() => Promise.resolve([] as unknown[])),
+)
+vi.mock('@/features/exam-preset/api/examPresetApi', () => ({
+  examPresetApi: { list: presetList },
+}))
+
+const preset = (type: string, open: number, close: number, late: number) => ({
+  type,
+  policy: {
+    autoOpenLeadMinutes: open,
+    autoCloseGraceMinutes: close,
+    lateToleranceMinutes: late,
+  },
+})
+
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const button = defineComponent({
   props: { variant: String, disabled: Boolean, type: String },
@@ -259,12 +275,44 @@ describe('ActivityForm delivery mode', () => {
     wrapper.unmount()
   })
 
-  it('states the effective timings as numbers', () => {
+  it('states the timings of the preset of the chosen type', async () => {
+    presetList.mockResolvedValueOnce([
+      preset('DAILY', 7, 20, 25),
+      preset('ASSIGNMENT', 3, 10, 12),
+    ])
     const wrapper = open()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('7 menit sebelum mulai')
+    expect(wrapper.text()).toContain('20 menit setelah selesai')
+    expect(wrapper.text()).toContain('Toleransi terlambat 25 menit')
+    expect(wrapper.text()).not.toContain('nilai bawaan')
+
+    await emitFrom(wrapper, 'presetName', 'SelectStub', 'ASSIGNMENT')
+
+    expect(wrapper.text()).toContain('3 menit sebelum mulai')
+    expect(wrapper.text()).toContain('Toleransi terlambat 12 menit')
+    wrapper.unmount()
+  })
+
+  it('labels the code defaults when the chosen type has no stored preset', async () => {
+    presetList.mockResolvedValueOnce([preset('ASSIGNMENT', 3, 10, 12)])
+    const wrapper = open()
+    await flushPromises()
 
     expect(wrapper.text()).toContain('5 menit sebelum mulai')
     expect(wrapper.text()).toContain('15 menit setelah selesai')
-    expect(wrapper.text()).toContain('Toleransi terlambat 15 menit')
+    expect(wrapper.text()).toContain('nilai bawaan')
+    wrapper.unmount()
+  })
+
+  it('shows no numbers and points to the detail page when the presets cannot be loaded', async () => {
+    presetList.mockRejectedValueOnce(new Error('forbidden'))
+    const wrapper = open()
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('menit sebelum mulai')
+    expect(wrapper.text()).toContain('halaman detail kegiatan')
     wrapper.unmount()
   })
 })

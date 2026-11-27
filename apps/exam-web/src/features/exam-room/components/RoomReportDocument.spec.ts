@@ -123,4 +123,56 @@ describe('RoomReportDocument', () => {
 
     expect(wrapper.find('tr[data-row]').text()).toContain('Prakarya')
   })
+
+  const offlineRow = (
+    subjectName: string,
+    offlineKind: 'WRITTEN' | 'PRACTICAL',
+  ) => ({
+    ...row(subjectName, 'g7'),
+    deliveryMode: 'OFFLINE' as const,
+    offlineKind,
+    startedCount: null,
+    submittedCount: null,
+  })
+
+  const ONLINE_SENTENCE = (subjects: string) =>
+    `Ujian dilaksanakan menggunakan aplikasi ujian madrasah. Peserta mengerjakan ujian mata pelajaran ${subjects} melalui akun masing-masing dan mengumpulkan jawaban secara daring. Token ujian diumumkan oleh pengawas ruangan pada saat ujian dimulai.`
+
+  const paragraphs = (wrapper: ReturnType<typeof mountRows>) =>
+    wrapper.findAll('p').map((node) => node.text().replace(/\s+/g, ' '))
+
+  it('keeps the app and token sentence for an all-online room', () => {
+    const texts = paragraphs(
+      mountRows([row('Fiqih', 'g7'), row('Akidah Akhlak', 'g8')]),
+    )
+
+    expect(texts).toContain(ONLINE_SENTENCE('Fiqih, Akidah Akhlak'))
+    expect(texts.join(' ')).not.toContain('luring')
+  })
+
+  it('drops the app and token sentence for an all-offline room', () => {
+    const texts = paragraphs(
+      mountRows([
+        offlineRow('Tafsir', 'WRITTEN'),
+        offlineRow('Prakarya', 'PRACTICAL'),
+      ]),
+    )
+
+    expect(texts.join(' ')).not.toContain('aplikasi ujian madrasah')
+    expect(texts.join(' ')).not.toContain('Token')
+    expect(texts).toContain(
+      'Ujian mata pelajaran Tafsir (tertulis), Prakarya (praktik) dilaksanakan secara luring tanpa aplikasi.',
+    )
+  })
+
+  it('names online and offline subjects apart in a mixed room', () => {
+    const texts = paragraphs(
+      mountRows([row('Fiqih', 'g7'), offlineRow('Tafsir', 'WRITTEN')]),
+    )
+
+    expect(texts).toContain(ONLINE_SENTENCE('Fiqih'))
+    expect(texts).toContain(
+      'Ujian mata pelajaran Tafsir (tertulis) dilaksanakan secara luring tanpa aplikasi.',
+    )
+  })
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
@@ -45,6 +45,10 @@ import {
   type ExamCategory,
   type ExamType,
 } from '@/features/exam-shared/examType'
+import {
+  examPresetApi,
+  type ExamPolicyPreset,
+} from '@/features/exam-preset/api/examPresetApi'
 import type {
   ActivityCreatePayload,
   ActivityTokenMode,
@@ -229,6 +233,25 @@ const { handleSubmit, values, setFieldValue } = useForm({
 const isExamType = computed(
   () => categoryOf(values.type as ExamType) === 'EXAM',
 )
+
+const presets = ref<ExamPolicyPreset[] | null>(null)
+
+onMounted(async () => {
+  try {
+    presets.value = await examPresetApi.list()
+  } catch {
+    presets.value = null
+  }
+})
+
+const presetTimings = computed(() => {
+  if (presets.value === null) return null
+  const chosen = isExamType.value ? values.type : values.presetName
+  const policy = presets.value.find((row) => row.type === chosen)?.policy
+  return policy === undefined
+    ? { ...ACTIVITY_POLICY_DEFAULTS, fallback: true }
+    : { ...policy, fallback: false }
+})
 
 const filteredEvents = computed(() =>
   (props.events ?? []).filter((event) => event.type === values.type),
@@ -853,13 +876,26 @@ const onSubmit = handleSubmit((form) => {
         />
         <span>Auto status</span>
       </label>
-      <p class="text-control text-muted-foreground">
+      <p
+        v-if="presetTimings"
+        class="text-control text-muted-foreground"
+      >
         Status berubah sendiri: kegiatan dibuka
-        {{ ACTIVITY_POLICY_DEFAULTS.autoOpenLeadMinutes }} menit sebelum mulai
-        dan ditutup {{ ACTIVITY_POLICY_DEFAULTS.autoCloseGraceMinutes }} menit
-        setelah selesai. Toleransi terlambat
-        {{ ACTIVITY_POLICY_DEFAULTS.lateToleranceMinutes }} menit. Angka ini
-        berlaku untuk kegiatan baru dan bisa diubah di kebijakan kegiatan.
+        {{ presetTimings.autoOpenLeadMinutes }} menit sebelum mulai dan ditutup
+        {{ presetTimings.autoCloseGraceMinutes }} menit setelah selesai.
+        Toleransi terlambat {{ presetTimings.lateToleranceMinutes }} menit.
+        {{
+          presetTimings.fallback
+            ? 'Angka ini nilai bawaan karena preset jenis ini belum tersimpan.'
+            : 'Angka ini diambil dari preset kebijakan jenis yang dipilih dan bisa diubah di kebijakan kegiatan.'
+        }}
+      </p>
+      <p
+        v-else
+        class="text-control text-muted-foreground"
+      >
+        Status berubah sendiri mengikuti preset kebijakan jenis yang dipilih.
+        Angkanya tampil di halaman detail kegiatan setelah kegiatan dibuat.
       </p>
     </div>
   </form>
