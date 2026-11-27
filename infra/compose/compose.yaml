@@ -252,6 +252,10 @@ services:
   exam-service:
     <<: *service-defaults
     image: ghcr.io/mts241alikhlash/exam-service@sha256:177c860bd2d4a46d59f4669f49a776eff6f2389d9274b3e3b492578005c15345
+    mem_limit: 768m
+    environment:
+      TRUST_PROXY: '${TRUST_PROXY:-1}'
+      NODE_OPTIONS: '--max-old-space-size=576'
     env_file:
       - path: env/exam-service.env
     expose:
