@@ -78,10 +78,10 @@
       "host": "exam.localhost",
       "sslHost": "exam.mts241alikhlash.sch.id",
       "root": "/usr/share/nginx/html/exam",
-      "webVersion": "0.9.2",
-      "webImage": "ghcr.io/mts241alikhlash/exam-web@sha256:c7c533d4886819da2c88b581e0db69ce439ed42c2d71bc4ad2c75e5b1821227f",
-      "routesVersion": "0.9.2",
-      "routesSha256": "fa1264d6272032a819549b03f821265b5d5505bb580bfc23326eb9ab41ce3904"
+      "webVersion": "0.9.3",
+      "webImage": "ghcr.io/mts241alikhlash/exam-web@sha256:85f5b72c244dbaef1bd405a30cb520e26ce262657e7b3d9f86583846963ce1e1",
+      "routesVersion": "0.9.3",
+      "routesSha256": "25b8dd6e37b50110ca0dca091df9d57e1392d568bc29088b57a710b8fccae5cc"
     }
   },
   "services": {
@@ -140,8 +140,8 @@
       "healthPath": "/health"
     },
     "exam": {
-      "version": "0.9.2",
-      "image": "ghcr.io/mts241alikhlash/exam-service@sha256:588587e09fc5d36e8177045f35ff5998e482d07b2a7dee3a70f25700847ad746",
+      "version": "0.9.3",
+      "image": "ghcr.io/mts241alikhlash/exam-service@sha256:177c860bd2d4a46d59f4669f49a776eff6f2389d9274b3e3b492578005c15345",
       "upstream": "exam-service:4100",
       "healthPath": "/health"
     }
