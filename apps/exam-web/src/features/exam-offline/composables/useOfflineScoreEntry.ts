@@ -1,4 +1,4 @@
-import { computed, reactive, ref, type Ref } from 'vue'
+import { computed, nextTick, reactive, ref, type Ref } from 'vue'
 import { examOfflineService } from '../services/examOfflineService'
 import {
   SCORE_PUBLISHED_CODE,
@@ -6,7 +6,7 @@ import {
   type OfflineSchedule,
   type SaveOfflineScorePayload,
 } from '../types'
-import { parseScore, pastedLines } from '../utils/score'
+import { parseScore, pastedColumn } from '../utils/score'
 
 export type RowStatus = 'idle' | 'saving' | 'saved' | 'invalid' | 'error'
 
@@ -21,6 +21,10 @@ export interface RowDraft {
 }
 
 const SAVE_DELAY_MS = 300
+
+const NUMBER_LINE = /^-?\d+([.,]\d+)?$/
+
+const HEADER_LINE = /^(score|nilai|skor)$/i
 
 const scoreText = (value: number | null) =>
   value === null ? '' : String(value).replace('.', ',')
@@ -104,14 +108,28 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
     }
   }
 
+  function edited(studentId: string) {
+    if (rowStates[studentId]?.status === 'saved') setState(studentId, 'idle')
+  }
+
   function setScore(studentId: string, text: string) {
     const draft = drafts[studentId]
-    if (draft) draft.score = text
+    if (!draft) return
+    draft.score = text
+    edited(studentId)
   }
 
   function setNote(studentId: string, text: string) {
     const draft = drafts[studentId]
-    if (draft) draft.note = text
+    if (!draft) return
+    draft.note = text
+    edited(studentId)
+  }
+
+  async function announce(message: string) {
+    lastError.value = ''
+    await nextTick()
+    lastError.value = message
   }
 
   function payloadOf(
@@ -159,20 +177,26 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
     )
     inFlight.delete(studentId)
     if (result.success) {
+      again.delete(studentId)
       rows.value = rows.value.map((item) =>
         item.studentId === studentId ? result.data : item,
       )
       const draft = drafts[studentId]
       if (draft.score === sent.score && draft.note === sent.note) {
         adopt(result.data)
+        setState(studentId, 'saved')
+      } else {
+        setState(studentId, 'idle')
+        commit(studentId)
       }
-      setState(studentId, 'saved')
-    } else {
-      const row = rowOf(studentId)
-      if (result.code === SCORE_PUBLISHED_CODE && row) adopt(row)
-      setState(studentId, 'error', result.error)
-      lastError.value = `${row?.name ?? 'Siswa'}: ${result.error}`
+      return
     }
+    const row = rowOf(studentId)
+    if (result.code === SCORE_PUBLISHED_CODE && row) {
+      drafts[studentId].score = scoreText(row.rawScore)
+    }
+    setState(studentId, 'error', result.error)
+    await announce(`${row?.name ?? 'Siswa'}: ${result.error}`)
     if (again.delete(studentId)) await save(studentId)
   }
 
@@ -198,29 +222,42 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
   }
 
   function paste(studentId: string, text: string): string {
-    const lines = pastedLines(text)
-    const start = rows.value.findIndex((item) => item.studentId === studentId)
-    const targets = rows.value
-      .slice(Math.max(start, 0))
-      .filter((item) => item.state !== 'ABSENT')
+    const column = pastedColumn(text)
+    if (!column.ok) return column.error
+    const lines = [...column.lines]
+    while (lines.length > 0 && HEADER_LINE.test(lines[0])) lines.shift()
+    const start = Math.max(
+      rows.value.findIndex((item) => item.studentId === studentId),
+      0,
+    )
     let applied = 0
-    let skipped = 0
-    let next = 0
-    for (const line of lines) {
-      if (line !== '' && !/^-?\d+([.,]\d+)?$/.test(line)) {
-        skipped += 1
-        continue
+    let notNumber = 0
+    let empty = 0
+    let onAbsent = 0
+    let overflow = 0
+    lines.forEach((line, index) => {
+      const target = rows.value[start + index]
+      const numeric = NUMBER_LINE.test(line)
+      if (target === undefined) {
+        if (numeric) overflow += 1
+      } else if (target.state === 'ABSENT') {
+        if (numeric) onAbsent += 1
+      } else if (line === '') {
+        empty += 1
+      } else if (!numeric) {
+        notNumber += 1
+      } else {
+        setScore(target.studentId, line)
+        applied += 1
+        commit(target.studentId)
       }
-      const target = targets[next]
-      next += 1
-      if (target === undefined || line === '') continue
-      setScore(target.studentId, line)
-      applied += 1
-      commit(target.studentId)
-    }
-    const overflow = Math.max(next - targets.length, 0)
+    })
     const parts = [`${applied} nilai ditempel`]
-    if (skipped > 0) parts.push(`${skipped} baris bukan angka dilewati`)
+    if (notNumber > 0) parts.push(`${notNumber} baris bukan angka dilewati`)
+    if (empty > 0) parts.push(`${empty} baris kosong dilewati`)
+    if (onAbsent > 0) {
+      parts.push(`${onAbsent} nilai jatuh pada siswa tidak hadir dilewati`)
+    }
     if (overflow > 0) {
       parts.push(`${overflow} nilai melebihi jumlah siswa tidak dipakai`)
     }
@@ -246,6 +283,16 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
     rows.value.filter((item) => item.state === 'MISSING'),
   )
 
+  const blockingRows = computed(() =>
+    rows.value.filter((item) => {
+      const status = rowStates[item.studentId]?.status
+      return (
+        status === 'invalid' ||
+        (status === 'error' && payloadOf(item.studentId) !== null)
+      )
+    }),
+  )
+
   const absentSentRows = computed(() =>
     rows.value.filter(
       (item) => item.state === 'ABSENT' && item.publication === 'SENT',
@@ -264,6 +311,7 @@ export function useOfflineScoreEntry(scheduleId: Ref<string>) {
     counts,
     missingRows,
     absentSentRows,
+    blockingRows,
     load,
     reloadRoster,
     setScore,

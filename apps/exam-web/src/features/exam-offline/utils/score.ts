@@ -19,10 +19,14 @@ export function parseScore(text: string, maxScore: number): ParsedScore {
   return { ok: true, value: score }
 }
 
-export function pastedLines(text: string): string[] {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => (line.split('\t')[0] ?? '').trim())
+export const SINGLE_COLUMN_ERROR = 'Tempel satu kolom nilai saja.'
+
+export type PastedColumn =
+  { ok: true; lines: string[] } | { ok: false; error: string }
+
+export function pastedColumn(text: string): PastedColumn {
+  if (text.includes('\t')) return { ok: false, error: SINGLE_COLUMN_ERROR }
+  const lines = text.split(/\r?\n/).map((line) => line.trim())
   while (lines.length > 0 && lines[lines.length - 1] === '') lines.pop()
-  return lines
+  return { ok: true, lines }
 }

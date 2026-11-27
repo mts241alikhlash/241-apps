@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseScore, pastedLines } from './score'
+import { parseScore, pastedColumn } from './score'
 
 describe('parseScore', () => {
   it('reads whole numbers and both decimal separators', () => {
@@ -31,15 +31,37 @@ describe('parseScore', () => {
       ok: false,
       error: 'Nilai paling banyak dua angka desimal',
     })
+    expect(parseScore('1,000', 50)).toEqual({
+      ok: false,
+      error: 'Nilai paling banyak dua angka desimal',
+    })
+    expect(parseScore('1e1', 50)).toEqual({
+      ok: false,
+      error: 'Nilai harus berupa angka',
+    })
+    expect(parseScore('.5', 50)).toEqual({
+      ok: false,
+      error: 'Nilai harus berupa angka',
+    })
+    expect(parseScore('-0', 50)).toEqual({
+      ok: false,
+      error: 'Nilai tidak boleh kurang dari 0',
+    })
   })
 })
 
-describe('pastedLines', () => {
+describe('pastedColumn', () => {
   it('splits a pasted column and drops the trailing blank lines', () => {
-    expect(pastedLines('40\r\n7,5\n\n41\n\n')).toEqual(['40', '7,5', '', '41'])
+    expect(pastedColumn('40\r\n7,5\n\n41\n\n')).toEqual({
+      ok: true,
+      lines: ['40', '7,5', '', '41'],
+    })
   })
 
-  it('keeps only the first cell of a pasted row', () => {
-    expect(pastedLines('40\tbaik\n41\t')).toEqual(['40', '41'])
+  it('refuses more than one column', () => {
+    expect(pastedColumn('40\tbaik\n41\t')).toEqual({
+      ok: false,
+      error: 'Tempel satu kolom nilai saja.',
+    })
   })
 })

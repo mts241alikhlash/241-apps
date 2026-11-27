@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { effectScope, ref } from 'vue'
+import { effectScope, ref, watch } from 'vue'
 import type { OfflineRosterRow, OfflineSchedule } from '../types'
 
 const { service } = vi.hoisted(() => ({
@@ -214,9 +214,9 @@ describe('useOfflineScoreEntry', () => {
     expect(service.save).not.toHaveBeenCalled()
   })
 
-  it('fills consecutive rows from a pasted column, skipping absent students and text', async () => {
+  it('maps each pasted line to the row at the same position, absent rows included', async () => {
     const entry = await setup()
-    const summary = entry.paste('a', '41\n42\nSkor\n43,5\n')
+    const summary = entry.paste('a', '41\nTIDAK HADIR\n42\n43,5\n')
     await vi.runAllTimersAsync()
 
     expect(entry.drafts.a.score).toBe('41')
@@ -228,20 +228,85 @@ describe('useOfflineScoreEntry', () => {
       ['s1', 'c', { rawScore: 42 }],
       ['s1', 'd', { rawScore: 43.5 }],
     ])
-    expect(summary).toBe('3 nilai ditempel, 1 baris bukan angka dilewati.')
+    expect(summary).toBe('3 nilai ditempel.')
+  })
+
+  it('lines up the Score column of the downloaded sheet, header included', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', 'Score\n41\nTIDAK HADIR\n42\n43')
+    await vi.runAllTimersAsync()
+    expect(['a', 'b', 'c', 'd'].map((id) => entry.drafts[id].score)).toEqual([
+      '41',
+      '',
+      '42',
+      '43',
+    ])
+    expect(summary).toBe('3 nilai ditempel.')
+  })
+
+  it('lets a non-numeric cell use up the row of its student (case A)', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', '41\nTIDAK HADIR\n-\n43')
+    await vi.runAllTimersAsync()
+    expect(entry.drafts.c.score).toBe('')
+    expect(entry.drafts.d.score).toBe('43')
+    expect(service.save.mock.calls).toEqual([
+      ['s1', 'a', { rawScore: 41 }],
+      ['s1', 'd', { rawScore: 43 }],
+    ])
+    expect(summary).toBe('2 nilai ditempel, 1 baris bukan angka dilewati.')
+  })
+
+  it('lets a blank cell use up the row of an absent student (case B)', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', '41\n\n42\n43')
+    await vi.runAllTimersAsync()
+    expect(['a', 'b', 'c', 'd'].map((id) => entry.drafts[id].score)).toEqual([
+      '41',
+      '',
+      '42',
+      '43',
+    ])
+    expect(summary).toBe('3 nilai ditempel.')
+  })
+
+  it('refuses a paste of more than one column (case C)', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', '1\t41\n2\t42\n3\t43')
+    await vi.runAllTimersAsync()
+    expect(summary).toBe('Tempel satu kolom nilai saja.')
+    expect(entry.drafts.a.score).toBe('40')
+    expect(entry.drafts.c.score).toBe('')
+    expect(service.save).not.toHaveBeenCalled()
+  })
+
+  it('says when a number falls on an absent student and does not use it', async () => {
+    const entry = await setup()
+    const summary = entry.paste('a', '41\n50\n42')
+    await vi.runAllTimersAsync()
+    expect(entry.drafts.b.score).toBe('')
+    expect(entry.drafts.c.score).toBe('42')
+    expect(summary).toBe(
+      '2 nilai ditempel, 1 nilai jatuh pada siswa tidak hadir dilewati.',
+    )
   })
 
   it('leaves a row unchanged for a blank pasted line and flags an out-of-range one', async () => {
     const entry = await setup()
-    const summary = entry.paste('a', '\n99\n20')
+    const summary = entry.paste('c', '\n20')
     await vi.runAllTimersAsync()
+    expect(entry.drafts.c.score).toBe('')
+    expect(entry.drafts.d.score).toBe('20')
+    expect(summary).toBe('1 nilai ditempel, 1 baris kosong dilewati.')
 
-    expect(entry.drafts.a.score).toBe('40')
+    entry.paste('c', '99\n21')
+    await vi.runAllTimersAsync()
     expect(entry.drafts.c.score).toBe('99')
     expect(entry.rowStates.c.status).toBe('invalid')
-    expect(entry.drafts.d.score).toBe('20')
-    expect(service.save.mock.calls).toEqual([['s1', 'd', { rawScore: 20 }]])
-    expect(summary).toBe('2 nilai ditempel.')
+    expect(service.save.mock.calls).toEqual([
+      ['s1', 'd', { rawScore: 20 }],
+      ['s1', 'd', { rawScore: 21 }],
+    ])
   })
 
   it('counts pasted values that do not fit below the last student', async () => {
@@ -252,5 +317,109 @@ describe('useOfflineScoreEntry', () => {
     expect(summary).toBe(
       '1 nilai ditempel, 2 nilai melebihi jumlah siswa tidak dipakai.',
     )
+  })
+
+  it('sends the stored value again when it is typed back while a save is under way', async () => {
+    let answer: (value: unknown) => void = () => undefined
+    service.save.mockImplementationOnce(
+      () => new Promise((resolve) => (answer = resolve)),
+    )
+    const entry = await setup()
+    entry.setScore('a', '45')
+    entry.commit('a')
+    await vi.advanceTimersByTimeAsync(400)
+    expect(service.save).toHaveBeenCalledTimes(1)
+
+    entry.setScore('a', '40')
+    entry.commit('a')
+    answer({
+      success: true,
+      data: row({
+        studentId: 'a',
+        state: 'SCORED',
+        rawScore: 45,
+        note: 'rapi',
+      }),
+    })
+    await vi.runAllTimersAsync()
+
+    expect(service.save).toHaveBeenLastCalledWith('s1', 'a', { rawScore: 40 })
+    expect(entry.rows.value[0].rawScore).toBe(40)
+    expect(entry.drafts.a.score).toBe('40')
+  })
+
+  it('clears the saved mark as soon as the row is edited again', async () => {
+    const entry = await setup()
+    entry.setScore('c', '30')
+    entry.commit('c')
+    await vi.runAllTimersAsync()
+    expect(entry.rowStates.c.status).toBe('saved')
+    entry.setScore('c', '31')
+    expect(entry.rowStates.c.status).toBe('idle')
+    entry.commit('c')
+    await vi.runAllTimersAsync()
+    entry.setNote('c', 'baik')
+    expect(entry.rowStates.c.status).toBe('idle')
+  })
+
+  it('restores only the score, not the note, when a sent score is cleared', async () => {
+    service.save.mockResolvedValueOnce({
+      success: false,
+      error: 'Nilai sudah terkirim; ganti dengan nilai baru',
+      code: 'OFFLINE_SCORE_PUBLISHED',
+    })
+    const entry = await setup()
+    entry.setScore('a', '')
+    entry.setNote('a', 'remedial')
+    entry.commit('a')
+    await vi.runAllTimersAsync()
+    expect(entry.drafts.a).toEqual({ score: '40', note: 'remedial' })
+  })
+
+  it('announces the same error again when it repeats', async () => {
+    service.save.mockResolvedValue({
+      success: false,
+      error: 'Gagal menyimpan nilai.',
+    })
+    const entry = await setup()
+    const heard: string[] = []
+    watch(entry.lastError, (value) => heard.push(value), { flush: 'sync' })
+    entry.setScore('c', '30')
+    entry.commit('c')
+    await vi.runAllTimersAsync()
+    entry.setScore('c', '31')
+    entry.commit('c')
+    await vi.runAllTimersAsync()
+    expect(heard).toEqual([
+      'Citra: Gagal menyimpan nilai.',
+      '',
+      'Citra: Gagal menyimpan nilai.',
+    ])
+  })
+
+  it('lists the rows that block sending: invalid, or failed and not stored', async () => {
+    service.save.mockResolvedValueOnce({
+      success: false,
+      error: 'Gagal menyimpan nilai.',
+    })
+    const entry = await setup()
+    entry.setScore('c', '30')
+    entry.commit('c')
+    entry.setScore('d', 'abc')
+    entry.commit('d')
+    await vi.runAllTimersAsync()
+    expect(entry.blockingRows.value.map((item) => item.name)).toEqual([
+      'Citra',
+      'Dewi',
+    ])
+  })
+
+  it('does nothing on an empty blur of a row that never had a score', async () => {
+    const entry = await setup()
+    entry.commit('c')
+    await vi.runAllTimersAsync()
+    expect(service.save).not.toHaveBeenCalled()
+    expect(entry.rowStates.c.status).toBe('idle')
+    expect(entry.pending.value).toBe(false)
   })
 })

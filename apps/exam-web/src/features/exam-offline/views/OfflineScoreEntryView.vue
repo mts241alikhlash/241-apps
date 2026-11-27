@@ -22,7 +22,7 @@ import {
   SENT_BEFORE_ABSENT_WARNING,
   offlineKindLabel,
 } from '../types'
-import { pastedLines } from '../utils/score'
+import { pastedColumn } from '../utils/score'
 
 const route = useRoute()
 const router = useRouter()
@@ -47,6 +47,7 @@ const {
   absentSentRows,
   missingRows,
   pending,
+  blockingRows,
 } = entry
 void entry.load()
 
@@ -57,6 +58,10 @@ const publishOpen = ref(false)
 const publishing = ref(false)
 const publishMessage = ref<string | null>(null)
 const publishResult = ref('')
+
+const blockingNames = computed(() =>
+  blockingRows.value.map((item) => item.name ?? '-').join(', '),
+)
 
 const missingNames = computed(() =>
   missingRows.value.map((item) => item.name ?? item.participantNumber ?? '-'),
@@ -80,7 +85,7 @@ async function publish() {
     return
   }
   publishOpen.value = false
-  publishResult.value = `${outcome.data.queued} nilai masuk antrean pengiriman ke penilaian; ${outcome.data.absent} siswa tidak hadir tidak dikirim.`
+  publishResult.value = `${outcome.data.queued} nilai masuk antrean pengiriman ke penilaian; ${outcome.data.missing} belum dinilai tidak dikirim; ${outcome.data.absent} siswa tidak hadir tidak dikirim.`
   await entry.reloadRoster()
 }
 
@@ -135,7 +140,8 @@ function onScoreKeydown(studentId: string, event: KeyboardEvent) {
 
 function onPaste(studentId: string, event: ClipboardEvent) {
   const text = event.clipboardData?.getData('text/plain') ?? ''
-  if (pastedLines(text).length <= 1) return
+  const column = pastedColumn(text)
+  if (column.ok && column.lines.length <= 1) return
   event.preventDefault()
   pasteSummary.value = entry.paste(studentId, text)
 }
@@ -176,7 +182,13 @@ async function download() {
         </div>
         <Button
           v-if="canWrite"
-          :disabled="loading || pending || publishing || loadError !== null"
+          :disabled="
+            loading ||
+            pending ||
+            publishing ||
+            loadError !== null ||
+            blockingRows.length > 0
+          "
           @click="openPublish"
         >
           Kirim ke penilaian
@@ -228,11 +240,20 @@ async function download() {
             </p>
           </div>
 
+          <p
+            v-if="canWrite && blockingRows.length > 0"
+            data-test="publish-blocked"
+            class="text-control text-destructive"
+          >
+            Perbaiki nilai yang ditandai sebelum mengirim:
+            {{ blockingNames }}.
+          </p>
+
           <div class="flex flex-wrap items-center gap-2">
             <Button
               v-if="canWrite"
               variant="outline"
-              :disabled="loading"
+              :disabled="loading || pending"
               @click="importOpen = true"
             >
               Impor nilai

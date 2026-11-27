@@ -218,7 +218,7 @@ describe('OfflineScoreEntryView', () => {
     expect(document.activeElement).toBe(inputs[3].element)
   })
 
-  it('fills the next rows from a pasted column and says what was skipped', async () => {
+  it('fills the rows from a pasted column, line by line over every student', async () => {
     const wrapper = await mountView()
     const input = scoreInputs(wrapper)[0]
     await input.trigger('paste', {
@@ -230,9 +230,23 @@ describe('OfflineScoreEntryView', () => {
     )
     expect(values).toEqual(['41', '', '', '42', '43'])
     expect(wrapper.get('[data-test="paste-summary"]').text()).toBe(
-      '3 nilai ditempel, 2 baris bukan angka dilewati.',
+      '3 nilai ditempel.',
     )
     await vi.waitFor(() => expect(service.save).toHaveBeenCalledTimes(3))
+  })
+
+  it('refuses a paste of two columns with a message', async () => {
+    const wrapper = await mountView()
+    await scoreInputs(wrapper)[0].trigger('paste', {
+      clipboardData: { getData: () => '1\t41\n2\t42' },
+    })
+    await flushPromises()
+    expect(wrapper.get('[data-test="paste-summary"]').text()).toBe(
+      'Tempel satu kolom nilai saja.',
+    )
+    expect((scoreInputs(wrapper)[0].element as HTMLInputElement).value).toBe(
+      '40',
+    )
   })
 
   it('downloads the score sheet of the schedule', async () => {
@@ -291,7 +305,7 @@ describe('OfflineScoreEntryView', () => {
     expect(service.publish).toHaveBeenCalledWith('s1', true)
     expect(wrapper.find('[data-test="publish-dialog"]').exists()).toBe(false)
     expect(wrapper.get('[data-test="publish-result"]').text()).toBe(
-      '2 nilai masuk antrean pengiriman ke penilaian; 2 siswa tidak hadir tidak dikirim.',
+      '2 nilai masuk antrean pengiriman ke penilaian; 1 belum dinilai tidak dikirim; 2 siswa tidak hadir tidak dikirim.',
     )
     expect(service.loadRoster).toHaveBeenCalledTimes(2)
   })
@@ -343,5 +357,26 @@ describe('OfflineScoreEntryView', () => {
     await vi.waitFor(() => expect(service.save).toHaveBeenCalled())
     await flushPromises()
     expect(publishButton(wrapper).attributes('disabled')).toBeUndefined()
+  })
+
+  it('cannot send or import while a score is invalid or still being saved', async () => {
+    const wrapper = await mountView()
+    const importButton = () =>
+      wrapper.findAll('button').find((item) => item.text() === 'Impor nilai')!
+    const input = scoreInputs(wrapper)[3]
+    await input.setValue('45')
+    await input.trigger('blur')
+    expect(importButton().attributes('disabled')).toBeDefined()
+    await vi.waitFor(() => expect(service.save).toHaveBeenCalled())
+    await flushPromises()
+    expect(importButton().attributes('disabled')).toBeUndefined()
+
+    await input.setValue('abc')
+    await input.trigger('blur')
+    await flushPromises()
+    expect(publishButton(wrapper).attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-test="publish-blocked"]').text()).toBe(
+      'Perbaiki nilai yang ditandai sebelum mengirim: Citra.',
+    )
   })
 })
