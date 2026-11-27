@@ -1,5 +1,12 @@
 # exam-service
 
+## 0.9.4
+
+### Patch Changes
+
+- 617217c: Answer saves of a web (SEB) session are refused from the deadline on with 409 `TIME_UP`; the hand-in still stores the answers it carries until the end of the grace. Istiqra sessions are unchanged.
+- 617217c: The session heartbeat returns the session deadline, and the student exam follows it, so a staff time extension moves the time-up lock. The time-up dialog keeps sending after a failed manual submit, finishes when the paper load answers `SESSION_LOST`, stops retrying on a lock or token gate, and closes before it leaves for the quit URL.
+
 ## 0.9.3
 
 ### Patch Changes

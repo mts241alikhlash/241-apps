@@ -1,5 +1,11 @@
 # infra
 
+## 0.2.1
+
+### Patch Changes
+
+- a36ffac: exam-service gets 768 MB of memory and a 576 MB heap.
+
 ## 0.2.0
 
 ### Minor Changes
