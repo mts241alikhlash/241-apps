@@ -81,8 +81,8 @@ const schedule = (
   classroomId: 'c1',
   classroomName: 'VII A',
   semesterId: 'sem',
-  type: 'MIDTERM',
-  category: 'EXAM',
+  type: 'DAILY',
+  category: 'NON_EXAM',
   startsAt: '2026-11-02T01:00:00.000Z',
   endsAt: '2026-11-02T04:00:00.000Z',
   sessions: 0,
@@ -156,6 +156,23 @@ describe('GradingScheduleListView', () => {
         .attributes('data-schedule'),
     ).toBe('m1')
     wrapper.unmount()
+  })
+
+  it('offers Susulan on an exam to the exam committee and not to a teacher', async () => {
+    const exam = schedule({ id: 'e1', type: 'MIDTERM', category: 'EXAM' })
+    listState.schedules.value = [exam]
+    const teacherView = mount(GradingScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(labelsOf(exam, teacherView)).toEqual([])
+    teacherView.unmount()
+
+    permissions.clear()
+    permissions.add('exam-events.manage')
+    permissions.add('exam-grading.read')
+    const committeeView = mount(GradingScheduleListView, { global: { stubs } })
+    await flushPromises()
+    expect(labelsOf(exam, committeeView)).toEqual(['Susulan'])
+    committeeView.unmount()
   })
 
   it('offers neither action without the grading permissions', async () => {

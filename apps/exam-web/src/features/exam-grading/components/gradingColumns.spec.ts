@@ -88,8 +88,9 @@ describe('grading columns', () => {
             .items ?? []
         ).map((item) => item.label)
 
-      expect(labels({ canMakeup: true }, schedule)).toEqual(['Susulan'])
-      expect(labels({ canMakeup: true }, makeup)).toEqual([])
+      expect(labels({ canMakeup: () => true }, schedule)).toEqual(['Susulan'])
+      expect(labels({ canMakeup: () => false }, schedule)).toEqual([])
+      expect(labels({ canMakeup: () => true }, makeup)).toEqual([])
       expect(labels({ canParticipants: true }, makeup)).toEqual(['Peserta'])
       expect(labels({ canParticipants: true }, schedule)).toEqual([])
     })
@@ -101,7 +102,7 @@ describe('grading columns', () => {
       const props = (row: GradingSchedule) =>
         actions(
           {
-            canMakeup: true,
+            canMakeup: () => true,
             canParticipants: true,
             onMakeup,
             onParticipants,

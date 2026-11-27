@@ -363,6 +363,8 @@ describe('ScheduleListView', () => {
   })
 
   it('offers no Susulan action without exam-grading.grade', async () => {
+    routeMeta.category = 'NON_EXAM'
+    permissions.delete('exam-schedules.manage-all')
     permissions.delete('exam-grading.grade')
     const wrapper = mount(ScheduleListView, { global: { stubs } })
     await flushPromises()
@@ -372,6 +374,40 @@ describe('ScheduleListView', () => {
     }[]
 
     expect(items.map((entry) => entry.label)).not.toContain('Susulan')
+    wrapper.unmount()
+  })
+
+  it('offers Susulan on an exam to the exam committee without exam-grading.grade', async () => {
+    routeMeta.category = 'EXAM'
+    permissions.clear()
+    permissions.add('exam-schedules.read')
+    permissions.add('exam-events.manage')
+    permissions.add('exam-grading.read')
+    const makeup = schedule({ id: 'm1', kind: 'MAKEUP', makeupOfId: 's1' })
+    listState.schedules.value = [schedule(), makeup]
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    const labels = (row: ExamSchedule) =>
+      (
+        rowActionProps(wrapper, row).items as unknown as { label: string }[]
+      ).map((entry) => entry.label)
+    expect(labels(schedule())).toContain('Susulan')
+    expect(labels(makeup)).toContain('Peserta')
+    wrapper.unmount()
+  })
+
+  it('offers no Susulan on an exam to a teacher who grades', async () => {
+    routeMeta.category = 'EXAM'
+    permissions.clear()
+    permissions.add('exam-schedules.read')
+    permissions.add('exam-schedules.manage')
+    permissions.add('exam-grading.read')
+    permissions.add('exam-grading.grade')
+    const wrapper = mount(ScheduleListView, { global: { stubs } })
+    await flushPromises()
+
+    expect(wrapper.findAllComponents(ActionCell)).toHaveLength(0)
     wrapper.unmount()
   })
 

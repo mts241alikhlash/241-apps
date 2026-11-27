@@ -18,6 +18,7 @@ import { FakeQuestionRepository } from '../../../../question/application/questio
 import { FakeExamScheduleRepository } from '../../exam-schedule.repository.fake.js'
 import {
   CLASSROOM_7A,
+  COMMITTEE_USER,
   SEMESTER_ID,
   STAFF_USER,
   TEACHER_USER,
@@ -314,5 +315,45 @@ describe('CreateMakeupUseCase', () => {
     ).rejects.toThrow('Anda tidak mengajar mapel ini di kelas ini')
     const made = await useCase.execute(TEACHER_USER, schedule.id, input, NOW)
     expect(made.createdById).toBe(TEACHER_USER.id)
+  })
+
+  async function asFinal(
+    schedules: FakeExamScheduleRepository,
+    schedule: Awaited<ReturnType<typeof setup>>['schedule'],
+  ) {
+    await schedules.updateWindow(schedule.id, {
+      startsAt: schedule.startsAt,
+      endsAt: schedule.endsAt,
+      durationMinutes: schedule.durationMinutes,
+      type: 'FINAL',
+    })
+  }
+
+  it('lets the exam committee create a makeup of a final exam', async () => {
+    const { schedule, schedules, useCase } = await setup()
+    await asFinal(schedules, schedule)
+
+    const made = await useCase.execute(
+      COMMITTEE_USER,
+      schedule.id,
+      { ...WINDOW, participants: people(ids.ani) },
+      NOW,
+    )
+
+    expect(made).toMatchObject({ kind: 'MAKEUP', type: 'FINAL' })
+  })
+
+  it('refuses a teacher who teaches the class a makeup of a final exam', async () => {
+    const { schedule, schedules, useCase } = await setup()
+    await asFinal(schedules, schedule)
+
+    await expect(
+      useCase.execute(
+        TEACHER_USER,
+        schedule.id,
+        { ...WINDOW, participants: people(ids.ani) },
+        NOW,
+      ),
+    ).rejects.toMatchObject({ code: 'EXAM_ADMIN_ONLY' })
   })
 })

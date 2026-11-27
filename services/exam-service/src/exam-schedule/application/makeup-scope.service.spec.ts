@@ -3,6 +3,7 @@ import { SUBJECT_ID } from '../../exam-package/application/exam-package.test-sup
 import type { ExamSchedule } from '../domain/entities/exam-schedule.entity.js'
 import {
   CLASSROOM_7A,
+  COMMITTEE_USER,
   SEMESTER_ID,
   STAFF_USER,
   TEACHER_USER,
@@ -14,7 +15,10 @@ const schedule = {
   subjectId: SUBJECT_ID,
   classroomId: CLASSROOM_7A.id,
   semesterId: SEMESTER_ID,
+  type: 'DAILY',
 } as ExamSchedule
+
+const examSchedule = { ...schedule, type: 'FINAL' } as ExamSchedule
 
 const OTHER_CLASS = '99999999-9999-4999-8999-999999999999'
 
@@ -61,5 +65,78 @@ describe('MakeupScopeService', () => {
     await expect(
       scope.assertCanWrite(STAFF_USER, untaught),
     ).resolves.toBeUndefined()
+  })
+
+  it('lets the exam committee read and write makeups of an exam and of non-exam work', async () => {
+    const scope = makeupScope([])
+
+    for (const target of [examSchedule, schedule]) {
+      await expect(
+        scope.assertCanRead(COMMITTEE_USER, target),
+      ).resolves.toBeUndefined()
+      await expect(
+        scope.assertCanWrite(COMMITTEE_USER, target),
+      ).resolves.toBeUndefined()
+    }
+  })
+
+  it('accepts exam-schedules.manage-all as the exam committee', async () => {
+    const scope = makeupScope([])
+    const curriculum = {
+      id: 'curriculum-1',
+      roles: ['Wakamad Kurikulum'],
+      permissions: ['exam-schedules.manage-all', 'exam-grading.read-all'],
+    }
+
+    await expect(
+      scope.assertCanWrite(curriculum, examSchedule),
+    ).resolves.toBeUndefined()
+  })
+
+  it('refuses a teacher who teaches the class writing a makeup of an exam, but lets them read it', async () => {
+    const scope = makeupScope()
+
+    await expect(
+      scope.assertCanRead(TEACHER_USER, examSchedule),
+    ).resolves.toBeUndefined()
+    await expect(
+      scope.assertCanWrite(TEACHER_USER, examSchedule),
+    ).rejects.toMatchObject({
+      code: 'EXAM_ADMIN_ONLY',
+      message:
+        'Jadwal ujian hanya dapat dikelola oleh panitia atau admin ujian.',
+    })
+  })
+
+  it('refuses a teacher who does not teach the class reading a makeup of an exam', async () => {
+    const scope = makeupScope([])
+
+    await expect(
+      scope.assertCanRead(TEACHER_USER, examSchedule),
+    ).rejects.toThrow('Anda tidak mengajar mapel ini di kelas ini')
+  })
+
+  it('lets exam-grading.manage-all write makeups of an exam', async () => {
+    const scope = makeupScope([])
+
+    await expect(
+      scope.assertCanWrite(STAFF_USER, examSchedule),
+    ).resolves.toBeUndefined()
+  })
+
+  it('lets exam-events.read read makeups of an exam but not write them', async () => {
+    const scope = makeupScope([])
+    const viewer = {
+      id: 'viewer-1',
+      roles: ['Kepala Madrasah'],
+      permissions: ['exam-events.read'],
+    }
+
+    await expect(
+      scope.assertCanRead(viewer, examSchedule),
+    ).resolves.toBeUndefined()
+    await expect(scope.assertCanWrite(viewer, examSchedule)).rejects.toThrow(
+      ForbiddenException,
+    )
   })
 })

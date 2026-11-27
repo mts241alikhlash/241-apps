@@ -4,6 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import {
+  canManageMakeup,
+  canReadMakeup,
+} from '@/features/exam-shared/makeupAccess'
+import {
   ActionCell,
   BackButton,
   DataTable,
@@ -218,8 +222,10 @@ const scheduleOptions = computed<ScheduleColumnOptions>(() => ({
   canAccessCode:
     isClasswork.value && hasPermission('exam-schedules.access-code'),
   canSessions: isClasswork.value && hasPermission('exam-sessions.read'),
-  canMakeup: isClasswork.value && hasPermission('exam-grading.grade'),
-  canParticipants: isClasswork.value && hasPermission('exam-grading.read'),
+  canMakeup:
+    category.value !== undefined &&
+    canManageMakeup(category.value, hasPermission),
+  canParticipants: category.value !== undefined && canReadMakeup(hasPermission),
   now: () => new Date(),
   onEdit: openEdit,
   onCancel: (schedule) => {
@@ -546,6 +552,7 @@ const columns = computed(
       v-if="participantsTarget"
       :open="true"
       :schedule-id="participantsTarget.id"
+      :type="participantsTarget.type"
       :title="`${subjectName(participantsTarget)} · ${participantsTarget.classroomName ?? '-'}`"
       @update:open="(value: boolean) => !value && (participantsTarget = null)"
     />

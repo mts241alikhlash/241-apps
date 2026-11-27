@@ -3,6 +3,11 @@ import { computed, h, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
+import { categoryOf } from '@/features/exam-shared/examType'
+import {
+  canManageMakeup,
+  canReadMakeup,
+} from '@/features/exam-shared/makeupAccess'
 import { usePackageSubjects } from '@/features/exam-shared/usePackageSubjects'
 import {
   ActionCell,
@@ -254,11 +259,9 @@ function openGradingRow(row: Row) {
 const classColumns = computed(() =>
   buildGradingScheduleColumns({
     subjectName,
-    canMakeup: hasPermission('exam-grading.grade'),
-    canParticipants:
-      hasPermission('exam-grading.read') ||
-      hasPermission('exam-grading.read-all') ||
-      hasPermission('exam-grading.manage-all'),
+    canMakeup: (schedule) =>
+      canManageMakeup(categoryOf(schedule.type), hasPermission),
+    canParticipants: canReadMakeup(hasPermission),
     onMakeup: (schedule) => {
       makeupTarget.value = originOf(schedule)
     },
@@ -482,6 +485,7 @@ function changePageSize(size: number) {
       v-if="participantsTarget"
       :open="true"
       :schedule-id="participantsTarget.id"
+      :type="participantsTarget.type"
       :title="`${subjectName(participantsTarget)} · ${participantsTarget.classroomName ?? '-'}`"
       @update:open="(value: boolean) => !value && (participantsTarget = null)"
     />

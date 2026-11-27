@@ -18,6 +18,7 @@ import { FakeQuestionRepository } from '../../../../question/application/questio
 import { FakeExamScheduleRepository } from '../../exam-schedule.repository.fake.js'
 import {
   CLASSROOM_7A,
+  COMMITTEE_USER,
   SEMESTER_ID,
   STAFF_USER,
   TEACHER_USER,
@@ -287,6 +288,55 @@ describe('makeup participants', () => {
           outsider,
         ).execute(TEACHER_USER, makeup.id, ids.ani),
       ).rejects.toThrow('Anda tidak mengajar')
+    })
+  })
+
+  describe('committee', () => {
+    async function finalMakeup() {
+      const context = await setup()
+      const { schedule, schedules } = context
+      const makeup = await schedules.createMakeup({
+        packageId: schedule.packageId,
+        classroomId: schedule.classroomId,
+        semesterId: schedule.semesterId,
+        startsAt: new Date('2026-11-06T01:00:00.000Z'),
+        endsAt: new Date('2026-11-06T04:00:00.000Z'),
+        durationMinutes: 90,
+        type: 'FINAL',
+        createdById: USER.id,
+        makeupOfId: schedule.id,
+        participants: [person(ids.ani)],
+      })
+      if (makeup === null) throw new Error('makeup not created')
+      return { ...context, makeup }
+    }
+
+    it('lets the exam committee add, list and remove participants of a final exam makeup', async () => {
+      const { makeup, schedules, add, get, remove } = await finalMakeup()
+
+      await add.execute(COMMITTEE_USER, makeup.id, [person(ids.citra)], NOW)
+      expect(await get.execute(COMMITTEE_USER, makeup.id)).toHaveLength(2)
+      await remove.execute(COMMITTEE_USER, makeup.id, ids.ani)
+
+      expect(
+        (await schedules.listParticipants(makeup.id)).map(
+          (row) => row.studentId,
+        ),
+      ).toEqual([ids.citra])
+    })
+
+    it('refuses a teacher who teaches the class changing participants of a final exam makeup', async () => {
+      const { makeup, add, remove, get } = await finalMakeup()
+
+      await expect(
+        add.execute(TEACHER_USER, makeup.id, [person(ids.citra)], NOW),
+      ).rejects.toMatchObject({ code: 'EXAM_ADMIN_ONLY' })
+      await expect(
+        remove.execute(TEACHER_USER, makeup.id, ids.ani),
+      ).rejects.toMatchObject({ code: 'EXAM_ADMIN_ONLY' })
+      await expect(get.execute(TEACHER_USER, makeup.id)).resolves.toHaveLength(
+        1,
+      )
     })
   })
 })
