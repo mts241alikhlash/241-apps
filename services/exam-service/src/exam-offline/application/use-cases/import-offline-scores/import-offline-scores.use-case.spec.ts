@@ -54,6 +54,12 @@ describe('ImportOfflineScoresUseCase', () => {
     const { world, useCase, sheet } = setup()
     world.markAbsent(STUDENTS.budi)
     const built = await sheet.execute(TEACHER, SCHEDULE_ID)
+    const layout = await (
+      await JSZip.loadAsync(built.buffer)
+    )
+      .file('xl/worksheets/sheet1.xml')!
+      .async('string')
+    expect(layout).toContain('<col ')
     const book = new ExcelJS.Workbook()
     await book.xlsx.load(built.buffer as unknown as ExcelJS.Buffer)
     const page = book.getWorksheet('Score Sheet')!
@@ -247,6 +253,120 @@ describe('ImportOfflineScoresUseCase', () => {
       expect(world.results.rows.size).toBe(0)
     },
   )
+
+  const SHEET = 'xl/worksheets/sheet1.xml'
+  const BOOK = 'xl/workbook.xml'
+  const MAIN = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
+
+  async function handedToExcel(
+    edit: (zip: JSZip) => Promise<void> | void,
+  ): Promise<{ result: Awaited<ReturnType<typeof run>>; handed: JSZip }> {
+    const { useCase } = setup()
+    const zip = await JSZip.loadAsync(
+      await xlsx([
+        ['No. Peserta', 'Score'],
+        ['7-001', 40],
+      ]),
+    )
+    await edit(zip)
+    const buffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+    })
+    const load = vi.spyOn(
+      Object.getPrototypeOf(new ExcelJS.Workbook().xlsx) as ExcelJS.Xlsx,
+      'load',
+    )
+    try {
+      const result = await run(useCase, { buffer, originalName: 'nilai.xlsx' })
+      const handed = await JSZip.loadAsync(load.mock.calls[0][0])
+      return { result, handed }
+    } finally {
+      load.mockRestore()
+    }
+  }
+
+  const insert =
+    (part: string, find: string, add: string) => async (zip: JSZip) => {
+      const text = await zip.file(part)!.async('string')
+      zip.file(part, text.replace(find, add))
+    }
+
+  it.each([
+    [
+      'a merge over C2:Z50000',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><mergeCells count="1"><mergeCell ref="C2:Z50000"/></mergeCells>',
+      'mergeCell',
+    ],
+    [
+      'a prefixed merge',
+      SHEET,
+      '</sheetData>',
+      `</sheetData><x:mergeCells xmlns:x="${MAIN}" count="1"><x:mergeCell ref="C2:Z50000"/></x:mergeCells>`,
+      'mergeCell',
+    ],
+    [
+      'a column run to 3000000',
+      SHEET,
+      '<sheetData>',
+      '<cols><col min="1" max="3000000" width="9" customWidth="1"/></cols><sheetData>',
+      '<col',
+    ],
+    [
+      'a validation over the whole sheet',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><dataValidations count="1"><dataValidation type="whole" sqref="A1:XFD1048576"><formula1>0</formula1></dataValidation></dataValidations>',
+      'dataValidation',
+    ],
+    [
+      'a conditional format over the whole sheet',
+      SHEET,
+      '</sheetData>',
+      '</sheetData><conditionalFormatting sqref="A1:XFD1048576"><cfRule type="expression" priority="1"><formula>TRUE</formula></cfRule></conditionalFormatting>',
+      'conditionalFormatting',
+    ],
+    [
+      'a defined name over a million rows',
+      BOOK,
+      '</sheets>',
+      '</sheets><definedNames><definedName name="besar">Lembar!$A$1:$Z$1000000</definedName></definedNames>',
+      'definedName',
+    ],
+  ])(
+    'reads only the cell data of a workbook with %s',
+    async (_, part, find, add, marker) => {
+      const { result, handed } = await handedToExcel(insert(part, find, add))
+
+      expect(result).toEqual({ saved: 1, rejected: [], skipped: [] })
+      expect(await handed.file(part)!.async('string')).not.toContain(marker)
+      expect(await handed.file(SHEET)!.async('string')).toContain('<sheetData>')
+    },
+  )
+
+  it('drops comments, drawings, tables and sheet relationships before ExcelJS reads the workbook', async () => {
+    const { result, handed } = await handedToExcel((zip) => {
+      zip.file(
+        'xl/worksheets/_rels/sheet1.xml.rels',
+        '<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="../comments1.xml"/></Relationships>',
+      )
+      zip.file(
+        'xl/comments1.xml',
+        `<?xml version="1.0"?><comments xmlns="${MAIN}"><authors><author>a</author></authors><commentList><comment ref="A1" authorId="0"><text><t>x</t></text></comment></commentList></comments>`,
+      )
+      zip.file('xl/drawings/drawing1.xml', '<?xml version="1.0"?><x/>')
+      zip.file('xl/tables/table1.xml', '<?xml version="1.0"?><x/>')
+    })
+
+    expect(result.saved).toBe(1)
+    expect(
+      Object.keys(handed.files).filter((name) =>
+        /xl\/(worksheets\/_rels|comments|drawings|tables)/u.test(name),
+      ),
+    ).toEqual([])
+  })
 
   it('keeps a filled sheet of 500 rows under the part limit', async () => {
     const { useCase } = setup()

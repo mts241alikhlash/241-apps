@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common'
 import ExcelJS from 'exceljs'
+import JSZip from 'jszip'
 import { normalizeArchive } from '../../question-import/application/parsers/archive-guard.js'
 import {
   OFFLINE_IMPORT_MAX_BYTES,
@@ -34,6 +35,23 @@ const ARCHIVE_LIMITS = {
   maxSheets: 3,
   message: 'Berkas terlalu besar untuk diimpor',
 }
+const LAYOUT_TAGS = [
+  'mergeCells',
+  'cols',
+  'dataValidations',
+  'conditionalFormatting',
+  'hyperlinks',
+  'drawing',
+  'legacyDrawing',
+  'legacyDrawingHF',
+  'picture',
+  'tableParts',
+  'extLst',
+]
+const WORKSHEET_PART = /xl\/worksheets\/sheet\d+\.xml/iu
+const WORKBOOK_PART = /^\/?xl\/workbook\.xml$/iu
+const DROPPED_PART =
+  /xl\/(worksheets\/_rels\/|drawings\/|tables\/|comments\d+\.xml)/iu
 const COLUMNS = {
   number: ['nopeserta'],
   score: ['score', 'nilai'],
@@ -44,8 +62,49 @@ function headerKey(value: string): string {
   return value.toLowerCase().replace(/[^a-z]/gu, '')
 }
 
+function withoutElements(xml: string, names: string[]): string {
+  const open = new RegExp(
+    `<(?:[\\w.-]+:)?(${names.join('|')})(?=[\\s/>])[^<>]*>`,
+    'gu',
+  )
+  let kept = ''
+  let from = 0
+  for (let found = open.exec(xml); found !== null; found = open.exec(xml)) {
+    kept += xml.slice(from, found.index)
+    from = open.lastIndex
+    if (found[0].endsWith('/>')) continue
+    const close = new RegExp(`</(?:[\\w.-]+:)?${found[1]}\\s*>`, 'gu')
+    close.lastIndex = from
+    if (close.exec(xml) === null) {
+      throw new BadRequestException('Berkas Excel tidak bisa dibaca')
+    }
+    from = close.lastIndex
+    open.lastIndex = from
+  }
+  return kept + xml.slice(from)
+}
+
+async function cellDataOnly(buffer: Buffer): Promise<Buffer> {
+  const zip = await JSZip.loadAsync(buffer)
+  for (const entry of Object.values(zip.files)) {
+    if (entry.dir) continue
+    if (DROPPED_PART.test(entry.name)) {
+      zip.remove(entry.name)
+    } else if (WORKSHEET_PART.test(entry.name)) {
+      const xml = await entry.async('string')
+      zip.file(entry.name, withoutElements(xml, LAYOUT_TAGS))
+    } else if (WORKBOOK_PART.test(entry.name)) {
+      const xml = await entry.async('string')
+      zip.file(entry.name, withoutElements(xml, ['definedNames']))
+    }
+  }
+  return zip.generateAsync({ type: 'nodebuffer' })
+}
+
 async function readXlsx(buffer: Buffer): Promise<Table> {
-  const checked = await normalizeArchive(buffer, ARCHIVE_LIMITS)
+  const checked = await cellDataOnly(
+    await normalizeArchive(buffer, ARCHIVE_LIMITS),
+  )
   const book = new ExcelJS.Workbook()
   try {
     await book.xlsx.load(checked as unknown as ExcelJS.Buffer)
