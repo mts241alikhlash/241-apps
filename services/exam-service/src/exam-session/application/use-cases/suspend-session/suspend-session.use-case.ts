@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ApiConflictException } from '../../../../core/filters/api-exception.js'
 import { IExamRoomRepository } from '../../../../exam-room/domain/repositories/exam-room.repository.js'
+import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import {
   MAX_TOTAL_EXTRA_MINUTES,
@@ -19,6 +20,7 @@ export const MIN_SUSPENSION_SECONDS = 1
 export const MAX_SUSPENSION_SECONDS = 900
 
 const SECONDS_PER_MINUTE = 60
+const MS_PER_MINUTE = 60_000
 
 export interface CallSuspensionInput {
   reason: CallSuspensionReason
@@ -39,6 +41,7 @@ export class SuspendSessionUseCase {
     private readonly access: SessionAccessService,
     private readonly sessions: IExamSessionRepository,
     private readonly rooms: IExamRoomRepository,
+    private readonly schedules: IExamScheduleRepository,
   ) {}
 
   async execute(
@@ -77,9 +80,20 @@ export class SuspendSessionUseCase {
       },
     ])
 
+    const schedule = await this.schedules.findById(session.scheduleId)
+    const untilScheduleEnd =
+      schedule === null
+        ? 0
+        : Math.floor(
+            (schedule.endsAt.getTime() - session.deadline.getTime()) /
+              MS_PER_MINUTE,
+          )
     const allowance = Math.max(
       0,
-      MAX_TOTAL_EXTRA_MINUTES - session.extraMinutes,
+      Math.min(
+        MAX_TOTAL_EXTRA_MINUTES - session.extraMinutes,
+        untilScheduleEnd,
+      ),
     )
     const minutes = Math.min(
       Math.ceil(input.seconds / SECONDS_PER_MINUTE),

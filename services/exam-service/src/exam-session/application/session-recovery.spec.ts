@@ -842,7 +842,7 @@ describe('call suspension', () => {
       new FakeSessionFinalizer(),
       f.schedules,
     )
-    return new SuspendSessionUseCase(access, f.sessions, f.rooms)
+    return new SuspendSessionUseCase(access, f.sessions, f.rooms, f.schedules)
   }
 
   const report = (seconds: number) => ({
@@ -911,6 +911,33 @@ describe('call suspension', () => {
     expect(result.deadline).toEqual(session.deadline)
     expect((await f.sessions.findById(session.id))?.extraMinutes).toBe(180)
     expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(1)
+  })
+
+  it('never moves the deadline past the schedule end with repeated calls', async () => {
+    const f = await setup()
+    const scheduleEnd = f.schedules.schedules.get(f.schedule.id)!.endsAt
+    const session = seed(f.sessions, f.schedule.id, {
+      deadline: new Date(scheduleEnd.getTime() - 5 * 60_000),
+      finalizeAt: new Date(scheduleEnd.getTime() + 5 * 60_000),
+    })
+    const useCase = build(f)
+
+    for (let call = 0; call < 12; call += 1) {
+      await useCase.execute(
+        ACTOR,
+        session.id,
+        { reason: 'CALL', seconds: 900, clientId: `call-${call}` },
+        new Date(scheduleEnd.getTime() - 4 * 60_000),
+      )
+    }
+
+    const stored = await f.sessions.findById(session.id)
+    expect(stored?.deadline).toEqual(scheduleEnd)
+    expect(stored?.finalizeAt).toEqual(
+      new Date(scheduleEnd.getTime() + 10 * 60_000),
+    )
+    expect(stored?.extraMinutes).toBe(5)
+    expect(await f.rooms.listSessionEvents(session.id)).toHaveLength(12)
   })
 
   it('refuses a session that is not running', async () => {
