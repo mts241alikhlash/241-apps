@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.9.3
+
+### Patch Changes
+
+- aaefe97: The exam committee can create and manage makeups of exams.
+
 ## 0.9.2
 
 ### Patch Changes
