@@ -73,14 +73,14 @@ Open `Nilai Offline` (`/exam/offline-scores`). It lists the offline schedules yo
 The roster is the students seated for that classroom in the period, sorted by participant number. A schedule without a period has an empty roster. Each student is in one state:
 
 - **Scored**: has a score.
-- **Absent**: marked absent in Berita Acara. The row is locked and cannot take a score.
+- **Absent**: marked absent in the room monitor (`Catat Absen`). The row shows `Tidak hadir`, is locked, cannot take a score, and is never sent to assessment.
 - **Missing**: present but no score yet.
 
 Entering:
 
 - Typing a score saves that row by itself shortly after (autosave per row). A score is 0 to the maximum with at most two decimals; a comma is accepted. The note holds up to 300 characters. Every save is audited.
 - Pasting a column. Paste into any score cell: line 1 goes to that row, line 2 to the next row, and so on, over all rows below it including absent students. A header line (`Score`, `Nilai`, `Skor`) at the top is dropped. A line that is not a number still uses up its row and is skipped, and so does a line that lands on an absent student. A paste containing a tab is refused ("Tempel satu kolom nilai saja"): copy one column only. A summary names the students who were skipped or got an invalid value.
-- Import a `.xlsx` or `.csv` (`Impor nilai`). The header row needs `No. Peserta` and `Score` (or `Nilai`); `Note` (or `Catatan`) is optional. Students are matched on `No. Peserta`. Limits: 5 MB and 500 rows. A row is rejected when the number is empty, duplicated in the file, not in this class, the value is not a number or is out of range, the student is absent (unless the cell says `TIDAK HADIR`), or the note is too long. A row is skipped, not rejected, when the score cell is empty or says `TIDAK HADIR` for an absent student. An empty cell never clears a stored score. The result lists rejected and skipped rows by row number.
+- Import a `.xlsx` or `.csv` (`Impor nilai`). The header row needs `No. Peserta` and `Score` (or `Nilai`); `Note` (or `Catatan`) is optional. Students are matched on `No. Peserta`. Limits: 1 MB and 500 rows. A row is rejected when the number is empty, duplicated in the file, not in this class, the value is not a number or is out of range, the student is absent (unless the cell says `TIDAK HADIR`), or the note is too long. A row is skipped, not rejected, when the score cell is empty or says `TIDAK HADIR` for an absent student. An empty cell never clears a stored score. The result lists rejected and skipped rows by row number.
 - Download the sheet (`Unduh lembar nilai (.xlsx)`). It is prefilled with the roster (`No. Peserta`, `Nama`, `Score`, `Note`) and can be filled by hand and imported back.
 - Print the Score Sheet from `Cetak Dokumen` (`/exam/print/score-sheet`), in the same family as Daftar Hadir, to fill in by hand in the room.
 
@@ -95,7 +95,7 @@ After sending:
 
 Berita Acara, Daftar Hadir and the printed timetable show `Mulai` and `Selesai` on every row, from the activity window. Offline rows show registered, present and absent counts; the started and submitted counts exist only for Online schedules that can have sessions.
 
-Absence marking in Berita Acara works on offline schedules. An activity with no classroom assigned yet appears as a row without a schedule and no absent count, so assign classrooms first.
+Absences of offline exams are recorded in the room monitor, not in Berita Acara. The monitor lists offline students with the `Offline` state (never as not started, late or silent, since they have no session by design) and `Catat Absen` works on them. The absence is stored on the offline schedule: the offline score page shows the student as Absent (`Tidak hadir`) and publishing leaves them out. Berita Acara is the printed record of the slot: it shows the absent count of each row and a sentence naming the offline subjects as done on paper or as a practical. An activity with no classroom assigned yet appears as a row without a schedule and no absent count, so assign classrooms first.
 
 ## 7. Release notes
 
@@ -122,7 +122,7 @@ Ask the owner to confirm each activity and kind before step 1.
 
 - An Offline schedule never gets a token or a session. The supervisor token endpoint refuses it with 409 `OFFLINE_NO_TOKEN`, and starting it answers `OFFLINE_NOT_STARTABLE`.
 - The delivery mode cannot be changed after creation: no screen or endpoint does it.
-- The room monitor lists only schedules with a package, so offline classes are not in it; use Berita Acara for absence.
+- The room monitor lists offline schedules for absence only: they do not count as not started and do not change the exam window shown in the monitor. An Online schedule without a package is still left out; its students show `Tidak ada jadwal ujian pada jam ini` and cannot be marked absent until a package is attached.
 - Offline score entry reads the seats of the exam period. Without seats there is no roster and nobody to score.
 - The import matches on participant numbers; when none can be loaded the import answers 503 "Nomor peserta tidak bisa dimuat".
 - `Auto status` off means the job never touches the activity, in either direction.
