@@ -106,6 +106,12 @@ Indonesian domain terms, the name used in code, and what they mean. One heading 
 - **Jenis Ujian** — `ExamType` — the four activity and schedule types: **Ulangan Harian** (`DAILY`), **Tugas** (`ASSIGNMENT`), **UTS** (`MIDTERM`), and **UAS** (`FINAL`).
 - **Kategori Ujian** — `ExamCategory` — derived from `ExamType` on the server: **Ujian** (`EXAM`, covering `MIDTERM` and `FINAL`) and **Non-ujian** (`NON_EXAM`, covering `DAILY` and `ASSIGNMENT`).
 - **Jadwal Ujian** — `ExamSchedule` — when a package is sat by a classroom, or by selected makeup participants (`ExamScheduleParticipant`).
+- **Mode Penyampaian** — `ExamDeliveryMode` — how an activity is taken: **Online** (`ONLINE`, on the Istiqra app, with a package) or **Offline** (`OFFLINE`, on paper or as a practical, no package, never started in the app). The UI keeps the English labels "Delivery", "Online" and "Offline".
+- **Jenis Offline** — `ExamOfflineKind` — the kind of an offline activity: **Written** (`WRITTEN`) or **Practical** (`PRACTICAL`), never both.
+- **Nilai Offline** — `ExamOfflineResult` — the single score a student gets in an offline activity, from 0 to the activity's `maxScore`; a student is Scored, Absent or Missing.
+- **Score Sheet** — the downloadable `.xlsx` and printable sheet of an offline exam's roster, filled in by hand and typed or imported back.
+- **Kesiapan** — readiness — the checklist of an exam day: package, schedules, seats, participant numbers, supervisors, technicians and late tolerance.
+- **Auto status** — `autoStatus` — the switch that lets the lifecycle job open and close an activity by itself, using `autoOpenLeadMinutes` and `autoCloseGraceMinutes` of its policy.
 - **Ruang Ujian** — `ExamRoom` — an exam room with seats and supervisors (**pengawas**).
 - **Sesi Ujian** — `ExamSession` — one participant's sitting, with answers (`ExamAnswer`).
 - **Nilai Ujian** — an exam score from grading a session; it may or may not be taken into a **Nilai Rapor**.
