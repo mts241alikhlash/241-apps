@@ -18,6 +18,7 @@ import { CurrentUser } from '@mts241alikhlash/nest-core/decorators'
 import { RequirePermissions } from '@mts241alikhlash/nest-core/access-control'
 import { JwtAuthGuard } from '@mts241alikhlash/nest-core/auth'
 import { ListMyExamsUseCase } from '../../application/use-cases/list-my-exams/list-my-exams.use-case.js'
+import { MyExamsCacheService } from '../../application/my-exams-cache.service.js'
 import { StartExamSessionUseCase } from '../../application/use-cases/start-exam-session/start-exam-session.use-case.js'
 import { ClientPlatformHeader } from './client-platform.decorator.js'
 import type { ClientPlatform } from '../../domain/policies/client-gate.policy.js'
@@ -32,6 +33,7 @@ export class StudentExamController {
   constructor(
     private readonly listMyExams: ListMyExamsUseCase,
     private readonly startSession: StartExamSessionUseCase,
+    private readonly myExamsCache: MyExamsCacheService,
   ) {}
 
   @Get()
@@ -39,9 +41,10 @@ export class StudentExamController {
   @ApiOperation({ summary: 'The exams of the classroom the student is in' })
   @ApiResponse({ status: 200, type: [MyExamDto] })
   async findMine(@CurrentUser() user: { id: string }): Promise<MyExamDto[]> {
-    return (await this.listMyExams.execute(user)).map((exam) =>
-      MyExamDto.fromDomain(exam),
+    const exams = await this.myExamsCache.load(user.id, () =>
+      this.listMyExams.execute(user),
     )
+    return exams.map((exam) => MyExamDto.fromDomain(exam))
   }
 
   @Post(':scheduleId/sessions')
@@ -58,8 +61,15 @@ export class StudentExamController {
     @Param('scheduleId', ParseUUIDPipe) scheduleId: string,
     @Body() dto: StartSessionDto,
   ): Promise<StartedSessionDto> {
-    return StartedSessionDto.fromDomain(
-      await this.startSession.execute(user, scheduleId, { ...dto, platform }),
-    )
+    try {
+      return StartedSessionDto.fromDomain(
+        await this.startSession.execute(user, scheduleId, {
+          ...dto,
+          platform,
+        }),
+      )
+    } finally {
+      this.myExamsCache.invalidate(user.id)
+    }
   }
 }

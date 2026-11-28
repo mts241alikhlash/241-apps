@@ -8,6 +8,7 @@ import type { SessionAuditAction } from '../../exam-room/domain/entities/exam-se
 import { assertRecoveryReason } from '../domain/policies/recovery-reason.policy.js'
 import { IExamSessionRepository } from '../domain/repositories/exam-session.repository.js'
 import { ISessionRecoveryRepository } from '../domain/repositories/session-recovery.port.js'
+import { MyExamsCacheService } from './my-exams-cache.service.js'
 
 export type SeatFlagAction = Extract<SessionAuditAction, 'ALLOW_LATE_ENTRY'>
 
@@ -29,6 +30,7 @@ export class SeatFlagService {
     private readonly rooms: IExamRoomRepository,
     private readonly recovery: ISessionRecoveryRepository,
     private readonly access: RoomAccessService,
+    private readonly myExams: MyExamsCacheService,
   ) {}
 
   async allow(
@@ -80,6 +82,7 @@ export class SeatFlagService {
       reason,
       metadata: { roomId: room.id, seatNumber: seat.seatNumber },
     })
+    this.myExams.invalidate(session.userId)
     const flagged = await this.rooms.setSeatFlags(
       room.eventId,
       request.studentId,

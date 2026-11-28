@@ -14,7 +14,7 @@ import {
   isWorkingTimeOver,
 } from '../../../domain/policies/session-times.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
-import { loadPaperSources } from '../../load-paper-sources.js'
+import { AnswerShapeCache, loadAnswerShapes } from '../../answer-shapes.js'
 import {
   SessionAccessService,
   type SessionActor,
@@ -28,6 +28,8 @@ export interface SaveAnswerInput {
 
 @Injectable()
 export class SaveAnswerUseCase {
+  private readonly shapes = new AnswerShapeCache()
+
   constructor(
     private readonly access: SessionAccessService,
     private readonly schedules: IExamScheduleRepository,
@@ -64,21 +66,22 @@ export class SaveAnswerUseCase {
       return replay
     }
 
-    const sources = await loadPaperSources(
+    const shapes = await loadAnswerShapes(
       this.schedules,
       this.packages,
       this.questions,
       session.scheduleId,
+      this.shapes,
     )
-    const source = sources.find((row) => row.questionId === input.questionId)
-    if (source === undefined) {
+    const shape = shapes.get(input.questionId)
+    if (shape === undefined) {
       throw new BadRequestException('Soal bukan bagian dari ujian ini')
     }
-    const answer = assertAnswerShape(source.type, source.content, input.answer)
+    const answer = assertAnswerShape(shape.type, shape.content, input.answer)
 
     const saved = await this.sessions.upsertAnswer({
       sessionId: session.id,
-      questionId: source.questionId,
+      questionId: input.questionId,
       clientId: input.clientId,
       answer,
       receivedAfterDeadline: now.getTime() >= session.deadline.getTime(),

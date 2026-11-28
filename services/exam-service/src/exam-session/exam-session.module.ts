@@ -5,6 +5,7 @@ import { QuestionModule } from '../question/question.module.js'
 import { ExamScheduleModule } from '../exam-schedule/exam-schedule.module.js'
 import { StartExamSessionUseCase } from './application/use-cases/start-exam-session/start-exam-session.use-case.js'
 import { ListMyExamsUseCase } from './application/use-cases/list-my-exams/list-my-exams.use-case.js'
+import { MyExamsCacheService } from './application/my-exams-cache.service.js'
 import { IExamAccessAttemptRepository } from './domain/repositories/exam-access-attempt.repository.js'
 import { SessionAccessService } from './application/session-access.service.js'
 import { LifecycleGate } from './application/lifecycle-gate.service.js'
@@ -84,6 +85,7 @@ import { ListSessionAuditLogsUseCase } from './application/use-cases/list-sessio
     GetSessionFileUseCase,
     ListSavedAnswersUseCase,
     ListMyExamsUseCase,
+    MyExamsCacheService,
     StartExamSessionUseCase,
     {
       provide: ISessionRecoveryRepository,

@@ -142,6 +142,15 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     return row ? toSchedule(row) : null
   }
 
+  async findByIds(ids: string[]): Promise<ExamSchedule[]> {
+    if (ids.length === 0) return []
+    const rows = await this.prisma.examSchedule.findMany({
+      where: { id: { in: ids } },
+      include: SCHEDULE_INCLUDE,
+    })
+    return rows.map(toSchedule)
+  }
+
   async createAndLockPackage(
     input: NewExamSchedule,
   ): Promise<ExamSchedule | null> {

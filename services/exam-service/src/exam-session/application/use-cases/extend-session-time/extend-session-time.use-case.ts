@@ -7,6 +7,7 @@ import { IExamScheduleRepository } from '../../../../exam-schedule/domain/reposi
 import type { RoomStaffUser } from '../../../../exam-room/application/room-access.service.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { SessionRecoveryService } from '../../session-recovery.service.js'
+import { MyExamsCacheService } from '../../my-exams-cache.service.js'
 
 const MS_PER_MINUTE = 60_000
 
@@ -64,6 +65,7 @@ export class ExtendSessionTimeUseCase {
   constructor(
     private readonly recovery: SessionRecoveryService,
     private readonly schedules: IExamScheduleRepository,
+    private readonly myExams: MyExamsCacheService,
   ) {}
 
   async execute(
@@ -86,7 +88,7 @@ export class ExtendSessionTimeUseCase {
       throw new ConflictException('Jadwal ujian tidak ditemukan')
     }
     assertWithinPastEnd(shiftBy(session, added).deadline, schedule.endsAt)
-    return this.recovery.apply(
+    const updated = this.recovery.apply(
       user,
       sessionId,
       'EXTEND_TIME',
@@ -95,5 +97,7 @@ export class ExtendSessionTimeUseCase {
       undefined,
       { minutes: added, extraMinutes: session.extraMinutes + added },
     )
+    this.myExams.invalidate(session.userId)
+    return updated
   }
 }

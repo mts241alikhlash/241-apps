@@ -334,6 +334,14 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
     return row === null ? null : toEntity(row)
   }
 
+  async findByIds(ids: string[]): Promise<ExamActivity[]> {
+    if (ids.length === 0) return []
+    const rows = await this.prisma.examActivity.findMany({
+      where: { id: { in: ids } },
+    })
+    return rows.map(toEntity)
+  }
+
   async updatePolicy(
     id: string,
     policy: ExamActivity['policy'],

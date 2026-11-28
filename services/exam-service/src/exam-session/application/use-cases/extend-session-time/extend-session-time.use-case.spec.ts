@@ -52,10 +52,15 @@ function setup(session: ExamSession, schedule: ExamSchedule | null) {
   } as unknown as IExamScheduleRepository
   return {
     apply,
-    useCase: new ExtendSessionTimeUseCase(recovery, schedules),
+    useCase: new ExtendSessionTimeUseCase(
+      recovery,
+      schedules,
+      new MyExamsCacheService(),
+    ),
   }
 }
 
+import { MyExamsCacheService } from '../../my-exams-cache.service.js'
 describe('ExtendSessionTimeUseCase', () => {
   it('refuses an extension that passes the schedule end by more than 30 minutes', async () => {
     const session = sessionWithDeadline(ENDS_AT)
@@ -166,7 +171,11 @@ describe('ExtendSessionTimeUseCase past the schedule end', () => {
     return {
       sessions,
       questionId: paper.questionIds[0],
-      extend: new ExtendSessionTimeUseCase(recovery, schedules),
+      extend: new ExtendSessionTimeUseCase(
+        recovery,
+        schedules,
+        new MyExamsCacheService(),
+      ),
       save: new SaveAnswerUseCase(
         access,
         schedules,

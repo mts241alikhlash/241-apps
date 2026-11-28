@@ -11,6 +11,7 @@ import type { ExamSession } from '../../../domain/entities/exam-session.entity.j
 import { assertRecoveryReason } from '../../../domain/policies/recovery-reason.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 import { ISessionRecoveryRepository } from '../../../domain/repositories/session-recovery.port.js'
+import { MyExamsCacheService } from '../../my-exams-cache.service.js'
 
 @Injectable()
 export class ReleaseSessionUseCase {
@@ -18,6 +19,7 @@ export class ReleaseSessionUseCase {
     private readonly sessions: IExamSessionRepository,
     private readonly recovery: ISessionRecoveryRepository,
     private readonly access: RoomAccessService,
+    private readonly myExams: MyExamsCacheService,
   ) {}
 
   async execute(
@@ -57,6 +59,7 @@ export class ReleaseSessionUseCase {
     if (released === null) {
       throw new ConflictException('Sesi sudah selesai dan tidak bisa dilepas')
     }
+    this.myExams.invalidate(session.userId)
     return released
   }
 }

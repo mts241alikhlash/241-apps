@@ -73,6 +73,28 @@ describe('SaveAnswersBatchUseCase', () => {
     expect(sessions.answers.size).toBe(46)
   })
 
+  it('reads the question content once across two batches of one session', async () => {
+    const { useCase, questionIds } = await setup(3)
+    const findPinned = vi.spyOn(questions, 'findPinned')
+    const batch = (clientPrefix: string) =>
+      useCase.execute(
+        STUDENT_USER,
+        'a',
+        {
+          answers: questionIds.map((questionId, index) =>
+            answerOf(questionId, `${clientPrefix}${index}`),
+          ),
+        },
+        NOW,
+      )
+
+    await batch('first')
+    const second = await batch('second')
+
+    expect(findPinned).toHaveBeenCalledTimes(1)
+    expect(second.confirmedCount).toBe(3)
+  })
+
   it('keeps the last entry when one batch repeats a question', async () => {
     const { useCase, questionIds } = await setup()
 
@@ -234,6 +256,33 @@ describe('SaveAnswersBatchUseCase', () => {
       ),
     ).rejects.toThrow('Bentuk jawaban tidak sesuai dengan jenis soal')
     expect(sessions.answers.size).toBe(0)
+  })
+
+  it('still rejects a wrong shape once the question is cached', async () => {
+    const { useCase, questionIds } = await setup()
+    await useCase.execute(
+      STUDENT_USER,
+      'a',
+      { answers: [answerOf(questionIds[0], 'c0')] },
+      NOW,
+    )
+
+    await expect(
+      useCase.execute(
+        STUDENT_USER,
+        'a',
+        {
+          answers: [
+            {
+              questionId: questionIds[0],
+              clientId: 'c1',
+              answer: { keys: ['A'] },
+            },
+          ],
+        },
+        NOW,
+      ),
+    ).rejects.toThrow('Bentuk jawaban tidak sesuai dengan jenis soal')
   })
 
   it('rejects a batch after finalizeAt', async () => {

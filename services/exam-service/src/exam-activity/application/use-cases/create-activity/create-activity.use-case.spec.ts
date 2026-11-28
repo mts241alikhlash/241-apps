@@ -111,6 +111,10 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve(id === this.stored.id ? this.stored : null)
   }
 
+  findByIds(ids: string[]) {
+    return Promise.resolve(ids.includes(this.stored.id) ? [this.stored] : [])
+  }
+
   updatePolicy(id: string, policy: ExamActivity['policy']) {
     if (id !== this.stored.id) return Promise.resolve(null)
     this.audits.push('UPDATE_POLICY')

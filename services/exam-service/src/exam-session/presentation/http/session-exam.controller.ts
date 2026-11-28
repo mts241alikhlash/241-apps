@@ -26,6 +26,7 @@ import { GetPaperUseCase } from '../../application/use-cases/get-paper/get-paper
 import { GetSessionFileUseCase } from '../../application/use-cases/get-session-file/get-session-file.use-case.js'
 import { RecordViolationsUseCase } from '../../application/use-cases/record-violations/record-violations.use-case.js'
 import { SubmitExamSessionUseCase } from '../../application/use-cases/submit-exam-session/submit-exam-session.use-case.js'
+import { MyExamsCacheService } from '../../application/my-exams-cache.service.js'
 import { SaveAnswerUseCase } from '../../application/use-cases/save-answer/save-answer.use-case.js'
 import { SaveAnswersBatchUseCase } from '../../application/use-cases/save-answers-batch/save-answers-batch.use-case.js'
 import { ListSavedAnswersUseCase } from '../../application/use-cases/list-saved-answers/list-saved-answers.use-case.js'
@@ -90,6 +91,7 @@ export class SessionExamController {
     private readonly resumeSession: ResumeExamSessionUseCase,
     private readonly heartbeat: SessionHeartbeatUseCase,
     private readonly suspendSession: SuspendSessionUseCase,
+    private readonly myExamsCache: MyExamsCacheService,
   ) {}
 
   @Get('questions')
@@ -316,14 +318,18 @@ export class SessionExamController {
     @Param('sessionId', ParseUUIDPipe) sessionId: string,
     @Body() body: SubmitSessionRequestDto,
   ): Promise<SubmitSessionResponseDto> {
-    return SubmitSessionResponseDto.fromDomain(
-      await this.submitSession.execute(
-        { id: user.id, deviceId },
-        sessionId,
-        body ?? {},
-        new Date(),
-      ),
-    )
+    try {
+      return SubmitSessionResponseDto.fromDomain(
+        await this.submitSession.execute(
+          { id: user.id, deviceId },
+          sessionId,
+          body ?? {},
+          new Date(),
+        ),
+      )
+    } finally {
+      this.myExamsCache.invalidate(user.id)
+    }
   }
 
   @Get('files/:fileId')

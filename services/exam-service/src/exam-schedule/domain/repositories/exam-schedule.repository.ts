@@ -62,6 +62,7 @@ export abstract class IExamScheduleRepository {
   abstract findAll(
     query: ExamScheduleListQuery,
   ): Promise<PaginatedResult<ExamSchedule>>
+  abstract findByIds(ids: string[]): Promise<ExamSchedule[]>
   abstract findById(id: string): Promise<ExamSchedule | null>
   abstract findForGrading(
     query: ExamScheduleGradingQuery,

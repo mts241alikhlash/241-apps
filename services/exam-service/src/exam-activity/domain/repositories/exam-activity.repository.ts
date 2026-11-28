@@ -68,6 +68,7 @@ export abstract class ExamActivityRepository {
     classroomIds: string[]
     actorId: string
   }): Promise<ExamSchedule[] | null>
+  abstract findByIds(ids: string[]): Promise<ExamActivity[]>
   abstract findById(id: string): Promise<ExamActivity | null>
   abstract updatePolicy(
     id: string,
