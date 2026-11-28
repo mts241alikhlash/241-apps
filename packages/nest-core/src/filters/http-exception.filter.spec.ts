@@ -234,6 +234,34 @@ describe('HttpExceptionFilter', () => {
       expect(mockLogger.error).toHaveBeenCalled()
     })
 
+    it('answers 503 with a retry message when the pg pool wait times out', () => {
+      const exception = new Error('timeout exceeded when trying to connect')
+      const host = createMockHost()
+
+      filter.catch(exception, host)
+
+      const body = (host as ExtendedHost)._mockJson.mock.calls[0][0] as {
+        message: string
+      }
+      expect((host as ExtendedHost)._mockStatus).toHaveBeenCalledWith(503)
+      expect(body.message).toBe('Server sedang sibuk, coba lagi sebentar.')
+      expect(mockLogger.warn).toHaveBeenCalled()
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
+    it('answers 503 when Prisma reports the pool wait timed out (P2024)', () => {
+      const exception = new PrismaClientKnownRequestError(
+        'Timed out fetching a new connection from the connection pool',
+        { code: 'P2024', clientVersion: 'test' },
+      )
+      const host = createMockHost()
+
+      filter.catch(exception, host)
+
+      expect((host as ExtendedHost)._mockStatus).toHaveBeenCalledWith(503)
+      expect(mockLogger.error).not.toHaveBeenCalled()
+    })
+
     it('should handle non-Error thrown values', () => {
       const host = createMockHost()
 

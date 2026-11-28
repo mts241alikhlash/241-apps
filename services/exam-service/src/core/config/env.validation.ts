@@ -1,10 +1,12 @@
 import { schoolTimeZone } from '@mts241alikhlash/nest-core/time'
+import { databasePoolShape } from '@mts241alikhlash/nest-core/database'
 import { z } from 'zod'
 
 const DURATION_PATTERN = /^\d+[smhd]$/
 
 export const envSchema = z
   .object({
+    ...databasePoolShape({ max: 12, timeoutMs: 4000 }),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
     DIRECT_URL: z.string().optional(),
     NODE_ENV: z

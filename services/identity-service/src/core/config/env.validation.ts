@@ -1,10 +1,12 @@
 import { z } from 'zod'
+import { databasePoolShape } from '@mts241alikhlash/nest-core/database'
 import { parseSsoApps } from '../../auth/domain/policies/sso-apps.policy.js'
 
 const DURATION_PATTERN = /^\d+[smhd]$/
 
 export const envSchema = z
   .object({
+    ...databasePoolShape({ max: 6, timeoutMs: 3000 }),
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
     DIRECT_URL: z.string().optional(),
     NODE_ENV: z

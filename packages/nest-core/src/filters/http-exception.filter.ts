@@ -34,7 +34,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const summary = `${request.method} ${path} - ${String(statusCode)} - ${errorText}`
     const userId = request.user?.id
 
-    if (statusCode >= 500) {
+    if (this.isPoolExhausted(exception)) {
+      this.logger.warn({ statusCode, responseTime, userId }, summary)
+
+      response.status(statusCode).json({ statusCode, message, data: null })
+      return
+    } else if (statusCode >= 500) {
       this.logger.error({ statusCode, responseTime, userId }, summary)
 
       response.status(statusCode).json({
@@ -57,11 +62,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
       )
   }
 
+  private isPoolExhausted(exception: unknown): boolean {
+    if (exception instanceof PrismaClientKnownRequestError) {
+      return exception.code === 'P2024'
+    }
+    return (
+      exception instanceof Error &&
+      exception.message.includes('timeout exceeded when trying to connect')
+    )
+  }
+
   private resolveException(exception: unknown): {
     statusCode: number
     message: string | string[]
     code?: string
   } {
+    if (this.isPoolExhausted(exception)) {
+      return {
+        statusCode: HttpStatus.SERVICE_UNAVAILABLE,
+        message: 'Server sedang sibuk, coba lagi sebentar.',
+      }
+    }
+
     if (exception instanceof HttpException) {
       const statusCode = exception.getStatus()
 
