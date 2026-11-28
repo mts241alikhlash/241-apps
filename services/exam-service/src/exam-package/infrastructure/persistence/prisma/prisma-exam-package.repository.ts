@@ -83,6 +83,15 @@ export class PrismaExamPackageRepository extends IExamPackageRepository {
     return row ? toDetail(row) : null
   }
 
+  async findByIds(ids: string[]): Promise<ExamPackageDetail[]> {
+    if (ids.length === 0) return []
+    const rows = await this.prisma.examPackage.findMany({
+      where: { id: { in: ids }, deletedAt: null },
+      include: DETAIL_INCLUDE,
+    })
+    return rows.map(toDetail)
+  }
+
   async create(input: NewExamPackage): Promise<ExamPackageDetail> {
     const row = await this.prisma.examPackage.create({
       data: {

@@ -4337,6 +4337,64 @@
         ]
       }
     },
+    "/exam-rooms/field-notes": {
+      "get": {
+        "operationId": "ExamRoomOverviewController_listFieldNotes",
+        "parameters": [
+          {
+            "name": "slotIds",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated supervisor slot ids. Omitted: the slot each room is on now.",
+            "schema": {
+              "maxItems": 100,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RoomFieldNoteDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Field notes of every room the caller may see, for each room's current slot or the given slots",
+        "tags": [
+          "Exam Rooms"
+        ]
+      }
+    },
     "/exam-rooms/reports": {
       "get": {
         "operationId": "ExamRoomOverviewController_roomReports",
@@ -12018,6 +12076,61 @@
           "currentSupervisorName",
           "isSubstituted",
           "isActiveNow"
+        ]
+      },
+      "RoomFieldNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomName": {
+            "type": "string"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "studentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sessionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "category": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "roomId",
+          "roomName",
+          "slotId",
+          "studentId",
+          "studentName",
+          "sessionId",
+          "category",
+          "note",
+          "recordedAt"
         ]
       },
       "RoomReportSummaryDto": {

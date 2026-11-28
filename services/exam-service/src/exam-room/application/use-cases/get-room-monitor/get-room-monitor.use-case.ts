@@ -347,24 +347,25 @@ export class GetRoomMonitorUseCase {
     const event = await this.rooms.findEventById(room.eventId)
     const fallbackSemesterId = event?.semesterId ?? null
     const numbers = new Map<string, string | null>()
+    const studentsBySemester = new Map<string, string[]>()
+    for (const row of slice) {
+      const semesterId =
+        semesterBySchedule.get(row.scheduleId) ?? fallbackSemesterId
+      if (semesterId === null) {
+        numbers.set(row.seat.studentId, null)
+        continue
+      }
+      const held = studentsBySemester.get(semesterId) ?? []
+      held.push(row.seat.studentId)
+      studentsBySemester.set(semesterId, held)
+    }
     await Promise.all(
-      slice.map(async (row) => {
-        const semesterId =
-          semesterBySchedule.get(row.scheduleId) ?? fallbackSemesterId
-        if (semesterId === null) {
-          numbers.set(row.seat.studentId, null)
-          return
-        }
-        try {
-          numbers.set(
-            row.seat.studentId,
-            await this.participantNumbers.findNumber(
-              row.seat.studentId,
-              semesterId,
-            ),
-          )
-        } catch {
-          numbers.set(row.seat.studentId, null)
+      [...studentsBySemester].map(async ([semesterId, studentIds]) => {
+        const found = await this.participantNumbers
+          .findNumbers(studentIds, semesterId)
+          .catch(() => new Map<string, string>())
+        for (const studentId of studentIds) {
+          numbers.set(studentId, found.get(studentId) ?? null)
         }
       }),
     )
@@ -585,12 +586,8 @@ export class GetRoomMonitorUseCase {
   private async questionCounts(
     packageIds: string[],
   ): Promise<Map<string, number>> {
-    const counts = new Map<string, number>()
-    for (const id of [...new Set(packageIds)]) {
-      const pkg = await this.packages.findById(id)
-      counts.set(id, pkg?.items.length ?? 0)
-    }
-    return counts
+    const packages = await this.packages.findByIds([...new Set(packageIds)])
+    return new Map(packages.map((pkg) => [pkg.id, pkg.items.length]))
   }
 
   private async latestEvents(

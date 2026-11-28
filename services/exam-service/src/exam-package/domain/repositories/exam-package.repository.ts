@@ -59,6 +59,7 @@ export abstract class IExamPackageRepository {
     query: ExamPackageListQuery,
   ): Promise<PaginatedResult<ExamPackageSummary>>
   abstract findById(id: string): Promise<ExamPackageDetail | null>
+  abstract findByIds(ids: string[]): Promise<ExamPackageDetail[]>
   abstract create(input: NewExamPackage): Promise<ExamPackageDetail>
   abstract softDeleteUnscheduled(id: string): Promise<boolean>
   abstract renamePackage(

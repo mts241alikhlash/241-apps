@@ -43,7 +43,7 @@ const READER: RoomStaffUser = {
   permissions: [READ_ALL],
 }
 
-function build() {
+function build(participants = new FakeParticipantNumber()) {
   return seedMonitorRoom(120).then((fixture) => ({
     fixture,
     monitor: new GetRoomMonitorUseCase(
@@ -55,7 +55,7 @@ function build() {
       fixture.academic,
       fixture.authors,
       fixture.employees,
-      new FakeParticipantNumber(),
+      participants,
       new RoomAccessService(fixture.rooms),
       new RoomAccessCodeService('unit-test-secret-of-at-least-32-characters'),
       new SchoolTimeService({
@@ -564,5 +564,24 @@ describe('GetRoomMonitorUseCase', () => {
       absentMarkedCount: 1,
     })
     expect(notStarted.meta.total).toBe(120 - offlineSeats)
+  })
+
+  it('looks up participant numbers for the whole page in one batch', async () => {
+    const participants = new FakeParticipantNumber()
+    const single = vi.spyOn(participants, 'findNumber')
+    const batch = vi.spyOn(participants, 'findNumbers')
+    const { monitor, fixture } = await build(participants)
+
+    const result = await monitor.execute(
+      SUPERVISOR_USER,
+      fixture.room.id,
+      { page: 1, limit: 30 },
+      MONITOR_NOW,
+    )
+
+    expect(result.data).toHaveLength(30)
+    expect(single).not.toHaveBeenCalled()
+    expect(batch).toHaveBeenCalledTimes(1)
+    expect(batch.mock.calls[0][0]).toHaveLength(30)
   })
 })

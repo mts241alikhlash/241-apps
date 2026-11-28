@@ -21,6 +21,7 @@ import { IssueSemesterParticipantNumbersUseCase } from './application/use-cases/
 import { LookupParticipantNumbersUseCase } from './application/use-cases/lookup-participant-numbers/lookup-participant-numbers.use-case.js'
 import { ListRoomReportsUseCase } from './application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from './application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
+import { ListFieldNotesUseCase } from './application/use-cases/list-field-notes/list-field-notes.use-case.js'
 import { GetSessionTimelineUseCase } from './application/use-cases/get-session-timeline/get-session-timeline.use-case.js'
 import { GetRoomReportUseCase } from './application/use-cases/get-room-report/get-room-report.use-case.js'
 import { SaveRoomReportUseCase } from './application/use-cases/save-room-report/save-room-report.use-case.js'
@@ -97,6 +98,7 @@ import {
     IssueSemesterParticipantNumbersUseCase,
     LookupParticipantNumbersUseCase,
     ListRoomsOverviewUseCase,
+    ListFieldNotesUseCase,
     ListRoomReportsUseCase,
     GetSessionTimelineUseCase,
     GetRoomReportUseCase,

@@ -80,6 +80,11 @@ export interface ExamRoomFieldNote {
   createdAt: Date
 }
 
+export interface ExamRoomFieldNoteWithSlot extends ExamRoomFieldNote {
+  roomId: string
+  supervisorSlotId: string
+}
+
 export interface NewExamRoomFieldNote {
   reportId: string
   studentId: string

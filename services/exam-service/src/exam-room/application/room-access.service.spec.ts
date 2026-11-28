@@ -47,6 +47,8 @@ class StubRooms extends IExamRoomRepository {
   findSupervisorById = vi.fn()
   listAbsencesByReport = vi.fn()
   listFieldNotesByReport = vi.fn()
+  listFieldNotesForSlots = vi.fn()
+  listSupervisorsAt = vi.fn()
   reopenReport = vi.fn()
   listLatestSessionEvents = vi.fn()
   updateRoom = vi.fn()

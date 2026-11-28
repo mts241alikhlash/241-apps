@@ -31,6 +31,7 @@ import type {
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
+  ExamRoomFieldNoteWithSlot,
   NewExamRoomFieldNote,
   NewExamRoomReport,
   NewExamRoomReportAbsence,
@@ -744,6 +745,37 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     })
     return rows.map(toExamRoomFieldNote)
+  }
+
+  async listFieldNotesForSlots(
+    slotIds: string[],
+  ): Promise<ExamRoomFieldNoteWithSlot[]> {
+    if (slotIds.length === 0) return []
+    const rows = await this.prisma.examRoomFieldNote.findMany({
+      where: { report: { supervisorSlotId: { in: slotIds } } },
+      include: { report: { select: { roomId: true, supervisorSlotId: true } } },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    })
+    return rows.map((row) => ({
+      ...toExamRoomFieldNote(row),
+      roomId: row.report.roomId,
+      supervisorSlotId: row.report.supervisorSlotId,
+    }))
+  }
+
+  async listSupervisorsAt(
+    roomIds: string[],
+    at: Date,
+  ): Promise<ExamRoomSupervisor[]> {
+    if (roomIds.length === 0) return []
+    const rows = await this.prisma.examRoomSupervisor.findMany({
+      where: {
+        roomId: { in: roomIds },
+        startsAt: { lte: at },
+        endsAt: { gt: at },
+      },
+    })
+    return rows.map(toExamRoomSupervisor)
   }
 
   async reopenReport(reportId: string): Promise<ExamRoomReport | null> {

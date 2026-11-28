@@ -44,6 +44,7 @@ import { ExtendRoomTimeUseCase } from '../../application/use-cases/extend-room-t
 import { GetRoomMonitorUseCase } from '../../application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
 import { ListRoomReportsUseCase } from '../../application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import { ListRoomsOverviewUseCase } from '../../application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
+import { ListFieldNotesUseCase } from '../../application/use-cases/list-field-notes/list-field-notes.use-case.js'
 import { GetRoomReportUseCase } from '../../application/use-cases/get-room-report/get-room-report.use-case.js'
 import { SaveRoomReportUseCase } from '../../application/use-cases/save-room-report/save-room-report.use-case.js'
 import { SubmitRoomReportUseCase } from '../../application/use-cases/submit-room-report/submit-room-report.use-case.js'
@@ -69,6 +70,8 @@ import {
   RoomMonitorQueryDto,
   RoomMonitorResponseDto,
   RoomOverviewDto,
+  RoomFieldNotesQueryDto,
+  RoomFieldNoteDto,
   RoomOverviewQueryDto,
   RoomReportDto,
   RoomReportListQueryDto,
@@ -664,6 +667,7 @@ export class ExamRoomOverviewController {
   constructor(
     private readonly overview: ListRoomsOverviewUseCase,
     private readonly listReports: ListRoomReportsUseCase,
+    private readonly fieldNotes: ListFieldNotesUseCase,
   ) {}
 
   @Get('overview')
@@ -683,6 +687,27 @@ export class ExamRoomOverviewController {
   ): Promise<RoomOverviewDto[]> {
     return (await this.overview.execute(user, query)).map((row) =>
       RoomOverviewDto.fromDomain(row),
+    )
+  }
+
+  @Get('field-notes')
+  @RequireAnyPermission(
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  )
+  @ApiOperation({
+    summary:
+      "Field notes of every room the caller may see, for each room's current slot or the given slots",
+  })
+  @ApiResponse({ status: 200, type: [RoomFieldNoteDto] })
+  async listFieldNotes(
+    @CurrentUser() user: RoomStaffUser,
+    @Query() query: RoomFieldNotesQueryDto,
+  ): Promise<RoomFieldNoteDto[]> {
+    return (await this.fieldNotes.execute(user, query)).map((row) =>
+      RoomFieldNoteDto.fromDomain(row),
     )
   }
 
