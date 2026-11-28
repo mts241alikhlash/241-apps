@@ -54,6 +54,17 @@ describe('UpdatePackageQuestionUseCase', () => {
     expect(result.status).toBe('DRAFT')
   })
 
+  it('refuses an edit to a locked package', async () => {
+    const { useCase, pkg, questionId, setStatus, questions } = await setup()
+    setStatus('LOCKED')
+    const before = questions.questions.get(questionId)?.currentVersion
+
+    await expect(
+      useCase.execute(TEACHER, pkg.id, questionId, { points: 2 }),
+    ).rejects.toThrow(ConflictException)
+    expect(questions.questions.get(questionId)?.currentVersion).toBe(before)
+  })
+
   it('refuses a question that is not in the package', async () => {
     const { useCase, pkg } = await setup()
 

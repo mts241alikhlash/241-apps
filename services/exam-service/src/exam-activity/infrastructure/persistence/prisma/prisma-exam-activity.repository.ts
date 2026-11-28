@@ -93,6 +93,12 @@ async function createSchedules(
   packageId: string | null,
   classroomIds: string[],
 ) {
+  if (packageId !== null) {
+    await tx.examPackage.updateMany({
+      where: { id: packageId, status: 'APPROVED', deletedAt: null },
+      data: { status: 'LOCKED', lockedAt: new Date() },
+    })
+  }
   await tx.examSchedule.createMany({
     data: classroomIds.map((classroomId) => ({
       packageId,
