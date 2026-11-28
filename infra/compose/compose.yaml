@@ -252,6 +252,11 @@ services:
   exam-service:
     <<: *service-defaults
     image: ghcr.io/mts241alikhlash/exam-service@sha256:f54bc9c7b1f5f92156a51fe4711291d5f7a0d129d9358a0b25ba928917b70b82
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+        max-file: '5'
     mem_limit: 768m
     environment:
       TRUST_PROXY: '${TRUST_PROXY:-1}'
