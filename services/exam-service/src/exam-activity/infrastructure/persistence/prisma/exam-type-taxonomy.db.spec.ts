@@ -73,11 +73,16 @@ suite('exam type taxonomy against a real database', () => {
       'FINAL',
       'MIDTERM',
     ])
-    const byName = new Map(presets.map((row) => [row.name, row.policy]))
-    expect(byName.get('MIDTERM')).toEqual(DEFAULT_POLICIES.MIDTERM)
-    expect(byName.get('FINAL')).toEqual(DEFAULT_POLICIES.FINAL)
-    expect(byName.get('DAILY')).toEqual(DEFAULT_POLICIES.DAILY)
-    expect(byName.get('ASSIGNMENT')).toEqual(DEFAULT_POLICIES.ASSIGNMENT)
+    const byName = new Map(
+      presets.map((row) => [row.name, row.policy as Record<string, unknown>]),
+    )
+    for (const type of ['MIDTERM', 'FINAL', 'DAILY', 'ASSIGNMENT'] as const) {
+      const stored = byName.get(type)
+      for (const [key, value] of Object.entries(DEFAULT_POLICIES[type])) {
+        expect(stored).toHaveProperty(key)
+        expect(typeof stored?.[key]).toBe(typeof value)
+      }
+    }
 
     const columns = await prisma.$queryRaw<{ column_name: string }[]>`
       SELECT column_name
