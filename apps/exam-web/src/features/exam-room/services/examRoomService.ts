@@ -10,6 +10,7 @@ import type {
   RoomMonitorParticipant,
   RoomMonitorQuery,
   RoomOverview,
+  RoomFieldNote,
   RoomReport,
   RoomReportPayload,
   RoomReportSummary,
@@ -183,6 +184,17 @@ export const examRoomService = {
       return { success: true, data: response }
     } catch (err: unknown) {
       return failure(err, 'Gagal memuat daftar berita acara.')
+    }
+  },
+
+  async loadFieldNotes(slotIds?: string[]): Promise<Outcome<RoomFieldNote[]>> {
+    try {
+      const response = await examRoomApi.getFieldNotes(
+        slotIds === undefined ? undefined : { slotIds },
+      )
+      return { success: true, data: response ?? [] }
+    } catch (err: unknown) {
+      return failure(err, 'Gagal memuat catatan lapangan.')
     }
   },
 

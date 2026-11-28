@@ -28,6 +28,9 @@ export const examRoomApi = {
       }),
     ),
 
+  getFieldNotes: (query?: { slotIds?: string[] }) =>
+    unwrap(examClient.GET('/exam-rooms/field-notes', { params: { query } })),
+
   getSupervisors: (roomId: string) =>
     unwrap(
       examClient.GET('/exam-rooms/{roomId}/supervisors', {

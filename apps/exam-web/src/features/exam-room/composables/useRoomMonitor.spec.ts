@@ -134,15 +134,40 @@ describe('useRoomMonitor', () => {
     monitor.stop()
   })
 
-  it('polls every five seconds while running', async () => {
+  it('polls every ten seconds while running', async () => {
     vi.useFakeTimers()
     const monitor = useRoomMonitor({ roomId: ref('r1') })
     monitor.start()
-    await vi.advanceTimersByTimeAsync(5000)
+    await vi.advanceTimersByTimeAsync(10_000)
     await nextTick()
 
     expect(loadMonitor).toHaveBeenCalledTimes(2)
     monitor.stop()
+  })
+
+  it('pauses polling while hidden and refreshes once when visible again', async () => {
+    vi.useFakeTimers()
+    let visibility: DocumentVisibilityState = 'visible'
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => visibility,
+    })
+    const monitor = useRoomMonitor({ roomId: ref('r1') })
+    monitor.start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(loadMonitor).toHaveBeenCalledTimes(1)
+
+    visibility = 'hidden'
+    document.dispatchEvent(new Event('visibilitychange'))
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(loadMonitor).toHaveBeenCalledTimes(1)
+
+    visibility = 'visible'
+    document.dispatchEvent(new Event('visibilitychange'))
+    await vi.advanceTimersByTimeAsync(0)
+    expect(loadMonitor).toHaveBeenCalledTimes(2)
+    monitor.stop()
+    visibility = 'visible'
   })
 
   it('reloads when the room changes', async () => {
