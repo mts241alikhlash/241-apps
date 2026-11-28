@@ -2,7 +2,13 @@
 import { computed, h, onMounted, ref, useId, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { Filter, PackagePlus, Plus, SquarePen } from '@lucide/vue'
+import {
+  CalendarCheck,
+  Filter,
+  PackagePlus,
+  Plus,
+  SquarePen,
+} from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import {
   ActionCell,
@@ -30,6 +36,7 @@ import {
   DialogTitle,
 } from '@mts241alikhlash/ui/dialog'
 import { FloatingLabelField } from '@mts241alikhlash/ui/form'
+import { Input } from '@mts241alikhlash/ui/input'
 import {
   Select,
   SelectContent,
@@ -48,11 +55,14 @@ import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { examTypeLabel } from '@/features/exam-shared/examType'
 import { gradeNumberOf } from '@/features/exam-shared/classroomName'
 import { examActivityApi } from '../api/examActivityApi'
+import ActivityReadinessPanel from '../components/ActivityReadinessPanel.vue'
 import ActivityStatusDialog from '../components/ActivityStatusDialog.vue'
 import AttachPackageDialog from '../components/AttachPackageDialog.vue'
+import DeliveryBadge from '../components/DeliveryBadge.vue'
 import {
   ACTIVITY_STATUSES,
   activityStatusLabel,
+  OFFLINE_KIND_LABELS,
   type ActivityStatus,
   type ExamActivityRecord,
 } from '../types'
@@ -103,6 +113,27 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const attachTarget = ref<ExamActivityRecord | null>(null)
 const statusTarget = ref<ExamActivityRecord | null>(null)
+const statusPreset = ref<ActivityStatus | undefined>(undefined)
+
+const todayInJakarta = (): string =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(
+    new Date(),
+  )
+const readinessDate = ref(todayInJakarta())
+const readinessDateFieldId = useId()
+const readinessEventId = computed(() =>
+  periodId.value === null || periodId.value === NO_PERIOD ? '' : periodId.value,
+)
+
+function closeStatus() {
+  statusTarget.value = null
+  statusPreset.value = undefined
+}
+
+function openStatus(item: ExamActivityRecord, preset?: ActivityStatus) {
+  statusPreset.value = preset
+  statusTarget.value = item
+}
 
 const search = ref('')
 const statusFilter = ref<'ALL' | ActivityStatus>('ALL')
@@ -181,6 +212,23 @@ const activityColumns = computed<ColumnDef<ExamActivityRecord>[]>(() => [
     },
     cell: ({ row }) =>
       row.original.type ? examTypeLabel(row.original.type) : '-',
+  },
+  {
+    id: 'delivery',
+    header: 'Mode',
+    meta: {
+      align: 'center',
+      mobileLabel: 'Mode',
+      mobileValue: (row: ExamActivityRecord) =>
+        row.deliveryMode === 'OFFLINE'
+          ? `Offline${row.offlineKind ? ` · ${OFFLINE_KIND_LABELS[row.offlineKind]}` : ''}`
+          : 'Online',
+    },
+    cell: ({ row }) =>
+      h(DeliveryBadge, {
+        deliveryMode: row.original.deliveryMode,
+        offlineKind: row.original.offlineKind,
+      }),
   },
   {
     id: 'subject',
@@ -262,12 +310,18 @@ const activityColumns = computed<ColumnDef<ExamActivityRecord>[]>(() => [
       align: 'center',
       mobileLabel: 'Paket',
       mobileValue: (row: ExamActivityRecord) =>
-        row.packageId === null ? 'Menunggu paket' : 'Terpasang',
+        row.deliveryMode === 'OFFLINE'
+          ? '-'
+          : row.packageId === null
+            ? 'Menunggu paket'
+            : 'Terpasang',
     },
     cell: ({ row }) =>
-      row.original.packageId === null
-        ? h(Badge, { variant: 'warning' }, () => 'Menunggu paket')
-        : h(Badge, { variant: 'success' }, () => 'Terpasang'),
+      row.original.deliveryMode === 'OFFLINE'
+        ? '-'
+        : row.original.packageId === null
+          ? h(Badge, { variant: 'warning' }, () => 'Menunggu paket')
+          : h(Badge, { variant: 'success' }, () => 'Terpasang'),
   },
   {
     id: 'status',
@@ -293,7 +347,18 @@ const activityColumns = computed<ColumnDef<ExamActivityRecord>[]>(() => [
         hideEdit: true,
         hideDelete: true,
         items: [
-          ...(row.original.packageId === null && canManage.value
+          ...(row.original.status === 'DRAFT' && canManage.value
+            ? [
+                {
+                  label: 'Bagikan Jadwal',
+                  icon: CalendarCheck,
+                  onClick: () => openStatus(row.original, 'SCHEDULED'),
+                },
+              ]
+            : []),
+          ...(row.original.packageId === null &&
+          row.original.deliveryMode === 'ONLINE' &&
+          canManage.value
             ? [
                 {
                   label: 'Pasang Paket',
@@ -309,9 +374,7 @@ const activityColumns = computed<ColumnDef<ExamActivityRecord>[]>(() => [
                 {
                   label: 'Ubah Status',
                   icon: SquarePen,
-                  onClick: () => {
-                    statusTarget.value = row.original
-                  },
+                  onClick: () => openStatus(row.original),
                 },
               ]
             : []),
@@ -558,6 +621,30 @@ onMounted(load)
         class="flex min-h-0 flex-1 flex-col space-y-4 overflow-auto pt-2 px-4 pb-4"
       >
         <div
+          v-if="canManage && level === 'activity'"
+          class="space-y-3"
+        >
+          <FloatingLabelField
+            label="Tanggal kesiapan"
+            :for="readinessDateFieldId"
+            class="w-fit min-w-40"
+            floating
+          >
+            <Input
+              :id="readinessDateFieldId"
+              v-model="readinessDate"
+              type="date"
+            />
+          </FloatingLabelField>
+          <ActivityReadinessPanel
+            v-if="readinessDate !== ''"
+            :event-id="readinessEventId"
+            :date="readinessDate"
+            :activity-ids="inScope.map((item) => item.id)"
+          />
+        </div>
+
+        <div
           v-if="error !== null"
           role="alert"
           class="space-y-3 rounded-md border p-4"
@@ -713,7 +800,8 @@ onMounted(load)
     <ActivityStatusDialog
       :open="statusTarget !== null"
       :activity="statusTarget"
-      @update:open="(value: boolean) => value || (statusTarget = null)"
+      :preset-status="statusPreset"
+      @update:open="(value: boolean) => value || closeStatus()"
       @saved="load"
     />
 

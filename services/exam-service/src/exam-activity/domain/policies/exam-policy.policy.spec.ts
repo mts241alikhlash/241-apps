@@ -17,6 +17,8 @@ const valid: ExamPolicy = {
   tokenSlotSeconds: 600,
   lateToleranceMinutes: 15,
   minSubmitMinutes: 0,
+  autoOpenLeadMinutes: 10,
+  autoCloseGraceMinutes: 30,
   shuffleQuestions: true,
   shuffleChoices: true,
   allowWeb: true,
@@ -65,6 +67,33 @@ describe('parsePolicy', () => {
     )
   })
 
+  it('gives every preset an automatic open lead of 5 and a close grace of 15', () => {
+    for (const policy of Object.values(DEFAULT_POLICIES)) {
+      expect(policy.autoOpenLeadMinutes).toBe(5)
+      expect(policy.autoCloseGraceMinutes).toBe(15)
+    }
+    expect(parsePolicy({}).autoOpenLeadMinutes).toBe(5)
+    expect(parsePolicy({}).autoCloseGraceMinutes).toBe(15)
+  })
+
+  it('refuses an automatic open lead and close grace out of range', () => {
+    expect(() => parsePolicy({ autoOpenLeadMinutes: -1 })).toThrow(
+      'autoOpenLeadMinutes harus 0 sampai 60',
+    )
+    expect(() => parsePolicy({ autoOpenLeadMinutes: 61 })).toThrow(
+      'autoOpenLeadMinutes harus 0 sampai 60',
+    )
+    expect(() => parsePolicy({ autoCloseGraceMinutes: -1 })).toThrow(
+      'autoCloseGraceMinutes harus 0 sampai 240',
+    )
+    expect(() => parsePolicy({ autoCloseGraceMinutes: 241 })).toThrow(
+      'autoCloseGraceMinutes harus 0 sampai 240',
+    )
+    expect(
+      parsePolicy({ autoOpenLeadMinutes: 0, autoCloseGraceMinutes: 240 }),
+    ).toMatchObject({ autoOpenLeadMinutes: 0, autoCloseGraceMinutes: 240 })
+  })
+
   it('refuses a boolean key given as a non-boolean', () => {
     expect(() => parsePolicy({ shuffleChoices: 'no' })).toThrow(
       'shuffleChoices harus true atau false',
@@ -90,6 +119,28 @@ describe('parsePolicy', () => {
     }
     expect(() => parsePolicy(legacy)).not.toThrow()
     expect(parsePolicy(legacy)).toEqual(DEFAULT_POLICIES.MIDTERM)
+  })
+
+  it('parses a stored policy saved before the automatic status keys', () => {
+    const stored = {
+      violationLimit: 4,
+      focusThresholdMs: 10_000,
+      heartbeatIntervalMs: 15_000,
+      gapRecordedMs: 60_000,
+      gapTokenMs: 300_000,
+      gapViolationFrom: 2,
+      tokenSlotSeconds: 600,
+      lateToleranceMinutes: 20,
+      minSubmitMinutes: 0,
+      shuffleQuestions: true,
+      shuffleChoices: false,
+      allowWeb: true,
+    }
+    expect(parsePolicy(stored, DEFAULT_POLICIES.FINAL)).toEqual({
+      ...stored,
+      autoOpenLeadMinutes: 5,
+      autoCloseGraceMinutes: 15,
+    })
   })
 
   it('refuses a timestamp that is not a whole number of milliseconds', () => {

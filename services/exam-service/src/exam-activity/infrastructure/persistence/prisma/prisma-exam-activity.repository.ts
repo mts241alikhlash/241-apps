@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { Prisma } from '../../../../generated/prisma/client.js'
+import {
+  SCHEDULE_INCLUDE,
+  toSchedule,
+} from '../../../../exam-schedule/infrastructure/persistence/prisma/prisma-exam-schedule.mapper.js'
 import {
   EXAM_TYPES,
   type ExamCategory,
@@ -11,12 +15,19 @@ import type {
   ActivityStatus,
   ActivityTokenMode,
   ExamActivity,
+  ExamDeliveryMode,
+  ExamOfflineKind,
 } from '../../../domain/entities/exam-activity.entity.js'
-import type { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
+import type {
+  AutoStatusReason,
+  ExamActivityRepository,
+} from '../../../domain/repositories/exam-activity.repository.js'
 import {
   DEFAULT_POLICIES,
   parsePolicy,
 } from '../../../domain/policies/exam-policy.policy.js'
+
+const MAX_LEAD_MS = 60 * 60_000
 
 interface ActivityRow {
   id: string
@@ -34,6 +45,10 @@ interface ActivityRow {
   endsAt: Date
   durationMinutes: number
   status: ActivityStatus
+  deliveryMode: ExamDeliveryMode
+  offlineKind: ExamOfflineKind | null
+  maxScore: number
+  autoStatus: boolean
   createdById: string
 }
 
@@ -54,6 +69,10 @@ function toEntity(row: ActivityRow): ExamActivity {
     endsAt: row.endsAt,
     durationMinutes: row.durationMinutes,
     status: row.status,
+    deliveryMode: row.deliveryMode,
+    offlineKind: row.offlineKind,
+    maxScore: row.maxScore,
+    autoStatus: row.autoStatus,
     createdById: row.createdById,
   }
 }
@@ -68,14 +87,16 @@ async function createSchedules(
     endsAt: Date
     durationMinutes: number
     type: ExamActivity['type']
+    deliveryMode: ExamDeliveryMode
     createdById: string
   },
-  packageId: string,
+  packageId: string | null,
   classroomIds: string[],
 ) {
   await tx.examSchedule.createMany({
     data: classroomIds.map((classroomId) => ({
       packageId,
+      deliveryMode: activity.deliveryMode,
       classroomId,
       semesterId: activity.semesterId,
       eventId: activity.eventId,
@@ -89,8 +110,33 @@ async function createSchedules(
   })
 }
 
+async function lockActivity(
+  tx: Prisma.TransactionClient,
+  activityId: string,
+): Promise<boolean> {
+  const rows = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM exam_activities WHERE id = ${activityId}::uuid FOR UPDATE
+  `
+  return rows.length > 0
+}
+
+async function missingClassrooms(
+  tx: Prisma.TransactionClient,
+  activityId: string,
+  classroomIds: string[],
+): Promise<string[]> {
+  const existing = await tx.examSchedule.findMany({
+    where: { activityId, kind: 'REGULAR' },
+    select: { classroomId: true },
+  })
+  const have = new Set(existing.map((row) => row.classroomId))
+  return [...new Set(classroomIds)].filter((id) => !have.has(id))
+}
+
 @Injectable()
 export class PrismaExamActivityRepository implements ExamActivityRepository {
+  private readonly logger = new Logger(PrismaExamActivityRepository.name)
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findPreset(name: string) {
@@ -180,6 +226,10 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
           startsAt: activity.startsAt,
           endsAt: activity.endsAt,
           durationMinutes: activity.durationMinutes,
+          deliveryMode: activity.deliveryMode,
+          offlineKind: activity.offlineKind,
+          maxScore: activity.maxScore,
+          autoStatus: activity.autoStatus,
           createdById: activity.createdById,
         },
       })
@@ -203,6 +253,7 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
   ) {
     const { activityId, packageId, classroomIds, actorId } = input
     return this.prisma.$transaction(async (tx) => {
+      if (!(await lockActivity(tx, activityId))) return null
       const before = await tx.examActivity.findUnique({
         where: { id: activityId },
       })
@@ -211,7 +262,16 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         where: { id: activityId },
         data: { packageId },
       })
-      await createSchedules(tx, updated, packageId, classroomIds)
+      await tx.examSchedule.updateMany({
+        where: { activityId, kind: 'REGULAR', packageId: null },
+        data: { packageId },
+      })
+      await createSchedules(
+        tx,
+        updated,
+        packageId,
+        await missingClassrooms(tx, activityId, classroomIds),
+      )
       await tx.examActivityAuditLog.create({
         data: {
           activityId,
@@ -222,6 +282,35 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         },
       })
       return toEntity(updated)
+    })
+  }
+
+  async assignClassrooms(
+    input: Parameters<ExamActivityRepository['assignClassrooms']>[0],
+  ) {
+    const { activityId, classroomIds } = input
+    return this.prisma.$transaction(async (tx) => {
+      if (!(await lockActivity(tx, activityId))) return null
+      const activity = await tx.examActivity.findUnique({
+        where: { id: activityId },
+      })
+      if (activity === null) return null
+      await createSchedules(
+        tx,
+        activity,
+        activity.packageId,
+        await missingClassrooms(tx, activityId, classroomIds),
+      )
+      const rows = await tx.examSchedule.findMany({
+        where: {
+          activityId,
+          kind: 'REGULAR',
+          classroomId: { in: classroomIds },
+        },
+        include: SCHEDULE_INCLUDE,
+        orderBy: { createdAt: 'asc' },
+      })
+      return rows.map(toSchedule)
     })
   }
 
@@ -313,6 +402,80 @@ export class PrismaExamActivityRepository implements ExamActivityRepository {
         },
       })
       return toEntity(updated)
+    })
+  }
+
+  async updateAutoStatus(id: string, autoStatus: boolean, actorId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const before = await tx.examActivity.findUnique({ where: { id } })
+      if (before === null) return null
+      const updated = await tx.examActivity.update({
+        where: { id },
+        data: { autoStatus },
+      })
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId: id,
+          actorId,
+          action: 'UPDATE_AUTO_STATUS',
+          before: { autoStatus: before.autoStatus },
+          after: { autoStatus: updated.autoStatus },
+        },
+      })
+      return toEntity(updated)
+    })
+  }
+
+  async findDueForAdvance(now: Date) {
+    const rows = await this.prisma.examActivity.findMany({
+      where: {
+        autoStatus: true,
+        OR: [
+          {
+            status: 'SCHEDULED',
+            startsAt: { lte: new Date(now.getTime() + MAX_LEAD_MS) },
+          },
+          { status: 'ACTIVE', endsAt: { lte: now } },
+        ],
+      },
+      orderBy: { startsAt: 'asc' },
+    })
+    return rows.flatMap((row) => {
+      try {
+        return [toEntity(row)]
+      } catch (error) {
+        this.logger.error(
+          `Kebijakan kegiatan ${row.id} tidak valid, dilewati`,
+          error instanceof Error ? error.stack : String(error),
+        )
+        return []
+      }
+    })
+  }
+
+  async updateStatusIf(
+    id: string,
+    expected: ActivityStatus,
+    next: ActivityStatus,
+    actorId: string,
+    reason: AutoStatusReason,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const { count } = await tx.examActivity.updateMany({
+        where: { id, status: expected },
+        data: { status: next },
+      })
+      if (count === 0) return false
+      await tx.examActivityAuditLog.create({
+        data: {
+          activityId: id,
+          actorId,
+          action: 'AUTO_STATUS',
+          before: { status: expected },
+          after: { status: next, reason },
+        },
+      })
+      return true
     })
   }
 }

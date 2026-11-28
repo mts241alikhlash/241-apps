@@ -48,9 +48,11 @@ export const syncText = (session: RoomMonitorSession): string =>
     : `${session.syncedAnswerCount} terkirim`
 
 const progressText = (row: RoomMonitorParticipant) =>
-  row.session === null
-    ? `0 / ${row.totalQuestions} soal`
-    : `${row.session.answeredCount} / ${row.totalQuestions} soal`
+  row.offline
+    ? '-'
+    : row.session === null
+      ? `0 / ${row.totalQuestions} soal`
+      : `${row.session.answeredCount} / ${row.totalQuestions} soal`
 
 export const isLowBattery = (session: RoomMonitorSession): boolean =>
   session.batteryLevel !== null &&
@@ -118,7 +120,9 @@ const statusNode = (row: RoomMonitorParticipant) => {
   }
   const session = row.session
   if (session === null) {
-    return h(Badge, { variant: 'outline' }, () => 'Belum Mulai')
+    return h(Badge, { variant: 'outline' }, () =>
+      row.offline ? 'Offline' : 'Belum Mulai',
+    )
   }
   if (session.lockedByViolation) {
     return h(Badge, { variant: 'destructive' }, () => 'Terkunci Pelanggaran')
@@ -138,7 +142,7 @@ const statusText = (row: RoomMonitorParticipant): string => {
     return `Tidak Hadir: ${reasonLabel(absence.reason)}`
   }
   const session = row.session
-  if (session === null) return 'Belum Mulai'
+  if (session === null) return row.offline ? 'Offline' : 'Belum Mulai'
   if (session.lockedByViolation) return 'Terkunci Pelanggaran'
   if (session.requiresTokenReentry) return 'Menunggu Token Ulang'
   return session.status === 'IN_PROGRESS' ? 'Mengerjakan' : 'Terkumpul'
@@ -406,7 +410,9 @@ export function buildRoomParticipantColumns(
         }
         items.push(
           {
-            label: 'Catat Absen',
+            label: target.scheduleId
+              ? 'Catat Absen'
+              : 'Tidak ada jadwal ujian pada jam ini',
             icon: UserX,
             disabled: target.session !== null || !target.scheduleId,
             onClick: () => options.onAbsence(target),

@@ -40,6 +40,40 @@ export interface paths {
         patch: operations["ExamActivityController_changeStatus"];
         trace?: never;
     };
+    "/exam-activities/{id}/auto-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Switch automatic opening and closing */
+        patch: operations["ExamActivityController_switchAutoStatus"];
+        trace?: never;
+    };
+    "/exam-activities/{id}/classrooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create the missing classroom schedules of an activity */
+        post: operations["ExamActivityController_assign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-activities/{id}/package": {
         parameters: {
             query?: never;
@@ -102,6 +136,23 @@ export interface paths {
         put?: never;
         /** Invalidate the previous access code of an activity */
         post: operations["ExamActivityController_rotate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-activities/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Check what is still missing before the activities of a day */
+        get: operations["ExamActivityController_readinessOfDay"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -428,6 +479,108 @@ export interface paths {
         /** Download the Excel or Word import template */
         get: operations["QuestionImportController_template"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The offline exams the caller may grade, with score counts */
+        get: operations["ExamOfflineController_schedules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules/{id}/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import scores from a filled score sheet (.xlsx or .csv) matched on No. Peserta */
+        post: operations["ExamOfflineController_importScores"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue the scores of an offline exam for sending to assessment-service */
+        post: operations["ExamOfflineController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules/{id}/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The seated students of an offline exam with their scores */
+        get: operations["ExamOfflineController_roster"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules/{id}/sheet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the prefilled score sheet (.xlsx) */
+        get: operations["ExamOfflineController_sheet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exam-offline/schedules/{id}/students/{studentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Enter, change or clear the score of one student */
+        put: operations["ExamOfflineController_save"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1669,6 +1822,23 @@ export interface components {
             id: string;
             name: string;
         };
+        ActivityReadinessCheckDto: {
+            detail: string;
+            /** @enum {string} */
+            key: "PACKAGE" | "SCHEDULES" | "SEATS" | "NUMBERS" | "SUPERVISORS" | "TECHNICIANS" | "LATE_TOLERANCE";
+            ok: boolean;
+        };
+        ActivityReadinessDto: {
+            /** Format: uuid */
+            activityId: string;
+            checks: components["schemas"]["ActivityReadinessCheckDto"][];
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
+            gradeName: string | null;
+            /** Format: date-time */
+            startsAt: string;
+            subjectName: string | null;
+        };
         AddPackageQuestionDto: {
             /** Format: uuid */
             authorEmployeeId?: string;
@@ -1704,6 +1874,9 @@ export interface components {
         };
         ApproveExamPackageDto: {
             note?: string;
+        };
+        AssignActivityClassroomsRequestDto: {
+            classroomIds: string[];
         };
         AssignSeatsDto: {
             /** @description Round-robin the students by classroom */
@@ -1800,7 +1973,14 @@ export interface components {
             updatedAt: string;
         };
         CreateActivityRequestDto: {
+            /** @default true */
+            autoStatus: boolean;
             classroomIds?: string[];
+            /**
+             * @default ONLINE
+             * @enum {string}
+             */
+            deliveryMode: "ONLINE" | "OFFLINE";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1808,6 +1988,10 @@ export interface components {
             eventId?: string | null;
             /** Format: uuid */
             gradeId: string;
+            /** @default 100 */
+            maxScore: number;
+            /** @enum {string|null} */
+            offlineKind?: "WRITTEN" | "PRACTICAL" | null;
             /** Format: uuid */
             packageId?: string | null;
             /** @enum {string} */
@@ -1894,8 +2078,11 @@ export interface components {
             guideHtml: string | null;
         };
         ExamActivityDetailDto: {
+            autoStatus: boolean;
             /** @enum {string} */
             category: "EXAM" | "NON_EXAM";
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1906,6 +2093,9 @@ export interface components {
             gradeName: string | null;
             /** Format: uuid */
             id: string;
+            maxScore: number;
+            /** @enum {string|null} */
+            offlineKind: "WRITTEN" | "PRACTICAL" | null;
             /** Format: uuid */
             packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
@@ -1926,8 +2116,11 @@ export interface components {
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
         };
         ExamActivityDto: {
+            autoStatus: boolean;
             /** @enum {string} */
             category: "EXAM" | "NON_EXAM";
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -1938,6 +2131,9 @@ export interface components {
             gradeName: string | null;
             /** Format: uuid */
             id: string;
+            maxScore: number;
+            /** @enum {string|null} */
+            offlineKind: "WRITTEN" | "PRACTICAL" | null;
             /** Format: uuid */
             packageId: string | null;
             policy: components["schemas"]["ExamPolicyDto"];
@@ -2118,6 +2314,8 @@ export interface components {
         };
         ExamPolicyDto: {
             allowWeb: boolean;
+            autoCloseGraceMinutes: number;
+            autoOpenLeadMinutes: number;
             focusThresholdMs: number;
             gapRecordedMs: number;
             gapTokenMs: number;
@@ -2178,6 +2376,8 @@ export interface components {
             createdAt: string;
             /** Format: uuid */
             createdById: string;
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -2193,8 +2393,8 @@ export interface components {
             makeupOfId: string | null;
             minSubmitMinutes: number;
             /** Format: uuid */
-            packageId: string;
-            packageTitle: string;
+            packageId: string | null;
+            packageTitle: string | null;
             /** Format: uuid */
             semesterId: string;
             /** Format: date-time */
@@ -2317,7 +2517,7 @@ export interface components {
             /** @enum {string} */
             kind: "REGULAR" | "MAKEUP";
             /** Format: uuid */
-            packageId: string;
+            packageId: string | null;
             /** Format: uuid */
             semesterId: string;
             sessions: number;
@@ -2463,6 +2663,8 @@ export interface components {
             activityStatus: "DRAFT" | "SCHEDULED" | "ACTIVE" | "CLOSED" | null;
             /** @enum {string} */
             category: "EXAM" | "NON_EXAM";
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
             durationMinutes: number;
             /** Format: date-time */
             endsAt: string;
@@ -2470,6 +2672,8 @@ export interface components {
             eventId: string | null;
             /** @description Null when the event cannot be named right now */
             eventName: string | null;
+            /** @description False while no question package is attached; never startable then */
+            hasPackage: boolean;
             /**
              * Format: uuid
              * @description The schedule id
@@ -2480,6 +2684,11 @@ export interface components {
             /** @description True for a makeup sitting */
             makeup: boolean;
             minSubmitMinutes: number;
+            /**
+             * @description Set for an offline exam only
+             * @enum {string|null}
+             */
+            offlineKind: "WRITTEN" | "PRACTICAL" | null;
             /** @description Null when no number was issued for the semester */
             participantNumber: string | null;
             /** @description Only filled while the exam is open */
@@ -2498,6 +2707,64 @@ export interface components {
             title: string;
             /** @enum {string} */
             type: "DAILY" | "ASSIGNMENT" | "MIDTERM" | "FINAL";
+        };
+        OfflineImportRejectionDto: {
+            participantNumber: string | null;
+            reason: string;
+            /** @description The 1-based row of the spreadsheet */
+            row: number;
+        };
+        OfflineImportResultDto: {
+            rejected: components["schemas"]["OfflineImportRejectionDto"][];
+            saved: number;
+            skipped: components["schemas"]["OfflineImportSkipDto"][];
+        };
+        OfflineImportSkipDto: {
+            participantNumber: string | null;
+            /**
+             * @description KOSONG: blank score, nothing changed; TIDAK_HADIR: absent student marked as such
+             * @enum {string}
+             */
+            reason: "KOSONG" | "TIDAK_HADIR";
+            /** @description The 1-based row of the spreadsheet */
+            row: number;
+        };
+        OfflinePublicationCountsDto: {
+            absent: number;
+            missing: number;
+            queued: number;
+        };
+        OfflineRosterRowDto: {
+            name: string | null;
+            note: string | null;
+            participantNumber: string | null;
+            /** @enum {string|null} */
+            publication: "PENDING" | "SENT" | "FAILED" | null;
+            rawScore: number | null;
+            /** @enum {string} */
+            state: "SCORED" | "ABSENT" | "MISSING";
+            /** Format: uuid */
+            studentId: string;
+        };
+        OfflineScheduleRowDto: {
+            absent: number;
+            /** Format: uuid */
+            activityId: string;
+            classroomName: string | null;
+            /** Format: date-time */
+            endsAt: string;
+            maxScore: number;
+            missing: number;
+            /** @enum {string} */
+            offlineKind: "WRITTEN" | "PRACTICAL";
+            published: number;
+            registered: number;
+            /** Format: uuid */
+            scheduleId: string;
+            scored: number;
+            /** Format: date-time */
+            startsAt: string;
+            subjectName: string | null;
         };
         PackageQuestionNoteDto: {
             note: string;
@@ -2756,19 +3023,27 @@ export interface components {
             /** Format: uuid */
             activityId: string | null;
             classroomName: string | null;
+            /** @enum {string} */
+            deliveryMode: "ONLINE" | "OFFLINE";
             /** Format: date-time */
             endsAt: string;
             /** Format: uuid */
             gradeId: string | null;
+            /** @enum {string|null} */
+            offlineKind: "WRITTEN" | "PRACTICAL" | null;
             packageTitle: string | null;
             registeredCount: number;
             /** Format: uuid */
             scheduleId: string | null;
-            startedCount: number;
+            startedCount: number | null;
             /** Format: date-time */
             startsAt: string;
             subjectName: string | null;
-            submittedCount: number;
+            submittedCount: number | null;
+        };
+        RequestOfflinePublicationDto: {
+            /** @description Send even when some students have no score yet */
+            confirmMissing?: boolean;
         };
         ResetCredentialsBodyDto: {
             /**
@@ -2841,6 +3116,7 @@ export interface components {
             absence: components["schemas"]["RoomMonitorAbsenceDto"] | null;
             classroomName: string | null;
             nis: string | null;
+            offline: boolean;
             packageTitle: string;
             participantNumber: string | null;
             /** Format: uuid */
@@ -3037,6 +3313,12 @@ export interface components {
             answer: components["schemas"]["KeyAnswerPayloadDto"] | components["schemas"]["KeysAnswerPayloadDto"] | components["schemas"]["ValueAnswerPayloadDto"] | components["schemas"]["TextAnswerPayloadDto"];
             /** Format: uuid */
             questionId: string;
+        };
+        SaveOfflineScoreDto: {
+            /** @description Omitted keeps the stored note; null or an empty string clears it */
+            note?: string | null;
+            /** @description From 0 up to the maximum score of the activity, at most two decimals; null clears the score */
+            rawScore: number | null;
         };
         ScheduleSessionDto: {
             /** @enum {string} */
@@ -3283,8 +3565,13 @@ export interface components {
         TrueFalseContentDto: {
             answer: components["schemas"]["BooleanAnswerDto"];
         };
+        UpdateActivityAutoStatusRequestDto: {
+            autoStatus: boolean;
+        };
         UpdateActivityPolicyRequestDto: {
             allowWeb?: boolean;
+            autoCloseGraceMinutes?: number;
+            autoOpenLeadMinutes?: number;
             focusThresholdMs?: number;
             gapRecordedMs?: number;
             gapTokenMs?: number;
@@ -3483,6 +3770,68 @@ export interface operations {
             };
         };
     };
+    ExamActivityController_switchAutoStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActivityAutoStatusRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_assign: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignActivityClassroomsRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ExamActivityDetailDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
     ExamActivityController_attach: {
         parameters: {
             query?: never;
@@ -3590,6 +3939,35 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["ExamActivityDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamActivityController_readinessOfDay: {
+        parameters: {
+            query: {
+                /** @description Day in Asia/Jakarta */
+                date: string;
+                eventId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["ActivityReadinessDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
@@ -4290,6 +4668,184 @@ export interface operations {
                 };
                 content: {
                     "application/octet-stream": string;
+                };
+            };
+        };
+    };
+    ExamOfflineController_schedules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["OfflineScheduleRowDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamOfflineController_importScores: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["OfflineImportResultDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamOfflineController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestOfflinePublicationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["OfflinePublicationCountsDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+            /** @description OFFLINE_SCORES_MISSING: some students have no score yet */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ExamOfflineController_roster: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["OfflineRosterRowDto"][];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamOfflineController_sheet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The score sheet */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    ExamOfflineController_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveOfflineScoreDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["OfflineRosterRowDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
                 };
             };
         };

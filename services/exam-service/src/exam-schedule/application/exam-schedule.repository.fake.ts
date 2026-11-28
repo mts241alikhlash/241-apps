@@ -59,6 +59,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
   findForGrading(query: ExamScheduleGradingQuery) {
     const rows = [...this.schedules.values()]
       .filter((row) => row.semesterId === query.semesterId)
+      .filter((row) => row.packageId !== null)
       .filter(
         (row) => !query.category || categoryOf(row.type) === query.category,
       )
@@ -111,6 +112,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     const now = new Date()
     const row: ExamSchedule = {
       id: randomUUID(),
+      deliveryMode: 'ONLINE',
       packageId: input.packageId,
       packageTitle: pkg.title,
       subjectId: pkg.subjectId,
@@ -142,6 +144,7 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     const now = new Date()
     const row: ExamSchedule = {
       id: randomUUID(),
+      deliveryMode: 'ONLINE',
       packageId: input.packageId,
       packageTitle: pkg.title,
       subjectId: pkg.subjectId,
@@ -271,6 +274,24 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
             row.kind === 'REGULAR' &&
             row.startsAt.getTime() < to.getTime() &&
             row.endsAt.getTime() > from.getTime(),
+        )
+        .sort(
+          (a, b) =>
+            a.startsAt.getTime() - b.startsAt.getTime() ||
+            a.id.localeCompare(b.id),
+        ),
+    )
+  }
+
+  findOfflineBySemester(semesterId: string) {
+    return Promise.resolve(
+      [...this.schedules.values()]
+        .filter(
+          (row) =>
+            row.semesterId === semesterId &&
+            row.deliveryMode === 'OFFLINE' &&
+            row.kind === 'REGULAR' &&
+            row.status !== 'CANCELLED',
         )
         .sort(
           (a, b) =>

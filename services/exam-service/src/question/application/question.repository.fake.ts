@@ -132,6 +132,7 @@ export function buildTeacherScope(fixture: ScopeFixture): {
   const academic = {
     teachingPairsOf: () => Promise.resolve(fixture.pairs ?? []),
     classroomsByIds: () => Promise.resolve([]),
+    classroomsOfYear: () => Promise.resolve([]),
     activeSemester: () => Promise.resolve(null),
     teachingAssignmentsOf: () => Promise.resolve([]),
     subjectsByIds: () => Promise.resolve([]),

@@ -5,6 +5,22 @@ import { defineComponent } from 'vue'
 import { floatingFieldStub } from '@/test-support/floatingFieldStub'
 import ActivityForm from './ActivityForm.vue'
 
+const presetList = vi.hoisted(() =>
+  vi.fn(() => Promise.resolve([] as unknown[])),
+)
+vi.mock('@/features/exam-preset/api/examPresetApi', () => ({
+  examPresetApi: { list: presetList },
+}))
+
+const preset = (type: string, open: number, close: number, late: number) => ({
+  type,
+  policy: {
+    autoOpenLeadMinutes: open,
+    autoCloseGraceMinutes: close,
+    lateToleranceMinutes: late,
+  },
+})
+
 const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const button = defineComponent({
   props: { variant: String, disabled: Boolean, type: String },
@@ -46,6 +62,14 @@ const numberInput = defineComponent({
     '<input :value="modelValue" @input="$emit(\'update:modelValue\', Number($event.target.value))" />',
 })
 
+const switchStub = defineComponent({
+  name: 'SwitchStub',
+  props: { modelValue: Boolean },
+  emits: ['update:modelValue'],
+  template:
+    '<button type="button" role="switch" :aria-checked="String(modelValue)" @click="$emit(\'update:modelValue\', !modelValue)" />',
+})
+
 const stubs = {
   FloatingField: floatingFieldStub,
   FloatingLabelField: passthrough,
@@ -69,6 +93,7 @@ const stubs = {
   CommandEmpty: passthrough,
   CommandGroup: passthrough,
   CommandItem: commandItem,
+  Switch: switchStub,
 }
 
 const props = {
@@ -122,6 +147,175 @@ const submitForm = async (host: VueWrapper) => {
 
 const classroomButtons = (host: VueWrapper) =>
   host.findAll('[data-field="classroomIds"] button[type="button"]')
+
+const fillBasics = async (host: VueWrapper) => {
+  await emitFrom(host, 'gradeId', 'SelectStub', 'grade-7')
+  await emitFrom(host, 'subjectId', 'ComboStub', 'subject-inf')
+  await typeInto(host, 'startDate', '2026-11-10')
+  await typeInto(host, 'startTime', '08:00')
+  await typeInto(host, 'endDate', '2026-11-10')
+  await typeInto(host, 'endTime', '11:00')
+}
+
+describe('ActivityForm delivery mode', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('offers Online and Offline and defaults to Online with the package field', () => {
+    const wrapper = open()
+
+    const options = wrapper
+      .get('[data-field="deliveryMode"]')
+      .findAll('option')
+      .map((opt) => opt.text())
+    expect(options).toEqual(['Online', 'Offline'])
+    expect(wrapper.find('[data-field="packageId"]').exists()).toBe(true)
+    expect(wrapper.find('[data-field="offlineKind"]').exists()).toBe(false)
+    expect(wrapper.find('[data-field="maxScore"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('hides the package for Offline and shows Type and Max score', async () => {
+    const wrapper = open()
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+
+    expect(wrapper.find('[data-field="packageId"]').exists()).toBe(false)
+    const kinds = wrapper
+      .get('[data-field="offlineKind"]')
+      .findAll('option')
+      .map((opt) => opt.text())
+    expect(kinds).toEqual(['Written', 'Practical'])
+    expect(wrapper.find('[data-field="maxScore"]').exists()).toBe(true)
+    expect(wrapper.find('[data-field="classroomIds"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('requires the Offline type', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+    await submitForm(wrapper)
+
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(wrapper.text()).toContain('Tipe wajib dipilih')
+    wrapper.unmount()
+  })
+
+  it.each([0, 1001])('rejects a max score of %i', async (score) => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+    await emitFrom(wrapper, 'offlineKind', 'SelectStub', 'WRITTEN')
+    await typeInto(wrapper, 'maxScore', String(score))
+    await submitForm(wrapper)
+
+    expect(wrapper.emitted('submit')).toBeUndefined()
+    expect(wrapper.text()).toContain('Nilai maksimal harus 1 sampai 1000')
+    wrapper.unmount()
+  })
+
+  it('submits the Offline payload without a package', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+    await emitFrom(wrapper, 'offlineKind', 'SelectStub', 'PRACTICAL')
+    await typeInto(wrapper, 'maxScore', '80')
+    await submitForm(wrapper)
+
+    const payload = wrapper.emitted('submit')?.[0]?.[0] as Record<
+      string,
+      unknown
+    >
+    expect(payload).toMatchObject({
+      deliveryMode: 'OFFLINE',
+      offlineKind: 'PRACTICAL',
+      maxScore: 80,
+      autoStatus: true,
+    })
+    expect(payload).not.toHaveProperty('packageId')
+    wrapper.unmount()
+  })
+
+  it('submits the Online defaults explicitly', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await submitForm(wrapper)
+
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
+      deliveryMode: 'ONLINE',
+      offlineKind: null,
+      maxScore: 100,
+      autoStatus: true,
+    })
+    wrapper.unmount()
+  })
+
+  it('sends autoStatus false when the switch is turned off', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await wrapper.get('[role="switch"]').trigger('click')
+    await submitForm(wrapper)
+
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
+      autoStatus: false,
+    })
+    wrapper.unmount()
+  })
+
+  it('fixes the token to Token tetap for Offline', async () => {
+    const wrapper = open()
+    await fillBasics(wrapper)
+    await emitFrom(wrapper, 'deliveryMode', 'SelectStub', 'OFFLINE')
+    await emitFrom(wrapper, 'offlineKind', 'SelectStub', 'WRITTEN')
+
+    expect(wrapper.find('[data-field="tokenMode"]').exists()).toBe(false)
+    await submitForm(wrapper)
+    expect(wrapper.emitted('submit')?.[0]?.[0]).toMatchObject({
+      tokenMode: 'STATIC',
+    })
+    wrapper.unmount()
+  })
+
+  it('states the timings of the preset of the chosen type', async () => {
+    presetList.mockResolvedValueOnce([
+      preset('DAILY', 7, 20, 25),
+      preset('ASSIGNMENT', 3, 10, 12),
+    ])
+    const wrapper = open()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('7 menit sebelum mulai')
+    expect(wrapper.text()).toContain('20 menit setelah selesai')
+    expect(wrapper.text()).toContain('Toleransi terlambat 25 menit')
+    expect(wrapper.text()).not.toContain('nilai bawaan')
+
+    await emitFrom(wrapper, 'presetName', 'SelectStub', 'ASSIGNMENT')
+
+    expect(wrapper.text()).toContain('3 menit sebelum mulai')
+    expect(wrapper.text()).toContain('Toleransi terlambat 12 menit')
+    wrapper.unmount()
+  })
+
+  it('labels the code defaults when the chosen type has no stored preset', async () => {
+    presetList.mockResolvedValueOnce([preset('ASSIGNMENT', 3, 10, 12)])
+    const wrapper = open()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('5 menit sebelum mulai')
+    expect(wrapper.text()).toContain('15 menit setelah selesai')
+    expect(wrapper.text()).toContain('nilai bawaan')
+    wrapper.unmount()
+  })
+
+  it('shows no numbers and points to the detail page when the presets cannot be loaded', async () => {
+    presetList.mockRejectedValueOnce(new Error('forbidden'))
+    const wrapper = open()
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain('menit sebelum mulai')
+    expect(wrapper.text()).toContain('halaman detail kegiatan')
+    wrapper.unmount()
+  })
+})
 
 describe('ActivityForm', () => {
   beforeEach(() => vi.clearAllMocks())

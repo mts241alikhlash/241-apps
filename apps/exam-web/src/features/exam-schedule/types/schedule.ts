@@ -69,8 +69,8 @@ export type MakeupParticipant = Schemas['ParticipantDto']
 
 export interface MakeupOrigin {
   id: string
-  packageId: string
-  packageTitle: string
+  packageId: string | null
+  packageTitle: string | null
   classroomName: string | null
   durationMinutes: number
   endsAt: string

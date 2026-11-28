@@ -27,13 +27,27 @@ export function lifecycleWindow(
 }
 
 export function scheduleLifecycle(
-  schedule: LifecycleWindow & { kind: 'REGULAR' | 'MAKEUP' },
+  schedule: LifecycleWindow & {
+    kind: 'REGULAR' | 'MAKEUP'
+    deliveryMode: 'ONLINE' | 'OFFLINE'
+    packageId: string | null
+  },
   activity: (LifecycleWindow & { status: ExamActivityStatus }) | null,
   now: Date,
 ): ExamLifecycle {
-  return examLifecycle(
-    activity?.status ?? 'ACTIVE',
-    lifecycleWindow(schedule, activity),
-    now,
-  )
+  const status =
+    schedule.kind === 'MAKEUP' ? 'ACTIVE' : (activity?.status ?? 'ACTIVE')
+  const window = lifecycleWindow(schedule, activity)
+  if (schedule.deliveryMode === 'OFFLINE') {
+    return status !== 'CLOSED' && now.getTime() < window.startsAt.getTime()
+      ? 'UPCOMING'
+      : 'FINISHED'
+  }
+  if (
+    status === 'SCHEDULED' ||
+    (status === 'ACTIVE' && schedule.packageId === null)
+  ) {
+    return now.getTime() < window.endsAt.getTime() ? 'UPCOMING' : 'FINISHED'
+  }
+  return examLifecycle(status, window, now)
 }

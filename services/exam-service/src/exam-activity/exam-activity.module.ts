@@ -1,11 +1,18 @@
 import { forwardRef, Module } from '@nestjs/common'
+import { SchoolTimeModule } from '@mts241alikhlash/nest-core/time'
+import { ExamRoomModule } from '../exam-room/exam-room.module.js'
 import { ExamScheduleModule } from '../exam-schedule/exam-schedule.module.js'
 import { ExamSessionModule } from '../exam-session/exam-session.module.js'
+import { AdvanceActivityStatusUseCase } from './application/use-cases/advance-activity-status/advance-activity-status.use-case.js'
+import { ActivityLifecycleJob } from './infrastructure/jobs/activity-lifecycle.job.js'
+import { AssignActivityClassroomsUseCase } from './application/use-cases/assign-activity-classrooms/assign-activity-classrooms.use-case.js'
 import { AttachActivityPackageUseCase } from './application/use-cases/attach-activity-package/attach-activity-package.use-case.js'
 import { CreateActivityUseCase } from './application/use-cases/create-activity/create-activity.use-case.js'
+import { GetActivityReadinessUseCase } from './application/use-cases/get-activity-readiness/get-activity-readiness.use-case.js'
 import { IssueParticipantNumbersUseCase } from './application/use-cases/issue-participant-numbers/issue-participant-numbers.use-case.js'
 import { ListActivitiesUseCase } from './application/use-cases/list-activities/list-activities.use-case.js'
 import { ManagePresetsUseCase } from './application/use-cases/manage-presets/manage-presets.use-case.js'
+import { UpdateActivityAutoStatusUseCase } from './application/use-cases/update-activity-auto-status/update-activity-auto-status.use-case.js'
 import { UpdateActivityStatusUseCase } from './application/use-cases/update-activity-status/update-activity-status.use-case.js'
 import {
   RotateActivityTokenUseCase,
@@ -18,8 +25,10 @@ import { ExamPolicyPresetController } from './presentation/http/exam-policy-pres
 
 @Module({
   imports: [
+    SchoolTimeModule,
     forwardRef(() => ExamScheduleModule),
     forwardRef(() => ExamSessionModule),
+    forwardRef(() => ExamRoomModule),
   ],
   controllers: [ExamActivityController, ExamPolicyPresetController],
   providers: [
@@ -32,6 +41,11 @@ import { ExamPolicyPresetController } from './presentation/http/exam-policy-pres
     RotateActivityTokenUseCase,
     IssueParticipantNumbersUseCase,
     AttachActivityPackageUseCase,
+    AssignActivityClassroomsUseCase,
+    AdvanceActivityStatusUseCase,
+    GetActivityReadinessUseCase,
+    UpdateActivityAutoStatusUseCase,
+    ActivityLifecycleJob,
   ],
   exports: [ExamActivityRepository],
 })

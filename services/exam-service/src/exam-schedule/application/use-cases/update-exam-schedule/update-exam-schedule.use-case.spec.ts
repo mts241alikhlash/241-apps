@@ -325,7 +325,7 @@ describe('Update and cancel exam schedule', () => {
     async function withMakeup() {
       const original = (await schedules.findById(scheduleId))!
       const makeup = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-03T01:00:00.000Z'),

@@ -82,7 +82,7 @@ describe('ListAbsenteesUseCase', () => {
       sessionFor(schedule, { id: 'b', studentId: ids.citra }),
     )
     await schedules.createMakeup({
-      packageId: schedule.packageId,
+      packageId: schedule.packageId!,
       classroomId: schedule.classroomId,
       semesterId: schedule.semesterId,
       startsAt: new Date(schedule.endsAt.getTime() + 86_400_000),
@@ -107,7 +107,7 @@ describe('ListAbsenteesUseCase', () => {
   it('does not count a makeup that was cancelled or already ended', async () => {
     const { schedule, schedules, useCase } = await setup()
     const makeup = await schedules.createMakeup({
-      packageId: schedule.packageId,
+      packageId: schedule.packageId!,
       classroomId: schedule.classroomId,
       semesterId: schedule.semesterId,
       startsAt: new Date('2026-11-03T01:00:00Z'),
@@ -130,7 +130,7 @@ describe('ListAbsenteesUseCase', () => {
   it('refuses a missing schedule and a makeup schedule', async () => {
     const { schedule, schedules, useCase } = await setup()
     const makeup = await schedules.createMakeup({
-      packageId: schedule.packageId,
+      packageId: schedule.packageId!,
       classroomId: schedule.classroomId,
       semesterId: schedule.semesterId,
       startsAt: new Date('2026-11-03T01:00:00Z'),
@@ -153,7 +153,7 @@ describe('ListAbsenteesUseCase', () => {
   it('keeps out a student who already sat an earlier makeup that has ended', async () => {
     const { schedule, schedules, sessions, useCase } = await setup()
     const first = await schedules.createMakeup({
-      packageId: schedule.packageId,
+      packageId: schedule.packageId!,
       classroomId: schedule.classroomId,
       semesterId: schedule.semesterId,
       startsAt: new Date('2026-11-03T01:00:00Z'),

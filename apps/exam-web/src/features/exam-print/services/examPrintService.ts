@@ -23,6 +23,7 @@ export const scheduleOfActivity = (
   classroomName: activity.gradeName,
   createdAt: activity.startsAt,
   createdById: '',
+  deliveryMode: activity.deliveryMode,
   durationMinutes: activity.durationMinutes,
   endsAt: activity.endsAt,
   eventId: activity.eventId,

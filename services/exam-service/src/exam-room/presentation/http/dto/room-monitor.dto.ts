@@ -12,6 +12,12 @@ import {
   Min,
 } from 'class-validator'
 import { PaginationQueryDto } from '@mts241alikhlash/nest-core/dto'
+import {
+  EXAM_DELIVERY_MODES,
+  EXAM_OFFLINE_KINDS,
+  type ExamDeliveryMode,
+  type ExamOfflineKind,
+} from '../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import { ROOM_EXECUTION_CONDITIONS } from '../../../../exam-room/domain/entities/exam-room-report.entity.js'
 import { MAKEUP_REASONS } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type {
@@ -142,6 +148,7 @@ export class RoomMonitorParticipantDto {
   @ApiProperty() packageTitle!: string
   @ApiProperty({ format: 'uuid' }) scheduleId!: string
   @ApiProperty() totalQuestions!: number
+  @ApiProperty() offline!: boolean
   @ApiProperty({ type: () => RoomMonitorSessionDto, nullable: true })
   session!: RoomMonitorSessionDto | null
   @ApiProperty({ type: () => RoomMonitorAbsenceDto, nullable: true })
@@ -159,6 +166,7 @@ export class RoomMonitorParticipantDto {
     dto.packageTitle = domain.packageTitle
     dto.scheduleId = domain.scheduleId
     dto.totalQuestions = domain.totalQuestions
+    dto.offline = domain.offline
     dto.session =
       domain.session === null
         ? null
@@ -359,6 +367,9 @@ export class ReportScheduleDto {
   scheduleId!: string | null
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   activityId!: string | null
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES }) deliveryMode!: ExamDeliveryMode
+  @ApiProperty({ enum: EXAM_OFFLINE_KINDS, nullable: true })
+  offlineKind!: ExamOfflineKind | null
   @ApiProperty({ type: String, nullable: true }) packageTitle!: string | null
   @ApiProperty({ type: String, format: 'uuid', nullable: true })
   gradeId!: string | null
@@ -367,8 +378,8 @@ export class ReportScheduleDto {
   @ApiProperty({ format: 'date-time' }) startsAt!: string
   @ApiProperty({ format: 'date-time' }) endsAt!: string
   @ApiProperty() registeredCount!: number
-  @ApiProperty() startedCount!: number
-  @ApiProperty() submittedCount!: number
+  @ApiProperty({ type: Number, nullable: true }) startedCount!: number | null
+  @ApiProperty({ type: Number, nullable: true }) submittedCount!: number | null
   @ApiProperty() absentCount!: number
 
   static fromDomain(domain: ReportScheduleRow): ReportScheduleDto {

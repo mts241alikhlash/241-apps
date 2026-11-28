@@ -18,7 +18,8 @@ const mountSheet = (extra: Record<string, unknown> = {}) =>
       roomName: 'Ruang 1',
       date: 'Senin, 23 November 2026',
       packages: 'Quran Hadits',
-      timeRange: '07:00 - 08:15',
+      startsAt: '2026-11-23T00:00:00.000Z',
+      endsAt: '2026-11-23T01:15:00.000Z',
       students,
       ...extra,
     },
@@ -37,6 +38,13 @@ describe('AttendanceSheet', () => {
       'Ahyar Sudrajat, S.Pd.I',
       'Fajar Hapidin, S.Sos',
     ])
+  })
+
+  it('labels the start and the end of the exam', () => {
+    const text = mountSheet().text()
+
+    expect(text).toMatch(/Mulai\s*:\s*\d{2}:\d{2}/)
+    expect(text).toMatch(/Selesai\s*:\s*\d{2}:\d{2}/)
   })
 
   it('leaves the name lines empty when nobody is assigned', () => {

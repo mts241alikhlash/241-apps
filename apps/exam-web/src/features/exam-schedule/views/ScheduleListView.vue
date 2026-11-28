@@ -405,7 +405,7 @@ const dayColumns: ColumnDef<DayGroup>[] = [
 const byClassroom = (left: ExamSchedule, right: ExamSchedule): number =>
   compareClassroom(left.classroomName, right.classroomName) ||
   left.startsAt.localeCompare(right.startsAt) ||
-  left.packageTitle.localeCompare(right.packageTitle, 'id')
+  (left.packageTitle ?? '').localeCompare(right.packageTitle ?? '', 'id')
 
 type ScheduleListRow = PeriodGroup | DayGroup | ExamSchedule
 

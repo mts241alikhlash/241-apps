@@ -112,15 +112,72 @@ describe('ActivityStatusDialog', () => {
     wrapper.unmount()
   })
 
-  it('does not allow activation without a package', () => {
-    const wrapper = open(activity({ packageId: null, status: 'DRAFT' }))
+  it('does not allow activating an online activity without a package, but allows scheduling it', () => {
+    const wrapper = open(
+      activity({ packageId: null, status: 'DRAFT', deliveryMode: 'ONLINE' }),
+    )
 
     const disabled = wrapper
       .findAll('option')
       .filter((option) => option.attributes('disabled') !== undefined)
       .map((option) => option.attributes('value'))
-    expect(disabled).toEqual(['SCHEDULED', 'ACTIVE'])
+    expect(disabled).toEqual(['ACTIVE'])
     expect(wrapper.text()).toContain('Pasang paket soal dulu')
+    wrapper.unmount()
+  })
+
+  it('opens on the preset status and explains sharing without a package', async () => {
+    updateStatus.mockResolvedValue(undefined)
+    const wrapper = mount(ActivityStatusDialog, {
+      props: {
+        open: true,
+        activity: activity({ packageId: null, status: 'DRAFT' }),
+        presetStatus: 'SCHEDULED',
+      },
+      global: { stubs },
+    })
+
+    expect(wrapper.text()).toContain(
+      'Jadwal dibagikan tanpa paket soal; ujian baru bisa dibuka setelah paket dipasang',
+    )
+    await submit(wrapper)
+    expect(updateStatus).toHaveBeenCalledWith('act-1', 'SCHEDULED')
+    wrapper.unmount()
+  })
+
+  it('explains that offline exams are not opened in the app and allows every status', () => {
+    const wrapper = open(
+      activity({ packageId: null, status: 'DRAFT', deliveryMode: 'OFFLINE' }),
+    )
+
+    expect(wrapper.text()).toContain('Ujian offline tidak dibuka di aplikasi')
+    const disabled = wrapper
+      .findAll('option')
+      .filter((option) => option.attributes('disabled') !== undefined)
+    expect(disabled).toHaveLength(0)
+    wrapper.unmount()
+  })
+
+  it('shows the server message when the server refuses ACTIVE for an online activity without a package', async () => {
+    updateStatus.mockRejectedValue({
+      response: {
+        status: 409,
+        data: { message: 'Pasang paket soal sebelum membuka ujian' },
+      },
+    })
+    const wrapper = open(activity({ packageId: null, status: 'SCHEDULED' }))
+    await wrapper
+      .get('[data-field="status"]')
+      .findComponent({ name: 'SelectStub' })
+      .vm.$emit('update:modelValue', 'ACTIVE')
+    await flushPromises()
+    await submit(wrapper)
+
+    expect(updateStatus).toHaveBeenCalledWith('act-1', 'ACTIVE')
+    expect(wrapper.get('[role="alert"]').text()).toContain(
+      'Pasang paket soal sebelum membuka ujian',
+    )
+    expect(wrapper.emitted('saved')).toBeUndefined()
     wrapper.unmount()
   })
 
@@ -147,5 +204,116 @@ describe('ActivityStatusDialog', () => {
     expect(wrapper.emitted('saved')).toBeUndefined()
     expect(wrapper.emitted('update:open')).toBeUndefined()
     wrapper.unmount()
+  })
+
+  describe('auto status warnings', () => {
+    const minutes = (offset: number) =>
+      new Date(Date.now() + offset * 60_000).toISOString()
+    const auto = (overrides: Partial<ExamActivityRecord> = {}) =>
+      activity({
+        status: 'DRAFT',
+        deliveryMode: 'ONLINE',
+        autoStatus: true,
+        policy: {
+          autoOpenLeadMinutes: 5,
+          autoCloseGraceMinutes: 15,
+        } as ExamActivityRecord['policy'],
+        startsAt: minutes(-10),
+        endsAt: minutes(60),
+        ...overrides,
+      })
+    const choose = async (wrapper: ReturnType<typeof open>, status: string) => {
+      await wrapper
+        .get('[data-field="status"]')
+        .findComponent({ name: 'SelectStub' })
+        .vm.$emit('update:modelValue', status)
+      await flushPromises()
+    }
+    const OPENS =
+      'Status otomatis aktif: kegiatan akan dibuka otomatis dalam satu menit'
+    const CLOSES_AFTER_WORK =
+      'Status otomatis aktif: kegiatan akan ditutup otomatis setelah tidak ada siswa yang masih mengerjakan'
+    const CLOSES =
+      'Status otomatis aktif: kegiatan akan ditutup otomatis dalam satu menit'
+
+    it('warns that scheduling inside the window opens the activity', async () => {
+      const wrapper = open(auto())
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it('warns within the open lead before the start', async () => {
+      const wrapper = open(auto({ startsAt: minutes(3), endsAt: minutes(60) }))
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it.each([
+      ['auto status is off', { autoStatus: false }],
+      ['the activity is offline', { deliveryMode: 'OFFLINE' as const }],
+      ['no package is attached', { packageId: null }],
+      ['the open lead has not come', { startsAt: minutes(30) }],
+    ])('stays quiet when %s', async (_, overrides) => {
+      const wrapper = open(auto(overrides))
+      await choose(wrapper, 'SCHEDULED')
+
+      expect(wrapper.text()).not.toContain('Status otomatis aktif')
+      wrapper.unmount()
+    })
+
+    it('warns that activating past the end and grace closes it again', async () => {
+      const wrapper = open(
+        auto({
+          status: 'CLOSED',
+          startsAt: minutes(-180),
+          endsAt: minutes(-120),
+        }),
+      )
+      await choose(wrapper, 'ACTIVE')
+
+      expect(wrapper.text()).toContain(CLOSES_AFTER_WORK)
+      expect(wrapper.text()).not.toContain(OPENS)
+      wrapper.unmount()
+    })
+
+    it.each([
+      ['online', 'ONLINE' as const],
+      ['offline', 'OFFLINE' as const],
+    ])(
+      'warns that scheduling an %s activity past the end and grace closes it',
+      async (_, deliveryMode) => {
+        const wrapper = open(
+          auto({
+            status: 'CLOSED',
+            deliveryMode,
+            startsAt: minutes(-180),
+            endsAt: minutes(-120),
+          }),
+        )
+        await choose(wrapper, 'SCHEDULED')
+
+        expect(wrapper.text()).toContain(CLOSES)
+        expect(wrapper.text()).not.toContain(OPENS)
+        wrapper.unmount()
+      },
+    )
+
+    it('stays quiet when activating within the grace', async () => {
+      const wrapper = open(
+        auto({
+          status: 'CLOSED',
+          startsAt: minutes(-70),
+          endsAt: minutes(-10),
+        }),
+      )
+      await choose(wrapper, 'ACTIVE')
+
+      expect(wrapper.text()).not.toContain('Status otomatis aktif')
+      wrapper.unmount()
+    })
   })
 })

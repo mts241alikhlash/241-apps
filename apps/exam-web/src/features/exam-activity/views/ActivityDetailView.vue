@@ -3,11 +3,12 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRouteCategory } from '@/features/exam-shared/useRouteCategory'
 import { toast } from 'vue-sonner'
-import { SquarePen } from '@lucide/vue'
+import { CalendarCheck, PackagePlus, SquarePen, Users } from '@lucide/vue'
 import { useAuthSession } from '@mts241alikhlash/platform/auth'
 import { BackButton, DataTable, DataTableEmpty } from '@mts241alikhlash/ui'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { Button } from '@mts241alikhlash/ui/button'
+import { Switch } from '@mts241alikhlash/ui/switch'
 import {
   Card,
   CardContent,
@@ -22,6 +23,10 @@ import {
   gradeOfClassroom,
 } from '@/features/exam-shared/classroomName'
 import ActivityPolicyDialog from '../components/ActivityPolicyDialog.vue'
+import ActivityStatusDialog from '../components/ActivityStatusDialog.vue'
+import AssignClassroomsDialog from '../components/AssignClassroomsDialog.vue'
+import AttachPackageDialog from '../components/AttachPackageDialog.vue'
+import DeliveryBadge from '../components/DeliveryBadge.vue'
 import { examActivityApi } from '../api/examActivityApi'
 import {
   activityStatusLabel,
@@ -36,11 +41,49 @@ const { hasPermission } = useAuthSession()
 const activityId = computed(() => String(route.params.id ?? ''))
 const { sectionPrefix } = useRouteCategory()
 const canManageAll = computed(() => hasPermission('exam-schedules.manage-all'))
+const canManage = computed(() =>
+  detail.value?.category === 'EXAM'
+    ? hasPermission('exam-schedules.manage-all') ||
+      hasPermission('exam-events.manage')
+    : hasPermission('exam-schedules.manage') ||
+      hasPermission('exam-schedules.manage-all'),
+)
 
 const detail = ref<ExamActivityDetail | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const policyOpen = ref(false)
+const statusOpen = ref(false)
+const attachOpen = ref(false)
+const assignOpen = ref(false)
+const autoStatusError = ref<string | null>(null)
+const autoStatusSaving = ref(false)
+
+const isOffline = computed(() => detail.value?.deliveryMode === 'OFFLINE')
+const canAttach = computed(
+  () =>
+    detail.value !== null &&
+    !isOffline.value &&
+    detail.value.packageId === null,
+)
+const assignedIds = computed(() =>
+  (detail.value?.schedules ?? []).map((item) => item.classroomId),
+)
+
+async function toggleAutoStatus(next: boolean): Promise<void> {
+  const current = detail.value
+  if (current === null || autoStatusSaving.value) return
+  autoStatusSaving.value = true
+  autoStatusError.value = null
+  try {
+    await examActivityApi.setAutoStatus(current.id, next)
+    detail.value = { ...current, autoStatus: next }
+  } catch (err: unknown) {
+    autoStatusError.value = messageOf(err, 'Status otomatis gagal diubah.')
+  } finally {
+    autoStatusSaving.value = false
+  }
+}
 
 type ScheduleRow = ExamActivityDetail['schedules'][number]
 
@@ -171,6 +214,34 @@ onMounted(load)
             {{ detail?.subjectName ?? 'Detail Kegiatan' }}
           </CardTitle>
         </div>
+        <div
+          v-if="detail && canManage"
+          class="flex shrink-0 flex-wrap gap-2"
+        >
+          <Button
+            v-if="detail.status === 'DRAFT'"
+            @click="statusOpen = true"
+          >
+            <CalendarCheck class="size-4" />
+            Bagikan jadwal
+          </Button>
+          <Button
+            v-if="canAttach"
+            variant="outline"
+            @click="attachOpen = true"
+          >
+            <PackagePlus class="size-4" />
+            Pasang paket
+          </Button>
+          <Button
+            v-if="detail.status !== 'CLOSED'"
+            variant="outline"
+            @click="assignOpen = true"
+          >
+            <Users class="size-4" />
+            Tetapkan kelas
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent
@@ -206,6 +277,22 @@ onMounted(load)
               <dd class="font-medium">
                 {{ detail.type ? examTypeLabel(detail.type) : '-' }}
               </dd>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <dt class="text-control text-muted-foreground">Mode</dt>
+              <dd class="font-medium">
+                <DeliveryBadge
+                  :delivery-mode="detail.deliveryMode"
+                  :offline-kind="detail.offlineKind"
+                />
+              </dd>
+            </div>
+            <div
+              v-if="isOffline"
+              class="flex flex-col gap-0.5"
+            >
+              <dt class="text-control text-muted-foreground">Nilai maksimal</dt>
+              <dd class="font-medium">{{ detail.maxScore }}</dd>
             </div>
             <div class="flex flex-col gap-0.5">
               <dt class="text-control text-muted-foreground">Tingkat</dt>
@@ -244,6 +331,52 @@ onMounted(load)
               </dd>
             </div>
           </dl>
+
+          <p
+            v-if="isOffline"
+            class="text-control text-muted-foreground"
+          >
+            Ujian offline tidak dibuka di aplikasi. Status hanya menandai jadwal
+            terbagi, berlangsung, atau selesai.
+          </p>
+          <p
+            v-if="canAttach && canManage && detail.status === 'DRAFT'"
+            class="text-control text-muted-foreground"
+          >
+            Jadwal bisa dibagikan tanpa paket soal; ujian baru bisa dibuka
+            setelah paket dipasang.
+          </p>
+          <p
+            v-else-if="canAttach && canManage && detail.status === 'SCHEDULED'"
+            class="text-control text-muted-foreground"
+          >
+            Jadwal sudah dibagikan tanpa paket soal; ujian baru bisa dibuka
+            setelah paket dipasang.
+          </p>
+
+          <div class="shrink-0 space-y-1">
+            <label class="flex items-center gap-2 text-control">
+              <Switch
+                :model-value="detail.autoStatus"
+                :disabled="!canManage || autoStatusSaving"
+                aria-label="Auto status"
+                @update:model-value="toggleAutoStatus"
+              />
+              <span>Auto status</span>
+            </label>
+            <p class="text-control text-muted-foreground">
+              Dibuka {{ detail.policy.autoOpenLeadMinutes }} menit sebelum mulai
+              dan ditutup {{ detail.policy.autoCloseGraceMinutes }} menit
+              setelah selesai.
+            </p>
+            <p
+              v-if="autoStatusError !== null"
+              role="alert"
+              class="text-control text-destructive"
+            >
+              {{ autoStatusError }}
+            </p>
+          </div>
 
           <Card
             gap="none"
@@ -375,6 +508,29 @@ onMounted(load)
       </CardContent>
       <CardFooter plain />
     </Card>
+
+    <ActivityStatusDialog
+      v-if="detail && statusOpen"
+      v-model:open="statusOpen"
+      :activity="detail"
+      preset-status="SCHEDULED"
+      @saved="load"
+    />
+
+    <AttachPackageDialog
+      v-if="detail && attachOpen"
+      v-model:open="attachOpen"
+      :activity="detail"
+      @attached="load"
+    />
+
+    <AssignClassroomsDialog
+      v-if="detail && assignOpen"
+      v-model:open="assignOpen"
+      :activity="detail"
+      :assigned-ids="assignedIds"
+      @assigned="load"
+    />
 
     <ActivityPolicyDialog
       v-if="detail && policyOpen"

@@ -10,12 +10,18 @@ import {
   type ExamType,
   type ExamScheduleView,
 } from '../../../../domain/entities/exam-schedule.entity.js'
+import {
+  EXAM_DELIVERY_MODES,
+  type ExamDeliveryMode,
+} from '../../../../../exam-activity/domain/entities/exam-activity.entity.js'
 import { categoryOf } from '../../../../domain/policies/exam-category.policy.js'
 
 export class ExamScheduleDto {
   @ApiProperty({ format: 'uuid' }) id!: string
-  @ApiProperty({ format: 'uuid' }) packageId!: string
-  @ApiProperty() packageTitle!: string
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES }) deliveryMode!: ExamDeliveryMode
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  packageId!: string | null
+  @ApiProperty({ type: String, nullable: true }) packageTitle!: string | null
   @ApiProperty({ format: 'uuid' }) classroomId!: string
   @ApiProperty({ type: String, nullable: true }) classroomName!: string | null
   @ApiProperty({ format: 'uuid' }) semesterId!: string
@@ -48,6 +54,7 @@ export class ExamScheduleDto {
   ): ExamScheduleDto {
     const dto = new ExamScheduleDto()
     dto.id = domain.id
+    dto.deliveryMode = domain.deliveryMode
     dto.packageId = domain.packageId
     dto.packageTitle = domain.packageTitle
     dto.classroomId = domain.classroomId

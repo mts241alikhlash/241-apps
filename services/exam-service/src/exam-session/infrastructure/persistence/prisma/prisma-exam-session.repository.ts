@@ -347,9 +347,7 @@ export class PrismaExamSessionRepository extends IExamSessionRepository {
     const rows = await this.prisma.examSession.findMany({
       where: {
         status: 'IN_PROGRESS',
-        schedule: {
-          OR: [{ activityId }, { makeupOf: { activityId } }],
-        },
+        schedule: { activityId, kind: 'REGULAR' },
       },
       select: { id: true },
     })

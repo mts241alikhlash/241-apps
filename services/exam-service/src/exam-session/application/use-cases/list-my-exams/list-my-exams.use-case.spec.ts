@@ -228,7 +228,7 @@ describe('ListMyExamsUseCase', () => {
     async function withMakeup(participants: string[] = [STUDENT_ID]) {
       const original = await scheduleExam(fixtures())
       const makeup = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-05T01:00:00.000Z'),
@@ -309,7 +309,7 @@ describe('ListMyExamsUseCase', () => {
     it('hides a makeup once the student sat an earlier makeup of the same exam', async () => {
       const { original, makeup } = await withMakeup()
       const earlier = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-03T01:00:00.000Z'),
@@ -471,14 +471,142 @@ describe('ListMyExamsUseCase', () => {
       })
     })
 
-    it('does not call an exam open while its activity is not active', async () => {
+    it('shows a scheduled activity as upcoming inside its window and finished after it', async () => {
       const exam = await scheduleExam(fixtures())
       const activity = await newActivity({ status: 'SCHEDULED' })
       schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
 
+      const [inside] = await build().execute(STUDENT_USER, NOW)
+      const [after] = await build().execute(STUDENT_USER, ENDS)
+
+      expect(inside).toMatchObject({
+        lifecycle: 'UPCOMING',
+        status: 'UPCOMING',
+      })
+      expect(after).toMatchObject({ lifecycle: 'FINISHED', status: 'FINISHED' })
+    })
+
+    it('leaves out the schedules of a draft activity', async () => {
+      const exam = await scheduleExam(fixtures())
+      const activity = await newActivity({ status: 'DRAFT' })
+      schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
+
+      expect(await build().execute(STUDENT_USER, NOW)).toEqual([])
+    })
+
+    it('lists a scheduled online exam without a package, never open, named after its subject', async () => {
+      const exam = await scheduleExam(fixtures())
+      const activity = await newActivity({
+        status: 'SCHEDULED',
+        packageId: null,
+      })
+      schedules.schedules.set(exam.id, {
+        ...exam,
+        activityId: activity.id,
+        packageId: null,
+        packageTitle: null,
+      })
+      const at = async (now: Date) =>
+        (await build().execute(STUDENT_USER, now))[0]
+
+      expect(await at(new Date('2026-11-02T00:00:00.000Z'))).toMatchObject({
+        id: exam.id,
+        title: 'Matematika',
+        subjectId: SUBJECT_ID,
+        subjectName: 'Matematika',
+        deliveryMode: 'ONLINE',
+        hasPackage: false,
+        offlineKind: null,
+        lifecycle: 'UPCOMING',
+        status: 'UPCOMING',
+      })
+      expect(await at(NOW)).toMatchObject({
+        lifecycle: 'UPCOMING',
+        status: 'UPCOMING',
+      })
+      expect(await at(ENDS)).toMatchObject({
+        lifecycle: 'FINISHED',
+        status: 'FINISHED',
+      })
+    })
+
+    it('opens the exam once the package is attached and the activity is active', async () => {
+      const exam = await scheduleExam(fixtures())
+      const activity = await newActivity({
+        status: 'SCHEDULED',
+        packageId: null,
+      })
+      schedules.schedules.set(exam.id, {
+        ...exam,
+        activityId: activity.id,
+        packageId: null,
+        packageTitle: null,
+      })
+      expect((await build().execute(STUDENT_USER, NOW))[0]).toMatchObject({
+        hasPackage: false,
+        lifecycle: 'UPCOMING',
+      })
+
+      schedules.schedules.set(exam.id, { ...exam, activityId: activity.id })
+      activities.activities.set(activity.id, {
+        ...activity,
+        status: 'ACTIVE',
+        packageId: exam.packageId,
+      })
+
       const [row] = await build().execute(STUDENT_USER, NOW)
 
-      expect(row).toMatchObject({ lifecycle: 'FINISHED', status: 'FINISHED' })
+      expect(row).toMatchObject({
+        title: 'UTS Matematika Kelas 7',
+        hasPackage: true,
+        lifecycle: 'OPEN',
+        status: 'OPEN',
+      })
+    })
+
+    it('lists an offline exam with its kind: upcoming, then finished from its start', async () => {
+      const exam = await scheduleExam(fixtures())
+      const activity = await newActivity({
+        status: 'ACTIVE',
+        packageId: null,
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'PRACTICAL',
+      })
+      schedules.schedules.set(exam.id, {
+        ...exam,
+        activityId: activity.id,
+        deliveryMode: 'OFFLINE',
+        packageId: null,
+        packageTitle: null,
+      })
+      const at = async (now: Date) =>
+        (await build().execute(STUDENT_USER, now))[0]
+
+      expect(await at(new Date('2026-11-02T00:00:00.000Z'))).toMatchObject({
+        title: 'Matematika',
+        deliveryMode: 'OFFLINE',
+        hasPackage: false,
+        offlineKind: 'PRACTICAL',
+        lifecycle: 'UPCOMING',
+        status: 'UPCOMING',
+        roomName: null,
+      })
+      expect(await at(NOW)).toMatchObject({
+        lifecycle: 'FINISHED',
+        status: 'FINISHED',
+      })
+    })
+
+    it('marks an online exam with a package as such', async () => {
+      await scheduleExam(fixtures())
+
+      const [row] = await build().execute(STUDENT_USER, NOW)
+
+      expect(row).toMatchObject({
+        deliveryMode: 'ONLINE',
+        hasPackage: true,
+        offlineKind: null,
+      })
     })
 
     it('still lists the exams when the participant registry cannot be read', async () => {
@@ -508,7 +636,7 @@ describe('ListMyExamsUseCase', () => {
         activityId: activity.id,
       })
       const makeup = await schedules.createMakeup({
-        packageId: original.packageId,
+        packageId: original.packageId!,
         classroomId: original.classroomId,
         semesterId: original.semesterId,
         startsAt: new Date('2026-11-10T01:00:00.000Z'),
@@ -539,6 +667,43 @@ describe('ListMyExamsUseCase', () => {
       expect((await at(new Date('2026-11-10T05:00:00.000Z')))?.lifecycle).toBe(
         'FINISHED',
       )
+    })
+
+    it('opens a makeup in its own window while its original activity is closed', async () => {
+      const original = await scheduleExam(fixtures())
+      const activity = await newActivity({ status: 'CLOSED' })
+      schedules.schedules.set(original.id, {
+        ...original,
+        activityId: activity.id,
+      })
+      const makeup = await schedules.createMakeup({
+        packageId: original.packageId!,
+        classroomId: original.classroomId,
+        semesterId: original.semesterId,
+        startsAt: new Date('2026-11-10T01:00:00.000Z'),
+        endsAt: new Date('2026-11-10T04:00:00.000Z'),
+        durationMinutes: 90,
+        type: original.type,
+        createdById: original.createdById,
+        makeupOfId: original.id,
+        participants: [
+          { studentId: STUDENT_ID, reason: 'SICK' as const, note: null },
+        ],
+      })
+
+      const list = await build().execute(
+        STUDENT_USER,
+        new Date('2026-11-10T02:00:00.000Z'),
+      )
+
+      expect(list.find((row) => row.id === makeup!.id)).toMatchObject({
+        title: 'UTS Matematika Kelas 7 (Susulan)',
+        lifecycle: 'OPEN',
+        status: 'OPEN',
+      })
+      expect(list.find((row) => row.id === original.id)).toMatchObject({
+        lifecycle: 'FINISHED',
+      })
     })
   })
 })

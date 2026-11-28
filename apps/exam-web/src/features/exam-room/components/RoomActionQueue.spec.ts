@@ -51,6 +51,7 @@ const participant = (
   packageTitle: 'UAS Ganjil',
   scheduleId: 's1',
   totalQuestions: 50,
+  offline: false,
   session: overrides === null ? null : session(overrides),
   absence: null,
 })

@@ -162,6 +162,8 @@ describe('ListRoomReportsUseCase', () => {
       subjectId: ipaId,
       startsAt: LATER_SLOT_START,
       endsAt: LATER_SLOT_END,
+      deliveryMode: 'ONLINE',
+      offlineKind: null,
     })
     const reports = new ListRoomReportsUseCase(
       fixture.rooms,

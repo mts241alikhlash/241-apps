@@ -190,6 +190,17 @@ describe('route permission guards', () => {
       'exam-grading.read-all',
       'exam-grading.manage-all',
     ])
+    for (const path of [
+      '/exam/offline-scores',
+      '/exam/offline-scores/s1',
+      '/exam/print/score-sheet',
+    ]) {
+      expect(instance.resolve(path).meta.requiredAnyPermission).toEqual([
+        'exam-grading.read',
+        'exam-grading.read-all',
+        'exam-grading.manage-all',
+      ])
+    }
     expect(
       instance.resolve('/exam/print/cards').meta.requiredAnyPermission,
     ).toEqual(['exam-events.manage', 'exam-events.read'])
@@ -308,6 +319,15 @@ describe('menu', () => {
             ],
           ],
           [
+            '/exam/offline-scores',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
             '/exam/print/schedule',
             undefined,
             ['exam-events.manage', 'exam-events.read'],
@@ -334,6 +354,15 @@ describe('menu', () => {
           ],
           [
             '/exam/print/grading-sheet',
+            undefined,
+            [
+              'exam-grading.read',
+              'exam-grading.read-all',
+              'exam-grading.manage-all',
+            ],
+          ],
+          [
+            '/exam/print/score-sheet',
             undefined,
             [
               'exam-grading.read',

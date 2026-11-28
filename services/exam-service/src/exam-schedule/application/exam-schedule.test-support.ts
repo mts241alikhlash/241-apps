@@ -67,6 +67,15 @@ export class FakeAcademicLookup extends IAcademicLookupPort {
     )
   }
 
+  classroomsOfYear(academicYearId: string) {
+    if (this.options.failWith) return Promise.reject(this.options.failWith)
+    return Promise.resolve(
+      (this.options.classrooms ?? [CLASSROOM_7A]).filter(
+        (room) => room.academicYearId === academicYearId,
+      ),
+    )
+  }
+
   activeSemester() {
     if (this.options.failWith) return Promise.reject(this.options.failWith)
     const id =

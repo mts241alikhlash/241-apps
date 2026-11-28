@@ -4,6 +4,7 @@ import type { RoomReport } from '../types'
 import LetterheadKop from './LetterheadKop.vue'
 import { CARD_HEADER } from './cardHeader'
 import { eventLabel } from '../types'
+import { formatPrintTime } from '@/features/exam-print/format'
 
 const props = defineProps<{
   report: RoomReport
@@ -90,14 +91,54 @@ const endClock = computed(() =>
     .replace('.', ':'),
 )
 
-const subjects = computed(() =>
+const subjectsOf = (
+  rows: RoomReport['schedules'],
+  label: (row: RoomReport['schedules'][number], name: string) => string,
+) =>
   [
     ...new Set(
-      props.report.schedules
-        .map((row) => row.subjectName ?? row.packageTitle)
-        .filter((name): name is string => name !== null),
+      rows.flatMap((row) => {
+        const name = row.subjectName ?? row.packageTitle
+        return name === null ? [] : [label(row, name)]
+      }),
     ),
-  ].join(', '),
+  ].join(', ')
+
+const offlineWords = { WRITTEN: 'tertulis', PRACTICAL: 'praktik' } as const
+
+const onlineSubjects = computed(() =>
+  subjectsOf(
+    props.report.schedules.filter((row) => row.deliveryMode !== 'OFFLINE'),
+    (_, name) => name,
+  ),
+)
+
+const offlineSubjects = computed(() =>
+  subjectsOf(
+    props.report.schedules.filter((row) => row.deliveryMode === 'OFFLINE'),
+    (row, name) =>
+      row.offlineKind === null
+        ? name
+        : `${name} (${offlineWords[row.offlineKind]})`,
+  ),
+)
+
+const kindLabels = { WRITTEN: 'Written', PRACTICAL: 'Practical' } as const
+
+const lines = computed(() =>
+  props.report.schedules.map((row, index) => ({
+    key: row.scheduleId ?? row.activityId ?? String(index),
+    title: row.packageTitle ?? row.subjectName ?? '-',
+    offline: row.deliveryMode === 'OFFLINE',
+    kind: row.offlineKind === null ? null : kindLabels[row.offlineKind],
+    startsAt: formatPrintTime(row.startsAt),
+    endsAt: formatPrintTime(row.endsAt),
+    registered: row.registeredCount,
+    present: row.registeredCount - row.absentCount,
+    absent: row.absentCount,
+    started: row.startedCount ?? '-',
+    submitted: row.submittedCount ?? '-',
+  })),
 )
 
 const registered = computed(() =>
@@ -156,11 +197,60 @@ const registeredWord = computed(() => spell(registered.value))
         </tbody>
       </table>
 
-      <p class="text-justify leading-relaxed">
+      <table class="lines">
+        <thead>
+          <tr>
+            <th>Mata Pelajaran</th>
+            <th>Mulai</th>
+            <th>Selesai</th>
+            <th>Peserta</th>
+            <th>Hadir</th>
+            <th>Tidak Hadir</th>
+            <th>Mengerjakan</th>
+            <th>Menyerahkan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="line in lines"
+            :key="line.key"
+            data-row
+          >
+            <td class="is-left">
+              {{ line.title }}
+              <span
+                v-if="line.offline"
+                class="mode"
+              >
+                Offline<template v-if="line.kind"> - {{ line.kind }}</template>
+              </span>
+            </td>
+            <td data-cell="startsAt">{{ line.startsAt }}</td>
+            <td data-cell="endsAt">{{ line.endsAt }}</td>
+            <td data-cell="registered">{{ line.registered }}</td>
+            <td data-cell="present">{{ line.present }}</td>
+            <td data-cell="absent">{{ line.absent }}</td>
+            <td data-cell="started">{{ line.started }}</td>
+            <td data-cell="submitted">{{ line.submitted }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p
+        v-if="onlineSubjects"
+        class="text-justify leading-relaxed"
+      >
         Ujian dilaksanakan menggunakan aplikasi ujian madrasah. Peserta
-        mengerjakan ujian mata pelajaran {{ subjects }} melalui akun
+        mengerjakan ujian mata pelajaran {{ onlineSubjects }} melalui akun
         masing-masing dan mengumpulkan jawaban secara daring. Token ujian
         diumumkan oleh pengawas ruangan pada saat ujian dimulai.
+      </p>
+      <p
+        v-if="offlineSubjects"
+        class="text-justify leading-relaxed"
+      >
+        Ujian mata pelajaran {{ offlineSubjects }} dilaksanakan secara luring
+        tanpa aplikasi.
       </p>
 
       <section class="space-y-1">
@@ -255,6 +345,28 @@ const registeredWord = computed(() => spell(registered.value))
 .note-line {
   border-bottom: 1px solid currentColor;
   height: 1.7em;
+}
+
+.lines {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.lines th,
+.lines td {
+  border: 0.3mm solid currentColor;
+  padding: 1mm 1.5mm;
+  text-align: center;
+}
+
+.lines .is-left {
+  text-align: left;
+}
+
+.mode {
+  display: block;
+  font-size: 8pt;
 }
 
 .blank {

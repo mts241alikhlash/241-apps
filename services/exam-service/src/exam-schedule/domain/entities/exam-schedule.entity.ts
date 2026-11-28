@@ -1,3 +1,5 @@
+import type { ExamDeliveryMode } from '../../../exam-activity/domain/entities/exam-activity.entity.js'
+
 export const EXAM_SCHEDULE_STATUSES = ['SCHEDULED', 'CANCELLED'] as const
 
 export const EXAM_TYPES = ['DAILY', 'ASSIGNMENT', 'MIDTERM', 'FINAL'] as const
@@ -20,8 +22,9 @@ export type ExamScheduleStatus = (typeof EXAM_SCHEDULE_STATUSES)[number]
 
 export interface ExamSchedule {
   id: string
-  packageId: string
-  packageTitle: string
+  deliveryMode: ExamDeliveryMode
+  packageId: string | null
+  packageTitle: string | null
   subjectId: string
   classroomId: string
   semesterId: string

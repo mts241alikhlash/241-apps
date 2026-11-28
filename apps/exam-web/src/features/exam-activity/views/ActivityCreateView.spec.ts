@@ -5,8 +5,20 @@ import { defineComponent } from 'vue'
 import ActivityCreateView from './ActivityCreateView.vue'
 import { examEventService } from '@/features/exam-event/services/examEventService'
 
-const { create, permissions, routeState } = vi.hoisted(() => ({
+const {
+  create,
+  assignClassrooms,
+  push,
+  success,
+  fail,
+  permissions,
+  routeState,
+} = vi.hoisted(() => ({
   create: vi.fn(),
+  assignClassrooms: vi.fn(),
+  push: vi.fn(),
+  success: vi.fn(),
+  fail: vi.fn(),
   permissions: new Set<string>(),
   routeState: {
     meta: { category: 'EXAM' },
@@ -14,14 +26,18 @@ const { create, permissions, routeState } = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('vue-router', () => ({ useRoute: () => routeState }))
+vi.mock('vue-router', () => ({
+  useRoute: () => routeState,
+  useRouter: () => ({ push }),
+}))
+vi.mock('vue-sonner', () => ({ toast: { success, error: fail } }))
 vi.mock('@mts241alikhlash/platform/auth', () => ({
   useAuthSession: () => ({
     hasPermission: (code: string) => permissions.has(code),
   }),
 }))
 vi.mock('../api/examActivityApi', () => ({
-  examActivityApi: { create },
+  examActivityApi: { create, assignClassrooms },
 }))
 vi.mock('@/features/lookup/semester', () => ({
   semesterApi: {
@@ -51,6 +67,7 @@ const passthrough = defineComponent({ template: '<div><slot /></div>' })
 const formStub = defineComponent({
   name: 'ActivityForm',
   props: { isAdmin: Boolean, canManageEvents: Boolean, fixedEventId: String },
+  emits: ['submit'],
   template: '<div data-test="form" />',
 })
 
@@ -114,5 +131,60 @@ describe('ActivityCreateView', () => {
     await flushPromises()
     expect(examEventService.loadEventOptions).toHaveBeenCalledWith('sem-1')
     examView.unmount()
+  })
+
+  describe('submitting', () => {
+    const submitWith = async (payload: Record<string, unknown>) => {
+      routeState.meta = { category: 'EXAM' }
+      const wrapper = mount(ActivityCreateView, { global: { stubs } })
+      await flushPromises()
+      wrapper.findComponent(formStub).vm.$emit('submit', payload)
+      await flushPromises()
+      wrapper.unmount()
+    }
+
+    beforeEach(() => {
+      create.mockResolvedValue({ id: 'act-9' })
+      assignClassrooms.mockResolvedValue({ id: 'act-9' })
+    })
+
+    it('assigns the chosen classrooms of an offline activity after creating it', async () => {
+      await submitWith({ deliveryMode: 'OFFLINE', classroomIds: ['c1', 'c2'] })
+
+      expect(assignClassrooms).toHaveBeenCalledWith('act-9', {
+        classroomIds: ['c1', 'c2'],
+      })
+      expect(success).toHaveBeenCalledWith(
+        'Kegiatan disimpan dan jadwal kelas dibuat',
+      )
+      expect(push).toHaveBeenCalledWith('/exam/activities/act-9')
+    })
+
+    it('does not assign when a package creates the schedules', async () => {
+      await submitWith({ packageId: 'p1', classroomIds: ['c1'] })
+
+      expect(assignClassrooms).not.toHaveBeenCalled()
+      expect(push).toHaveBeenCalledWith('/exam/activities/act-9')
+    })
+
+    it('does not assign when no classroom was chosen', async () => {
+      await submitWith({ deliveryMode: 'OFFLINE', classroomIds: [] })
+
+      expect(assignClassrooms).not.toHaveBeenCalled()
+      expect(success).toHaveBeenCalledWith('Kegiatan disimpan')
+    })
+
+    it('tells the activity was saved when assigning fails and still opens the detail', async () => {
+      assignClassrooms.mockRejectedValue(new Error('x'))
+      await submitWith({ deliveryMode: 'OFFLINE', classroomIds: ['c1'] })
+
+      expect(fail).toHaveBeenCalledWith(
+        expect.stringContaining('Kegiatan sudah disimpan'),
+      )
+      expect(fail).toHaveBeenCalledWith(
+        expect.stringContaining('Tetapkan kelas'),
+      )
+      expect(push).toHaveBeenCalledWith('/exam/activities/act-9')
+    })
   })
 })

@@ -6,6 +6,7 @@ import {
   IsIn,
   IsInt,
   IsISO8601,
+  Matches,
   IsOptional,
   IsUUID,
   Max,
@@ -22,7 +23,14 @@ import type { ExamActivity } from '../../../domain/entities/exam-activity.entity
 import {
   ACTIVITY_STATUSES,
   ACTIVITY_TOKEN_MODES,
+  EXAM_DELIVERY_MODES,
+  EXAM_OFFLINE_KINDS,
 } from '../../../domain/entities/exam-activity.entity.js'
+import {
+  READINESS_KEYS,
+  type ActivityReadiness,
+  type ReadinessCheck,
+} from '../../../application/use-cases/get-activity-readiness/get-activity-readiness.use-case.js'
 import type { ExamPolicy } from '../../../domain/policies/exam-policy.policy.js'
 
 export const EXAM_PRESET_NAMES = EXAM_TYPES
@@ -72,6 +80,36 @@ export class CreateActivityRequestDto {
   @Min(1)
   @Max(1440)
   durationMinutes!: number
+
+  @ApiPropertyOptional({ enum: EXAM_DELIVERY_MODES, default: 'ONLINE' })
+  @IsOptional()
+  @IsIn([...EXAM_DELIVERY_MODES])
+  deliveryMode?: ExamActivity['deliveryMode']
+
+  @ApiPropertyOptional({ enum: EXAM_OFFLINE_KINDS, nullable: true })
+  @IsOptional()
+  @IsIn([...EXAM_OFFLINE_KINDS])
+  offlineKind?: ExamActivity['offlineKind']
+
+  @ApiPropertyOptional({ minimum: 1, maximum: 1000, default: 100 })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  maxScore?: number
+
+  @ApiPropertyOptional({ default: true })
+  @IsOptional()
+  @IsBoolean()
+  autoStatus?: boolean
+}
+
+export class AssignActivityClassroomsRequestDto {
+  @ApiProperty({ type: [String], format: 'uuid' })
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUUID('4', { each: true })
+  classroomIds!: string[]
 }
 
 export class AttachActivityPackageRequestDto {
@@ -88,6 +126,49 @@ export class UpdateActivityStatusRequestDto {
   @ApiProperty({ enum: ACTIVITY_STATUSES })
   @IsIn([...ACTIVITY_STATUSES])
   status!: (typeof ACTIVITY_STATUSES)[number]
+}
+
+export class UpdateActivityAutoStatusRequestDto {
+  @ApiProperty() @IsBoolean() autoStatus!: boolean
+}
+
+export class ActivityReadinessQueryDto {
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  eventId?: string
+
+  @ApiProperty({ example: '2026-11-30', description: 'Day in Asia/Jakarta' })
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  date!: string
+}
+
+export class ActivityReadinessCheckDto {
+  @ApiProperty({ enum: READINESS_KEYS }) key!: ReadinessCheck['key']
+  @ApiProperty() ok!: boolean
+  @ApiProperty() detail!: string
+}
+
+export class ActivityReadinessDto {
+  @ApiProperty({ format: 'uuid' }) activityId!: string
+  @ApiProperty({ type: String, nullable: true }) subjectName!: string | null
+  @ApiProperty({ type: String, nullable: true }) gradeName!: string | null
+  @ApiProperty({ format: 'date-time' }) startsAt!: string
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES })
+  deliveryMode!: ActivityReadiness['deliveryMode']
+  @ApiProperty({ type: [ActivityReadinessCheckDto] })
+  checks!: ActivityReadinessCheckDto[]
+
+  static of(row: ActivityReadiness): ActivityReadinessDto {
+    const dto = new ActivityReadinessDto()
+    dto.activityId = row.activityId
+    dto.subjectName = row.subjectName
+    dto.gradeName = row.gradeName
+    dto.startsAt = row.startsAt.toISOString()
+    dto.deliveryMode = row.deliveryMode
+    dto.checks = row.checks.map((check) => ({ ...check }))
+    return dto
+  }
 }
 
 export class IssueParticipantNumbersResponseDto {
@@ -166,6 +247,20 @@ export class UpdateActivityPolicyRequestDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  autoOpenLeadMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(240)
+  autoCloseGraceMinutes?: number
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
   shuffleQuestions?: boolean
 
@@ -190,6 +285,8 @@ export class ExamPolicyDto implements ExamPolicy {
   @ApiProperty() tokenSlotSeconds!: number
   @ApiProperty() lateToleranceMinutes!: number
   @ApiProperty() minSubmitMinutes!: number
+  @ApiProperty() autoOpenLeadMinutes!: number
+  @ApiProperty() autoCloseGraceMinutes!: number
   @ApiProperty() shuffleQuestions!: boolean
   @ApiProperty() shuffleChoices!: boolean
   @ApiProperty() allowWeb!: boolean
@@ -209,6 +306,14 @@ export class ExamActivityDto {
   @ApiProperty({ format: 'uuid' }) gradeId!: string
   @ApiProperty({ format: 'uuid' }) subjectId!: string
   @ApiProperty({ format: 'uuid', nullable: true }) packageId!: string | null
+  @ApiProperty({ enum: EXAM_DELIVERY_MODES })
+  deliveryMode!: ExamActivity['deliveryMode']
+
+  @ApiProperty({ enum: EXAM_OFFLINE_KINDS, nullable: true })
+  offlineKind!: ExamActivity['offlineKind']
+
+  @ApiProperty() maxScore!: number
+  @ApiProperty() autoStatus!: boolean
   @ApiProperty({ enum: EXAM_TYPES }) type!: ExamType
   @ApiProperty({ enum: EXAM_CATEGORIES }) category!: ExamCategory
   @ApiProperty({ enum: ACTIVITY_TOKEN_MODES })
@@ -240,6 +345,10 @@ export class ExamActivityDto {
     dto.gradeId = activity.gradeId
     dto.subjectId = activity.subjectId
     dto.packageId = activity.packageId
+    dto.deliveryMode = activity.deliveryMode
+    dto.offlineKind = activity.offlineKind
+    dto.maxScore = activity.maxScore
+    dto.autoStatus = activity.autoStatus
     dto.type = activity.type
     dto.category = categoryOf(activity.type)
     dto.tokenMode = activity.tokenMode

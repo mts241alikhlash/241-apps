@@ -103,6 +103,7 @@ export interface RoomMonitorParticipant {
   packageTitle: string
   scheduleId: string
   totalQuestions: number
+  offline: boolean
   session: RoomMonitorSession | null
   absence: { reason: string; note: string | null } | null
 }
@@ -138,6 +139,7 @@ interface RosterRowBase {
   packageTitle: string
   subjectName: string | null
   totalQuestions: number
+  offline: boolean
   absence: ExamRoomReportAbsence | null
 }
 
@@ -159,7 +161,7 @@ function isOfflineOrUnsynced(session: ExamSession, now: Date): boolean {
 
 function matchesStatus(row: RosterRow, status: MonitorStatus): boolean {
   if (status === 'ALL') return true
-  if (status === 'NOT_STARTED') return row.session === null
+  if (status === 'NOT_STARTED') return row.session === null && !row.offline
   if (status === 'ABSENT') return row.absence !== null
   if (status === 'LOCKED') {
     return (
@@ -234,7 +236,9 @@ export class GetRoomMonitorUseCase {
     const room = await this.access.assertCanView(user, roomId)
     const slot = await this.resolveSlot(user, room, query.slotId, now)
     const seats = await this.rooms.listSeatsByRoom(roomId)
-    const schedules = await this.roomSchedules(room.eventId, slot, now)
+    const schedules = (
+      await this.roomSchedules(room.eventId, slot, now)
+    ).filter((row) => row.deliveryMode === 'OFFLINE' || row.packageId !== null)
     const sessions = await this.sessions.listByRoom(roomId)
     const sessionOf = new Map(
       sessions.map((session) => [
@@ -263,7 +267,9 @@ export class GetRoomMonitorUseCase {
       ).map((row) => [row.id, row.name]),
     )
     const questionCounts = await this.questionCounts(
-      schedules.map((row) => row.packageId),
+      schedules.flatMap((row) =>
+        row.packageId === null ? [] : [row.packageId],
+      ),
     )
     const schedulesOfClassroom = new Map<string, ExamSchedule[]>()
     for (const schedule of schedules) {
@@ -293,9 +299,10 @@ export class GetRoomMonitorUseCase {
               ? null
               : (subjectNames.get(schedule.subjectId) ?? null),
           totalQuestions:
-            schedule === undefined
+            schedule?.packageId == null
               ? 0
               : (questionCounts.get(schedule.packageId) ?? 0),
+          offline: schedule?.deliveryMode === 'OFFLINE',
           absence:
             session !== null
               ? null
@@ -377,6 +384,7 @@ export class GetRoomMonitorUseCase {
           packageTitle: row.packageTitle,
           scheduleId: row.scheduleId,
           totalQuestions: row.totalQuestions,
+          offline: row.offline,
           session:
             row.session === null
               ? null
@@ -435,7 +443,9 @@ export class GetRoomMonitorUseCase {
             slot !== null && slot.actualUserId !== slot.scheduledUserId,
         },
         token: this.tokenFor(user, room, now),
-        window: examWindowOf(schedules),
+        window: examWindowOf(
+          schedules.filter((row) => row.deliveryMode !== 'OFFLINE'),
+        ),
         summary,
       },
     }
@@ -470,7 +480,7 @@ export class GetRoomMonitorUseCase {
     for (const row of roster) {
       if (row.absence !== null) absentMarkedCount += 1
       if (row.session === null) {
-        notStartedCount += 1
+        if (!row.offline) notStartedCount += 1
         continue
       }
       if (row.session.status === 'IN_PROGRESS') inProgressCount += 1

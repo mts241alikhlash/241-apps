@@ -80,6 +80,18 @@ export class HttpAcademicLookupAdapter extends IAcademicLookupPort {
     const data = await this.client.postData(URL_KEY, '/classrooms/by-ids', {
       ids,
     })
+    return this.toClassrooms(data)
+  }
+
+  async classroomsOfYear(academicYearId: string): Promise<ClassroomRef[]> {
+    const data = await this.client.getData(
+      URL_KEY,
+      `/classrooms/by-academic-year/${encodeURIComponent(academicYearId)}`,
+    )
+    return this.toClassrooms(data)
+  }
+
+  private toClassrooms(data: unknown): ClassroomRef[] {
     if (!Array.isArray(data)) return this.client.malformed(URL_KEY)
 
     return (data as unknown[]).map((row) => {

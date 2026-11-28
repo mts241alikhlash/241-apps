@@ -60,6 +60,46 @@ export interface EventOption {
 
 export type ActivityCreatePayload = Schemas['CreateActivityRequestDto']
 
+export type DeliveryMode = Schemas['ExamActivityDto']['deliveryMode']
+
+export type OfflineKind = NonNullable<Schemas['ExamActivityDto']['offlineKind']>
+
+export const DELIVERY_MODES = [
+  'ONLINE',
+  'OFFLINE',
+] as const satisfies readonly DeliveryMode[]
+
+export const OFFLINE_KINDS = [
+  'WRITTEN',
+  'PRACTICAL',
+] as const satisfies readonly OfflineKind[]
+
+export const DELIVERY_MODE_LABELS: Record<DeliveryMode, string> = {
+  ONLINE: 'Online',
+  OFFLINE: 'Offline',
+}
+
+export const OFFLINE_KIND_LABELS: Record<OfflineKind, string> = {
+  WRITTEN: 'Written',
+  PRACTICAL: 'Practical',
+}
+
+export const ACTIVITY_POLICY_DEFAULTS = {
+  autoOpenLeadMinutes: 5,
+  autoCloseGraceMinutes: 15,
+  lateToleranceMinutes: 15,
+} as const
+
+export type AssignClassroomsPayload =
+  Schemas['AssignActivityClassroomsRequestDto']
+
+export type ActivityReadiness = Schemas['ActivityReadinessDto']
+
+export interface ActivityReadinessQuery {
+  eventId?: string
+  date: string
+}
+
 export type ActivityPolicyPayload = Schemas['UpdateActivityPolicyRequestDto']
 
 export type AttachPackagePayload = Schemas['AttachActivityPackageRequestDto']

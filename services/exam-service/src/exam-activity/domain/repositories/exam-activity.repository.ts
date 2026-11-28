@@ -2,6 +2,7 @@ import type {
   ExamCategory,
   ExamType,
 } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
+import type { ExamSchedule } from '../../../exam-schedule/domain/entities/exam-schedule.entity.js'
 import type { ExamPolicy } from '../policies/exam-policy.policy.js'
 import type { ActivityEventRef } from '../policies/activity-rules.policy.js'
 import type {
@@ -11,6 +12,8 @@ import type {
   NewExamActivity,
 } from '../entities/exam-activity.entity.js'
 
+export type AutoStatusReason = 'AUTO_OPEN' | 'AUTO_CLOSE'
+
 export interface ActivityAuditEntry {
   action:
     | 'CREATE_ACTIVITY'
@@ -18,6 +21,8 @@ export interface ActivityAuditEntry {
     | 'UPDATE_POLICY'
     | 'ROTATE_TOKEN'
     | 'UPDATE_STATUS'
+    | 'AUTO_STATUS'
+    | 'UPDATE_AUTO_STATUS'
   before: unknown
   after: unknown
 }
@@ -58,6 +63,11 @@ export abstract class ExamActivityRepository {
     classroomIds: string[]
     actorId: string
   }): Promise<ExamActivity | null>
+  abstract assignClassrooms(input: {
+    activityId: string
+    classroomIds: string[]
+    actorId: string
+  }): Promise<ExamSchedule[] | null>
   abstract findById(id: string): Promise<ExamActivity | null>
   abstract updatePolicy(
     id: string,
@@ -78,6 +88,19 @@ export abstract class ExamActivityRepository {
     status: ActivityStatus,
     actorId: string,
   ): Promise<ExamActivity | null>
+  abstract updateAutoStatus(
+    id: string,
+    autoStatus: boolean,
+    actorId: string,
+  ): Promise<ExamActivity | null>
+  abstract findDueForAdvance(now: Date): Promise<ExamActivity[]>
+  abstract updateStatusIf(
+    id: string,
+    expected: ActivityStatus,
+    next: ActivityStatus,
+    actorId: string,
+    reason: AutoStatusReason,
+  ): Promise<boolean>
 }
 
 export interface ActivityScheduleCopy {

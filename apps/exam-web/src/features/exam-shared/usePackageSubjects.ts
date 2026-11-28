@@ -50,8 +50,9 @@ export function usePackageSubjects() {
     ready.value = true
   })
 
-  const subjectOf = (packageId: string, title: string): string =>
-    names.value.get(packageId) ?? subjectFromTitle(title)
+  const subjectOf = (packageId: string | null, title: string | null): string =>
+    (packageId === null ? undefined : names.value.get(packageId)) ??
+    subjectFromTitle(title ?? '-')
 
   return { subjectOf, ready }
 }

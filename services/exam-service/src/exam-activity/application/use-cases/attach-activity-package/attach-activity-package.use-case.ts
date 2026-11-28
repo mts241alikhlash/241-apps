@@ -12,7 +12,11 @@ import {
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
 import { ApiConflictException } from '../../../../core/filters/api-exception.js'
-import { assertPackageReady } from '../create-activity/create-activity.use-case.js'
+import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
+import {
+  assertClassroomsInGrade,
+  assertPackageReady,
+} from '../create-activity/create-activity.use-case.js'
 
 export interface AttachActivityPackageCommand {
   actor: ScheduleAccessUser
@@ -27,6 +31,7 @@ export class AttachActivityPackageUseCase {
     private readonly activities: ExamActivityRepository,
     @Inject(forwardRef(() => ScheduleScopeService))
     private readonly scheduleScope: ScheduleScopeService,
+    private readonly academic: IAcademicLookupPort,
   ) {}
 
   async execute(command: AttachActivityPackageCommand): Promise<ExamActivity> {
@@ -36,6 +41,12 @@ export class AttachActivityPackageUseCase {
     }
     const scope = await this.scheduleScope.forUser(command.actor)
     await scope.assertCanManageActivity(current, command.classroomIds)
+    if (current.deliveryMode === 'OFFLINE') {
+      throw new ApiConflictException(
+        'OFFLINE_NO_PACKAGE',
+        'Kegiatan Offline tidak memakai paket soal',
+      )
+    }
     if (current.packageId !== null) {
       throw new ApiConflictException(
         'ACTIVITY_HAS_PACKAGE',
@@ -46,6 +57,11 @@ export class AttachActivityPackageUseCase {
     if (command.classroomIds.length === 0) {
       throw new BadRequestException('Pilih minimal satu kelas')
     }
+    await assertClassroomsInGrade(
+      this.academic,
+      current.gradeId,
+      command.classroomIds,
+    )
     const updated = await this.activities.attachPackage({
       activityId: command.activityId,
       packageId: command.packageId,

@@ -17,7 +17,7 @@ export function useMakeupForm(original: MakeupOrigin) {
   const reason = ref<MakeupReason>('SICK')
   const overrides = ref<Record<string, MakeupReason>>({})
   const notes = ref<Record<string, string>>({})
-  const packageId = ref(original.packageId)
+  const packageId = ref(original.packageId ?? '')
   const startDate = ref('')
   const endDate = ref('')
   const startTime = ref('')

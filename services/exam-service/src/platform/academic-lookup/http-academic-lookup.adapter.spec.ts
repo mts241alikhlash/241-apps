@@ -194,6 +194,35 @@ describe('HttpAcademicLookupAdapter.classroomsByIds', () => {
   })
 })
 
+describe('HttpAcademicLookupAdapter.classroomsOfYear', () => {
+  it('lists the classrooms of one academic year', async () => {
+    const { adapter, getData } = build({
+      '/classrooms/by-academic-year/': [classroomRow()],
+    })
+
+    await expect(adapter.classroomsOfYear('year-1')).resolves.toEqual([
+      {
+        id: 'c-7a',
+        gradeId: 'grade-7',
+        academicYearId: 'year-1',
+        name: 'VII A',
+      },
+    ])
+    expect(getData).toHaveBeenCalledWith(
+      'ACADEMIC_SERVICE_URL',
+      '/classrooms/by-academic-year/year-1',
+    )
+  })
+
+  it('treats a non-list answer as malformed', async () => {
+    const { adapter } = build({ '/classrooms/by-academic-year/': {} })
+
+    await expect(adapter.classroomsOfYear('year-1')).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    )
+  })
+})
+
 describe('HttpAcademicLookupAdapter.activeSemester', () => {
   it('returns the id and academic year of the active semester', async () => {
     const { adapter } = build({ '/semesters/active': SEMESTER })

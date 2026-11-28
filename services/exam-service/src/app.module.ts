@@ -27,6 +27,7 @@ import { ExamScheduleModule } from './exam-schedule/exam-schedule.module.js'
 import { ScorePublisherModule } from './platform/score-publisher/score-publisher.module.js'
 import { StudentDirectoryModule } from './platform/student-directory/student-directory.module.js'
 import { ExamGradingModule } from './exam-grading/exam-grading.module.js'
+import { ExamOfflineModule } from './exam-offline/exam-offline.module.js'
 import { ExamMakeupModule } from './exam-schedule/exam-makeup.module.js'
 import { ExamSessionModule } from './exam-session/exam-session.module.js'
 import { ExamRoomModule } from './exam-room/exam-room.module.js'
@@ -59,6 +60,7 @@ import { PermissionGuard } from '@mts241alikhlash/nest-core/access-control'
     ExamRoomModule,
     ExamMakeupModule,
     ExamGradingModule,
+    ExamOfflineModule,
     ScorePublisherModule,
     StudentDirectoryModule,
     ExamFileModule,

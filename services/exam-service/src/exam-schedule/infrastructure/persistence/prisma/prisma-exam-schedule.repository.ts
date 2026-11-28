@@ -80,6 +80,7 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
     }
     const where: Prisma.ExamScheduleWhereInput = {
       semesterId: query.semesterId,
+      packageId: { not: null },
       ...(query.category
         ? { type: { in: typesInCategory(query.category) } }
         : {}),
@@ -353,6 +354,20 @@ export class PrismaExamScheduleRepository extends IExamScheduleRepository {
         kind: 'REGULAR',
         startsAt: { lt: to },
         endsAt: { gt: from },
+      },
+      include: SCHEDULE_INCLUDE,
+      orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+    })
+    return rows.map(toSchedule)
+  }
+
+  async findOfflineBySemester(semesterId: string): Promise<ExamSchedule[]> {
+    const rows = await this.prisma.examSchedule.findMany({
+      where: {
+        semesterId,
+        deliveryMode: 'OFFLINE',
+        kind: 'REGULAR',
+        status: { not: 'CANCELLED' },
       },
       include: SCHEDULE_INCLUDE,
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],

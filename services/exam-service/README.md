@@ -4,7 +4,7 @@
 
 Owns computer-based exams: the question bank with versions, packages and their approval, schedules, rooms and seats, sessions, answers and score publication.
 
-Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAuditLog`, `ExamPolicyPreset`, `ExamPackage`, `ExamPackageReview`, `ExamPackageItem`, `ExamSchedule`, `ExamScheduleParticipant`, `ExamEvent`, `ExamRoom`, `ExamRoomSeat`, `ExamRoomSupervisor`, `ExamRoomReport`, `ExamRoomReportAbsence`, `ExamRoomFieldNote`, `ExamSession`, `ExamAnswer`, `ExamAccessAttempt`, `ScorePublication`, `ExamSessionEvent`, `ExamSessionAuditLog`, `Question`, `QuestionVersion`, `ExamFile`). The terms are in the [glossary](../../GLOSSARY.md).
+Port 4100 locally; database `exam` (25 models: `ExamActivity`, `ExamActivityAuditLog`, `ExamPolicyPreset`, `ExamPackage`, `ExamPackageReview`, `ExamPackageItem`, `ExamSchedule`, `ExamScheduleParticipant`, `ExamOfflineResult`, `ExamEvent`, `ExamRoom`, `ExamRoomSeat`, `ExamRoomSupervisor`, `ExamRoomReport`, `ExamRoomReportAbsence`, `ExamRoomFieldNote`, `ExamSession`, `ExamAnswer`, `ExamAccessAttempt`, `ScorePublication`, `ExamSessionEvent`, `ExamSessionAuditLog`, `Question`, `QuestionVersion`, `ExamFile`). The terms are in the [glossary](../../GLOSSARY.md).
 
 ## Depends on
 
@@ -62,11 +62,22 @@ Port 4100 locally; database `exam` (24 models: `ExamActivity`, `ExamActivityAudi
 - Participant numbers come from one bulk call to student-service (`POST /students/participant-numbers/lookup`) per pack, for every seated student of the event. Never call it per student or per room.
 - `POST /exam-events/:id/credentials/reset?roomId=<uuid>` (`exam-events.manage`, body `{ confirm: true }`) resets the login passwords of the event's seated students in one identity-service call (chunks of 500) and answers `{ items, skipped }` once, `Cache-Control: no-store`. Passwords are never stored, logged or audited; the audit entry (`RESET_CREDENTIALS`) holds the count and the actor. Students without an account are listed in `skipped`. Not idempotent: each call issues new passwords and kills the cards printed before.
 
+### Offline exams and automatic status
+
+- `ExamActivity.deliveryMode` is `ONLINE | OFFLINE` and cannot change after creation. `OFFLINE` needs `offlineKind` (`WRITTEN | PRACTICAL`), takes `maxScore` (1 to 1000, default 100) and never a package; database CHECKs enforce it on `exam_activities` and `exam_schedules` (`exam_schedules_offline_without_package_check`). `ExamSchedule.packageId` is nullable. `POST /exam-activities/:id/classrooms` creates the per-classroom schedules without a package; attaching a package to an `OFFLINE` activity is 409 `OFFLINE_NO_PACKAGE`.
+- `assertOpenable` (`exam-schedule/domain/policies`) is the one gate for starting a session and deriving a token: `OFFLINE_NOT_STARTABLE`, `PACKAGE_MISSING`, then the window. The supervisor token endpoint answers 409 `OFFLINE_NO_TOKEN` for offline schedules. `scheduleLifecycle` feeds `GET /me/exams`, which lists schedules of activities that are not `DRAFT` and carries `deliveryMode` and `hasPackage`; the `status` and `lifecycle` enums did not change.
+- `ActivityLifecycleJob` (every minute) runs `AdvanceActivityStatusUseCase`: opens an online `SCHEDULED` activity with an `APPROVED` or `LOCKED` package `autoOpenLeadMinutes` before the start, closes after `endsAt + autoCloseGraceMinutes` (an online `ACTIVE` activity waits while a regular session is `IN_PROGRESS`), skips activities with `autoStatus = false`, and writes `AUTO_OPEN` or `AUTO_CLOSE` audit rows with `SYSTEM_ACTOR_ID`. Status changes are compare-and-set, so overlapping runs are safe. `PATCH /exam-activities/:id/auto-status` flips the switch.
+- `GET /exam-activities/readiness?date=YYYY-MM-DD[&eventId=]` returns the checks `PACKAGE`, `SCHEDULES`, `SEATS`, `NUMBERS`, `SUPERVISORS`, `TECHNICIANS`, `LATE_TOLERANCE` per activity of that Asia/Jakarta day; the room checks only run for activities with an event.
+- Module `exam-offline` (`/exam-offline`): `GET schedules`, `GET schedules/:id/roster`, `PUT schedules/:id/students/:studentId`, `POST schedules/:id/import` (`.xlsx` or `.csv`, 5 MB, 500 rows, matched on `No. Peserta`), `GET schedules/:id/sheet`, `POST schedules/:id/publish` (body `confirmMissing`). Reading uses `exam-grading.read`, `read-all` or `manage-all`; writing `exam-grading.grade` or `manage-all`, through the existing grading scope. The roster is the seated students of the schedule's classroom; state is `SCORED`, `ABSENT` (from the Berita Acara) or `MISSING`. Scores live in `exam_offline_results` with their own publication columns; `PublishOfflineScoresJob` sends them through `IScorePublisherPort` with the result id as `examSessionId`. Errors: `OFFLINE_SCORES_MISSING` (409, publish without `confirmMissing`), `OFFLINE_SCORE_PUBLISHED` (409, clearing a sent score), `SCHEDULE_NOT_OFFLINE`.
+- A makeup has its own lifecycle: it reads no status of the original activity, and closing an activity touches only its regular schedules and sessions.
+
 ## Gotchas
 
 - A default `test` run reports skipped specs; they are not failures.
 - Images are uploaded before the database write, so a failed save can leave orphan image files. Accepted debt.
 - Berita Acara files are deleted again when the status change fails, but a crash between upload and save, or a failed delete, can leave an orphan object under `exam/room-reports/`. Accepted debt.
+- The effective late tolerance is `lateToleranceMinutes` of the activity policy (default 15), never the field on the exam period.
+- An offline score already sent cannot be cleared, only replaced; a student marked absent after sending keeps the score in assessment.
 - Nested Word tables are not supported.
 - Old v1 Excel files and paragraph-style Word files are rejected with "Unduh template baru".
 - In a vertical file, any paragraph starting with the word `Bagian` that is not a section line is an error.

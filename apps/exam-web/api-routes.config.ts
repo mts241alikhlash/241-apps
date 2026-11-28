@@ -19,6 +19,7 @@ export const SERVICE_PREFIXES = {
     '/exam-files',
     '/exam-grading',
     '/exam-imports',
+    '/exam-offline',
     '/exam-packages',
     '/exam-participant-numbers',
     '/exam-policy-presets',

@@ -198,7 +198,8 @@
 
   body.printing-stack .print-room.grading-sheet,
   body.printing-stack .print-room.question-key-sheet,
-  body.printing-stack .print-room.student-recap-sheet {
+  body.printing-stack .print-room.student-recap-sheet,
+  body.printing-stack .print-room.score-sheet {
     break-inside: auto;
   }
 

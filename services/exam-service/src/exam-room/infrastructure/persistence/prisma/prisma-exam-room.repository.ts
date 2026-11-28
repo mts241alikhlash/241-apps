@@ -162,6 +162,8 @@ export class PrismaExamRoomRepository extends IExamRoomRepository {
         subjectId: true,
         startsAt: true,
         endsAt: true,
+        deliveryMode: true,
+        offlineKind: true,
       },
       orderBy: { startsAt: 'asc' },
     })

@@ -45,6 +45,10 @@ function activity(overrides: Partial<ExamActivity> = {}): ExamActivity {
     endsAt: new Date('2026-11-10T04:00:00Z'),
     durationMinutes: 90,
     status: 'SCHEDULED',
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
+    maxScore: 100,
+    autoStatus: true,
     createdById: 'admin-1',
     ...overrides,
   }
@@ -99,6 +103,10 @@ class FakeActivityRepository implements ExamActivityRepository {
     return Promise.resolve(null)
   }
 
+  assignClassrooms() {
+    return Promise.resolve(null)
+  }
+
   findById(id: string) {
     return Promise.resolve(id === this.stored.id ? this.stored : null)
   }
@@ -114,6 +122,18 @@ class FakeActivityRepository implements ExamActivityRepository {
     if (id !== this.stored.id) return Promise.resolve(null)
     this.audits.push('ROTATE_TOKEN')
     return Promise.resolve(this.stored)
+  }
+
+  findDueForAdvance() {
+    return Promise.resolve([])
+  }
+
+  updateAutoStatus() {
+    return Promise.resolve(null)
+  }
+
+  updateStatusIf() {
+    return Promise.resolve(false)
   }
 
   listSchedules() {
@@ -382,6 +402,115 @@ describe('CreateActivityUseCase', () => {
       }),
     ).rejects.toBeInstanceOf(UnprocessableEntityException)
     expect(repo.created).toEqual([])
+  })
+
+  describe('offline', () => {
+    const offline = {
+      ...command,
+      packageId: null,
+      classroomIds: [],
+      deliveryMode: 'OFFLINE' as const,
+      offlineKind: 'WRITTEN' as const,
+    }
+
+    function run(overrides: Record<string, unknown> = {}) {
+      const repo = new FakeActivityRepository()
+      const result = new CreateActivityUseCase(
+        repo,
+        new FakeParticipants(),
+      ).execute({ ...offline, ...overrides })
+      return { repo, result }
+    }
+
+    it('stores the kind, forces the static token and defaults the max score', async () => {
+      const { repo, result } = run()
+      await result
+
+      expect(repo.lastCreatedActivity).toMatchObject({
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'WRITTEN',
+        tokenMode: 'STATIC',
+        maxScore: 100,
+        packageId: null,
+      })
+    })
+
+    it('keeps an explicit max score and auto status', async () => {
+      const { repo, result } = run({
+        offlineKind: 'PRACTICAL',
+        maxScore: 40,
+        autoStatus: false,
+      })
+      await result
+
+      expect(repo.lastCreatedActivity).toMatchObject({
+        offlineKind: 'PRACTICAL',
+        maxScore: 40,
+        autoStatus: false,
+      })
+    })
+
+    it('accepts an offline exam type asking for a rotating token', async () => {
+      const repo = new FakeActivityRepository()
+      repo.events.set('event-pts', {
+        semesterId: 'sem-1',
+        type: 'MIDTERM',
+        status: 'ACTIVE',
+        startsAt: new Date('2026-11-10T00:00:00Z'),
+        endsAt: new Date('2026-11-10T06:00:00Z'),
+      })
+      await new CreateActivityUseCase(repo, new FakeParticipants()).execute({
+        ...offline,
+        type: 'MIDTERM',
+        presetName: 'MIDTERM',
+        eventId: 'event-pts',
+      })
+
+      expect(repo.lastCreatedActivity?.tokenMode).toBe('STATIC')
+    })
+
+    it('requires the offline kind', async () => {
+      const { repo, result } = run({ offlineKind: undefined })
+      await expect(result).rejects.toThrow(
+        new BadRequestException('Jenis kegiatan Offline wajib dipilih'),
+      )
+      expect(repo.created).toEqual([])
+    })
+
+    it('forbids a package', async () => {
+      const { repo, result } = run({ packageId: 'package-1' })
+      await expect(result).rejects.toThrow(
+        new BadRequestException('Kegiatan Offline tidak memakai paket soal'),
+      )
+      expect(repo.created).toEqual([])
+    })
+
+    it.each([0, 1001, 10.5])('rejects a max score of %s', async (maxScore) => {
+      const { repo, result } = run({ maxScore })
+      await expect(result).rejects.toBeInstanceOf(BadRequestException)
+      expect(repo.created).toEqual([])
+    })
+  })
+
+  it('creates an online activity as ONLINE and keeps its token mode', async () => {
+    const repo = new FakeActivityRepository()
+    await new CreateActivityUseCase(repo, new FakeParticipants()).execute(
+      command,
+    )
+
+    expect(repo.lastCreatedActivity?.deliveryMode).toBe('ONLINE')
+    expect(repo.lastCreatedActivity?.offlineKind).toBeNull()
+    expect(repo.lastCreatedActivity?.tokenMode).toBe('ROTATING')
+  })
+
+  it('does not let the status endpoint change the delivery mode', async () => {
+    const pipe = new ValidationPipe({ whitelist: true })
+    const body = await pipe.transform(
+      { status: 'ACTIVE', deliveryMode: 'OFFLINE' },
+      { type: 'body', metatype: UpdateActivityStatusRequestDto },
+    )
+
+    expect(body).toEqual({ status: 'ACTIVE' })
   })
 
   it('refuses an unknown preset', async () => {

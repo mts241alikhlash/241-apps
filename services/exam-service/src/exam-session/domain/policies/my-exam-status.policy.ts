@@ -12,5 +12,6 @@ export function myExamStatus(
   }
   if (now.getTime() < window.startsAt.getTime()) return 'UPCOMING'
   if (lifecycle === 'OPEN') return 'OPEN'
+  if (lifecycle === 'UPCOMING') return 'UPCOMING'
   return 'FINISHED'
 }

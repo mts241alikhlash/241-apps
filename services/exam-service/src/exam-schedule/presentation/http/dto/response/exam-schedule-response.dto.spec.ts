@@ -6,6 +6,7 @@ import { DEFAULT_POLICIES } from '../../../../../exam-activity/domain/policies/e
 
 const view = {
   id: '55555555-5555-4555-8555-555555555555',
+  deliveryMode: 'ONLINE' as const,
   packageId: '66666666-6666-4666-8666-666666666666',
   subjectId: '11111111-1111-4111-8111-111111111111',
   packageTitle: 'UTS',
@@ -49,6 +50,26 @@ describe('exam schedule response DTOs', () => {
     expect(dto.makeupOfId).toBe('44444444-4444-4444-8444-444444444444')
   })
 
+  it('keeps a missing package as null and carries the delivery mode', () => {
+    const dto = ExamScheduleDto.fromDomain({
+      ...view,
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+
+    expect(dto).toMatchObject({
+      deliveryMode: 'OFFLINE',
+      packageId: null,
+      packageTitle: null,
+    })
+    expect(ExamScheduleDto.fromDomain(view)).toMatchObject({
+      deliveryMode: 'ONLINE',
+      packageId: view.packageId,
+      packageTitle: 'UTS',
+    })
+  })
+
   it('exposes the access code only through AccessCodeDto', () => {
     const dto = AccessCodeDto.of(
       'K7M2QX',
@@ -88,6 +109,10 @@ describe('exam schedule response DTOs', () => {
         endsAt: new Date('2026-11-02T04:00:00.000Z'),
         durationMinutes: 90,
         status: 'SCHEDULED',
+        deliveryMode: 'ONLINE',
+        offlineKind: null,
+        maxScore: 100,
+        autoStatus: true,
         createdById: 'admin-1',
       }).category,
     ).toBe('EXAM')
@@ -128,6 +153,9 @@ describe('exam schedule response DTOs', () => {
         seatNumber: null,
         participantNumber: null,
         makeup: false,
+        deliveryMode: 'ONLINE',
+        hasPackage: true,
+        offlineKind: null,
       }).category,
     ).toBe('NON_EXAM')
   })

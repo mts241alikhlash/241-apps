@@ -46,6 +46,10 @@ function seeded(status: ActivityStatus): FakeExamActivityRepository {
     endsAt: new Date('2026-11-10T04:00:00Z'),
     durationMinutes: 90,
     status,
+    deliveryMode: 'ONLINE',
+    offlineKind: null,
+    maxScore: 100,
+    autoStatus: true,
     createdById: 'admin-1',
   }
   repo.activities.set(activity.id, activity)
@@ -118,7 +122,7 @@ describe('UpdateActivityStatusUseCase', () => {
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
 
-  it('refuses to activate an activity without a package', async () => {
+  it('refuses to activate an online activity without a package', async () => {
     const repo = seeded('DRAFT')
     repo.activities.set('activity-1', {
       ...repo.activities.get('activity-1')!,
@@ -127,13 +131,52 @@ describe('UpdateActivityStatusUseCase', () => {
     const { useCase, closeSessions } = build(repo)
 
     await expect(
-      useCase.execute(SCHEDULE_ADMIN_USER, 'activity-1', 'SCHEDULED'),
+      useCase.execute(SCHEDULE_ADMIN_USER, 'activity-1', 'ACTIVE'),
     ).rejects.toMatchObject({
       message: 'Pasang paket soal dulu',
     })
     expect(repo.activities.get('activity-1')?.status).toBe('DRAFT')
     expect(closeSessions.execute).not.toHaveBeenCalled()
   })
+
+  it('schedules an online activity without a package', async () => {
+    const repo = seeded('DRAFT')
+    repo.activities.set('activity-1', {
+      ...repo.activities.get('activity-1')!,
+      packageId: null,
+    })
+    const { useCase } = build(repo)
+
+    const updated = await useCase.execute(
+      SCHEDULE_ADMIN_USER,
+      'activity-1',
+      'SCHEDULED',
+    )
+
+    expect(updated.status).toBe('SCHEDULED')
+  })
+
+  it.each(['SCHEDULED', 'ACTIVE'] as const)(
+    'allows an offline activity to be %s without a package',
+    async (status) => {
+      const repo = seeded('DRAFT')
+      repo.activities.set('activity-1', {
+        ...repo.activities.get('activity-1')!,
+        packageId: null,
+        deliveryMode: 'OFFLINE',
+        offlineKind: 'WRITTEN',
+      })
+      const { useCase } = build(repo)
+
+      const updated = await useCase.execute(
+        SCHEDULE_ADMIN_USER,
+        'activity-1',
+        status,
+      )
+
+      expect(updated.status).toBe(status)
+    },
+  )
 
   it('refuses an unknown activity', async () => {
     const repo = seeded('SCHEDULED')

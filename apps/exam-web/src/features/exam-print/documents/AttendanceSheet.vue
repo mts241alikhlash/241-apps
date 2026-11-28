@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import LetterheadKop from '@/features/exam-room/components/LetterheadKop.vue'
 import { CARD_HEADER } from '@/features/exam-room/components/cardHeader'
+import { formatPrintTime } from '../format'
 
 const ROWS_PER_PAGE = 26
 const SINGLE_PAGE_MAX = 36
@@ -32,7 +33,8 @@ const props = withDefaults(
     roomName: string
     date: string
     packages: string
-    timeRange: string
+    startsAt: string
+    endsAt: string
     students: AttendanceStudent[]
     paginate?: boolean
     stacked?: boolean
@@ -130,12 +132,17 @@ const pairsOf = (sheet: Sheet): PairRow[] => {
                 <td class="sheet-value">{{ packages }}</td>
               </tr>
               <tr>
-                <td class="sheet-label">Jam Ke/Waktu</td>
+                <td class="sheet-label">Mulai</td>
                 <td class="sheet-colon">:</td>
-                <td class="sheet-value">{{ timeRange }}</td>
+                <td class="sheet-value">{{ formatPrintTime(startsAt) }}</td>
                 <td class="sheet-label">Ruangan</td>
                 <td class="sheet-colon">:</td>
                 <td class="sheet-value">{{ roomName }}</td>
+              </tr>
+              <tr>
+                <td class="sheet-label">Selesai</td>
+                <td class="sheet-colon">:</td>
+                <td class="sheet-value">{{ formatPrintTime(endsAt) }}</td>
               </tr>
             </tbody>
           </table>

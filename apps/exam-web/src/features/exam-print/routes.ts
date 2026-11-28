@@ -62,6 +62,22 @@ export const examPrintRoutes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/exam/print/score-sheet',
+    name: 'ExamPrintScoreSheet',
+    component: () => import('./views/ScoreSheetView.vue'),
+    meta: {
+      title: 'Score Sheet',
+      category: 'EXAM',
+      requiresAuth: true,
+      requiredAnyPermission: [
+        'exam-grading.read',
+        'exam-grading.read-all',
+        'exam-grading.manage-all',
+      ],
+      breadcrumbs: crumbs('Score Sheet', '/exam/print/score-sheet'),
+    },
+  },
+  {
     path: '/classwork/print/grading-sheet/:dayId?/:subjectId?/:classId?',
     name: 'ClassworkPrintGradingSheet',
     component: () => import('./views/GradingSheetView.vue'),

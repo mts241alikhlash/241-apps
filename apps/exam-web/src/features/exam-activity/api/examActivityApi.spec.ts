@@ -87,6 +87,35 @@ describe('examActivityApi', () => {
     })
   })
 
+  it('assigns classrooms', async () => {
+    POST.mockResolvedValue(ok({ id: 'a' }))
+    const body = { classroomIds: ['c'] }
+    await examActivityApi.assignClassrooms('a', body)
+    expect(POST).toHaveBeenCalledWith('/exam-activities/{id}/classrooms', {
+      params: { path: { id: 'a' } },
+      body,
+    })
+  })
+
+  it('sets the auto status', async () => {
+    PATCH.mockResolvedValue(ok({ id: 'a' }))
+    await examActivityApi.setAutoStatus('a', false)
+    expect(PATCH).toHaveBeenCalledWith('/exam-activities/{id}/auto-status', {
+      params: { path: { id: 'a' } },
+      body: { autoStatus: false },
+    })
+  })
+
+  it('reads the readiness of a day', async () => {
+    GET.mockResolvedValue(ok([{ activityId: 'a' }]))
+    await expect(
+      examActivityApi.readiness({ eventId: 'e', date: '2026-11-27' }),
+    ).resolves.toEqual([{ activityId: 'a' }])
+    expect(GET).toHaveBeenCalledWith('/exam-activities/readiness', {
+      params: { query: { eventId: 'e', date: '2026-11-27' } },
+    })
+  })
+
   it('rotates the token', async () => {
     POST.mockResolvedValue(ok({ id: 'a', tokenRotation: 2 }))
     await examActivityApi.rotateToken('a')

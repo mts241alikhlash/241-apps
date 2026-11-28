@@ -6,9 +6,14 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common'
 import type { ExamType } from '../../../../exam-schedule/domain/entities/exam-schedule.entity.js'
-import type { ActivityTokenMode } from '../../../domain/entities/exam-activity.entity.js'
+import type {
+  ActivityTokenMode,
+  ExamDeliveryMode,
+  ExamOfflineKind,
+} from '../../../domain/entities/exam-activity.entity.js'
 import type { ExamActivity } from '../../../domain/entities/exam-activity.entity.js'
 import { ExamActivityRepository } from '../../../domain/repositories/exam-activity.repository.js'
+import { IAcademicLookupPort } from '../../../../platform/academic-lookup/academic-lookup.port.js'
 import { IParticipantNumberPort } from '../../../../platform/participant-number/participant-number.port.js'
 import {
   DEFAULT_POLICIES,
@@ -35,6 +40,21 @@ export async function assertPackageReady(
   }
 }
 
+export async function assertClassroomsInGrade(
+  academic: IAcademicLookupPort,
+  gradeId: string,
+  classroomIds: string[],
+): Promise<void> {
+  const ids = [...new Set(classroomIds)]
+  const rooms = await academic.classroomsByIds(ids)
+  const valid = rooms.filter((room) => room.gradeId === gradeId)
+  if (valid.length !== ids.length) {
+    throw new BadRequestException(
+      'Kelas tidak ditemukan atau bukan tingkat kegiatan ini',
+    )
+  }
+}
+
 export interface CreateActivityCommand {
   actorId: string
   manageAll: boolean
@@ -51,6 +71,10 @@ export interface CreateActivityCommand {
   startsAt: Date
   endsAt: Date
   durationMinutes: number
+  deliveryMode?: ExamDeliveryMode
+  offlineKind?: ExamOfflineKind | null
+  maxScore?: number
+  autoStatus?: boolean
 }
 
 @Injectable()
@@ -72,6 +96,21 @@ export class CreateActivityUseCase {
     if (command.endsAt.getTime() <= command.startsAt.getTime()) {
       throw new BadRequestException('Jendela kegiatan tidak masuk akal')
     }
+    const offline = command.deliveryMode === 'OFFLINE'
+    const maxScore = command.maxScore ?? 100
+    if (offline) {
+      if (!command.offlineKind) {
+        throw new BadRequestException('Jenis kegiatan Offline wajib dipilih')
+      }
+      if (command.packageId) {
+        throw new BadRequestException(
+          'Kegiatan Offline tidak memakai paket soal',
+        )
+      }
+      if (!Number.isInteger(maxScore) || maxScore < 1 || maxScore > 1000) {
+        throw new BadRequestException('Nilai maksimal harus 1 sampai 1000')
+      }
+    }
     const packageId = command.packageId ?? null
     if (packageId !== null) {
       if (command.classroomIds.length === 0) {
@@ -86,7 +125,7 @@ export class CreateActivityUseCase {
     assertActivityAllowed({
       type: command.type,
       presetName,
-      tokenMode: command.tokenMode,
+      tokenMode: offline ? 'ROTATING' : command.tokenMode,
       manageAll: command.manageAll,
       canManageEvents: command.canManageEvents,
       event,
@@ -107,12 +146,16 @@ export class CreateActivityUseCase {
         subjectId: command.subjectId,
         packageId,
         type: command.type,
-        tokenMode: command.tokenMode,
+        tokenMode: offline ? 'STATIC' : command.tokenMode,
         presetId: preset.id,
         policy: parsePolicy(preset.policy, DEFAULT_POLICIES[presetName]),
         startsAt: command.startsAt,
         endsAt: command.endsAt,
         durationMinutes: command.durationMinutes,
+        deliveryMode: offline ? 'OFFLINE' : 'ONLINE',
+        offlineKind: offline ? command.offlineKind : null,
+        ...(offline ? { maxScore } : {}),
+        autoStatus: command.autoStatus,
         createdById: command.actorId,
       },
       classroomIds: packageId === null ? [] : command.classroomIds,

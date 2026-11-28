@@ -4,7 +4,14 @@ import type { ScheduleParticipant } from '../../../domain/entities/schedule-part
 
 export const SCHEDULE_INCLUDE = {
   package: { select: { title: true, subjectId: true } },
-  activity: { select: { tokenMode: true, tokenRotation: true, policy: true } },
+  activity: {
+    select: {
+      tokenMode: true,
+      tokenRotation: true,
+      policy: true,
+      subjectId: true,
+    },
+  },
 } satisfies Prisma.ExamScheduleInclude
 
 type Row = Prisma.ExamScheduleGetPayload<{ include: typeof SCHEDULE_INCLUDE }>
@@ -12,9 +19,10 @@ type Row = Prisma.ExamScheduleGetPayload<{ include: typeof SCHEDULE_INCLUDE }>
 export function toSchedule(row: Row): ExamSchedule {
   return {
     id: row.id,
+    deliveryMode: row.deliveryMode,
     packageId: row.packageId,
-    packageTitle: row.package.title,
-    subjectId: row.package.subjectId,
+    packageTitle: row.package?.title ?? null,
+    subjectId: row.package?.subjectId ?? row.activity?.subjectId ?? '',
     classroomId: row.classroomId,
     semesterId: row.semesterId,
     eventId: row.eventId,

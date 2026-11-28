@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import * as z from 'zod'
@@ -30,6 +30,7 @@ import {
   FormControl,
 } from '@mts241alikhlash/ui/form'
 import { Input } from '@mts241alikhlash/ui/input'
+import { Switch } from '@mts241alikhlash/ui/switch'
 import {
   Select,
   SelectContent,
@@ -44,17 +45,30 @@ import {
   type ExamCategory,
   type ExamType,
 } from '@/features/exam-shared/examType'
+import {
+  examPresetApi,
+  type ExamPolicyPreset,
+} from '@/features/exam-preset/api/examPresetApi'
 import type {
   ActivityCreatePayload,
   ActivityTokenMode,
+  DeliveryMode,
   ClassroomOption,
   EventOption,
   GradeOption,
+  OfflineKind,
   PackageOption,
   PresetName,
   SubjectOption,
 } from '../types'
-import { ACTIVITY_TOKEN_MODES } from '../types'
+import {
+  ACTIVITY_POLICY_DEFAULTS,
+  ACTIVITY_TOKEN_MODES,
+  DELIVERY_MODES,
+  DELIVERY_MODE_LABELS,
+  OFFLINE_KINDS,
+  OFFLINE_KIND_LABELS,
+} from '../types'
 
 const props = defineProps<{
   semesterId: string
@@ -110,17 +124,23 @@ const nonExamPresetTypes: readonly PresetName[] = ['DAILY', 'ASSIGNMENT']
 const combine = (date: string, time: string): number =>
   new Date(`${date}T${time}`).getTime()
 
+const MAX_SCORE_MESSAGE = 'Nilai maksimal harus 1 sampai 1000'
+
 const formSchema = toTypedSchema(
   z
     .object({
       gradeId: z.string().min(1, 'Tingkat wajib dipilih'),
       classroomIds: z.array(z.string()),
-      packageId: z.string(),
+      packageId: z.string().optional(),
+      deliveryMode: z.string(),
+      offlineKind: z.string().optional(),
+      maxScore: z.number({ invalid_type_error: MAX_SCORE_MESSAGE }).optional(),
+      autoStatus: z.boolean(),
       subjectId: z.string().min(1, 'Mata pelajaran wajib dipilih'),
       type: z.string().min(1, 'Jenis wajib dipilih'),
       eventId: z.string().optional(),
       presetName: z.string(),
-      tokenMode: z.string(),
+      tokenMode: z.string().optional(),
       startDate: z.string().min(1, 'Tanggal mulai wajib diisi'),
       startTime: z.string().min(1, 'Jam mulai wajib diisi'),
       endDate: z.string().min(1, 'Tanggal selesai wajib diisi'),
@@ -132,7 +152,27 @@ const formSchema = toTypedSchema(
         .max(1440, 'Durasi maksimal 1440 menit'),
     })
     .superRefine((value, ctx) => {
-      if (value.packageId !== '' && value.classroomIds.length === 0) {
+      if (value.deliveryMode === 'OFFLINE') {
+        if (!value.offlineKind) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['offlineKind'],
+            message: 'Tipe wajib dipilih',
+          })
+        }
+        if (
+          !Number.isInteger(value.maxScore) ||
+          (value.maxScore ?? 0) < 1 ||
+          (value.maxScore ?? 0) > 1000
+        ) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['maxScore'],
+            message: MAX_SCORE_MESSAGE,
+          })
+        }
+      }
+      if (value.packageId && value.classroomIds.length === 0) {
         ctx.addIssue({
           code: 'custom',
           path: ['classroomIds'],
@@ -173,6 +213,10 @@ const { handleSubmit, values, setFieldValue } = useForm({
     gradeId: '',
     classroomIds: [] as string[],
     packageId: '',
+    deliveryMode: 'ONLINE',
+    offlineKind: '',
+    maxScore: 100,
+    autoStatus: true,
     subjectId: '',
     type: availableTypes.value[0] ?? 'DAILY',
     eventId: props.fixedEventId ?? '',
@@ -190,6 +234,25 @@ const isExamType = computed(
   () => categoryOf(values.type as ExamType) === 'EXAM',
 )
 
+const presets = ref<ExamPolicyPreset[] | null>(null)
+
+onMounted(async () => {
+  try {
+    presets.value = await examPresetApi.list()
+  } catch {
+    presets.value = null
+  }
+})
+
+const presetTimings = computed(() => {
+  if (presets.value === null) return null
+  const chosen = isExamType.value ? values.type : values.presetName
+  const policy = presets.value.find((row) => row.type === chosen)?.policy
+  return policy === undefined
+    ? { ...ACTIVITY_POLICY_DEFAULTS, fallback: true }
+    : { ...policy, fallback: false }
+})
+
 const filteredEvents = computed(() =>
   (props.events ?? []).filter((event) => event.type === values.type),
 )
@@ -198,8 +261,12 @@ const visibleClassrooms = computed(() =>
   props.classrooms.filter((room) => room.gradeId === values.gradeId),
 )
 
-const chosenPackage = computed(
-  () => props.packages.find((item) => item.id === values.packageId) ?? null,
+const isOffline = computed(() => values.deliveryMode === 'OFFLINE')
+
+const chosenPackage = computed(() =>
+  isOffline.value
+    ? null
+    : (props.packages.find((item) => item.id === values.packageId) ?? null),
 )
 
 watch(
@@ -255,6 +322,16 @@ watch(
 )
 
 watch(
+  () => values.deliveryMode,
+  (mode) => {
+    if (mode !== 'OFFLINE') return
+    setFieldValue('packageId', '')
+    setFieldValue('offlineKind', '')
+    setFieldValue('maxScore', 100)
+  },
+)
+
+watch(
   () => values.gradeId,
   () => setFieldValue('classroomIds', []),
 )
@@ -293,16 +370,25 @@ function toggleClassroom(
 const onSubmit = handleSubmit((form) => {
   const item = chosenPackage.value
   const exam = categoryOf(form.type as ExamType) === 'EXAM'
+  const offline = form.deliveryMode === 'OFFLINE'
   emit('submit', {
     semesterId: props.semesterId,
     ...(exam && form.eventId ? { eventId: form.eventId } : {}),
     gradeId: form.gradeId,
     subjectId: item?.subjectId ?? form.subjectId,
     ...(item !== null ? { packageId: item.id } : {}),
+    deliveryMode: form.deliveryMode as DeliveryMode,
+    offlineKind: offline ? (form.offlineKind as OfflineKind) : null,
+    maxScore: offline ? (form.maxScore ?? 100) : 100,
+    autoStatus: form.autoStatus,
     type: form.type as ExamType,
     classroomIds: [...form.classroomIds],
     presetName: (exam ? form.type : form.presetName) as PresetName,
-    tokenMode: (exam ? 'ROTATING' : form.tokenMode) as ActivityTokenMode,
+    tokenMode: (offline
+      ? 'STATIC'
+      : exam
+        ? 'ROTATING'
+        : form.tokenMode) as ActivityTokenMode,
     startsAt: new Date(`${form.startDate}T${form.startTime}`).toISOString(),
     endsAt: new Date(`${form.endDate}T${form.endTime}`).toISOString(),
     durationMinutes: form.durationMinutes,
@@ -404,6 +490,84 @@ const onSubmit = handleSubmit((form) => {
             </SelectItem>
           </SelectContent>
         </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-slot="{ value, handleChange }"
+      name="deliveryMode"
+      label="Delivery"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="mode in DELIVERY_MODES"
+              :key="mode"
+              :value="mode"
+            >
+              {{ DELIVERY_MODE_LABELS[mode] }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-if="isOffline"
+      v-slot="{ value, handleChange }"
+      name="offlineKind"
+      label="Type"
+      required
+    >
+      <div class="content-start">
+        <Select
+          :model-value="value || undefined"
+          @update:model-value="handleChange"
+        >
+          <FormControl>
+            <SelectTrigger class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectItem
+              v-for="kind in OFFLINE_KINDS"
+              :key="kind"
+              :value="kind"
+            >
+              {{ OFFLINE_KIND_LABELS[kind] }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </FloatingField>
+
+    <FloatingField
+      v-if="isOffline"
+      v-slot="{ value, handleChange }"
+      name="maxScore"
+      label="Max score"
+      required
+    >
+      <div class="content-start">
+        <FormControl>
+          <FormattedNumberInput
+            :model-value="value"
+            numeric
+            :max-digits="4"
+            @update:model-value="handleChange"
+          />
+        </FormControl>
       </div>
     </FloatingField>
 
@@ -544,6 +708,7 @@ const onSubmit = handleSubmit((form) => {
     </FloatingField>
 
     <FloatingField
+      v-if="!isOffline"
       v-slot="{ value, handleChange }"
       name="packageId"
       label="Paket soal"
@@ -649,7 +814,19 @@ const onSubmit = handleSubmit((form) => {
     </FloatingField>
 
     <FloatingLabelField
-      v-if="isExamType"
+      v-if="isOffline"
+      label="Jenis token"
+      for="activity-token-offline"
+      floating
+    >
+      <Input
+        id="activity-token-offline"
+        model-value="Token tetap"
+        disabled
+      />
+    </FloatingLabelField>
+    <FloatingLabelField
+      v-else-if="isExamType"
       label="Jenis token"
       for="activity-token-fixed"
       floating
@@ -689,5 +866,37 @@ const onSubmit = handleSubmit((form) => {
         </Select>
       </div>
     </FloatingField>
+
+    <div class="grid gap-2 sm:col-span-2">
+      <label class="flex items-center gap-2 text-control">
+        <Switch
+          :model-value="values.autoStatus"
+          aria-label="Auto status"
+          @update:model-value="setFieldValue('autoStatus', $event)"
+        />
+        <span>Auto status</span>
+      </label>
+      <p
+        v-if="presetTimings"
+        class="text-control text-muted-foreground"
+      >
+        Status berubah sendiri: kegiatan dibuka
+        {{ presetTimings.autoOpenLeadMinutes }} menit sebelum mulai dan ditutup
+        {{ presetTimings.autoCloseGraceMinutes }} menit setelah selesai.
+        Toleransi terlambat {{ presetTimings.lateToleranceMinutes }} menit.
+        {{
+          presetTimings.fallback
+            ? 'Angka ini nilai bawaan karena preset jenis ini belum tersimpan.'
+            : 'Angka ini diambil dari preset kebijakan jenis yang dipilih dan bisa diubah di kebijakan kegiatan.'
+        }}
+      </p>
+      <p
+        v-else
+        class="text-control text-muted-foreground"
+      >
+        Status berubah sendiri mengikuti preset kebijakan jenis yang dipilih.
+        Angkanya tampil di halaman detail kegiatan setelah kegiatan dibuat.
+      </p>
+    </div>
   </form>
 </template>

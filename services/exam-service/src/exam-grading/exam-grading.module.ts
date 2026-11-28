@@ -37,5 +37,6 @@ import { ExamGradingController } from './presentation/http/exam-grading.controll
       useClass: PrismaScorePublicationRepository,
     },
   ],
+  exports: [GradingScopeService],
 })
 export class ExamGradingModule {}

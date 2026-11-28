@@ -77,4 +77,20 @@ describe('GradingScheduleDto', () => {
       kind: 'REGULAR',
     })
   })
+
+  it('keeps a missing package as null', () => {
+    const dto = GradingScheduleDto.fromDomain({
+      id: 's4',
+      packageId: null,
+      packageTitle: null,
+      durationMinutes: 60,
+      kind: 'REGULAR',
+      type: 'MIDTERM',
+      startsAt: new Date('2026-11-02T01:00:00.000Z'),
+      endsAt: new Date('2026-11-02T03:00:00.000Z'),
+    } as GradingSchedule)
+
+    expect(dto.packageId).toBeNull()
+    expect(dto.title).toBe('')
+  })
 })

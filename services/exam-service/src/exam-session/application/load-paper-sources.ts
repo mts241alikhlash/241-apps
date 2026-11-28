@@ -15,7 +15,10 @@ export async function loadPaperSources(
   if (schedule === null) {
     throw new NotFoundException('Jadwal ujian tidak ditemukan')
   }
-  const pkg = await packages.findById(schedule.packageId)
+  const pkg =
+    schedule.packageId === null
+      ? null
+      : await packages.findById(schedule.packageId)
   if (pkg === null) throw new NotFoundException('Paket soal tidak ditemukan')
   const pinned = await questions.findPinned(
     pkg.items.map((item) => ({
