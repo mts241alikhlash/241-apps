@@ -28,7 +28,9 @@ export class PrismaService
     const adapter = new PrismaPg({
       connectionString,
       ...pgSslOptions(connectionString),
-      ...pgPoolOptions(4, (key) => configService.get(key)),
+      ...pgPoolOptions({ max: 4, timeoutMs: 4000 }, (key) =>
+        configService.get(key),
+      ),
     })
     super({ adapter })
   }

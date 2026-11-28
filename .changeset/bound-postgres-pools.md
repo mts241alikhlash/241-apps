@@ -12,4 +12,4 @@
 'student-service': patch
 ---
 
-Bound each service's Postgres pool with DATABASE_POOL_MAX and DATABASE_POOL_TIMEOUT_MS, failing a request after 4 s instead of queueing forever.
+Bound each service's Postgres pool with DATABASE_POOL_MAX and DATABASE_POOL_TIMEOUT_MS (3 s for identity, student, academic and hr; 4 s otherwise) instead of queueing forever. A pool wait timeout now answers 503 with a retry message instead of 500.
