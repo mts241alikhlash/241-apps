@@ -20,6 +20,18 @@ describe('ApproveExamPackageUseCase', () => {
     ])
   })
 
+  it('approving a package that already has schedules locks it', async () => {
+    const world = await reviewWorld()
+    world.setStatus('SUBMITTED')
+    world.packages.scheduledPackageIds.add(world.pkg.id)
+    const useCase = new ApproveExamPackageUseCase(world.packages)
+
+    const result = await useCase.execute(REVIEWER, world.pkg.id)
+
+    expect(result.status).toBe('LOCKED')
+    expect(result.lockedAt).toBeInstanceOf(Date)
+  })
+
   it('refuses a package that is not submitted', async () => {
     const world = await reviewWorld()
     const useCase = new ApproveExamPackageUseCase(world.packages)

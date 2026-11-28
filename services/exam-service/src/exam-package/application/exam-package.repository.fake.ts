@@ -22,6 +22,7 @@ import {
 export class FakeExamPackageRepository extends IExamPackageRepository {
   readonly packages = new Map<string, ExamPackageDetail>()
   readonly reviews: PackageReview[] = []
+  readonly scheduledPackageIds = new Set<string>()
 
   constructor(private readonly questions?: FakeQuestionRepository) {
     super()
@@ -108,7 +109,13 @@ export class FakeExamPackageRepository extends IExamPackageRepository {
     if (review.action === 'SUBMIT' && row.items.length === 0) {
       return Promise.resolve(false)
     }
-    this.packages.set(id, { ...row, status: to, updatedAt: new Date() })
+    const now = new Date()
+    this.packages.set(id, {
+      ...row,
+      status: to,
+      lockedAt: to === 'LOCKED' ? now : row.lockedAt,
+      updatedAt: now,
+    })
     this.reviews.push({
       id: randomUUID(),
       packageId: id,
@@ -116,6 +123,10 @@ export class FakeExamPackageRepository extends IExamPackageRepository {
       ...review,
     })
     return Promise.resolve(true)
+  }
+
+  hasSchedules(id: string) {
+    return Promise.resolve(this.scheduledPackageIds.has(id))
   }
 
   listReviews(id: string) {

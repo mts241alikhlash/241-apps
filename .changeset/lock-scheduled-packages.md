@@ -2,4 +2,4 @@
 'exam-service': patch
 ---
 
-Lock a package when an activity or classroom schedule is created from it, and lock existing approved packages that already have schedules.
+Lock a package once it has schedules: approving or scheduling one locks it, and an unlocked package refuses new schedules.

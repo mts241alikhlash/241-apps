@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { ConflictException, Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service.js'
 import { Prisma } from '../../../../generated/prisma/client.js'
 import {
@@ -98,6 +98,15 @@ async function createSchedules(
       where: { id: packageId, status: 'APPROVED', deletedAt: null },
       data: { status: 'LOCKED', lockedAt: new Date() },
     })
+    const locked = await tx.examPackage.findFirst({
+      where: { id: packageId, status: 'LOCKED', deletedAt: null },
+      select: { id: true },
+    })
+    if (locked === null) {
+      throw new ConflictException(
+        'Paket belum disetujui dan tidak bisa dijadwalkan',
+      )
+    }
   }
   await tx.examSchedule.createMany({
     data: classroomIds.map((classroomId) => ({

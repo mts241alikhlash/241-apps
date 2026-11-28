@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common'
 import { describe, expect, it, vi } from 'vitest'
 import { Prisma } from '../../../../generated/prisma/client.js'
 import type { PrismaService } from '../../../../core/database/prisma.service.js'
@@ -104,7 +105,10 @@ function transaction() {
       updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       findMany: vi.fn().mockResolvedValue([]),
     },
-    examPackage: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+    examPackage: {
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      findFirst: vi.fn().mockResolvedValue({ id: PACKAGE_ID }),
+    },
     examActivityAuditLog: { create: vi.fn().mockResolvedValue({}) },
   }
 }
@@ -175,5 +179,54 @@ describe('PrismaExamActivityRepository package locking', () => {
     } as never)
 
     expect(tx.examPackage.updateMany).toHaveBeenCalledWith(LOCK_CALL)
+  })
+
+  it('refuses schedules when the package is not approved or locked, and writes none', async () => {
+    const tx = transaction()
+    tx.examPackage.updateMany.mockResolvedValue({ count: 0 })
+    tx.examPackage.findFirst.mockResolvedValue(null)
+    const repo = repositoryWith(tx)
+
+    await expect(
+      repo.create({
+        activity: { packageId: PACKAGE_ID, deliveryMode: 'ONLINE' },
+        classroomIds: [CLASSROOM_ID],
+        actorId: 'admin-1',
+      } as never),
+    ).rejects.toThrow(ConflictException)
+    expect(tx.examSchedule.createMany).not.toHaveBeenCalled()
+  })
+
+  it('assigning classrooms to an activity whose package is a draft is refused', async () => {
+    const tx = transaction()
+    tx.examActivity.findUnique.mockResolvedValue(
+      activityRow({ packageId: PACKAGE_ID }),
+    )
+    tx.examPackage.updateMany.mockResolvedValue({ count: 0 })
+    tx.examPackage.findFirst.mockResolvedValue(null)
+    const repo = repositoryWith(tx)
+
+    await expect(
+      repo.assignClassrooms({
+        activityId: ACTIVITY_ID,
+        classroomIds: [CLASSROOM_ID],
+      } as never),
+    ).rejects.toThrow(ConflictException)
+    expect(tx.examSchedule.createMany).not.toHaveBeenCalled()
+  })
+
+  it('a package already locked takes schedules without error', async () => {
+    const tx = transaction()
+    tx.examPackage.updateMany.mockResolvedValue({ count: 0 })
+    const repo = repositoryWith(tx)
+
+    await repo.attachPackage({
+      activityId: ACTIVITY_ID,
+      packageId: PACKAGE_ID,
+      classroomIds: [CLASSROOM_ID],
+      actorId: 'admin-1',
+    })
+
+    expect(tx.examSchedule.createMany).toHaveBeenCalled()
   })
 })
