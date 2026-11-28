@@ -31,6 +31,22 @@ import {
 } from '../../../../exam-activity/domain/policies/exam-policy.policy.js'
 import { IExamSessionRepository } from '../../../domain/repositories/exam-session.repository.js'
 
+function runsOnPastEnd(
+  lifecycle: ExamLifecycle,
+  session: { status: string; finalizeAt: Date } | null,
+  now: Date,
+): ExamLifecycle {
+  if (
+    lifecycle === 'FINISHED' &&
+    session !== null &&
+    session.status === 'IN_PROGRESS' &&
+    now.getTime() < session.finalizeAt.getTime()
+  ) {
+    return 'OPEN'
+  }
+  return lifecycle
+}
+
 export interface MyExam {
   id: string
   title: string
@@ -146,7 +162,11 @@ export class ListMyExamsUseCase {
         : null
       if (schedule.kind === 'REGULAR' && activity?.status === 'DRAFT') continue
       const eventId = activity?.eventId ?? source.eventId
-      const lifecycle = scheduleLifecycle(schedule, activity, now)
+      const lifecycle = runsOnPastEnd(
+        scheduleLifecycle(schedule, activity, now),
+        session,
+        now,
+      )
       const seat =
         lifecycle === 'OPEN' && eventId !== null
           ? await this.rooms.findSeatForStudent(eventId, studentId)
