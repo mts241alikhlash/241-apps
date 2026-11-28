@@ -1,5 +1,18 @@
 # exam-service
 
+## 0.10.0
+
+### Minor Changes
+
+- cbffe8e: Offline exams: timetable before package, automatic activity status, offline scores
+
+### Patch Changes
+
+- dfd6194: Staff can extend one student's exam up to 30 minutes past the schedule end.
+- 392f52e: Lock a package once it has schedules: approving or scheduling one locks it, and an unlocked package refuses new schedules.
+- 8d25564: Student exam list batches its lookups and caches for 3 seconds, and answer saves cache question shapes.
+- 67b612a: Fill the policy keys missing from the stored exam policy presets.
+
 ## 0.9.4
 
 ### Patch Changes
