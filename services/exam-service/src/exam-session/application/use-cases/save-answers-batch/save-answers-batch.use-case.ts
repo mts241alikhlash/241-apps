@@ -12,7 +12,7 @@ import {
   IExamSessionRepository,
   type SkippedAnswerBatchItem,
 } from '../../../domain/repositories/exam-session.repository.js'
-import { loadPaperSources } from '../../load-paper-sources.js'
+import { AnswerShapeCache, loadAnswerShapes } from '../../answer-shapes.js'
 import {
   SessionAccessService,
   type SessionActor,
@@ -50,6 +50,8 @@ export interface SaveAnswersBatchResult {
 
 @Injectable()
 export class SaveAnswersBatchUseCase {
+  private readonly shapes = new AnswerShapeCache()
+
   constructor(
     private readonly access: SessionAccessService,
     private readonly schedules: IExamScheduleRepository,
@@ -82,24 +84,24 @@ export class SaveAnswersBatchUseCase {
     const latest = new Map<string, SaveAnswerBatchInputItem>()
     for (const item of input.answers) latest.set(item.questionId, item)
 
-    const sources = await loadPaperSources(
+    const shapes = await loadAnswerShapes(
       this.schedules,
       this.packages,
       this.questions,
       session.scheduleId,
+      this.shapes,
     )
-    const sourceOf = new Map(sources.map((row) => [row.questionId, row]))
     const receivedAfterDeadline = now.getTime() >= session.deadline.getTime()
 
     const items = [...latest.values()].map((item) => {
-      const source = sourceOf.get(item.questionId)
-      if (source === undefined) {
+      const shape = shapes.get(item.questionId)
+      if (shape === undefined) {
         throw new BadRequestException('Soal bukan bagian dari ujian ini')
       }
       return {
         questionId: item.questionId,
         clientId: item.clientId,
-        answer: assertAnswerShape(source.type, source.content, item.answer),
+        answer: assertAnswerShape(shape.type, shape.content, item.answer),
         receivedAfterDeadline,
       }
     })
