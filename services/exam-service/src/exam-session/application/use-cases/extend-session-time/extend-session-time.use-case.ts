@@ -13,6 +13,7 @@ const MS_PER_MINUTE = 60_000
 export const MIN_EXTRA_MINUTES = 1
 export const MAX_EXTRA_MINUTES = 120
 export const MAX_TOTAL_EXTRA_MINUTES = 180
+export const MAX_PAST_END_MINUTES = 30
 
 export function assertExtraMinutes(minutes: number): number {
   if (
@@ -34,6 +35,15 @@ export function assertTotalExtraMinutes(total: number): number {
     )
   }
   return total
+}
+
+export function assertWithinPastEnd(deadline: Date, endsAt: Date): void {
+  const limit = endsAt.getTime() + MAX_PAST_END_MINUTES * MS_PER_MINUTE
+  if (deadline.getTime() > limit) {
+    throw new ConflictException(
+      `Tambahan waktu melewati batas ${MAX_PAST_END_MINUTES} menit setelah jam selesai ujian`,
+    )
+  }
 }
 
 export function shiftBy(session: ExamSession, minutes: number) {
@@ -72,9 +82,7 @@ export class ExtendSessionTimeUseCase {
     if (schedule === null) {
       throw new ConflictException('Jadwal ujian tidak ditemukan')
     }
-    if (shiftBy(session, added).deadline > schedule.endsAt) {
-      throw new ConflictException('Tambahan waktu melewati jendela ujian')
-    }
+    assertWithinPastEnd(shiftBy(session, added).deadline, schedule.endsAt)
     return this.recovery.apply(
       user,
       sessionId,
