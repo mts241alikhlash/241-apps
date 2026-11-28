@@ -112,6 +112,24 @@ describe('AdjustPackageItemKeyUseCase', () => {
     expect(sessions.publications.get('s-4')).toBe('SENT')
   })
 
+  it('adjusts the key of a locked package', async () => {
+    const { packages, sessions, useCase, schedule, pkg, questionIds } =
+      await setup()
+    packages.packages.get(pkg.id)!.status = 'LOCKED'
+    seedAnswered(sessions, schedule.id, questionIds[0], 'SUBMITTED', 's-1', 'A')
+
+    const result = await useCase.execute(
+      ACTOR,
+      pkg.id,
+      questionIds[0],
+      { resolution: 'BONUS_ALL', reason: 'Soal nomor 1 salah kunci' },
+      NOW,
+    )
+
+    expect(result.rescoredSessions).toBe(1)
+    expect((await packages.findById(pkg.id))?.status).toBe('LOCKED')
+  })
+
   it('scores against the replacement key for KEY_OVERRIDE', async () => {
     const { packages, sessions, useCase, schedule, pkg, questionIds } =
       await setup()

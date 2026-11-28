@@ -26,10 +26,11 @@ export class ApproveExamPackageUseCase {
     assertCanReview(pkg.status)
     assertNotOwnReview(pkg.createdById, user.id)
 
+    const scheduled = await this.packages.hasSchedules(id)
     const moved = await this.packages.transition(
       id,
       ['SUBMITTED'],
-      'APPROVED',
+      scheduled ? 'LOCKED' : 'APPROVED',
       {
         action: 'APPROVE',
         byUserId: user.id,

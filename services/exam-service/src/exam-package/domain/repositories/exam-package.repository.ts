@@ -72,6 +72,7 @@ export abstract class IExamPackageRepository {
     to: ExamPackageStatus,
     review: NewPackageReview,
   ): Promise<boolean>
+  abstract hasSchedules(id: string): Promise<boolean>
   abstract listReviews(id: string): Promise<PackageReview[]>
   abstract addQuestion(
     id: string,

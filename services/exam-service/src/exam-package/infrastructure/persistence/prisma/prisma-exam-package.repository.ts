@@ -121,6 +121,13 @@ export class PrismaExamPackageRepository extends IExamPackageRepository {
     })
   }
 
+  async hasSchedules(id: string): Promise<boolean> {
+    const count = await this.prisma.examSchedule.count({
+      where: { packageId: id },
+    })
+    return count > 0
+  }
+
   async transition(
     id: string,
     from: ExamPackageStatus[],
@@ -130,7 +137,10 @@ export class PrismaExamPackageRepository extends IExamPackageRepository {
     const moved = await this.inTransaction(async (tx) => {
       const result = await tx.examPackage.updateMany({
         where: { id, status: { in: from }, deletedAt: null },
-        data: { status: to },
+        data: {
+          status: to,
+          ...(to === 'LOCKED' ? { lockedAt: new Date() } : {}),
+        },
       })
       if (result.count === 0) return false
       if (
