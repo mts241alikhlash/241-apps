@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-export interface PoolDefaults { max: number; timeoutMs: number }
+export interface PoolDefaults {
+  max: number
+  timeoutMs: number
+}
 
 const positiveInt = z.coerce.number().int().min(1)
 
