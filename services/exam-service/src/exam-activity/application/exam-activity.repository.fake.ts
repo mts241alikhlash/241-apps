@@ -211,6 +211,10 @@ export class FakeExamActivityRepository extends ExamActivityRepository {
     return Promise.resolve(this.activities.get(id) ?? null)
   }
 
+  findByIds(ids: string[]) {
+    return Promise.resolve(ids.flatMap((id) => this.activities.get(id) ?? []))
+  }
+
   updatePolicy(id: string, policy: ExamPolicy) {
     const activity = this.activities.get(id)
     if (activity === undefined) return Promise.resolve(null)

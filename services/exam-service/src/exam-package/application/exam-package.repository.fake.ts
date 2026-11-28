@@ -58,6 +58,15 @@ export class FakeExamPackageRepository extends IExamPackageRepository {
     return Promise.resolve(row?.deletedAt === null ? row : null)
   }
 
+  findByIds(ids: string[]) {
+    return Promise.resolve(
+      ids.flatMap((id) => {
+        const row = this.packages.get(id)
+        return row?.deletedAt === null ? [row] : []
+      }),
+    )
+  }
+
   create(input: NewExamPackage) {
     const now = new Date()
     const row: ExamPackageDetail = {

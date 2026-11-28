@@ -106,6 +106,10 @@ export class FakeExamScheduleRepository extends IExamScheduleRepository {
     return Promise.resolve(this.schedules.get(id) ?? null)
   }
 
+  findByIds(ids: string[]) {
+    return Promise.resolve(ids.flatMap((id) => this.schedules.get(id) ?? []))
+  }
+
   async createAndLockPackage(input: NewExamSchedule) {
     const pkg = await this.packages.findById(input.packageId)
     if (pkg === null) return null

@@ -748,3 +748,49 @@ describe('ListMyExamsUseCase', () => {
     })
   })
 })
+
+describe('ListMyExamsUseCase lookups', () => {
+  it('reads the packages and activities of many schedules in one query each', async () => {
+    const packages = new FakeExamPackageRepository()
+    const schedules = new FakeExamScheduleRepository(packages)
+    const questions = new FakeQuestionRepository()
+    const activities = new FakeExamActivityRepository()
+    const students = new FakeStudentIdentity()
+    const enrollments = new FakeEnrollment()
+    const academic = new FakeAcademicLookup({
+      subjects: [{ id: SUBJECT_ID, name: 'Matematika' }],
+    })
+    const useCase = new ListMyExamsUseCase(
+      students,
+      enrollments,
+      schedules,
+      packages,
+      new FakeExamSessionRepository(),
+      academic,
+      activities,
+      new FakeExamRoomRepository(),
+      new FakeParticipantNumber(),
+    )
+    for (let index = 0; index < 20; index++) {
+      await scheduleExam(
+        { packages, schedules, questions },
+        {
+          startsAt: new Date(STARTS.getTime() + index * 86_400_000),
+          endsAt: new Date(ENDS.getTime() + index * 86_400_000),
+        },
+      )
+    }
+    const findPackage = vi.spyOn(packages, 'findById')
+    const findPackages = vi.spyOn(packages, 'findByIds')
+    const findActivities = vi.spyOn(activities, 'findByIds')
+    const findActivity = vi.spyOn(activities, 'findById')
+
+    const list = await useCase.execute(STUDENT_USER, NOW)
+
+    expect(list).toHaveLength(20)
+    expect(findPackages).toHaveBeenCalledTimes(1)
+    expect(findPackage).not.toHaveBeenCalled()
+    expect(findActivities).toHaveBeenCalledTimes(1)
+    expect(findActivity).not.toHaveBeenCalled()
+  })
+})

@@ -103,103 +103,158 @@ export class ListMyExamsUseCase {
     const enrollment = await this.enrollments.findActiveByStudent(studentId)
     if (enrollment === null) return []
 
-    const regular = await this.schedules.findForClassroom(
-      enrollment.classroomId,
-      enrollment.semesterId,
-    )
-    const makeups = await this.schedules.findMakeupsForStudent(
-      studentId,
-      enrollment.semesterId,
-    )
+    const [regular, makeups] = await Promise.all([
+      this.schedules.findForClassroom(
+        enrollment.classroomId,
+        enrollment.semesterId,
+      ),
+      this.schedules.findMakeupsForStudent(studentId, enrollment.semesterId),
+    ])
     const schedules = [...regular, ...makeups]
     if (schedules.length === 0) return []
 
-    const sessions = await this.sessions.listByStudentAndSchedules(
-      studentId,
-      schedules.map((schedule) => schedule.id),
-    )
+    const originIds = [
+      ...new Set(
+        schedules.flatMap((schedule) =>
+          schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
+            ? [schedule.makeupOfId]
+            : [],
+        ),
+      ),
+    ]
+    const [sessions, originals] = await Promise.all([
+      this.sessions.listByStudentAndSchedules(
+        studentId,
+        schedules.map((schedule) => schedule.id),
+      ),
+      this.schedules.findByIds(originIds),
+    ])
     const sessionOf = new Map(sessions.map((s) => [s.scheduleId, s]))
+    const originOf = new Map(originals.map((s) => [s.id, s]))
+    const originFor = (schedule: ExamSchedule): ExamSchedule | null =>
+      schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
+        ? (originOf.get(schedule.makeupOfId) ?? null)
+        : null
 
-    const eventNames = new Map<string, Promise<string | null>>()
-    const eventName = (eventId: string): Promise<string | null> => {
-      const cached = eventNames.get(eventId)
-      if (cached !== undefined) return cached
-      const name = this.rooms
-        .findEventById(eventId)
-        .then((event) => event?.name ?? null)
-      eventNames.set(eventId, name)
-      return name
-    }
-    let participantNumber: Promise<string | null> | null = null
-    const number = (): Promise<string | null> => {
-      participantNumber ??= this.participants
-        .findNumber(studentId, enrollment.semesterId)
-        .catch(() => null)
-      return participantNumber
-    }
+    const eligible = await Promise.all(
+      schedules.map((schedule) =>
+        schedule.kind === 'MAKEUP'
+          ? this.canSitMakeup(schedule, originFor(schedule), studentId)
+          : Promise.resolve(true),
+      ),
+    )
+    const candidates = schedules.filter((_, index) => eligible[index])
 
-    const rows: MyExam[] = []
-    for (const schedule of schedules) {
-      const original =
-        schedule.kind === 'MAKEUP' && schedule.makeupOfId !== null
-          ? await this.schedules.findById(schedule.makeupOfId)
-          : null
-      if (
-        schedule.kind === 'MAKEUP' &&
-        !(await this.canSitMakeup(schedule, original, studentId))
-      ) {
-        continue
-      }
+    const packageIds = [
+      ...new Set(
+        candidates.flatMap((schedule) =>
+          schedule.packageId === null ? [] : [schedule.packageId],
+        ),
+      ),
+    ]
+    const activityIds = [
+      ...new Set(
+        candidates.flatMap((schedule) => {
+          const activityId = (originFor(schedule) ?? schedule).activityId
+          return activityId ? [activityId] : []
+        }),
+      ),
+    ]
+    const [packageRows, activityRows] = await Promise.all([
+      this.packages.findByIds(packageIds),
+      this.activities.findByIds(activityIds),
+    ])
+    const packageOf = new Map(packageRows.map((p) => [p.id, p]))
+    const activityOf = new Map(activityRows.map((a) => [a.id, a]))
+
+    const planned = candidates.flatMap((schedule) => {
       const pkg =
         schedule.packageId === null
           ? null
-          : await this.packages.findById(schedule.packageId)
-      if (schedule.packageId !== null && pkg === null) continue
-      const session = sessionOf.get(schedule.id) ?? null
-      const source = original ?? schedule
+          : (packageOf.get(schedule.packageId) ?? null)
+      if (schedule.packageId !== null && pkg === null) return []
+      const source = originFor(schedule) ?? schedule
       const activity = source.activityId
-        ? await this.activities.findById(source.activityId)
+        ? (activityOf.get(source.activityId) ?? null)
         : null
-      if (schedule.kind === 'REGULAR' && activity?.status === 'DRAFT') continue
+      if (schedule.kind === 'REGULAR' && activity?.status === 'DRAFT') return []
+      const session = sessionOf.get(schedule.id) ?? null
       const eventId = activity?.eventId ?? source.eventId
       const lifecycle = runsOnPastEnd(
         scheduleLifecycle(schedule, activity, now),
         session,
         now,
       )
-      const seat =
-        lifecycle === 'OPEN' && eventId !== null
-          ? await this.rooms.findSeatForStudent(eventId, studentId)
-          : null
-      rows.push({
-        id: schedule.id,
-        title: schedule.packageTitle ?? pkg?.title ?? '',
-        subjectId: pkg?.subjectId ?? schedule.subjectId,
-        subjectName: null,
-        type: schedule.type,
-        startsAt: schedule.startsAt,
-        endsAt: schedule.endsAt,
-        durationMinutes: schedule.durationMinutes,
-        minSubmitMinutes: effectiveMinSubmit(
-          tryParsePolicy(schedule.activityPolicy) ?? DEFAULT_POLICIES.MIDTERM,
-          schedule.minSubmitMinutes,
+      return [{ schedule, pkg, activity, session, eventId, lifecycle }]
+    })
+
+    const seatEventIds = [
+      ...new Set(
+        planned.flatMap((row) =>
+          row.lifecycle === 'OPEN' && row.eventId !== null ? [row.eventId] : [],
         ),
-        status: myExamStatus(schedule, session, now, lifecycle),
-        sessionId: session?.id ?? null,
-        activityId: activity?.id ?? null,
-        activityStatus: activity?.status ?? null,
-        eventId,
-        eventName: eventId === null ? null : await eventName(eventId),
-        lifecycle,
-        roomName: seat?.roomName ?? null,
-        seatNumber: seat?.seatNumber ?? null,
-        participantNumber: await number(),
-        makeup: schedule.kind === 'MAKEUP',
-        deliveryMode: schedule.deliveryMode,
-        hasPackage: schedule.packageId !== null,
-        offlineKind: activity?.offlineKind ?? null,
-      })
-    }
+      ),
+    ]
+    const eventIds = [
+      ...new Set(
+        planned.flatMap((row) => (row.eventId === null ? [] : [row.eventId])),
+      ),
+    ]
+    const [seats, events, participantNumber] = await Promise.all([
+      Promise.all(
+        seatEventIds.map((eventId) =>
+          this.rooms.findSeatForStudent(eventId, studentId),
+        ),
+      ),
+      Promise.all(eventIds.map((eventId) => this.rooms.findEventById(eventId))),
+      planned.length === 0
+        ? Promise.resolve(null)
+        : this.participants
+            .findNumber(studentId, enrollment.semesterId)
+            .catch(() => null),
+    ])
+    const seatOf = new Map(seatEventIds.map((id, index) => [id, seats[index]]))
+    const eventNameOf = new Map(
+      eventIds.map((id, index) => [id, events[index]?.name ?? null]),
+    )
+
+    const rows: MyExam[] = planned.map(
+      ({ schedule, pkg, activity, session, eventId, lifecycle }) => {
+        const seat =
+          lifecycle === 'OPEN' && eventId !== null
+            ? (seatOf.get(eventId) ?? null)
+            : null
+        return {
+          id: schedule.id,
+          title: schedule.packageTitle ?? pkg?.title ?? '',
+          subjectId: pkg?.subjectId ?? schedule.subjectId,
+          subjectName: null,
+          type: schedule.type,
+          startsAt: schedule.startsAt,
+          endsAt: schedule.endsAt,
+          durationMinutes: schedule.durationMinutes,
+          minSubmitMinutes: effectiveMinSubmit(
+            tryParsePolicy(schedule.activityPolicy) ?? DEFAULT_POLICIES.MIDTERM,
+            schedule.minSubmitMinutes,
+          ),
+          status: myExamStatus(schedule, session, now, lifecycle),
+          sessionId: session?.id ?? null,
+          activityId: activity?.id ?? null,
+          activityStatus: activity?.status ?? null,
+          eventId,
+          eventName:
+            eventId === null ? null : (eventNameOf.get(eventId) ?? null),
+          lifecycle,
+          roomName: seat?.roomName ?? null,
+          seatNumber: seat?.seatNumber ?? null,
+          participantNumber,
+          makeup: schedule.kind === 'MAKEUP',
+          deliveryMode: schedule.deliveryMode,
+          hasPackage: schedule.packageId !== null,
+          offlineKind: activity?.offlineKind ?? null,
+        }
+      },
+    )
     const names = await this.subjectNames(rows.map((row) => row.subjectId))
     for (const row of rows) {
       row.subjectName = names.get(row.subjectId) ?? null
