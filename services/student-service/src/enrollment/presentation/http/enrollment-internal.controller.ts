@@ -289,7 +289,8 @@ export class EnrollmentInternalController {
     summary: "A student's active enrollment, as ids",
     description:
       'With `semesterId`, the active enrollment in that term rather than ' +
-      'whichever one is current.',
+      'whichever one is current. Student name and gender are not resolved ' +
+      'here (null); resolve them from identity-service.',
   })
   @ApiResponse({ status: 200, type: ActiveEnrollmentResponseDto })
   @ApiResponse({
@@ -300,7 +301,7 @@ export class EnrollmentInternalController {
     @Param('studentId', ParseUUIDPipe) studentId: string,
     @Query('semesterId') semesterId?: string,
   ): Promise<ActiveEnrollmentResponseDto> {
-    const enrollment = await this.enrollmentRepository.findActiveEnrollment(
+    const enrollment = await this.enrollmentRepository.findActiveRow(
       studentId,
       semesterId,
     )

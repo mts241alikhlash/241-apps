@@ -36,6 +36,7 @@ describe('EnrollmentInternalController', () => {
   const mockRepo = {
     findAll: vi.fn(),
     findActiveEnrollment: vi.fn(),
+    findActiveRow: vi.fn(),
     findById: vi.fn(),
     findManyActiveByIds: vi.fn(),
     countActiveByClassrooms: vi.fn(),
@@ -87,13 +88,27 @@ describe('EnrollmentInternalController', () => {
   })
 
   it('includes studentNisn in active()', async () => {
-    mockRepo.findActiveEnrollment.mockResolvedValue(
+    mockRepo.findActiveRow.mockResolvedValue(
       makeEnrollment({ nisn: '0091234567' }),
     )
 
     const result = await controller.active('stu-1', 'sem-1')
 
     expect(result.data?.studentNisn).toBe('0091234567')
+  })
+
+  it('active() reads the bare enrollment and resolves no name', async () => {
+    const row = makeEnrollment()
+    mockRepo.findActiveRow.mockResolvedValue({
+      ...row,
+      student: { userId: 'usr-1', nis: '2024001', nisn: '0091234567' },
+    })
+
+    const result = await controller.active('stu-1', 'sem-1')
+
+    expect(mockRepo.findActiveRow).toHaveBeenCalledWith('stu-1', 'sem-1')
+    expect(mockRepo.findActiveEnrollment).not.toHaveBeenCalled()
+    expect(result.data?.studentName).toBeNull()
   })
 
   it('includes studentNisn in search()', async () => {

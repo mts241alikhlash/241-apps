@@ -155,7 +155,7 @@ export interface paths {
         };
         /**
          * A student's active enrollment, as ids
-         * @description With `semesterId`, the active enrollment in that term rather than whichever one is current.
+         * @description With `semesterId`, the active enrollment in that term rather than whichever one is current. Student name and gender are not resolved here (null); resolve them from identity-service.
          */
         get: operations["EnrollmentInternalController_active"];
         put?: never;

@@ -255,6 +255,13 @@ export class PrismaEnrollmentRepository extends IEnrollmentRepository {
     return withRefs
   }
 
+  async findActiveRow(
+    studentId: string,
+    semesterId?: string,
+  ): Promise<EnrollmentRowWithRefs | null> {
+    return findActiveEnrollment(this.prisma, studentId, semesterId)
+  }
+
   async findDuplicate(
     studentId: string,
     semesterId?: string,
