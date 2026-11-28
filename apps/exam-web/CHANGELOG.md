@@ -1,5 +1,11 @@
 # exam-web
 
+## 0.10.0
+
+### Minor Changes
+
+- cbffe8e: Offline exams: timetable before package, automatic activity status, offline scores
+
 ## 0.9.4
 
 ### Patch Changes

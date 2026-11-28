@@ -1,5 +1,11 @@
 # @mts241alikhlash/exam-api
 
+## 0.9.0
+
+### Minor Changes
+
+- cbffe8e: Offline exams: timetable before package, automatic activity status, offline scores
+
 ## 0.8.6
 
 ### Patch Changes
