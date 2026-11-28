@@ -19,6 +19,7 @@ function session(id: string, deadline: Date): ExamSession {
     extraMinutes: 0,
     deadline,
     finalizeAt: new Date(deadline.getTime() + 10 * MS_PER_MINUTE),
+    seatNumber: 12,
   } as unknown as ExamSession
 }
 
@@ -61,7 +62,7 @@ describe('ExtendRoomTimeUseCase past the schedule end', () => {
 
     await expect(useCase.execute(USER, 'room-1', 10, REASON)).rejects.toThrow(
       new ConflictException(
-        'Tambahan waktu melewati batas 30 menit setelah jam selesai ujian',
+        'Tambahan waktu melewati batas 30 menit setelah jam selesai ujian (kursi 12, sisa 5 menit)',
       ),
     )
     expect(recoverRoom).not.toHaveBeenCalled()

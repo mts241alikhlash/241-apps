@@ -8,9 +8,10 @@ import { ISessionRecoveryRepository } from '../../../../exam-session/domain/repo
 import { IExamSessionRepository } from '../../../../exam-session/domain/repositories/exam-session.repository.js'
 import { IExamScheduleRepository } from '../../../../exam-schedule/domain/repositories/exam-schedule.repository.js'
 import {
+  MAX_PAST_END_MINUTES,
   assertExtraMinutes,
   assertTotalExtraMinutes,
-  assertWithinPastEnd,
+  pastEndLimit,
   shiftBy,
 } from '../../../../exam-session/application/use-cases/extend-session-time/extend-session-time.use-case.js'
 import { assertRecoveryReason } from '../../../../exam-session/domain/policies/recovery-reason.policy.js'
@@ -41,7 +42,16 @@ export class ExtendRoomTimeUseCase {
       if (schedule === null) {
         throw new ConflictException('Jadwal ujian tidak ditemukan')
       }
-      assertWithinPastEnd(shiftBy(session, added).deadline, schedule.endsAt)
+      const limit = pastEndLimit(schedule.endsAt)
+      if (shiftBy(session, added).deadline > limit) {
+        const left = Math.max(
+          0,
+          Math.floor((limit.getTime() - session.deadline.getTime()) / 60_000),
+        )
+        throw new ConflictException(
+          `Tambahan waktu melewati batas ${MAX_PAST_END_MINUTES} menit setelah jam selesai ujian (kursi ${session.seatNumber ?? '-'}, sisa ${left} menit)`,
+        )
+      }
     }
     return this.recovery.recoverRoom(
       roomId,

@@ -37,9 +37,12 @@ export function assertTotalExtraMinutes(total: number): number {
   return total
 }
 
+export function pastEndLimit(endsAt: Date): Date {
+  return new Date(endsAt.getTime() + MAX_PAST_END_MINUTES * MS_PER_MINUTE)
+}
+
 export function assertWithinPastEnd(deadline: Date, endsAt: Date): void {
-  const limit = endsAt.getTime() + MAX_PAST_END_MINUTES * MS_PER_MINUTE
-  if (deadline.getTime() > limit) {
+  if (deadline.getTime() > pastEndLimit(endsAt).getTime()) {
     throw new ConflictException(
       `Tambahan waktu melewati batas ${MAX_PAST_END_MINUTES} menit setelah jam selesai ujian`,
     )

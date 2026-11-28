@@ -167,6 +167,47 @@ describe('ListMyExamsUseCase', () => {
     expect(list.find((row) => row.id === running.id)?.sessionId).toBe('a')
   })
 
+  it('keeps an extended session that runs past the schedule end open', async () => {
+    const END = new Date('2026-11-02T03:30:00.000Z')
+    const extended = await scheduleExam(fixtures(), { endsAt: END })
+    const submitted = await scheduleExam(fixtures(), { endsAt: END })
+    const untouched = await scheduleExam(fixtures(), { endsAt: END })
+    const at = new Date('2026-11-02T03:35:00.000Z')
+    sessions.sessions.set(
+      'x',
+      sessionFor(extended, {
+        id: 'x',
+        deadline: new Date('2026-11-02T03:40:00.000Z'),
+        finalizeAt: new Date('2026-11-02T03:50:00.000Z'),
+        extraMinutes: 10,
+      }),
+    )
+    sessions.sessions.set(
+      'y',
+      sessionFor(submitted, {
+        id: 'y',
+        status: 'SUBMITTED',
+        submittedAt: new Date('2026-11-02T03:20:00.000Z'),
+      }),
+    )
+
+    const list = await build().execute(STUDENT_USER, at)
+    const row = (id: string) => list.find((item) => item.id === id)
+
+    expect(row(extended.id)).toMatchObject({
+      status: 'IN_PROGRESS',
+      lifecycle: 'OPEN',
+    })
+    expect(row(submitted.id)).toMatchObject({
+      status: 'FINISHED',
+      lifecycle: 'FINISHED',
+    })
+    expect(row(untouched.id)).toMatchObject({
+      status: 'FINISHED',
+      lifecycle: 'FINISHED',
+    })
+  })
+
   it('puts what the student can enter first', async () => {
     const missed = await scheduleExam(fixtures(), {
       startsAt: new Date('2026-11-01T01:00:00.000Z'),
