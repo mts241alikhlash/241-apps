@@ -32,6 +32,7 @@ import type {
   ExamRoomReportAbsence,
   ExamRoomReportDraft,
   ExamRoomFieldNote,
+  ExamRoomFieldNoteWithSlot,
   NewExamRoomFieldNote,
   NewExamRoomReport,
   NewExamRoomReportAbsence,
@@ -188,6 +189,13 @@ export abstract class IExamRoomRepository {
   abstract listFieldNotesByReport(
     reportId: string,
   ): Promise<ExamRoomFieldNote[]>
+  abstract listFieldNotesForSlots(
+    slotIds: string[],
+  ): Promise<ExamRoomFieldNoteWithSlot[]>
+  abstract listSupervisorsAt(
+    roomIds: string[],
+    at: Date,
+  ): Promise<ExamRoomSupervisor[]>
   abstract reopenReport(reportId: string): Promise<ExamRoomReport | null>
   abstract verifyReport(
     reportId: string,

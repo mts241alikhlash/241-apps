@@ -1,22 +1,20 @@
 import { computed, onScopeDispose, ref, type Ref } from 'vue'
 import { examRoomService } from '../services/examRoomService'
 import type {
+  RoomFieldNote,
   RoomMonitorMeta,
   RoomMonitorParticipant,
   RoomOverview,
-  RoomReport,
 } from '../types'
 
-export const ALL_ROOMS_POLL_MS = 10_000
+export const ALL_ROOMS_POLL_MS = 30_000
 const MONITOR_ALL = 100
-
-export const NOTES_POLL_MS = 30_000
 
 export interface LiveNote {
   id: string
   roomId: string
   roomName: string
-  note: RoomReport['fieldNotes'][number]
+  note: RoomFieldNote
 }
 
 export interface LiveRoom {
@@ -42,7 +40,6 @@ export function useAllRoomsMonitor(options: AllRoomsMonitorOptions = {}) {
 
   let pollTimer: ReturnType<typeof setInterval> | null = null
   let clockTimer: ReturnType<typeof setInterval> | null = null
-  let notesTimer: ReturnType<typeof setInterval> | null = null
   let running = false
 
   async function loadRoom(room: RoomOverview): Promise<LiveRoom> {
@@ -80,58 +77,61 @@ export function useAllRoomsMonitor(options: AllRoomsMonitorOptions = {}) {
         left.room.code.localeCompare(right.room.code, 'id', { numeric: true }),
       )
       lastUpdatedAt.value = Date.now()
+      await refreshNotes()
     } finally {
       loading.value = false
       running = false
     }
   }
 
-  async function notesOf(room: RoomOverview): Promise<LiveNote[]> {
-    let targetSlotId = options.slotByRoomTarget?.value.get(room.id)
-    if (!targetSlotId) {
-      const slots = await examRoomService.loadSupervisors(room.id)
-      const now = Date.now()
-      const current = slots.find(
-        (slot) =>
-          Date.parse(slot.startsAt) <= now && Date.parse(slot.endsAt) > now,
-      )
-      targetSlotId = current?.slotId
+  async function refreshNotes() {
+    const targets = options.slotByRoomTarget?.value
+    const targeted = rooms.value.flatMap((live) => {
+      const target = targets?.get(live.room.id)
+      return target === undefined ? [] : [target]
+    })
+    const slotIds =
+      targets !== undefined && targeted.length === rooms.value.length
+        ? targeted
+        : undefined
+    for (const live of rooms.value) {
+      const target = targets?.get(live.room.id)
+      if (target) slotByRoom.value.set(live.room.id, target)
     }
-    if (!targetSlotId) return []
-    slotByRoom.value.set(room.id, targetSlotId)
-    const report = await examRoomService.loadReport(room.id, targetSlotId)
-    if (!report.success) return []
-    return report.data.fieldNotes.map((note) => ({
-      id: `${room.id}-${note.id}`,
-      roomId: room.id,
-      roomName: room.name,
-      note,
+    const result = await examRoomService.loadFieldNotes(slotIds)
+    if (!result.success) return
+    notes.value = result.data.map((row) => ({
+      id: `${row.roomId}-${row.id}`,
+      roomId: row.roomId,
+      roomName: row.roomName,
+      note: row,
     }))
   }
 
-  async function refreshNotes() {
-    const loaded = await Promise.all(
-      rooms.value.map((live) => notesOf(live.room)),
-    )
-    notes.value = loaded.flat()
+  function poll() {
+    if (running || document.visibilityState === 'hidden') return
+    void refresh()
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible') void refresh()
   }
 
   function start() {
     stop()
     loading.value = true
-    void refresh().then(refreshNotes)
-    notesTimer = setInterval(() => void refreshNotes(), NOTES_POLL_MS)
-    pollTimer = setInterval(() => void refresh(), ALL_ROOMS_POLL_MS)
+    void refresh()
+    pollTimer = setInterval(poll, ALL_ROOMS_POLL_MS)
     clockTimer = setInterval(() => {
       nowMs.value = Date.now()
     }, 1000)
+    document.addEventListener('visibilitychange', onVisibilityChange)
   }
 
   function stop() {
     if (pollTimer !== null) clearInterval(pollTimer)
     if (clockTimer !== null) clearInterval(clockTimer)
-    if (notesTimer !== null) clearInterval(notesTimer)
-    notesTimer = null
+    document.removeEventListener('visibilitychange', onVisibilityChange)
     pollTimer = null
     clockTimer = null
   }

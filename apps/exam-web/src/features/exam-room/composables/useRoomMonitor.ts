@@ -6,7 +6,7 @@ import type {
   RoomMonitorParticipant,
 } from '../types'
 
-export const POLL_INTERVAL_MS = 5000
+export const POLL_INTERVAL_MS = 10_000
 export const STALE_WARNING_SECONDS = 15
 export const STALE_DANGER_SECONDS = 45
 export const MONITOR_DEFAULT_LIMIT = 25
@@ -110,15 +110,26 @@ export function useRoomMonitor(options: RoomMonitorOptions) {
     clockTimer = setInterval(tick, 1000)
   }
 
+  function poll() {
+    if (inFlight || document.visibilityState === 'hidden') return
+    void refresh()
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible') void refresh()
+  }
+
   function start() {
     stop()
     ensureClock()
-    pollTimer = setInterval(() => void refresh(), POLL_INTERVAL_MS)
+    pollTimer = setInterval(poll, POLL_INTERVAL_MS)
+    document.addEventListener('visibilitychange', onVisibilityChange)
   }
 
   function stop() {
     clearInterval(pollTimer ?? undefined)
     clearInterval(clockTimer ?? undefined)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
     pollTimer = null
     clockTimer = null
   }

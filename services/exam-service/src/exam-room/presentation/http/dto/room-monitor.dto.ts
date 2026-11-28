@@ -1,6 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
   IsIn,
   IsInt,
@@ -26,6 +28,7 @@ import type {
   RoomMonitorSession,
 } from '../../../application/use-cases/get-room-monitor/get-room-monitor.use-case.js'
 import type { RoomOverviewRow } from '../../../application/use-cases/list-rooms-overview/list-rooms-overview.use-case.js'
+import type { RoomFieldNoteRow } from '../../../application/use-cases/list-field-notes/list-field-notes.use-case.js'
 import type { RoomReportSummary } from '../../../application/use-cases/list-room-reports/list-room-reports.use-case.js'
 import type {
   ReportAbsenceRow,
@@ -273,11 +276,48 @@ export class RoomOverviewQueryDto {
   eventId?: string
 }
 
+export class RoomFieldNotesQueryDto {
+  @ApiPropertyOptional({
+    type: [String],
+    description:
+      'Comma-separated supervisor slot ids. Omitted: the slot each room is on now.',
+  })
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.split(',').filter(Boolean) : value,
+  )
+  @IsArray()
+  @ArrayMaxSize(100)
+  @IsUUID('all', { each: true })
+  slotIds?: string[]
+}
+
 export class RoomReportListQueryDto {
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()
   eventId?: string
+}
+
+export class RoomFieldNoteDto {
+  @ApiProperty({ format: 'uuid' }) id!: string
+  @ApiProperty({ format: 'uuid' }) roomId!: string
+  @ApiProperty() roomName!: string
+  @ApiProperty({ format: 'uuid' }) slotId!: string
+  @ApiProperty({ format: 'uuid' }) studentId!: string
+  @ApiProperty({ type: String, nullable: true }) studentName!: string | null
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  sessionId!: string | null
+  @ApiProperty() category!: string
+  @ApiProperty() note!: string
+  @ApiProperty({ format: 'date-time' }) recordedAt!: string
+
+  static fromDomain(domain: RoomFieldNoteRow): RoomFieldNoteDto {
+    return Object.assign(new RoomFieldNoteDto(), {
+      ...domain,
+      recordedAt: domain.recordedAt.toISOString(),
+    })
+  }
 }
 
 export class RoomOverviewDto {

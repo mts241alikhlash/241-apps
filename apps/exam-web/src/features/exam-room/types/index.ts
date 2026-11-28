@@ -66,6 +66,8 @@ export type RoomReport = Schemas['RoomReportDto']
 
 export type RoomReportSummary = Schemas['RoomReportSummaryDto']
 
+export type RoomFieldNote = Schemas['RoomFieldNoteDto']
+
 export type RoomReportPayload = Schemas['UpdateRoomReportDto']
 
 export type RoomAbsencePayload = Schemas['RecordRoomAbsenceDto']

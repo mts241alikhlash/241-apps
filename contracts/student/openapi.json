@@ -413,7 +413,7 @@
     },
     "/student-enrollments/active/{studentId}": {
       "get": {
-        "description": "With `semesterId`, the active enrollment in that term rather than whichever one is current.",
+        "description": "With `semesterId`, the active enrollment in that term rather than whichever one is current. Student name and gender are not resolved here (null); resolve them from identity-service.",
         "operationId": "EnrollmentInternalController_active",
         "parameters": [
           {

@@ -680,6 +680,38 @@ export class FakeExamRoomRepository extends IExamRoomRepository {
     )
   }
 
+  listFieldNotesForSlots(slotIds: string[]) {
+    return Promise.resolve(
+      this.fieldNotes.flatMap((row) => {
+        const report = this.reports.get(row.reportId)
+        if (
+          report === undefined ||
+          !slotIds.includes(report.supervisorSlotId)
+        ) {
+          return []
+        }
+        return [
+          {
+            ...row,
+            roomId: report.roomId,
+            supervisorSlotId: report.supervisorSlotId,
+          },
+        ]
+      }),
+    )
+  }
+
+  listSupervisorsAt(roomIds: string[], at: Date) {
+    return Promise.resolve(
+      [...this.supervisors.values()].filter(
+        (row) =>
+          roomIds.includes(row.roomId) &&
+          row.startsAt.getTime() <= at.getTime() &&
+          row.endsAt.getTime() > at.getTime(),
+      ),
+    )
+  }
+
   listFieldNotesByReport(reportId: string) {
     return Promise.resolve(
       this.fieldNotes

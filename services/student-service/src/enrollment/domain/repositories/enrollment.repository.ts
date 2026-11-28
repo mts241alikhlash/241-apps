@@ -45,6 +45,10 @@ export abstract class IEnrollmentRepository {
     semesterId?: string,
     excludeId?: string,
   ): Promise<EnrollmentWithDetails | null>
+  abstract findActiveRow(
+    studentId: string,
+    semesterId?: string,
+  ): Promise<EnrollmentWithDetails | null>
   abstract create(
     input: CreateEnrollmentRepositoryInput,
   ): Promise<EnrollmentWithDetails>

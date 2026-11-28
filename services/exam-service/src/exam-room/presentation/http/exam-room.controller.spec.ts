@@ -165,6 +165,12 @@ const overviewAnyRoutes: Record<string, string[]> = {
     'exam-rooms.read-all',
     'exam-rooms.manage-all',
   ],
+  listFieldNotes: [
+    'exam-rooms.supervise',
+    'exam-rooms.technician',
+    'exam-rooms.read-all',
+    'exam-rooms.manage-all',
+  ],
 }
 
 const eventRoutes: Record<string, string[]> = {

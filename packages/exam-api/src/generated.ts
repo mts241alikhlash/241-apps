@@ -1158,6 +1158,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exam-rooms/field-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Field notes of every room the caller may see, for each room's current slot or the given slots */
+        get: operations["ExamRoomOverviewController_listFieldNotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/exam-rooms/overview": {
         parameters: {
             query?: never;
@@ -3089,6 +3106,24 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
             rotation: number;
+        };
+        RoomFieldNoteDto: {
+            category: string;
+            /** Format: uuid */
+            id: string;
+            note: string;
+            /** Format: date-time */
+            recordedAt: string;
+            /** Format: uuid */
+            roomId: string;
+            roomName: string;
+            /** Format: uuid */
+            sessionId: string | null;
+            /** Format: uuid */
+            slotId: string;
+            /** Format: uuid */
+            studentId: string;
+            studentName: string | null;
         };
         RoomMonitorAbsenceDto: {
             note: string | null;
@@ -6087,6 +6122,34 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: components["schemas"]["SupervisorSlotDto"];
+                        /** @example Success */
+                        message?: string;
+                        /** @example 200 */
+                        statusCode?: number;
+                    };
+                };
+            };
+        };
+    };
+    ExamRoomOverviewController_listFieldNotes: {
+        parameters: {
+            query?: {
+                /** @description Comma-separated supervisor slot ids. Omitted: the slot each room is on now. */
+                slotIds?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["RoomFieldNoteDto"][];
                         /** @example Success */
                         message?: string;
                         /** @example 200 */
