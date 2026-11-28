@@ -8,7 +8,10 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../../generated/prisma/client.js'
-import { pgSslOptions } from '@mts241alikhlash/nest-core/database'
+import {
+  pgPoolOptions,
+  pgSslOptions,
+} from '@mts241alikhlash/nest-core/database'
 
 @Injectable()
 export class PrismaService
@@ -25,6 +28,7 @@ export class PrismaService
     const adapter = new PrismaPg({
       connectionString,
       ...pgSslOptions(connectionString),
+      ...pgPoolOptions(8, (key) => configService.get(key)),
     })
     super({ adapter })
   }
