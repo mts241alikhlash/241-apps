@@ -87,4 +87,20 @@ describe('MyExamsCacheService', () => {
     await cache.load('u0', produce)
     expect(produce).toHaveBeenCalledTimes(1)
   })
+
+  it('drops an expired entry when it is read', async () => {
+    const cache = new MyExamsCacheService()
+    await cache.load('u1', () => Promise.resolve(exams('a')))
+    const entries = (cache as unknown as { done: Map<string, unknown> }).done
+
+    vi.advanceTimersByTime(MY_EXAMS_CACHE_MS)
+    await cache.load('u1', () => Promise.resolve(exams('b')))
+
+    expect((entries.get('u1') as { value: MyExam[] }).value[0].id).toBe('b')
+    vi.advanceTimersByTime(MY_EXAMS_CACHE_MS)
+    const produce = vi.fn(() => Promise.resolve(exams('c')))
+    await cache.load('u1', produce)
+    expect(produce).toHaveBeenCalledTimes(1)
+    expect((entries.get('u1') as { value: MyExam[] }).value[0].id).toBe('c')
+  })
 })

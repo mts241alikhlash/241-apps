@@ -48,6 +48,7 @@ const codes = new AccessCodeService(
   'unit-test-secret-of-at-least-32-characters',
 )
 
+import { MyExamsCacheService } from '../../my-exams-cache.service.js'
 describe('ReleaseSessionUseCase', () => {
   async function setup() {
     const packages = new FakeExamPackageRepository()
@@ -69,6 +70,7 @@ describe('ReleaseSessionUseCase', () => {
         sessions,
         new FakeSessionRecoveryRepository(sessions, rooms, packages),
         new RoomAccessService(rooms),
+        new MyExamsCacheService(),
       ),
     }
   }

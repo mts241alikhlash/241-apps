@@ -318,14 +318,18 @@ export class SessionExamController {
     @Param('sessionId', ParseUUIDPipe) sessionId: string,
     @Body() body: SubmitSessionRequestDto,
   ): Promise<SubmitSessionResponseDto> {
-    const result = await this.submitSession.execute(
-      { id: user.id, deviceId },
-      sessionId,
-      body ?? {},
-      new Date(),
-    )
-    this.myExamsCache.invalidate(user.id)
-    return SubmitSessionResponseDto.fromDomain(result)
+    try {
+      return SubmitSessionResponseDto.fromDomain(
+        await this.submitSession.execute(
+          { id: user.id, deviceId },
+          sessionId,
+          body ?? {},
+          new Date(),
+        ),
+      )
+    } finally {
+      this.myExamsCache.invalidate(user.id)
+    }
   }
 
   @Get('files/:fileId')

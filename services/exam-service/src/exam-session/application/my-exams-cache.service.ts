@@ -16,8 +16,9 @@ export class MyExamsCacheService {
 
   load(userId: string, produce: () => Promise<MyExam[]>): Promise<MyExam[]> {
     const entry = this.done.get(userId)
-    if (entry !== undefined && entry.expiresAt > Date.now()) {
-      return Promise.resolve(entry.value)
+    if (entry !== undefined) {
+      if (entry.expiresAt > Date.now()) return Promise.resolve(entry.value)
+      this.done.delete(userId)
     }
     const inFlight = this.running.get(userId)
     if (inFlight !== undefined) return inFlight

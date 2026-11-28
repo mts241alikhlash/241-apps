@@ -23,6 +23,7 @@ import type { ExamSession } from '../domain/entities/exam-session.entity.js'
 import { FakeExamSessionRepository } from './exam-session.repository.fake.js'
 import { FakeSessionRecoveryRepository } from './session-recovery.repository.fake.js'
 import { SeatFlagService } from './seat-flag.service.js'
+import { MyExamsCacheService } from './my-exams-cache.service.js'
 import { SessionRecoveryService } from './session-recovery.service.js'
 import {
   NOW,
@@ -226,6 +227,7 @@ describe('reopen', () => {
     const reopened = await new ReopenSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(ADMIN, session.id, 'Salah tekan tombol kumpul', NOW)
 
     expect(reopened).toMatchObject({
@@ -279,6 +281,7 @@ describe('reopen', () => {
     const reopened = await new ReopenSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(ADMIN, session.id, 'Salah tekan tombol kumpul', NOW)
 
     expect(reopened.status).toBe('IN_PROGRESS')
@@ -300,6 +303,7 @@ describe('reopen', () => {
     const reopened = await new ReopenSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(ADMIN, session.id, 'Buka blokir pelanggaran', NOW)
 
     expect(reopened.lockedByViolation).toBe(false)
@@ -312,12 +316,11 @@ describe('reopen', () => {
     const session = seed(f.sessions, f.schedule.id)
 
     await expect(
-      new ReopenSessionUseCase(f.recovery, f.schedules).execute(
-        ADMIN,
-        session.id,
-        'Coba buka sesi',
-        NOW,
-      ),
+      new ReopenSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(ADMIN, session.id, 'Coba buka sesi', NOW),
     ).rejects.toThrow(ConflictException)
   })
 
@@ -326,7 +329,11 @@ describe('reopen', () => {
     const session = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
 
     await expect(
-      new ReopenSessionUseCase(f.recovery, f.schedules).execute(
+      new ReopenSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(
         ADMIN,
         session.id,
         'Salah tekan kumpul',
@@ -337,6 +344,22 @@ describe('reopen', () => {
 })
 
 describe('reset', () => {
+  it('drops the cached exam list of that student', async () => {
+    const f = await setup()
+    const session = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
+    const cache = new MyExamsCacheService()
+    const invalidate = vi.spyOn(cache, 'invalidate')
+
+    await new ResetSessionUseCase(f.recovery, f.schedules, cache).execute(
+      ADMIN,
+      session.id,
+      'Ulangi dari awal',
+      NOW,
+    )
+
+    expect(invalidate).toHaveBeenCalledWith(session.userId)
+  })
+
   it('wipes the answers and restarts with a new seed', async () => {
     const f = await setup()
     const session = seed(f.sessions, f.schedule.id, {
@@ -350,6 +373,7 @@ describe('reset', () => {
     const cleared = await new ResetSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(ADMIN, session.id, 'Ulangi dari awal', NOW)
 
     expect(cleared.status).toBe('IN_PROGRESS')
@@ -374,6 +398,7 @@ describe('extend time', () => {
     const extended = await new ExtendSessionTimeUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(ADMIN, session.id, 15, 'Server lambat')
 
     expect(extended.extraMinutes).toBe(15)
@@ -386,27 +411,29 @@ describe('extend time', () => {
     const session = seed(f.sessions, f.schedule.id, { extraMinutes: 150 })
 
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
-        ADMIN,
-        session.id,
-        60,
-        'Server lambat',
-      ),
+      new ExtendSessionTimeUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(ADMIN, session.id, 60, 'Server lambat'),
     ).rejects.toThrow(BadRequestException)
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
-        ADMIN,
-        session.id,
-        30,
-        'Server lambat',
-      ),
+      new ExtendSessionTimeUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(ADMIN, session.id, 30, 'Server lambat'),
     ).resolves.toMatchObject({ extraMinutes: 180 })
   })
 
   it('refuses a finished session and out-of-range minutes', async () => {
     const f = await setup()
     const done = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
-    const extend = new ExtendSessionTimeUseCase(f.recovery, f.schedules)
+    const extend = new ExtendSessionTimeUseCase(
+      f.recovery,
+      f.schedules,
+      new MyExamsCacheService(),
+    )
 
     await expect(
       extend.execute(ADMIN, done.id, 10, 'Server lambat'),
@@ -429,28 +456,25 @@ describe('authorization matrix', () => {
     })
 
     await expect(
-      new ReopenSessionUseCase(f.recovery, f.schedules).execute(
-        TECH_A,
-        session.id,
-        'Salah tekan kumpul',
-        NOW,
-      ),
+      new ReopenSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(TECH_A, session.id, 'Salah tekan kumpul', NOW),
     ).rejects.toThrow(ForbiddenException)
     await expect(
-      new ResetSessionUseCase(f.recovery, f.schedules).execute(
-        TECH_A,
-        session.id,
-        'Ulangi dari awal',
-        NOW,
-      ),
+      new ResetSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(TECH_A, session.id, 'Ulangi dari awal', NOW),
     ).rejects.toThrow(ForbiddenException)
     await expect(
-      new ExtendSessionTimeUseCase(f.recovery, f.schedules).execute(
-        TECH_A,
-        session.id,
-        10,
-        'Server lambat',
-      ),
+      new ExtendSessionTimeUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(TECH_A, session.id, 10, 'Server lambat'),
     ).rejects.toThrow(ForbiddenException)
     expect(await f.rooms.listAuditLogs(session.id)).toEqual([])
     expect(f.sessions.sessions.get(session.id)?.status).toBe('SUBMITTED')
@@ -464,20 +488,18 @@ describe('authorization matrix', () => {
     })
 
     await expect(
-      new ReopenSessionUseCase(f.recovery, f.schedules).execute(
-        SUP_A,
-        session.id,
-        'Salah tekan kumpul',
-        NOW,
-      ),
+      new ReopenSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(SUP_A, session.id, 'Salah tekan kumpul', NOW),
     ).rejects.toThrow(ForbiddenException)
     await expect(
-      new ResetSessionUseCase(f.recovery, f.schedules).execute(
-        SUP_A,
-        session.id,
-        'Ulangi dari awal',
-        NOW,
-      ),
+      new ResetSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(SUP_A, session.id, 'Ulangi dari awal', NOW),
     ).rejects.toThrow(ForbiddenException)
     expect(await f.rooms.listAuditLogs(session.id)).toEqual([])
   })
@@ -492,6 +514,7 @@ describe('authorization matrix', () => {
     const reopened = await new ReopenSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(TECH_A, session.id, 'Salah tekan kumpul', NOW)
 
     expect(reopened.status).toBe('IN_PROGRESS')
@@ -502,12 +525,11 @@ describe('authorization matrix', () => {
     const session = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
 
     await expect(
-      new ReopenSessionUseCase(f.recovery, f.schedules).execute(
-        TECH_A,
-        session.id,
-        'Salah tekan kumpul',
-        NOW,
-      ),
+      new ReopenSessionUseCase(
+        f.recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(TECH_A, session.id, 'Salah tekan kumpul', NOW),
     ).rejects.toThrow(ForbiddenException)
   })
 })
@@ -516,7 +538,11 @@ describe('reason validation', () => {
   it('refuses a reason shorter than five characters and leaves the session alone', async () => {
     const f = await setup()
     const session = seed(f.sessions, f.schedule.id, { status: 'SUBMITTED' })
-    const reopen = new ReopenSessionUseCase(f.recovery, f.schedules)
+    const reopen = new ReopenSessionUseCase(
+      f.recovery,
+      f.schedules,
+      new MyExamsCacheService(),
+    )
 
     await expect(reopen.execute(ADMIN, session.id, 'hm', NOW)).rejects.toThrow(
       BadRequestException,
@@ -542,12 +568,11 @@ describe('audit transaction guarantee', () => {
     const recovery = new SessionRecoveryService(f.sessions, failing, f.access)
 
     await expect(
-      new ReopenSessionUseCase(recovery, f.schedules).execute(
-        ADMIN,
-        session.id,
-        'Salah tekan kumpul',
-        NOW,
-      ),
+      new ReopenSessionUseCase(
+        recovery,
+        f.schedules,
+        new MyExamsCacheService(),
+      ).execute(ADMIN, session.id, 'Salah tekan kumpul', NOW),
     ).rejects.toThrow(ConflictException)
     expect(await f.rooms.listAuditLogs(session.id)).toEqual([])
     expect(f.sessions.sessions.get(session.id)?.status).toBe('SUBMITTED')
@@ -578,6 +603,7 @@ describe('allow late', () => {
       f.rooms,
       new FakeSessionRecoveryRepository(f.sessions, f.rooms, f.packages),
       f.access,
+      new MyExamsCacheService(),
     )
     const allowLate = new AllowLateEntryUseCase(flags)
 
@@ -640,6 +666,7 @@ describe('allow flags before the session starts', () => {
       f.rooms,
       new FakeSessionRecoveryRepository(f.sessions, f.rooms, f.packages),
       f.access,
+      new MyExamsCacheService(),
     )
   }
 
@@ -1601,6 +1628,7 @@ describe('seated sessions in production', () => {
     const reopened = await new ReopenSessionUseCase(
       f.recovery,
       f.schedules,
+      new MyExamsCacheService(),
     ).execute(TECH_A, stored.id, 'Salah tekan tombol kumpul', NOW)
     expect(reopened.status).toBe('IN_PROGRESS')
 

@@ -61,11 +61,15 @@ export class StudentExamController {
     @Param('scheduleId', ParseUUIDPipe) scheduleId: string,
     @Body() dto: StartSessionDto,
   ): Promise<StartedSessionDto> {
-    const started = await this.startSession.execute(user, scheduleId, {
-      ...dto,
-      platform,
-    })
-    this.myExamsCache.invalidate(user.id)
-    return StartedSessionDto.fromDomain(started)
+    try {
+      return StartedSessionDto.fromDomain(
+        await this.startSession.execute(user, scheduleId, {
+          ...dto,
+          platform,
+        }),
+      )
+    } finally {
+      this.myExamsCache.invalidate(user.id)
+    }
   }
 }

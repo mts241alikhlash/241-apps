@@ -3,6 +3,7 @@ import { IExamScheduleRepository } from '../../../../exam-schedule/domain/reposi
 import type { RoomStaffUser } from '../../../../exam-room/application/room-access.service.js'
 import type { ExamSession } from '../../../domain/entities/exam-session.entity.js'
 import { SessionRecoveryService } from '../../session-recovery.service.js'
+import { MyExamsCacheService } from '../../my-exams-cache.service.js'
 
 const MS_PER_MINUTE = 60_000
 
@@ -11,6 +12,7 @@ export class ReopenSessionUseCase {
   constructor(
     private readonly recovery: SessionRecoveryService,
     private readonly schedules: IExamScheduleRepository,
+    private readonly myExams: MyExamsCacheService,
   ) {}
 
   async execute(
@@ -26,7 +28,7 @@ export class ReopenSessionUseCase {
     }
     if (closed) await this.assertWithinWindow(session, now)
 
-    return this.recovery.apply(
+    const updated = this.recovery.apply(
       user,
       sessionId,
       'REOPEN_SESSION',
@@ -44,6 +46,8 @@ export class ReopenSessionUseCase {
       { clearAnswerScores: true, deletePublication: true },
       { from: session.status, lockedByViolation: session.lockedByViolation },
     )
+    this.myExams.invalidate(session.userId)
+    return updated
   }
 
   private async assertWithinWindow(
